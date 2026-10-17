@@ -114,7 +114,7 @@ Feuille de route de développement, à suivre dans l'ordre. Les règles de trava
 - [x] **4.5 Mini-fenêtre** (`Features/MiniWindow/`, l'équivalent de Little Arc). `NSPanel` flottant d'environ 520 × 680 pt, barre minimale : domaine, « Ouvrir dans le Space », fermer. Raccourci global réglable avec KeyboardShortcuts (défaut ⌥⌘N). Les liens venus d'autres apps y arriveront en phase 8.
 - [x] **4.6 Copier l'URL** avec ⌘⇧C et une petite confirmation « URL copiée ».
 - **4.7 Boosts** : reportée, voir `FEATURES.md`.
-- [ ] **4.8 Raccourcis supplémentaires.** ⌘1 à ⌘8 pour les premiers favoris puis épinglés, ⌘9 pour le dernier onglet ; ⌃Tab et ⌃⇧Tab pour l'onglet suivant et précédent dans l'ordre de la barre.
+- [x] **4.8 Raccourcis supplémentaires.** ⌘1 à ⌘8 pour les premiers favoris puis épinglés, ⌘9 pour le dernier onglet ; ⌃Tab et ⌃⇧Tab pour l'onglet suivant et précédent dans l'ordre de la barre.
 
 **Fini quand [À VOIR]** tu passes une journée entière sans ouvrir Arc.
 

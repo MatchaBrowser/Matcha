@@ -140,3 +140,16 @@ Ou ⌘R dans Xcode.
 - [ ] Pendant que la capsule est visible, clique ou fais défiler la page juste dessous : le clic atteint la page, le clavier reste où il était (un champ de la page garde la saisie).
 - [ ] Aspect en clair, en sombre et dans une fenêtre privée (⇧⌘N) : capsule floutée, lisible, discrète ; avec la barre d'adresse au-dessus de la page (Réglages > Apparence), elle reste en bas et ne gêne rien.
 - [ ] Facultatif, VoiceOver (⌘F5) : chaque copie annonce « URL copiée ».
+
+### 4.8 Raccourcis supplémentaires
+
+- [ ] Prépare deux favoris, trois épinglés (dont un dans un dossier déplié) et quelques onglets du jour. ⌘1 et ⌘2 affichent les favoris, ⌘3 à ⌘5 les épinglés dans l'ordre de la barre, du haut vers le bas. Un épinglé déchargé se recharge sur son adresse d'origine. ⌘ suivi d'un chiffre sans favori ni épinglé à ce rang ne fait rien (même s'il reste des onglets du jour).
+- [ ] ⌘9 affiche le dernier onglet du jour ; sans onglet du jour (« Effacer »), le dernier épinglé.
+- [ ] ⌃⇥ passe à l'onglet suivant dans l'ordre de la barre : favoris, épinglés, onglets du jour, puis retour au premier favori. ⌃⇧⇥ fait le chemin inverse, et du premier favori revient au dernier onglet du jour. Garde ⌃ enfoncé et appuie plusieurs fois sur ⇥ : chaque appui avance d'un onglet, sans saut ni clignotement.
+- [ ] Replie le dossier : ⌘3… ne comptent plus ses onglets et ⌃⇥ les saute. Déplie-le : ils reviennent.
+- [ ] Split de deux pages : ⌃⇥ va d'un panneau à l'autre (la bordure du panneau actif et la pastille d'adresse suivent), puis à la ligne suivante. Un split épinglé numéroté par ⌘ revient sur le panneau que tu avais quitté.
+- [ ] Le clavier suit : après ⌃⇥ ou ⌘2, les flèches font défiler la nouvelle page ; dans un champ de la page (recherche, formulaire), ⌃⇥ change quand même d'onglet. Le nom d'un dossier en cours de saisie est validé.
+- [ ] Barre de commande ouverte (⌘T ou ⌘L) : ⌘1 ou ⌃⇥ la ferment et affichent l'onglet. Aperçu ouvert (Maj+clic) : ⌃⇥ le ferme et passe à l'onglet suivant ; le raccourci ⌘ de l'onglet affiché ferme l'aperçu et rend le clavier à la page.
+- [ ] Menu Onglets (après Spaces) : « Afficher l'onglet suivant » (⌃⇥), « Afficher l'onglet précédent » (⌃⇧⇥), puis les favoris et épinglés numérotés sous leur titre (⌘1…⌘8, un split sous les titres de ses panneaux), puis « Afficher le dernier onglet » (⌘9). Les titres suivent les changements (nouveau favori, onglet renommé par sa page). Sans onglet, tout est grisé.
+- [ ] Mini-fenêtre active, puis fenêtre des Réglages : ⌃⇥, ⌘1 et ⌘9 ne changent rien dans la fenêtre de navigation ; le menu Onglets est grisé. Dans une fenêtre privée, ils parcourent ses propres onglets. ⌃1 et ⌃2 changent toujours de Space.
+- [ ] Sur un site qui utilise ⌃⇥ ou ⌘1 pour lui-même (éditeur en ligne, Google Docs…), le site garde la main, comme dans Safari ; sinon, dis-le-moi.

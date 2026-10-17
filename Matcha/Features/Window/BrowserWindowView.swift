@@ -205,7 +205,16 @@ struct BrowserWindowView: View {
             currentSpaceIndex: model.spaceIndex,
             selectSpace: { index in withAnimation(.easeInOut(duration: 0.3)) { model.selectSpace(at: index) } },
             newSpace: { withAnimation(.easeInOut(duration: 0.3)) { model.newSpace() } },
+            showTab: showTab,
         )
+    }
+
+    /// ⌘1 à ⌘9, ⌃⇥ et ⌃⇧⇥ : comme un clic dans la barre, qui ferme la barre de commande et l'aperçu (même
+    /// sur l'onglet déjà affiché).
+    private func showTab(_ tab: BrowserTab) {
+        commandBar.dismiss()
+        tabManager.closePeek()
+        TabActivation.activate(tab, in: tabManager)
     }
 
     /// ⌘T et « Nouvel onglet » : la barre de commande, ou un onglet sur la page d'accueil.

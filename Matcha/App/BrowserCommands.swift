@@ -145,6 +145,9 @@ struct BrowserCommands: Commands {
             }
         }
 
+        // Menu Onglets : juste après Spaces.
+        TabCommands(miniWindows: miniWindows)
+
         CommandMenu("History") {
             Button("Homepage") { windowActions?.goHome?() }
                 .keyboardShortcut("h", modifiers: [.command, .shift])

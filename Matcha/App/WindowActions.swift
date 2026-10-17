@@ -21,4 +21,7 @@ struct WindowActions {
     let currentSpaceIndex: Int
     let selectSpace: (Int) -> Void
     let newSpace: () -> Void
+    /// Affiche un onglet de la fenêtre comme un clic sur sa ligne (⌘1 à ⌘9, ⌃⇥) : la barre de commande et
+    /// l'aperçu se ferment, la page prend le clavier.
+    let showTab: (BrowserTab) -> Void
 }

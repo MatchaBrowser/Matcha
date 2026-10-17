@@ -15,6 +15,9 @@ protocol SidebarItemDropTarget: AnyObject {
 
 /// Vue web des onglets de Matcha.
 ///
+/// ⌃⇥ et ⌃⇧⇥ changent d'onglet, comme dans Safari : le menu de l'app passe avant WebKit, qui s'en servirait
+/// pour déplacer le focus dans la page.
+///
 /// Un élément glissé depuis la barre n'atteint jamais la page : le glisser de SwiftUI porte aussi des promesses
 /// de fichier, pour lesquelles WebKit est inscrit, si bien que la page recevrait tout glisser qui la survole.
 /// Ceux qui portent le type privé de la barre vont à `sidebarDropTarget`, ou sont refusés.
@@ -74,6 +77,22 @@ final class BrowserWebView: WKWebView {
             return
         }
         sidebarDropTarget?.sidebarItemDragExited()
+    }
+
+    override func performKeyEquivalent(with event: NSEvent) -> Bool {
+        if Self.isTabSwitch(event), NSApp.mainMenu?.performKeyEquivalent(with: event) == true {
+            return true
+        }
+        return super.performKeyEquivalent(with: event)
+    }
+
+    /// ⌃⇥ ou ⌃⇧⇥, sans ⌘ ni ⌥.
+    private static func isTabSwitch(_ event: NSEvent) -> Bool {
+        let flags = event.modifierFlags.intersection(.deviceIndependentFlagsMask)
+        return event.type == .keyDown
+            && (event.specialKey == .tab || event.specialKey == .backTab)
+            && flags.contains(.control)
+            && flags.isDisjoint(with: [.command, .option])
     }
 
     /// Le glisser porte-t-il un élément de la barre ? Seuls les types sont lus, jamais les données.
