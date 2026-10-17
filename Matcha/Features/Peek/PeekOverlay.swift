@@ -69,22 +69,26 @@ struct PeekOverlay: View {
     }
 
     private func panel(_ webView: WKWebView, of peek: Peek, layout: PeekLayout, area: CGSize) -> some View {
-        PeekWebHost(webView: webView) { PeekActions.close(in: tabManager) }
-            .background(.background)
-            .clipShape(.rect(cornerRadius: BrowserWindowView.cardCornerRadius))
-            .overlay {
-                RoundedRectangle(cornerRadius: BrowserWindowView.cardCornerRadius)
-                    .strokeBorder(Color.primary.opacity(0.12), lineWidth: 1)
-                    .allowsHitTesting(false)
-            }
-            .shadow(color: .black.opacity(0.35), radius: 30, y: 12)
-            .frame(width: layout.pane.width, height: layout.pane.height)
-            .position(x: layout.pane.midX, y: layout.pane.midY)
-            // Toute la zone : le point d'ancrage de l'agrandissement s'y rapporte.
-            .frame(width: area.width, height: area.height)
-            // Un nouvel aperçu = un nouveau conteneur (la vue web n'y est ajoutée qu'à la création).
-            .id(peek.id)
-            .transition(.asymmetric(insertion: insertion(from: peek.openingPoint), removal: .identity))
+        VStack(spacing: 0) {
+            // Demandes de permission de la page de l'aperçu (tâche 5.2).
+            PermissionBanner(prompts: peek.tab.permissionPrompts)
+            PeekWebHost(webView: webView) { PeekActions.close(in: tabManager) }
+        }
+        .background(.background)
+        .clipShape(.rect(cornerRadius: BrowserWindowView.cardCornerRadius))
+        .overlay {
+            RoundedRectangle(cornerRadius: BrowserWindowView.cardCornerRadius)
+                .strokeBorder(Color.primary.opacity(0.12), lineWidth: 1)
+                .allowsHitTesting(false)
+        }
+        .shadow(color: .black.opacity(0.35), radius: 30, y: 12)
+        .frame(width: layout.pane.width, height: layout.pane.height)
+        .position(x: layout.pane.midX, y: layout.pane.midY)
+        // Toute la zone : le point d'ancrage de l'agrandissement s'y rapporte.
+        .frame(width: area.width, height: area.height)
+        // Un nouvel aperçu = un nouveau conteneur (la vue web n'y est ajoutée qu'à la création).
+        .id(peek.id)
+        .transition(.asymmetric(insertion: insertion(from: peek.openingPoint), removal: .identity))
     }
 
     private func insertion(from point: CGPoint) -> AnyTransition {

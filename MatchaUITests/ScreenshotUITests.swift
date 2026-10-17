@@ -39,7 +39,13 @@ import XCTest
 ///   Sans réseau : `MATCHA_SCREENSHOT_MINI=about:blank?mini` ;
 /// - `MATCHA_SCREENSHOT_DOWNLOADS` : chemin d'un fichier local que WebKit n'affiche pas (« 1 » : celui des tests
 ///   des téléchargements), téléchargé dans ~/Downloads/MatchaUITests, effacé à la fin : `24-telechargement-bouton`
-///   (bouton du pied de la barre), `25-telechargements-liste` (liste ouverte).
+///   (bouton du pied de la barre), `25-telechargements-liste` (liste ouverte) ;
+/// - `MATCHA_SCREENSHOT_SITE_SETTINGS` : panneau des réglages du site de l'onglet affiché (`26-reglages-site`), puis la
+///   confirmation de l'effacement de ses données (`27-reglages-site-effacer`) ; sans `MATCHA_SCREENSHOT_URLS`, ouvre
+///   https://example.com (réseau). Avec `…_SETTINGS_VALUES=addressBarPosition=top` : en haut de la carte ;
+/// - `MATCHA_SCREENSHOT_PERMISSION_URL` : page qui demande la caméra ou le micro, et `MATCHA_SCREENSHOT_PERMISSION_BUTTON`
+///   (facultatif) : texte du bouton de la page à cliquer pour lancer la demande ; capture le bandeau
+///   (`28-permission-bandeau`). Réseau nécessaire ; la demande d'accès de macOS peut apparaître la première fois.
 ///
 /// La capture `1-vide` montre la fenêtre sans onglet : la page vide invite à ⌘T, la barre de commande
 /// ne s'ouvre jamais d'elle-même.
@@ -75,6 +81,8 @@ final class ScreenshotUITests: XCTestCase {
         }
         // Après l'aperçu (sa page doit rester affichée), avant la barre masquée (le bouton doit être visible).
         try captureDownloads(in: app, window: window)
+        captureSiteSettings(in: app, window: window)
+        capturePermissionBanner(in: app, window: window)
         if environment["MATCHA_SCREENSHOT_PEEK"] != nil {
             captureHiddenSidebar(in: app, window: window)
         }

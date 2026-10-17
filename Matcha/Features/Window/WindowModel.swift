@@ -5,7 +5,7 @@ import OSLog
 import SwiftUI
 
 /// État d'une fenêtre : le Space affiché, le bord par lequel arrive le Space choisi (animation), la
-/// confirmation « URL copiée » et la liste des téléchargements.
+/// confirmation « URL copiée », la liste des téléchargements et le panneau des réglages du site.
 @MainActor
 @Observable
 final class WindowModel {
@@ -18,6 +18,10 @@ final class WindowModel {
     let copyConfirmation = CopyConfirmationModel()
     /// Liste des téléchargements ouverte (tâche 5.1) ; la barre masquée reste affichée tant qu'elle l'est.
     var isDownloadsPresented = false
+    /// Panneau des réglages du site ouvert (tâche 5.2), pour l'onglet affiché ; seul l'utilisateur l'ouvre et le ferme.
+    var isSiteSettingsPresented = false
+    /// Effacement des données d'un site en attente de confirmation (alerte de la fenêtre).
+    var siteDataClearRequest: SiteDataClearRequest?
     /// Où retenir le Space affiché d'un lancement à l'autre ; nil pour ne rien retenir (tests).
     @ObservationIgnored private let defaults: UserDefaults?
 

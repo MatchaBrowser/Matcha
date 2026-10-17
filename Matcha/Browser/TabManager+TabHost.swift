@@ -42,6 +42,11 @@ extension TabManager: TabHost {
         return true
     }
 
+    /// Onglets et aperçu partagent le profil du Space.
+    func sitePermissions(for _: WKWebView) -> SitePermissionScope? {
+        sitePermissions
+    }
+
     func closePage(of webView: WKWebView) {
         if isPeek(webView) {
             PeekActions.close(in: self)

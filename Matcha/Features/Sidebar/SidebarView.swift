@@ -1,7 +1,8 @@
 import SwiftUI
 
-/// Barre latérale, de haut en bas : navigation, adresse, favoris, épinglés, nouvel onglet,
-/// onglets du jour, panneau des téléchargements s'il est ouvert, Spaces (et à gauche, le bouton des téléchargements).
+/// Barre latérale, de haut en bas : navigation, adresse (et bouton des réglages du site), panneau des réglages du site
+/// s'il est ouvert, favoris, épinglés, nouvel onglet, onglets du jour, panneau des téléchargements s'il est ouvert,
+/// Spaces (et à gauche, le bouton des téléchargements).
 struct SidebarView: View {
     let model: WindowModel
     let tabManager: TabManager
@@ -21,7 +22,19 @@ struct SidebarView: View {
         VStack(alignment: .leading, spacing: 10) {
             if showsAddressBar {
                 SidebarTopBar(tab: tabManager.selectedTab, showsNavigationButtons: showsNavigationButtons, goHome: goHome)
-                AddressPill(tab: tabManager.selectedTab, edit: editAddress)
+                HStack(spacing: 4) {
+                    AddressPill(tab: tabManager.selectedTab, edit: editAddress)
+                    SiteSettingsButton(tab: tabManager.selectedTab, isPresented: model.isSiteSettingsPresented) {
+                        setSiteSettingsPresented(!model.isSiteSettingsPresented)
+                    }
+                }
+                if model.isSiteSettingsPresented {
+                    VStack(spacing: 0) {
+                        SiteSettingsPanel(model: model, tabManager: tabManager)
+                        Divider()
+                    }
+                    .transition(.move(edge: .top).combined(with: .opacity))
+                }
             } else {
                 SidebarTopBar(tab: tabManager.selectedTab, showsNavigationButtons: false)
             }
@@ -50,5 +63,10 @@ struct SidebarView: View {
         }
         .padding(.horizontal, 10)
         .padding(.bottom, 8)
+    }
+
+    /// Le panneau des réglages du site glisse sous la pastille et pousse les onglets.
+    private func setSiteSettingsPresented(_ isPresented: Bool) {
+        withAnimation(.easeOut(duration: 0.2)) { model.isSiteSettingsPresented = isPresented }
     }
 }

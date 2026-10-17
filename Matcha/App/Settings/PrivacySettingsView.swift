@@ -2,7 +2,7 @@ import OSLog
 import SwiftUI
 import WebKit
 
-/// Réglages de confidentialité : effacer cookies et données des sites.
+/// Réglages de confidentialité : effacer cookies et données des sites, décisions de permission retenues par site.
 struct PrivacySettingsView: View {
     @Environment(BrowserSession.self) private var session
     @State private var isConfirmingClear = false
@@ -26,6 +26,7 @@ struct PrivacySettingsView: View {
                     .font(.caption)
                     .foregroundStyle(.secondary)
             }
+            SitePermissionsSection(store: session.sitePermissions, profiles: session.profiles)
         }
         .formStyle(.grouped)
         // La fenêtre prend la hauteur du contenu : pas de barre de défilement.

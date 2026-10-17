@@ -33,6 +33,8 @@ final class BrowserSession {
     @ObservationIgnored let faviconService: FaviconService
     /// Téléchargements de cette session : ceux d'une fenêtre privée quittent la liste à sa fermeture (tâche 5.1).
     @ObservationIgnored let downloadScope: DownloadScope
+    /// Décisions de permission des sites (tâche 5.2) : enregistrées, ou en mémoire seulement pour une fenêtre privée.
+    @ObservationIgnored let sitePermissions: SitePermissionStore
     private(set) var spaces: [SpaceSession] = []
     private(set) var profiles: [ProfileRecord] = []
     /// Magasin de données (cookies, stockage) de chaque profil, par identifiant de profil.
@@ -47,6 +49,7 @@ final class BrowserSession {
         faviconService = isPrivate ? FaviconService(directory: nil) : .shared
         downloadScope = isPrivate ? .privateWindow(UUID()) : .regular
         let context = container.mainContext
+        sitePermissions = SitePermissionStore(context: isPrivate ? nil : context)
         var records = (try? context.fetch(FetchDescriptor<SpaceRecord>(sortBy: [SortDescriptor(\.order)]))) ?? []
         if records.isEmpty {
             records = [Self.createDefaultSpace(in: context)]
@@ -59,6 +62,7 @@ final class BrowserSession {
                 websiteDataStore: dataStore(for: record.profile),
                 faviconService: faviconService,
                 downloadScope: downloadScope,
+                sitePermissions: sitePermissions,
             )
         }
         terminationObserver = NotificationCenter.default.addObserver(

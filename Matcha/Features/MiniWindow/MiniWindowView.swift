@@ -64,18 +64,22 @@ struct MiniWindowView: View {
         .onChange(of: settings) { _, settings in controller.commandBar.apply(settings) }
     }
 
-    /// Page de la mini-fenêtre (conteneur AppKit, jamais recréé), ou une invite tant qu'elle n'a rien chargé.
+    /// Page de la mini-fenêtre (conteneur AppKit, jamais recréé), ou une invite tant qu'elle n'a rien chargé ; au-dessus,
+    /// le bandeau de ses demandes de permission (tâche 5.2).
     private var page: some View {
-        ZStack {
-            MiniWebViewContainerView(container: controller.container)
-            if tab.url == nil {
-                ContentUnavailableView(
-                    "Mini Window",
-                    systemImage: "macwindow",
-                    description: Text("Press ⌘L to search or enter an address."),
-                )
-                .frame(maxWidth: .infinity, maxHeight: .infinity)
-                .background(.background)
+        VStack(spacing: 0) {
+            PermissionBanner(prompts: tab.permissionPrompts)
+            ZStack {
+                MiniWebViewContainerView(container: controller.container)
+                if tab.url == nil {
+                    ContentUnavailableView(
+                        "Mini Window",
+                        systemImage: "macwindow",
+                        description: Text("Press ⌘L to search or enter an address."),
+                    )
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+                    .background(.background)
+                }
             }
         }
     }

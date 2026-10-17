@@ -9,7 +9,8 @@ import WebKit
 ///   passe pas devant ; sans Space de ce profil, une nouvelle mini-fenêtre (jamais les cookies d'un autre profil) ;
 /// - `window.close()` : la mini-fenêtre se ferme ;
 /// - pas d'aperçu : un Maj+clic reste un clic (`NavigationSource.other`) ;
-/// - téléchargements : dans la liste de la fenêtre principale.
+/// - téléchargements : dans la liste de la fenêtre principale ;
+/// - permissions des sites : décisions du profil de la mini-fenêtre, bandeau dans sa page.
 /// Tâche 5.8 : `windowFeatures` (fenêtres de connexion) est encore ignoré.
 extension MiniWindowManager: TabHost {
     var faviconService: FaviconService {
@@ -67,5 +68,10 @@ extension MiniWindowManager: TabHost {
 
     func closePage(of webView: WKWebView) {
         window(for: webView)?.close()
+    }
+
+    /// Décisions du profil de la mini-fenêtre (jamais privée : elles sont enregistrées).
+    func sitePermissions(for webView: WKWebView) -> SitePermissionScope? {
+        window(for: webView).map { SitePermissionScope(store: session.sitePermissions, profileID: $0.profileID) }
     }
 }

@@ -19,4 +19,6 @@ nonisolated extension Logger {
     static let miniWindow = Logger(subsystem: subsystem, category: "MiniWindow")
     /// Téléchargements ; jamais d'adresse complète ni de nom de fichier, seulement l'hôte.
     static let downloads = Logger(subsystem: subsystem, category: "Downloads")
+    /// Permissions des sites (caméra, micro) et données d'un site ; jamais d'adresse complète, seulement l'hôte.
+    static let permissions = Logger(subsystem: subsystem, category: "Permissions")
 }

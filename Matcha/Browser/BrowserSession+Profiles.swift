@@ -36,7 +36,8 @@ extension BrowserSession {
         spaces.filter { $0.record.profile?.id == profile.id }
     }
 
-    /// Supprime le profil, ses Spaces, ses favoris et ses données de sites (cookies, stockage).
+    /// Supprime le profil, ses Spaces, ses favoris, ses données de sites (cookies, stockage) et ses décisions de
+    /// permission.
     /// Le dernier profil ne peut pas être supprimé.
     func deleteProfile(_ profile: ProfileRecord) async {
         guard profiles.count > 1, profiles.contains(where: { $0.id == profile.id }) else {
@@ -52,6 +53,7 @@ extension BrowserSession {
         save(container.mainContext)
         refreshProfiles()
         forgetDataStore(of: identifier)
+        sitePermissions.removeAll(profileID: identifier)
         guard !isInMemory else {
             return
         }

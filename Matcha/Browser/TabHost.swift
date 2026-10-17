@@ -24,4 +24,6 @@ protocol TabHost: AnyObject {
     func openInPeek(_ url: URL, from webView: WKWebView, openingPoint: CGPoint) -> Bool
     /// La page a appelé `window.close()`.
     func closePage(of webView: WKWebView)
+    /// Décisions de permission du profil de `webView` (tâche 5.2) ; nil : rien n'est retenu.
+    func sitePermissions(for webView: WKWebView) -> SitePermissionScope?
 }

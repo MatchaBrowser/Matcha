@@ -30,6 +30,93 @@
         }
       }
     },
+    "%@ wants to use your camera and microphone." : {
+      "comment" : "Permission banner; %@ is the website",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ möchte deine Kamera und dein Mikrofon verwenden."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ quiere usar tu cámara y tu micrófono."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ souhaite utiliser votre caméra et votre micro."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ vuole usare la tua fotocamera e il tuo microfono."
+          }
+        }
+      }
+    },
+    "%@ wants to use your camera." : {
+      "comment" : "Permission banner; %@ is the website",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ möchte deine Kamera verwenden."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ quiere usar tu cámara."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ souhaite utiliser votre caméra."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ vuole usare la tua fotocamera."
+          }
+        }
+      }
+    },
+    "%@ wants to use your microphone." : {
+      "comment" : "Permission banner; %@ is the website",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ möchte dein Mikrofon verwenden."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ quiere usar tu micrófono."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ souhaite utiliser votre micro."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ vuole usare il tuo microfono."
+          }
+        }
+      }
+    },
     "%lld Spaces" : {
       "comment" : "Number of Spaces of a profile (Settings > Profiles)",
       "localizations" : {
@@ -299,6 +386,122 @@
         }
       }
     },
+    "Allow" : {
+      "comment" : "Site settings: the website may use the camera or microphone without asking",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Erlauben"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Permitir"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Autoriser"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Consenti"
+          }
+        }
+      }
+    },
+    "Allow Once" : {
+      "comment" : "Permission banner: allow for this request only, nothing is remembered",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Einmal erlauben"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Permitir una vez"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Autoriser une fois"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Consenti una volta"
+          }
+        }
+      }
+    },
+    "Allowed" : {
+      "comment" : "Settings > Privacy: a website is allowed to use the camera or microphone",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Erlaubt"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Permitido"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Autorisé"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Consentito"
+          }
+        }
+      }
+    },
+    "Always Allow" : {
+      "comment" : "Permission banner: allow, and remember it for this website",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Immer erlauben"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Permitir siempre"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Toujours autoriser"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Consenti sempre"
+          }
+        }
+      }
+    },
     "Angle" : {
       "comment" : "Label of the slider that sets the direction of the Space theme gradient",
       "localizations" : {
@@ -357,6 +560,35 @@
         }
       }
     },
+    "Ask" : {
+      "comment" : "Site settings: the website must ask before using the camera or microphone",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fragen"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Preguntar"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Demander"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Chiedi"
+          }
+        }
+      }
+    },
     "Ask before quitting" : {
       "localizations" : {
         "de" : {
@@ -410,6 +642,35 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Indietro"
+          }
+        }
+      }
+    },
+    "Camera" : {
+      "comment" : "Website permission: the camera",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kamera"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cámara"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Caméra"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fotocamera"
           }
         }
       }
@@ -593,6 +854,35 @@
         }
       }
     },
+    "Clear cookies and website data for “%@”?" : {
+      "comment" : "Site settings: confirmation title; %@ is the website",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cookies und Websitedaten von „%@“ löschen?"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "¿Borrar las cookies y los datos de “%@”?"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Effacer les cookies et les données de « %@ » ?"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vuoi cancellare i cookie e i dati di “%@”?"
+          }
+        }
+      }
+    },
     "Clear…" : {
       "localizations" : {
         "de" : {
@@ -732,6 +1022,35 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Chiudi anteprima"
+          }
+        }
+      }
+    },
+    "Close Site Settings" : {
+      "comment" : "Button that closes the site settings panel",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Website-Einstellungen schließen"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cerrar ajustes del sitio web"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fermer les réglages du site"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Chiudi impostazioni del sito web"
           }
         }
       }
@@ -904,6 +1223,35 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Barra dei comandi"
+          }
+        }
+      }
+    },
+    "Cookies and Website Data" : {
+      "comment" : "Site settings: the cookies and data this website keeps on the Mac",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cookies und Websitedaten"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cookies y datos del sitio web"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cookies et données du site"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cookie e dati del sito web"
           }
         }
       }
@@ -1254,6 +1602,64 @@
         }
       }
     },
+    "Denied" : {
+      "comment" : "Settings > Privacy: a website is not allowed to use the camera or microphone",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Abgelehnt"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Denegado"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Refusé"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rifiutato"
+          }
+        }
+      }
+    },
+    "Deny" : {
+      "comment" : "Site settings: the website may not use the camera or microphone",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ablehnen"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Denegar"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Refuser"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rifiuta"
+          }
+        }
+      }
+    },
     "Do not ask again" : {
       "comment" : "Checkbox of the alert shown before quitting",
       "localizations" : {
@@ -1279,6 +1685,35 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Non chiedere più"
+          }
+        }
+      }
+    },
+    "Don't Allow" : {
+      "comment" : "Permission banner: refuse, and remember it for this website",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nicht erlauben"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No permitir"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Refuser"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Non consentire"
           }
         }
       }
@@ -1654,6 +2089,35 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Foresta"
+          }
+        }
+      }
+    },
+    "Forget Decision" : {
+      "comment" : "Settings > Privacy: removes a saved camera or microphone decision; the website will ask again",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Entscheidung vergessen"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Olvidar decisión"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Oublier la décision"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dimentica decisione"
           }
         }
       }
@@ -2128,6 +2592,35 @@
         }
       }
     },
+    "Microphone" : {
+      "comment" : "Website permission: the microphone",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mikrofon"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Micrófono"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Micro"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Microfono"
+          }
+        }
+      }
+    },
     "Mini Window" : {
       "localizations" : {
         "de" : {
@@ -2500,6 +2993,35 @@
         }
       }
     },
+    "No saved decisions." : {
+      "comment" : "Settings > Privacy: no website has a saved camera or microphone decision",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Keine gespeicherten Entscheidungen."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No hay decisiones guardadas."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aucune décision enregistrée."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nessuna decisione salvata."
+          }
+        }
+      }
+    },
     "Ocean" : {
       "comment" : "Space theme preset",
       "localizations" : {
@@ -2785,6 +3307,35 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Anteprima"
+          }
+        }
+      }
+    },
+    "Permission Request" : {
+      "comment" : "Accessibility label of the banner where a website asks to use the camera or microphone",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Berechtigungsanfrage"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Solicitud de permiso"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Demande d'autorisation"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Richiesta di autorizzazione"
           }
         }
       }
@@ -3455,6 +4006,35 @@
         }
       }
     },
+    "Requested by an embedded frame from %@." : {
+      "comment" : "Permission banner: the request comes from a frame of another website inside the page; %@ is that website",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Angefragt von einem eingebetteten Frame von %@."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Solicitado por un marco incrustado de %@."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Demande faite par un cadre intégré de %@."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Richiesto da un frame incorporato di %@."
+          }
+        }
+      }
+    },
     "Results" : {
       "comment" : "Accessibility label of the command bar result list",
       "localizations" : {
@@ -3509,6 +4089,35 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Rosa"
+          }
+        }
+      }
+    },
+    "Saved with “Always Allow” or “Don't Allow”, or in the site settings next to the address. Never in private windows." : {
+      "comment" : "Settings > Privacy: footer of the website permissions list",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gespeichert mit „Immer erlauben“ oder „Nicht erlauben“ oder in den Website-Einstellungen neben der Adresse. Nie in privaten Fenstern."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Guardadas con “Permitir siempre” o “No permitir”, o en los ajustes del sitio web junto a la dirección. Nunca en ventanas privadas."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Enregistrées avec « Toujours autoriser » ou « Refuser », ou dans les réglages du site, à côté de l'adresse. Jamais dans les fenêtres privées."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Salvate con “Consenti sempre” o “Non consentire”, o nelle impostazioni del sito web accanto all'indirizzo. Mai nelle finestre private."
           }
         }
       }
@@ -3944,6 +4553,35 @@
         }
       }
     },
+    "Site Settings" : {
+      "comment" : "Button next to the address: permissions and data of the website shown",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Website-Einstellungen"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ajustes del sitio web"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Réglages du site"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Impostazioni del sito web"
+          }
+        }
+      }
+    },
     "Space %@" : {
       "comment" : "Accessibility label of a Space button; %@ is the Space name",
       "localizations" : {
@@ -4262,6 +4900,64 @@
         }
       }
     },
+    "This page" : {
+      "comment" : "Permission banner: the page asking, when it has no website name (local file)",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Diese Seite"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Esta página"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cette page"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Questa pagina"
+          }
+        }
+      }
+    },
+    "This page has no website settings." : {
+      "comment" : "Site settings panel shown for a page that is not a website (empty tab, local file)",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Für diese Seite gibt es keine Website-Einstellungen."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Esta página no tiene ajustes de sitio web."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cette page n'a pas de réglages de site."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Questa pagina non ha impostazioni del sito web."
+          }
+        }
+      }
+    },
     "URL Copied" : {
       "comment" : "Confirmation shown at the bottom of the page after copying its address (⇧⌘C)",
       "localizations" : {
@@ -4349,6 +5045,35 @@
         }
       }
     },
+    "Website Permissions" : {
+      "comment" : "Settings > Privacy: section listing the saved camera and microphone decisions",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Website-Berechtigungen"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Permisos de sitios web"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Autorisations des sites"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Autorizzazioni dei siti web"
+          }
+        }
+      }
+    },
     "What you type in the command bar is sent to %@ to suggest searches. Never in private windows." : {
       "comment" : "Settings > General: note under the search suggestions toggle; %@ is the search engine name (Google, DuckDuckGo, Bing)",
       "localizations" : {
@@ -4402,6 +5127,35 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Verrai disconnesso da tutti i siti web. Questa azione non può essere annullata."
+          }
+        }
+      }
+    },
+    "You will be signed out of this website. The page will reload." : {
+      "comment" : "Site settings: confirmation message before clearing the data of one website",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Du wirst von dieser Website abgemeldet. Die Seite wird neu geladen."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Se cerrará tu sesión en este sitio web. La página se volverá a cargar."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vous serez déconnecté de ce site. La page sera rechargée."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Verrai disconnesso da questo sito web. La pagina verrà ricaricata."
           }
         }
       }

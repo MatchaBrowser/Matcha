@@ -22,6 +22,8 @@ final class TabManager {
     @ObservationIgnored let faviconService: FaviconService
     /// Fenêtre à laquelle reviennent les téléchargements de ces onglets : celle d'une fenêtre privée les oublie.
     @ObservationIgnored let downloadScope: DownloadScope
+    /// Décisions de permission du profil de ces onglets (tâche 5.2), données par le Space ; nil : rien n'est retenu.
+    @ObservationIgnored var sitePermissions: SitePermissionScope?
 
     init(websiteDataStore: WKWebsiteDataStore, faviconService: FaviconService = .shared, downloadScope: DownloadScope = .regular) {
         self.websiteDataStore = websiteDataStore
@@ -278,6 +280,7 @@ final class TabManager {
     func discard(_ tab: BrowserTab) {
         layout.remove(tab.id)
         tabsByID[tab.id] = nil
+        tab.permissionPrompts.denyAll()
         tab.stop()
     }
 

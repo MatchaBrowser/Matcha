@@ -21,18 +21,21 @@ final class SpaceSession: Identifiable {
     }
 
     /// Recharge les onglets enregistrés du Space et enregistre ensuite chaque changement.
-    /// `websiteDataStore` : magasin de données du profil du Space ; `downloadScope` : celui de la fenêtre.
+    /// `websiteDataStore` : magasin de données du profil du Space ; `downloadScope` : celui de la fenêtre ;
+    /// `sitePermissions` : décisions de permission de la session, vues pour le profil du Space.
     init(
         record: SpaceRecord,
         context: ModelContext,
         websiteDataStore: WKWebsiteDataStore,
         faviconService: FaviconService = .shared,
         downloadScope: DownloadScope = .regular,
+        sitePermissions: SitePermissionStore? = nil,
     ) {
         self.record = record
         self.context = context
         theme = SpaceTheme.decoded(from: record.themeData) ?? .default
         tabManager = TabManager(websiteDataStore: websiteDataStore, faviconService: faviconService, downloadScope: downloadScope)
+        tabManager.sitePermissions = sitePermissions.map { SitePermissionScope(store: $0, profileID: record.profile?.id) }
         store = SpaceStore(space: record, context: context)
         let (tabs, layout) = store.load()
         tabManager.restore(tabs: tabs, layout: layout)

@@ -83,6 +83,7 @@ struct ContentCard: View {
         PageCard(
             tab: tab,
             isMarked: isMarked,
+            isActive: tab == nil || tab?.id == tabManager.selectedTabID,
             addressBarPosition: addressBarPosition,
             showsNavigationButtons: showsNavigationButtons,
             goHome: goHome,

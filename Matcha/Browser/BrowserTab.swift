@@ -34,6 +34,8 @@ final class BrowserTab: Identifiable {
     var lastActivity = Date.now
     /// État de navigation retenu pour la restauration (historique précédent/suivant, défilement).
     var savedInteractionState: Data?
+    /// Demandes de permission de la page qui attendent une réponse (bandeau, tâche 5.2).
+    let permissionPrompts = PermissionPromptQueue()
 
     /// Délégué de navigation et d'interface, branché sur chaque vue web créée (et sur la vue actuelle).
     @ObservationIgnored weak var delegate: (any WKNavigationDelegate & WKUIDelegate)? {
@@ -130,10 +132,11 @@ final class BrowserTab: Identifiable {
         savedInteractionState = state
     }
 
-    /// Libère la vue web (mémoire, son, processus). L'onglet affiche désormais `url` et `title`,
-    /// et chargera `url` quand on le rouvrira.
+    /// Libère la vue web (mémoire, son, processus) et refuse les demandes de permission en attente. L'onglet affiche
+    /// désormais `url` et `title`, et chargera `url` quand on le rouvrira.
     func unload(resettingTo url: URL?, title: String?) {
         observations = []
+        permissionPrompts.denyAll()
         if let webView {
             webView.pauseAllMediaPlayback(completionHandler: nil)
             webView.stopLoading()

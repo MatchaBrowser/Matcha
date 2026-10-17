@@ -1,11 +1,14 @@
 import SwiftUI
 
 /// Carte aux coins arrondis d'un panneau : la page de l'onglet, avec la barre d'adresse au-dessus si les
-/// réglages la placent là. Un onglet qui n'a encore rien chargé, ou l'absence d'onglet, affiche un accueil.
+/// réglages la placent là (et dessous, le panneau des réglages du site), puis le bandeau des demandes de permission
+/// de la page. Un onglet qui n'a encore rien chargé, ou l'absence d'onglet, affiche un accueil.
 struct PageCard: View {
     let tab: BrowserTab?
     /// Panneau actif d'un split : bordure de la couleur d'accentuation.
     let isMarked: Bool
+    /// Onglet sélectionné (seul panneau, ou panneau actif d'un split) : il porte le panneau des réglages du site.
+    var isActive = true
     let addressBarPosition: AddressBarPosition
     let showsNavigationButtons: Bool
     /// Action du bouton Accueil ; nil pour ne pas l'afficher.
@@ -16,6 +19,8 @@ struct PageCard: View {
     let activate: () -> Void
     /// Destinataire des éléments de la barre lâchés sur la page.
     var sidebarDropTarget: (any SidebarItemDropTarget)?
+
+    @Environment(WindowModel.self) private var windowModel: WindowModel?
 
     var body: some View {
         VStack(spacing: 0) {
@@ -34,9 +39,21 @@ struct PageCard: View {
                             home()
                         }
                     },
+                    isSiteSettingsPresented: showsSiteSettings,
+                    toggleSiteSettings: toggleSiteSettings,
                 )
                 .simultaneousGesture(TapGesture().onEnded { activate() })
                 Divider()
+                if showsSiteSettings, let windowModel {
+                    SiteSettingsPanel(model: windowModel, tabManager: windowModel.space.tabManager, maximumContentWidth: 320)
+                        .padding(.horizontal, 12)
+                        .transition(.move(edge: .top).combined(with: .opacity))
+                    Divider()
+                }
+            }
+            // Demandes de permission de cette page (tâche 5.2) : le bandeau pousse la page.
+            if let tab {
+                PermissionBanner(prompts: tab.permissionPrompts)
             }
             page
                 // Zone que l'aperçu (Maj+clic) voile, sous la barre d'adresse (tâche 4.4).
@@ -54,6 +71,18 @@ struct PageCard: View {
         .accessibilityLabel(Text(verbatim: tab?.displayTitle ?? ""))
         .accessibilityValue(accessibilityValue)
         .accessibilityIdentifier("pagePane")
+    }
+
+    /// Panneau des réglages du site ouvert dans la fenêtre, montré sur la carte de l'onglet sélectionné.
+    private var showsSiteSettings: Bool {
+        isActive && windowModel?.isSiteSettingsPresented == true
+    }
+
+    /// Sur le panneau actif, ouvre ou ferme le panneau ; sur un autre panneau d'un split, le rend actif et l'y ouvre.
+    private func toggleSiteSettings() {
+        let isPresented = isActive ? !(windowModel?.isSiteSettingsPresented ?? false) : true
+        activate()
+        withAnimation(.easeOut(duration: 0.2)) { windowModel?.isSiteSettingsPresented = isPresented }
     }
 
     /// « Panneau actif » sur le panneau actif d'un split.

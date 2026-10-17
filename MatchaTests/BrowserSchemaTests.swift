@@ -62,6 +62,46 @@ struct BrowserSchemaTests {
         #expect(try context.fetchCount(FetchDescriptor<FolderRecord>()) == 0)
     }
 
+    /// Tâche 5.2 : une base créée avant `SitePermissionRecord` s'ouvre avec le schéma actuel (migration légère, faite
+    /// par SwiftData), sans perdre ses données.
+    @Test func `a store from before site permissions opens and keeps its data`() throws {
+        let directory = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString, isDirectory: true)
+        try FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)
+        defer { try? FileManager.default.removeItem(at: directory) }
+        let url = directory.appendingPathComponent("ancienne.store")
+        let oldModels: [any PersistentModel.Type] = [ProfileRecord.self, SpaceRecord.self, FolderRecord.self, TabRecord.self]
+        #expect(BrowserSchema.models.count == oldModels.count + 1)
+
+        try {
+            let schema = Schema(oldModels)
+            let container = try ModelContainer(
+                for: schema,
+                configurations: ModelConfiguration(schema: schema, url: url, cloudKitDatabase: .none),
+            )
+            let profile = ProfileRecord(name: "Personnel")
+            let space = SpaceRecord(name: "Perso", profile: profile)
+            let pinned = TabRecord(url: URL(string: "https://example.com"), title: "Exemple", place: .pinned)
+            pinned.space = space
+            container.mainContext.insert(profile)
+            try container.mainContext.save()
+        }()
+
+        let schema = Schema(BrowserSchema.models)
+        let container = try ModelContainer(
+            for: schema,
+            configurations: ModelConfiguration(schema: schema, url: url, cloudKitDatabase: .none),
+        )
+        let context = container.mainContext
+        let spaces = try context.fetch(FetchDescriptor<SpaceRecord>())
+        #expect(spaces.map(\.name) == ["Perso"])
+        #expect(spaces.first?.profile?.name == "Personnel")
+        #expect(spaces.first?.tabs?.first?.title == "Exemple")
+        let profileID = spaces.first?.profile?.id
+        context.insert(SitePermissionRecord(profileID: profileID, originKey: "https://meet.example.com", kind: .camera, decision: .allow))
+        try context.save()
+        #expect(SitePermissionStore(context: context).decision(.camera, for: TestOrigins.meet, profileID: profileID) == .allow)
+    }
+
     @Test func `archived tabs have no sidebar place`() {
         let tab = TabRecord(place: .today)
         tab.place = nil

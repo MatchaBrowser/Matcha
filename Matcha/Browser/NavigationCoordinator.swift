@@ -4,8 +4,8 @@ import WebKit
 
 /// Délégué de navigation et d'interface des vues web d'un `TabHost` (les onglets d'un Space et leur aperçu, ou
 /// les mini-fenêtres) : nouvelles fenêtres, fermeture par la page, liens vers d'autres apps, clics avec
-/// modificateur, aperçu (Peek), téléchargements. Les règles viennent de `NavigationPolicy` et de `DownloadPolicy` ;
-/// l'hôte décide où vont les pages.
+/// modificateur, aperçu (Peek), téléchargements, permissions des sites (`+Permissions`). Les règles viennent de
+/// `NavigationPolicy`, `DownloadPolicy` et `SitePermissionPolicy` ; l'hôte décide où vont les pages.
 @MainActor
 final class NavigationCoordinator: NSObject {
     weak var tabHost: (any TabHost)?
@@ -86,11 +86,12 @@ final class NavigationCoordinator: NSObject {
 
 extension NavigationCoordinator: WKNavigationDelegate {
     /// Nouvelle page affichée (onglet, aperçu ou mini-fenêtre) : icône connue de son domaine, ou pastille en
-    /// attendant mieux.
+    /// attendant mieux. Les demandes de permission de l'ancienne page n'ont plus d'objet : refusées.
     func webView(_ webView: WKWebView, didCommit _: WKNavigation!) {
         guard let tabHost, let tab = tabHost.page(for: webView) else {
             return
         }
+        tab.permissionPrompts.denyAll()
         tab.favicon = webView.url?.host().flatMap(tabHost.faviconService.cachedIcon(forHost:))
     }
 

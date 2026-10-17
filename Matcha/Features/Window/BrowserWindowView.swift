@@ -124,6 +124,8 @@ struct BrowserWindowView: View {
             tabManager.closePeek()
         }
         .task { await session.removeOrphanDataStores() }
+        // « Effacer… » des réglages du site (tâche 5.2) : l'alerte appartient à la fenêtre.
+        .modifier(SiteDataClearConfirmation(model: model))
         // Les mini-fenêtres envoient leurs pages dans cette fenêtre (tâche 4.5).
         .linkedToMiniWindows(session: session, model: model, window: window) { [commandBar] in commandBar.dismiss() }
         .environment(model)
