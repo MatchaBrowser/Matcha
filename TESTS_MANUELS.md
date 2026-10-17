@@ -153,3 +153,27 @@ Ou ⌘R dans Xcode.
 - [ ] Menu Onglets (après Spaces) : « Afficher l'onglet suivant » (⌃⇥), « Afficher l'onglet précédent » (⌃⇧⇥), puis les favoris et épinglés numérotés sous leur titre (⌘1…⌘8, un split sous les titres de ses panneaux), puis « Afficher le dernier onglet » (⌘9). Les titres suivent les changements (nouveau favori, onglet renommé par sa page). Sans onglet, tout est grisé.
 - [ ] Mini-fenêtre active, puis fenêtre des Réglages : ⌃⇥, ⌘1 et ⌘9 ne changent rien dans la fenêtre de navigation ; le menu Onglets est grisé. Dans une fenêtre privée, ils parcourent ses propres onglets. ⌃1 et ⌃2 changent toujours de Space.
 - [ ] Sur un site qui utilise ⌃⇥ ou ⌘1 pour lui-même (éditeur en ligne, Google Docs…), le site garde la main, comme dans Safari ; sinon, dis-le-moi.
+
+## Phase 5
+
+### 5.1 Téléchargements
+
+Les tests d'interface écrivent dans ~/Downloads/MatchaUITests, que l'app efface ensuite ; à la première lecture du dossier, macOS peut te demander d'autoriser « MatchaUITests-Runner » à accéder à Téléchargements : accepte.
+
+- [ ] Gros téléchargement réel (par exemple l'image disque d'une app d'une centaine de Mo) : le bouton flèche apparaît à gauche dans le pied de la barre, entouré d'un anneau qui se remplit ; rien ne s'ouvre de soi-même, ni la liste ni le fichier. Ouvre la liste pendant le téléchargement : barre de progression et « 12 Mo sur 140 Mo » qui avancent, bouton ⓧ pour annuler. À la fin, la flèche rebondit une fois, la ligne montre la taille et une loupe (« Afficher dans le Finder »).
+- [ ] Lien vers un PDF : il s'affiche dans la page, rien n'est téléchargé. Lien vers un .zip : il est téléchargé, la page reste affichée.
+- [ ] Pièce jointe (`Content-Disposition: attachment`), par exemple un fichier d'une release GitHub (« Assets » d'une release) ou le bouton « Download ZIP » d'un dépôt : téléchargée sous le nom donné par le serveur, même si c'est un type que WebKit sait afficher.
+- [ ] Le même fichier deux fois : « nom.zip » puis « nom 2.zip » dans Téléchargements, le plus récent en tête de la liste ; aucun fichier n'est écrasé. Une archive « .tar.gz » devient « archive 2.tar.gz ».
+- [ ] Annuler pendant un gros téléchargement : la ligne passe à « Annulé », et aucun fichier partiel ne reste dans Téléchargements.
+- [ ] « Afficher dans le Finder » : une fenêtre du Finder s'ouvre sur Téléchargements, le fichier sélectionné. Double-clic sur une ligne terminée : le fichier s'ouvre dans son app ; sur une ligne en cours, annulée ou en échec, rien ne se passe.
+- [ ] « Effacer » retire les lignes terminées, en échec ou annulées (pas celles en cours) ; les fichiers restent dans Téléchargements. Plus rien dans la liste : elle se ferme et le bouton disparaît.
+- [ ] Quarantaine : télécharge une app ou une image disque (.dmg) d'un éditeur, puis ouvre-la depuis le Finder : macOS demande confirmation (Gatekeeper). Dans le Terminal, `xattr -p com.apple.quarantine ~/Downloads/<fichier>` affiche une valeur qui contient « Matcha ».
+- [ ] Fenêtre privée (⇧⌘N) : un téléchargement y montre son propre bouton ; la fenêtre principale n'en montre pas. Ferme la fenêtre privée : le fichier reste dans Téléchargements, mais la liste l'oublie (rouvre une fenêtre privée : pas de bouton). Un téléchargement privé encore en cours à la fermeture est annulé.
+- [ ] Mini-fenêtre : un téléchargement lancé depuis sa page apparaît dans la liste de la fenêtre principale ; la mini-fenêtre reste sur sa page.
+- [ ] Barre latérale masquée (⌘S) : survole le bord gauche, clique le bouton des téléchargements, puis va avec le pointeur dans la liste : la barre et la liste restent affichées. Échap ferme la liste ; en quittant le bord, la barre se masque.
+- [ ] Aperçu (Maj+clic sur un lien) : un lien de téléchargement dans l'aperçu télécharge le fichier, l'aperçu reste ouvert.
+- [ ] Quitter Matcha pendant un téléchargement : au lancement suivant, la liste est vide (elle ne dure que le temps de la session) et aucun fichier partiel ne reste dans Téléchargements.
+- [ ] Aspect en clair, en sombre et en fenêtre privée : anneau lisible, liste lisible, icônes des fichiers (celle de l'app pour une app).
+- [ ] Facultatif, VoiceOver : « Téléchargements » sur le bouton, nom du fichier et état sur chaque ligne, « Annuler », « Afficher dans le Finder », « Effacer ».
+- Connu : un lien `target=_blank` vers un fichier laisse un onglet vide après le téléchargement (Safari le ferme) ; ferme-le à la main. Pas de reprise d'un téléchargement interrompu.
+- [ ] Ouvre la liste des téléchargements pendant qu'un gros fichier arrive, et laisse-la ouverte jusqu'à la fin : elle reste ouverte, la ligne passe à « terminé » et la flèche du bouton rebondit une fois.

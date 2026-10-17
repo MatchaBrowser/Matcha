@@ -4,10 +4,13 @@ import WebKit
 
 /// Délégué de navigation et d'interface des vues web d'un `TabHost` (les onglets d'un Space et leur aperçu, ou
 /// les mini-fenêtres) : nouvelles fenêtres, fermeture par la page, liens vers d'autres apps, clics avec
-/// modificateur, aperçu (Peek). Les règles viennent de `NavigationPolicy` ; l'hôte décide où vont les pages.
+/// modificateur, aperçu (Peek), téléchargements. Les règles viennent de `NavigationPolicy` et de `DownloadPolicy` ;
+/// l'hôte décide où vont les pages.
 @MainActor
 final class NavigationCoordinator: NSObject {
     weak var tabHost: (any TabHost)?
+    /// Reçoit les téléchargements ; remplacé dans les tests (dossier temporaire).
+    var downloadManager = DownloadManager.shared
 
     /// Confie une URL à l'app qui la gère ; remplaçable dans les tests.
     var openExternally: (URL) -> Bool = { NSWorkspace.shared.open($0) }
@@ -60,6 +63,17 @@ final class NavigationCoordinator: NSObject {
         }
     }
 
+    /// Confie à `downloadManager` un téléchargement que WebKit vient de créer. La page d'origine est le référent de
+    /// la requête, sinon la page affichée (jamais l'adresse en cours de chargement, qui est celle du fichier).
+    private func track(_ download: WKDownload, from webView: WKWebView) {
+        let referrer = download.originalRequest?.value(forHTTPHeaderField: "Referer").flatMap(URL.init(string:))
+        downloadManager.track(
+            download,
+            scope: tabHost?.downloadScope ?? .regular,
+            pageURL: referrer ?? webView.backForwardList.currentItem?.url,
+        )
+    }
+
     /// Lien à ouvrir dans l'aperçu : refusé (le lien suit son cours) si l'hôte ne peut pas l'ouvrir.
     private func openInPeek(_ url: URL, from webView: WKWebView, decisionHandler: @MainActor @Sendable (WKNavigationActionPolicy) -> Void) {
         guard let tabHost, tabHost.openInPeek(url, from: webView, openingPoint: Self.pointerPoint(in: webView)) else {
@@ -108,7 +122,27 @@ extension NavigationCoordinator: WKNavigationDelegate {
             tabHost?.openLink(url, configuration: webView.configuration, from: webView, inBackground: inBackground)
         case let .openInPeek(url):
             openInPeek(url, from: webView, decisionHandler: decisionHandler)
+        case .download:
+            decisionHandler(.download)
         }
+    }
+
+    /// Une réponse que WebKit ne sait pas afficher, ou une pièce jointe, devient un téléchargement.
+    func webView(
+        _: WKWebView,
+        decidePolicyFor navigationResponse: WKNavigationResponse,
+        decisionHandler: @escaping @MainActor @Sendable (WKNavigationResponsePolicy) -> Void,
+    ) {
+        let response = DownloadResponse(navigationResponse.response, canShowMIMEType: navigationResponse.canShowMIMEType)
+        decisionHandler(DownloadPolicy.shouldDownload(response) ? .download : .allow)
+    }
+
+    func webView(_ webView: WKWebView, navigationAction _: WKNavigationAction, didBecome download: WKDownload) {
+        track(download, from: webView)
+    }
+
+    func webView(_ webView: WKWebView, navigationResponse _: WKNavigationResponse, didBecome download: WKDownload) {
+        track(download, from: webView)
     }
 }
 

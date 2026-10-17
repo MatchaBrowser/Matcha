@@ -8,11 +8,18 @@ import WebKit
 /// - ⌘-clic, clic du milieu, ⇧⌘-clic : un onglet en arrière-plan dans le Space visé, la fenêtre principale ne
 ///   passe pas devant ; sans Space de ce profil, une nouvelle mini-fenêtre (jamais les cookies d'un autre profil) ;
 /// - `window.close()` : la mini-fenêtre se ferme ;
-/// - pas d'aperçu : un Maj+clic reste un clic (`NavigationSource.other`).
+/// - pas d'aperçu : un Maj+clic reste un clic (`NavigationSource.other`) ;
+/// - téléchargements : dans la liste de la fenêtre principale.
 /// Tâche 5.8 : `windowFeatures` (fenêtres de connexion) est encore ignoré.
 extension MiniWindowManager: TabHost {
     var faviconService: FaviconService {
         session.faviconService
+    }
+
+    /// Les mini-fenêtres n'ont pas de barre latérale : leurs téléchargements vont dans la liste de la fenêtre
+    /// principale.
+    var downloadScope: DownloadScope {
+        .regular
     }
 
     func page(for webView: WKWebView) -> BrowserTab? {

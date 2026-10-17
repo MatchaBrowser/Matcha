@@ -4,8 +4,8 @@ import Observation
 import OSLog
 import SwiftUI
 
-/// État d'une fenêtre : le Space affiché, le bord par lequel arrive le Space choisi (animation), et
-/// la confirmation « URL copiée ».
+/// État d'une fenêtre : le Space affiché, le bord par lequel arrive le Space choisi (animation), la
+/// confirmation « URL copiée » et la liste des téléchargements.
 @MainActor
 @Observable
 final class WindowModel {
@@ -16,6 +16,8 @@ final class WindowModel {
     private(set) var transitionEdge = Edge.trailing
     /// Confirmation montrée à chaque adresse copiée depuis cette fenêtre.
     let copyConfirmation = CopyConfirmationModel()
+    /// Liste des téléchargements ouverte (tâche 5.1) ; la barre masquée reste affichée tant qu'elle l'est.
+    var isDownloadsPresented = false
     /// Où retenir le Space affiché d'un lancement à l'autre ; nil pour ne rien retenir (tests).
     @ObservationIgnored private let defaults: UserDefaults?
 

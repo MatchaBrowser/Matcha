@@ -15,6 +15,8 @@ struct MatchaApp: App {
     init() {
         // Les onglets sont les nôtres : pas d'onglets de fenêtre macOS (« Afficher la barre d'onglets »).
         NSWindow.allowsAutomaticWindowTabbing = false
+        // Tests d'interface : leur dossier de téléchargements repart vide (sans effet sinon).
+        DownloadLocation.resetTestSubfolderIfRequested()
         let session = BrowserSession.launch()
         // Rien n'est retenu (taille, Space affiché) avec une base de test.
         let miniWindows = MiniWindowManager(session: session, defaults: session.isInMemory ? nil : .standard)
@@ -32,6 +34,7 @@ struct MatchaApp: App {
         Window(Text(verbatim: "Matcha"), id: Self.browserWindowID) {
             BrowserWindowView(session: session)
                 .environment(miniWindows)
+                .environment(DownloadManager.shared)
         }
         .windowStyle(.hiddenTitleBar)
         .commands {
@@ -42,6 +45,7 @@ struct MatchaApp: App {
         // Fenêtres privées : chacune a sa session en mémoire, rien n'est enregistré.
         WindowGroup("Private Browsing", id: Self.privateWindowID) {
             PrivateWindowView()
+                .environment(DownloadManager.shared)
         }
         .windowStyle(.hiddenTitleBar)
         // Sans ses commandes par défaut (« Close », « Close All ») qui écraseraient ⌘W et ⇧⌘W.

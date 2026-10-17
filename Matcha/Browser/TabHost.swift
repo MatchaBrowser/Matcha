@@ -7,6 +7,8 @@ import WebKit
 @MainActor
 protocol TabHost: AnyObject {
     var faviconService: FaviconService { get }
+    /// Fenêtre à laquelle reviennent les téléchargements de ces pages (tâche 5.1).
+    var downloadScope: DownloadScope { get }
     /// Onglet, ou page hors de la barre (aperçu, mini-fenêtre), qui possède `webView`.
     func page(for webView: WKWebView) -> BrowserTab?
     /// Vue web d'où part une navigation, pour `NavigationPolicy`.

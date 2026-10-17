@@ -57,8 +57,10 @@ struct BrowserWindowView: View {
         SidebarMetrics.clampedWidth(sidebarWidth)
     }
 
+    /// Barre masquée affichée : survolée, ou sa liste des téléchargements est ouverte (le pointeur la quitte pour
+    /// aller dans la liste, qui disparaîtrait avec elle).
     private var isFloatingSidebarShown: Bool {
-        !isSidebarVisible && isFloatingSidebarHovered
+        !isSidebarVisible && (isFloatingSidebarHovered || model.isDownloadsPresented)
     }
 
     var body: some View {
@@ -102,8 +104,12 @@ struct BrowserWindowView: View {
         // Comme dans Arc, les boutons de la fenêtre disparaissent avec la barre latérale.
         .onChange(of: window) { WindowChrome.setButtonsHidden(!(isSidebarVisible || isFloatingSidebarShown), in: window) }
         .onChange(of: isSidebarVisible || isFloatingSidebarShown) { _, shown in WindowChrome.setButtonsHidden(!shown, in: window) }
-        // La barre vise un onglet du Space affiché : changer de Space la ferme.
-        .onChange(of: model.currentSpaceID) { commandBar.dismiss() }
+        // La barre vise un onglet du Space affiché : changer de Space la ferme. La liste des téléchargements aussi :
+        // la barre latérale du Space est remplacée.
+        .onChange(of: model.currentSpaceID) {
+            commandBar.dismiss()
+            model.isDownloadsPresented = false
+        }
         // Moteur ou suggestions changés dans les Réglages pendant que la barre reste ouverte.
         .onChange(of: commandBarSettings) { _, settings in commandBar.apply(settings) }
         .navigationTitle(session.isPrivate ? String(localized: "Private Browsing") : tabManager.selectedTab?.displayTitle ?? "Matcha")
@@ -232,6 +238,8 @@ struct BrowserWindowView: View {
     }
 
     private func toggleSidebar() {
+        // La liste des téléchargements tient à la barre qui disparaît.
+        model.isDownloadsPresented = false
         withAnimation(.easeInOut(duration: 0.2)) {
             isSidebarVisible.toggle()
             isFloatingSidebarHovered = false

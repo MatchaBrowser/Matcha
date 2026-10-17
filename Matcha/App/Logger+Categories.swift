@@ -17,4 +17,6 @@ nonisolated extension Logger {
     static let peek = Logger(subsystem: subsystem, category: "Peek")
     /// Mini-fenêtres et leur raccourci global ; jamais d'adresse ni de texte tapé.
     static let miniWindow = Logger(subsystem: subsystem, category: "MiniWindow")
+    /// Téléchargements ; jamais d'adresse complète ni de nom de fichier, seulement l'hôte.
+    static let downloads = Logger(subsystem: subsystem, category: "Downloads")
 }

@@ -80,8 +80,9 @@ struct NavigationPolicyPeekTests {
         #expect(NavigationPolicy.decide(request(modifiers: [], button: 4)) == .openInNewTab(url, inBackground: true))
     }
 
-    @Test func `shift click on a download link is allowed`() {
-        #expect(NavigationPolicy.decide(request(download: true)) == .allow)
+    /// Un lien `download` se télécharge (tâche 5.1) : l'aperçu resterait vide.
+    @Test func `shift click on a download link downloads`() {
+        #expect(NavigationPolicy.decide(request(download: true)) == .download)
     }
 
     @Test(arguments: [start, "\(start)#a"])
@@ -127,8 +128,8 @@ struct NavigationPolicyPeekTests {
         #expect(NavigationPolicy.decide(request(modifiers: .option, newWindow: true, source: .peek)) == peek())
     }
 
-    @Test func `download inside Peek is allowed`() {
-        #expect(NavigationPolicy.decide(request(modifiers: [], newWindow: true, download: true, source: .peek)) == .allow)
+    @Test func `download link inside Peek downloads`() {
+        #expect(NavigationPolicy.decide(request(modifiers: [], newWindow: true, download: true, source: .peek)) == .download)
     }
 
     @Test func `command or middle click inside Peek opens a background tab`() throws {
@@ -204,8 +205,8 @@ struct NavigationPolicyPeekTests {
         #expect(pinned(url: "file:///usr/share/doc/postfix/html/index.html") == .allow)
     }
 
-    @Test func `pinned download is allowed`() {
-        #expect(pinned(download: true) == .allow)
+    @Test func `pinned download link downloads`() {
+        #expect(pinned(download: true) == .download)
     }
 
     @Test func `pinned script navigation is allowed`() {

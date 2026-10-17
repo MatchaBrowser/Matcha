@@ -20,10 +20,13 @@ final class TabManager {
     /// Délégué de toutes les vues web de cette fenêtre (les vues ne le retiennent pas).
     @ObservationIgnored let coordinator = NavigationCoordinator()
     @ObservationIgnored let faviconService: FaviconService
+    /// Fenêtre à laquelle reviennent les téléchargements de ces onglets : celle d'une fenêtre privée les oublie.
+    @ObservationIgnored let downloadScope: DownloadScope
 
-    init(websiteDataStore: WKWebsiteDataStore, faviconService: FaviconService = .shared) {
+    init(websiteDataStore: WKWebsiteDataStore, faviconService: FaviconService = .shared, downloadScope: DownloadScope = .regular) {
         self.websiteDataStore = websiteDataStore
         self.faviconService = faviconService
+        self.downloadScope = downloadScope
         coordinator.tabHost = self
     }
 

@@ -17,7 +17,7 @@ nonisolated struct NavigationRequest: Sendable {
     var opensNewWindow = false
     /// Adresse de la page affichée par la vue web : ancre de la même page, lien vers un autre site.
     var pageURL: URL?
-    /// Vrai pour un lien `download` (tâche 5.1).
+    /// Vrai si la page demande le téléchargement (lien `download`) : la navigation devient un téléchargement.
     var shouldPerformDownload = false
     /// Vue web d'où part la navigation.
     var source = NavigationSource.tab
@@ -48,6 +48,8 @@ nonisolated enum NavigationDecision: Equatable, Sendable {
     case openInNewTab(URL, inBackground: Bool)
     /// Annulée, puis l'URL est ouverte dans l'aperçu ; depuis l'aperçu, elle s'y charge (tâche 4.4).
     case openInPeek(URL)
+    /// La navigation devient un téléchargement (tâche 5.1).
+    case download
 }
 
 /// Règles de navigation des vues web, sans dépendance à l'interface.
@@ -66,6 +68,10 @@ nonisolated enum NavigationPolicy {
             // Un cadre secondaire (publicité…) n'a pas le droit de lancer une autre app.
             return request.targetsMainFrame ? .openExternally(url) : .cancel
         }
+        // Lien `download` : téléchargé quel que soit le clic (⌘-clic, Maj+clic) ; un onglet ou un aperçu resterait vide.
+        if request.shouldPerformDownload {
+            return .download
+        }
         guard request.navigationType == .linkActivated else {
             return .allow
         }
@@ -73,7 +79,7 @@ nonisolated enum NavigationPolicy {
         if modifiers.contains(.command) || request.buttonNumber == middleMouseButton {
             return .openInNewTab(url, inBackground: !modifiers.contains(.shift))
         }
-        guard !request.shouldPerformDownload, !schemesKeptInPlace.contains(url.scheme?.lowercased() ?? "") else {
+        guard !schemesKeptInPlace.contains(url.scheme?.lowercased() ?? "") else {
             return .allow
         }
         switch request.source {

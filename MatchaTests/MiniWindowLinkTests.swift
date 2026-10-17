@@ -111,4 +111,21 @@ struct MiniWindowLinkTests {
         #expect(!popup.tab.isLoaded)
         #expect(mini.tab.isLoaded)
     }
+
+    /// Tâche 5.1 : une mini-fenêtre n'a pas de barre latérale, ses téléchargements vont dans la liste de la fenêtre
+    /// principale.
+    @Test func `downloads of a mini window go to the main window's list`() async throws {
+        let folder = try TemporaryDownloadsFolder()
+        let downloads = folder.makeManager()
+        manager.coordinator.downloadManager = downloads
+        let mini = try await openPage("page", body: "<a id='l' download='mini.txt' href='data:text/plain,mini'>mini</a>")
+
+        _ = try await mini.tab.loadedWebView.evaluateJavaScript("document.getElementById('l').click(); true")
+        try await waitUntil { downloads.items.count == 1 && !downloads.items[0].isActive }
+
+        #expect(downloads.items[0].state == .finished)
+        #expect(downloads.items[0].scope == .regular)
+        #expect(manager.windows.count == 1)
+        #expect(folder.contents() == ["mini.txt"])
+    }
 }

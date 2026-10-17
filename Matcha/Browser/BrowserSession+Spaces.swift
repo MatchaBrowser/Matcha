@@ -35,6 +35,7 @@ extension BrowserSession {
             context: context,
             websiteDataStore: dataStore(for: profile),
             faviconService: faviconService,
+            downloadScope: downloadScope,
         )
         appendSpace(space)
         return space

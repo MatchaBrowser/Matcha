@@ -31,6 +31,8 @@ final class BrowserSession {
     @ObservationIgnored let isPrivate: Bool
     /// Icônes de sites : cache disque partagé, ou en mémoire seulement pour une fenêtre privée.
     @ObservationIgnored let faviconService: FaviconService
+    /// Téléchargements de cette session : ceux d'une fenêtre privée quittent la liste à sa fermeture (tâche 5.1).
+    @ObservationIgnored let downloadScope: DownloadScope
     private(set) var spaces: [SpaceSession] = []
     private(set) var profiles: [ProfileRecord] = []
     /// Magasin de données (cookies, stockage) de chaque profil, par identifiant de profil.
@@ -43,6 +45,7 @@ final class BrowserSession {
         self.container = container
         self.isPrivate = isPrivate
         faviconService = isPrivate ? FaviconService(directory: nil) : .shared
+        downloadScope = isPrivate ? .privateWindow(UUID()) : .regular
         let context = container.mainContext
         var records = (try? context.fetch(FetchDescriptor<SpaceRecord>(sortBy: [SortDescriptor(\.order)]))) ?? []
         if records.isEmpty {
@@ -50,7 +53,13 @@ final class BrowserSession {
         }
         refreshProfiles()
         spaces = records.map { record in
-            SpaceSession(record: record, context: context, websiteDataStore: dataStore(for: record.profile), faviconService: faviconService)
+            SpaceSession(
+                record: record,
+                context: context,
+                websiteDataStore: dataStore(for: record.profile),
+                faviconService: faviconService,
+                downloadScope: downloadScope,
+            )
         }
         terminationObserver = NotificationCenter.default.addObserver(
             forName: NSApplication.willTerminateNotification,

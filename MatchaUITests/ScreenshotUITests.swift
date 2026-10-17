@@ -36,7 +36,10 @@ import XCTest
 /// - `MATCHA_SCREENSHOT_MINI` : texte tapé dans une mini-fenêtre ouverte par le menu Fichier, après les autres
 ///   captures : `20-mini-vide` (barre ouverte), `21-mini-page` (après Entrée), `22-mini-flottante` (écran entier,
 ///   fenêtre du navigateur active : la mini-fenêtre reste devant), `23-mini-remise` (⌘O, la page dans le Space).
-///   Sans réseau : `MATCHA_SCREENSHOT_MINI=about:blank?mini`.
+///   Sans réseau : `MATCHA_SCREENSHOT_MINI=about:blank?mini` ;
+/// - `MATCHA_SCREENSHOT_DOWNLOADS` : chemin d'un fichier local que WebKit n'affiche pas (« 1 » : celui des tests
+///   des téléchargements), téléchargé dans ~/Downloads/MatchaUITests, effacé à la fin : `24-telechargement-bouton`
+///   (bouton du pied de la barre), `25-telechargements-liste` (liste ouverte).
 ///
 /// La capture `1-vide` montre la fenêtre sans onglet : la page vide invite à ⌘T, la barre de commande
 /// ne s'ouvre jamais d'elle-même.
@@ -70,6 +73,8 @@ final class ScreenshotUITests: XCTestCase {
         if let text = environment["MATCHA_SCREENSHOT_PEEK_LINK"] {
             capturePeek(link: text, in: app, window: window)
         }
+        // Après l'aperçu (sa page doit rester affichée), avant la barre masquée (le bouton doit être visible).
+        try captureDownloads(in: app, window: window)
         if environment["MATCHA_SCREENSHOT_PEEK"] != nil {
             captureHiddenSidebar(in: app, window: window)
         }
@@ -109,13 +114,18 @@ final class ScreenshotUITests: XCTestCase {
         attach(window.screenshot(), as: "8-theme-\(preset)")
     }
 
-    /// Réglages imposés pour la capture : `MATCHA_SCREENSHOT_SETTINGS_VALUES`, « clé=valeur » séparés par des virgules.
+    /// Réglages imposés pour la capture : `MATCHA_SCREENSHOT_SETTINGS_VALUES`, « clé=valeur » séparés par des virgules ;
+    /// avec `MATCHA_SCREENSHOT_DOWNLOADS`, le dossier des téléchargements de test.
     private var settingsOverrides: [String: String] {
         let pairs = environment["MATCHA_SCREENSHOT_SETTINGS_VALUES"]?.split(separator: ",") ?? []
-        return Dictionary(pairs.compactMap { pair in
+        let settings = Dictionary(pairs.compactMap { pair in
             let parts = pair.split(separator: "=", maxSplits: 1).map(String.init)
             return parts.count == 2 ? (parts[0], parts[1]) : nil
         }) { _, last in last }
+        guard environment["MATCHA_SCREENSHOT_DOWNLOADS"] != nil else {
+            return settings
+        }
+        return settings.merging(Self.downloadsTestSettings) { _, test in test }
     }
 
     @MainActor
