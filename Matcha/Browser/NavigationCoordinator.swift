@@ -4,8 +4,9 @@ import WebKit
 
 /// Délégué de navigation et d'interface des vues web d'un `TabHost` (les onglets d'un Space et leur aperçu, ou
 /// les mini-fenêtres) : nouvelles fenêtres, fermeture par la page, liens vers d'autres apps, clics avec
-/// modificateur, aperçu (Peek), téléchargements, permissions des sites (`+Permissions`). Les règles viennent de
-/// `NavigationPolicy`, `DownloadPolicy` et `SitePermissionPolicy` ; l'hôte décide où vont les pages.
+/// modificateur, aperçu (Peek), téléchargements, permissions des sites (`+Permissions`), historique (`+History`). Les
+/// règles viennent de `NavigationPolicy`, `DownloadPolicy` et `SitePermissionPolicy` ; l'hôte décide où vont les
+/// pages.
 @MainActor
 final class NavigationCoordinator: NSObject {
     weak var tabHost: (any TabHost)?
@@ -104,6 +105,8 @@ extension NavigationCoordinator: WKNavigationDelegate {
         tabHost.faviconService.refreshIcon(of: tab)
         // Retenu à chaque page chargée : un plantage ne fait pas perdre l'historique.
         tab.captureInteractionState()
+        // Visite retenue dans l'historique du profil (tâche 5.5), jamais pour une fenêtre privée.
+        tab.history.pageDidFinishLoading(url: webView.url, title: webView.title, scope: tabHost.historyScope(for: webView))
     }
 
     func webView(

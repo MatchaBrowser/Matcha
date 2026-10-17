@@ -38,6 +38,8 @@ final class BrowserTab: Identifiable {
     let permissionPrompts = PermissionPromptQueue()
     /// Recherche dans la page (barre, texte, résultat ; tâche 5.3).
     let find = FindSession()
+    /// Visites de la page retenues dans l'historique (tâche 5.5).
+    let history = PageHistory()
     /// Zoom de la page (`WKWebView.pageZoom`, tâche 5.4), recopié ici pour les menus : il ne change que par
     /// `setPageZoom`. Le zoom par pincement (`magnification`) est à part.
     private(set) var pageZoom = ZoomLevels.actualSize
@@ -65,6 +67,7 @@ final class BrowserTab: Identifiable {
         self.configuration = configuration
         self.openerID = openerID
         find.performer = self
+        history.page = self
     }
 
     /// Onglet restauré depuis l'enregistrement : il affiche `url` et `title`, et ne crée sa vue web
@@ -146,6 +149,7 @@ final class BrowserTab: Identifiable {
         observations = []
         permissionPrompts.denyAll()
         find.reset()
+        history.reset()
         if let webView {
             webView.pauseAllMediaPlayback(completionHandler: nil)
             webView.stopLoading()
@@ -217,8 +221,16 @@ final class BrowserTab: Identifiable {
 
     private func observe(_ webView: WKWebView) {
         observations = [
-            webView.observe(\.title, options: .initial, changeHandler: sync { $0.title = $1.title }),
-            webView.observe(\.url, options: .initial, changeHandler: sync { $0.setURL($1.url) }),
+            webView.observe(\.title, options: .initial, changeHandler: sync { tab, webView in
+                tab.title = webView.title
+                tab.history.titleDidChange(to: webView.title, pageURL: webView.url)
+            }),
+            webView.observe(\.url, options: .initial, changeHandler: sync { tab, webView in
+                tab.setURL(webView.url)
+                // Chargement lu sur la vue web : WebKit change l'adresse et le chargement ensemble, avant que l'onglet
+                // n'ait recopié le second.
+                tab.history.urlDidChange(to: webView.url, isLoading: webView.isLoading)
+            }),
             webView.observe(\.isLoading, options: .initial, changeHandler: sync { $0.isLoading = $1.isLoading }),
             webView.observe(\.estimatedProgress, options: .initial, changeHandler: sync { $0.progress = $1.estimatedProgress }),
             webView.observe(\.canGoBack, options: .initial, changeHandler: sync { $0.canGoBack = $1.canGoBack }),

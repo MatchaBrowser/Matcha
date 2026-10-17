@@ -6,7 +6,7 @@ enum BrowserSchema {
     /// Ajouter un modèle est une migration légère : SwiftData ajoute sa table et garde les données existantes
     /// (vérifié par `BrowserSchemaTests`, sur une base créée avec l'ancien schéma).
     static let models: [any PersistentModel.Type] = [
-        ProfileRecord.self, SpaceRecord.self, FolderRecord.self, TabRecord.self, SitePermissionRecord.self,
+        ProfileRecord.self, SpaceRecord.self, FolderRecord.self, TabRecord.self, SitePermissionRecord.self, HistoryRecord.self,
     ]
 
     /// Conteneur local (la synchronisation iCloud viendra en phase 7) ; en mémoire pour les tests.

@@ -11,6 +11,9 @@ nonisolated struct CommandQuery: Equatable, Sendable {
     let folded: String
     /// Mots du texte replié, séparés par les espaces.
     let tokens: [String]
+    /// Ce qui doit commencer un mot pour chaque mot tapé : ses morceaux s'il est coupé par une ponctuation
+    /// (« node.js » → « node », « js »), sinon le mot entier (« c++ » reste « c++ »).
+    let wordParts: [[String]]
     /// Texte replié sans espaces, pour la correspondance approximative.
     let compact: String
     /// Texte replié sans « https:// », « http:// », « www. » ni « / » final, comparé aux adresses.
@@ -26,6 +29,10 @@ nonisolated struct CommandQuery: Equatable, Sendable {
         trimmed = text.trimmingCharacters(in: .whitespacesAndNewlines)
         folded = CommandText.fold(text)
         tokens = folded.split(separator: " ").map(String.init)
+        wordParts = tokens.map { token in
+            let pieces = CommandText.words(token)
+            return pieces.count > 1 ? pieces.map(String.init) : [token]
+        }
         compact = tokens.joined()
         let stripped = CommandText.stripURLPrefixes(folded)
         urlFolded = stripped.count > 1 && stripped.hasSuffix("/") ? String(stripped.dropLast()) : stripped

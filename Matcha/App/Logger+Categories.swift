@@ -21,4 +21,6 @@ nonisolated extension Logger {
     static let downloads = Logger(subsystem: subsystem, category: "Downloads")
     /// Permissions des sites (caméra, micro) et données d'un site ; jamais d'adresse complète, seulement l'hôte.
     static let permissions = Logger(subsystem: subsystem, category: "Permissions")
+    /// Historique de navigation ; jamais d'adresse ni de titre, seulement des nombres.
+    static let history = Logger(subsystem: subsystem, category: "History")
 }

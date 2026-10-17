@@ -5,6 +5,7 @@ import SwiftUI
 struct MatchaApp: App {
     static let browserWindowID = "browser"
     static let privateWindowID = "private"
+    static let historyWindowID = "history"
 
     @NSApplicationDelegateAdaptor(AppDelegate.self) private var appDelegate
     @AppStorage(BrowserSettings.Key.appearance) private var appearance = BrowserSettings.appearance
@@ -18,6 +19,11 @@ struct MatchaApp: App {
         // Tests d'interface : leur dossier de téléchargements repart vide (sans effet sinon).
         DownloadLocation.resetTestSubfolderIfRequested()
         let session = BrowserSession.launch()
+        // Historique lu dès le lancement, hors du fil principal, après l'effacement des visites de plus d'un an : la
+        // barre de commande le trouve prêt.
+        if let history = session.history {
+            Task { await history.load() }
+        }
         // Rien n'est retenu (taille, Space affiché) avec une base de test.
         let miniWindows = MiniWindowManager(session: session, defaults: session.isInMemory ? nil : .standard)
         // Raccourci global de la mini-fenêtre, sauf dans l'app hôte des tests unitaires : il serait pris à
@@ -49,6 +55,17 @@ struct MatchaApp: App {
         }
         .windowStyle(.hiddenTitleBar)
         // Sans ses commandes par défaut (« Close », « Close All ») qui écraseraient ⌘W et ⇧⌘W.
+        .commandsRemoved()
+
+        // Historique (⌘Y, tâche 5.5) : une seule fenêtre, ouverte seulement par l'utilisateur, jamais au lancement ni
+        // restaurée ; sans commandes à elle (pas d'élément en plus dans le menu Fenêtre).
+        Window(Text("History"), id: Self.historyWindowID) {
+            HistoryWindow(session: session)
+                .environment(miniWindows)
+        }
+        .defaultSize(width: 760, height: 560)
+        .defaultLaunchBehavior(.suppressed)
+        .restorationBehavior(.disabled)
         .commandsRemoved()
 
         Settings {

@@ -64,6 +64,13 @@ extension MiniWindowManager {
             return
         }
         controller.close()
+        reveal(tab, in: space, openMainWindow: openMainWindow)
+        Logger.miniWindow.info("Page ouverte dans un Space")
+    }
+
+    /// La fenêtre principale affiche `space` et passe au premier plan, la page de `tab` prend le clavier ; fermée,
+    /// elle est rouverte par `openMainWindow` et la page s'y montre dès son affichage (`linkMainWindow`).
+    func reveal(_ tab: BrowserTab, in space: SpaceSession, openMainWindow: () -> Void) {
         if let link = mainWindow, link.isShown, let windowModel = link.windowModel {
             if windowModel.space !== space {
                 withAnimation(.easeInOut(duration: 0.3)) { windowModel.select(space) }
@@ -74,6 +81,5 @@ extension MiniWindowManager {
             pendingReveal = (space.id, tab)
             openMainWindow()
         }
-        Logger.miniWindow.info("Page ouverte dans un Space")
     }
 }

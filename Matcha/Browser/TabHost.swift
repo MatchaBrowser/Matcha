@@ -28,4 +28,6 @@ protocol TabHost: AnyObject {
     func sitePermissions(for webView: WKWebView) -> SitePermissionScope?
     /// Zoom des pages par site (tâche 5.4) ; nil : les pages gardent leur zoom d'une page à l'autre.
     var siteZooms: SiteZoomStore? { get }
+    /// Historique où retenir les visites de `webView` (tâche 5.5) ; nil : rien n'est retenu (fenêtre privée).
+    func historyScope(for webView: WKWebView) -> HistoryScope?
 }

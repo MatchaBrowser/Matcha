@@ -27,7 +27,8 @@ final class BrowserSession {
     static let resetStoreKey = "resetStore"
 
     @ObservationIgnored let container: ModelContainer
-    /// Session d'une fenêtre privée : rien n'est gardé (ni onglets, ni cookies, ni icônes, ni historique).
+    /// Session d'une fenêtre privée : rien n'est gardé (ni onglets, ni cookies, ni icônes, ni historique : `history`
+    /// est nil).
     @ObservationIgnored let isPrivate: Bool
     /// Icônes de sites : cache disque partagé, ou en mémoire seulement pour une fenêtre privée.
     @ObservationIgnored let faviconService: FaviconService
@@ -38,6 +39,8 @@ final class BrowserSession {
     /// Zoom des pages par site (tâche 5.4) : enregistré dans les réglages, ou en mémoire seulement pour une fenêtre
     /// privée ou une base de test.
     @ObservationIgnored let siteZooms: SiteZoomStore
+    /// Historique de navigation (tâche 5.5) ; nil pour une fenêtre privée : rien n'est retenu.
+    @ObservationIgnored let history: HistoryStore?
     private(set) var spaces: [SpaceSession] = []
     private(set) var profiles: [ProfileRecord] = []
     /// Magasin de données (cookies, stockage) de chaque profil, par identifiant de profil.
@@ -55,6 +58,7 @@ final class BrowserSession {
         sitePermissions = SitePermissionStore(context: isPrivate ? nil : context)
         let isInMemory = container.configurations.allSatisfy(\.isStoredInMemoryOnly)
         siteZooms = SiteZoomStore(defaults: isPrivate || isInMemory ? nil : .standard)
+        history = isPrivate ? nil : HistoryStore(container: container)
         var records = (try? context.fetch(FetchDescriptor<SpaceRecord>(sortBy: [SortDescriptor(\.order)]))) ?? []
         if records.isEmpty {
             records = [Self.createDefaultSpace(in: context)]
@@ -69,6 +73,7 @@ final class BrowserSession {
                 downloadScope: downloadScope,
                 sitePermissions: sitePermissions,
                 siteZooms: siteZooms,
+                history: history,
             )
         }
         terminationObserver = NotificationCenter.default.addObserver(

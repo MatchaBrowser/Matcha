@@ -47,6 +47,11 @@ extension TabManager: TabHost {
         sitePermissions
     }
 
+    /// Onglets et aperçu : le profil et le Space de ce Space.
+    func historyScope(for _: WKWebView) -> HistoryScope? {
+        history
+    }
+
     func closePage(of webView: WKWebView) {
         if isPeek(webView) {
             PeekActions.close(in: self)

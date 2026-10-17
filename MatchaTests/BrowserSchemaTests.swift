@@ -70,7 +70,7 @@ struct BrowserSchemaTests {
         defer { try? FileManager.default.removeItem(at: directory) }
         let url = directory.appendingPathComponent("ancienne.store")
         let oldModels: [any PersistentModel.Type] = [ProfileRecord.self, SpaceRecord.self, FolderRecord.self, TabRecord.self]
-        #expect(BrowserSchema.models.count == oldModels.count + 1)
+        #expect(BrowserSchema.models.count > oldModels.count)
 
         try {
             let schema = Schema(oldModels)
@@ -100,6 +100,61 @@ struct BrowserSchemaTests {
         context.insert(SitePermissionRecord(profileID: profileID, originKey: "https://meet.example.com", kind: .camera, decision: .allow))
         try context.save()
         #expect(SitePermissionStore(context: context).decision(.camera, for: TestOrigins.meet, profileID: profileID) == .allow)
+    }
+
+    /// Tâche 5.5 : une base créée avec le schéma de la 5.2 (sans `HistoryRecord`) s'ouvre avec le schéma actuel
+    /// (migration légère, faite par SwiftData), sans perdre ses onglets ni ses décisions de permission.
+    @Test func `a store from before history opens and keeps its data`() async throws {
+        let directory = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString, isDirectory: true)
+        try FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)
+        defer { try? FileManager.default.removeItem(at: directory) }
+        let url = directory.appendingPathComponent("avant-historique.store")
+        let oldModels: [any PersistentModel.Type] = [
+            ProfileRecord.self, SpaceRecord.self, FolderRecord.self, TabRecord.self, SitePermissionRecord.self,
+        ]
+        #expect(BrowserSchema.models.count == oldModels.count + 1)
+
+        let profileID = try {
+            let schema = Schema(oldModels)
+            let container = try ModelContainer(
+                for: schema,
+                configurations: ModelConfiguration(schema: schema, url: url, cloudKitDatabase: .none),
+            )
+            let profile = ProfileRecord(name: "Personnel")
+            let space = SpaceRecord(name: "Perso", profile: profile)
+            let pinned = TabRecord(url: URL(string: "https://example.com"), title: "Exemple", place: .pinned)
+            pinned.space = space
+            container.mainContext.insert(profile)
+            container.mainContext.insert(SitePermissionRecord(
+                profileID: profile.id, originKey: "https://meet.example.com", kind: .camera, decision: .allow,
+            ))
+            try container.mainContext.save()
+            return profile.id
+        }()
+
+        let schema = Schema(BrowserSchema.models)
+        let container = try ModelContainer(
+            for: schema,
+            configurations: ModelConfiguration(schema: schema, url: url, cloudKitDatabase: .none),
+        )
+        let context = container.mainContext
+        let spaces = try context.fetch(FetchDescriptor<SpaceRecord>())
+        #expect(spaces.map(\.name) == ["Perso"])
+        #expect(spaces.first?.tabs?.first?.title == "Exemple")
+        #expect(SitePermissionStore(context: context).decision(.camera, for: TestOrigins.meet, profileID: profileID) == .allow)
+        #expect(try context.fetchCount(FetchDescriptor<HistoryRecord>()) == 0)
+
+        // L'historique s'y écrit et s'y relit.
+        let history = HistoryStore(container: container)
+        try history.recordVisit(
+            url: #require(URL(string: "https://example.com/")),
+            title: "Exemple",
+            profileID: profileID,
+            spaceID: spaces.first?.id,
+        )
+        let reopened = HistoryStore(container: container)
+        await reopened.load()
+        #expect(reopened.index(for: profileID)?.entries["example.com"]?.title == "Exemple")
     }
 
     @Test func `archived tabs have no sidebar place`() {

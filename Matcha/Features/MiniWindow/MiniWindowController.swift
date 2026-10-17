@@ -24,7 +24,11 @@ final class MiniWindowController: NSObject, Identifiable {
         self.tab = tab
         self.profileID = profileID
         self.manager = manager
-        commandBar = MiniCommandBarModel(tab: tab, faviconService: manager.session.faviconService)
+        commandBar = MiniCommandBarModel(
+            tab: tab,
+            faviconService: manager.session.faviconService,
+            history: manager.session.history.map { ProfileHistory(store: $0, profileID: profileID) },
+        )
         panel = MiniWindowPanel(frame: frame)
         super.init()
         panel.delegate = self

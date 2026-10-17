@@ -38,6 +38,7 @@ extension BrowserSession {
             downloadScope: downloadScope,
             sitePermissions: sitePermissions,
             siteZooms: siteZooms,
+            history: history,
         )
         appendSpace(space)
         return space

@@ -13,6 +13,29 @@ nonisolated enum MatchTier: Int, Comparable, Sendable {
     }
 }
 
+/// Champs d'un résultat comparés au texte tapé, repliés une fois pour toutes : titres, adresse lisible et clé
+/// d'adresse. L'historique (tâche 5.5) les prépare à son chargement plutôt qu'à chaque frappe.
+nonisolated struct CommandMatchFields: Equatable, Sendable {
+    /// Titres repliés.
+    let titles: [String]
+    /// Adresse lisible repliée.
+    let address: String?
+    /// Clé de l'adresse (`CommandText.urlKey`).
+    let urlKey: String?
+
+    init(titles: [String], url: URL?) {
+        self.titles = titles.map(CommandText.fold)
+        address = url.map { CommandText.fold(CommandText.displayURL($0)) }
+        urlKey = url.map(CommandText.urlKey)
+    }
+
+    /// Même page que l'adresse tapée (`CommandText.urlKey`) : une adresse collée telle quelle
+    /// (« https://www.apple.com/ », fragment, « %20 ») désigne l'onglet ouvert dessus.
+    func isSamePage(as typedKey: String?) -> Bool {
+        typedKey != nil && urlKey == typedKey
+    }
+}
+
 /// Correspondance trouvée par `CommandMatcher`.
 nonisolated struct CommandMatch: Equatable, Sendable {
     let tier: MatchTier
@@ -49,14 +72,14 @@ nonisolated enum CommandMatcher {
     /// Meilleur palier atteint par `query` sur `titles` et `url`, ou nil s'il n'y en a aucun ou
     /// s'il est sous `minimumTier`.
     static func match(_ query: CommandQuery, titles: [String], url: URL?, minimumTier: MatchTier = .fuzzy) -> CommandMatch? {
+        match(query, fields: CommandMatchFields(titles: titles, url: url), minimumTier: minimumTier)
+    }
+
+    /// Comme `match(_:titles:url:minimumTier:)`, avec des champs déjà repliés (historique, tâche 5.5).
+    static func match(_ query: CommandQuery, fields: CommandMatchFields, minimumTier: MatchTier = .fuzzy) -> CommandMatch? {
         guard !query.folded.isEmpty else {
             return nil
         }
-        let fields = MatchFields(
-            titles: titles.map(CommandText.fold),
-            address: url.map { CommandText.fold(CommandText.displayURL($0)) },
-            url: url,
-        )
         if let tier = strictTier(query, fields) {
             return tier >= minimumTier ? CommandMatch(tier: tier, quality: 100) : nil
         }
@@ -89,24 +112,7 @@ nonisolated enum CommandMatcher {
 
     // MARK: Paliers
 
-    private struct MatchFields {
-        /// Titres repliés.
-        let titles: [String]
-        /// Adresse lisible repliée.
-        let address: String?
-        let url: URL?
-
-        /// Même page que l'adresse tapée (`CommandText.urlKey`) : une adresse collée telle quelle
-        /// (« https://www.apple.com/ », fragment, « %20 ») désigne l'onglet ouvert dessus.
-        func isSamePage(as typedKey: String?) -> Bool {
-            guard let typedKey, let url else {
-                return false
-            }
-            return CommandText.urlKey(url) == typedKey
-        }
-    }
-
-    private static func strictTier(_ query: CommandQuery, _ fields: MatchFields) -> MatchTier? {
+    private static func strictTier(_ query: CommandQuery, _ fields: CommandMatchFields) -> MatchTier? {
         let folded = query.folded
         let urlFolded = query.urlFolded
         let address = urlFolded.isEmpty ? nil : fields.address
@@ -116,7 +122,7 @@ nonisolated enum CommandMatcher {
         if fields.titles.contains(where: { $0.hasPrefix(folded) }) || address?.hasPrefix(urlFolded) == true {
             return .prefix
         }
-        if isWordPrefixMatch(query.tokens, fields) {
+        if isWordPrefixMatch(query, fields) {
             return .wordPrefix
         }
         if folded.count >= 2, fields.titles.contains(where: { $0.contains(folded) }) || address?.contains(urlFolded) == true {
@@ -127,17 +133,39 @@ nonisolated enum CommandMatcher {
 
     /// Chaque mot tapé commence un mot des titres ou de l'adresse, dans n'importe quel ordre. Un mot
     /// tapé coupé par une ponctuation (« node.js », « 6.4 ») compte pour ses morceaux ; « c++ », d'un
-    /// seul morceau, reste entier pour ne pas se réduire à « c ».
-    private static func isWordPrefixMatch(_ tokens: [String], _ fields: MatchFields) -> Bool {
-        let words = (fields.titles + [fields.address].compactMap(\.self)).flatMap(CommandText.words)
-        return !tokens.isEmpty && tokens.allSatisfy { token in
-            let pieces = CommandText.words(token)
-            let parts = pieces.count > 1 ? pieces : [Substring(token)]
-            return parts.allSatisfy { part in words.contains { $0.hasPrefix(part) } }
+    /// seul morceau, reste entier pour ne pas se réduire à « c » (et ne commence donc aucun mot).
+    private static func isWordPrefixMatch(_ query: CommandQuery, _ fields: CommandMatchFields) -> Bool {
+        let haystacks = fields.titles + [fields.address].compactMap(\.self)
+        return !query.wordParts.isEmpty && query.wordParts.allSatisfy { parts in
+            parts.allSatisfy { part in haystacks.contains { hasWord(startingWith: part, in: $0) } }
         }
     }
 
-    private static func bestFuzzyQuality(_ compact: String, _ fields: MatchFields) -> Int? {
+    /// Vrai si un mot de `text` (suite de lettres et de chiffres, comme `CommandText.words`) commence par `part`,
+    /// sans découper le texte : l'historique (tâche 5.5) passe des milliers d'adresses à chaque frappe.
+    private static func hasWord(startingWith part: String, in text: String) -> Bool {
+        guard let first = part.first, part.allSatisfy(isWordCharacter) else {
+            return false
+        }
+        var previousIsWordCharacter = false
+        var index = text.startIndex
+        while index < text.endIndex {
+            let character = text[index]
+            let isWord = isWordCharacter(character)
+            if isWord, !previousIsWordCharacter, character == first, text[index...].hasPrefix(part) {
+                return true
+            }
+            previousIsWordCharacter = isWord
+            index = text.index(after: index)
+        }
+        return false
+    }
+
+    private static func isWordCharacter(_ character: Character) -> Bool {
+        character.isLetter || character.isNumber
+    }
+
+    private static func bestFuzzyQuality(_ compact: String, _ fields: CommandMatchFields) -> Int? {
         guard (3 ... maximumFuzzyLength).contains(compact.count) else {
             return nil
         }

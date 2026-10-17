@@ -415,6 +415,35 @@
         }
       }
     },
+    "All History" : {
+      "comment" : "Clear History: period",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gesamter Verlauf"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Todo el historial"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tout l'historique"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tutta la cronologia"
+          }
+        }
+      }
+    },
     "Allow" : {
       "comment" : "Site settings: the website may use the camera or microphone without asking",
       "localizations" : {
@@ -851,6 +880,100 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Cancella"
+          }
+        }
+      }
+    },
+    "Clear History" : {
+      "comment" : "Title of the dialog that clears the history",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Verlauf löschen"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Borrar historial"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Effacer l'historique"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cancella cronologia"
+          }
+        }
+      }
+    },
+    "Clear History Today" : {
+      "comment" : "Clear History: period since midnight",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Heute"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Today"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hoy"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aujourd'hui"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Oggi"
+          }
+        }
+      }
+    },
+    "Clear History…" : {
+      "comment" : "Toolbar button of the History window",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Verlauf löschen …"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Borrar historial…"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Effacer l'historique…"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cancella cronologia…"
           }
         }
       }
@@ -3225,6 +3348,35 @@
         }
       }
     },
+    "No History" : {
+      "comment" : "Title of the empty History window",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kein Verlauf"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No hay historial"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aucun historique"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nessuna cronologia"
+          }
+        }
+      }
+    },
     "No Tabs" : {
       "comment" : "Title of the empty page when no tab is selected",
       "localizations" : {
@@ -3428,6 +3580,35 @@
         }
       }
     },
+    "Open in New Tab" : {
+      "comment" : "History window: context menu item",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "In neuem Tab öffnen"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Abrir en una pestaña nueva"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ouvrir dans un nouvel onglet"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Apri in un nuovo pannello"
+          }
+        }
+      }
+    },
     "Open in Space" : {
       "localizations" : {
         "de" : {
@@ -3597,6 +3778,93 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Zoom della pagina: %@"
+          }
+        }
+      }
+    },
+    "Pages visited during this period are removed from the history of “%@”. Cookies and website data are kept." : {
+      "comment" : "Clear History dialog, with several profiles; %@ is the profile name",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Die in diesem Zeitraum besuchten Seiten werden aus dem Verlauf von „%@“ entfernt. Cookies und Websitedaten bleiben erhalten."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Las páginas visitadas durante este periodo se eliminan del historial de “%@”. Las cookies y los datos de los sitios se conservan."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Les pages visitées pendant cette période sont supprimées de l'historique de « %@ ». Les cookies et les données des sites sont conservés."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Le pagine visitate in questo periodo vengono rimosse dalla cronologia di “%@”. I cookie e i dati dei siti vengono mantenuti."
+          }
+        }
+      }
+    },
+    "Pages visited during this period are removed from the history. Cookies and website data are kept." : {
+      "comment" : "Clear History dialog, with a single profile",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Die in diesem Zeitraum besuchten Seiten werden aus dem Verlauf entfernt. Cookies und Websitedaten bleiben erhalten."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Las páginas visitadas durante este periodo se eliminan del historial. Las cookies y los datos de los sitios se conservan."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Les pages visitées pendant cette période sont supprimées de l'historique. Les cookies et les données des sites sont conservés."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Le pagine visitate in questo periodo vengono rimosse dalla cronologia. I cookie e i dati dei siti vengono mantenuti."
+          }
+        }
+      }
+    },
+    "Pages you visit appear here." : {
+      "comment" : "Description of the empty History window",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hier erscheinen die Seiten, die du besuchst."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aquí aparecen las páginas que visitas."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Les pages que vous visitez apparaissent ici."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Qui compaiono le pagine che visiti."
           }
         }
       }
@@ -4557,6 +4825,35 @@
         }
       }
     },
+    "Search History" : {
+      "comment" : "Placeholder of the search field of the History window",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Verlauf durchsuchen"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Buscar en el historial"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rechercher dans l'historique"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cerca nella cronologia"
+          }
+        }
+      }
+    },
     "Search engine" : {
       "localizations" : {
         "de" : {
@@ -4697,6 +4994,35 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Fai clic su un link tenendo premuto il tasto Maiuscole per aprirlo in anteprima senza lasciare la pagina. Con questa opzione, i Preferiti e i pannelli fissati restano sul loro sito web."
+          }
+        }
+      }
+    },
+    "Show All History" : {
+      "comment" : "History menu item (⌘Y)",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gesamten Verlauf anzeigen"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mostrar todo el historial"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Afficher tout l'historique"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mostra tutta la cronologia"
           }
         }
       }
@@ -5306,6 +5632,35 @@
         }
       }
     },
+    "The Last Hour" : {
+      "comment" : "Clear History: period",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Letzte Stunde"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "La última hora"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "La dernière heure"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "L'ultima ora"
+          }
+        }
+      }
+    },
     "The page couldn't be exported as PDF." : {
       "comment" : "Alert after File > Export as PDF… failed",
       "localizations" : {
@@ -5389,6 +5744,64 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Questa pagina non ha impostazioni del sito web."
+          }
+        }
+      }
+    },
+    "Today" : {
+      "comment" : "History section of the pages visited today",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Heute"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hoy"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aujourd'hui"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Oggi"
+          }
+        }
+      }
+    },
+    "Today and Yesterday" : {
+      "comment" : "Clear History: period",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Heute und gestern"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hoy y ayer"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aujourd'hui et hier"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Oggi e ieri"
           }
         }
       }
@@ -5534,6 +5947,35 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Ciò che digiti nella barra dei comandi viene inviato a %@ per suggerire ricerche. Mai nelle finestre private."
+          }
+        }
+      }
+    },
+    "Yesterday" : {
+      "comment" : "History section of the pages visited yesterday",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gestern"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ayer"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hier"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ieri"
           }
         }
       }

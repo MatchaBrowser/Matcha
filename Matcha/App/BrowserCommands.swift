@@ -154,18 +154,8 @@ struct BrowserCommands: Commands {
         // Menu Onglets : juste après Spaces.
         TabCommands(miniWindows: miniWindows)
 
-        CommandMenu("History") {
-            Button("Homepage") { windowActions?.goHome?() }
-                .keyboardShortcut("h", modifiers: [.command, .shift])
-                .disabled(windowActions?.goHome == nil)
-            Divider()
-            Button("Back") { frontTab?.goBack() }
-                .keyboardShortcut("[")
-                .disabled(frontTab?.canGoBack != true)
-            Button("Forward") { frontTab?.goForward() }
-                .keyboardShortcut("]")
-                .disabled(frontTab?.canGoForward != true)
-        }
+        // Menu Historique : Accueil, Précédent, Suivant, « Afficher tout l'historique » (tâche 5.5).
+        HistoryCommands(miniWindows: miniWindows)
     }
 
     /// ⌘W : la mini-fenêtre active (sa barre d'abord), sinon la barre de commande, l'aperçu, l'onglet, ou la

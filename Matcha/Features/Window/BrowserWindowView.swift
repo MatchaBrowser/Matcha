@@ -35,7 +35,9 @@ struct BrowserWindowView: View {
         // Le Space affiché est retenu d'un lancement à l'autre, sauf avec une base de test.
         let windowModel = WindowModel(session: session, defaults: session.isInMemory ? nil : .standard)
         _model = State(initialValue: windowModel)
-        _commandBar = State(initialValue: CommandBarModel(windowModel: windowModel))
+        // Historique du profil du Space affiché, relu à chaque frappe ; aucun pour une fenêtre privée.
+        let history = session.history.map { store in ProfileHistory(store: store) { windowModel.space.record.profile?.id } }
+        _commandBar = State(initialValue: CommandBarModel(windowModel: windowModel, history: history))
     }
 
     /// Space affiché.
@@ -212,6 +214,7 @@ struct BrowserWindowView: View {
             selectSpace: { index in withAnimation(.easeInOut(duration: 0.3)) { model.selectSpace(at: index) } },
             newSpace: { withAnimation(.easeInOut(duration: 0.3)) { model.newSpace() } },
             showTab: showTab,
+            isPrivate: session.isPrivate,
         )
     }
 
