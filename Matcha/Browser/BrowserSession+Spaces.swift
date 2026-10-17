@@ -37,6 +37,7 @@ extension BrowserSession {
             faviconService: faviconService,
             downloadScope: downloadScope,
             sitePermissions: sitePermissions,
+            siteZooms: siteZooms,
         )
         appendSpace(space)
         return space

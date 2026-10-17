@@ -16,7 +16,7 @@ protocol SidebarItemDropTarget: AnyObject {
 /// Vue web des onglets de Matcha.
 ///
 /// ⌃⇥ et ⌃⇧⇥ changent d'onglet, comme dans Safari : le menu de l'app passe avant WebKit, qui s'en servirait
-/// pour déplacer le focus dans la page.
+/// pour déplacer le focus dans la page. ⌘= est proposé au menu comme ⌘+ (« Zoom avant », tâche 5.4).
 ///
 /// Un élément glissé depuis la barre n'atteint jamais la page : le glisser de SwiftUI porte aussi des promesses
 /// de fichier, pour lesquelles WebKit est inscrit, si bien que la page recevrait tout glisser qui la survole.
@@ -81,6 +81,10 @@ final class BrowserWebView: WKWebView {
 
     override func performKeyEquivalent(with event: NSEvent) -> Bool {
         if Self.isTabSwitch(event), NSApp.mainMenu?.performKeyEquivalent(with: event) == true {
+            return true
+        }
+        // ⌘= : « Zoom avant » (⌘+) ; sans lui, le menu ne le reconnaîtrait pas.
+        if let zoomIn = ZoomKeyAlias.zoomInEvent(for: event), NSApp.mainMenu?.performKeyEquivalent(with: zoomIn) == true {
             return true
         }
         return super.performKeyEquivalent(with: event)

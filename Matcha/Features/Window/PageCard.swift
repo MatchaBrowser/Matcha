@@ -19,6 +19,8 @@ struct PageCard: View {
     let activate: () -> Void
     /// Destinataire des éléments de la barre lâchés sur la page.
     var sidebarDropTarget: (any SidebarItemDropTarget)?
+    /// Zoom par site de la fenêtre (badge du zoom de la barre d'adresse au-dessus de la page).
+    var siteZooms: SiteZoomStore?
 
     @Environment(WindowModel.self) private var windowModel: WindowModel?
 
@@ -41,6 +43,7 @@ struct PageCard: View {
                     },
                     isSiteSettingsPresented: showsSiteSettings,
                     toggleSiteSettings: toggleSiteSettings,
+                    siteZooms: siteZooms,
                 )
                 .simultaneousGesture(TapGesture().onEnded { activate() })
                 Divider()

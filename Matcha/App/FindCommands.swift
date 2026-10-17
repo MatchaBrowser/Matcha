@@ -1,7 +1,7 @@
 import SwiftUI
 
 /// Sous-menu Édition > Rechercher (tâche 5.3), comme dans Safari : « Rechercher… » (⌘F), « Rechercher le suivant »
-/// (⌘G), « Rechercher le précédent » (⇧⌘G), sur la page de la fenêtre active (`FindTarget`). Il prend la place des
+/// (⌘G), « Rechercher le précédent » (⇧⌘G), sur la page de la fenêtre active (`FrontPage`). Il prend la place des
 /// commandes de recherche standard (`.textEditing`, vide aujourd'hui) : jamais deux ⌘F. Une page qui garde ⌘F ou ⌘G
 /// pour elle (éditeur en ligne) passe avant, comme dans Safari : WebKit lui envoie les raccourcis d'abord.
 struct FindCommands: Commands {
@@ -16,7 +16,7 @@ struct FindCommands: Commands {
     }
 
     private var page: BrowserTab? {
-        FindTarget.page(miniWindowTab: miniWindow?.tab, tabManager: tabManager)
+        FrontPage.page(miniWindowTab: miniWindow?.tab, tabManager: tabManager)
     }
 
     var body: some Commands {

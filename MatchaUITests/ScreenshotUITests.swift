@@ -48,7 +48,10 @@ import XCTest
 ///   (`28-permission-bandeau`). Réseau nécessaire ; la demande d'accès de macOS peut apparaître la première fois ;
 /// - `MATCHA_SCREENSHOT_FIND` : texte cherché (⌘F) dans l'onglet affiché : `29-recherche-trouvee`, puis « zzqqxx » :
 ///   `30-recherche-introuvable`. Sans `MATCHA_SCREENSHOT_URLS`, ouvre la documentation de Postfix (sans réseau) :
-///   `MATCHA_SCREENSHOT_FIND=postfix`.
+///   `MATCHA_SCREENSHOT_FIND=postfix` ;
+/// - `MATCHA_SCREENSHOT_ZOOM` : badge du zoom à côté de la pastille d'adresse après ⌘+ (`31-zoom-badge`) ; avec
+///   `=site`, la ligne « Zoom » des réglages du site d'example.com (`32-zoom-reglages-site`, réseau). Voir
+///   `ScreenshotUITests+Zoom`.
 ///
 /// La capture `1-vide` montre la fenêtre sans onglet : la page vide invite à ⌘T, la barre de commande
 /// ne s'ouvre jamais d'elle-même.
@@ -87,6 +90,7 @@ final class ScreenshotUITests: XCTestCase {
         captureSiteSettings(in: app, window: window)
         capturePermissionBanner(in: app, window: window)
         try captureFindBar(in: app, window: window)
+        try captureZoom(in: app, window: window)
         if environment["MATCHA_SCREENSHOT_PEEK"] != nil {
             captureHiddenSidebar(in: app, window: window)
         }
@@ -172,21 +176,6 @@ final class ScreenshotUITests: XCTestCase {
             app.menuItems[parts[0]].click()
         }
         attach(window.screenshot(), as: "3-rangement")
-    }
-
-    /// Confirmation « URL copiée » (⇧⌘C), capturée une fois le fondu d'apparition fini, puis attendue
-    /// jusqu'à sa disparition pour ne pas gêner les captures suivantes.
-    @MainActor
-    private func captureCopyConfirmation(in app: XCUIApplication, window: XCUIElement) {
-        if environment["MATCHA_SCREENSHOT_URLS"] == nil {
-            openAddress("about:blank?copy", in: app)
-        }
-        app.typeKey("c", modifierFlags: [.command, .shift])
-        let confirmation = app.descendants(matching: .any).matching(identifier: "copyConfirmation").firstMatch
-        XCTAssertTrue(confirmation.waitForExistence(timeout: 2))
-        usleep(300_000)
-        attach(window.screenshot(), as: "14-url-copiee")
-        XCTAssertTrue(confirmation.waitForNonExistence(timeout: 5))
     }
 
     /// Split de `count` panneaux formé par le menu, puis le panneau de gauche rendu actif, puis la poignée

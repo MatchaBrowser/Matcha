@@ -38,6 +38,9 @@ final class BrowserTab: Identifiable {
     let permissionPrompts = PermissionPromptQueue()
     /// Recherche dans la page (barre, texte, résultat ; tâche 5.3).
     let find = FindSession()
+    /// Zoom de la page (`WKWebView.pageZoom`, tâche 5.4), recopié ici pour les menus : il ne change que par
+    /// `setPageZoom`. Le zoom par pincement (`magnification`) est à part.
+    private(set) var pageZoom = ZoomLevels.actualSize
 
     /// Délégué de navigation et d'interface, branché sur chaque vue web créée (et sur la vue actuelle).
     @ObservationIgnored weak var delegate: (any WKNavigationDelegate & WKUIDelegate)? {
@@ -107,6 +110,7 @@ final class BrowserTab: Identifiable {
         #endif
         webView.navigationDelegate = delegate
         webView.uiDelegate = delegate
+        webView.pageZoom = pageZoom
         // Copie réutilisable pour les prochaines vues (rechargement, duplication).
         configuration = webView.configuration
         self.webView = webView
@@ -135,8 +139,9 @@ final class BrowserTab: Identifiable {
         savedInteractionState = state
     }
 
-    /// Libère la vue web (mémoire, son, processus), refuse les demandes de permission en attente et oublie la recherche
-    /// dans la page. L'onglet affiche désormais `url` et `title`, et chargera `url` quand on le rouvrira.
+    /// Libère la vue web (mémoire, son, processus), refuse les demandes de permission en attente, oublie la recherche
+    /// dans la page et revient à 100 % (le zoom du site reviendra avec la page). L'onglet affiche désormais `url` et
+    /// `title`, et chargera `url` quand on le rouvrira.
     func unload(resettingTo url: URL?, title: String?) {
         observations = []
         permissionPrompts.denyAll()
@@ -158,6 +163,7 @@ final class BrowserTab: Identifiable {
         progress = 0
         canGoBack = false
         canGoForward = false
+        pageZoom = ZoomLevels.actualSize
     }
 
     func load(_ url: URL) {
@@ -178,6 +184,14 @@ final class BrowserTab: Identifiable {
 
     func stop() {
         webView?.stopLoading()
+    }
+
+    /// Zoom de la page (100 % = 1) ; gardé pour la vue web recréée après un déchargement.
+    func setPageZoom(_ zoom: Double) {
+        if pageZoom != zoom {
+            pageZoom = zoom
+        }
+        webView?.pageZoom = zoom
     }
 
     private func load(_ url: URL, in webView: WKWebView) {

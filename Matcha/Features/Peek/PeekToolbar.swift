@@ -1,6 +1,6 @@
 import SwiftUI
 
-/// Barre flottante au-dessus de l'aperçu : site à gauche, « Ouvrir en onglet » et × à droite.
+/// Barre flottante au-dessus de l'aperçu : site et zoom de sa page à gauche, « Ouvrir en onglet » et × à droite.
 struct PeekToolbar: View {
     let page: BrowserTab
     let tabManager: TabManager
@@ -8,6 +8,7 @@ struct PeekToolbar: View {
     var body: some View {
         HStack(spacing: 6) {
             address
+            ZoomBadge(page: page, siteZooms: tabManager.siteZooms, style: .floating)
             Spacer(minLength: 8)
             Button { PeekActions.openAsTab(in: tabManager) } label: {
                 Image(systemName: "arrow.up.left.and.arrow.down.right")
@@ -26,6 +27,7 @@ struct PeekToolbar: View {
             .accessibilityIdentifier("peekCloseButton")
         }
         .buttonStyle(PeekRoundButtonStyle())
+        .animatesZoomBadge(of: page)
     }
 
     private var openAsTabTitle: Text {

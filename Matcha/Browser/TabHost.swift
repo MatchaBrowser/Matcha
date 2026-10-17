@@ -26,4 +26,6 @@ protocol TabHost: AnyObject {
     func closePage(of webView: WKWebView)
     /// Décisions de permission du profil de `webView` (tâche 5.2) ; nil : rien n'est retenu.
     func sitePermissions(for webView: WKWebView) -> SitePermissionScope?
+    /// Zoom des pages par site (tâche 5.4) ; nil : les pages gardent leur zoom d'une page à l'autre.
+    var siteZooms: SiteZoomStore? { get }
 }

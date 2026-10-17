@@ -35,6 +35,9 @@ final class BrowserSession {
     @ObservationIgnored let downloadScope: DownloadScope
     /// Décisions de permission des sites (tâche 5.2) : enregistrées, ou en mémoire seulement pour une fenêtre privée.
     @ObservationIgnored let sitePermissions: SitePermissionStore
+    /// Zoom des pages par site (tâche 5.4) : enregistré dans les réglages, ou en mémoire seulement pour une fenêtre
+    /// privée ou une base de test.
+    @ObservationIgnored let siteZooms: SiteZoomStore
     private(set) var spaces: [SpaceSession] = []
     private(set) var profiles: [ProfileRecord] = []
     /// Magasin de données (cookies, stockage) de chaque profil, par identifiant de profil.
@@ -50,6 +53,8 @@ final class BrowserSession {
         downloadScope = isPrivate ? .privateWindow(UUID()) : .regular
         let context = container.mainContext
         sitePermissions = SitePermissionStore(context: isPrivate ? nil : context)
+        let isInMemory = container.configurations.allSatisfy(\.isStoredInMemoryOnly)
+        siteZooms = SiteZoomStore(defaults: isPrivate || isInMemory ? nil : .standard)
         var records = (try? context.fetch(FetchDescriptor<SpaceRecord>(sortBy: [SortDescriptor(\.order)]))) ?? []
         if records.isEmpty {
             records = [Self.createDefaultSpace(in: context)]
@@ -63,6 +68,7 @@ final class BrowserSession {
                 faviconService: faviconService,
                 downloadScope: downloadScope,
                 sitePermissions: sitePermissions,
+                siteZooms: siteZooms,
             )
         }
         terminationObserver = NotificationCenter.default.addObserver(

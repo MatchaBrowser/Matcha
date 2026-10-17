@@ -70,6 +70,11 @@ extension MiniWindowManager: TabHost {
         window(for: webView)?.close()
     }
 
+    /// Zoom par site de la session principale : une mini-fenêtre n'est jamais privée (tâche 5.4).
+    var siteZooms: SiteZoomStore? {
+        session.siteZooms
+    }
+
     /// Décisions du profil de la mini-fenêtre (jamais privée : elles sont enregistrées).
     func sitePermissions(for webView: WKWebView) -> SitePermissionScope? {
         window(for: webView).map { SitePermissionScope(store: session.sitePermissions, profileID: $0.profileID) }

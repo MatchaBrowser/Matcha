@@ -27,6 +27,7 @@ struct MiniWindowView: View {
             MiniWindowToolbar(
                 tab: tab,
                 target: target,
+                siteZooms: manager.siteZooms,
                 close: controller.close,
                 editAddress: { controller.showCommandBar(.editAddress) },
                 openInSpace: { manager.openInSpace(controller) { openWindow(id: MatchaApp.browserWindowID) } },

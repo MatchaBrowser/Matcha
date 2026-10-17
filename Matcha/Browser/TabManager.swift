@@ -24,6 +24,8 @@ final class TabManager {
     @ObservationIgnored let downloadScope: DownloadScope
     /// Décisions de permission du profil de ces onglets (tâche 5.2), données par le Space ; nil : rien n'est retenu.
     @ObservationIgnored var sitePermissions: SitePermissionScope?
+    /// Zoom des pages par site (tâche 5.4), donné par le Space : celui de la session ; nil : rien n'est retenu.
+    @ObservationIgnored var siteZooms: SiteZoomStore?
 
     init(websiteDataStore: WKWebsiteDataStore, faviconService: FaviconService = .shared, downloadScope: DownloadScope = .regular) {
         self.websiteDataStore = websiteDataStore

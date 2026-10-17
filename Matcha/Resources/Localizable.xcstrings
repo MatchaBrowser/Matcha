@@ -270,6 +270,35 @@
         }
       }
     },
+    "Actual Size" : {
+      "comment" : "View menu, site settings and help tag of the zoom badge next to the address: page zoom back to 100 % (⌘0)",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Originalgröße"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tamaño real"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Taille réelle"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dimensioni reali"
+          }
+        }
+      }
+    },
     "Add Color" : {
       "comment" : "Icon button: add a color to the Space theme",
       "localizations" : {
@@ -2006,6 +2035,35 @@
         }
       }
     },
+    "Export as PDF…" : {
+      "comment" : "File menu: saves the whole page as a PDF file",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Als PDF exportieren …"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Exportar como PDF…"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Exporter au format PDF…"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Esporta come PDF…"
+          }
+        }
+      }
+    },
     "Failed" : {
       "comment" : "State of a download that failed",
       "localizations" : {
@@ -3485,6 +3543,64 @@
         }
       }
     },
+    "Page Zoom" : {
+      "comment" : "Accessibility label of the zoom badge next to the address; its value is a percentage",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Seitenzoom"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zoom de la página"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zoom de la page"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zoom della pagina"
+          }
+        }
+      }
+    },
+    "Page zoom: %@" : {
+      "comment" : "VoiceOver announcement after ⌘+, ⌘- or ⌘0, or a click on the zoom badge; the argument is a percentage",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Seitenzoom: %@"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zoom de la página: %@"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zoom de la page : %@"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zoom della pagina: %@"
+          }
+        }
+      }
+    },
     "Pane Divider" : {
       "comment" : "Accessibility label of the handle between two split view panes",
       "localizations" : {
@@ -3800,6 +3916,35 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Occorrenza precedente"
+          }
+        }
+      }
+    },
+    "Print…" : {
+      "comment" : "File menu: prints the page (⌘P)",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Drucken …"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Imprimir…"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Imprimer…"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Stampa…"
           }
         }
       }
@@ -5161,6 +5306,35 @@
         }
       }
     },
+    "The page couldn't be exported as PDF." : {
+      "comment" : "Alert after File > Export as PDF… failed",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Die Seite konnte nicht als PDF exportiert werden."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No se ha podido exportar la página como PDF."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "La page n'a pas pu être exportée au format PDF."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Impossibile esportare la pagina come PDF."
+          }
+        }
+      }
+    },
     "This page" : {
       "comment" : "Permission banner: the page asking, when it has no website name (local file)",
       "localizations" : {
@@ -5446,6 +5620,93 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Pagina iniziale"
+          }
+        }
+      }
+    },
+    "Zoom" : {
+      "comment" : "Site settings: zoom of the pages of the website",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zoom"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zoom"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zoom"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zoom"
+          }
+        }
+      }
+    },
+    "Zoom In" : {
+      "comment" : "View menu and site settings: enlarges the page (⌘+)",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vergrößern"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ampliar"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zoom avant"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ingrandisci"
+          }
+        }
+      }
+    },
+    "Zoom Out" : {
+      "comment" : "View menu and site settings: reduces the page (⌘-)",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Verkleinern"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Reducir"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zoom arrière"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Riduci"
           }
         }
       }

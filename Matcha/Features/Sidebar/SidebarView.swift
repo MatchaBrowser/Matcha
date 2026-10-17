@@ -1,6 +1,6 @@
 import SwiftUI
 
-/// Barre latérale, de haut en bas : navigation, adresse (et bouton des réglages du site), panneau des réglages du site
+/// Barre latérale, de haut en bas : navigation, adresse (badge du zoom, bouton des réglages du site), panneau des réglages du site
 /// s'il est ouvert, favoris, épinglés, nouvel onglet, onglets du jour, panneau des téléchargements s'il est ouvert,
 /// Spaces (et à gauche, le bouton des téléchargements).
 struct SidebarView: View {
@@ -22,12 +22,15 @@ struct SidebarView: View {
         VStack(alignment: .leading, spacing: 10) {
             if showsAddressBar {
                 SidebarTopBar(tab: tabManager.selectedTab, showsNavigationButtons: showsNavigationButtons, goHome: goHome)
+                // Badge du zoom de l'onglet sélectionné, même quand un aperçu est ouvert (il a le sien).
                 HStack(spacing: 4) {
                     AddressPill(tab: tabManager.selectedTab, edit: editAddress)
+                    ZoomBadge(page: tabManager.selectedTab, siteZooms: tabManager.siteZooms)
                     SiteSettingsButton(tab: tabManager.selectedTab, isPresented: model.isSiteSettingsPresented) {
                         setSiteSettingsPresented(!model.isSiteSettingsPresented)
                     }
                 }
+                .animatesZoomBadge(of: tabManager.selectedTab)
                 if model.isSiteSettingsPresented {
                     VStack(spacing: 0) {
                         SiteSettingsPanel(model: model, tabManager: tabManager)

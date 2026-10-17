@@ -22,7 +22,8 @@ final class SpaceSession: Identifiable {
 
     /// Recharge les onglets enregistrés du Space et enregistre ensuite chaque changement.
     /// `websiteDataStore` : magasin de données du profil du Space ; `downloadScope` : celui de la fenêtre ;
-    /// `sitePermissions` : décisions de permission de la session, vues pour le profil du Space.
+    /// `sitePermissions` : décisions de permission de la session, vues pour le profil du Space ; `siteZooms` : zoom des
+    /// pages par site de la session.
     init(
         record: SpaceRecord,
         context: ModelContext,
@@ -30,12 +31,14 @@ final class SpaceSession: Identifiable {
         faviconService: FaviconService = .shared,
         downloadScope: DownloadScope = .regular,
         sitePermissions: SitePermissionStore? = nil,
+        siteZooms: SiteZoomStore? = nil,
     ) {
         self.record = record
         self.context = context
         theme = SpaceTheme.decoded(from: record.themeData) ?? .default
         tabManager = TabManager(websiteDataStore: websiteDataStore, faviconService: faviconService, downloadScope: downloadScope)
         tabManager.sitePermissions = sitePermissions.map { SitePermissionScope(store: $0, profileID: record.profile?.id) }
+        tabManager.siteZooms = siteZooms
         store = SpaceStore(space: record, context: context)
         let (tabs, layout) = store.load()
         tabManager.restore(tabs: tabs, layout: layout)

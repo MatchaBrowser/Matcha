@@ -90,6 +90,7 @@ struct ContentCard: View {
             editAddress: editAddress,
             activate: { tab.map(activate) },
             sidebarDropTarget: dropController,
+            siteZooms: tabManager.siteZooms,
         )
     }
 
