@@ -1,0 +1,5 @@
+--swift-version 6.4
+--language-mode 6
+--indent 4
+--max-width 140
+--exclude build,DerivedData

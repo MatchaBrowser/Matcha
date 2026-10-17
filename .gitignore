@@ -1,0 +1,14 @@
+# Produits de compilation
+build/
+DerivedData/
+
+# Données propres à l'utilisateur dans Xcode
+xcuserdata/
+*.xcuserstate
+
+# macOS
+.DS_Store
+
+# Outils locaux
+buildServer.json
+matcha-icon/

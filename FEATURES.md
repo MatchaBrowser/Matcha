@@ -1,0 +1,35 @@
+# FEATURES.md — fonctions mises de côté
+
+Fonctions retirées du plan pour l'instant. **Ne pas les reprendre sans mon accord.** Pour en relancer une, on la remet dans `PLAN.md` à sa place, avec son numéro, et on relit d'abord les notes ci-dessous.
+
+---
+
+## Archivage automatique (ex-tâche 4.2)
+
+**Reportée le 2026-10-17.** L'archivage a été une source de soucis à l'usage ; on le repensera plus tard.
+
+**Texte d'origine :** `Services/ArchiveService.swift`. Réglage : 12 h, 24 h (défaut), 7 jours, 30 jours. Au lancement puis toutes les 10 minutes, les onglets du jour inactifs depuis plus longtemps passent en `archived` et libèrent leur vue. Page Archive avec recherche et restauration ; la barre de commande cherche aussi dans l'archive. Action « Archiver l'onglet » dans la barre de commande. Tests des règles.
+
+**Ce qui existe déjà :** `TabRecord.placeValue` accepte `archived` depuis la 3.1, et `TabRecord.place` vaut alors nil. On garde cette valeur : la retirer changerait le schéma de la base.
+
+**Notes d'une étude faite le 2026-10-17, à vérifier sur le code de l'époque :**
+- Ne jamais archiver l'onglet sélectionné d'un Space, ni un onglet qui joue du son ou utilise la caméra ou le micro. Un onglet du jour vide est fermé, sans entrée d'archive.
+- `lastActivity` doit être tenu à jour à la sélection, à l'affichage, à l'ouverture en arrière-plan et à l'arrivée dans les onglets du jour. Aujourd'hui, un onglet ouvert en arrière-plan est plus récent que l'onglet sélectionné et lui prend la sélection au lancement suivant.
+- Sans changer le schéma : pour un onglet archivé, `lastActivity` peut porter la date d'archivage. L'`interactionState` est gardé pour retrouver l'historique précédent/suivant à la restauration.
+- Archiver dans le même tour que le retrait de l'onglet : l'enregistrement automatique de `SpaceStore` a lieu une seconde après.
+- Page « Onglets archivés » dans une fenêtre à part (⌥⌘Y) plutôt qu'une feuille, pour que ⌘W et les autres commandes n'agissent pas sur la fenêtre derrière.
+- Conservation : 30 jours, 500 entrées au plus, une seule entrée par Space et par adresse.
+- Ce qui a posé problème à l'usage reste à préciser avec toi avant de reprendre.
+
+---
+
+## Boosts (ex-tâche 4.7)
+
+**Reportée le 2026-10-17.** Utilité pas certaine ; à revoir plus tard.
+
+**Texte d'origine :** `Features/Boosts/`. `BoostRecord` : domaine, CSS, JavaScript, actif. Le CSS est injecté par un `WKUserScript` au début du document (une balise `<style>`), le JavaScript à la fin ; chaque script vérifie `location.hostname`. À chaque modification : retirer et remettre les scripts sur toutes les vues, puis recharger les onglets concernés. Éditeur : domaine, deux zones de texte à chasse fixe, interrupteur.
+
+**À savoir si on la reprend :**
+- `SYNC.md` réserve déjà le type `boost` (`domain`, `css`, `js`, `isEnabled`) ; il ne coûte rien tant que la fonction n'existe pas.
+- Questions à trancher : Boosts communs ou par profil ; monde d'exécution du JavaScript (`WKContentWorld`) ; pages dont la politique de sécurité (CSP) refuse les balises `<style>` ; règles de correspondance des domaines (sous-domaines, `www`) dans un type pur testé ; nouveau modèle SwiftData, donc migration de la base.
+- Le popover de réglages du site (5.2) aurait une ligne Boost.

@@ -1,0 +1,23 @@
+import SwiftUI
+
+/// Barre latérale affichée par-dessus la page quand elle est masquée : carte à fond de thème, ombrée.
+struct FloatingSidebar<Content: View>: View {
+    let theme: SpaceTheme
+    let width: Double
+    let onHover: (Bool) -> Void
+    @ViewBuilder let content: () -> Content
+
+    var body: some View {
+        content()
+            .frame(width: width)
+            .background { SpaceBackground(theme: theme) }
+            .clipShape(.rect(cornerRadius: BrowserWindowView.cardCornerRadius))
+            .overlay {
+                RoundedRectangle(cornerRadius: BrowserWindowView.cardCornerRadius)
+                    .strokeBorder(Color.primary.opacity(0.12), lineWidth: 1)
+            }
+            .onHover(perform: onHover)
+            .shadow(color: .black.opacity(0.3), radius: 12, x: 2)
+            .padding(.vertical, BrowserWindowView.cardMargin)
+    }
+}

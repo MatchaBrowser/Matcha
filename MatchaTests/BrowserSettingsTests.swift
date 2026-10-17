@@ -1,0 +1,71 @@
+import AppKit
+import Foundation
+@testable import Matcha
+import Testing
+
+struct BrowserSettingsTests {
+    private func emptyDefaults() -> UserDefaults {
+        let name = "BrowserSettingsTests-\(UUID().uuidString)"
+        let defaults = UserDefaults(suiteName: name)!
+        defaults.removePersistentDomain(forName: name)
+        return defaults
+    }
+
+    @Test func `quitting asks for confirmation by default`() {
+        #expect(BrowserSettings.confirmsBeforeQuitting(in: emptyDefaults()))
+    }
+
+    @Test func `quitting confirmation can be turned off`() {
+        let defaults = emptyDefaults()
+        defaults.set(false, forKey: BrowserSettings.Key.confirmBeforeQuitting)
+        #expect(!BrowserSettings.confirmsBeforeQuitting(in: defaults))
+    }
+
+    @Test func `appearance modes map to AppKit appearances`() {
+        #expect(AppearanceMode.system.appearanceName == nil)
+        #expect(AppearanceMode.light.appearanceName == .aqua)
+        #expect(AppearanceMode.dark.appearanceName == .darkAqua)
+        #expect(AppearanceMode(rawValue: "dark") == .dark)
+    }
+
+    @Test func `search engines have display names`() {
+        #expect(SearchEngine.allCases.map(\.name) == ["Google", "DuckDuckGo", "Bing"])
+        #expect(SearchEngine(rawValue: "duckDuckGo") == .duckDuckGo)
+    }
+
+    @Test func `home page text is read like the address bar`() {
+        #expect(BrowserSettings.homeURL(from: "", searchEngine: .google) == nil)
+        #expect(BrowserSettings.homeURL(from: "  ", searchEngine: .google) == nil)
+        #expect(BrowserSettings.homeURL(from: "apple.com", searchEngine: .google)?.absoluteString == "https://apple.com")
+        #expect(BrowserSettings.homeURL(from: "about:blank", searchEngine: .google)?.absoluteString == "about:blank")
+    }
+
+    @Test func `new tabs open blank and the home button is hidden by default`() {
+        #expect(BrowserSettings.newTabPage == .blank)
+        #expect(!BrowserSettings.showsHomeButton)
+        #expect(NewTabPage(rawValue: "homePage") == .homePage)
+    }
+
+    @Test func `address bar is in the sidebar with navigation buttons by default`() {
+        #expect(BrowserSettings.addressBarPosition == .sidebar)
+        #expect(BrowserSettings.showsNavigationButtons)
+        #expect(AddressBarPosition(rawValue: "top") == .top)
+    }
+
+    @Test func `search suggestions are on by default`() {
+        #expect(BrowserSettings.showsSearchSuggestions)
+        #expect(BrowserSettings.Key.showsSearchSuggestions == "showsSearchSuggestions")
+    }
+
+    @Test func `command bar settings use the homepage only when asked and valid`() {
+        func settings(_ page: NewTabPage, _ homePage: String) -> CommandBarSettings {
+            CommandBarSettings(searchEngine: .duckDuckGo, newTabPage: page, homePage: homePage, showsSearchSuggestions: true)
+        }
+        #expect(settings(.blank, "apple.com").newTabHomeURL == nil)
+        #expect(settings(.homePage, "").newTabHomeURL == nil)
+        #expect(settings(.homePage, "  ").newTabHomeURL == nil)
+        #expect(settings(.homePage, "apple.com").newTabHomeURL?.absoluteString == "https://apple.com")
+        #expect(settings(.homePage, "apple.com").searchEngine == .duckDuckGo)
+        #expect(settings(.homePage, "apple.com").showsSearchSuggestions)
+    }
+}

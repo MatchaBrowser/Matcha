@@ -1,0 +1,22 @@
+included:
+  - Matcha
+  - MatchaTests
+  - MatchaUITests
+
+excluded:
+  - build
+  - DerivedData
+
+# La mise en forme relève de SwiftFormat, qui ajoute des virgules finales.
+disabled_rules:
+  - trailing_comma
+
+opt_in_rules:
+  - indentation_width
+
+indentation_width:
+  indentation_width: 4
+
+line_length:
+  warning: 140
+  ignores_comments: true

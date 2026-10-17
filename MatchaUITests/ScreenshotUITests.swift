@@ -1,0 +1,204 @@
+import XCTest
+
+/// Captures de la fenêtre pour le contrôle visuel, jointes au résultat des tests.
+/// Ignoré sauf si `MATCHA_SCREENSHOT` est défini :
+///
+///     TEST_RUNNER_MATCHA_SCREENSHOT=1 xcodebuild … test -only-testing:MatchaUITests/ScreenshotUITests
+///     xcrun xcresulttool export attachments --path <résultat>.xcresult --output-path <dossier>
+///
+/// Variables facultatives :
+/// - `MATCHA_SCREENSHOT_URLS` : adresses séparées par des virgules, ouvertes chacune dans un onglet ;
+/// - `MATCHA_SCREENSHOT_MENU` : actions du menu contextuel, « Élément@titre d'onglet » séparées par des `;`
+///   (ex. « Ajouter aux favoris@Apple;Épingler@GitHub ») ;
+/// - `MATCHA_SCREENSHOT_PEEK` : capture aussi la barre masquée (⌘S), puis apparue au survol du bord gauche ;
+/// - `MATCHA_SCREENSHOT_SETTINGS` : capture aussi chaque onglet des réglages (⌘,) ;
+/// - `MATCHA_SCREENSHOT_SETTINGS_VALUES` : réglages imposés au lancement (« addressBarPosition=top,… ») ;
+/// - `MATCHA_SCREENSHOT_THEME` : ouvre l'éditeur de thème et choisit ce thème prédéfini (« Océan »…) ;
+/// - `MATCHA_SCREENSHOT_SPACES` : crée ce nombre de Spaces avec le bouton + ;
+/// - `MATCHA_SCREENSHOT_COMMAND_BAR` : texte tapé dans la barre de commande (⌘T), capturée avec ses
+///   résultats, puis la sélection descendue, puis la barre d'édition (⌘L). Pour voir les suggestions du
+///   moteur : `MATCHA_SCREENSHOT_SETTINGS_VALUES=showsSearchSuggestions=YES` ; en sombre :
+///   `MATCHA_SCREENSHOT_SETTINGS_VALUES=AppleInterfaceStyle=Dark` ; en clair sur un Mac réglé en
+///   sombre : `NSRequiresAquaSystemAppearance=YES` (`AppleInterfaceStyle=Light` reste sombre) ;
+/// - `MATCHA_SCREENSHOT_PRIVATE` : capture aussi la barre de commande (⌘T) d'une nouvelle fenêtre privée
+///   (⇧⌘N), avec le texte de `MATCHA_SCREENSHOT_COMMAND_BAR` s'il est défini ;
+/// - `MATCHA_SCREENSHOT_COPY_URL` : capture aussi la confirmation « URL copiée » après ⇧⌘C, sur l'onglet
+///   affiché (sans `MATCHA_SCREENSHOT_URLS`, un onglet `about:blank?copy` est ouvert d'abord).
+///
+/// La capture `1-vide` montre la fenêtre sans onglet : la page vide invite à ⌘T, la barre de commande
+/// ne s'ouvre jamais d'elle-même.
+final class ScreenshotUITests: XCTestCase {
+    private let environment = ProcessInfo.processInfo.environment
+
+    @MainActor
+    func testCaptureWindow() throws {
+        guard environment["MATCHA_SCREENSHOT"] != nil else {
+            throw XCTSkip("MATCHA_SCREENSHOT non défini")
+        }
+        let app = launchApp(settings: settingsOverrides)
+        let window = app.windows.firstMatch
+        XCTAssertTrue(waitForBrowserWindow(of: app))
+        attach(window.screenshot(), as: "1-vide")
+
+        openAddresses(in: app, window: window)
+        applyMenuActions(in: app, window: window)
+        if environment["MATCHA_SCREENSHOT_COPY_URL"] != nil {
+            captureCopyConfirmation(in: app, window: window)
+        }
+        if let query = environment["MATCHA_SCREENSHOT_COMMAND_BAR"] {
+            captureCommandBar(typing: query, in: app, window: window)
+        }
+        if environment["MATCHA_SCREENSHOT_PRIVATE"] != nil {
+            capturePrivateCommandBar(typing: environment["MATCHA_SCREENSHOT_COMMAND_BAR"], in: app)
+        }
+        if environment["MATCHA_SCREENSHOT_PEEK"] != nil {
+            captureHiddenSidebar(in: app, window: window)
+        }
+        if let count = environment["MATCHA_SCREENSHOT_SPACES"].flatMap(Int.init), count > 0 {
+            for _ in 0 ..< count {
+                app.buttons["newSpaceButton"].click()
+                sleep(1)
+            }
+            attach(window.screenshot(), as: "9-spaces")
+        }
+        if let preset = environment["MATCHA_SCREENSHOT_THEME"] {
+            captureThemeEditor(choosing: preset, in: app, window: window)
+        }
+        if environment["MATCHA_SCREENSHOT_SETTINGS"] != nil {
+            captureSettings(in: app)
+        }
+    }
+
+    @MainActor
+    private func captureThemeEditor(choosing preset: String, in app: XCUIApplication, window: XCUIElement) {
+        app.buttons["spaceButton"].click()
+        sleep(1)
+        attach(window.screenshot(), as: "7-theme-editeur")
+        app.buttons[preset].click()
+        window.coordinate(withNormalizedOffset: CGVector(dx: 0.7, dy: 0.5)).click()
+        sleep(1)
+        attach(window.screenshot(), as: "8-theme-\(preset)")
+    }
+
+    /// Réglages imposés pour la capture : `MATCHA_SCREENSHOT_SETTINGS_VALUES`, « clé=valeur » séparés par des virgules.
+    private var settingsOverrides: [String: String] {
+        let pairs = environment["MATCHA_SCREENSHOT_SETTINGS_VALUES"]?.split(separator: ",") ?? []
+        return Dictionary(pairs.compactMap { pair in
+            let parts = pair.split(separator: "=", maxSplits: 1).map(String.init)
+            return parts.count == 2 ? (parts[0], parts[1]) : nil
+        }) { _, last in last }
+    }
+
+    @MainActor
+    private func openAddresses(in app: XCUIApplication, window: XCUIElement) {
+        let addresses = environment["MATCHA_SCREENSHOT_URLS"]?.split(separator: ",").map(String.init) ?? []
+        guard !addresses.isEmpty else {
+            return
+        }
+        for address in addresses {
+            openAddress(address, in: app)
+            sleep(4)
+        }
+        attach(window.screenshot(), as: "2-onglets")
+    }
+
+    @MainActor
+    private func applyMenuActions(in app: XCUIApplication, window: XCUIElement) {
+        let actions = environment["MATCHA_SCREENSHOT_MENU"]?.split(separator: ";").map(String.init) ?? []
+        guard !actions.isEmpty else {
+            return
+        }
+        for action in actions {
+            let parts = action.split(separator: "@", maxSplits: 1).map(String.init)
+            guard parts.count == 2 else {
+                continue
+            }
+            let row = app.descendants(matching: .any)
+                .matching(NSPredicate(format: "label CONTAINS %@", parts[1]))
+                .matching(NSPredicate(format: "identifier IN %@", ["tabRow", "favoriteTile"]))
+                .firstMatch
+            row.rightClick()
+            app.menuItems[parts[0]].click()
+        }
+        attach(window.screenshot(), as: "3-rangement")
+    }
+
+    /// Confirmation « URL copiée » (⇧⌘C), capturée une fois le fondu d'apparition fini, puis attendue
+    /// jusqu'à sa disparition pour ne pas gêner les captures suivantes.
+    @MainActor
+    private func captureCopyConfirmation(in app: XCUIApplication, window: XCUIElement) {
+        if environment["MATCHA_SCREENSHOT_URLS"] == nil {
+            openAddress("about:blank?copy", in: app)
+        }
+        app.typeKey("c", modifierFlags: [.command, .shift])
+        let confirmation = app.descendants(matching: .any).matching(identifier: "copyConfirmation").firstMatch
+        XCTAssertTrue(confirmation.waitForExistence(timeout: 2))
+        usleep(300_000)
+        attach(window.screenshot(), as: "14-url-copiee")
+        XCTAssertTrue(confirmation.waitForNonExistence(timeout: 5))
+    }
+
+    /// Barre de commande avec ses résultats, puis la 2e ligne sélectionnée, puis l'édition de l'onglet affiché.
+    @MainActor
+    private func captureCommandBar(typing query: String, in app: XCUIApplication, window: XCUIElement) {
+        openCommandBar(in: app)
+        app.typeText(query)
+        sleep(2)
+        attach(window.screenshot(), as: "10-barre-commande")
+        app.typeKey(.downArrow, modifierFlags: [])
+        sleep(1)
+        attach(window.screenshot(), as: "11-barre-commande-selection")
+        app.typeKey(.escape, modifierFlags: [])
+        guard tabRows(in: app).count > 0 else {
+            return
+        }
+        openCommandBar(in: app, newTab: false)
+        sleep(1)
+        attach(window.screenshot(), as: "12-barre-commande-edition")
+        app.typeKey(.escape, modifierFlags: [])
+    }
+
+    /// Barre de commande (⌘T) d'une nouvelle fenêtre privée, toujours sombre.
+    @MainActor
+    private func capturePrivateCommandBar(typing query: String?, in app: XCUIApplication) {
+        let privateWindow = openPrivateWindow(in: app)
+        openCommandBar(in: app, window: privateWindow)
+        if let query {
+            app.typeText(query)
+        }
+        sleep(2)
+        attach(privateWindow.screenshot(), as: "13-barre-commande-privee")
+        app.typeKey("w", modifierFlags: [.command, .shift])
+        XCTAssertTrue(privateWindow.waitForNonExistence(timeout: 5))
+    }
+
+    @MainActor
+    private func captureHiddenSidebar(in app: XCUIApplication, window: XCUIElement) {
+        window.coordinate(withNormalizedOffset: CGVector(dx: 0.6, dy: 0.5)).hover()
+        app.typeKey("s", modifierFlags: .command)
+        sleep(1)
+        attach(window.screenshot(), as: "4-barre-masquee")
+        window.coordinate(withNormalizedOffset: CGVector(dx: 0, dy: 0.5)).withOffset(CGVector(dx: 3, dy: 0)).hover()
+        sleep(1)
+        attach(window.screenshot(), as: "5-barre-survolee")
+    }
+
+    @MainActor
+    private func captureSettings(in app: XCUIApplication) {
+        app.typeKey(",", modifierFlags: .command)
+        sleep(1)
+        let settings = app.windows.element(boundBy: 0)
+        for (index, tab) in ["Général", "Apparence", "Profils", "Confidentialité"].enumerated() {
+            app.toolbars.buttons[tab].click()
+            sleep(1)
+            attach(settings.screenshot(), as: "6-reglages-\(index)")
+        }
+    }
+
+    private func attach(_ screenshot: XCUIScreenshot, as name: String) {
+        let attachment = XCTAttachment(screenshot: screenshot)
+        attachment.name = name
+        attachment.lifetime = .keepAlways
+        add(attachment)
+    }
+}
