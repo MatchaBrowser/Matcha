@@ -120,6 +120,9 @@ struct BrowserCommands: Commands {
             .disabled(miniWindow.map { !$0.tab.hasURL } ?? (windowActions?.copyURL == nil))
         }
 
+        // Édition > Rechercher (⌘F, ⌘G, ⇧⌘G).
+        FindCommands(miniWindows: miniWindows)
+
         CommandGroup(replacing: .sidebar) {
             Button(sidebarToggleTitle) {
                 windowActions?.toggleSidebar()

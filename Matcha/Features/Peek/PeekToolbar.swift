@@ -15,11 +15,12 @@ struct PeekToolbar: View {
             .help(openAsTabTitle)
             .accessibilityLabel(openAsTabTitle)
             .accessibilityIdentifier("peekOpenAsTabButton")
-            // ⎋ quand la page n'a pas le clavier ; sinon la page passe d'abord (PeekWebContainer).
+            // ⎋ quand la page n'a pas le clavier ; sinon la page passe d'abord (PeekWebContainer). Barre de recherche
+            // ouverte, ⎋ revient à son champ (qui la ferme) : le raccourci passerait avant lui et fermerait l'aperçu.
             Button { PeekActions.close(in: tabManager) } label: {
                 Image(systemName: "xmark")
             }
-            .keyboardShortcut(.cancelAction)
+            .keyboardShortcut(page.find.isPresented ? nil : .cancelAction)
             .help(Text(PeekActions.closeTitle))
             .accessibilityLabel(Text(PeekActions.closeTitle))
             .accessibilityIdentifier("peekCloseButton")

@@ -65,9 +65,10 @@ struct MiniWindowView: View {
     }
 
     /// Page de la mini-fenêtre (conteneur AppKit, jamais recréé), ou une invite tant qu'elle n'a rien chargé ; au-dessus,
-    /// le bandeau de ses demandes de permission (tâche 5.2).
+    /// sa barre de recherche (tâche 5.3) et le bandeau de ses demandes de permission (tâche 5.2).
     private var page: some View {
         VStack(spacing: 0) {
+            FindBar(page: tab)
             PermissionBanner(prompts: tab.permissionPrompts)
             ZStack {
                 MiniWebViewContainerView(container: controller.container)

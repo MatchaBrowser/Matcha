@@ -1,8 +1,8 @@
 import SwiftUI
 
 /// Carte aux coins arrondis d'un panneau : la page de l'onglet, avec la barre d'adresse au-dessus si les
-/// réglages la placent là (et dessous, le panneau des réglages du site), puis le bandeau des demandes de permission
-/// de la page. Un onglet qui n'a encore rien chargé, ou l'absence d'onglet, affiche un accueil.
+/// réglages la placent là (et dessous, le panneau des réglages du site), puis la barre de recherche et le bandeau des
+/// demandes de permission de la page. Un onglet qui n'a encore rien chargé, ou l'absence d'onglet, affiche un accueil.
 struct PageCard: View {
     let tab: BrowserTab?
     /// Panneau actif d'un split : bordure de la couleur d'accentuation.
@@ -51,8 +51,10 @@ struct PageCard: View {
                     Divider()
                 }
             }
-            // Demandes de permission de cette page (tâche 5.2) : le bandeau pousse la page.
+            // Recherche dans la page (tâche 5.3), puis demandes de permission (tâche 5.2) : barre et bandeau poussent
+            // la page. La barre reste en haut : un bandeau qui arrive ne déplace pas le champ où l'on tape.
             if let tab {
+                FindBar(page: tab, activate: activate)
                 PermissionBanner(prompts: tab.permissionPrompts)
             }
             page

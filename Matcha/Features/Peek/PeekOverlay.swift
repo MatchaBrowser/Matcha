@@ -70,7 +70,8 @@ struct PeekOverlay: View {
 
     private func panel(_ webView: WKWebView, of peek: Peek, layout: PeekLayout, area: CGSize) -> some View {
         VStack(spacing: 0) {
-            // Demandes de permission de la page de l'aperçu (tâche 5.2).
+            // Recherche dans la page (tâche 5.3) et demandes de permission (tâche 5.2) de la page de l'aperçu.
+            FindBar(page: peek.tab)
             PermissionBanner(prompts: peek.tab.permissionPrompts)
             PeekWebHost(webView: webView) { PeekActions.close(in: tabManager) }
         }

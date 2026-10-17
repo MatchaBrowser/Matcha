@@ -201,3 +201,29 @@ Pour la caméra et le micro : https://webcamtests.com (bouton « Test my cam »)
 - [ ] Partage d'écran dans Meet : note ce qui se passe (WebKit ne passe pas par Matcha pour l'écran).
 - [ ] Aspect en clair, en sombre et en fenêtre privée : bandeau et panneau lisibles. Facultatif, VoiceOver : « Demande d'autorisation », le texte du bandeau et ses trois boutons ; « Réglages du site » sur le bouton, « Fermer les réglages du site » sur la croix.
 - Connu : « Autoriser une fois » vaut pour la page affichée jusqu'à son rechargement (WebKit garde l'accord le temps de la page). Un onglet en arrière-plan qui demande la caméra attend que tu l'affiches : rien ne le signale dans la barre latérale. Pas de réglages du site dans l'aperçu ni dans une mini-fenêtre.
+
+### 5.3 Recherche dans la page
+
+Une page longue : un article de Wikipédia (https://fr.wikipedia.org/wiki/Paris) ou, sans réseau, file:///usr/share/doc/postfix/html/postconf.5.html. Les tests d'interface utilisent la documentation de Postfix ; sans elle, ils sont ignorés.
+
+- [ ] ⌘F : une barre descend en haut de la page et la pousse vers le bas (sans la couvrir) : loupe, champ « Rechercher dans la page », flèches ⌃ et ⌄, ×. Le champ a le clavier tout de suite : tape sans cliquer.
+- [ ] Tape un mot présent plusieurs fois : à mesure que tu tapes (léger délai), l'occurrence est sélectionnée et la page défile jusqu'à elle ; en ajoutant des lettres, la sélection reste sur le même mot tant qu'il correspond. Note si la sélection (grise tant que le champ a le clavier) se voit assez. Pas de nombre d'occurrences : l'API publique ne le donne pas.
+- [ ] ⏎, ⌘G ou ⌄ : occurrence suivante ; ⇧⏎, ⇧⌘G ou ⌃ : précédente. Après la dernière, ⏎ revient à la première ; depuis la première, ⇧⏎ va à la dernière. Les majuscules ne comptent pas (« PARIS » trouve « Paris »).
+- [ ] Un texte absent (« zzqqxx ») : « Introuvable » au bout du champ ; efface le champ : le mot disparaît.
+- [ ] Accents : « ete » et « éte » trouvent « été », « cafe » trouve « café », mais « café » ne trouve pas « cafe » (WebKit : une lettre sans accent trouve aussi les lettres accentuées, pas l'inverse). Note si c'est gênant.
+- [ ] ⎋ dans le champ : la barre se ferme, l'occurrence est désélectionnée et la page a le clavier (Espace ou ↓ la font défiler). Le × fait pareil. ⌘F la rouvre avec le dernier texte, tout sélectionné. Barre ouverte, clique dans la page puis ⌘F : le champ reprend le clavier, texte sélectionné.
+- [ ] Barre fermée, ⌘G : elle se rouvre avec le dernier texte et cherche (depuis le haut de la page) ; le clavier reste dans la page.
+- [ ] Barre ouverte, change d'onglet : elle disparaît. Reviens : elle est là avec son texte, sans reprendre le clavier. Va sur une autre page dans cet onglet : la barre reste, « Introuvable » disparaît. Sur un onglet vide, ⌘F ne fait rien.
+- [ ] Menu Édition > Rechercher : « Rechercher… ⌘F », « Rechercher le suivant ⌘G », « Rechercher le précédent ⇧⌘G », chacun une seule fois dans le menu Édition. Suivant et précédent grisés tant que rien n'a été cherché dans la page ; tout est grisé sur un onglet vide et quand les Réglages (⌘,) sont au premier plan.
+- [ ] Barre de commande ouverte (⌘T ou ⌘L), ⌘F : elle se ferme et la barre de recherche prend le clavier.
+- [ ] Split de deux pages : ⌘F n'ouvre la barre que sur le panneau actif. Rends l'autre actif, ⌘F : chaque panneau a sa barre. Un clic dans le champ ou sur une flèche d'un panneau le rend actif (bordure) ; ⎋ rend le clavier à la page de ce panneau.
+- [ ] Aperçu (Maj+clic sur un lien) : ⌘F ouvre la barre en haut de l'aperçu, pas de la carte derrière ; ⎋ ferme la barre et laisse l'aperçu ; un second ⎋ ferme l'aperçu. Barre ouverte, « Ouvrir en onglet » : la barre suit la page dans la carte.
+- [ ] Mini-fenêtre (⌥⌘N, puis une page) : ⌘F, ⌘G et ⎋ agissent sur sa page ; la fenêtre derrière n'est pas touchée, et ⎋ dans le champ ne ferme pas la mini-fenêtre. Mini-fenêtre vide : ⌘F ne fait rien.
+- [ ] Fenêtre privée (⇧⌘N) : même barre, mêmes raccourcis.
+- [ ] Barre d'adresse au-dessus de la page (Réglages > Apparence) : la barre de recherche s'ouvre sous la barre d'adresse, et sous le panneau des réglages du site s'il est ouvert. Barre latérale masquée (⌘S) : la barre est en haut de la carte, rien ne déborde.
+- [ ] Barre ouverte, déclenche un bandeau de permission (webcamtests.com, « Test my cam ») : le bandeau s'affiche sous la barre de recherche, qui ne bouge pas.
+- [ ] Méthode de saisie japonaise (Romaji) dans le champ : tape « nihon », Espace pour convertir, ⏎ pour valider : ⏎ valide la composition sans passer à l'occurrence suivante ; ⎋ pendant une composition l'annule sans fermer la barre ; rien n'est cherché avant la validation. Sur https://ja.wikipedia.org, le mot validé est trouvé. Touche morte (⌥E puis e → « é ») : pareil.
+- [ ] Une page qui garde ⌘F pour elle (Google Docs) : sa propre recherche s'ouvre, pas la barre de Matcha (comme dans Safari).
+- [ ] Carte étroite (split de quatre pages, fenêtre de 700 × 450) : note si la barre reste utilisable ou si le × est coupé.
+- [ ] Aspect en clair, en sombre et en fenêtre privée. Facultatif, VoiceOver : « Rechercher dans la page » sur la barre et le champ, « Occurrence précédente », « Occurrence suivante », « Fermer la recherche » ; « Introuvable » est annoncé.
+- Connu : ni nombre d'occurrences ni surlignage de toutes les occurrences (API privées) ; une occurrence trouvée dans un cadre intégré reste sélectionnée après la fermeture ; ⌘G après la fermeture repart du haut de la page.

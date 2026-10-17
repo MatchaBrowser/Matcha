@@ -45,7 +45,10 @@ import XCTest
 ///   https://example.com (réseau). Avec `…_SETTINGS_VALUES=addressBarPosition=top` : en haut de la carte ;
 /// - `MATCHA_SCREENSHOT_PERMISSION_URL` : page qui demande la caméra ou le micro, et `MATCHA_SCREENSHOT_PERMISSION_BUTTON`
 ///   (facultatif) : texte du bouton de la page à cliquer pour lancer la demande ; capture le bandeau
-///   (`28-permission-bandeau`). Réseau nécessaire ; la demande d'accès de macOS peut apparaître la première fois.
+///   (`28-permission-bandeau`). Réseau nécessaire ; la demande d'accès de macOS peut apparaître la première fois ;
+/// - `MATCHA_SCREENSHOT_FIND` : texte cherché (⌘F) dans l'onglet affiché : `29-recherche-trouvee`, puis « zzqqxx » :
+///   `30-recherche-introuvable`. Sans `MATCHA_SCREENSHOT_URLS`, ouvre la documentation de Postfix (sans réseau) :
+///   `MATCHA_SCREENSHOT_FIND=postfix`.
 ///
 /// La capture `1-vide` montre la fenêtre sans onglet : la page vide invite à ⌘T, la barre de commande
 /// ne s'ouvre jamais d'elle-même.
@@ -83,6 +86,7 @@ final class ScreenshotUITests: XCTestCase {
         try captureDownloads(in: app, window: window)
         captureSiteSettings(in: app, window: window)
         capturePermissionBanner(in: app, window: window)
+        try captureFindBar(in: app, window: window)
         if environment["MATCHA_SCREENSHOT_PEEK"] != nil {
             captureHiddenSidebar(in: app, window: window)
         }

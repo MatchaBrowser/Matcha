@@ -36,6 +36,8 @@ final class BrowserTab: Identifiable {
     var savedInteractionState: Data?
     /// Demandes de permission de la page qui attendent une réponse (bandeau, tâche 5.2).
     let permissionPrompts = PermissionPromptQueue()
+    /// Recherche dans la page (barre, texte, résultat ; tâche 5.3).
+    let find = FindSession()
 
     /// Délégué de navigation et d'interface, branché sur chaque vue web créée (et sur la vue actuelle).
     @ObservationIgnored weak var delegate: (any WKNavigationDelegate & WKUIDelegate)? {
@@ -59,6 +61,7 @@ final class BrowserTab: Identifiable {
         self.id = id
         self.configuration = configuration
         self.openerID = openerID
+        find.performer = self
     }
 
     /// Onglet restauré depuis l'enregistrement : il affiche `url` et `title`, et ne crée sa vue web
@@ -132,11 +135,12 @@ final class BrowserTab: Identifiable {
         savedInteractionState = state
     }
 
-    /// Libère la vue web (mémoire, son, processus) et refuse les demandes de permission en attente. L'onglet affiche
-    /// désormais `url` et `title`, et chargera `url` quand on le rouvrira.
+    /// Libère la vue web (mémoire, son, processus), refuse les demandes de permission en attente et oublie la recherche
+    /// dans la page. L'onglet affiche désormais `url` et `title`, et chargera `url` quand on le rouvrira.
     func unload(resettingTo url: URL?, title: String?) {
         observations = []
         permissionPrompts.denyAll()
+        find.reset()
         if let webView {
             webView.pauseAllMediaPlayback(completionHandler: nil)
             webView.stopLoading()
@@ -184,8 +188,12 @@ final class BrowserTab: Identifiable {
         }
     }
 
-    /// `hasURL` n'est modifié (et ne prévient ses observateurs) que si l'onglet gagne ou perd son adresse.
+    /// `hasURL` n'est modifié (et ne prévient ses observateurs) que si l'onglet gagne ou perd son adresse. Une
+    /// autre adresse rend caduc le dernier résultat de la recherche dans la page.
     private func setURL(_ newURL: URL?) {
+        if newURL != url {
+            find.pageDidChange()
+        }
         url = newURL
         let hasNewURL = newURL != nil
         if hasURL != hasNewURL {

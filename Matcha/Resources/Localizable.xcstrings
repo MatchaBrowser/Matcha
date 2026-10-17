@@ -940,6 +940,35 @@
         }
       }
     },
+    "Close Find Bar" : {
+      "comment" : "Find bar: help tag and accessibility label of the × button",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Suche schließen"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cerrar búsqueda"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fermer la recherche"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Chiudi ricerca"
+          }
+        }
+      }
+    },
     "Close Mini Window" : {
       "localizations" : {
         "de" : {
@@ -2035,6 +2064,151 @@
         }
       }
     },
+    "Find" : {
+      "comment" : "Edit menu: submenu with Find…, Find Next and Find Previous",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Suchen"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Buscar"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rechercher"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Trova"
+          }
+        }
+      }
+    },
+    "Find Next" : {
+      "comment" : "Edit > Find menu: selects the next match in the page (⌘G)",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Weitersuchen"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Buscar siguiente"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rechercher le suivant"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Trova successivo"
+          }
+        }
+      }
+    },
+    "Find Previous" : {
+      "comment" : "Edit > Find menu: selects the previous match in the page (⇧⌘G)",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rückwärts suchen"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Buscar anterior"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rechercher le précédent"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Trova precedente"
+          }
+        }
+      }
+    },
+    "Find in Page" : {
+      "comment" : "Find bar: placeholder of the search field, accessibility label of the bar and of its field",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Auf der Seite suchen"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Buscar en la página"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rechercher dans la page"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Trova nella pagina"
+          }
+        }
+      }
+    },
+    "Find…" : {
+      "comment" : "Edit > Find menu: opens the find bar of the page (⌘F)",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Suchen …"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Buscar…"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rechercher…"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Trova…"
+          }
+        }
+      }
+    },
     "Folder name" : {
       "comment" : "Placeholder of the pinned folder name field",
       "localizations" : {
@@ -2964,6 +3138,35 @@
         }
       }
     },
+    "Next Match" : {
+      "comment" : "Find bar: button that selects the next match in the page (⌘G)",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nächster Treffer"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Coincidencia siguiente"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Occurrence suivante"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Occorrenza successiva"
+          }
+        }
+      }
+    },
     "No Tabs" : {
       "comment" : "Title of the empty page when no tab is selected",
       "localizations" : {
@@ -3018,6 +3221,35 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Nessuna decisione salvata."
+          }
+        }
+      }
+    },
+    "Not Found" : {
+      "comment" : "Find bar: the last search found nothing in the page",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nicht gefunden"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No encontrado"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Introuvable"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Non trovato"
           }
         }
       }
@@ -3539,6 +3771,35 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Premi ⌘T per cercare o inserire un indirizzo."
+          }
+        }
+      }
+    },
+    "Previous Match" : {
+      "comment" : "Find bar: button that selects the previous match in the page (⇧⌘G)",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vorheriger Treffer"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Coincidencia anterior"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Occurrence précédente"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Occorrenza precedente"
           }
         }
       }

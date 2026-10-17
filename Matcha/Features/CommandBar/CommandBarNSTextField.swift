@@ -1,7 +1,7 @@
 import AppKit
 
-/// Champ de la barre de commande : il prend le clavier dans la mise à jour même qui l'insère, pour
-/// qu'aucune frappe tapée juste après ⌘T n'atteigne la page.
+/// Champ de la barre de commande et de la barre de recherche dans la page : il prend le clavier dans la mise à jour
+/// même qui l'insère, pour qu'aucune frappe tapée juste après ⌘T (ou ⌘F) n'atteigne la page.
 final class CommandBarNSTextField: NSTextField {
     override static var cellClass: AnyClass? {
         get { CommandBarFieldCell.self }
@@ -10,6 +10,16 @@ final class CommandBarNSTextField: NSTextField {
 
     /// Le champ doit prendre le clavier dès qu'il sera dans une fenêtre.
     var wantsFocus = false
+    /// Appelé quand le champ prend le clavier (clic, ⌘F).
+    var onBecomeFirstResponder: (() -> Void)?
+
+    override func becomeFirstResponder() -> Bool {
+        let became = super.becomeFirstResponder()
+        if became {
+            onBecomeFirstResponder?()
+        }
+        return became
+    }
 
     override func viewDidMoveToWindow() {
         super.viewDidMoveToWindow()
