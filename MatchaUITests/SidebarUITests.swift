@@ -69,7 +69,7 @@ final class SidebarUITests: XCTestCase {
         XCTAssertEqual(favorites.count, 1)
         XCTAssertEqual(tabRows(in: app).count, 2)
 
-        app.buttons["Effacer"].click()
+        clickWhenSettled(app.buttons["Effacer"])
         XCTAssertEqual(tabRows(in: app).count, 0)
         XCTAssertEqual(favorites.count, 1)
     }
@@ -92,8 +92,8 @@ final class SidebarUITests: XCTestCase {
         let pinnedZone = app.descendants(matching: .any).matching(identifier: "pinnedDropZone").firstMatch
         tabRows(in: app).element(boundBy: 1).press(forDuration: 0.5, thenDragTo: pinnedZone)
         // L'onglet épinglé survit à « Effacer », qui ne ferme que les onglets du jour.
-        app.buttons["Effacer"].click()
-        XCTAssertEqual(tabRows(in: app).count, 1)
+        clickWhenSettled(app.buttons["Effacer"])
+        XCTAssertTrue(waitForCount(tabRows(in: app), 1), "onglets restants : \(tabRows(in: app).count)")
         XCTAssertEqual(favorites.count, 1)
     }
 

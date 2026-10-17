@@ -22,12 +22,21 @@ struct TodaySection: View {
         }
         .frame(height: 24)
         NewTabRow(action: newTab)
-        let today = tabManager.todayTabs
-        ForEach(Array(today.enumerated()), id: \.element.id) { index, tab in
-            TabRowView(tab: tab, tabManager: tabManager, dropDestination: .today(index: index))
+        // Un split tient sur une ligne, à la place de son premier onglet.
+        ForEach(tabManager.layout.todayRows) { row in
+            switch row {
+            case let .tab(id, index):
+                if let tab = tabManager.tab(withID: id) {
+                    TabRowView(tab: tab, tabManager: tabManager, dropDestination: .today(index: index))
+                }
+            case let .split(group, index):
+                SplitRowView(group: group, tabManager: tabManager, dropDestination: .today(index: index))
+            case .folder:
+                EmptyView()
+            }
         }
         // Grande zone sous les onglets du jour, pour les déposer en fin de liste.
-        SidebarDropZone(tabManager: tabManager, destination: .today(index: today.count), restingHeight: 60)
+        SidebarDropZone(tabManager: tabManager, destination: .today(index: tabManager.layout.today.count), restingHeight: 60)
             .accessibilityIdentifier("todayDropZone")
     }
 }

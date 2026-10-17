@@ -1,7 +1,7 @@
 import SwiftUI
 
-/// Carte aux coins arrondis qui contient la page, avec la barre d'adresse au-dessus si les réglages
-/// la placent là. Un onglet qui n'a encore rien chargé, ou l'absence d'onglet, affiche un accueil.
+/// Zone de contenu : la carte de l'onglet sélectionné, ou les cartes de son split côte à côte, séparées par
+/// des poignées réglables. Un onglet glissé depuis la barre et lâché sur le bord d'un panneau rejoint le split.
 struct ContentCard: View {
     let tabManager: TabManager
     let addressBarPosition: AddressBarPosition
@@ -10,48 +10,133 @@ struct ContentCard: View {
     var goHome: (() -> Void)?
     /// Ouvre la barre de commande sur l'adresse de l'onglet affiché.
     let editAddress: () -> Void
+    /// Largeur cachée par la barre flottante à gauche des panneaux : pas de dépôt sur la carte dessous.
+    var dropInset = 0.0
+
+    /// Parts pendant un glissement du séparateur : état de la vue seulement, retenues à la fin.
+    @State private var liveFractions: [Double]?
+    /// Largeurs au début du glissement en cours.
+    @State private var dragStartWidths: [Double]?
+    @State private var dropTarget: SplitDropTarget?
+    /// Destinataire des onglets lâchés sur les pages, reconfiguré à chaque affichage.
+    @State private var dropController = SplitDropController()
 
     var body: some View {
-        VStack(spacing: 0) {
-            if addressBarPosition == .top {
-                AddressToolbar(
-                    tabManager: tabManager,
-                    editAddress: editAddress,
-                    showsNavigationButtons: showsNavigationButtons,
-                    goHome: goHome,
-                )
-                Divider()
+        let panes = tabManager.displayedTabs
+        let split = tabManager.displayedSplit
+        GeometryReader { proxy in
+            let widths = SplitGeometry.paneWidths(
+                fractions: liveFractions ?? split?.fractions ?? [],
+                count: max(panes.count, 1),
+                totalWidth: proxy.size.width,
+            )
+            // `_ =` n'est pas permis dans un constructeur de vue.
+            // swiftlint:disable:next redundant_discardable_let
+            let _ = configureDropController(panes: panes, widths: widths)
+            HStack(spacing: 0) {
+                if panes.isEmpty {
+                    pageCard(nil, isMarked: false)
+                } else {
+                    ForEach(Array(panes.enumerated()), id: \.element.id) { index, tab in
+                        pageCard(tab, isMarked: panes.count > 1 && tab.id == tabManager.selectedTabID)
+                            .frame(width: widths[index])
+                        if index < panes.count - 1, let split {
+                            divider(after: index, in: split, widths: widths)
+                                .frame(width: SplitGeometry.gap)
+                        }
+                    }
+                }
             }
-            page
+            // Panneaux ajoutés ou retirés sans animation : une vue web ne change jamais d'hôte.
+            .transaction { $0.animation = nil }
+            .background {
+                if panes.count > 1 {
+                    PaneClickMonitor(tabs: panes) { activate($0) }
+                }
+            }
+            .overlay {
+                SplitDropHighlight(target: dropTarget, widths: widths)
+                    .allowsHitTesting(false)
+            }
         }
-        .background(.background)
-        .clipShape(.rect(cornerRadius: BrowserWindowView.cardCornerRadius))
-        .overlay {
-            RoundedRectangle(cornerRadius: BrowserWindowView.cardCornerRadius)
-                .strokeBorder(Color.primary.opacity(0.12), lineWidth: 1)
+        .onChange(of: split?.id) {
+            liveFractions = nil
+            dragStartWidths = nil
         }
-        .shadow(color: .black.opacity(0.18), radius: 3, y: 1)
+        // ⌘W, menus, split formé ou défait, autre Space : la page sélectionnée reprend le clavier si
+        // personne ne l'a.
+        .onChange(of: panes.map(\.id)) {
+            if let tab = tabManager.selectedTab {
+                TabActivation.focusPage(of: tab)
+            }
+        }
     }
 
-    /// Page de l'onglet sélectionné, ou l'accueil.
-    @ViewBuilder private var page: some View {
-        if let tab = tabManager.selectedTab, tab.url != nil, let webView = tab.webView {
-            WebView(webView: webView)
-                .id(ObjectIdentifier(webView))
-        } else {
-            ContentUnavailableView(emptyPageTitle, systemImage: "globe", description: Text(emptyPageDescription))
-                // Occupe toute la hauteur, comme la vue web : sinon la colonne entière est centrée verticalement.
-                .frame(maxWidth: .infinity, maxHeight: .infinity)
+    private func pageCard(_ tab: BrowserTab?, isMarked: Bool) -> PageCard {
+        PageCard(
+            tab: tab,
+            isMarked: isMarked,
+            addressBarPosition: addressBarPosition,
+            showsNavigationButtons: showsNavigationButtons,
+            goHome: goHome,
+            editAddress: editAddress,
+            activate: { tab.map(activate) },
+            sidebarDropTarget: dropController,
+        )
+    }
+
+    /// Poignée entre les panneaux `index` et `index + 1` : parts suivies pendant le glissement, écrites une
+    /// fois à la fin.
+    private func divider(after index: Int, in split: SplitGroup, widths: [Double]) -> SplitDivider {
+        SplitDivider(
+            onDrag: { translation in
+                let start = dragStartWidths ?? widths
+                dragStartWidths = start
+                liveFractions = SplitGeometry.fractions(draggingDivider: index, by: translation, startWidths: start)
+            },
+            onDragEnded: {
+                if let liveFractions {
+                    tabManager.setSplitFractions(split.id, liveFractions)
+                }
+                liveFractions = nil
+                dragStartWidths = nil
+            },
+            onReset: { tabManager.setSplitFractions(split.id, SplitGroup.equalFractions(count: widths.count)) },
+            onStep: { step in
+                let delta = Double(step) * SplitGeometry.accessibilityStep * widths.reduce(0, +)
+                tabManager.setSplitFractions(split.id, SplitGeometry.fractions(draggingDivider: index, by: delta, startWidths: widths))
+            },
+        )
+    }
+
+    /// Le contrôleur n'est pas observé : le reconfigurer pendant l'affichage ne redessine rien.
+    private func configureDropController(panes: [BrowserTab], widths: [Double]) {
+        dropController.panes = panes
+        dropController.widths = widths
+        dropController.leadingInset = dropInset
+        dropController.canTakeTab = canTakeTab
+        dropController.onTargetChange = { dropTarget = $0 }
+        dropController.onDrop = { id, target in
+            guard let tab = tabManager.tab(withID: id), tabManager.openInSplit(tab, at: target.insertionIndex) else {
+                return
+            }
+            TabActivation.activate(tab, in: tabManager)
         }
     }
 
-    /// Titre de l'accueil : aucun onglet sélectionné, ou onglet qui n'a encore rien chargé.
-    private var emptyPageTitle: LocalizedStringKey {
-        tabManager.selectedTab == nil ? "No Tabs" : "New Tab"
+    /// Un onglet sélectionné, hors des favoris, dont le split n'est pas plein. L'onglet glissé lui-même n'est
+    /// vérifié qu'au dépôt (`openInSplit` refuse un onglet déjà affiché ou un favori).
+    private var canTakeTab: Bool {
+        guard let selected = tabManager.selectedTab, tabManager.place(of: selected) != .favorite else {
+            return false
+        }
+        return tabManager.displayedSplit?.isFull != true
     }
 
-    /// Sans onglet, ⌘T en ouvre un ; un onglet vide se remplit avec ⌘L.
-    private var emptyPageDescription: LocalizedStringKey {
-        tabManager.selectedTab == nil ? "Press ⌘T to search or enter an address." : "Press ⌘L to search or enter an address."
+    /// Rend `tab` panneau actif.
+    private func activate(_ tab: BrowserTab) {
+        if tabManager.selectedTabID != tab.id {
+            tabManager.select(tab)
+        }
     }
 }

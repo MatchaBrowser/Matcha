@@ -85,14 +85,18 @@ final class TabManager {
     }
 
     /// Ferme `tab` (⌘W, ×). Un onglet du jour disparaît. Un épinglé ou un favori reste dans la barre,
-    /// comme dans Arc : il revient à son adresse d'origine et se décharge.
-    /// S'il était sélectionné, son voisin suivant dans la barre prend la sélection, ou le précédent.
+    /// comme dans Arc : il revient à son adresse d'origine et se décharge ; un split épinglé se ferme en entier.
+    /// S'il était sélectionné, son voisin dans le split prend la sélection, sinon son voisin suivant dans la
+    /// barre, ou le précédent.
     func close(_ tab: BrowserTab) {
         guard let place = layout.place(of: tab.id) else {
             return
         }
         if place == .today {
             delete(tab)
+        } else if place == .pinned, let group = layout.split(containing: tab.id) {
+            // Un split épinglé se ferme en entier, comme un épinglé : il se décharge et reste dans la barre.
+            closeSplit(group.id)
         } else {
             moveSelection(awayFrom: tab) {
                 tab.unload(resettingTo: tab.pinnedURL, title: tab.pinnedTitle)
@@ -132,10 +136,11 @@ final class TabManager {
         return copy
     }
 
-    /// Ferme tous les onglets du jour sauf `tab`, qui est sélectionné ; épinglés et favoris restent.
+    /// Ferme tous les onglets du jour sauf `tab` et son split ; `tab` est sélectionné, épinglés et favoris restent.
     func closeOtherTabs(than tab: BrowserTab) {
         select(tab)
-        for other in todayTabs where other !== tab {
+        let kept = Set(layout.split(containing: tab.id)?.tabIDs ?? [tab.id])
+        for other in todayTabs where !kept.contains(other.id) {
             close(other)
         }
     }
@@ -148,24 +153,29 @@ final class TabManager {
         setSelection(tab.id)
     }
 
-    /// Range l'onglet dans les favoris, les épinglés (à la fin) ou les onglets du jour (en tête).
+    /// Range l'onglet dans les favoris, les épinglés (à la fin) ou les onglets du jour (en tête) ; il quitte
+    /// son split, dont le reste reste affiché.
     func setPlace(_ tab: BrowserTab, to place: TabPlace) {
         guard tabsByID[tab.id] != nil else {
             return
         }
-        let previous = layout.place(of: tab.id)
-        layout.setPlace(tab.id, to: place)
-        updatePinnedOrigin(of: tab, previousPlace: previous)
+        keepingPanesOnScreen(leaving: tab) {
+            let previous = layout.place(of: tab.id)
+            layout.setPlace(tab.id, to: place)
+            updatePinnedOrigin(of: tab, previousPlace: previous)
+        }
     }
 
-    /// Déplace l'onglet dans la barre (glisser-déposer).
+    /// Déplace l'onglet dans la barre (glisser-déposer) ; il quitte son split, dont le reste reste affiché.
     func move(_ tab: BrowserTab, to destination: SidebarDestination) {
         guard tabsByID[tab.id] != nil else {
             return
         }
-        let previous = layout.place(of: tab.id)
-        layout.move(tab.id, to: destination)
-        updatePinnedOrigin(of: tab, previousPlace: previous)
+        keepingPanesOnScreen(leaving: tab) {
+            let previous = layout.place(of: tab.id)
+            layout.move(tab.id, to: destination)
+            updatePinnedOrigin(of: tab, previousPlace: previous)
+        }
     }
 
     // MARK: Primitives des extensions
@@ -193,7 +203,7 @@ final class TabManager {
 
     /// Un onglet qui devient épinglé ou favori retient son adresse et son titre actuels comme origine ;
     /// redevenu onglet du jour, il les oublie.
-    private func updatePinnedOrigin(of tab: BrowserTab, previousPlace: TabPlace?) {
+    func updatePinnedOrigin(of tab: BrowserTab, previousPlace: TabPlace?) {
         if layout.place(of: tab.id) == .today {
             tab.pinnedURL = nil
             tab.pinnedTitle = nil
@@ -203,41 +213,58 @@ final class TabManager {
         }
     }
 
-    /// Sélectionne `id`, note son activité et s'assure que sa vue web existe.
+    /// Sélectionne `id`, note son activité et s'assure que la vue web de chaque onglet affiché existe
+    /// (tout son split).
     func setSelection(_ id: BrowserTab.ID?) {
-        // L'onglet qui quitte l'écran retient son état de navigation.
-        if let previous = selectedTab, previous.id != id {
-            previous.captureInteractionState()
-        }
+        // Les onglets qui quittent l'écran retiennent leur état de navigation.
+        let leaving = displayedTabs
         selectedTabID = id
-        if let id, let tab = tabsByID[id] {
-            tab.lastActivity = .now
-            tab.makeWebViewIfNeeded()
+        let shown = displayedTabs
+        for tab in leaving where !shown.contains(where: { $0 === tab }) {
+            tab.captureInteractionState()
         }
+        if let id {
+            tabsByID[id]?.lastActivity = .now
+        }
+        shown.forEach { $0.makeWebViewIfNeeded() }
     }
 
-    /// Applique `change` à `tab` ; s'il était sélectionné, la sélection passe à son voisin suivant
-    /// dans la barre, ou au précédent s'il était le dernier.
+    /// Applique `change` à `tab` ; s'il était sélectionné, la sélection passe à son voisin dans le split,
+    /// sinon à son voisin suivant dans la barre, ou au précédent s'il était le dernier.
     func moveSelection(awayFrom tab: BrowserTab, during change: () -> Void) {
+        moveSelection(awayFrom: [tab.id], preferring: layout.split(containing: tab.id)?.neighbor(of: tab.id), during: change)
+    }
+
+    /// Applique `change` ; si l'onglet sélectionné fait partie de `ids`, la sélection passe à `preferred` s'il est
+    /// encore rangé, sinon au premier onglet hors de `ids` qui le suivait dans la barre, sinon au dernier qui le précédait.
+    func moveSelection(awayFrom ids: Set<BrowserTab.ID>, preferring preferred: BrowserTab.ID? = nil, during change: () -> Void) {
         let ordered = layout.orderedTabIDs
-        let index = ordered.firstIndex(of: tab.id)
-        let wasSelected = selectedTabID == tab.id
+        let index = selectedTabID.flatMap { ordered.firstIndex(of: $0) }
+        let wasSelected = selectedTabID.map(ids.contains) ?? false
         change()
         guard wasSelected, let index else {
             return
         }
-        let others = layout.orderedTabIDs.filter { $0 != tab.id }
-        setSelection(others.isEmpty ? nil : others[min(index, others.count - 1)])
+        if let preferred, !ids.contains(preferred), layout.place(of: preferred) != nil {
+            setSelection(preferred)
+            return
+        }
+        func remains(_ id: UUID) -> Bool {
+            !ids.contains(id) && layout.place(of: id) != nil
+        }
+        setSelection(ordered[index...].first(where: remains) ?? ordered[..<index].last(where: remains))
     }
 
-    private func discard(_ tab: BrowserTab) {
+    func discard(_ tab: BrowserTab) {
         layout.remove(tab.id)
         tabsByID[tab.id] = nil
         tab.stop()
     }
 
+    /// Après l'ancre (après son split s'il en a un) et les onglets déjà ouverts depuis elle ; en tête sans ancre
+    /// du jour.
     private func todayInsertionIndex(after anchor: BrowserTab?) -> Int {
-        guard let anchor, var index = layout.today.firstIndex(of: anchor.id) else {
+        guard let anchor, var index = layout.today.firstIndex(of: layout.split(containing: anchor.id)?.tabIDs.last ?? anchor.id) else {
             return 0
         }
         index += 1

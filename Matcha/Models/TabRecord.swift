@@ -17,6 +17,10 @@ final class TabRecord {
     var pinnedTitle: String?
     /// État de navigation de WebKit (historique précédent/suivant), pour la restauration.
     @Attribute(.externalStorage) var interactionState: Data?
+    /// Split view (tâche 4.3) dont l'onglet fait partie ; nil hors split. Jamais pour un favori.
+    var splitGroupID: UUID?
+    /// Part de largeur de son panneau dans le split ; 0 : inconnue (parts égales).
+    var splitFraction = 0.0
     var space: SpaceRecord?
     var profile: ProfileRecord?
     var folder: FolderRecord?

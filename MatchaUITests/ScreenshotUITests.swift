@@ -23,7 +23,11 @@ import XCTest
 /// - `MATCHA_SCREENSHOT_PRIVATE` : capture aussi la barre de commande (⌘T) d'une nouvelle fenêtre privée
 ///   (⇧⌘N), avec le texte de `MATCHA_SCREENSHOT_COMMAND_BAR` s'il est défini ;
 /// - `MATCHA_SCREENSHOT_COPY_URL` : capture aussi la confirmation « URL copiée » après ⇧⌘C, sur l'onglet
-///   affiché (sans `MATCHA_SCREENSHOT_URLS`, un onglet `about:blank?copy` est ouvert d'abord).
+///   affiché (sans `MATCHA_SCREENSHOT_URLS`, un onglet `about:blank?copy` est ouvert d'abord) ;
+/// - `MATCHA_SCREENSHOT_SPLIT` : nombre de panneaux (2 à 4). Sans `MATCHA_SCREENSHOT_URLS`, ouvre d'abord
+///   `about:blank?split1`… ; puis « Ouvrir en split » sur la première ligne d'onglet non sélectionnée jusqu'à ce
+///   nombre ; capture `15-split`, clique le panneau de gauche (`16-split-panneau-actif`), survole le premier
+///   séparateur (`17-split-separateur`). Avec `…_SETTINGS_VALUES=addressBarPosition=top` : une barre par panneau.
 ///
 /// La capture `1-vide` montre la fenêtre sans onglet : la page vide invite à ⌘T, la barre de commande
 /// ne s'ouvre jamais d'elle-même.
@@ -44,6 +48,9 @@ final class ScreenshotUITests: XCTestCase {
         applyMenuActions(in: app, window: window)
         if environment["MATCHA_SCREENSHOT_COPY_URL"] != nil {
             captureCopyConfirmation(in: app, window: window)
+        }
+        if let count = environment["MATCHA_SCREENSHOT_SPLIT"].flatMap(Int.init) {
+            captureSplit(panes: min(max(count, 2), 4), in: app, window: window)
         }
         if let query = environment["MATCHA_SCREENSHOT_COMMAND_BAR"] {
             captureCommandBar(typing: query, in: app, window: window)
@@ -136,6 +143,34 @@ final class ScreenshotUITests: XCTestCase {
         usleep(300_000)
         attach(window.screenshot(), as: "14-url-copiee")
         XCTAssertTrue(confirmation.waitForNonExistence(timeout: 5))
+    }
+
+    /// Split de `count` panneaux formé par le menu, puis le panneau de gauche rendu actif, puis la poignée
+    /// survolée.
+    @MainActor
+    private func captureSplit(panes count: Int, in app: XCUIApplication, window: XCUIElement) {
+        if environment["MATCHA_SCREENSHOT_URLS"] == nil {
+            for index in 1 ... count {
+                openAddress("about:blank?split\(index)", in: app)
+            }
+        }
+        // Un essai par panneau au plus : un menu qui n'ajoute rien ne bloque pas la capture.
+        for _ in 0 ..< count where pagePanes(in: app).count < count {
+            guard let row = tabRows(in: app).allElementsBoundByIndex.first(where: { !$0.isSelected }) else {
+                break
+            }
+            row.rightClick()
+            app.menuItems["Ouvrir en split"].click()
+            sleep(1)
+        }
+        sleep(1)
+        attach(window.screenshot(), as: "15-split")
+        orderedPagePanes(in: app).first?.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.5)).click()
+        sleep(1)
+        attach(window.screenshot(), as: "16-split-panneau-actif")
+        splitDivider(in: app).hover()
+        sleep(1)
+        attach(window.screenshot(), as: "17-split-separateur")
     }
 
     /// Barre de commande avec ses résultats, puis la 2e ligne sélectionnée, puis l'édition de l'onglet affiché.

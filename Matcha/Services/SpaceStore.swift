@@ -29,7 +29,13 @@ final class SpaceStore {
         var positions: [UUID: SidebarPosition] = [:]
         for record in records {
             if let place = record.place {
-                positions[record.id] = SidebarPosition(place: place, order: record.order, folderID: record.folder?.id)
+                positions[record.id] = SidebarPosition(
+                    place: place,
+                    order: record.order,
+                    folderID: record.folder?.id,
+                    splitGroupID: record.splitGroupID,
+                    splitFraction: record.splitFraction,
+                )
             }
         }
         let folders = (space.folders ?? []).map { folder in
@@ -116,6 +122,9 @@ final class SpaceStore {
             record.place = position.place
             record.order = position.order
             record.folder = position.folderID.flatMap { folders[$0] }
+            // Jamais de split pour un favori (`positions` n'en donne pas).
+            record.splitGroupID = position.splitGroupID
+            record.splitFraction = position.splitFraction
             // Un favori appartient au profil, les autres onglets au Space.
             record.profile = position.place == .favorite ? space.profile : nil
             record.space = position.place == .favorite ? nil : space

@@ -125,6 +125,35 @@
         }
       }
     },
+    "Active Pane" : {
+      "comment" : "Accessibility value of the active page in a split view",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aktiver Bereich"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Panel activo"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Panneau actif"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Riquadro attivo"
+          }
+        }
+      }
+    },
     "Add Color" : {
       "comment" : "Icon button: add a color to the Space theme",
       "localizations" : {
@@ -523,6 +552,35 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Chiudi gli altri pannelli"
+          }
+        }
+      }
+    },
+    "Close Split View" : {
+      "comment" : "Menu item, close button and accessibility action of a split view row",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Split View schließen"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cerrar Split View"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fermer le split"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Chiudi Split View"
           }
         }
       }
@@ -1041,6 +1099,35 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Non chiedere più"
+          }
+        }
+      }
+    },
+    "Drag to resize. Double-click to make panes equal." : {
+      "comment" : "Help tag of the handle between two split view panes",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ziehe, um die Größe zu ändern. Doppelklicke, um die Bereiche anzugleichen."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Arrastra para cambiar el tamaño. Haz doble clic para igualar los paneles."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Faites glisser pour redimensionner. Double-cliquez pour égaliser les panneaux."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Trascina per ridimensionare. Fai doppio clic per rendere uguali i riquadri."
           }
         }
       }
@@ -2150,6 +2237,35 @@
         }
       }
     },
+    "Open in Split View" : {
+      "comment" : "Tab context menu item: shows the tab next to the active pane",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "In Split View öffnen"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Abrir en Split View"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ouvrir en split"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Apri in Split View"
+          }
+        }
+      }
+    },
     "Open tabs will be closed." : {
       "comment" : "Message of the alert shown before quitting",
       "localizations" : {
@@ -2179,6 +2295,35 @@
         }
       }
     },
+    "Pane Divider" : {
+      "comment" : "Accessibility label of the handle between two split view panes",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bereichstrenner"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Divisor de paneles"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Séparateur des panneaux"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Divisore dei riquadri"
+          }
+        }
+      }
+    },
     "Personal" : {
       "comment" : "Name of the profile created at first launch",
       "localizations" : {
@@ -2204,6 +2349,35 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Personale"
+          }
+        }
+      }
+    },
+    "Pin Split View" : {
+      "comment" : "Context menu of a tab in a Today split view: pins the whole split",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Split View anheften"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fijar Split View"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Épingler le split"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fissa Split View"
           }
         }
       }
@@ -2643,6 +2817,35 @@
         }
       }
     },
+    "Remove from Split View" : {
+      "comment" : "Context menu of a tab in a split view: takes it out",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aus Split View entfernen"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Quitar de Split View"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Retirer du split"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rimuovi da Split View"
+          }
+        }
+      }
+    },
     "Rename" : {
       "comment" : "Pinned folder context menu; confirmation button of the Rename Space alert",
       "localizations" : {
@@ -2870,6 +3073,35 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Cerca o inserisci indirizzo"
+          }
+        }
+      }
+    },
+    "Separate Tabs" : {
+      "comment" : "Context menu of a tab in a split view: dissolves the split, tabs stay",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tabs trennen"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Separar pestañas"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Séparer les onglets"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Separa pannelli"
           }
         }
       }
@@ -3162,6 +3394,35 @@
         }
       }
     },
+    "Split View with %@" : {
+      "comment" : "Accessibility label of a split view row; %@ is the list of its tab titles",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Split View mit %@"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Split View con %@"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Split avec %@"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Split View con %@"
+          }
+        }
+      }
+    },
     "Stop" : {
       "comment" : "Toolbar button: stop loading the page",
       "localizations" : {
@@ -3303,6 +3564,35 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "URL copiato"
+          }
+        }
+      }
+    },
+    "Unpin Split View" : {
+      "comment" : "Context menu of a tab in a pinned split view: moves the whole split to Today",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Split View loslösen"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Soltar Split View"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Désépingler le split"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sblocca Split View"
           }
         }
       }

@@ -43,8 +43,8 @@ struct SidebarDropZone: View {
 }
 
 extension View {
-    /// Accepte un onglet ou un dossier glissé et le range à la destination calculée d'après
-    /// l'endroit du dépôt dans la vue. Un dossier n'est accepté que parmi les épinglés.
+    /// Accepte un onglet, un split ou un dossier glissé et le range à la destination calculée d'après
+    /// l'endroit du dépôt dans la vue. Un dossier n'est accepté que parmi les épinglés, un split hors des favoris.
     func sidebarDropDestination(
         tabManager: TabManager,
         isTargeted: Binding<Bool>,
@@ -66,6 +66,14 @@ extension View {
                     return false
                 }
                 withAnimation(.easeOut(duration: 0.15)) { tabManager.moveFolder(id, to: target) }
+            case let .split(id):
+                if case .favorites = target {
+                    return false
+                }
+                guard tabManager.layout.split(withID: id) != nil else {
+                    return false
+                }
+                withAnimation(.easeOut(duration: 0.15)) { tabManager.moveSplit(id, to: target) }
             }
             return true
         } isTargeted: { targeted in

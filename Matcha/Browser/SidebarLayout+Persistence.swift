@@ -7,6 +7,9 @@ nonisolated struct SidebarPosition: Equatable, Sendable {
     var order: Int
     /// Dossier qui contient l'onglet épinglé, nil à la racine.
     var folderID: UUID?
+    /// Split de l'onglet et part de largeur de son panneau.
+    var splitGroupID: UUID?
+    var splitFraction = 0.0
 }
 
 /// Dossier d'épinglés tel qu'enregistré.
@@ -22,7 +25,7 @@ nonisolated struct FolderEntry: Equatable, Sendable {
 
 /// Passage du rangement en mémoire à sa forme enregistrée (positions à plat), et retour.
 nonisolated extension SidebarLayout {
-    /// Position de chaque onglet rangé.
+    /// Position de chaque onglet rangé, avec son split.
     var positions: [UUID: SidebarPosition] {
         var result: [UUID: SidebarPosition] = [:]
         for (order, id) in favorites.enumerated() {
@@ -32,6 +35,12 @@ nonisolated extension SidebarLayout {
             result[id] = SidebarPosition(place: .today, order: order)
         }
         Self.collectPinned(pinned, in: nil, positions: &result)
+        for group in splits {
+            for (offset, id) in group.tabIDs.enumerated() {
+                result[id]?.splitGroupID = group.id
+                result[id]?.splitFraction = group.fractions[offset]
+            }
+        }
         return result
     }
 
@@ -44,6 +53,7 @@ nonisolated extension SidebarLayout {
 
     /// Reconstruit le rangement : chaque conteneur dans l'ordre croissant des rangs. Un dossier dont le
     /// parent est inconnu, ou pris dans une boucle, va à la racine ; un épinglé dans un dossier inconnu aussi.
+    /// Les splits enregistrés sont réparés au besoin (voir `restoreSplits`).
     init(positions: [UUID: SidebarPosition], folders: [FolderEntry]) {
         self.init()
         for (id, _) in positions.filter({ $0.value.place == .favorite }).sorted(by: Self.byOrder) {
@@ -69,6 +79,27 @@ nonisolated extension SidebarLayout {
             remaining[orphan.id]?.parentID = nil
             fillPinned(in: nil, tabs: tabsInFolders, folders: &remaining)
         }
+        restoreSplits(from: positions)
+    }
+
+    /// Regroupe les onglets rangés par split, dans l'ordre de la barre. La normalisation répare une base
+    /// invalide (synchro, ancienne version) : groupe d'un seul onglet abandonné, favori retiré, membres hors du
+    /// conteneur du premier retirés, 4 membres au plus, membres regroupés après le premier, parts invalides
+    /// remplacées par des parts égales.
+    private mutating func restoreSplits(from positions: [UUID: SidebarPosition]) {
+        let rank = Dictionary(orderedTabIDs.enumerated().map { ($1, $0) }) { first, _ in first }
+        var members: [UUID: [(id: UUID, fraction: Double)]] = [:]
+        for (id, position) in positions where rank[id] != nil {
+            if let groupID = position.splitGroupID {
+                members[groupID, default: []].append((id, position.splitFraction))
+            }
+        }
+        let candidates = members.map { groupID, entries in
+            let sorted = entries.sorted { (rank[$0.id] ?? 0) < (rank[$1.id] ?? 0) }
+            return SplitGroup(id: groupID, tabIDs: sorted.map(\.id), fractions: sorted.map(\.fraction))
+        }
+        // Ordre fixe : une base invalide est toujours réparée de la même façon.
+        setSplits(candidates.sorted { $0.id.uuidString < $1.id.uuidString })
     }
 
     /// Ajoute, dans l'ordre des rangs, les onglets et dossiers de `parent`, puis le contenu de chaque dossier.

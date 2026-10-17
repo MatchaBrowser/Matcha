@@ -121,6 +121,37 @@ struct WindowModelTests {
         #expect(space.record.symbol == "briefcase.fill")
     }
 
+    @Test func `switching space captures every displayed pane`() async throws {
+        let tabManager = model.space.tabManager
+        let panes = ["un", "deux"].map { name in
+            let tab = tabManager.insertTab(configuration: TestPages.configuration(), after: nil, select: true)
+            tab.load(TestPages.url(name))
+            return (tab, name)
+        }
+        try await waitUntil { panes.allSatisfy { $0.0.title == $0.1 && !$0.0.isLoading } }
+        tabManager.openInSplit(panes[0].0)
+        for (tab, _) in panes {
+            tab.savedInteractionState = nil
+        }
+        model.newSpace()
+        #expect(panes.allSatisfy { $0.0.savedInteractionState != nil })
+    }
+
+    @Test func `moving a split member to another space takes it out of the split`() {
+        let source = model.space
+        let other = session.addSpace(inProfileOf: source)
+        let first = source.tabManager.newTab(url: blankPage("one"))
+        let second = source.tabManager.newTab(url: blankPage("two"))
+        source.tabManager.openInSplit(first)
+        #expect(source.tabManager.displayedTabs.count == 2)
+
+        model.move(first, to: other)
+        #expect(source.tabManager.layout.splits.isEmpty)
+        #expect(source.tabManager.selectedTab === second)
+        #expect(other.tabManager.todayTabs.first === first)
+        #expect(other.tabManager.layout.splits.isEmpty)
+    }
+
     @Test func `copying the selected tab url writes the pasteboard and shows the confirmation`() {
         let pasteboard = NSPasteboard(name: NSPasteboard.Name("WindowModelTests-\(UUID().uuidString)"))
         defer { pasteboard.releaseGlobally() }

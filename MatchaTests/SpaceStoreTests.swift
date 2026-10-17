@@ -74,8 +74,45 @@ struct SpaceStoreTests {
         let tab = manager.newTab()
         manager.setPlace(tab, to: .pinned)
         #expect(store.space.tabs?.isEmpty != false)
-        try await waitUntil(timeout: .seconds(4)) { store.space.tabs?.first?.id == tab.id }
+        // Délai par défaut (10 s) : avec tous les tests en parallèle, l'enregistrement attend le fil principal.
+        try await waitUntil { store.space.tabs?.first?.id == tab.id }
         #expect(store.space.tabs?.first?.place == .pinned)
+    }
+
+    @Test func `split membership and widths are saved and loaded back`() async throws {
+        let store = makeStore()
+        let tabs = try await fillManager()
+        manager.select(tabs[4])
+        manager.openInSplit(tabs[3])
+        let group = try #require(manager.displayedSplit)
+        manager.setSplitFractions(group.id, [0.4, 0.6])
+        store.saveNow(manager)
+
+        let records = try Dictionary(uniqueKeysWithValues: container.mainContext.fetch(FetchDescriptor<TabRecord>()).map { ($0.id, $0) })
+        #expect(records[tabs[4].id]?.splitGroupID == group.id)
+        #expect(records[tabs[4].id]?.splitFraction == 0.4)
+        #expect(records[tabs[3].id]?.splitGroupID == group.id)
+        #expect(records[tabs[3].id]?.splitFraction == 0.6)
+        for tab in tabs.prefix(3) {
+            #expect(records[tab.id]?.splitGroupID == nil)
+            #expect(records[tab.id]?.splitFraction == 0)
+        }
+
+        // Relance : le split revient, et chacun de ses panneaux crée sa vue web à l'affichage.
+        let (stored, layout) = SpaceStore(space: store.space, context: container.mainContext).load()
+        #expect(layout == manager.layout)
+        let restored = TabManager(websiteDataStore: .nonPersistent())
+        restored.restore(tabs: stored, layout: layout)
+        #expect(restored.selectedTabID == tabs[3].id)
+        restored.loadSelectedTab()
+        #expect(restored.displayedTabIDs == [tabs[4].id, tabs[3].id])
+        let allLoaded = restored.displayedTabs.allSatisfy(\.isLoaded)
+        #expect(allLoaded)
+
+        manager.separateSplit(group.id)
+        store.saveNow(manager)
+        #expect(records[tabs[4].id]?.splitGroupID == nil)
+        #expect(records[tabs[3].id]?.splitFraction == 0)
     }
 
     @Test func `restored tabs wait to be shown before loading`() {

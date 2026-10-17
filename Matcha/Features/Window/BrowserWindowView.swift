@@ -74,6 +74,8 @@ struct BrowserWindowView: View {
                 showsNavigationButtons: showsNavigationButtons,
                 goHome: homeButtonAction,
                 editAddress: editAddress,
+                // La barre flottante couvre le début de la carte : la zone de dépôt du split commence après.
+                dropInset: isPeeking ? max(0, width - Self.cardMargin) : 0,
             )
             // En bas : le haut de la carte accueille la barre d'adresse (réglage) et, plus haut, la
             // barre de commande.

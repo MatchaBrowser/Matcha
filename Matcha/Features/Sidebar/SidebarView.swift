@@ -19,7 +19,7 @@ struct SidebarView: View {
         VStack(alignment: .leading, spacing: 10) {
             if showsAddressBar {
                 SidebarTopBar(tab: tabManager.selectedTab, showsNavigationButtons: showsNavigationButtons, goHome: goHome)
-                AddressPill(tabManager: tabManager, edit: editAddress)
+                AddressPill(tab: tabManager.selectedTab, edit: editAddress)
             } else {
                 SidebarTopBar(tab: tabManager.selectedTab, showsNavigationButtons: false)
             }

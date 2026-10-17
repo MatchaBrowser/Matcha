@@ -66,6 +66,31 @@ Ou ⌘R dans Xcode.
 - [ ] VoiceOver : ↑ ↓ annonce le titre de la ligne.
 - Connu : au-dessus d'une page, le flou ne montre pas le contenu de la page (texte, images) ; le panneau prend une teinte unie tirée du fond de la page. Dis-moi si ça te gêne (détail dans `DECISIONS.md`).
 
+### 4.3 Split view
+
+- [ ] Avant de lancer cette version, copie `~/Library/Containers/com.matchabrowser.matcha/Data/Library/Application Support/` ailleurs (la base gagne deux champs). Lance Matcha : Spaces, épinglés, dossiers et onglets sont là.
+- [ ] Ouvre apple.com, fr.wikipedia.org et github.com. Sur apple.com, glisse l'onglet Wikipédia jusqu'au bord droit de la page : la moitié droite se colore ; lâche : deux cartes côte à côte, Wikipédia à droite, bordée de la couleur d'accentuation. Glisse GitHub sur le bord gauche de la carte de gauche, puis essaie entre deux cartes : jusqu'à quatre panneaux ; avec quatre, un cinquième onglet ne colore plus rien.
+- [ ] Pendant un glisser, au milieu d'une page, rien ne se colore et lâcher ne fait rien ; sur le champ de recherche de google.com, aucun texte « matcha-tab:… » n'apparaît. Hors glisser, clics, défilement, sélection de texte et clic droit dans les pages marchent comme avant (S4). Un fichier glissé du Finder dans une page (pièce jointe Gmail) et un texte glissé depuis Notes dans un champ arrivent toujours.
+- [ ] Clique dans chaque panneau : la bordure, la pastille d'adresse et le titre de la fenêtre suivent ; le clic agit du premier coup (un lien s'ouvre) ; ⌘L puis une adresse l'ouvre dans le panneau actif ; ⌘R, ⌘[, ⌘] et ⇧⌘C agissent sur lui.
+- [ ] Séparateur : curseur de redimensionnement et petit trait au survol ; glissement fluide même avec des pages lourdes (YouTube, Google Docs) ; jamais moins d'environ 200 pt ; double-clic : parts égales ; une infobulle explique les deux gestes. Rétrécis la fenêtre au minimum avec quatre panneaux : parts égales, rien ne déborde ; agrandis-la : les proportions reviennent. Pareil avec ⌘S.
+- [ ] Barre latérale : une ligne par split (icônes et titres ; icônes seules avec 4 onglets dans une barre étroite), morceau actif marqué ; un clic sur un morceau rend ce panneau actif ; un onglet ordinaire cliqué s'affiche seul, un clic sur le split le réaffiche.
+- [ ] Menu d'un onglet ordinaire : « Ouvrir en split » l'ajoute à droite du panneau actif et tu peux taper aussitôt dans sa page ; grisé avec 4 panneaux ; absent sur un favori ou sur l'onglet affiché.
+- [ ] Menu d'un morceau : « Retirer du split » (l'onglet passe juste sous le split), « Séparer les onglets », « Épingler le split » (il survit à « Effacer »), « Désépingler le split », « Fermer le split ».
+- [ ] Glisse la ligne du split dans les épinglés, puis dans un dossier ; replie, déplie, supprime le dossier : le split reste entier. Sur les favoris : refusé.
+- [ ] Split du jour : ⌘W ferme le panneau actif, son voisin prend le clavier ; à un onglet, le split disparaît ; × de la ligne : tout se ferme. Split épinglé : ⌘W le décharge en entier (ligne grisée) ; un clic sur un morceau le rouvre aux adresses d'origine.
+- [ ] Sur un onglet du jour affiché, glisse un épinglé sur le bord de la carte : le split se range dans les épinglés, rien n'est désépinglé.
+- [ ] Liens : ⌘-clic dans un panneau ouvre l'onglet sous le split, hors du split ; un lien qui ouvre une fenêtre l'affiche seul.
+- [ ] « Fermer les autres onglets » sur un morceau : le split reste entier.
+- [ ] Barre d'adresse au-dessus de la page (Réglages) : une barre par carte ; un clic sur la pastille d'une carte non active l'active puis ouvre la barre de commande sur son adresse ; avec 4 panneaux à 200 pt, rien n'est coupé.
+- [ ] Barre masquée (⌘S) : fais apparaître la barre flottante, glisse un onglet sur le bord droit de la carte : le split se crée ; réordonne des onglets dans la barre flottante : ça marche toujours (S5).
+- [ ] Change de Space et reviens : même split, même panneau actif ; « Déplacer vers » sur un morceau n'emporte que cet onglet. Fenêtre privée (⇧⌘N) : split possible, rien de gardé.
+- [ ] ⌘Q et relance : splits, ordre et proportions retrouvés ; si le dernier onglet utilisé était dans un split, il s'affiche avec ce panneau actif.
+- [ ] Vidéo en plein écran dans un panneau, puis Échap : elle revient dans le bon panneau ; une vidéo continue quand tu cliques dans l'autre panneau ou tires le séparateur.
+- [ ] Clair, sombre, privé : bordure, intervalles, poignée et zones de dépôt lisibles mais discrets. VoiceOver : la ligne annonce « Split avec … », les panneaux annoncent leur titre et « Panneau actif », le séparateur se règle avec Augmenter et Diminuer.
+- [ ] Langues : menus du split en anglais, allemand, espagnol et italien (« riquadro » pour un panneau, jamais « pannello »).
+- [ ] Glisse un onglet de la barre sur un champ de texte d'une page (la recherche de Wikipédia par exemple), au milieu de la page : rien n'est collé dans le champ, et l'onglet reprend sa place. Glisser un lien ou du texte d'une page vers une autre marche toujours comme avant.
+- Connu : la touche Tab ne change pas le panneau actif (un clic, oui) ; pas encore de glisser d'un onglet hors de la ligne d'un split ni de réordonnancement des panneaux (voir `DECISIONS.md`).
+
 ### 4.6 Copier l'URL
 
 - [ ] Sur une page, ⌘⇧C : une petite capsule « URL copiée » (icône de lien) apparaît en fondu, centrée en bas de la page, reste environ 1,5 s puis disparaît en fondu. Colle dans une autre app (Notes, TextEdit) : c'est bien l'adresse complète de la page.

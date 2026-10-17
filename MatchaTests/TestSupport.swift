@@ -1,5 +1,6 @@
 import Foundation
 @testable import Matcha
+import Testing
 import WebKit
 
 extension BrowserTab {
@@ -7,6 +8,28 @@ extension BrowserTab {
     var loadedWebView: WKWebView {
         makeWebViewIfNeeded()
     }
+}
+
+/// Règles des splits (I1–I3), vérifiées après chaque changement dans les tests : 2 à 4 membres, une part par
+/// membre (somme 1), groupes disjoints, membres rangés hors des favoris, voisins dans un même conteneur dans
+/// l'ordre des panneaux, groupes triés par identifiant.
+func expectSplitInvariants(_ layout: SidebarLayout, sourceLocation: SourceLocation = #_sourceLocation) {
+    var seen: Set<UUID> = []
+    for group in layout.splits {
+        #expect(SplitGroup.paneCount.contains(group.tabIDs.count), sourceLocation: sourceLocation)
+        #expect(group.fractions.count == group.tabIDs.count, sourceLocation: sourceLocation)
+        #expect(abs(group.fractions.reduce(0, +) - 1) <= 1e-9, sourceLocation: sourceLocation)
+        #expect(seen.isDisjoint(with: group.tabIDs), sourceLocation: sourceLocation)
+        seen.formUnion(group.tabIDs)
+        #expect(group.tabIDs.allSatisfy { [.pinned, .today].contains(layout.place(of: $0)) }, sourceLocation: sourceLocation)
+        let locations = group.tabIDs.compactMap(layout.container(of:))
+        #expect(locations.count == group.tabIDs.count, sourceLocation: sourceLocation)
+        #expect(locations.allSatisfy { $0.container == locations.first?.container }, sourceLocation: sourceLocation)
+        let start = locations.first?.index ?? 0
+        #expect(locations.map(\.index) == Array(start ..< start + locations.count), sourceLocation: sourceLocation)
+    }
+    let ids = layout.splits.map(\.id.uuidString)
+    #expect(ids == ids.sorted(), sourceLocation: sourceLocation)
 }
 
 struct WaitTimeoutError: Error, CustomStringConvertible {

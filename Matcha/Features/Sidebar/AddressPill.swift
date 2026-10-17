@@ -1,16 +1,12 @@
 import SwiftUI
 
-/// Pastille d'adresse : le domaine de l'onglet affiché. Un clic (ou ⌘L) ouvre la barre de commande
-/// sur l'adresse complète.
+/// Pastille d'adresse : le domaine de l'onglet affiché (ou du panneau, barre au-dessus de la page). Un clic
+/// (ou ⌘L) ouvre la barre de commande sur l'adresse complète.
 struct AddressPill: View {
-    let tabManager: TabManager
+    let tab: BrowserTab?
     let edit: () -> Void
 
     @State private var isHovered = false
-
-    private var tab: BrowserTab? {
-        tabManager.selectedTab
-    }
 
     var body: some View {
         Button(action: edit) {

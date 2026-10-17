@@ -94,7 +94,7 @@ final class BrowserTab: Identifiable {
         if let webView {
             return webView
         }
-        let webView = WKWebView(frame: .zero, configuration: configuration)
+        let webView = BrowserWebView(frame: .zero, configuration: configuration)
         webView.allowsBackForwardNavigationGestures = true
         webView.allowsMagnification = true
         #if DEBUG

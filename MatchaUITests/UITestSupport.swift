@@ -1,3 +1,4 @@
+import AppKit
 import XCTest
 
 /// Outils partagés des tests d'interface. Tout est synchrone : les appels à XCUIApplication depuis
@@ -20,6 +21,23 @@ extension XCTestCase {
     func waitForCount(_ query: XCUIElementQuery, _ expected: Int, timeout: TimeInterval = 3) -> Bool {
         let predicate = NSPredicate(format: "count == %d", expected)
         return XCTWaiter().wait(for: [XCTNSPredicateExpectation(predicate: predicate, object: query)], timeout: timeout) == .completed
+    }
+
+    /// Clique `element` une fois sa position stable : juste après un glisser-déposer, la barre s'anime
+    /// (ligne insérée, zone de dépôt qui se replie) et un clic immédiat viserait l'ancienne place du bouton.
+    @MainActor
+    func clickWhenSettled(_ element: XCUIElement, timeout: TimeInterval = 3) {
+        var previous = element.frame
+        let deadline = Date().addingTimeInterval(timeout)
+        while Date() < deadline {
+            Thread.sleep(forTimeInterval: 0.25)
+            let current = element.frame
+            if current == previous {
+                break
+            }
+            previous = current
+        }
+        element.click()
     }
 
     /// Place le pointeur au milieu de la page, loin du bord qui fait apparaître la barre masquée.
@@ -67,13 +85,28 @@ extension XCTestCase {
     /// quelle que soit la langue du Mac.
     static let languageArguments = ["-AppleLanguages", "(fr)", "-AppleLocale", "fr_FR"]
 
+    /// Fenêtre de navigation imposée à chaque lancement : 1400 × 900 pt en haut à gauche de l'écran principal.
+    /// La position retenue par l'app (« NSWindow Frame browser », peut-être sur un autre écran, éteint ou
+    /// occupé) ne joue plus sur les tests ; celle de l'utilisateur n'est pas modifiée.
+    @MainActor
+    static var windowFrameArguments: [String] {
+        guard let screen = NSScreen.screens.first?.visibleFrame else {
+            return []
+        }
+        let width = min(1400, screen.width - 80)
+        let height = min(900, screen.height - 80)
+        let frame = [screen.minX + 40, screen.maxY - 40 - height, width, height]
+        let values = (frame + [screen.minX, screen.minY, screen.width, screen.height]).map { String(Int($0)) }
+        return ["-NSWindow Frame browser", values.joined(separator: " ")]
+    }
+
     /// Lance l'app en français, sans restaurer les fenêtres d'un lancement précédent, avec les réglages
     /// par défaut et `settings` en plus, pour ce lancement seulement (« -clé valeur »), sans toucher à
-    /// ceux de l'utilisateur.
+    /// ceux de l'utilisateur. La fenêtre s'ouvre sur l'écran principal.
     @MainActor
     func launchApp(settings: [String: String] = [:]) -> XCUIApplication {
         let app = XCUIApplication()
-        app.launchArguments += Self.languageArguments
+        app.launchArguments += Self.languageArguments + Self.windowFrameArguments
         var values = Self.defaultSettings
         values.merge(settings) { _, new in new }
         for (key, value) in values.sorted(by: { $0.key < $1.key }) {
@@ -157,6 +190,57 @@ extension XCTestCase {
     @MainActor
     func tabRow(titled title: String, in app: XCUIApplication) -> XCUIElement {
         tabRows(in: app).matching(NSPredicate(format: "label CONTAINS %@", title)).firstMatch
+    }
+
+    // MARK: Split view
+
+    /// Cartes des panneaux affichés (une seule hors split, même sans onglet).
+    @MainActor
+    func pagePanes(in app: XCUIApplication) -> XCUIElementQuery {
+        app.descendants(matching: .any).matching(identifier: "pagePane")
+    }
+
+    /// Cartes des panneaux de gauche à droite.
+    @MainActor
+    func orderedPagePanes(in app: XCUIApplication) -> [XCUIElement] {
+        pagePanes(in: app).allElementsBoundByIndex.sorted { $0.frame.minX < $1.frame.minX }
+    }
+
+    @MainActor
+    func splitRows(in app: XCUIApplication) -> XCUIElementQuery {
+        app.descendants(matching: .any).matching(identifier: "splitRow")
+    }
+
+    @MainActor
+    func splitSegments(in app: XCUIApplication) -> XCUIElementQuery {
+        app.descendants(matching: .any).matching(identifier: "splitSegment")
+    }
+
+    /// Morceau de la ligne d'un split dont le titre contient `title`.
+    @MainActor
+    func splitSegment(titled title: String, in app: XCUIApplication) -> XCUIElement {
+        splitSegments(in: app).matching(NSPredicate(format: "label CONTAINS %@", title)).firstMatch
+    }
+
+    /// Poignée entre les deux premiers panneaux.
+    @MainActor
+    func splitDivider(in app: XCUIApplication) -> XCUIElement {
+        app.descendants(matching: .any).matching(identifier: "splitDivider").firstMatch
+    }
+
+    /// « Ouvrir en split » dans le menu de la ligne d'onglet `title`.
+    @MainActor
+    func openInSplit(_ title: String, in app: XCUIApplication) {
+        tabRow(titled: title, in: app).rightClick()
+        app.menuItems["Ouvrir en split"].click()
+    }
+
+    /// Glisse la ligne d'onglet `title` jusqu'à `target`, lentement, avec une pause à l'arrivée : la zone de
+    /// dépôt de la carte a le temps de choisir son bord.
+    @MainActor
+    func dragTab(titled title: String, to target: XCUICoordinate, in app: XCUIApplication) {
+        tabRow(titled: title, in: app).coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.5))
+            .press(forDuration: 0.5, thenDragTo: target, withVelocity: .slow, thenHoldForDuration: 0.5)
     }
 
     /// Les tests qui chargent une vraie page sont ignorés sans accès à Internet.

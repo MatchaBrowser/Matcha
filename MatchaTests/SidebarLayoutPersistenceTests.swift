@@ -73,6 +73,70 @@ struct SidebarLayoutPersistenceTests {
         #expect(layout.pinned.folder(folder.id)?.items == [.tab(ids[1])])
     }
 
+    @Test func `positions carry split membership and fractions`() throws {
+        var layout = richLayout().layout
+        let joined = layout.joinSplit(ids[7], anchor: ids[6], at: 1)
+        let groupID = try #require(joined)
+        layout.setSplitFractions(groupID, [0.3, 0.7])
+        let positions = layout.positions
+        #expect(positions[ids[6]] == SidebarPosition(place: .today, order: 0, splitGroupID: groupID, splitFraction: 0.3))
+        #expect(positions[ids[7]] == SidebarPosition(place: .today, order: 1, splitGroupID: groupID, splitFraction: 0.7))
+        #expect(positions[ids[2]]?.splitGroupID == nil)
+        #expect(positions[ids[0]]?.splitFraction == 0)
+    }
+
+    @Test func `split groups survive the round trip`() throws {
+        var rich = richLayout()
+        let todayGroup = rich.layout.joinSplit(ids[7], anchor: ids[6], at: 0)
+        // Épinglé de la racine qui rejoint celui du dossier Travail.
+        let joined = rich.layout.joinSplit(ids[5], anchor: ids[3], at: 1)
+        try #require(todayGroup != nil)
+        let pinnedGroup = try #require(joined)
+        rich.layout.setSplitFractions(pinnedGroup, [0.25, 0.75])
+        expectSplitInvariants(rich.layout)
+        #expect(rich.layout.pinned.folder(rich.work)?.items.prefix(2) == [.tab(ids[3]), .tab(ids[5])])
+
+        let rebuilt = SidebarLayout(positions: rich.layout.positions, folders: rich.layout.folderEntries)
+        #expect(rebuilt == rich.layout)
+        #expect(rebuilt.splits.count == 2)
+    }
+
+    @Test func `invalid saved groups are repaired or dropped`() {
+        let single = UUID()
+        let mixed = UUID()
+        let crowded = UUID()
+        let scattered = UUID()
+        let folder = FolderEntry(id: UUID(), name: "Travail", isCollapsed: false, parentID: nil, order: 0)
+        var positions: [UUID: SidebarPosition] = [:]
+        // Groupe d'un seul onglet : abandonné.
+        positions[ids[0]] = SidebarPosition(place: .today, order: 0, splitGroupID: single, splitFraction: 1)
+        // Un favori et deux conteneurs : seuls les membres du conteneur du premier restent (le dossier),
+        // et la part 0 donne des parts égales.
+        positions[ids[1]] = SidebarPosition(place: .favorite, order: 0, splitGroupID: mixed, splitFraction: 0.5)
+        positions[ids[2]] = SidebarPosition(place: .pinned, order: 0, folderID: folder.id, splitGroupID: mixed, splitFraction: 0)
+        positions[ids[3]] = SidebarPosition(place: .pinned, order: 1, folderID: folder.id, splitGroupID: mixed, splitFraction: 0.5)
+        positions[ids[4]] = SidebarPosition(place: .today, order: 1, splitGroupID: mixed, splitFraction: 0.5)
+        let rebuilt = SidebarLayout(positions: positions, folders: [folder])
+        expectSplitInvariants(rebuilt)
+        #expect(rebuilt.splits.map(\.id) == [mixed])
+        #expect(rebuilt.split(withID: mixed)?.tabIDs == [ids[2], ids[3]])
+        #expect(rebuilt.split(withID: mixed)?.fractions == [0.5, 0.5])
+
+        // Cinq membres, pas voisins : les quatre premiers, regroupés après le premier.
+        var crowd: [UUID: SidebarPosition] = [:]
+        for (order, id) in ids.enumerated() {
+            let member = order.isMultiple(of: 2) || order == 7
+            crowd[id] = SidebarPosition(place: .today, order: order, splitGroupID: member ? crowded : scattered, splitFraction: 0.2)
+        }
+        let repaired = SidebarLayout(positions: crowd, folders: [])
+        expectSplitInvariants(repaired)
+        #expect(repaired.split(withID: crowded)?.tabIDs == [ids[0], ids[2], ids[4], ids[6]])
+        #expect(repaired.today.prefix(4) == [ids[0], ids[2], ids[4], ids[6]])
+        let fractions = repaired.split(withID: crowded)?.fractions ?? []
+        #expect(fractions.count == 4)
+        #expect(fractions.allSatisfy { abs($0 - 0.25) < 1e-12 })
+    }
+
     @Test func `folders caught in a loop are not lost`() {
         let first = UUID()
         let second = UUID()

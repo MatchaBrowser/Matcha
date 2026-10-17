@@ -32,7 +32,7 @@ Trois modes, au choix dans Réglages > Synchronisation :
 | `tab` | `TabRecord` favori ou épinglé | `place` (`favorite` ou `pinned`), `url` et `title` d'origine (`pinnedURL`, `pinnedTitle`), `order`, `profileId` (favori) ou `spaceId` (épinglé), `folderId` ou `null` |
 | `boost` | `BoostRecord` (tâche 4.7) | `domain`, `css`, `js`, `isEnabled` |
 
-**Restent sur le Mac :** onglets du jour et archivés, adresse et titre courants d'un épinglé, historique, états de navigation (`interactionState`), données des sites (cookies, connexions, stockage), téléchargements, réglages de l'app.
+**Restent sur le Mac :** onglets du jour et archivés, adresse et titre courants d'un épinglé, historique, états de navigation (`interactionState`), regroupements en split view (`splitGroupID`, `splitFraction`), données des sites (cookies, connexions, stockage), téléchargements, réglages de l'app.
 
 Un onglet qui quitte les favoris ou les épinglés compte comme une suppression pour la synchro. Un onglet qui y entre compte comme une création.
 

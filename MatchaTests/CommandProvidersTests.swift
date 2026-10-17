@@ -65,6 +65,15 @@ struct CommandProvidersTests {
         #expect(await openTabs().map(\.id) == [id(listed)])
     }
 
+    @Test func `other panes of the displayed split stay listed`() async {
+        let first = shownTabs.newTab(url: blankPage("one"))
+        let second = shownTabs.newTab(url: blankPage("two"))
+        shownTabs.openInSplit(first)
+        #expect(shownTabs.displayedTabs.count == 2)
+        // Le panneau actif est exclu ; l'autre panneau reste proposé, pour y passer depuis la barre.
+        #expect(await openTabs().map(\.id) == [id(second)])
+    }
+
     @Test func `shared favorites come once from the shown space`() async throws {
         let shown = windowModel.space
         let favorite = shown.tabManager.newTab(url: blankPage("favorite"))

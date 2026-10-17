@@ -23,9 +23,10 @@ extension TabManager {
         restoreSelection(restored.max { $0.lastActivity < $1.lastActivity }?.id)
     }
 
-    /// Crée la vue web de l'onglet sélectionné, pour l'afficher (Space affiché, lancement).
+    /// Crée la vue web des onglets affichés (l'onglet sélectionné et son split), pour les afficher (Space
+    /// affiché, lancement).
     func loadSelectedTab() {
-        selectedTab?.makeWebViewIfNeeded()
+        displayedTabs.forEach { $0.makeWebViewIfNeeded() }
     }
 
     /// Ce qu'il faut enregistrer de chaque onglet rangé.

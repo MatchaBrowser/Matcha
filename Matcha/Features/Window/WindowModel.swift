@@ -50,8 +50,8 @@ final class WindowModel {
         guard target !== current, let targetIndex = session.spaces.firstIndex(where: { $0 === target }) else {
             return
         }
-        // L'onglet affiché quitte l'écran : il retient son état de navigation.
-        current.tabManager.selectedTab?.captureInteractionState()
+        // Les onglets affichés (tout le split) quittent l'écran : ils retiennent leur état de navigation.
+        current.tabManager.displayedTabs.forEach { $0.captureInteractionState() }
         if target.record.profile?.id == current.record.profile?.id {
             target.tabManager.adoptFavorites(from: current.tabManager)
         }

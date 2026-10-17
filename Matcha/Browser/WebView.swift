@@ -8,10 +8,15 @@ import WebKit
 /// que SwiftUI appelle de nouveau `makeNSView` au lieu de réutiliser l'ancienne vue.
 struct WebView: NSViewRepresentable {
     let webView: WKWebView
+    /// Destinataire des éléments de la barre lâchés sur la page (split view) ; nil : refusés.
+    var sidebarDropTarget: (any SidebarItemDropTarget)?
 
     func makeNSView(context _: Context) -> WKWebView {
-        webView
+        (webView as? BrowserWebView)?.sidebarDropTarget = sidebarDropTarget
+        return webView
     }
 
-    func updateNSView(_: WKWebView, context _: Context) {}
+    func updateNSView(_ webView: WKWebView, context _: Context) {
+        (webView as? BrowserWebView)?.sidebarDropTarget = sidebarDropTarget
+    }
 }
