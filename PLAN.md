@@ -112,7 +112,7 @@ Feuille de route de développement, à suivre dans l'ordre. Les règles de trava
 - [ ] **4.3 Split view.** Groupe de 2 à 4 onglets côte à côte dans la carte, séparateurs réglables. Création en déposant un onglet sur le bord gauche ou droit de la carte, ou par le menu « Ouvrir en split ». Dans la barre latérale, le groupe tient sur une ligne. Le panneau actif est marqué et le champ d'adresse le suit.
 - [ ] **4.4 Peek** (`Features/Peek/`). Maj+clic sur un lien : navigation annulée, page ouverte dans un aperçu flottant (≈ 85 % de la carte, fond assombri, même profil). Boutons « Ouvrir en onglet » (la même vue web passe dans un nouvel onglet, sans recharger) et « Fermer » (⎋ ou clic à côté). Option : les liens d'un épinglé vers un autre domaine s'ouvrent aussi en aperçu.
 - [ ] **4.5 Mini-fenêtre** (`Features/MiniWindow/`, l'équivalent de Little Arc). `NSPanel` flottant d'environ 520 × 680 pt, barre minimale : domaine, « Ouvrir dans le Space », fermer. Raccourci global réglable avec KeyboardShortcuts (défaut ⌥⌘N). Les liens venus d'autres apps y arriveront en phase 8.
-- [ ] **4.6 Copier l'URL** avec ⌘⇧C et une petite confirmation « URL copiée ».
+- [x] **4.6 Copier l'URL** avec ⌘⇧C et une petite confirmation « URL copiée ».
 - **4.7 Boosts** : reportée, voir `FEATURES.md`.
 - [ ] **4.8 Raccourcis supplémentaires.** ⌘1 à ⌘8 pour les premiers favoris puis épinglés, ⌘9 pour le dernier onglet ; ⌃Tab et ⌃⇧Tab pour l'onglet suivant et précédent dans l'ordre de la barre.
 
