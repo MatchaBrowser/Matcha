@@ -18,6 +18,11 @@ final class SettingsUITests: XCTestCase {
         let picker = app.descendants(matching: .any).matching(identifier: "searchEnginePicker").firstMatch
         XCTAssertTrue(picker.waitForExistence(timeout: 5))
         XCTAssertEqual(app.windows.count, 2)
+        // Aperçu des liens des favoris et des épinglés : désactivé par défaut (lu seulement, jamais modifié ici).
+        let peekToggle = app.descendants(matching: .any).matching(identifier: "pinnedLinksInPeekToggle").firstMatch
+        XCTAssertTrue(peekToggle.exists)
+        // Case ou interrupteur : valeur 0 (nombre ou texte selon le contrôle).
+        XCTAssertEqual(peekToggle.value.map { "\($0)" }, "0")
 
         app.typeKey("w", modifierFlags: .command)
         XCTAssertTrue(picker.waitForNonExistence(timeout: 3))

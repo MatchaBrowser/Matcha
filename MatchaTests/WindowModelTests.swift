@@ -182,6 +182,42 @@ struct WindowModelTests {
         #expect(model.copyConfirmation.presentationCount == 0)
     }
 
+    @Test func `copying the url while Peek is open copies the peek`() async throws {
+        let pasteboard = NSPasteboard(name: NSPasteboard.Name("WindowModelTests-\(UUID().uuidString)"))
+        defer { pasteboard.releaseGlobally() }
+        let tabManager = model.space.tabManager
+        let source = tabManager.newTab(url: blankPage("source"))
+        let peek = try #require(tabManager.openPeek(blankPage("apercu"), from: source))
+        try await waitUntil { peek.tab.url != nil }
+
+        #expect(model.copySelectedTabURL(to: pasteboard))
+        #expect(pasteboard.string(forType: .string) == "about:blank?apercu")
+    }
+
+    // MARK: Aperçu (tâche 4.4)
+
+    @Test func `changing Space closes Peek`() throws {
+        let tabManager = model.space.tabManager
+        let source = tabManager.newTab(url: blankPage("source"))
+        let peek = try #require(tabManager.openPeek(blankPage("apercu"), from: source))
+        model.newSpace()
+        #expect(tabManager.peek == nil)
+        #expect(peek.tab.webView == nil)
+        #expect(source.isLoaded)
+    }
+
+    @Test func `deleting a Space closes its Peek`() throws {
+        model.newSpace()
+        let second = model.space
+        let source = second.tabManager.newTab(url: blankPage("source"))
+        model.selectSpace(at: 0)
+        // L'aperçu du Space supprimé est fermé par la suppression elle-même, pas par un changement de Space.
+        let peek = try #require(second.tabManager.openPeek(blankPage("apercu"), from: source))
+        model.deleteSpace(second)
+        #expect(second.tabManager.peek == nil)
+        #expect(peek.tab.webView == nil)
+    }
+
     @Test func `copying a link of any tab shows the confirmation`() {
         let pasteboard = NSPasteboard(name: NSPasteboard.Name("WindowModelTests-\(UUID().uuidString)"))
         defer { pasteboard.releaseGlobally() }

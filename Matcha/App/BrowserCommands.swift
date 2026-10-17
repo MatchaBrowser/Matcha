@@ -11,6 +11,16 @@ struct BrowserCommands: Commands {
         tabManager?.selectedTab
     }
 
+    /// Page au premier plan : l'aperçu s'il est ouvert, sinon l'onglet sélectionné.
+    private var frontTab: BrowserTab? {
+        tabManager?.frontTab
+    }
+
+    /// Aperçu ouvert (et pas de barre de commande) : ⌘W le ferme.
+    private var isPeekOpen: Bool {
+        tabManager?.peek != nil && windowActions?.isCommandBarPresented != true
+    }
+
     private var sidebarToggleTitle: LocalizedStringKey {
         windowActions?.isSidebarVisible == false ? "Show Sidebar" : "Hide Sidebar"
     }
@@ -35,12 +45,15 @@ struct BrowserCommands: Commands {
             .disabled(windowActions == nil)
         }
 
-        // Remplace « Fermer » (⌘W) : ⌘W ferme l'onglet, ⇧⌘W la fenêtre, comme dans Safari.
+        // Remplace « Fermer » (⌘W) : ⌘W ferme l'onglet (ou l'aperçu), ⇧⌘W la fenêtre, comme dans Safari.
         CommandGroup(replacing: .saveItem) {
-            Button("Close Tab") {
+            Button {
                 if let windowActions, windowActions.isCommandBarPresented {
                     // Barre de commande ouverte : ⌘W ne ferme qu'elle, jamais l'onglet par réflexe.
                     windowActions.closeCommandBar()
+                } else if let tabManager, tabManager.peek != nil {
+                    // Aperçu ouvert : ⌘W ne ferme que lui.
+                    PeekActions.close(in: tabManager)
                 } else if let tabManager {
                     if let tab = tabManager.selectedTab {
                         tabManager.close(tab)
@@ -49,6 +62,8 @@ struct BrowserCommands: Commands {
                     // Fenêtre sans onglets (réglages) : ⌘W la ferme.
                     NSApp.keyWindow?.performClose(nil)
                 }
+            } label: {
+                isPeekOpen ? Text(PeekActions.closeTitle) : Text("Close Tab")
             }
             .keyboardShortcut("w")
             .disabled(tabManager != nil && selectedTab == nil && windowActions?.isCommandBarPresented != true)
@@ -76,9 +91,9 @@ struct BrowserCommands: Commands {
         }
 
         CommandGroup(after: .toolbar) {
-            Button("Reload Page") { selectedTab?.reload() }
+            Button("Reload Page") { frontTab?.reload() }
                 .keyboardShortcut("r")
-                .disabled(selectedTab?.hasURL != true)
+                .disabled(frontTab?.hasURL != true)
         }
 
         CommandMenu("Spaces") {
@@ -97,12 +112,12 @@ struct BrowserCommands: Commands {
                 .keyboardShortcut("h", modifiers: [.command, .shift])
                 .disabled(windowActions?.goHome == nil)
             Divider()
-            Button("Back") { selectedTab?.goBack() }
+            Button("Back") { frontTab?.goBack() }
                 .keyboardShortcut("[")
-                .disabled(selectedTab?.canGoBack != true)
-            Button("Forward") { selectedTab?.goForward() }
+                .disabled(frontTab?.canGoBack != true)
+            Button("Forward") { frontTab?.goForward() }
                 .keyboardShortcut("]")
-                .disabled(selectedTab?.canGoForward != true)
+                .disabled(frontTab?.canGoForward != true)
         }
     }
 }

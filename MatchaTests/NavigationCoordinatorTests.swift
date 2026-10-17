@@ -98,6 +98,30 @@ struct NavigationCoordinatorTests {
         #expect(tab1.openerID == page.id && tab2.openerID == page.id)
     }
 
+    @Test func `middle click opens a background tab after the page`() async throws {
+        let (page, other) = try await openPage(body: "")
+        let recorder = PolicyRecorder()
+
+        // Molette : WebKit donne un masque de boutons, 4 pour le bouton du milieu (2 est le bouton droit).
+        let action = FakeNavigationAction(url: TestPages.url("milieu"), modifierFlags: [], buttonNumber: 4)
+        manager.coordinator.webView(page.loadedWebView, decidePolicyFor: action, decisionHandler: recorder.record)
+
+        #expect(recorder.policies == [.cancel])
+        #expect(manager.selectedTab === page)
+        #expect(manager.tabs.count == 3)
+        #expect(manager.tabs[0] === page && manager.tabs[2] === other)
+        #expect(manager.tabs[1].openerID == page.id)
+    }
+
+    @Test func `right click is allowed`() throws {
+        let tab = manager.newTab()
+        let recorder = PolicyRecorder()
+        let action = try FakeNavigationAction(url: #require(URL(string: "https://example.com/")), modifierFlags: [], buttonNumber: 2)
+        manager.coordinator.webView(tab.loadedWebView, decidePolicyFor: action, decisionHandler: recorder.record)
+        #expect(recorder.policies == [.allow])
+        #expect(manager.tabs.count == 1)
+    }
+
     @Test func `plain click is allowed`() throws {
         let tab = manager.newTab()
         let recorder = PolicyRecorder()
@@ -105,48 +129,5 @@ struct NavigationCoordinatorTests {
         manager.coordinator.webView(tab.loadedWebView, decidePolicyFor: action, decisionHandler: recorder.record)
         #expect(recorder.policies == [.allow])
         #expect(manager.tabs.count == 1)
-    }
-}
-
-/// Garde les décisions passées au `decisionHandler` de WebKit.
-@MainActor
-private final class PolicyRecorder {
-    private(set) var policies: [WKNavigationActionPolicy] = []
-
-    func record(_ policy: WKNavigationActionPolicy) {
-        policies.append(policy)
-    }
-}
-
-/// Clic sur un lien du cadre principal, avec les modificateurs voulus.
-@MainActor
-private final class FakeNavigationAction: WKNavigationAction {
-    private let fakeRequest: URLRequest
-    private let fakeModifierFlags: NSEvent.ModifierFlags
-
-    init(url: URL, modifierFlags: NSEvent.ModifierFlags) {
-        fakeRequest = URLRequest(url: url)
-        fakeModifierFlags = modifierFlags
-        super.init()
-    }
-
-    override var request: URLRequest {
-        fakeRequest
-    }
-
-    override var modifierFlags: NSEvent.ModifierFlags {
-        fakeModifierFlags
-    }
-
-    override var navigationType: WKNavigationType {
-        .linkActivated
-    }
-
-    override var buttonNumber: Int {
-        0
-    }
-
-    override var targetFrame: WKFrameInfo? {
-        nil
     }
 }

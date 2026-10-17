@@ -2,6 +2,7 @@ import SwiftUI
 
 /// Zone de contenu : la carte de l'onglet sélectionné, ou les cartes de son split côte à côte, séparées par
 /// des poignées réglables. Un onglet glissé depuis la barre et lâché sur le bord d'un panneau rejoint le split.
+/// L'aperçu (Peek) s'ouvre par-dessus les pages de tous les panneaux.
 struct ContentCard: View {
     let tabManager: TabManager
     let addressBarPosition: AddressBarPosition
@@ -57,6 +58,12 @@ struct ContentCard: View {
             .overlay {
                 SplitDropHighlight(target: dropTarget, widths: widths)
                     .allowsHitTesting(false)
+            }
+            // L'aperçu (Maj+clic) couvre les pages de tous les panneaux, pas leur barre d'adresse (tâche 4.4).
+            .overlayPreferenceValue(PeekPageAreas.self) { anchors in
+                GeometryReader { overlay in
+                    PeekOverlay(tabManager: tabManager, pages: anchors.map { overlay[$0] }, pageCorners: pageCorners)
+                }
             }
         }
         .onChange(of: split?.id) {
@@ -131,6 +138,13 @@ struct ContentCard: View {
             return false
         }
         return tabManager.displayedSplit?.isFull != true
+    }
+
+    /// Coins d'une page : ceux de la carte, droits en haut sous la barre d'adresse.
+    private var pageCorners: RectangleCornerRadii {
+        let radius = BrowserWindowView.cardCornerRadius
+        let top = addressBarPosition == .top ? 0 : radius
+        return RectangleCornerRadii(topLeading: top, bottomLeading: radius, bottomTrailing: radius, topTrailing: top)
     }
 
     /// Rend `tab` panneau actif.

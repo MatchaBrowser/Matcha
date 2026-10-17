@@ -11,6 +11,8 @@ final class TabManager {
     private(set) var selectedTabID: BrowserTab.ID?
     /// Dossier dont le nom est en cours de saisie dans la barre (état d'interface).
     var renamingFolderID: UUID?
+    /// Aperçu ouvert par-dessus les pages affichées (Maj+clic, tâche 4.4) : une page hors de la barre latérale.
+    private(set) var peek: Peek?
     private var tabsByID: [BrowserTab.ID: BrowserTab] = [:]
 
     /// Magasin de données (cookies, stockage) des onglets de cette fenêtre.
@@ -74,6 +76,13 @@ final class TabManager {
     @discardableResult
     func insertTab(configuration: WKWebViewConfiguration, after anchor: BrowserTab?, select: Bool) -> BrowserTab {
         let tab = BrowserTab(configuration: configuration, openerID: anchor?.id)
+        insert(tab, after: anchor, select: select)
+        return tab
+    }
+
+    /// Range parmi les onglets du jour un onglet déjà créé (aperçu ouvert en onglet ; tâche 4.5 : « Ouvrir dans
+    /// le Space »), comme `insertTab`.
+    func insert(_ tab: BrowserTab, after anchor: BrowserTab?, select: Bool) {
         tab.delegate = coordinator
         tab.makeWebViewIfNeeded()
         tabsByID[tab.id] = tab
@@ -81,7 +90,6 @@ final class TabManager {
         if select || selectedTab == nil {
             setSelection(tab.id)
         }
-        return tab
     }
 
     /// Ferme `tab` (⌘W, ×). Un onglet du jour disparaît. Un épinglé ou un favori reste dans la barre,
@@ -196,6 +204,11 @@ final class TabManager {
         selectedTabID = id
     }
 
+    /// Primitive de `TabManager+Peek` : remplace l'aperçu, sans rien libérer.
+    func setPeek(_ newPeek: Peek?) {
+        peek = newPeek
+    }
+
     /// Seul point d'entrée des extensions pour modifier le rangement.
     func updateLayout(_ change: (inout SidebarLayout) -> Void) {
         change(&layout)
@@ -216,6 +229,10 @@ final class TabManager {
     /// Sélectionne `id`, note son activité et s'assure que la vue web de chaque onglet affiché existe
     /// (tout son split).
     func setSelection(_ id: BrowserTab.ID?) {
+        // L'aperçu appartient à l'onglet affiché : en afficher un autre le ferme (tâche 4.4).
+        if let peek, peek.sourceTabID != id {
+            closePeek()
+        }
         // Les onglets qui quittent l'écran retiennent leur état de navigation.
         let leaving = displayedTabs
         selectedTabID = id

@@ -50,8 +50,10 @@ final class WindowModel {
         guard target !== current, let targetIndex = session.spaces.firstIndex(where: { $0 === target }) else {
             return
         }
-        // Les onglets affichés (tout le split) quittent l'écran : ils retiennent leur état de navigation.
+        // Les onglets affichés (tout le split) quittent l'écran : ils retiennent leur état de navigation ; leur
+        // aperçu se ferme.
         current.tabManager.displayedTabs.forEach { $0.captureInteractionState() }
+        current.tabManager.closePeek()
         if target.record.profile?.id == current.record.profile?.id {
             target.tabManager.adoptFavorites(from: current.tabManager)
         }
@@ -115,11 +117,11 @@ final class WindowModel {
         Logger.browser.info("Adresse copiée")
     }
 
-    /// ⇧⌘C et l'action « Copier l'URL » de la barre de commande : l'adresse de l'onglet affiché.
-    /// Sans adresse, rien n'est copié ni confirmé.
+    /// ⇧⌘C et l'action « Copier l'URL » de la barre de commande : l'adresse de la page au premier plan
+    /// (l'aperçu s'il est ouvert, sinon l'onglet affiché). Sans adresse, rien n'est copié ni confirmé.
     @discardableResult
     func copySelectedTabURL(to pasteboard: NSPasteboard = .general) -> Bool {
-        guard let url = space.tabManager.selectedTab?.url else {
+        guard let url = space.tabManager.frontTab?.url else {
             return false
         }
         copyLink(url, to: pasteboard)

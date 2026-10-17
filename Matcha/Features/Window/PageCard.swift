@@ -39,6 +39,8 @@ struct PageCard: View {
                 Divider()
             }
             page
+                // Zone que l'aperçu (Maj+clic) voile, sous la barre d'adresse (tâche 4.4).
+                .anchorPreference(key: PeekPageAreas.self, value: .bounds) { [$0] }
         }
         .background(.background)
         .clipShape(.rect(cornerRadius: BrowserWindowView.cardCornerRadius))

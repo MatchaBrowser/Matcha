@@ -10,7 +10,7 @@ struct NavigationPolicyTests {
         url: URL? = URL(string: "https://example.com/page"),
         type: WKNavigationType = .linkActivated,
         modifiers: NSEvent.ModifierFlags = [],
-        button: Int = 0,
+        button: Int = 1,
         mainFrame: Bool = true,
         handled: Bool = true,
     ) -> NavigationRequest {
@@ -37,7 +37,15 @@ struct NavigationPolicyTests {
     }
 
     @Test func `middle click opens a background tab`() {
-        #expect(NavigationPolicy.decide(request(button: 2)) == .openInNewTab(page, inBackground: true))
+        #expect(NavigationPolicy.decide(request(button: 4)) == .openInNewTab(page, inBackground: true))
+    }
+
+    /// Masque de boutons de WebKit, vérifié sur de vrais clics : avant la 4.4, le bouton du milieu était pris
+    /// pour 2 (le bouton droit), si bien que la molette suivait le lien sur place.
+    @Test func `button numbers follow WebKit's mask`() {
+        #expect(NavigationPolicy.leftMouseButton == 1)
+        #expect(NavigationPolicy.middleMouseButton == 4)
+        #expect(NavigationPolicy.decide(request(button: 0)) == .allow)
     }
 
     @Test func `command shift click opens a foreground tab`() {
@@ -45,7 +53,7 @@ struct NavigationPolicyTests {
     }
 
     @Test func `right click or option click is allowed`() {
-        #expect(NavigationPolicy.decide(request(button: 1)) == .allow)
+        #expect(NavigationPolicy.decide(request(button: 2)) == .allow)
         #expect(NavigationPolicy.decide(request(modifiers: .option)) == .allow)
     }
 

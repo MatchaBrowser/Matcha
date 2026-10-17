@@ -1,13 +1,15 @@
 import AppKit
 import SwiftUI
 
-/// Réglages généraux : page d'accueil, nouveaux onglets, recherche et suggestions, fermeture de l'app, langue.
+/// Réglages généraux : page d'accueil, nouveaux onglets, recherche et suggestions, aperçu des liens, fermeture de
+/// l'app, langue.
 struct GeneralSettingsView: View {
     @AppStorage(BrowserSettings.Key.homePage) private var homePage = BrowserSettings.homePage
     @AppStorage(BrowserSettings.Key.newTabPage) private var newTabPage = BrowserSettings.newTabPage
     @AppStorage(BrowserSettings.Key.searchEngine) private var searchEngine = BrowserSettings.searchEngine
     @AppStorage(BrowserSettings.Key.showsSearchSuggestions) private var showsSearchSuggestions = BrowserSettings.showsSearchSuggestions
     @AppStorage(BrowserSettings.Key.confirmBeforeQuitting) private var confirmBeforeQuitting = BrowserSettings.confirmBeforeQuitting
+    @AppStorage(BrowserSettings.Key.opensPinnedLinksInPeek) private var opensPinnedLinksInPeek = BrowserSettings.opensPinnedLinksInPeek
 
     var body: some View {
         Form {
@@ -32,6 +34,17 @@ struct GeneralSettingsView: View {
                     .accessibilityIdentifier("searchSuggestionsToggle")
             } footer: {
                 Text("What you type in the command bar is sent to \(searchEngine.name) to suggest searches. Never in private windows.")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+            }
+            Section {
+                Toggle("Open links to other websites from Favorites and pinned tabs in Peek", isOn: $opensPinnedLinksInPeek)
+                    .accessibilityIdentifier("pinnedLinksInPeekToggle")
+            } footer: {
+                Text("""
+                Shift-click a link to open it in Peek without leaving the page. \
+                With this option, Favorites and pinned tabs stay on their website.
+                """, comment: "Settings > General: note under the Peek toggle")
                     .font(.caption)
                     .foregroundStyle(.secondary)
             }

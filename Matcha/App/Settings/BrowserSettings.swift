@@ -13,6 +13,7 @@ nonisolated enum BrowserSettings {
         static let addressBarPosition = "addressBarPosition"
         static let showsNavigationButtons = "showsNavigationButtons"
         static let showsSearchSuggestions = "showsSearchSuggestions"
+        static let opensPinnedLinksInPeek = "opensPinnedLinksInPeek"
     }
 
     static let searchEngine = SearchEngine.defaultEngine
@@ -27,6 +28,9 @@ nonisolated enum BrowserSettings {
     static let showsNavigationButtons = true
     /// Suggestions du moteur de recherche dans la barre de commande (jamais en fenêtre privée).
     static let showsSearchSuggestions = true
+    /// Liens d'un favori ou d'un épinglé vers un autre site ouverts dans l'aperçu (tâche 4.4), comme dans Arc ;
+    /// désactivé par défaut : un clic ordinaire garde son comportement tant qu'on ne l'a pas choisi.
+    static let opensPinnedLinksInPeek = false
 
     /// Adresse de la page d'accueil saisie dans les réglages, interprétée comme dans la barre d'adresse ;
     /// nil si elle est vide.
@@ -37,5 +41,13 @@ nonisolated enum BrowserSettings {
     /// Valeur de l'alerte avant de quitter dans `defaults`, ou sa valeur par défaut.
     static func confirmsBeforeQuitting(in defaults: UserDefaults = .standard) -> Bool {
         defaults.object(forKey: Key.confirmBeforeQuitting) as? Bool ?? confirmBeforeQuitting
+    }
+
+    /// Valeur du réglage de l'aperçu dans `defaults`, ou sa valeur par défaut. `bool(forKey:)` lit aussi les
+    /// « YES » et « NO » des arguments de lancement (`as? Bool` les ignore).
+    static func pinnedLinksOpenInPeek(in defaults: UserDefaults = .standard) -> Bool {
+        defaults.object(forKey: Key.opensPinnedLinksInPeek) == nil
+            ? opensPinnedLinksInPeek
+            : defaults.bool(forKey: Key.opensPinnedLinksInPeek)
     }
 }

@@ -50,10 +50,11 @@ final class SpaceSession: Identifiable {
         store.saveNow(tabManager)
     }
 
-    /// Space supprimé : plus d'enregistrement, et ses onglets du jour et épinglés libèrent leur vue web.
+    /// Space supprimé : plus d'enregistrement, et son aperçu, ses onglets du jour et épinglés libèrent leur vue web.
     /// Les favoris, communs au profil, restent ouverts dans les autres Spaces.
     func close() {
         store.stop()
+        tabManager.closePeek()
         let favorites = Set(tabManager.layout.favorites)
         for tab in tabManager.tabs where !favorites.contains(tab.id) {
             tab.unload(resettingTo: nil, title: nil)

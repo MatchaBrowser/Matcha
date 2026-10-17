@@ -27,7 +27,7 @@ struct BrowserWindowView: View {
     @AppStorage(BrowserSettings.Key.showsSearchSuggestions) private var showsSearchSuggestions = BrowserSettings.showsSearchSuggestions
     @Environment(\.openSettings) private var openSettings
     /// Barre masquée affichée par-dessus la page parce que le pointeur la survole.
-    @State private var isPeekHovered = false
+    @State private var isFloatingSidebarHovered = false
 
     /// Sans effet de bord : ni tâche ni lecture de fichier.
     init(session: BrowserSession) {
@@ -57,8 +57,8 @@ struct BrowserWindowView: View {
         SidebarMetrics.clampedWidth(sidebarWidth)
     }
 
-    private var isPeeking: Bool {
-        !isSidebarVisible && isPeekHovered
+    private var isFloatingSidebarShown: Bool {
+        !isSidebarVisible && isFloatingSidebarHovered
     }
 
     var body: some View {
@@ -75,7 +75,7 @@ struct BrowserWindowView: View {
                 goHome: homeButtonAction,
                 editAddress: editAddress,
                 // La barre flottante couvre le début de la carte : la zone de dépôt du split commence après.
-                dropInset: isPeeking ? max(0, width - Self.cardMargin) : 0,
+                dropInset: isFloatingSidebarShown ? max(0, width - Self.cardMargin) : 0,
             )
             // En bas : le haut de la carte accueille la barre d'adresse (réglage) et, plus haut, la
             // barre de commande.
@@ -98,8 +98,8 @@ struct BrowserWindowView: View {
             }
         }
         // Comme dans Arc, les boutons de la fenêtre disparaissent avec la barre latérale.
-        .onChange(of: window) { WindowChrome.setButtonsHidden(!(isSidebarVisible || isPeeking), in: window) }
-        .onChange(of: isSidebarVisible || isPeeking) { _, shown in WindowChrome.setButtonsHidden(!shown, in: window) }
+        .onChange(of: window) { WindowChrome.setButtonsHidden(!(isSidebarVisible || isFloatingSidebarShown), in: window) }
+        .onChange(of: isSidebarVisible || isFloatingSidebarShown) { _, shown in WindowChrome.setButtonsHidden(!shown, in: window) }
         // La barre vise un onglet du Space affiché : changer de Space la ferme.
         .onChange(of: model.currentSpaceID) { commandBar.dismiss() }
         // Moteur ou suggestions changés dans les Réglages pendant que la barre reste ouverte.
@@ -112,7 +112,11 @@ struct BrowserWindowView: View {
         // focus, et l'enlèverait au champ de nom d'un nouveau dossier.
         // Sans onglet sélectionné, la page vide invite à ⌘T : la barre ne s'ouvre jamais d'elle-même.
         .onAppear { tabManager.loadSelectedTab() }
-        .onDisappear { model.copyConfirmation.cancel() }
+        .onDisappear {
+            model.copyConfirmation.cancel()
+            // Fenêtre fermée : l'aperçu ne reste pas ouvert (son, processus) sans elle.
+            tabManager.closePeek()
+        }
         .task { await session.removeOrphanDataStores() }
         .environment(model)
         .focusedSceneValue(\.tabManager, tabManager)
@@ -154,12 +158,12 @@ struct BrowserWindowView: View {
                 .contentShape(Rectangle())
                 .onHover { hovering in
                     if hovering {
-                        withAnimation(.easeOut(duration: 0.15)) { isPeekHovered = true }
+                        withAnimation(.easeOut(duration: 0.15)) { isFloatingSidebarHovered = true }
                     }
                 }
-            if isPeeking {
+            if isFloatingSidebarShown {
                 FloatingSidebar(theme: theme, width: width) { hovering in
-                    withAnimation(.easeOut(duration: 0.15)) { isPeekHovered = hovering }
+                    withAnimation(.easeOut(duration: 0.15)) { isFloatingSidebarHovered = hovering }
                 } content: {
                     sidebar
                 }
@@ -191,7 +195,7 @@ struct BrowserWindowView: View {
             toggleSidebar: toggleSidebar,
             isSidebarVisible: isSidebarVisible,
             // `hasURL` et non `url` : la fenêtre n'est pas recalculée à chaque changement d'adresse.
-            copyURL: tabManager.selectedTab?.hasURL == true ? { model.copySelectedTabURL() } : nil,
+            copyURL: tabManager.frontTab?.hasURL == true ? { model.copySelectedTabURL() } : nil,
             goHome: homeURL.map { url in { goHome(to: url) } },
             spaceNames: session.spaces.map(\.record.name),
             currentSpaceIndex: model.spaceIndex,
@@ -202,18 +206,22 @@ struct BrowserWindowView: View {
 
     /// ⌘T et « Nouvel onglet » : la barre de commande, ou un onglet sur la page d'accueil.
     private func openCommandBarForNewTab() {
+        // Une seule couche flottante : la barre de commande ferme l'aperçu.
+        tabManager.closePeek()
         commandBar.newTab(commandBarSettings)
     }
 
     /// ⌘L et la pastille d'adresse : la barre de commande sur l'adresse de l'onglet affiché.
     private func editAddress() {
+        // Une seule couche flottante : la barre de commande ferme l'aperçu.
+        tabManager.closePeek()
         commandBar.editCurrentTab(commandBarSettings)
     }
 
     private func toggleSidebar() {
         withAnimation(.easeInOut(duration: 0.2)) {
             isSidebarVisible.toggle()
-            isPeekHovered = false
+            isFloatingSidebarHovered = false
         }
     }
 
@@ -228,6 +236,7 @@ struct BrowserWindowView: View {
 
     /// Charge la page d'accueil dans l'onglet sélectionné, ou dans un nouvel onglet s'il n'y en a pas.
     private func goHome(to url: URL) {
+        tabManager.closePeek()
         if let tab = tabManager.selectedTab {
             tab.load(url)
         } else {

@@ -13,4 +13,6 @@ nonisolated extension Logger {
     static let favicons = Logger(subsystem: subsystem, category: "Favicons")
     /// Barre de commande et suggestions de recherche.
     static let commandBar = Logger(subsystem: subsystem, category: "CommandBar")
+    /// Aperçu des liens (Maj+clic).
+    static let peek = Logger(subsystem: subsystem, category: "Peek")
 }

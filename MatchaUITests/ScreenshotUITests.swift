@@ -10,7 +10,12 @@ import XCTest
 /// - `MATCHA_SCREENSHOT_URLS` : adresses séparées par des virgules, ouvertes chacune dans un onglet ;
 /// - `MATCHA_SCREENSHOT_MENU` : actions du menu contextuel, « Élément@titre d'onglet » séparées par des `;`
 ///   (ex. « Ajouter aux favoris@Apple;Épingler@GitHub ») ;
-/// - `MATCHA_SCREENSHOT_PEEK` : capture aussi la barre masquée (⌘S), puis apparue au survol du bord gauche ;
+/// - `MATCHA_SCREENSHOT_PEEK` : capture aussi la barre masquée (⌘S), puis apparue au survol du bord gauche
+///   (barre latérale masquée, rien à voir avec l'aperçu des liens) ;
+/// - `MATCHA_SCREENSHOT_PEEK_LINK` : texte d'un lien de la dernière page de `MATCHA_SCREENSHOT_URLS`, ouvert par
+///   Maj+clic dans l'aperçu (`18-apercu`), puis « Ouvrir en onglet » (`19-apercu-onglet`). Pages locales sans
+///   réseau : `MATCHA_SCREENSHOT_URLS=file:///usr/share/doc/postfix/html/index.html` et
+///   `MATCHA_SCREENSHOT_PEEK_LINK="Basic configuration"` ;
 /// - `MATCHA_SCREENSHOT_SETTINGS` : capture aussi chaque onglet des réglages (⌘,) ;
 /// - `MATCHA_SCREENSHOT_SETTINGS_VALUES` : réglages imposés au lancement (« addressBarPosition=top,… ») ;
 /// - `MATCHA_SCREENSHOT_THEME` : ouvre l'éditeur de thème et choisit ce thème prédéfini (« Océan »…) ;
@@ -58,22 +63,32 @@ final class ScreenshotUITests: XCTestCase {
         if environment["MATCHA_SCREENSHOT_PRIVATE"] != nil {
             capturePrivateCommandBar(typing: environment["MATCHA_SCREENSHOT_COMMAND_BAR"], in: app)
         }
+        if let text = environment["MATCHA_SCREENSHOT_PEEK_LINK"] {
+            capturePeek(link: text, in: app, window: window)
+        }
         if environment["MATCHA_SCREENSHOT_PEEK"] != nil {
             captureHiddenSidebar(in: app, window: window)
         }
-        if let count = environment["MATCHA_SCREENSHOT_SPACES"].flatMap(Int.init), count > 0 {
-            for _ in 0 ..< count {
-                app.buttons["newSpaceButton"].click()
-                sleep(1)
-            }
-            attach(window.screenshot(), as: "9-spaces")
-        }
+        captureSpaces(in: app, window: window)
         if let preset = environment["MATCHA_SCREENSHOT_THEME"] {
             captureThemeEditor(choosing: preset, in: app, window: window)
         }
         if environment["MATCHA_SCREENSHOT_SETTINGS"] != nil {
             captureSettings(in: app)
         }
+    }
+
+    /// `MATCHA_SCREENSHOT_SPACES` Spaces créés avec le bouton +.
+    @MainActor
+    private func captureSpaces(in app: XCUIApplication, window: XCUIElement) {
+        guard let count = environment["MATCHA_SCREENSHOT_SPACES"].flatMap(Int.init), count > 0 else {
+            return
+        }
+        for _ in 0 ..< count {
+            app.buttons["newSpaceButton"].click()
+            sleep(1)
+        }
+        attach(window.screenshot(), as: "9-spaces")
     }
 
     @MainActor
@@ -205,6 +220,22 @@ final class ScreenshotUITests: XCTestCase {
         attach(privateWindow.screenshot(), as: "13-barre-commande-privee")
         app.typeKey("w", modifierFlags: [.command, .shift])
         XCTAssertTrue(privateWindow.waitForNonExistence(timeout: 5))
+    }
+
+    /// Aperçu ouvert par Maj+clic sur le lien `text`, puis passé en onglet.
+    @MainActor
+    private func capturePeek(link text: String, in app: XCUIApplication, window: XCUIElement) {
+        let source = link(containing: text, in: app)
+        guard source.exists else {
+            XCTFail("Lien « \(text) » introuvable")
+            return
+        }
+        shiftClick(source)
+        sleep(2)
+        attach(window.screenshot(), as: "18-apercu")
+        peekElement("peekOpenAsTabButton", in: app).click()
+        sleep(1)
+        attach(window.screenshot(), as: "19-apercu-onglet")
     }
 
     @MainActor

@@ -21,6 +21,27 @@ struct BrowserSettingsTests {
         #expect(!BrowserSettings.confirmsBeforeQuitting(in: defaults))
     }
 
+    @Test func `pinned links stay in their tab by default`() {
+        #expect(!BrowserSettings.opensPinnedLinksInPeek)
+        #expect(!BrowserSettings.pinnedLinksOpenInPeek(in: emptyDefaults()))
+    }
+
+    @Test func `pinned links in Peek follow the setting`() {
+        let defaults = emptyDefaults()
+        defaults.set(true, forKey: BrowserSettings.Key.opensPinnedLinksInPeek)
+        #expect(BrowserSettings.pinnedLinksOpenInPeek(in: defaults))
+        defaults.set(false, forKey: BrowserSettings.Key.opensPinnedLinksInPeek)
+        #expect(!BrowserSettings.pinnedLinksOpenInPeek(in: defaults))
+    }
+
+    /// Les arguments de lancement (« -opensPinnedLinksInPeek YES ») arrivent sous forme de texte.
+    @Test(arguments: [("YES", true), ("NO", false)])
+    func `pinned links in Peek read launch arguments`(text: String, expected: Bool) {
+        let defaults = emptyDefaults()
+        defaults.set(text, forKey: BrowserSettings.Key.opensPinnedLinksInPeek)
+        #expect(BrowserSettings.pinnedLinksOpenInPeek(in: defaults) == expected)
+    }
+
     @Test func `appearance modes map to AppKit appearances`() {
         #expect(AppearanceMode.system.appearanceName == nil)
         #expect(AppearanceMode.light.appearanceName == .aqua)

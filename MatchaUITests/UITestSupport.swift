@@ -23,8 +23,8 @@ extension XCTestCase {
         return XCTWaiter().wait(for: [XCTNSPredicateExpectation(predicate: predicate, object: query)], timeout: timeout) == .completed
     }
 
-    /// Clique `element` une fois sa position stable : juste après un glisser-déposer, la barre s'anime
-    /// (ligne insérée, zone de dépôt qui se replie) et un clic immédiat viserait l'ancienne place du bouton.
+    /// Clique `element` une fois sa position stable : juste après un glisser-déposer ou une ouverture animée,
+    /// la vue bouge encore et un clic immédiat viserait l'ancienne place de l'élément.
     @MainActor
     func clickWhenSettled(_ element: XCUIElement, timeout: TimeInterval = 3) {
         var previous = element.frame
@@ -37,7 +37,9 @@ extension XCTestCase {
             }
             previous = current
         }
-        element.click()
+        // Au centre, par coordonnées : un lien de page est entièrement couvert par son texte, et XCTest refuse
+        // alors de cliquer l'élément lui-même.
+        element.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.5)).click()
     }
 
     /// Place le pointeur au milieu de la page, loin du bord qui fait apparaître la barre masquée.
@@ -79,6 +81,8 @@ extension XCTestCase {
         "showsNavigationButtons": "YES",
         // Jamais de requête au moteur de recherche pendant les tests.
         "showsSearchSuggestions": "NO",
+        // Les liens des favoris et des épinglés restent dans leur onglet (valeur par défaut de l'app).
+        "opensPinnedLinksInPeek": "NO",
     ]
 
     /// Langue imposée à chaque lancement : les tests cherchent les éléments par leurs textes français,

@@ -556,6 +556,35 @@
         }
       }
     },
+    "Close Peek" : {
+      "comment" : "Peek: help tag and accessibility label of the × button; File menu item replacing “Close Tab” (⌘W) while a peek is open",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vorschau schließen"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cerrar vista previa"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fermer l'aperçu"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Chiudi anteprima"
+          }
+        }
+      }
+    },
     "Close Split View" : {
       "comment" : "Menu item, close button and accessibility action of a split view row",
       "localizations" : {
@@ -2237,6 +2266,35 @@
         }
       }
     },
+    "Open as Tab" : {
+      "comment" : "Peek: button that turns the preview into a tab, without reloading the page",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Als Tab öffnen"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Abrir como pestaña"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ouvrir en onglet"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Apri come pannello"
+          }
+        }
+      }
+    },
     "Open in Split View" : {
       "comment" : "Tab context menu item: shows the tab next to the active pane",
       "localizations" : {
@@ -2262,6 +2320,35 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Apri in Split View"
+          }
+        }
+      }
+    },
+    "Open links to other websites from Favorites and pinned tabs in Peek" : {
+      "comment" : "Settings > General: toggle (off by default)",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Links von Favoriten und angehefteten Tabs zu anderen Websites in der Vorschau öffnen"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Abrir en una vista previa los enlaces de Favoritos y pestañas fijadas a otros sitios web"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ouvrir dans un aperçu les liens des favoris et des onglets épinglés vers d'autres sites"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Apri in anteprima i link dei Preferiti e dei pannelli fissati verso altri siti web"
           }
         }
       }
@@ -2320,6 +2407,35 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Divisore dei riquadri"
+          }
+        }
+      }
+    },
+    "Peek" : {
+      "comment" : "Accessibility label of the floating preview opened by Shift-clicking a link",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vorschau"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vista previa"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aperçu"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Anteprima"
           }
         }
       }
@@ -3131,6 +3247,35 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Impostazioni"
+          }
+        }
+      }
+    },
+    "Shift-click a link to open it in Peek without leaving the page. With this option, Favorites and pinned tabs stay on their website." : {
+      "comment" : "Settings > General: note under the Peek toggle",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Klicke mit gedrückter Umschalttaste auf einen Link, um ihn in der Vorschau zu öffnen, ohne die Seite zu verlassen. Mit dieser Option bleiben Favoriten und angeheftete Tabs auf ihrer Website."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Haz clic en un enlace con la tecla Mayúsculas pulsada para abrirlo en una vista previa sin salir de la página. Con esta opción, los Favoritos y las pestañas fijadas se quedan en su sitio web."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cliquez sur un lien en maintenant la touche Maj enfoncée pour l'ouvrir dans un aperçu, sans quitter la page. Avec cette option, les favoris et les onglets épinglés restent sur leur site."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fai clic su un link tenendo premuto il tasto Maiuscole per aprirlo in anteprima senza lasciare la pagina. Con questa opzione, i Preferiti e i pannelli fissati restano sul loro sito web."
           }
         }
       }

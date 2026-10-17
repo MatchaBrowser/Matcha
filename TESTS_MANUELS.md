@@ -91,6 +91,26 @@ Ou ⌘R dans Xcode.
 - [ ] Glisse un onglet de la barre sur un champ de texte d'une page (la recherche de Wikipédia par exemple), au milieu de la page : rien n'est collé dans le champ, et l'onglet reprend sa place. Glisser un lien ou du texte d'une page vers une autre marche toujours comme avant.
 - Connu : la touche Tab ne change pas le panneau actif (un clic, oui) ; pas encore de glisser d'un onglet hors de la ligne d'un split ni de réordonnancement des panneaux (voir `DECISIONS.md`).
 
+### 4.4 Peek
+
+- [ ] Sur fr.wikipedia.org, Maj+clic sur un lien : l'aperçu grandit depuis le lien. La page derrière s'assombrit ; la barre latérale reste claire. Au-dessus du panneau : le site à gauche, « Ouvrir en onglet » et × à droite, avec leur bulle d'aide. Aucun onglet n'apparaît et la page d'origine ne bouge pas (pas de texte sélectionné ; sinon, dis-le-moi). À refaire en clair, en sombre et en fenêtre privée.
+- [ ] Le clavier est tout de suite dans l'aperçu : les flèches et l'espace le font défiler.
+- [ ] ⎋ ferme l'aperçu, puis les flèches font défiler la page d'origine. × et ⌘W le ferment aussi ; pendant l'aperçu, le menu Fichier affiche « Fermer l'aperçu ». L'onglet n'est jamais fermé.
+- [ ] Une page qui utilise ⎋ le garde (visionneuse, boîte de dialogue : le premier ⎋ la ferme, le second ferme l'aperçu). Saisie japonaise dans un champ de l'aperçu : ⎋ annule la composition sans fermer l'aperçu.
+- [ ] Clic sur la zone sombre : l'aperçu se ferme et le lien dessous n'est pas suivi. Clic sur un autre onglet de la barre : l'aperçu se ferme et l'onglet s'affiche du premier coup. Pointeur sur la zone sombre : flèche, pas d'effet de survol de la page dessous (sinon, dis-le-moi).
+- [ ] « Ouvrir en onglet » : la page passe dans un onglet juste sous l'onglet d'origine, sans recharger (une vidéo continue, un texte saisi reste). Le clavier est dans la page ; ⌘[ revient aux pages vues dans l'aperçu.
+- [ ] Dans l'aperçu : un lien, même « nouvelle fenêtre », reste dedans. ⌘[, ⌘] et ⌘R agissent sur l'aperçu ; ⇧⌘C copie son adresse. ⌘-clic ouvre un onglet en arrière-plan sous l'onglet d'origine, et l'aperçu reste ouvert.
+- [ ] Une vidéo avec du son s'arrête dès la fermeture. Dans le Moniteur d'activité, un processus « Web Content » disparaît.
+- [ ] Aperçu ouvert : ⌘T ou ⌘L le ferment et ouvrent la barre de commande. ⌃2 ou un glissement de Space le ferment.
+- [ ] Maj+clic sur un lien `download` ou sur une entrée du sommaire de Wikipédia : comportement habituel, pas d'aperçu. ⌥⇧-clic : navigation normale.
+- [ ] Clic du milieu (molette) sur un lien : onglet en arrière-plan (avant, la page changeait dans l'onglet).
+- [ ] Réglages > Général : l'option « Ouvrir dans un aperçu les liens des favoris et des onglets épinglés vers d'autres sites » est décochée par défaut ; un clic sur un lien d'un épinglé garde alors son comportement habituel. Coche-la : dans un épinglé ou un favori, un lien vers un autre site s'ouvre en aperçu ; un lien du même site (ou d'un sous-domaine) reste dans l'onglet. Gmail : les liens des messages ouvrent un onglet, comme avant (redirection par google.com). Un onglet du jour n'est pas concerné. Décoche-la : plus d'aperçu automatique.
+- [ ] Split de deux pages : Maj+clic dans le panneau qui n'est pas actif : il devient actif, les deux pages s'assombrissent (pas les barres d'adresse au-dessus des pages, ni l'intervalle entre les cartes) et le panneau se place au milieu des deux. « Ouvrir en onglet » : la page s'affiche seule, rangée juste sous le split dans la barre ; le split reste entier.
+- [ ] Space d'un autre profil : l'aperçu est connecté au même compte que l'onglet d'origine.
+- [ ] Barre latérale masquée (⌘S, puis survol du bord : la barre flottante reste claire et cliquable), barre d'adresse au-dessus de la page (elle reste claire et un clic sur la pastille ouvre la barre de commande), petite fenêtre (700 × 450), « Réduire les animations » (simple fondu) : l'aperçu tient dans la page et reste utilisable.
+- [ ] VoiceOver : le panneau est annoncé « Aperçu » ; « Ouvrir en onglet » et « Fermer l'aperçu » sont lus.
+- Connu : la page derrière est assombrie, pas floutée. L'aperçu n'est pas gardé quand tu quittes Matcha.
+
 ### 4.6 Copier l'URL
 
 - [ ] Sur une page, ⌘⇧C : une petite capsule « URL copiée » (icône de lien) apparaît en fondu, centrée en bas de la page, reste environ 1,5 s puis disparaît en fondu. Colle dans une autre app (Notes, TextEdit) : c'est bien l'adresse complète de la page.

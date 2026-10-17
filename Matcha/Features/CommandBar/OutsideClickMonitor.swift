@@ -1,8 +1,8 @@
 import AppKit
 import SwiftUI
 
-/// Posée derrière le panneau de la barre : un clic de la même fenêtre hors du panneau appelle
-/// `onOutsideClick`, puis atteint sa cible (le clic n'est jamais retenu).
+/// Posée derrière le panneau de la barre de commande ou de l'aperçu : un clic de la même fenêtre hors du
+/// panneau appelle `onOutsideClick`, puis atteint sa cible (le clic n'est jamais retenu).
 struct OutsideClickMonitor: NSViewRepresentable {
     let onOutsideClick: () -> Void
 
