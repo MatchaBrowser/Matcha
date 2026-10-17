@@ -29,6 +29,25 @@ final class SettingsUITests: XCTestCase {
         XCTAssertEqual(app.windows.count, 1)
     }
 
+    /// Raccourci de la mini-fenêtre affiché dans Général (⌃⌥⇧⌘N donné au lancement : jamais ⌥⌘N, qui atteindrait la
+    /// Matcha de l'utilisateur). Le champ n'est jamais cliqué : aucun raccourci n'est enregistré par un test.
+    @MainActor
+    func testMiniWindowShortcutIsShownInGeneralSettings() {
+        let app = launchApp(settings: ["KeyboardShortcuts_openMiniWindow": Self.shortcutArgument(keyCode: 45, carbonModifiers: 6912)])
+        XCTAssertTrue(waitForBrowserWindow(of: app))
+        app.typeKey(",", modifierFlags: .command)
+        let generalTab = app.toolbars.buttons["Général"]
+        XCTAssertTrue(generalTab.waitForExistence(timeout: 5))
+        generalTab.click()
+        let label = "Raccourci de la mini-fenêtre"
+        let title = app.staticTexts.matching(NSPredicate(format: "value == %@ OR label == %@", label, label)).firstMatch
+        XCTAssertTrue(title.waitForExistence(timeout: 3))
+        // Le champ d'enregistrement est un champ de recherche ; ses symboles viennent dans l'ordre ⌃ ⌥ ⇧ ⌘.
+        let recorder = app.searchFields.firstMatch
+        XCTAssertTrue(recorder.waitForExistence(timeout: 3))
+        XCTAssertTrue((recorder.value as? String)?.hasPrefix("⌃⌥⇧⌘") == true, "\(String(describing: recorder.value))")
+    }
+
     @MainActor
     func testSearchUsesTheChosenEngine() throws {
         try skipIfOffline()

@@ -3,6 +3,7 @@ import SwiftUI
 /// Réglages des profils : chacun a ses cookies, ses connexions et ses favoris, partagés par ses Spaces.
 struct ProfilesSettingsView: View {
     @Environment(BrowserSession.self) private var session
+    @Environment(MiniWindowManager.self) private var miniWindows: MiniWindowManager?
     @State private var profileToDelete: ProfileRecord?
 
     var body: some View {
@@ -33,6 +34,8 @@ struct ProfilesSettingsView: View {
         ) {
             Button("Delete", role: .destructive) {
                 if let profile = profileToDelete {
+                    // Ses mini-fenêtres se ferment d'abord : leurs pages n'utilisent plus ses données.
+                    miniWindows?.closeWindows(ofProfile: profile.id)
                     Task { await session.deleteProfile(profile) }
                 }
             }

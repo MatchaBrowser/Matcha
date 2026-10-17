@@ -2,11 +2,12 @@ import AppKit
 import OSLog
 import WebKit
 
-/// Délégué de navigation et d'interface des vues web d'un `TabManager` : nouvelles fenêtres, fermeture par
-/// la page, liens vers d'autres apps, clics avec modificateur, aperçu (Peek).
+/// Délégué de navigation et d'interface des vues web d'un `TabHost` (les onglets d'un Space et leur aperçu, ou
+/// les mini-fenêtres) : nouvelles fenêtres, fermeture par la page, liens vers d'autres apps, clics avec
+/// modificateur, aperçu (Peek). Les règles viennent de `NavigationPolicy` ; l'hôte décide où vont les pages.
 @MainActor
 final class NavigationCoordinator: NSObject {
-    weak var tabManager: TabManager?
+    weak var tabHost: (any TabHost)?
 
     /// Confie une URL à l'app qui la gère ; remplaçable dans les tests.
     var openExternally: (URL) -> Bool = { NSWorkspace.shared.open($0) }
@@ -16,7 +17,8 @@ final class NavigationCoordinator: NSObject {
 
     private func request(for navigationAction: WKNavigationAction, in webView: WKWebView) -> NavigationRequest {
         let url = navigationAction.request.url
-        let source = navigationSource(of: webView)
+        // Sans hôte, la page n'est rangée nulle part : un Maj+clic y reste un clic.
+        let source = tabHost?.navigationSource(of: webView) ?? .other
         return NavigationRequest(
             url: url,
             navigationType: navigationAction.navigationType,
@@ -28,26 +30,8 @@ final class NavigationCoordinator: NSObject {
             pageURL: webView.url,
             shouldPerformDownload: navigationAction.shouldPerformDownload,
             source: source,
-            opensOtherSitesInPeek: source == .tab && isFavoriteOrPinned(webView) && opensPinnedLinksInPeek(),
+            opensOtherSitesInPeek: source == .tab && tabHost?.isFavoriteOrPinned(webView) == true && opensPinnedLinksInPeek(),
         )
-    }
-
-    /// Tâche 4.5 : les vues de la mini-fenêtre ne sont pas rangées ici (`.other`) : un Maj+clic y reste un clic.
-    private func navigationSource(of webView: WKWebView) -> NavigationSource {
-        guard let tabManager else {
-            return .other
-        }
-        if tabManager.isPeek(webView) {
-            return .peek
-        }
-        return tabManager.tab(for: webView) == nil ? .other : .tab
-    }
-
-    private func isFavoriteOrPinned(_ webView: WKWebView) -> Bool {
-        guard let tabManager, let tab = tabManager.tab(for: webView), let place = tabManager.place(of: tab) else {
-            return false
-        }
-        return place != .today
     }
 
     /// Point d'où l'aperçu grandit : le pointeur, en fractions de la vue web d'origine (origine en haut à gauche).
@@ -76,31 +60,31 @@ final class NavigationCoordinator: NSObject {
         }
     }
 
-    /// Lien à ouvrir dans l'aperçu : refusé (le lien suit son cours) si sa vue web n'est pas affichée.
+    /// Lien à ouvrir dans l'aperçu : refusé (le lien suit son cours) si l'hôte ne peut pas l'ouvrir.
     private func openInPeek(_ url: URL, from webView: WKWebView, decisionHandler: @MainActor @Sendable (WKNavigationActionPolicy) -> Void) {
-        guard let tabManager, let source = tabManager.tabOrPeek(for: webView), tabManager.canPeek(from: source) else {
+        guard let tabHost, tabHost.openInPeek(url, from: webView, openingPoint: Self.pointerPoint(in: webView)) else {
             decisionHandler(.allow)
             return
         }
         decisionHandler(.cancel)
-        tabManager.openPeek(url, from: source, openingPoint: Self.pointerPoint(in: webView))
     }
 }
 
 extension NavigationCoordinator: WKNavigationDelegate {
-    /// Nouvelle page affichée (onglet ou aperçu) : icône connue de son domaine, ou pastille en attendant mieux.
+    /// Nouvelle page affichée (onglet, aperçu ou mini-fenêtre) : icône connue de son domaine, ou pastille en
+    /// attendant mieux.
     func webView(_ webView: WKWebView, didCommit _: WKNavigation!) {
-        guard let tabManager, let tab = tabManager.tabOrPeek(for: webView) else {
+        guard let tabHost, let tab = tabHost.page(for: webView) else {
             return
         }
-        tab.favicon = webView.url?.host().flatMap(tabManager.faviconService.cachedIcon(forHost:))
+        tab.favicon = webView.url?.host().flatMap(tabHost.faviconService.cachedIcon(forHost:))
     }
 
     func webView(_ webView: WKWebView, didFinish _: WKNavigation!) {
-        guard let tabManager, let tab = tabManager.tabOrPeek(for: webView) else {
+        guard let tabHost, let tab = tabHost.page(for: webView) else {
             return
         }
-        tabManager.faviconService.refreshIcon(of: tab)
+        tabHost.faviconService.refreshIcon(of: tab)
         // Retenu à chaque page chargée : un plantage ne fait pas perdre l'historique.
         tab.captureInteractionState()
     }
@@ -120,12 +104,8 @@ extension NavigationCoordinator: WKNavigationDelegate {
             open(externally: url)
         case let .openInNewTab(url, inBackground):
             decisionHandler(.cancel)
-            guard let tabManager else {
-                return
-            }
-            // Même configuration que la vue d'origine : même profil. Depuis l'aperçu, après son onglet d'origine.
-            let anchor = tabManager.insertionAnchor(for: webView)
-            tabManager.insertTab(configuration: webView.configuration, after: anchor, select: !inBackground).load(url)
+            // Même configuration que la vue d'origine : même profil.
+            tabHost?.openLink(url, configuration: webView.configuration, from: webView, inBackground: inBackground)
         case let .openInPeek(url):
             openInPeek(url, from: webView, decisionHandler: decisionHandler)
         }
@@ -141,24 +121,11 @@ extension NavigationCoordinator: WKUIDelegate {
         for _: WKNavigationAction,
         windowFeatures _: WKWindowFeatures,
     ) -> WKWebView? {
-        guard let tabManager else {
-            return nil
-        }
-        // Fenêtre ouverte par l'aperçu : il devient d'abord un onglet, pour que `window.opener` reste valable.
-        // Tâche 5.8 : une fenêtre de connexion (taille donnée) ira dans sa propre fenêtre, sans `openPeekAsTab`.
-        let opener = tabManager.tab(for: webView) ?? (tabManager.isPeek(webView) ? tabManager.openPeekAsTab() : nil)
-        return tabManager.insertTab(configuration: configuration, after: opener, select: true).makeWebViewIfNeeded()
+        tabHost?.openWindow(configuration: configuration, from: webView)
     }
 
     /// La page a appelé `window.close()`.
     func webViewDidClose(_ webView: WKWebView) {
-        guard let tabManager else {
-            return
-        }
-        if tabManager.isPeek(webView) {
-            PeekActions.close(in: tabManager)
-        } else if let tab = tabManager.tab(for: webView) {
-            tabManager.close(tab)
-        }
+        tabHost?.closePage(of: webView)
     }
 }

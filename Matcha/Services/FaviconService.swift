@@ -43,6 +43,11 @@ final class FaviconService {
         return favicon
     }
 
+    /// Vrai pendant la recherche de l'icône du domaine (tests : attendre la fin d'une recherche infructueuse).
+    func isRefreshingIcon(forHost host: String) -> Bool {
+        downloads[host] != nil
+    }
+
     /// Après le chargement d'une page : affiche tout de suite l'icône connue du domaine, puis va chercher
     /// celle que déclare la page, une fois par domaine et par lancement.
     func refreshIcon(of tab: BrowserTab) {

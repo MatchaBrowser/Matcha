@@ -6,6 +6,10 @@
 	objectVersion = 90;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		000000000000000150000000 /* KeyboardShortcuts in Frameworks */ = {isa = PBXBuildFile; productRef = 000000000000000160000000 /* KeyboardShortcuts */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXContainerItemProxy section */
 		0FB2736730828C8F00AE21C6 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -56,6 +60,7 @@
 		000000000000000130000000 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			files = (
+				000000000000000150000000 /* KeyboardShortcuts in Frameworks */,
 			);
 		};
 		0FB2736030828C8F00AE21C6 /* Frameworks */ = {
@@ -109,6 +114,9 @@
 				000000000000000000000010 /* Matcha */,
 			);
 			name = Matcha;
+			packageProductDependencies = (
+				000000000000000160000000 /* KeyboardShortcuts */,
+			);
 			productName = MyApp;
 			productReference = 000000000000000000000120 /* Matcha.app */;
 			productType = "com.apple.product-type.application";
@@ -191,6 +199,9 @@
 			);
 			mainGroup = 000000000000000000000001;
 			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				000000000000000000000030 /* XCRemoteSwiftPackageReference "KeyboardShortcuts" */,
+			);
 			preferredProjectObjectVersion = 90;
 			productRefGroup = 000000000000000000000020 /* Products */;
 			projectDirPath = "";
@@ -631,6 +642,25 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		000000000000000000000030 /* XCRemoteSwiftPackageReference "KeyboardShortcuts" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/sindresorhus/KeyboardShortcuts";
+			requirement = {
+				kind = exactVersion;
+				version = 3.1.0;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		000000000000000160000000 /* KeyboardShortcuts */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 000000000000000000000030 /* XCRemoteSwiftPackageReference "KeyboardShortcuts" */;
+			productName = KeyboardShortcuts;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = 000000000000000000000000 /* Project object */;
 }

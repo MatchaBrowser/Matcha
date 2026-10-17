@@ -15,4 +15,6 @@ nonisolated extension Logger {
     static let commandBar = Logger(subsystem: subsystem, category: "CommandBar")
     /// Aperçu des liens (Maj+clic).
     static let peek = Logger(subsystem: subsystem, category: "Peek")
+    /// Mini-fenêtres et leur raccourci global ; jamais d'adresse ni de texte tapé.
+    static let miniWindow = Logger(subsystem: subsystem, category: "MiniWindow")
 }

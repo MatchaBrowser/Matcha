@@ -1,34 +1,33 @@
 import SwiftUI
 
 /// Couche de la barre de commande sur toute la fenêtre, sans fond : seul le panneau reçoit les clics.
-/// Le panneau est centré sur la fenêtre, à 18 % de sa hauteur ; il apparaît en fondu et disparaît
-/// sans animation, pour que deux champs d'adresse n'existent jamais en même temps.
+/// Le panneau est placé selon `placement` (centré à 18 % de la hauteur d'une fenêtre de navigation, sous la barre
+/// d'outils d'une mini-fenêtre) ; il apparaît en fondu et disparaît sans animation, pour que deux champs
+/// d'adresse n'existent jamais en même temps.
 struct CommandBarOverlay: View {
-    static let maximumWidth = 640.0
-    static let horizontalMargin = 24.0
-    static let minimumTop = 52.0
-    static let bottomMargin = 24.0
-
-    let model: CommandBarModel
-    let executor: CommandBarExecutor
+    let model: any CommandBarPanelModel
+    let submit: (CommandRow.ID?) -> Void
+    let cancel: () -> Void
     let theme: SpaceTheme
+    var placement = CommandBarPlacement.window
 
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
     var body: some View {
         GeometryReader { geometry in
-            let top = max(Self.minimumTop, (geometry.size.height * 0.18).rounded())
+            let top = placement.top(inHeight: geometry.size.height)
             VStack(spacing: 0) {
                 if model.isPresented {
                     CommandBarPanel(
                         model: model,
-                        executor: executor,
+                        submit: submit,
+                        cancel: cancel,
                         theme: theme,
-                        maxHeight: geometry.size.height - top - Self.bottomMargin,
+                        maxHeight: geometry.size.height - top - placement.bottomMargin,
                     )
                     .background { OutsideClickMonitor { model.dismiss() } }
-                    .frame(maxWidth: Self.maximumWidth)
-                    .padding(.horizontal, Self.horizontalMargin)
+                    .frame(maxWidth: placement.maximumWidth)
+                    .padding(.horizontal, placement.horizontalMargin)
                     .padding(.top, top)
                     .transition(.asymmetric(insertion: insertion, removal: .identity))
                 }

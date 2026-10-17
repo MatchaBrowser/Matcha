@@ -527,6 +527,34 @@
         }
       }
     },
+    "Close Mini Window" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mini-Fenster schließen"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cerrar miniventana"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fermer la mini-fenêtre"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Chiudi minifinestra"
+          }
+        }
+      }
+    },
     "Close Other Tabs" : {
       "comment" : "Tab context menu",
       "localizations" : {
@@ -1920,6 +1948,62 @@
         }
       }
     },
+    "Mini Window" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mini-Fenster"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Miniventana"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mini-fenêtre"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Minifinestra"
+          }
+        }
+      }
+    },
+    "Mini Window Shortcut" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kurzbefehl für Mini-Fenster"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Atajo de la miniventana"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Raccourci de la mini-fenêtre"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Scorciatoia della minifinestra"
+          }
+        }
+      }
+    },
     "Move to Space" : {
       "comment" : "Tab context menu: submenu listing the other Spaces",
       "localizations" : {
@@ -2003,6 +2087,34 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Nuova cartella"
+          }
+        }
+      }
+    },
+    "New Mini Window" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Neues Mini-Fenster"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nueva miniventana"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nouvelle mini-fenêtre"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nuova minifinestra"
           }
         }
       }
@@ -2295,6 +2407,63 @@
         }
       }
     },
+    "Open in %@" : {
+      "comment" : "Mini window button; %@ is the name of the Space",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "In %@ öffnen"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Abrir en %@"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ouvrir dans %@"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Apri in %@"
+          }
+        }
+      }
+    },
+    "Open in Space" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Im Space öffnen"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Abrir en el Space"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ouvrir dans le Space"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Apri nello Space"
+          }
+        }
+      }
+    },
     "Open in Split View" : {
       "comment" : "Tab context menu item: shows the tab next to the active pane",
       "localizations" : {
@@ -2552,6 +2721,35 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Fissati"
+          }
+        }
+      }
+    },
+    "Press this shortcut in any app to open a mini window, even when Matcha is in the background. It uses the profile of the Space shown." : {
+      "comment" : "Settings > General: note under the mini window shortcut",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Drücke diesen Kurzbefehl in einer beliebigen App, um ein Mini-Fenster zu öffnen, auch wenn Matcha im Hintergrund ist. Es verwendet das Profil des angezeigten Space."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pulsa este atajo en cualquier app para abrir una miniventana, incluso con Matcha en segundo plano. Usa el perfil del Space que se muestra."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Appuyez sur ce raccourci dans n'importe quelle app pour ouvrir une mini-fenêtre, même quand Matcha est en arrière-plan. Elle utilise le profil du Space affiché."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Premi questa scorciatoia in qualsiasi app per aprire una minifinestra, anche quando Matcha è in secondo piano. Usa il profilo dello Space mostrato."
           }
         }
       }

@@ -66,8 +66,10 @@ struct FaviconServiceTests {
         let tab = manager.insertTab(configuration: TestPages.configuration(), after: nil, select: true)
         tab.load(TestPages.url("sans-icone"))
         try await waitUntil { tab.title == "sans-icone" && !tab.isLoading }
-        // Laisse la première recherche, infructueuse, se terminer.
+        // Laisse la première recherche, infructueuse, se terminer : une recherche encore en cours serait reprise
+        // par le chargement suivant, sans les icônes de sa page (lente quand beaucoup de vues web tournent).
         try await Task.sleep(for: .milliseconds(300))
+        try await waitUntil { !manager.faviconService.isRefreshingIcon(forHost: "pages") }
         #expect(tab.favicon == nil)
 
         tab.load(TestPages.url("avec-icone", body: "<link rel='icon' href='\(Self.pngURL.absoluteString)'>"))

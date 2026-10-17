@@ -83,6 +83,9 @@ extension XCTestCase {
         "showsSearchSuggestions": "NO",
         // Les liens des favoris et des épinglés restent dans leur onglet (valeur par défaut de l'app).
         "opensPinnedLinksInPeek": "NO",
+        // Pas de raccourci global pour la mini-fenêtre (texte « NO » : aucun raccourci, rien n'est écrit) : ⌥⌘N
+        // reste à la Matcha de l'utilisateur. Le test du raccourci en impose un autre.
+        "KeyboardShortcuts_openMiniWindow": "NO",
     ]
 
     /// Langue imposée à chaque lancement : les tests cherchent les éléments par leurs textes français,

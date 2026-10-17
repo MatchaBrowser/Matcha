@@ -32,7 +32,11 @@ import XCTest
 /// - `MATCHA_SCREENSHOT_SPLIT` : nombre de panneaux (2 à 4). Sans `MATCHA_SCREENSHOT_URLS`, ouvre d'abord
 ///   `about:blank?split1`… ; puis « Ouvrir en split » sur la première ligne d'onglet non sélectionnée jusqu'à ce
 ///   nombre ; capture `15-split`, clique le panneau de gauche (`16-split-panneau-actif`), survole le premier
-///   séparateur (`17-split-separateur`). Avec `…_SETTINGS_VALUES=addressBarPosition=top` : une barre par panneau.
+///   séparateur (`17-split-separateur`). Avec `…_SETTINGS_VALUES=addressBarPosition=top` : une barre par panneau ;
+/// - `MATCHA_SCREENSHOT_MINI` : texte tapé dans une mini-fenêtre ouverte par le menu Fichier, après les autres
+///   captures : `20-mini-vide` (barre ouverte), `21-mini-page` (après Entrée), `22-mini-flottante` (écran entier,
+///   fenêtre du navigateur active : la mini-fenêtre reste devant), `23-mini-remise` (⌘O, la page dans le Space).
+///   Sans réseau : `MATCHA_SCREENSHOT_MINI=about:blank?mini`.
 ///
 /// La capture `1-vide` montre la fenêtre sans onglet : la page vide invite à ⌘T, la barre de commande
 /// ne s'ouvre jamais d'elle-même.
@@ -75,6 +79,9 @@ final class ScreenshotUITests: XCTestCase {
         }
         if environment["MATCHA_SCREENSHOT_SETTINGS"] != nil {
             captureSettings(in: app)
+        }
+        if let text = environment["MATCHA_SCREENSHOT_MINI"] {
+            captureMiniWindow(typing: text, in: app)
         }
     }
 
@@ -261,7 +268,7 @@ final class ScreenshotUITests: XCTestCase {
         }
     }
 
-    private func attach(_ screenshot: XCUIScreenshot, as name: String) {
+    func attach(_ screenshot: XCUIScreenshot, as name: String) {
         let attachment = XCTAttachment(screenshot: screenshot)
         attachment.name = name
         attachment.lifetime = .keepAlways

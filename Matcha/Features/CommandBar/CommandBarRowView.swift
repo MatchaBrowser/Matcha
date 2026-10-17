@@ -9,7 +9,7 @@ struct CommandBarRowView: View {
     let searchEngineName: String
     /// Couleur du Space affiché, qui teinte la ligne sélectionnée.
     let tint: Color
-    let windowModel: WindowModel
+    let icons: CommandRowIcons
     let action: () -> Void
 
     @State private var isHovered = false
@@ -70,7 +70,7 @@ struct CommandBarRowView: View {
                 .font(.system(size: 13, weight: .medium))
                 .foregroundStyle(.secondary)
         case let .tab(reference, _, _):
-            if let tab = windowModel.locate(reference)?.tab {
+            if let tab = icons.tab(reference) {
                 FaviconView(tab: tab)
             } else {
                 siteIcon
@@ -85,7 +85,7 @@ struct CommandBarRowView: View {
     }
 
     private var siteIcon: some View {
-        CachedSiteIcon(host: row.url?.host(), service: windowModel.session.faviconService)
+        CachedSiteIcon(host: row.url?.host(), service: icons.faviconService)
     }
 
     @ViewBuilder private var accessory: some View {

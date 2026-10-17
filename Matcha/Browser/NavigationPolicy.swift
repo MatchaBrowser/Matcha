@@ -31,7 +31,8 @@ nonisolated enum NavigationSource: Sendable {
     case tab
     /// L'aperçu (Peek, tâche 4.4).
     case peek
-    /// Une vue web que ce gestionnaire d'onglets n'affiche pas.
+    /// Une vue web que ce gestionnaire d'onglets n'affiche pas, ou la page d'une mini-fenêtre (tâche 4.5) : un
+    /// Maj+clic y reste un clic.
     case other
 }
 

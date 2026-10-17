@@ -24,7 +24,7 @@ final class TabManager {
     init(websiteDataStore: WKWebsiteDataStore, faviconService: FaviconService = .shared) {
         self.websiteDataStore = websiteDataStore
         self.faviconService = faviconService
-        coordinator.tabManager = self
+        coordinator.tabHost = self
     }
 
     /// Tous les onglets, dans l'ordre de la barre latérale.

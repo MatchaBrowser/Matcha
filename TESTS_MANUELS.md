@@ -111,6 +111,25 @@ Ou ⌘R dans Xcode.
 - [ ] VoiceOver : le panneau est annoncé « Aperçu » ; « Ouvrir en onglet » et « Fermer l'aperçu » sont lus.
 - Connu : la page derrière est assombrie, pas floutée. L'aperçu n'est pas gardé quand tu quittes Matcha.
 
+### 4.5 Mini-fenêtre
+
+- [ ] Finder au premier plan, ⌥⌘N : une mini-fenêtre d'environ 520 × 680, aux couleurs du Space affiché, apparaît au centre de l'écran du pointeur ; tu tapes tout de suite, sans cliquer. La grande fenêtre de Matcha ne passe pas devant le Finder. « météo », Entrée : la recherche s'affiche dans la mini-fenêtre ; avec les suggestions activées, elles apparaissent sous le champ.
+- [ ] Barre : ×, ← (après une 2ᵉ page), domaine (un clic = ⌘L, adresse sélectionnée, ligne « Copier l'URL »), « Ouvrir dans Perso ». Clique les boutons tout en haut de la barre : ils répondent (sinon, dis-le-moi). Glisse la zone vide de la barre : la fenêtre bouge. Redimensionne-la : la suivante reprend cette taille.
+- [ ] ⌥⌘N trois fois : trois fenêtres décalées ; ⌘W et × ferment chacune, sans toucher aux onglets. Une mini-fenêtre vide se ferme avec Échap. Dans une page, Échap ne ferme jamais la mini-fenêtre.
+- [ ] Clic sur la fenêtre du navigateur : la mini-fenêtre reste devant. Clic sur une autre app : elle passe derrière cette app, mais pas derrière la fenêtre du navigateur ; retour à Matcha : elle repasse devant.
+- [ ] Connecte-toi à un site, va sur une 2ᵉ page, lance une vidéo, puis « Ouvrir dans … » (ou ⌘O) : la page arrive en tête des onglets du jour, sélectionnée, sans rechargement (vidéo qui continue, toujours connecté) ; Précédent ramène à la 1ʳᵉ page.
+- [ ] Deux profils : ouvre une mini-fenêtre depuis un Space du 2ᵉ profil, puis affiche un Space du 1ᵉʳ : le bouton nomme un Space du 2ᵉ profil, et l'ouverture y ramène la fenêtre principale avec la page connectée.
+- [ ] Fenêtre principale fermée (⇧⌘W) : ⌥⌘N, une page, ⌘O : la fenêtre revient sur le bon Space avec l'onglet. Puis, fenêtre fermée et une mini-fenêtre ouverte : clic sur l'icône du Dock ; la fenêtre principale revient-elle ? (Sinon : menu Fenêtre, et dis-le-moi.)
+- [ ] « Se connecter avec Google » dans une mini-fenêtre : la fenêtre de connexion s'ouvre en mini-fenêtre et se ferme d'elle-même. ⌘-clic sur un lien : un onglet arrive en arrière-plan dans le Space, sans que la fenêtre principale passe devant. Maj+clic : le lien s'ouvre dans la mini-fenêtre (pas d'aperçu). Un lien `mailto:` ouvre Mail.
+- [ ] Dans une mini-fenêtre : ⌘T, ⌘L, ⌘R, ⌘[, ⌘], ⌘O, ⌘W (titre « Fermer la mini-fenêtre » dans le menu Fichier), ⇧⌘W, et ⇧⌘C avec la confirmation « URL copiée » en bas de la mini-fenêtre.
+- [ ] Safari en plein écran, ⌥⌘N : la mini-fenêtre apparaît par-dessus, sur le même bureau. Fenêtre de Matcha sur le bureau 1, toi sur le bureau 2 dans une autre app : ⌥⌘N l'ouvre sur le bureau 2, sans changer de bureau. Pareil avec Stage Manager. Deux écrans : elle s'ouvre sur l'écran du pointeur.
+- [ ] Fenêtre privée au premier plan, ⌥⌘N : la mini-fenêtre n'est pas privée (tes cookies habituels) et sa page va dans la fenêtre principale.
+- [ ] Réglages > Général : « Raccourci de la mini-fenêtre » affiche ⌥⌘N. Enregistre ⌃⌥M et essaie-le depuis une autre app ; ⌘T est refusé ; efface-le (ⓧ) : plus de raccourci, mais Fichier > Nouvelle mini-fenêtre marche toujours. Remets ⌥⌘N.
+- [ ] Menu Fenêtre et ⌘` : la mini-fenêtre y figure sous le titre de sa page ; Mission Control la montre.
+- [ ] Quitter avec des mini-fenêtres ouvertes : l'alerte s'affiche au-dessus, et rien ne revient au lancement suivant. Supprimer un profil ferme ses mini-fenêtres.
+- [ ] VoiceOver : « Fermer la mini-fenêtre », « Précédent », « Adresse », « Ouvrir dans le Space » avec le nom du Space.
+- Connu : tant que Matcha tourne, ⌥⌘N ne marche plus dans le Finder (« Nouveau dossier intelligent »), Mail ni Xcode ; si Arc est ouvert, il reçoit aussi ⌥⌘N. ⌘S, Spaces et Accueil ne font rien dans une mini-fenêtre. Les fenêtres de connexion ignorent la taille demandée (5.8).
+
 ### 4.6 Copier l'URL
 
 - [ ] Sur une page, ⌘⇧C : une petite capsule « URL copiée » (icône de lien) apparaît en fondu, centrée en bas de la page, reste environ 1,5 s puis disparaît en fondu. Colle dans une autre app (Notes, TextEdit) : c'est bien l'adresse complète de la page.

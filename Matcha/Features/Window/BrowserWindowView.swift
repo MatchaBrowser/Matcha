@@ -83,7 +83,9 @@ struct BrowserWindowView: View {
             .padding(isSidebarVisible ? [.top, .trailing, .bottom] : .all, Self.cardMargin)
         }
         .overlay(alignment: .leading) { sidebarOverlay }
-        .overlay { CommandBarOverlay(model: commandBar, executor: commandBarExecutor, theme: theme) }
+        .overlay {
+            CommandBarOverlay(model: commandBar, submit: commandBarExecutor.submit, cancel: commandBarExecutor.cancel, theme: theme)
+        }
         .ignoresSafeArea()
         .background {
             // Tirer sur le fond (zones vides) déplace la fenêtre.
@@ -118,6 +120,8 @@ struct BrowserWindowView: View {
             tabManager.closePeek()
         }
         .task { await session.removeOrphanDataStores() }
+        // Les mini-fenêtres envoient leurs pages dans cette fenêtre (tâche 4.5).
+        .linkedToMiniWindows(session: session, model: model, window: window) { [commandBar] in commandBar.dismiss() }
         .environment(model)
         .focusedSceneValue(\.tabManager, tabManager)
         .focusedSceneValue(\.windowActions, windowActions)

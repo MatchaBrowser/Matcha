@@ -7,8 +7,11 @@ struct CommandBarPanel: View {
     static let rowHeight = 36.0
     static let listPadding = 6.0
 
-    let model: CommandBarModel
-    let executor: CommandBarExecutor
+    let model: any CommandBarPanelModel
+    /// ⏎ ou clic : la ligne `id` (nil : la ligne sélectionnée).
+    let submit: (CommandRow.ID?) -> Void
+    /// ⎋.
+    let cancel: () -> Void
     let theme: SpaceTheme
     /// Hauteur maximale du panneau ; la liste défile au-delà.
     let maxHeight: Double
@@ -60,21 +63,13 @@ struct CommandBarPanel: View {
 
     /// Icône du site de l'onglet modifié (⌘L), sinon une loupe.
     @ViewBuilder private var leadingIcon: some View {
-        if let target, target.url != nil {
+        if let target = model.editedTab, target.url != nil {
             FaviconView(tab: target, size: 18)
         } else {
             Image(systemName: "magnifyingglass")
                 .font(.system(size: 15, weight: .medium))
                 .foregroundStyle(.secondary)
         }
-    }
-
-    /// Onglet visé en mode « onglet affiché ».
-    private var target: BrowserTab? {
-        guard case let .currentTab(id) = model.mode else {
-            return nil
-        }
-        return model.windowModel.space.tabManager.tab(withID: id)
     }
 
     // MARK: Résultats
@@ -89,9 +84,9 @@ struct CommandBarPanel: View {
                             isSelected: row.id == model.selectedRowID,
                             searchEngineName: model.searchEngine.name,
                             tint: tint,
-                            windowModel: model.windowModel,
+                            icons: model.rowIcons,
                         ) {
-                            executor.submit(row.id)
+                            submit(row.id)
                         }
                         .id(row.id)
                     }
@@ -125,9 +120,9 @@ struct CommandBarPanel: View {
         case .moveDown:
             moveSelection(by: 1)
         case .submit:
-            executor.submit(nil)
+            submit(nil)
         case .cancel:
-            executor.cancel()
+            cancel()
         }
     }
 

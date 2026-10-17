@@ -12,3 +12,6 @@ xcuserdata/
 # Outils locaux
 buildServer.json
 matcha-icon/
+
+# Index créé par l'éditeur dans le projet
+Matcha.xcodeproj/-Xcc/

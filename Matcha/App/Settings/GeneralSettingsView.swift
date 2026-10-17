@@ -1,8 +1,9 @@
 import AppKit
+import KeyboardShortcuts
 import SwiftUI
 
-/// Réglages généraux : page d'accueil, nouveaux onglets, recherche et suggestions, aperçu des liens, fermeture de
-/// l'app, langue.
+/// Réglages généraux : page d'accueil, nouveaux onglets, recherche et suggestions, aperçu des liens, raccourci de
+/// la mini-fenêtre, fermeture de l'app, langue.
 struct GeneralSettingsView: View {
     @AppStorage(BrowserSettings.Key.homePage) private var homePage = BrowserSettings.homePage
     @AppStorage(BrowserSettings.Key.newTabPage) private var newTabPage = BrowserSettings.newTabPage
@@ -45,6 +46,20 @@ struct GeneralSettingsView: View {
                 Shift-click a link to open it in Peek without leaving the page. \
                 With this option, Favorites and pinned tabs stay on their website.
                 """, comment: "Settings > General: note under the Peek toggle")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+            }
+            Section {
+                LabeledContent("Mini Window Shortcut") {
+                    // Ses propres textes (effacer, raccourci refusé) sont traduits par KeyboardShortcuts.
+                    KeyboardShortcuts.Recorder(for: .openMiniWindow)
+                        .accessibilityIdentifier("miniWindowShortcutRecorder")
+                }
+            } footer: {
+                Text("""
+                Press this shortcut in any app to open a mini window, even when Matcha is in the background. \
+                It uses the profile of the Space shown.
+                """, comment: "Settings > General: note under the mini window shortcut")
                     .font(.caption)
                     .foregroundStyle(.secondary)
             }
