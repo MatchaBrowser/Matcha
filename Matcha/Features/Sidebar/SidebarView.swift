@@ -1,7 +1,7 @@
 import SwiftUI
 
 /// Barre latérale, de haut en bas : navigation, adresse, favoris, épinglés, nouvel onglet,
-/// onglets du jour, Spaces (et à gauche, les téléchargements).
+/// onglets du jour, panneau des téléchargements s'il est ouvert, Spaces (et à gauche, le bouton des téléchargements).
 struct SidebarView: View {
     let model: WindowModel
     let tabManager: TabManager
@@ -36,6 +36,12 @@ struct SidebarView: View {
             // Clic droit sur le fond de la barre ; les lignes ont leur propre menu.
             .contextMenu {
                 Button("New Folder") { tabManager.newFolder() }
+            }
+            if model.isDownloadsPresented, !downloads.items(in: model.session.downloadScope).isEmpty {
+                DownloadsPanel(downloads: downloads, scope: model.session.downloadScope) {
+                    withAnimation(.easeOut(duration: 0.2)) { model.isDownloadsPresented = false }
+                }
+                .transition(.move(edge: .bottom).combined(with: .opacity))
             }
             SpaceSwitcher(model: model)
                 .overlay(alignment: .leading) {

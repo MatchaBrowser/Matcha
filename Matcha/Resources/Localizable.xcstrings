@@ -621,6 +621,35 @@
         }
       }
     },
+    "Close Downloads" : {
+      "comment" : "Help tag and accessibility label of the × button that closes the downloads panel at the bottom of the sidebar",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Downloads schließen"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cerrar descargas"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fermer les téléchargements"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Chiudi download"
+          }
+        }
+      }
+    },
     "Close Mini Window" : {
       "localizations" : {
         "de" : {

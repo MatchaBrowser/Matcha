@@ -2,7 +2,7 @@ import SwiftUI
 
 /// Bouton « Téléchargements » du pied de la barre latérale, visible dès que la fenêtre a un téléchargement dans cette
 /// session : anneau de progression pendant qu'un fichier arrive, petit rebond à chaque fichier terminé. Un clic
-/// ouvre la liste ; rien ne l'ouvre de soi-même.
+/// ouvre le panneau des téléchargements, en bas de la barre ; rien ne l'ouvre de soi-même.
 struct DownloadsButton: View {
     @Bindable var model: WindowModel
     let downloads: DownloadManager
@@ -16,7 +16,7 @@ struct DownloadsButton: View {
         if !items.isEmpty {
             let active = items.filter(\.isActive)
             Button {
-                model.isDownloadsPresented.toggle()
+                withAnimation(.easeOut(duration: 0.2)) { model.isDownloadsPresented.toggle() }
             } label: {
                 DownloadsIcon(
                     isDownloading: !active.isEmpty,
@@ -28,11 +28,6 @@ struct DownloadsButton: View {
             .help("Downloads")
             .accessibilityLabel("Downloads")
             .accessibilityIdentifier("downloadsButton")
-            .popover(isPresented: $model.isDownloadsPresented, arrowEdge: .top) {
-                DownloadsPopover(downloads: downloads, scope: scope) {
-                    model.isDownloadsPresented = false
-                }
-            }
             .transition(.opacity)
         }
     }

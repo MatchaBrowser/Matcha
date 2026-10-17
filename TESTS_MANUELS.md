@@ -166,14 +166,14 @@ Les tests d'interface écrivent dans ~/Downloads/MatchaUITests, que l'app efface
 - [ ] Le même fichier deux fois : « nom.zip » puis « nom 2.zip » dans Téléchargements, le plus récent en tête de la liste ; aucun fichier n'est écrasé. Une archive « .tar.gz » devient « archive 2.tar.gz ».
 - [ ] Annuler pendant un gros téléchargement : la ligne passe à « Annulé », et aucun fichier partiel ne reste dans Téléchargements.
 - [ ] « Afficher dans le Finder » : une fenêtre du Finder s'ouvre sur Téléchargements, le fichier sélectionné. Double-clic sur une ligne terminée : le fichier s'ouvre dans son app ; sur une ligne en cours, annulée ou en échec, rien ne se passe.
-- [ ] « Effacer » retire les lignes terminées, en échec ou annulées (pas celles en cours) ; les fichiers restent dans Téléchargements. Plus rien dans la liste : elle se ferme et le bouton disparaît.
+- [ ] « Effacer » retire les lignes terminées, en échec ou annulées (pas celles en cours) ; les fichiers restent dans Téléchargements. Plus rien dans la liste : le panneau se ferme et le bouton disparaît.
 - [ ] Quarantaine : télécharge une app ou une image disque (.dmg) d'un éditeur, puis ouvre-la depuis le Finder : macOS demande confirmation (Gatekeeper). Dans le Terminal, `xattr -p com.apple.quarantine ~/Downloads/<fichier>` affiche une valeur qui contient « Matcha ».
 - [ ] Fenêtre privée (⇧⌘N) : un téléchargement y montre son propre bouton ; la fenêtre principale n'en montre pas. Ferme la fenêtre privée : le fichier reste dans Téléchargements, mais la liste l'oublie (rouvre une fenêtre privée : pas de bouton). Un téléchargement privé encore en cours à la fermeture est annulé.
 - [ ] Mini-fenêtre : un téléchargement lancé depuis sa page apparaît dans la liste de la fenêtre principale ; la mini-fenêtre reste sur sa page.
-- [ ] Barre latérale masquée (⌘S) : survole le bord gauche, clique le bouton des téléchargements, puis va avec le pointeur dans la liste : la barre et la liste restent affichées. Échap ferme la liste ; en quittant le bord, la barre se masque.
+- [ ] Barre latérale masquée (⌘S) : survole le bord gauche, clique le bouton des téléchargements : le panneau monte dans la barre flottante. Éloigne le pointeur : la barre se cache, panneau compris ; reviens au bord : elle réapparaît avec le panneau toujours ouvert. La croix le ferme.
 - [ ] Aperçu (Maj+clic sur un lien) : un lien de téléchargement dans l'aperçu télécharge le fichier, l'aperçu reste ouvert.
 - [ ] Quitter Matcha pendant un téléchargement : au lancement suivant, la liste est vide (elle ne dure que le temps de la session) et aucun fichier partiel ne reste dans Téléchargements.
-- [ ] Aspect en clair, en sombre et en fenêtre privée : anneau lisible, liste lisible, icônes des fichiers (celle de l'app pour une app).
+- [ ] Aspect en clair, en sombre et en fenêtre privée : anneau lisible, panneau lisible (titre, « Effacer », croix, trait de séparation), icônes des fichiers (celle de l'app pour une app).
 - [ ] Facultatif, VoiceOver : « Téléchargements » sur le bouton, nom du fichier et état sur chaque ligne, « Annuler », « Afficher dans le Finder », « Effacer ».
 - Connu : un lien `target=_blank` vers un fichier laisse un onglet vide après le téléchargement (Safari le ferme) ; ferme-le à la main. Pas de reprise d'un téléchargement interrompu.
-- [ ] Ouvre la liste des téléchargements pendant qu'un gros fichier arrive, et laisse-la ouverte jusqu'à la fin : elle reste ouverte, la ligne passe à « terminé » et la flèche du bouton rebondit une fois.
+- [ ] Ouvre le panneau des téléchargements pendant qu'un gros fichier arrive, et laisse-le ouvert jusqu'à la fin : il reste ouvert, la ligne passe à « terminé » et la flèche du bouton rebondit une fois. Change de Space : le panneau reste ouvert.

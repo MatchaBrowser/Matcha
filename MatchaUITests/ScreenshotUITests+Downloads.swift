@@ -21,7 +21,7 @@ extension ScreenshotUITests {
         sleep(1)
         attach(window.screenshot(), as: "24-telechargement-bouton")
         button.click()
-        XCTAssertTrue(downloadsPopover(in: app).waitForExistence(timeout: 3))
+        XCTAssertTrue(downloadsPanel(in: app).waitForExistence(timeout: 3))
         sleep(1)
         attach(window.screenshot(), as: "25-telechargements-liste")
         app.typeKey(.escape, modifierFlags: [])

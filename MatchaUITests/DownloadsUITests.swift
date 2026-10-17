@@ -29,10 +29,10 @@ final class DownloadsUITests: XCTestCase {
         download(source, in: app)
         XCTAssertTrue(button.waitForExistence(timeout: 10))
         // Rien ne s'ouvre de soi-même : ni la liste, ni le fichier.
-        XCTAssertFalse(downloadsPopover(in: app).waitForExistence(timeout: 1))
+        XCTAssertFalse(downloadsPanel(in: app).waitForExistence(timeout: 1))
 
         button.click()
-        XCTAssertTrue(downloadsPopover(in: app).waitForExistence(timeout: 3))
+        XCTAssertTrue(downloadsPanel(in: app).waitForExistence(timeout: 3))
         let row = downloadRows(in: app).firstMatch
         XCTAssertTrue(row.waitForExistence(timeout: 3))
         XCTAssertEqual(downloadRows(in: app).count, 1)
@@ -53,7 +53,7 @@ final class DownloadsUITests: XCTestCase {
         XCTAssertTrue(clear.waitForExistence(timeout: 3))
         clear.click()
         XCTAssertTrue(button.waitForNonExistence(timeout: 3))
-        XCTAssertFalse(downloadsPopover(in: app).exists)
+        XCTAssertFalse(downloadsPanel(in: app).exists)
         XCTAssertTrue(FileManager.default.fileExists(atPath: file.path))
         app.terminate()
     }
@@ -104,9 +104,10 @@ final class DownloadsUITests: XCTestCase {
         app.terminate()
     }
 
-    /// Barre masquée (⌘S) : la liste ouverte depuis la barre apparue au survol reste ouverte quand le pointeur y va.
+    /// Barre masquée : le panneau monte dans la barre flottante, se cache avec elle quand le pointeur s'éloigne,
+    /// réapparaît ouvert avec elle ; la croix le ferme.
     @MainActor
-    func testDownloadsListStaysOpenOverTheHiddenSidebar() throws {
+    func testDownloadsPanelFollowsTheHiddenSidebar() throws {
         let source = try undisplayableFile()
         let app = launchForDownloads()
         let window = app.windows.firstMatch
@@ -117,20 +118,23 @@ final class DownloadsUITests: XCTestCase {
         moveAwayFromLeftEdge(in: window)
         app.typeKey("s", modifierFlags: .command)
         XCTAssertTrue(button.waitForNonExistence(timeout: 3))
-        window.coordinate(withNormalizedOffset: CGVector(dx: 0, dy: 0.5)).withOffset(CGVector(dx: 3, dy: 0)).hover()
+        let edge = window.coordinate(withNormalizedOffset: CGVector(dx: 0, dy: 0.5)).withOffset(CGVector(dx: 3, dy: 0))
+        edge.hover()
         XCTAssertTrue(button.waitForExistence(timeout: 3))
         button.click()
         let row = downloadRows(in: app).firstMatch
         XCTAssertTrue(row.waitForExistence(timeout: 3))
 
-        row.hover()
-        sleep(1)
-        XCTAssertTrue(row.exists)
-        XCTAssertTrue(button.exists)
-        // Un clic sur la page ferme la liste ; loin du bord, la barre se masque à nouveau.
-        window.coordinate(withNormalizedOffset: CGVector(dx: 0.6, dy: 0.5)).click()
-        XCTAssertTrue(row.waitForNonExistence(timeout: 3))
+        // Loin du bord : la barre se cache, panneau compris.
+        moveAwayFromLeftEdge(in: window)
         XCTAssertTrue(button.waitForNonExistence(timeout: 3))
+        XCTAssertFalse(row.exists)
+        // De retour au bord : le panneau est toujours ouvert.
+        edge.hover()
+        XCTAssertTrue(row.waitForExistence(timeout: 3))
+        clickWhenSettled(app.buttons["downloadsCloseButton"])
+        XCTAssertTrue(row.waitForNonExistence(timeout: 3))
+        XCTAssertTrue(button.exists)
         app.terminate()
     }
 

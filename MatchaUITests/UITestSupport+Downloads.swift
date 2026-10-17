@@ -48,8 +48,8 @@ extension XCTestCase {
     }
 
     @MainActor
-    func downloadsPopover(in app: XCUIApplication) -> XCUIElement {
-        app.descendants(matching: .any).matching(identifier: "downloadsPopover").firstMatch
+    func downloadsPanel(in app: XCUIApplication) -> XCUIElement {
+        app.descendants(matching: .any).matching(identifier: "downloadsPanel").firstMatch
     }
 
     @MainActor

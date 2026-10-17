@@ -33,7 +33,7 @@ struct DownloadRow: View {
             Spacer(minLength: 0)
             actionButton
         }
-        .padding(.horizontal, 14)
+        .padding(.horizontal, 4)
         .frame(height: Self.height)
         .contentShape(Rectangle())
         .onTapGesture(count: 2) {
