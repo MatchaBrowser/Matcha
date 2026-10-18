@@ -81,6 +81,18 @@ extension ExtensionManager {
         Logger.extensions.info("Extension désinstallée (\(identifier, privacy: .public))")
     }
 
+    /// Ouvre `url` dans un nouvel onglet de la fenêtre de navigation (jamais privée) et l'amène devant : liens des
+    /// réglages vers les boutiques d'extensions. Faux sans fenêtre de navigation ouverte.
+    @discardableResult
+    func openInBrowser(_ url: URL) -> Bool {
+        guard let model = windows.browserWindows.compactMap(\.model).first(where: { !$0.session.isPrivate }) else {
+            return false
+        }
+        openTab(url, in: model, after: nil, isActive: true, isPinned: false)
+        windows.adapter(for: model)?.owner?.nsWindow?.makeKeyAndOrderFront(nil)
+        return true
+    }
+
     /// Ouvre la page d'options de l'extension chargée `identifier` dans un nouvel onglet ; faux sans page d'options ou
     /// sans fenêtre de navigation.
     @discardableResult

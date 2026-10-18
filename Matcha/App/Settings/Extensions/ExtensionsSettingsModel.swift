@@ -84,6 +84,27 @@ final class ExtensionsSettingsModel {
         }
     }
 
+    /// App Store sur sa page des extensions Safari, comme « Plus d'extensions » de Safari ; à défaut de l'app App Store,
+    /// la même page dans un onglet.
+    func openAppStore() {
+        if let url = URL(string: "macappstore://apps.apple.com/story/id1377753262"), NSWorkspace.shared.open(url) {
+            return
+        }
+        if let url = URL(string: "https://apps.apple.com/mac/story/id1377753262") {
+            manager.openInBrowser(url)
+        }
+    }
+
+    /// Modules de Firefox (addons.mozilla.org) dans un onglet de Matcha, sinon dans le navigateur par défaut.
+    func openFirefoxAddOns() {
+        guard let url = URL(string: "https://addons.mozilla.org/firefox/") else {
+            return
+        }
+        if !manager.openInBrowser(url) {
+            NSWorkspace.shared.open(url)
+        }
+    }
+
     /// Prépare l'extension Safari `appExtension`.
     func add(_ appExtension: SafariAppExtension) {
         Task { await prepare { try await $0.prepare(appExtension) } }

@@ -4145,6 +4145,62 @@
         }
       }
     },
+    "Firefox Add-ons" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Firefox-Add-ons"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Complementos de Firefox"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Modules Firefox"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Componenti aggiuntivi di Firefox"
+          }
+        }
+      }
+    },
+    "Firefox extensions work too: get the .xpi file from the extension's versions page on addons.mozilla.org." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Firefox-Erweiterungen funktionieren auch: Lade die .xpi-Datei von der Versionsseite der Erweiterung auf addons.mozilla.org."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Las extensiones de Firefox también funcionan: descarga el archivo .xpi desde la página de versiones de la extensión en addons.mozilla.org."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Les extensions Firefox marchent aussi : récupérez le fichier .xpi sur la page des versions de l'extension, sur addons.mozilla.org."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Anche le estensioni di Firefox funzionano: scarica il file .xpi dalla pagina delle versioni dell'estensione su addons.mozilla.org."
+          }
+        }
+      }
+    },
     "Flag" : {
       "comment" : "Icon choice (SF Symbol)",
       "localizations" : {
@@ -5735,6 +5791,34 @@
         }
       }
     },
+    "More Extensions…" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Weitere Erweiterungen …"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Más extensiones…"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Plus d'extensions…"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Altre estensioni…"
+          }
+        }
+      }
+    },
     "Mountains" : {
       "comment" : "Icon choice (SF Symbol)",
       "localizations" : {
@@ -6657,6 +6741,34 @@
         }
       }
     },
+    "Open addons.mozilla.org in a new tab" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "addons.mozilla.org in einem neuen Tab öffnen"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Abrir addons.mozilla.org en una pestaña nueva"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ouvrir addons.mozilla.org dans un nouvel onglet"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Apri addons.mozilla.org in un nuovo pannello"
+          }
+        }
+      }
+    },
     "Open as Tab" : {
       "comment" : "Peek: button that turns the preview into a tab, without reloading the page",
       "localizations" : {
@@ -6884,6 +6996,34 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Apri la cartella Download nel Finder"
+          }
+        }
+      }
+    },
+    "Open the Safari Extensions page of the App Store" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Die Seite mit Safari-Erweiterungen im App Store öffnen"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Abrir la página de extensiones de Safari del App Store"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ouvrir la page des extensions Safari de l'App Store"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Apri la pagina delle estensioni di Safari nell'App Store"
           }
         }
       }
@@ -10803,6 +10943,34 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Ciò che digiti nella barra dei comandi viene inviato a %@ per suggerire ricerche. Mai nelle finestre private."
+          }
+        }
+      }
+    },
+    "When an extension also exists for Safari, prefer the Safari version." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gibt es eine Erweiterung auch für Safari, nimm die Safari-Version."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Si una extensión también existe para Safari, elige la versión de Safari."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Quand une extension existe aussi pour Safari, préférez la version Safari."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Se un'estensione esiste anche per Safari, scegli la versione per Safari."
           }
         }
       }

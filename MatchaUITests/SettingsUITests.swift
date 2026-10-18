@@ -44,6 +44,9 @@ final class SettingsUITests: XCTestCase {
         let emptyState = app.descendants(matching: .any).matching(identifier: "extensionsEmptyState").firstMatch
         XCTAssertTrue(emptyState.waitForExistence(timeout: 5))
         XCTAssertTrue(app.descendants(matching: .any).matching(identifier: "extensionsChooseFileButton").firstMatch.exists)
+        // Liens vers les boutiques (jamais cliqués ici : l'App Store s'ouvrirait).
+        XCTAssertTrue(app.descendants(matching: .any).matching(identifier: "extensionsAppStoreButton").firstMatch.exists)
+        XCTAssertTrue(app.descendants(matching: .any).matching(identifier: "extensionsFirefoxAddOnsButton").firstMatch.exists)
         XCTAssertFalse(app.descendants(matching: .any).matching(identifier: "installedExtensionRow").firstMatch.exists)
         app.typeKey("w", modifierFlags: .command)
     }

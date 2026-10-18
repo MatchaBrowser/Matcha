@@ -1,8 +1,9 @@
 import SwiftUI
 
 /// Réglages > Extensions (tâche 6.4) : les extensions installées (activer, options, fenêtres privées, supprimer), puis
-/// « Ajouter » : les extensions Safari des apps installées et un fichier (`.crx` de Chrome, `.xpi` de Firefox, `.zip`)
-/// ou un dossier décompressé. Chaque ajout passe par l'écran des permissions.
+/// « Ajouter » : les extensions Safari des apps installées (et l'App Store, « Plus d'extensions… »), et un fichier
+/// (`.crx` de Chrome, `.xpi` de Firefox, `.zip`) ou un dossier décompressé (et le lien vers les modules de Firefox).
+/// Chaque ajout passe par l'écran des permissions.
 struct ExtensionsSettingsView: View {
     @State private var model = ExtensionsSettingsModel(manager: .shared)
     @State private var pendingRemoval: ExtensionsSettingsModel.Installed?
@@ -31,6 +32,9 @@ struct ExtensionsSettingsView: View {
                         .font(.caption)
                         .foregroundStyle(.secondary)
                 }
+                Button("More Extensions…") { model.openAppStore() }
+                    .help("Open the Safari Extensions page of the App Store")
+                    .accessibilityIdentifier("extensionsAppStoreButton")
             } header: {
                 Text("Safari Extensions from Your Apps")
             }
@@ -46,6 +50,21 @@ struct ExtensionsSettingsView: View {
                     Button("Choose…") { model.chooseFile() }
                         .disabled(model.isWorking)
                         .accessibilityIdentifier("extensionsChooseFileButton")
+                }
+                HStack(alignment: .firstTextBaseline) {
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text("Firefox extensions work too: get the .xpi file from the extension's versions page on addons.mozilla.org.")
+                        Text("When an extension also exists for Safari, prefer the Safari version.")
+                    }
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+                    .fixedSize(horizontal: false, vertical: true)
+                    Spacer(minLength: 8)
+                    Button("Firefox Add-ons") { model.openFirefoxAddOns() }
+                        .buttonStyle(.link)
+                        .font(.caption)
+                        .help("Open addons.mozilla.org in a new tab")
+                        .accessibilityIdentifier("extensionsFirefoxAddOnsButton")
                 }
                 if let message = model.errorMessage {
                     Text(message)
