@@ -8,7 +8,7 @@ final class FolderRecord {
     var name = ""
     var order = 0
     var isCollapsed = false
-    /// Icône choisie (`FolderIcon.storedValue`) : « symbol:<nom du symbole SF> » ou « emoji:<emoji> » ; nil : l'icône
+    /// Icône choisie (`SidebarIcon.storedValue`) : « symbol:<nom du symbole SF> » ou « emoji:<emoji> » ; nil : l'icône
     /// par défaut.
     var iconValue: String?
     /// Couleurs du nom et du fond de la ligne, « #RRGGBB » (sRGB) ; nil : celles du système.

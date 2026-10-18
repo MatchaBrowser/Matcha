@@ -36,11 +36,12 @@ struct MiniWindowToolbar: View {
         .frame(height: Self.height)
     }
 
-    /// « Ouvrir dans ‹Space› », avec l'icône du Space ; le nom se tronque avant que le bouton ne rétrécisse.
+    /// « Ouvrir dans ‹Space› », avec l'icône du Space (symbole ou emoji) ; le nom se tronque avant que le bouton ne
+    /// rétrécisse.
     private var openButton: some View {
         Button(action: openInSpace) {
             HStack(spacing: 6) {
-                Image(systemName: target.record.symbol)
+                SidebarIconView(icon: target.icon, defaultSymbol: SidebarIcon.defaultSpaceSymbol, size: 12, weight: .medium)
                 Text("Open in \(target.record.name)", comment: "Mini window button; %@ is the name of the Space")
                     .lineLimit(1)
                     .truncationMode(.tail)

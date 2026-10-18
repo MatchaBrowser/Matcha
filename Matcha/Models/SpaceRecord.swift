@@ -6,7 +6,7 @@ import SwiftData
 final class SpaceRecord {
     var id = UUID()
     var name = ""
-    /// Symbole SF de l'icône du Space.
+    /// Icône du Space (`SidebarIcon.spaceSymbol`) : nom d'un symbole SF, ou « emoji:<emoji> ».
     var symbol = "circle.fill"
     /// Thème encodé (`SpaceTheme`, tâche 3.4) ; nil pour le thème par défaut.
     var themeData: Data?
@@ -21,5 +21,11 @@ final class SpaceRecord {
         self.symbol = symbol
         self.order = order
         self.profile = profile
+    }
+
+    /// Icône lue dans `symbol` (illisible : le cercle) ; l'écrire la remplace.
+    var icon: SidebarIcon {
+        get { SidebarIcon(spaceSymbol: symbol) }
+        set { symbol = newValue.spaceSymbol }
     }
 }

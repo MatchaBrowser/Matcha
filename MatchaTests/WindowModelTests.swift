@@ -116,9 +116,10 @@ struct WindowModelTests {
         let space = model.space
         session.renameSpace(space, to: "  Travail ")
         session.renameSpace(space, to: "   ")
-        session.setSymbol("briefcase.fill", of: space)
+        space.setIcon(.symbol("briefcase.fill"))
         #expect(space.record.name == "Travail")
         #expect(space.record.symbol == "briefcase.fill")
+        #expect(space.icon == .symbol("briefcase.fill"))
     }
 
     @Test func `switching space captures every displayed pane`() async throws {

@@ -1,7 +1,7 @@
 import SwiftUI
 
 /// Grille de symboles SF à choisir, à la largeur disponible : le symbole choisi est entouré, chacun a son nom en bulle
-/// d'aide et pour VoiceOver. Icône d'un dossier ; réutilisable pour l'icône d'un Space.
+/// d'aide et pour VoiceOver. Icône d'un dossier (panneau de personnalisation) ou d'un Space (`SpaceEditor`).
 struct SymbolPickerGrid: View {
     static let cellSize = 24.0
 

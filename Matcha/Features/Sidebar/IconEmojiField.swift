@@ -1,13 +1,15 @@
 import AppKit
 import SwiftUI
 
-/// Emoji de l'icône d'un dossier : un champ qui n'accepte qu'un emoji (le dernier tapé ou choisi remplace l'ancien,
-/// une lettre est refusée, le vider rend l'icône par défaut) et « Emoji et symboles… », qui ouvre le visualiseur de
-/// caractères du système sur ce champ.
-struct FolderEmojiField: View {
+/// Emoji d'une icône de dossier ou de Space : un champ qui n'accepte qu'un emoji (le dernier tapé ou choisi remplace
+/// l'ancien, une lettre est refusée, le vider rend l'icône par défaut) et « Emoji et symboles… », qui ouvre le
+/// visualiseur de caractères du système sur ce champ.
+struct IconEmojiField: View {
     /// Emoji de l'icône actuelle, nil si elle n'en est pas un.
     let emoji: String?
-    /// Échap dans le champ : ferme le panneau.
+    /// Préfixe des identifiants d'accessibilité : « <préfixe>Field » et « <préfixe>PaletteButton ».
+    let identifierPrefix: String
+    /// Échap dans le champ : ferme le panneau ou la bulle qui le contient.
     let close: () -> Void
     /// Nouvel emoji, ou nil pour revenir à l'icône par défaut.
     let choose: (String?) -> Void
@@ -18,7 +20,7 @@ struct FolderEmojiField: View {
     var body: some View {
         HStack(spacing: 6) {
             TextField(text: $draft, prompt: Text("Emoji")) {
-                Text("Emoji", comment: "Folder customization: field that takes one emoji as the folder icon")
+                Text("Emoji", comment: "Icon of a folder or a Space: field that takes one emoji as the icon")
             }
             .textFieldStyle(.roundedBorder)
             .multilineTextAlignment(.center)
@@ -29,11 +31,11 @@ struct FolderEmojiField: View {
             .onChange(of: emoji) { _, value in draft = value ?? "" }
             .onChange(of: draft) { _, text in accept(text) }
             .help("Type or paste one emoji")
-            .accessibilityIdentifier("folderEmojiField")
+            .accessibilityIdentifier("\(identifierPrefix)Field")
             Button("Emoji & Symbols…", action: showCharacterViewer)
                 .controlSize(.small)
                 .help("Choose an emoji in the Character Viewer")
-                .accessibilityIdentifier("folderEmojiPaletteButton")
+                .accessibilityIdentifier("\(identifierPrefix)PaletteButton")
             Spacer(minLength: 0)
         }
     }
@@ -47,7 +49,7 @@ struct FolderEmojiField: View {
             if emoji != nil {
                 choose(nil)
             }
-        } else if let latest = FolderEmoji.latest(in: text) {
+        } else if let latest = IconEmoji.latest(in: text) {
             if draft != latest {
                 draft = latest
             }

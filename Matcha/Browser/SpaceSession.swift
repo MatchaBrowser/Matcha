@@ -58,6 +58,27 @@ final class SpaceSession: Identifiable {
         }
     }
 
+    /// Icône du Space, lue dans son enregistrement (observé : la barre suit ses changements).
+    var icon: SidebarIcon {
+        record.icon
+    }
+
+    /// Change l'icône et l'enregistre : un symbole ou un emoji invalide donne le cercle, `.default` aussi. Rien n'est
+    /// enregistré si elle ne change pas.
+    func setIcon(_ newIcon: SidebarIcon) {
+        // Aller-retour par la forme enregistrée : la même icône que celle relue au lancement suivant.
+        let icon = SidebarIcon(spaceSymbol: newIcon.spaceSymbol)
+        guard icon.spaceSymbol != record.symbol else {
+            return
+        }
+        record.icon = icon
+        do {
+            try context.save()
+        } catch {
+            Logger.app.error("Icône du Space non enregistrée : \(error.localizedDescription, privacy: .public)")
+        }
+    }
+
     /// Enregistre tout de suite, avec l'état de navigation de chaque onglet chargé (fermeture de l'app).
     func saveNow() {
         tabManager.captureInteractionStates()

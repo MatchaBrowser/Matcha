@@ -35,7 +35,7 @@ struct FolderRowView: View {
                 .rotationEffect(.degrees(folder.isCollapsed ? 0 : 90))
                 .foregroundStyle(chevronStyle)
                 .frame(width: 10)
-            FolderIconView(icon: folder.appearance.icon, tint: textColor)
+            SidebarIconView(icon: folder.appearance.icon, defaultSymbol: SidebarIcon.defaultFolderSymbol, tint: textColor)
                 .frame(width: 16)
             if isRenaming {
                 nameField
@@ -60,7 +60,9 @@ struct FolderRowView: View {
         .onHover { isHovered = $0 }
         .contextMenu { menu }
         .draggable(SidebarDragItem.folder(folder.id)) {
-            SidebarDragPreview(title: folder.name) { FolderIconView(icon: folder.appearance.icon) }
+            SidebarDragPreview(title: folder.name) {
+                SidebarIconView(icon: folder.appearance.icon, defaultSymbol: SidebarIcon.defaultFolderSymbol)
+            }
         }
         .sidebarDropDestination(tabManager: tabManager, isTargeted: $isDropTargeted) { location in
             location.y < Self.beforeZoneHeight ? dropDestination : .pinned(folder: folder.id, index: folder.items.count)

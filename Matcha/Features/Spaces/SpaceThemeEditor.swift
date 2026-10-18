@@ -1,16 +1,18 @@
 import SwiftUI
 
-/// Éditeur du thème d'un Space : thèmes prédéfinis, couleurs libres (2 ou 3) et angle du dégradé.
+/// Thème d'un Space, section de son éditeur (`SpaceEditor`) : thèmes prédéfinis, couleurs libres (2 ou 3) et angle du
+/// dégradé.
 struct SpaceThemeEditor: View {
     @Binding var theme: SpaceTheme
 
     var body: some View {
         VStack(alignment: .leading, spacing: 14) {
-            Text("Space Theme")
-                .font(.headline)
-            HStack(spacing: 10) {
-                ForEach(SpaceTheme.presets, id: \.self) { preset in
-                    presetButton(preset)
+            VStack(alignment: .leading, spacing: 8) {
+                SpaceEditorSectionTitle(Text("Theme", comment: "Space editor: title of the theme section"))
+                HStack(spacing: 10) {
+                    ForEach(SpaceTheme.presets, id: \.self) { preset in
+                        presetButton(preset)
+                    }
                 }
             }
             Divider()
@@ -30,8 +32,6 @@ struct SpaceThemeEditor: View {
                 Slider(value: $theme.angle, in: 0 ... 360, step: 15)
             }
         }
-        .padding(16)
-        .frame(width: 300)
     }
 
     private func presetButton(_ preset: SpaceTheme) -> some View {

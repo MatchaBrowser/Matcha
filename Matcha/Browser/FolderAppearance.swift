@@ -1,18 +1,9 @@
 import Foundation
 
-/// Icône d'un dossier d'épinglés : celle par défaut (un dossier), un symbole SF ou un emoji.
-nonisolated enum FolderIcon: Hashable, Sendable {
-    case `default`
-    /// Nom d'un symbole SF (« star »…).
-    case symbol(String)
-    /// Un seul emoji, un caractère (`FolderEmoji`).
-    case emoji(String)
-}
-
 /// Apparence d'un dossier d'épinglés, choisie dans son panneau de personnalisation : icône, couleur du texte et
 /// couleur du fond (nil : celles du système). Les couleurs s'affichent telles quelles, en clair comme en sombre.
 nonisolated struct FolderAppearance: Hashable, Sendable {
-    var icon = FolderIcon.default
+    var icon = SidebarIcon.default
     var textColor: ThemeColor?
     var backgroundColor: ThemeColor?
 

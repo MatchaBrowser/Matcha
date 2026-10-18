@@ -60,7 +60,7 @@ struct FolderAppearanceTests {
     /// Une base modifiée à la main, une synchro ou une version future : ce qui est illisible redevient la valeur par défaut.
     @Test(arguments: [nil, "", "star", "symbol:", "symbol:Star", "symbol:star fill", "emoji:", "emoji:ab", "emoji:😀😀", "other:x"])
     func `unreadable stored icons fall back to the default`(stored: String?) {
-        #expect(FolderIcon(storedValue: stored) == .default)
+        #expect(SidebarIcon(storedValue: stored) == .default)
     }
 
     @Test func `hexadecimal colors`() {
@@ -86,12 +86,12 @@ struct FolderAppearanceTests {
     @MainActor
     @Test func `every folder symbol exists on this macOS`() {
         let names = SymbolChoice.folderIcons.map(\.name)
-        #expect(names.first == "folder")
+        #expect(names.first == SidebarIcon.defaultFolderSymbol)
         #expect(names.count >= 30)
         #expect(Set(names).count == names.count)
         for name in names {
             #expect(NSImage(systemSymbolName: name, accessibilityDescription: nil) != nil, "\(name)")
-            #expect(FolderIcon.isSymbolName(name), "\(name)")
+            #expect(SidebarIcon.isSymbolName(name), "\(name)")
         }
     }
 }

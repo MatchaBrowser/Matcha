@@ -4,7 +4,8 @@ import SwiftData
 
 /// Création, renommage et suppression des Spaces.
 extension BrowserSession {
-    /// Symboles proposés pour l'icône d'un Space.
+    /// Symboles donnés tour à tour aux nouveaux Spaces ; ce sont les premiers de leur grille d'icônes
+    /// (`SymbolChoice.spaceIcons`).
     static let spaceSymbols = [
         "circle.fill", "star.fill", "heart.fill", "bolt.fill", "leaf.fill", "moon.fill", "flame.fill", "briefcase.fill", "house.fill",
     ]
@@ -51,11 +52,6 @@ extension BrowserSession {
             return
         }
         space.record.name = trimmed
-        save(container.mainContext)
-    }
-
-    func setSymbol(_ symbol: String, of space: SpaceSession) {
-        space.record.symbol = symbol
         save(container.mainContext)
     }
 

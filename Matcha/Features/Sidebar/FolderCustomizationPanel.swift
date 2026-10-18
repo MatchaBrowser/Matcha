@@ -95,30 +95,17 @@ struct FolderCustomizationPanel: View {
             Text("Icon")
                 .font(.caption.weight(.medium))
                 .foregroundStyle(.secondary)
-            SymbolPickerGrid(symbols: SymbolChoice.folderIcons, selection: selectedSymbol, identifierPrefix: "folderSymbol") { name in
-                update { $0.icon = name == Self.defaultSymbol ? .default : .symbol(name) }
+            SymbolPickerGrid(
+                symbols: SymbolChoice.folderIcons,
+                selection: appearance.icon.selectedSymbol(defaultSymbol: SidebarIcon.defaultFolderSymbol),
+                identifierPrefix: "folderSymbol",
+            ) { name in
+                update { $0.icon = name == SidebarIcon.defaultFolderSymbol ? .default : .symbol(name) }
             }
-            FolderEmojiField(emoji: emoji, close: close) { chosen in
-                update { $0.icon = chosen.map(FolderIcon.emoji) ?? .default }
+            IconEmojiField(emoji: appearance.icon.emoji, identifierPrefix: "folderEmoji", close: close) { chosen in
+                update { $0.icon = chosen.map(SidebarIcon.emoji) ?? .default }
             }
         }
-    }
-
-    private static let defaultSymbol = "folder"
-
-    private var selectedSymbol: String? {
-        switch appearance.icon {
-        case .default: Self.defaultSymbol
-        case let .symbol(name): name
-        case .emoji: nil
-        }
-    }
-
-    private var emoji: String? {
-        if case let .emoji(emoji) = appearance.icon {
-            return emoji
-        }
-        return nil
     }
 
     private func update(_ change: (inout FolderAppearance) -> Void) {

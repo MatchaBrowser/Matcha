@@ -1,12 +1,12 @@
 import SwiftUI
 
 /// Pied de la barre latérale : une icône par Space et le bouton pour en créer un. Un clic affiche le
-/// Space ; sur le Space affiché, il ouvre l'éditeur de son thème. Menu contextuel : renommer, thème,
-/// icône, supprimer.
+/// Space ; sur le Space affiché, il ouvre son éditeur (icône et thème). Menu contextuel : renommer,
+/// thème, icône, supprimer.
 struct SpaceSwitcher: View {
     let model: WindowModel
 
-    @State private var editedTheme: SpaceSession?
+    @State private var editedSpace: SpaceSession?
     @State private var renamedSpace: SpaceSession?
     @State private var newName = ""
 
@@ -65,14 +65,12 @@ struct SpaceSwitcher: View {
         let isCurrent = space === model.space
         return Button {
             if isCurrent {
-                editedTheme = space
+                editedSpace = space
             } else {
                 withAnimation(.easeInOut(duration: 0.3)) { model.select(space) }
             }
         } label: {
-            Image(systemName: space.record.symbol)
-                .font(.system(size: isCurrent ? 11 : 9))
-                .foregroundStyle(isCurrent ? .primary : .secondary)
+            icon(of: space, isCurrent: isCurrent)
                 .frame(width: 24, height: 24)
                 .background(Circle().fill(Color.primary.opacity(isCurrent ? 0.12 : 0)))
                 .contentShape(Rectangle())
@@ -80,16 +78,45 @@ struct SpaceSwitcher: View {
         .buttonStyle(.plain)
         .help(model.session.profiles.count > 1 ? "\(space.record.name) — \(space.record.profile?.name ?? "")" : space.record.name)
         .accessibilityLabel("Space \(space.record.name)")
+        .accessibilityValue(iconSummary(of: space))
         .accessibilityAddTraits(isCurrent ? .isSelected : [])
         .accessibilityIdentifier("spaceButton")
         .contextMenu { menu(for: space) }
-        .popover(isPresented: Binding { editedTheme === space } set: {
+        .popover(isPresented: Binding { editedSpace === space } set: {
             if !$0 {
-                editedTheme = nil
+                editedSpace = nil
             }
         }, arrowEdge: .top) {
-            SpaceThemeEditor(theme: Binding { space.theme } set: { space.setTheme($0) })
+            SpaceEditor(space: space) { editedSpace = nil }
         }
+    }
+
+    /// Symbole gris (plus grand et au premier plan pour le Space affiché), ou emoji, qui garde ses couleurs et
+    /// s'atténue pour un autre Space.
+    private func icon(of space: SpaceSession, isCurrent: Bool) -> some View {
+        SidebarIconView(
+            icon: space.icon,
+            defaultSymbol: SidebarIcon.defaultSpaceSymbol,
+            tint: isCurrent ? .primary : .secondary,
+            size: isCurrent ? 11 : 9,
+            emojiSize: isCurrent ? 14 : 12,
+        )
+        .opacity(isCurrent || space.icon.emoji == nil ? 1 : 0.6)
+    }
+
+    /// En Debug, l'icône sous sa forme enregistrée (« symbol:star.fill », « emoji:🌿 »), pour les tests d'interface.
+    private func iconSummary(of space: SpaceSession) -> Text {
+        #if DEBUG
+            return Text(verbatim: space.icon.storedValue ?? "")
+        #else
+            return Text(verbatim: "")
+        #endif
+    }
+
+    /// Affiche le Space et ouvre son éditeur.
+    private func edit(_ space: SpaceSession) {
+        model.select(space)
+        editedSpace = space
     }
 
     @ViewBuilder private func menu(for space: SpaceSession) -> some View {
@@ -97,19 +124,8 @@ struct SpaceSwitcher: View {
             newName = space.record.name
             renamedSpace = space
         }
-        Button("Edit Theme…") {
-            model.select(space)
-            editedTheme = space
-        }
-        Menu("Icon") {
-            ForEach(BrowserSession.spaceSymbols, id: \.self) { symbol in
-                Button {
-                    model.session.setSymbol(symbol, of: space)
-                } label: {
-                    Label(symbol, systemImage: symbol)
-                }
-            }
-        }
+        Button("Edit Theme…") { edit(space) }
+        Button("Change Icon…") { edit(space) }
         Divider()
         Button("Delete Space") {
             withAnimation(.easeInOut(duration: 0.3)) { model.deleteSpace(space) }

@@ -47,7 +47,7 @@ Ou ⌘R dans Xcode.
 - [ ] Réglages > Profils : le nombre de Spaces d'un profil s'accorde (« 1 Space », « 2 Spaces »).
 - [ ] Message caméra et micro dans ta langue : dans le Terminal, lance `tccutil reset Camera com.matchabrowser.matcha` puis `tccutil reset Microphone com.matchabrowser.matcha`, et ouvre un site qui demande la caméra (par exemple webcamtests.com).
 - [ ] Remets Matcha en français (ou retire-la de la liste des Applications) quand tu as fini.
-- Connu, laissé tel quel : le sous-menu Icône d'un Space affiche les noms techniques des symboles (« circle.fill »…). C'était déjà le cas avant ; noté dans `DECISIONS.md`.
+- Réglé depuis (« Icônes des Spaces », plus bas) : le sous-menu Icône d'un Space, qui affichait les noms techniques des symboles (« circle.fill »…), est remplacé par « Changer l'icône… » et une grille aux noms traduits.
 
 ### 4.1 Barre de commande
 
@@ -413,3 +413,21 @@ En plus du plan : icône (symbole ou emoji) et couleurs du texte et du fond d'un
 - [ ] Facultatif, VoiceOver : le nom de chaque symbole et de chaque couleur, « Aucune couleur », « Couleur de texte personnalisée », « Fermer la personnalisation ».
 - [ ] Captures (vraie souris, ne touche à rien pendant ce temps) : `TEST_RUNNER_MATCHA_SCREENSHOT=1 TEST_RUNNER_MATCHA_SCREENSHOT_FOLDER=1 xcodebuild … test -only-testing:MatchaUITests/ScreenshotUITests` donne `37-dossier-panneau` et `38-dossier-personnalise` (en sombre : `TEST_RUNNER_MATCHA_SCREENSHOT_SETTINGS_VALUES=AppleInterfaceStyle=Dark`). Tests d'interface `FolderCustomizationUITests` : écrits mais pas encore lancés.
 - Connu : pas de défilement automatique vers le panneau s'il s'ouvre en bas de la barre (fais défiler) ; une seule couleur pour le clair et le sombre.
+
+### Icônes des Spaces
+
+En plus du plan : un symbole parmi 45, ou un emoji, pour l'icône d'un Space, comme pour les dossiers. Prépare deux Spaces (bouton + en bas de la barre).
+
+- [ ] Clic sur l'icône du Space affiché : la bulle s'ouvre avec le nom du Space, la section « Icône » (grille de symboles, champ emoji, « Emoji et symboles… »), puis « Thème » comme avant. Le symbole du Space est entouré. Rien ne déborde, et la bulle tient dans la fenêtre sans défiler (essaie aussi avec une fenêtre basse).
+- [ ] Survol d'un symbole : fond léger et bulle d'aide en français (« Cercle », « Montagnes », « Tasse à café »… regarde que les noms sont justes). Un clic : l'icône du Space change aussitôt en bas de la barre, le symbole est entouré.
+- [ ] Emoji : « Emoji et symboles… » ouvre le visualiseur de caractères de macOS ; double-clique un emoji : il arrive dans le champ et en bas de la barre, en couleurs, un peu plus grand qu'un symbole ; aucun symbole n'est plus entouré. Une lettre ou un chiffre sont refusés. Vide le champ : le cercle revient. Essaie un drapeau (🇫🇷), un emoji avec une couleur de peau (👍🏽) et ❤️.
+- [ ] Space non affiché avec un emoji : son emoji est plus petit et atténué ; affiche ce Space (clic ou ⌃2) : il reprend sa taille et son éclat, et le précédent s'atténue. Dis-moi si l'atténuation te va. Un symbole d'un Space non affiché reste gris comme avant.
+- [ ] Clic droit sur un Space : « Renommer… », « Modifier le thème… », « Changer l'icône… », « Supprimer le Space » ; plus de sous-menu « Icône » aux noms techniques. « Changer l'icône… » sur un Space non affiché : il s'affiche et sa bulle s'ouvre.
+- [ ] Échap dans le champ emoji ferme la bulle ; un clic à côté aussi.
+- [ ] Enregistrement : quitte Matcha (⌘Q) et relance : symboles et emoji retrouvés. Un nouveau Space reçoit toujours le symbole suivant de la liste habituelle (étoile, cœur, éclair…).
+- [ ] Mini-fenêtre (⌥⌘N) : le bouton « Ouvrir dans ‹Space› » montre l'emoji ou le symbole du Space affiché ; change l'icône du Space : le bouton suit.
+- [ ] Apparence claire et sombre (Réglages Système > Apparence) : symboles lisibles, emoji en couleurs.
+- [ ] Langues : « Changer l'icône… » en allemand « Symbol ändern … », en espagnol « Cambiar icono… », en italien « Cambia icona… » ; « Thème » : « Thema », « Tema », « Tema ».
+- [ ] Facultatif, VoiceOver : le nom de chaque symbole.
+- [ ] Captures (vraie souris, ne touche à rien pendant ce temps) : `TEST_RUNNER_MATCHA_SCREENSHOT=1 TEST_RUNNER_MATCHA_SCREENSHOT_THEME=Forêt xcodebuild … test -only-testing:MatchaUITests/ScreenshotUITests` donne `7-theme-editeur`, l'éditeur complet. Tests d'interface `SpaceIconUITests` : écrits mais pas encore lancés.
+- Connu : 45 symboles proposés, pas de recherche dans tous les symboles SF.

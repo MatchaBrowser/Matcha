@@ -532,7 +532,7 @@
       }
     },
     "Airplane" : {
-      "comment" : "Folder icon choice (SF Symbol)",
+      "comment" : "Icon choice (SF Symbol)",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -908,7 +908,7 @@
       }
     },
     "Book" : {
-      "comment" : "Folder icon choice (SF Symbol)",
+      "comment" : "Icon choice (SF Symbol)",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -937,7 +937,7 @@
       }
     },
     "Bookmark" : {
-      "comment" : "Folder icon choice (SF Symbol)",
+      "comment" : "Icon choice (SF Symbol)",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -966,7 +966,7 @@
       }
     },
     "Briefcase" : {
-      "comment" : "Folder icon choice (SF Symbol)",
+      "comment" : "Icon choice (SF Symbol)",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -990,6 +990,35 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Valigetta"
+          }
+        }
+      }
+    },
+    "Buildings" : {
+      "comment" : "Icon choice (SF Symbol): two office buildings",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gebäude"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Edificios"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Immeubles"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Edifici"
           }
         }
       }
@@ -1024,7 +1053,7 @@
       }
     },
     "Camera Icon" : {
-      "comment" : "Folder icon choice (SF Symbol): a photo camera. Distinct from the Camera website permission.",
+      "comment" : "Icon choice (SF Symbol): a photo camera. Distinct from the Camera website permission.",
       "extractionState" : "extracted_with_value",
       "localizations" : {
         "de" : {
@@ -1117,7 +1146,7 @@
       }
     },
     "Car" : {
-      "comment" : "Folder icon choice (SF Symbol)",
+      "comment" : "Icon choice (SF Symbol)",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -1141,6 +1170,35 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Auto"
+          }
+        }
+      }
+    },
+    "Change Icon…" : {
+      "comment" : "Space context menu: opens the Space editor on its icon section",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Symbol ändern …"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cambiar icono…"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Changer l'icône…"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cambia icona…"
           }
         }
       }
@@ -1175,7 +1233,7 @@
       }
     },
     "Chart" : {
-      "comment" : "Folder icon choice (SF Symbol): a bar chart",
+      "comment" : "Icon choice (SF Symbol): a bar chart",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -1204,7 +1262,7 @@
       }
     },
     "Choose an emoji in the Character Viewer" : {
-      "comment" : "Help tag of the Emoji & Symbols button of the folder customization panel",
+      "comment" : "Help tag of the Emoji & Symbols button (folder customization panel, Space editor)",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -1228,6 +1286,35 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Scegli un’emoji nel Visore caratteri"
+          }
+        }
+      }
+    },
+    "Circle" : {
+      "comment" : "Icon choice (SF Symbol)",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kreis"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Círculo"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cercle"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cerchio"
           }
         }
       }
@@ -1792,6 +1879,64 @@
         }
       }
     },
+    "Cloud" : {
+      "comment" : "Icon choice (SF Symbol)",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wolke"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nube"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nuage"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nuvola"
+          }
+        }
+      }
+    },
+    "Coffee Cup" : {
+      "comment" : "Icon choice (SF Symbol): a cup on a saucer",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kaffeetasse"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Taza de café"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tasse à café"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tazza da caffè"
+          }
+        }
+      }
+    },
     "Color %lld" : {
       "comment" : "Accessibility label of a theme color picker; the number is the color's position",
       "localizations" : {
@@ -1851,7 +1996,7 @@
       }
     },
     "Conversation" : {
-      "comment" : "Folder icon choice (SF Symbol): two speech bubbles",
+      "comment" : "Icon choice (SF Symbol): two speech bubbles",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -2023,7 +2168,7 @@
       }
     },
     "Credit Card" : {
-      "comment" : "Folder icon choice (SF Symbol)",
+      "comment" : "Icon choice (SF Symbol)",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -2487,7 +2632,7 @@
       }
     },
     "Document" : {
-      "comment" : "Folder icon choice (SF Symbol)",
+      "comment" : "Icon choice (SF Symbol)",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -2659,6 +2804,35 @@
         }
       }
     },
+    "Dumbbell" : {
+      "comment" : "Icon choice (SF Symbol)",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hantel"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mancuerna"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Haltère"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Manubrio"
+          }
+        }
+      }
+    },
     "Duplicate Tab" : {
       "comment" : "Tab context menu",
       "localizations" : {
@@ -2775,7 +2949,7 @@
       }
     },
     "Emoji" : {
-      "comment" : "Folder customization: field that takes one emoji as the folder icon",
+      "comment" : "Icon of a folder or a Space: field that takes one emoji as the icon",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -2804,7 +2978,7 @@
       }
     },
     "Emoji & Symbols…" : {
-      "comment" : "Folder customization panel: button that opens the system Character Viewer (same name as the Edit menu item of macOS)",
+      "comment" : "Folder customization panel and Space editor: button that opens the system Character Viewer (same name as the Edit menu item of macOS)",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -2949,7 +3123,7 @@
       }
     },
     "Filled Folder" : {
-      "comment" : "Folder icon choice (SF Symbol)",
+      "comment" : "Icon choice (SF Symbol)",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -2978,7 +3152,7 @@
       }
     },
     "Film" : {
-      "comment" : "Folder icon choice (SF Symbol)",
+      "comment" : "Icon choice (SF Symbol)",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -3152,7 +3326,7 @@
       }
     },
     "Flag" : {
-      "comment" : "Folder icon choice (SF Symbol)",
+      "comment" : "Icon choice (SF Symbol)",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -3181,7 +3355,7 @@
       }
     },
     "Flame" : {
-      "comment" : "Folder icon choice (SF Symbol)",
+      "comment" : "Icon choice (SF Symbol)",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -3210,7 +3384,7 @@
       }
     },
     "Folder" : {
-      "comment" : "Folder icon choice (SF Symbol)",
+      "comment" : "Icon choice (SF Symbol)",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -3325,6 +3499,35 @@
         }
       }
     },
+    "Fork and Knife" : {
+      "comment" : "Icon choice (SF Symbol)",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Messer und Gabel"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tenedor y cuchillo"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fourchette et couteau"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Forchetta e coltello"
+          }
+        }
+      }
+    },
     "Forward" : {
       "comment" : "Menu item and toolbar button: go to the next page",
       "localizations" : {
@@ -3383,7 +3586,7 @@
       }
     },
     "Game Controller" : {
-      "comment" : "Folder icon choice (SF Symbol)",
+      "comment" : "Icon choice (SF Symbol)",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -3440,8 +3643,37 @@
         }
       }
     },
+    "Gift" : {
+      "comment" : "Icon choice (SF Symbol)",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Geschenk"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Regalo"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cadeau"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Regalo"
+          }
+        }
+      }
+    },
     "Globe" : {
-      "comment" : "Folder icon choice (SF Symbol)",
+      "comment" : "Icon choice (SF Symbol)",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -3470,7 +3702,7 @@
       }
     },
     "Graduation Cap" : {
-      "comment" : "Folder icon choice (SF Symbol)",
+      "comment" : "Icon choice (SF Symbol)",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -3586,7 +3818,7 @@
       }
     },
     "Hammer" : {
-      "comment" : "Folder icon choice (SF Symbol)",
+      "comment" : "Icon choice (SF Symbol)",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -3615,7 +3847,7 @@
       }
     },
     "Heart" : {
-      "comment" : "Folder icon choice (SF Symbol)",
+      "comment" : "Icon choice (SF Symbol)",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -3825,7 +4057,7 @@
       }
     },
     "House" : {
-      "comment" : "Folder icon choice (SF Symbol)",
+      "comment" : "Icon choice (SF Symbol)",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -3854,7 +4086,7 @@
       }
     },
     "Icon" : {
-      "comment" : "Space context menu: submenu of the Space icons; folder customization panel: title of the icon section",
+      "comment" : "Folder customization panel and Space editor: title of the icon section",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -4027,7 +4259,7 @@
       }
     },
     "Laptop" : {
-      "comment" : "Folder icon choice (SF Symbol)",
+      "comment" : "Icon choice (SF Symbol)",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -4085,7 +4317,7 @@
       }
     },
     "Leaf" : {
-      "comment" : "Folder icon choice (SF Symbol)",
+      "comment" : "Icon choice (SF Symbol)",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -4142,8 +4374,37 @@
         }
       }
     },
+    "Light Bulb" : {
+      "comment" : "Icon choice (SF Symbol)",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Glühbirne"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bombilla"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ampoule"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lampadina"
+          }
+        }
+      }
+    },
     "Lightning Bolt" : {
-      "comment" : "Folder icon choice (SF Symbol)",
+      "comment" : "Icon choice (SF Symbol)",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -4285,6 +4546,64 @@
         }
       }
     },
+    "Moon" : {
+      "comment" : "Icon choice (SF Symbol)",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mond"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Luna"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lune"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Luna"
+          }
+        }
+      }
+    },
+    "Mountains" : {
+      "comment" : "Icon choice (SF Symbol)",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Berge"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Montañas"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Montagnes"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Montagne"
+          }
+        }
+      }
+    },
     "Move to Space" : {
       "comment" : "Tab context menu: submenu listing the other Spaces",
       "localizations" : {
@@ -4315,7 +4634,7 @@
       }
     },
     "Music" : {
-      "comment" : "Folder icon choice (SF Symbol)",
+      "comment" : "Icon choice (SF Symbol)",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -5413,7 +5732,7 @@
       }
     },
     "Paintbrush" : {
-      "comment" : "Folder icon choice (SF Symbol)",
+      "comment" : "Icon choice (SF Symbol)",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -5499,6 +5818,35 @@
         }
       }
     },
+    "Paw Print" : {
+      "comment" : "Icon choice (SF Symbol)",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pfotenabdruck"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Huella de pata"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Empreinte de patte"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Impronta di zampa"
+          }
+        }
+      }
+    },
     "Peek" : {
       "comment" : "Accessibility label of the floating preview opened by Shift-clicking a link",
       "localizations" : {
@@ -5529,7 +5877,7 @@
       }
     },
     "People" : {
-      "comment" : "Folder icon choice (SF Symbol)",
+      "comment" : "Icon choice (SF Symbol)",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -5586,6 +5934,35 @@
         }
       }
     },
+    "Person" : {
+      "comment" : "Icon choice (SF Symbol)",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Person"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Persona"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Personne"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Persona"
+          }
+        }
+      }
+    },
     "Personal" : {
       "comment" : "Name of the profile created at first launch",
       "localizations" : {
@@ -5616,7 +5993,7 @@
       }
     },
     "Photo" : {
-      "comment" : "Folder icon choice (SF Symbol)",
+      "comment" : "Icon choice (SF Symbol)",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -6104,6 +6481,35 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Viola"
+          }
+        }
+      }
+    },
+    "Puzzle Piece" : {
+      "comment" : "Icon choice (SF Symbol)",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Puzzleteil"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pieza de puzle"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pièce de puzzle"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pezzo di puzzle"
           }
         }
       }
@@ -6861,7 +7267,7 @@
       }
     },
     "Shopping Bag" : {
-      "comment" : "Folder icon choice (SF Symbol)",
+      "comment" : "Icon choice (SF Symbol)",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -6890,7 +7296,7 @@
       }
     },
     "Shopping Cart" : {
-      "comment" : "Folder icon choice (SF Symbol)",
+      "comment" : "Icon choice (SF Symbol)",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -7350,35 +7756,6 @@
         }
       }
     },
-    "Space Theme" : {
-      "comment" : "Title of the Space theme editor popover",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Space-Thema"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Tema del Space"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Thème du Space"
-          }
-        },
-        "it" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Tema dello Space"
-          }
-        }
-      }
-    },
     "Spaces" : {
       "comment" : "Menu bar menu listing the Spaces",
       "localizations" : {
@@ -7409,7 +7786,7 @@
       }
     },
     "Sparkles" : {
-      "comment" : "Folder icon choice (SF Symbol)",
+      "comment" : "Icon choice (SF Symbol)",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -7467,7 +7844,7 @@
       }
     },
     "Star" : {
-      "comment" : "Folder icon choice (SF Symbol)",
+      "comment" : "Icon choice (SF Symbol)",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -7520,6 +7897,35 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Interrompi"
+          }
+        }
+      }
+    },
+    "Sun" : {
+      "comment" : "Icon choice (SF Symbol)",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sonne"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sol"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Soleil"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sole"
           }
         }
       }
@@ -7670,7 +8076,7 @@
       }
     },
     "Terminal" : {
-      "comment" : "Folder icon choice (SF Symbol)",
+      "comment" : "Icon choice (SF Symbol)",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -7809,6 +8215,35 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Impossibile esportare la pagina come PDF."
+          }
+        }
+      }
+    },
+    "Theme" : {
+      "comment" : "Space editor: title of the theme section",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Thema"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tema"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Thème"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tema"
           }
         }
       }
@@ -7959,7 +8394,7 @@
       }
     },
     "Tools" : {
-      "comment" : "Folder icon choice (SF Symbol): a wrench and a screwdriver",
+      "comment" : "Icon choice (SF Symbol): a wrench and a screwdriver",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -7988,7 +8423,7 @@
       }
     },
     "Tray" : {
-      "comment" : "Folder icon choice (SF Symbol): an inbox tray",
+      "comment" : "Icon choice (SF Symbol): an inbox tray",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -8012,6 +8447,35 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Vassoio"
+          }
+        }
+      }
+    },
+    "Tree" : {
+      "comment" : "Icon choice (SF Symbol)",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Baum"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Árbol"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Arbre"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Albero"
           }
         }
       }
@@ -8046,7 +8510,7 @@
       }
     },
     "Type or paste one emoji" : {
-      "comment" : "Help tag of the emoji field of the folder customization panel",
+      "comment" : "Help tag of the emoji field (folder customization panel, Space editor)",
       "localizations" : {
         "de" : {
           "stringUnit" : {

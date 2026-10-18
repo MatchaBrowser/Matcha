@@ -1,7 +1,7 @@
 import Foundation
 
-/// Emoji d'icône d'un dossier : un seul caractère (graphème), qui s'affiche en emoji.
-nonisolated enum FolderEmoji {
+/// Emoji d'une icône de dossier ou de Space (`SidebarIcon`) : un seul caractère (graphème), qui s'affiche en emoji.
+nonisolated enum IconEmoji {
     /// `text` sans les espaces autour, s'il est exactement un emoji ; sinon nil (vide, plusieurs caractères, lettre…).
     static func validated(_ text: String) -> String? {
         let trimmed = text.trimmingCharacters(in: .whitespacesAndNewlines)
