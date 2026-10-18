@@ -7,10 +7,11 @@ import WebKit
 ///   par WebKit (`window.opener` reste valable), même profil ;
 /// - `window.open` avec une taille (fenêtre de connexion, tâche 5.8) : une petite fenêtre au-dessus de la
 ///   mini-fenêtre (`PopupWindowManager` de la session principale) ;
-/// - ⌘-clic, clic du milieu, ⇧⌘-clic : un onglet en arrière-plan dans le Space visé, la fenêtre principale ne
-///   passe pas devant ; sans Space de ce profil, une nouvelle mini-fenêtre (jamais les cookies d'un autre profil) ;
+/// - ⌘-clic, clic du milieu, ⇧⌘-clic, « … dans un nouvel onglet » du menu contextuel (tâche 5.9) : un onglet en
+///   arrière-plan dans le Space visé, la fenêtre principale ne passe pas devant ; sans Space de ce profil, une
+///   nouvelle mini-fenêtre (jamais les cookies d'un autre profil) ;
 /// - `window.close()` : la mini-fenêtre se ferme ;
-/// - pas d'aperçu : un Maj+clic reste un clic (`NavigationSource.other`) ;
+/// - pas d'aperçu : un Maj+clic reste un clic (`NavigationSource.other`), pas de « Ouvrir dans un aperçu » ;
 /// - téléchargements : dans la liste de la fenêtre principale ;
 /// - permissions des sites : décisions du profil de la mini-fenêtre, bandeau dans sa page ;
 /// - historique : visites retenues pour le profil de la mini-fenêtre, sans Space ;
@@ -54,9 +55,18 @@ extension MiniWindowManager: TabHost {
         Logger.miniWindow.info("Lien d'une mini-fenêtre ouvert en arrière-plan dans un Space")
     }
 
-    func openWindow(configuration: WKWebViewConfiguration, from webView: WKWebView) -> WKWebView? {
+    /// Une nouvelle mini-fenêtre. En arrière-plan (menu contextuel, tâche 5.9) : un onglet en arrière-plan du Space
+    /// visé, comme ⌘-clic ; sans Space de ce profil, une mini-fenêtre tout de même.
+    func openWindow(configuration: WKWebViewConfiguration, from webView: WKWebView, inBackground: Bool) -> WKWebView? {
         let opener = window(for: webView)
         let profileID = opener?.profileID ?? displayedSpace.record.profile?.id
+        if inBackground {
+            let space = defaultTarget(profileID: profileID)
+            if space.record.profile?.id == profileID {
+                Logger.miniWindow.info("Lien d'une mini-fenêtre ouvert en arrière-plan dans un Space")
+                return space.tabManager.insertTab(configuration: configuration, after: nil, select: false).makeWebViewIfNeeded()
+            }
+        }
         let controller = show(BrowserTab(configuration: configuration, openerID: opener?.tab.id), profileID: profileID)
         let newWebView = controller.tab.makeWebViewIfNeeded()
         controller.showWebView()

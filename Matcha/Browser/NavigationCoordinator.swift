@@ -5,9 +5,10 @@ import WebKit
 /// Délégué de navigation et d'interface des vues web d'un `TabHost` (les onglets d'un Space et leur aperçu, les
 /// mini-fenêtres ou les fenêtres de connexion) : nouvelles fenêtres, fenêtres de connexion (`PopupWindowManager`),
 /// fermeture par la page, liens vers d'autres apps, clics avec modificateur, aperçu (Peek), téléchargements,
-/// permissions des sites (`+Permissions`), historique (`+History`), arrêt du processus d'une page (`+Crash`). Les
-/// règles viennent de `NavigationPolicy`, `PopupWindowFeatures`, `DownloadPolicy`, `SitePermissionPolicy` et
-/// `PageCrashPolicy` ; l'hôte décide où vont les pages.
+/// permissions des sites (`+Permissions`), historique (`+History`), arrêt du processus d'une page (`+Crash`), menu
+/// contextuel des pages (`+PageMenu`). Les règles viennent de `NavigationPolicy`, `PopupWindowFeatures`,
+/// `DownloadPolicy`, `SitePermissionPolicy`, `PageCrashPolicy` et `PendingPageMenuIntent` ; l'hôte décide où vont les
+/// pages.
 @MainActor
 final class NavigationCoordinator: NSObject {
     weak var tabHost: (any TabHost)?
@@ -41,24 +42,15 @@ final class NavigationCoordinator: NSObject {
         )
     }
 
-    /// Point d'où l'aperçu grandit : le pointeur, en fractions de la vue web d'origine (origine en haut à gauche).
-    private static func pointerPoint(in webView: WKWebView) -> CGPoint {
-        guard let window = webView.window else {
-            return PeekLayout.center
-        }
-        let point = webView.convert(window.convertPoint(fromScreen: NSEvent.mouseLocation), from: nil)
-        return PeekLayout.fraction(of: point, in: webView.bounds.size, flipped: webView.isFlipped)
-    }
-
     /// Vrai si WebKit charge lui-même ce schéma ou si la configuration de la vue lui associe un gestionnaire.
-    private func handles(_ url: URL, in webView: WKWebView) -> Bool {
+    func handles(_ url: URL, in webView: WKWebView) -> Bool {
         guard let scheme = url.scheme?.lowercased() else {
             return true
         }
         return WKWebView.handlesURLScheme(scheme) || webView.configuration.urlSchemeHandler(forURLScheme: scheme) != nil
     }
 
-    private func open(externally url: URL) {
+    func open(externally url: URL) {
         let scheme = url.scheme ?? "?"
         if openExternally(url) {
             Logger.browser.info("Lien \(scheme, privacy: .public): confié à une autre app")
@@ -81,7 +73,7 @@ final class NavigationCoordinator: NSObject {
 
     /// Lien à ouvrir dans l'aperçu : refusé (le lien suit son cours) si l'hôte ne peut pas l'ouvrir.
     private func openInPeek(_ url: URL, from webView: WKWebView, decisionHandler: @MainActor @Sendable (WKNavigationActionPolicy) -> Void) {
-        guard let tabHost, tabHost.openInPeek(url, from: webView, openingPoint: Self.pointerPoint(in: webView)) else {
+        guard let tabHost, tabHost.openInPeek(url, from: webView, openingPoint: webView.pointerPeekPoint) else {
             decisionHandler(.allow)
             return
         }
@@ -165,7 +157,7 @@ extension NavigationCoordinator: WKUIDelegate {
     /// fournie, sans quoi `window.opener` ne fonctionne pas. WebKit y charge ensuite la requête. Une fenêtre dont la
     /// page donne la taille (connexion Google, Apple, banque) s'ouvre dans sa propre petite fenêtre (tâche 5.8), même
     /// depuis un aperçu (qui reste un aperçu) ou une mini-fenêtre ; sinon, l'hôte en fait un onglet (ou une
-    /// mini-fenêtre).
+    /// mini-fenêtre). Une fenêtre ouverte pour un choix du menu contextuel (tâche 5.9) suit ce choix (`+PageMenu`).
     func webView(
         _ webView: WKWebView,
         createWebViewWith configuration: WKWebViewConfiguration,
@@ -176,8 +168,11 @@ extension NavigationCoordinator: WKUIDelegate {
             return nil
         }
         let features = PopupWindowFeatures(windowFeatures)
+        if let intent = takePageMenuIntent(of: webView, for: navigationAction, features: features) {
+            return openWindow(for: intent, configuration: configuration, url: navigationAction.request.url, from: webView, in: tabHost)
+        }
         guard features.opensPopupWindow, let popupWindows = tabHost.popupWindows else {
-            return tabHost.openWindow(configuration: configuration, from: webView)
+            return tabHost.openWindow(configuration: configuration, from: webView, inBackground: false)
         }
         // Jamais l'adresse : l'hôte seulement.
         let host = navigationAction.request.url?.host() ?? "?"

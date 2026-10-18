@@ -28,8 +28,12 @@ extension TabManager: TabHost {
 
     /// Fenêtre sans taille ouverte par l'aperçu : il devient d'abord un onglet, pour que `window.opener` reste
     /// valable. Une fenêtre de connexion (taille donnée, tâche 5.8) va dans sa propre fenêtre et l'aperçu reste un
-    /// aperçu (`NavigationCoordinator`).
-    func openWindow(configuration: WKWebViewConfiguration, from webView: WKWebView) -> WKWebView? {
+    /// aperçu (`NavigationCoordinator`). En arrière-plan (menu contextuel, tâche 5.9) : après l'onglet d'origine,
+    /// ou celui de l'aperçu, qui reste un aperçu.
+    func openWindow(configuration: WKWebViewConfiguration, from webView: WKWebView, inBackground: Bool) -> WKWebView? {
+        if inBackground {
+            return insertTab(configuration: configuration, after: insertionAnchor(for: webView), select: false).makeWebViewIfNeeded()
+        }
         let opener = tab(for: webView) ?? (isPeek(webView) ? openPeekAsTab() : nil)
         return insertTab(configuration: configuration, after: opener, select: true).makeWebViewIfNeeded()
     }

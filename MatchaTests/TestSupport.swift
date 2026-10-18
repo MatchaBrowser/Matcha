@@ -54,7 +54,7 @@ func waitUntil(timeout: Duration = .seconds(10), line: Int = #line, _ condition:
 
 /// Sert des pages HTML locales sous le schéma `obtest:`, pour tester la navigation sans réseau.
 /// `obtest://pages/<nom>` renvoie une page dont le titre est `<nom>` ; le paramètre `body`
-/// fournit le contenu HTML du corps.
+/// fournit le contenu HTML du corps. Un nom en `.svg` renvoie une image (un carré bleu de 400 points).
 @MainActor
 final class TestPages: NSObject, WKURLSchemeHandler {
     static let scheme = "obtest"
@@ -82,10 +82,14 @@ final class TestPages: NSObject, WKURLSchemeHandler {
         let components = URLComponents(url: url, resolvingAgainstBaseURL: false)
         let title = url.lastPathComponent
         let body = components?.queryItems?.first { $0.name == "body" }?.value ?? ""
-        let html = "<!doctype html><html><head><title>\(title)</title></head><body>\(body)</body></html>"
-        let response = URLResponse(url: url, mimeType: "text/html", expectedContentLength: -1, textEncodingName: "utf-8")
+        let isImage = url.pathExtension == "svg"
+        let content = isImage
+            ? "<svg xmlns='http://www.w3.org/2000/svg' width='400' height='400'><rect width='400' height='400' fill='blue'/></svg>"
+            : "<!doctype html><html><head><title>\(title)</title></head><body>\(body)</body></html>"
+        let mimeType = isImage ? "image/svg+xml" : "text/html"
+        let response = URLResponse(url: url, mimeType: mimeType, expectedContentLength: -1, textEncodingName: "utf-8")
         urlSchemeTask.didReceive(response)
-        urlSchemeTask.didReceive(Data(html.utf8))
+        urlSchemeTask.didReceive(Data(content.utf8))
         urlSchemeTask.didFinish()
     }
 

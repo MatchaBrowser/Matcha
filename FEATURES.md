@@ -74,3 +74,11 @@ Fonctions livrées avec une limite, faute d'API publique ou par choix de simplic
 - **Position demandée ignorée** : la fenêtre est centrée sur sa fenêtre d'origine. Sans le délégué privé de WebKit, la page lit `screenX`, `outerWidth` et `outerHeight` à 0 et ne peut pas calculer une position juste ; `window.moveTo` et `window.resizeTo` sont sans effet (vérifié).
 - **Menus de page** (⌘R, ⌘F, ⌘P, zoom, ⌘[ et ⌘]) : sans effet dans une fenêtre de connexion (ils visent la fenêtre de navigation ou la mini-fenêtre). Le glissement à deux doigts revient en arrière. Dans le menu Fichier, ⌘W s'appelle encore « Fermer l'onglet » quand elle est au premier plan (il la ferme bien). Piste : suivre la fenêtre de connexion active comme la mini-fenêtre active (`FrontPage`).
 - **Ouverte depuis un aperçu** : si l'aperçu se ferme pendant la connexion (clic à côté de lui dans la fenêtre, autre onglet, ⌘T), sa page disparaît et la connexion ne peut plus la prévenir. Piste : garder l'aperçu ouvert tant qu'il a une fenêtre de connexion.
+
+### Menu contextuel des pages (5.9)
+
+- **Identifiants non documentés** : les éléments de WebKit sont reconnus par des identifiants absents des en-têtes publics ; si une version de macOS les change, le menu reste celui de WebKit (« … dans une nouvelle fenêtre » ouvre un onglet au premier plan) et `PageMenuIntegrationTests` échoue. Piste : une API publique de menu contextuel pour macOS, si WebKit en publie une.
+- **Vidéo, audio, cadre** : « Ouvrir la vidéo (l'audio, le cadre) dans une nouvelle fenêtre » restent ceux de WebKit et ouvrent un onglet au premier plan. Piste : les remplacer comme le lien et l'image (titres vidéo et audio à distinguer).
+- **`window.open` simultané** : une fenêtre ouverte par la page dans les quelques millisecondes entre le choix et la fenêtre de WebKit prend le choix à sa place. Aucune information publique ne distingue les deux.
+- **« Ouvrir dans un aperçu »** charge l'adresse sans `Referer`, comme Maj+clic.
+- **« Ouvrir le lien en split »** : renvoyé de la 4.3 vers la 5.9 (`DECISIONS.md`), absent du texte de la 5.9 ; pas fait. À décider avec toi.

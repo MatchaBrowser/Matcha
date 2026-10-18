@@ -21,11 +21,20 @@ protocol SidebarItemDropTarget: AnyObject {
 /// Un élément glissé depuis la barre n'atteint jamais la page : le glisser de SwiftUI porte aussi des promesses
 /// de fichier, pour lesquelles WebKit est inscrit, si bien que la page recevrait tout glisser qui la survole.
 /// Ceux qui portent le type privé de la barre vont à `sidebarDropTarget`, ou sont refusés.
+///
+/// Menu contextuel de la page (tâche 5.9) : `BrowserWebView+PageMenu`.
 final class BrowserWebView: WKWebView {
     static let sidebarItemType = NSPasteboard.PasteboardType(UTType.matchaSidebarItem.identifier)
 
     /// Destinataire des éléments de la barre lâchés sur cette page ; nil : refusés.
     weak var sidebarDropTarget: (any SidebarItemDropTarget)?
+    /// Choix du menu contextuel en attente de la fenêtre que WebKit ouvre pour lui, lu par `NavigationCoordinator`.
+    var pageMenuIntent = PendingPageMenuIntent()
+
+    override func willOpenMenu(_ menu: NSMenu, with event: NSEvent) {
+        super.willOpenMenu(menu, with: event)
+        rewritePageMenu(menu)
+    }
 
     override func draggingEntered(_ sender: any NSDraggingInfo) -> NSDragOperation {
         guard Self.carriesSidebarItem(sender) else {

@@ -4,10 +4,11 @@ import WebKit
 /// Les pages des fenêtres de connexion vues par le délégué de navigation (`NavigationCoordinator`) :
 /// - permissions des sites et historique : ceux de la page d'origine (son profil ; rien en fenêtre privée) ;
 /// - téléchargements : dans la liste de la session ; une fenêtre qui n'a rien affiché avant de télécharger se ferme ;
-/// - ⌘-clic, clic du milieu, `target=_blank`, `window.open` sans taille : comme depuis la page d'origine (onglet de sa
-///   fenêtre, ou mini-fenêtre), tant qu'elle est ouverte ; sinon une autre fenêtre de connexion, du même profil ;
+/// - ⌘-clic, clic du milieu, `target=_blank`, `window.open` sans taille, « … dans un nouvel onglet » du menu
+///   contextuel (tâche 5.9) : comme depuis la page d'origine (onglet de sa fenêtre, ou mini-fenêtre), tant qu'elle
+///   est ouverte ; sinon une autre fenêtre de connexion, du même profil ;
 /// - `window.open` avec une taille : une autre fenêtre de connexion, au-dessus de celle-ci (`NavigationCoordinator`) ;
-/// - pas d'aperçu : un Maj+clic reste un clic (`NavigationSource.other`) ;
+/// - pas d'aperçu : un Maj+clic reste un clic (`NavigationSource.other`), pas de « Ouvrir dans un aperçu » ;
 /// - `window.close()` : la fenêtre se ferme ;
 /// - processus de la page arrêté (tâche 5.7) : la page est visible tant que sa fenêtre est ouverte, elle se recharge.
 extension PopupWindowManager: TabHost {
@@ -35,12 +36,12 @@ extension PopupWindowManager: TabHost {
         show(tab, features: PopupWindowFeatures(), opener: PopupOpener(host: self, webView: webView)).tab.load(url)
     }
 
-    func openWindow(configuration: WKWebViewConfiguration, from webView: WKWebView) -> WKWebView? {
+    func openWindow(configuration: WKWebViewConfiguration, from webView: WKWebView, inBackground: Bool) -> WKWebView? {
         guard let controller = window(for: webView) else {
             return nil
         }
         if let source = controller.opener.liveSource {
-            return source.host.openWindow(configuration: configuration, from: source.webView)
+            return source.host.openWindow(configuration: configuration, from: source.webView, inBackground: inBackground)
         }
         return open(configuration: configuration, features: PopupWindowFeatures(), opener: PopupOpener(host: self, webView: webView))
     }

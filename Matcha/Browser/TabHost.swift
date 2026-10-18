@@ -20,7 +20,9 @@ protocol TabHost: AnyObject {
     func openLink(_ url: URL, configuration: WKWebViewConfiguration, from webView: WKWebView, inBackground: Bool)
     /// `target=_blank`, `window.open` sans taille : une vue créée avec `configuration` telle quelle, sans quoi
     /// `window.opener` ne fonctionne pas ; nil refuse la fenêtre. Avec une taille, `popupWindows` la reçoit.
-    func openWindow(configuration: WKWebViewConfiguration, from webView: WKWebView) -> WKWebView?
+    /// `inBackground` : « Ouvrir … dans un nouvel onglet » du menu contextuel (tâche 5.9), un onglet en arrière-plan
+    /// placé comme celui d'un ⌘-clic (`openLink`).
+    func openWindow(configuration: WKWebViewConfiguration, from webView: WKWebView, inBackground: Bool) -> WKWebView?
     /// Fenêtres de connexion de la session (tâche 5.8) : une page qui ouvre une fenêtre en donnant sa taille l'obtient
     /// dans sa propre petite fenêtre ; nil (tests) : un onglet, comme sans taille.
     var popupWindows: PopupWindowManager? { get }

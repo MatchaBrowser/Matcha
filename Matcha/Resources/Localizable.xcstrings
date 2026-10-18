@@ -3695,6 +3695,93 @@
         }
       }
     },
+    "Open Image in New Tab" : {
+      "comment" : "Context menu of an image in a web page",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bild in neuem Tab öffnen"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Abrir imagen en una pestaña nueva"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ouvrir l'image dans un nouvel onglet"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Apri immagine in un nuovo pannello"
+          }
+        }
+      }
+    },
+    "Open Link in New Tab" : {
+      "comment" : "Context menu of a link in a web page",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Link in neuem Tab öffnen"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Abrir enlace en una pestaña nueva"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ouvrir le lien dans un nouvel onglet"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Apri link in un nuovo pannello"
+          }
+        }
+      }
+    },
+    "Open Link in Peek" : {
+      "comment" : "Context menu of a link in a web page: opens it in Peek, over the page",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Link in der Vorschau öffnen"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Abrir enlace en una vista previa"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ouvrir dans un aperçu"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Apri link in anteprima"
+          }
+        }
+      }
+    },
     "Open Location…" : {
       "comment" : "File menu: puts the focus in the address bar (⌘L)",
       "localizations" : {
