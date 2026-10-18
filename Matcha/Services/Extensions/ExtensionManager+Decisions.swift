@@ -7,6 +7,7 @@ extension ExtensionManager {
     /// Ouvre (ou ferme) les fenêtres privées à l'extension `identifier` : choix de l'utilisateur seulement (tâche 6.4) ;
     /// retenu, et appliqué tout de suite si elle est chargée.
     func setAccessToPrivateData(_ isAllowed: Bool, identifier: String) {
+        defer { buttonsDidChange() }
         if let context = contexts[identifier] {
             context.hasAccessToPrivateData = isAllowed
             saveState(of: context, identifier: identifier)
@@ -34,10 +35,13 @@ extension ExtensionManager {
         }
     }
 
-    /// État retenu de `context` : ses décisions actuelles, et l'emplacement de son `.appex` s'il vient d'une app.
+    /// État retenu de `context` : ses décisions actuelles, l'emplacement de son `.appex` s'il vient d'une app et
+    /// l'affichage de son bouton.
     func state(of context: WKWebExtensionContext, identifier: String, isEnabled: Bool) -> ExtensionState {
         var state = ExtensionState(context: context, isEnabled: isEnabled)
-        state.appExtensionPath = store.state(for: identifier)?.appExtensionPath
+        let stored = store.state(for: identifier)
+        state.appExtensionPath = stored?.appExtensionPath
+        state.showsButton = stored?.showsButton
         return state
     }
 

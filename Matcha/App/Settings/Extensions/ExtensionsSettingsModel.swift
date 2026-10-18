@@ -22,6 +22,8 @@ final class ExtensionsSettingsModel {
         let isEnabled: Bool
         let hasOptionsPage: Bool
         let allowsPrivateWindows: Bool
+        /// Bouton près de l'adresse affiché (tâche 6.5).
+        let showsButton: Bool
     }
 
     let manager: ExtensionManager
@@ -145,6 +147,11 @@ final class ExtensionsSettingsModel {
         revision += 1
     }
 
+    func setShowsButton(_ shows: Bool, for identifier: String) {
+        manager.setShowsButton(shows, identifier: identifier)
+        revision += 1
+    }
+
     func openOptions(of identifier: String) {
         manager.openOptionsPage(identifier: identifier)
     }
@@ -169,6 +176,7 @@ final class ExtensionsSettingsModel {
             isEnabled: manager.isEnabled(identifier),
             hasOptionsPage: manager.contexts[identifier]?.optionsPageURL != nil,
             allowsPrivateWindows: state?.hasAccessToPrivateData ?? false,
+            showsButton: manager.showsButton(identifier),
         )
     }
 

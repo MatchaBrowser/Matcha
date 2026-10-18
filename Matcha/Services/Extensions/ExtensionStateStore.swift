@@ -18,6 +18,8 @@ nonisolated struct ExtensionState: Codable, Equatable, Sendable {
     /// Extension Safari d'une app (tâche 6.4) : chemin de son `.appex`, chargé sur place ; nil pour une extension copiée
     /// dans le dossier des extensions.
     var appExtensionPath: String?
+    /// Bouton près de l'adresse (tâche 6.5) : faux s'il est masqué ; nil (par défaut) : affiché.
+    var showsButton: Bool?
 
     /// Sans les décisions expirées à `date`.
     func removingExpired(at date: Date) -> ExtensionState {

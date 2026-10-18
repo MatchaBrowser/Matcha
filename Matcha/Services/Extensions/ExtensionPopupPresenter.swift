@@ -2,8 +2,8 @@ import AppKit
 import WebKit
 
 /// Bulle d'une action d'extension (tâche 6.3) : la bulle toute prête de WebKit (`WKWebExtension.Action.popupPopover`,
-/// vue web de la popup qui prend la taille de sa page ; la fermer libère la page). La tâche 6.5 l'ancrera au bouton de
-/// l'extension (`anchor`) ; en attendant, au coin haut droit du contenu de la fenêtre.
+/// vue web de la popup qui prend la taille de sa page ; la fermer libère la page), ancrée au bouton de l'extension
+/// (`anchor`, tâche 6.5), sinon au coin haut droit du contenu de la fenêtre.
 @MainActor
 final class ExtensionPopupPresenter {
     /// Vue et rectangle (dans cette vue) sous lesquels montrer la bulle de `action` dans `window` ; nil : pas de bulle.

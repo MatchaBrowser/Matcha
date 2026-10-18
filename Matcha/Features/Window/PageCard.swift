@@ -46,6 +46,7 @@ struct PageCard: View {
                     isSiteSettingsPresented: showsSiteSettings,
                     toggleSiteSettings: toggleSiteSettings,
                     siteZooms: siteZooms,
+                    isPrivate: windowModel?.session.isPrivate ?? false,
                 )
                 .simultaneousGesture(TapGesture().onEnded { activate() })
                 Divider()

@@ -1,7 +1,8 @@
 import SwiftUI
 
-/// Barre latérale, de haut en bas : navigation, adresse (badge du zoom, bouton des réglages du site), panneau des réglages du site
-/// s'il est ouvert, favoris, épinglés, nouvel onglet, onglets du jour, panneau des téléchargements s'il est ouvert,
+/// Barre latérale, de haut en bas : navigation, adresse (badge du zoom, bouton des réglages du site), boutons des
+/// extensions, panneau des réglages du site s'il est ouvert, favoris, épinglés, nouvel onglet, onglets du jour, panneau des téléchargements
+/// s'il est ouvert,
 /// Spaces (et à gauche, le bouton des téléchargements, toujours là).
 struct SidebarView: View {
     let model: WindowModel
@@ -31,6 +32,8 @@ struct SidebarView: View {
                     }
                 }
                 .animatesZoomBadge(of: tabManager.selectedTab)
+                // Boutons des extensions (tâche 6.5) : ils visent la page au premier plan (l'aperçu s'il est ouvert).
+                ExtensionButtonsRow(tab: tabManager.frontTab, isPrivate: model.session.isPrivate)
                 if model.isSiteSettingsPresented {
                     VStack(spacing: 0) {
                         SiteSettingsPanel(model: model, tabManager: tabManager)

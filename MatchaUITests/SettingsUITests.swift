@@ -31,6 +31,23 @@ final class SettingsUITests: XCTestCase {
         XCTAssertEqual(app.windows.count, 1)
     }
 
+    /// Réglages > Extensions (tâche 6.4) : avec une base de test, aucune extension de l'utilisateur n'est visible ; la
+    /// section des extensions Safari et « Choisir… » sont là. Rien n'est installé ici.
+    @MainActor
+    func testExtensionsTabListsNothingOfTheUser() {
+        let app = launchApp()
+        XCTAssertTrue(waitForBrowserWindow(of: app))
+        app.typeKey(",", modifierFlags: .command)
+        let extensionsTab = app.toolbars.buttons["Extensions"]
+        XCTAssertTrue(extensionsTab.waitForExistence(timeout: 5))
+        extensionsTab.click()
+        let emptyState = app.descendants(matching: .any).matching(identifier: "extensionsEmptyState").firstMatch
+        XCTAssertTrue(emptyState.waitForExistence(timeout: 5))
+        XCTAssertTrue(app.descendants(matching: .any).matching(identifier: "extensionsChooseFileButton").firstMatch.exists)
+        XCTAssertFalse(app.descendants(matching: .any).matching(identifier: "installedExtensionRow").firstMatch.exists)
+        app.typeKey("w", modifierFlags: .command)
+    }
+
     /// Raccourci de la mini-fenêtre affiché dans Général (⌃⌥⇧⌘N donné au lancement : jamais ⌥⌘N, qui atteindrait la
     /// Matcha de l'utilisateur). Le champ n'est jamais cliqué : aucun raccourci n'est enregistré par un test.
     @MainActor

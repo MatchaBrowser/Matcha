@@ -1,7 +1,8 @@
 import SwiftUI
 
-/// Ligne d'une extension installée (tâche 6.4) : icône, nom, version et origine, menu (options, fenêtres privées,
-/// supprimer) et interrupteur. Une extension introuvable (app supprimée) n'a que « Supprimer ».
+/// Ligne d'une extension installée (tâche 6.4) : icône, nom, version et origine, menu (options, bouton près de
+/// l'adresse, fenêtres privées, supprimer) et interrupteur. Une extension introuvable (app supprimée) n'a que
+/// « Supprimer ».
 struct InstalledExtensionRow: View {
     let item: ExtensionsSettingsModel.Installed
     let model: ExtensionsSettingsModel
@@ -22,6 +23,11 @@ struct InstalledExtensionRow: View {
                     Button("Options…") { model.openOptions(of: item.id) }
                 }
                 if !item.isMissing {
+                    Toggle("Show Button Next to the Address", isOn: Binding {
+                        item.showsButton
+                    } set: {
+                        model.setShowsButton($0, for: item.id)
+                    })
                     Toggle("Allow in Private Windows", isOn: Binding {
                         item.allowsPrivateWindows
                     } set: {

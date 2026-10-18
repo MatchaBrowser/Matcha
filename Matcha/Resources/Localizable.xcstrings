@@ -4752,6 +4752,34 @@
         }
       }
     },
+    "Hide Button" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Taste ausblenden"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ocultar botón"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Masquer le bouton"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nascondi pulsante"
+          }
+        }
+      }
+    },
     "Hide Downloads" : {
       "comment" : "View menu item (⌥⌘L) that closes the downloads panel at the bottom of the sidebar",
       "localizations" : {
@@ -5447,6 +5475,34 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Fulmine"
+          }
+        }
+      }
+    },
+    "Manage Extensions…" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Erweiterungen verwalten …"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gestionar extensiones…"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gérer les extensions…"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gestisci estensioni…"
           }
         }
       }
@@ -9018,6 +9074,34 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Mostra i pulsanti Indietro, Avanti e Ricarica"
+          }
+        }
+      }
+    },
+    "Show Button Next to the Address" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Taste neben der Adresse anzeigen"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mostrar el botón junto a la dirección"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Afficher le bouton près de l'adresse"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mostra il pulsante accanto all'indirizzo"
           }
         }
       }

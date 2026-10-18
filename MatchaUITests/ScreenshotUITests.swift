@@ -283,7 +283,7 @@ final class ScreenshotUITests: XCTestCase {
         app.typeKey(",", modifierFlags: .command)
         sleep(1)
         let settings = app.windows.element(boundBy: 0)
-        for (index, tab) in ["Général", "Apparence", "Profils", "Confidentialité"].enumerated() {
+        for (index, tab) in ["Général", "Apparence", "Profils", "Confidentialité", "Extensions"].enumerated() {
             app.toolbars.buttons[tab].click()
             sleep(1)
             attach(settings.screenshot(), as: "6-reglages-\(index)")

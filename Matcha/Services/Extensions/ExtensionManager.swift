@@ -20,8 +20,8 @@ final class ExtensionManager: NSObject {
     /// Schéma des pages des extensions (options, popup, arrière-plan).
     nonisolated static let scheme = "webkit-extension"
 
-    /// Instance de l'app ; dans l'app hôte des tests unitaires, un contrôleur non persistant, sans rien d'enregistré
-    /// ni de chargé.
+    /// Instance de l'app ; dans l'app hôte des tests unitaires et avec une base de test (tests d'interface), un
+    /// contrôleur non persistant, sans rien d'enregistré ni de chargé.
     static let shared = ExtensionManager.makeShared()
 
     @ObservationIgnored let controller: WKWebExtensionController
@@ -37,8 +37,12 @@ final class ExtensionManager: NSObject {
     private(set) var contexts: [String: WKWebExtensionContext] = [:]
     /// Extensions installées, chargées ou non, par identifiant (tâche 6.4) : de quoi les montrer dans les réglages.
     private(set) var installed: [String: WKWebExtension] = [:]
-    /// Change à chaque mise à jour d'une action (icône, titre, badge) : les boutons de la tâche 6.5 le suivront.
+    /// Change à chaque mise à jour d'une action (icône, titre, badge) : les boutons la suivent (tâche 6.5).
     private(set) var actionRevision = 0
+    /// Change quand les boutons à montrer changent (bouton masqué ou affiché, fenêtres privées ; tâche 6.5).
+    private(set) var buttonsRevision = 0
+    /// Boutons des extensions affichés, pour y ancrer leur bulle (tâche 6.5).
+    @ObservationIgnored let buttonAnchors = ExtensionButtonAnchors()
     @ObservationIgnored var isStarted = false
     @ObservationIgnored var observers: [any NSObjectProtocol] = []
 
@@ -54,10 +58,23 @@ final class ExtensionManager: NSObject {
         controller.delegate = self
         windows.sink = controller
         observeContexts()
+        // Bulle d'une action sous le bouton de son extension (dans la fenêtre et, s'il y en a plusieurs, la carte de
+        // l'onglet visé), sinon au coin haut droit de la fenêtre.
+        popups.anchor = { [weak self] action, window in
+            guard let self, let context = action.webExtensionContext, let identifier = identifier(of: context),
+                  let view = buttonAnchors.view(for: identifier, tabID: (action.associatedTab as? ExtensionTab)?.tabID, in: window)
+            else {
+                return ExtensionPopupPresenter.topTrailingAnchor(in: window)
+            }
+            return (view, view.bounds)
+        }
     }
 
     private static func makeShared() -> ExtensionManager {
-        guard ProcessInfo.processInfo.environment["XCTestConfigurationFilePath"] == nil else {
+        // App hôte des tests unitaires, et base de test (tests d'interface) : rien de l'utilisateur n'est lu ni écrit
+        // (mêmes réglages et même conteneur que l'app).
+        let isUnitTesting = ProcessInfo.processInfo.environment["XCTestConfigurationFilePath"] != nil
+        guard !isUnitTesting, !UserDefaults.standard.bool(forKey: BrowserSession.inMemoryStoreKey) else {
             return ExtensionManager(configuration: .nonPersistent(), store: ExtensionStateStore(defaults: nil), directory: nil)
         }
         let applicationSupport = FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask).first
@@ -164,5 +181,10 @@ final class ExtensionManager: NSObject {
     /// Une action a changé (tâche 6.5 : boutons des extensions).
     func actionDidUpdate() {
         actionRevision &+= 1
+    }
+
+    /// Les boutons à montrer ont changé (tâche 6.5).
+    func buttonsDidChange() {
+        buttonsRevision &+= 1
     }
 }

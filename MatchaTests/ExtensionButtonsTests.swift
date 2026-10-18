@@ -1,0 +1,116 @@
+import AppKit
+import Foundation
+@testable import Matcha
+import Testing
+import WebKit
+
+/// Boutons des extensions (tâche 6.5) : lesquels montrer, bouton masqué retenu, action (titre, badge, bulle) et ancre
+/// de la bulle.
+@MainActor
+struct ExtensionButtonsTests {
+    /// Extension d'essai avec une action (titre, popup) et un arrière-plan qui pose un badge « 7 ».
+    private func loadExtensionWithAction(in manager: ExtensionManager) async throws -> (identifier: String, folder: URL) {
+        let folder = try TestExtension.makeFolder()
+        let manifestURL = folder.appendingPathComponent("manifest.json")
+        var manifest = try #require(JSONSerialization.jsonObject(with: Data(contentsOf: manifestURL)) as? [String: Any])
+        manifest["action"] = ["default_title": "Matcha Test Action", "default_popup": "popup.html"]
+        try JSONSerialization.data(withJSONObject: manifest).write(to: manifestURL)
+        try Data("<p>Popup</p>".utf8).write(to: folder.appendingPathComponent("popup.html"))
+        try Data(#"browser.action.setBadgeText({ text: "7" });"#.utf8)
+            .write(to: folder.appendingPathComponent("test-extension-background.js"))
+        let identifier = TestExtension.uniqueIdentifier("buttons")
+        try await manager.load(resourceBaseURL: folder, identifier: identifier)
+        return (identifier, folder)
+    }
+
+    @Test func `loaded extensions have a button unless hidden, private windows only when allowed`() async throws {
+        let manager = TestExtension.manager()
+        let (context, folder) = try await TestExtension.load(in: manager)
+        defer { try? FileManager.default.removeItem(at: folder) }
+        let identifier = try #require(manager.identifier(of: context))
+
+        #expect(manager.buttonExtensions(isPrivate: false).map(\.identifier) == [identifier])
+        #expect(manager.buttonExtensions(isPrivate: true).isEmpty)
+        manager.setAccessToPrivateData(true, identifier: identifier)
+        #expect(manager.buttonExtensions(isPrivate: true).map(\.identifier) == [identifier])
+
+        let revision = manager.buttonsRevision
+        manager.setShowsButton(false, identifier: identifier)
+        #expect(manager.buttonsRevision != revision)
+        #expect(!manager.showsButton(identifier))
+        #expect(manager.buttonExtensions(isPrivate: false).isEmpty)
+        // Retenu, même quand WebKit change les décisions ou au rechargement.
+        manager.saveAllStates()
+        manager.unload(identifier: identifier)
+        #expect(manager.store.state(for: identifier)?.showsButton == false)
+        try await manager.load(resourceBaseURL: folder, identifier: identifier)
+        #expect(manager.buttonExtensions(isPrivate: false).isEmpty)
+
+        manager.setShowsButton(true, identifier: identifier)
+        #expect(manager.store.state(for: identifier)?.showsButton == nil)
+        #expect(manager.buttonExtensions(isPrivate: false).map(\.identifier) == [identifier])
+        manager.unload(identifier: identifier)
+    }
+
+    @Test func `an action gives its title, popup and badge`() async throws {
+        let manager = TestExtension.manager()
+        let (identifier, folder) = try await loadExtensionWithAction(in: manager)
+        defer { try? FileManager.default.removeItem(at: folder) }
+        let action = try #require(manager.action(of: identifier, for: nil))
+        #expect(action.label == "Matcha Test Action")
+        #expect(action.presentsPopup)
+
+        let revision = manager.actionRevision
+        try await TestExtension.waitForBackground(of: #require(manager.contexts[identifier]))
+        try await waitUntil { manager.action(of: identifier, for: nil)?.badgeText == "7" }
+        #expect(manager.actionRevision != revision)
+        manager.unload(identifier: identifier)
+    }
+
+    @Test func `the popup is anchored under the button of its extension`() async throws {
+        let manager = TestExtension.manager()
+        let (identifier, folder) = try await loadExtensionWithAction(in: manager)
+        defer { try? FileManager.default.removeItem(at: folder) }
+        let window = NSWindow(
+            contentRect: CGRect(x: 0, y: 0, width: 400, height: 300),
+            styleMask: [.titled],
+            backing: .buffered,
+            defer: true,
+        )
+        let button = NSView(frame: CGRect(x: 10, y: 10, width: 26, height: 26))
+        window.contentView?.addSubview(button)
+        manager.buttonAnchors.register(button, identifier: identifier, tabID: nil)
+        let action = try #require(manager.action(of: identifier, for: nil))
+
+        let anchor = try #require(manager.popups.anchor(action, window))
+        #expect(anchor.view === button)
+        #expect(anchor.rect == button.bounds)
+
+        // Sans bouton (masqué) : coin haut droit de la fenêtre.
+        manager.buttonAnchors.unregister(button)
+        #expect(manager.popups.anchor(action, window)?.view === window.contentView)
+        manager.unload(identifier: identifier)
+    }
+
+    @Test func `anchors prefer the button of the targeted tab, in the right window`() {
+        let anchors = ExtensionButtonAnchors()
+        let first = NSWindow(contentRect: .zero, styleMask: [.titled], backing: .buffered, defer: true)
+        let second = NSWindow(contentRect: .zero, styleMask: [.titled], backing: .buffered, defer: true)
+        let tab = UUID()
+        let left = NSView()
+        let right = NSView()
+        let elsewhere = NSView()
+        first.contentView?.addSubview(left)
+        first.contentView?.addSubview(right)
+        second.contentView?.addSubview(elsewhere)
+        anchors.register(left, identifier: "ext", tabID: UUID())
+        anchors.register(right, identifier: "ext", tabID: tab)
+        anchors.register(elsewhere, identifier: "ext", tabID: tab)
+
+        #expect(anchors.view(for: "ext", tabID: tab, in: first) === right)
+        #expect(anchors.view(for: "ext", tabID: tab, in: second) === elsewhere)
+        #expect(anchors.view(for: "other", tabID: tab, in: first) == nil)
+        anchors.unregister(right)
+        #expect(anchors.view(for: "ext", tabID: tab, in: first) === left)
+    }
+}

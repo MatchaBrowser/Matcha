@@ -133,3 +133,10 @@ Fonctions livrées avec une limite, faute d'API publique ou par choix de simplic
 - **Signature des `.crx`** : non vérifiée ; l'utilisateur choisit le fichier et voit les permissions avant d'installer. Une extension Safari d'app, elle, est vérifiée par WebKit (manifeste contrôlé par la signature du `.appex`).
 - **Mises à jour** : rien n'est mis à jour seul. Une extension Safari suit son app (App Store) ; un fichier se réinstalle par-dessus (« Mettre à jour l'extension »), ses données gardées.
 - **Permissions facultatives** (`optional_permissions`) : pas montrées à l'installation ; l'extension les demande en cours de route (alerte de la 6.3).
+
+### Boutons des extensions (6.5)
+
+- **Bouton masqué** : la bulle de l'extension n'est plus accessible (ses scripts continuent d'agir sur les pages). Piste : un menu « Extensions » (pièce de puzzle) qui liste les extensions masquées, comme Chrome.
+- **Mini-fenêtres et fenêtres de connexion** : pas de boutons ; une bulle demandée pour leur page s'ouvre au coin haut droit de la fenêtre.
+- **Menu de l'action** (`menus` avec le contexte « action ») : pas repris dans le menu contextuel du bouton. **Couleur du badge** : celle de Matcha (WebKit ne la donne pas).
+- **Ordre des boutons** : par nom ; pas de glisser-déposer pour les ranger.

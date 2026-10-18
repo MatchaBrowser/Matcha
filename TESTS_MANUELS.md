@@ -480,3 +480,16 @@ Réglages (⌘,) > Extensions. Extensions Safari : celles des apps de /Applicati
 - [ ] Quitte et relance Matcha : les extensions installées sont toujours là, avec leurs réglages.
 - [ ] Langues : l'onglet et l'écran des permissions en allemand, espagnol et italien ; aucun texte coupé.
 - Connu : les messages natifs vers l'app de l'extension ne marchent pas (`FEATURES.md`).
+
+### 6.5 Boutons des extensions
+
+Avec au moins une extension installée (Proton Pass, uBlock Origin Lite, Dark Reader…).
+
+- [ ] Barre latérale : une rangée de boutons sous la pastille d'adresse, un par extension, avec son icône ; survol : son titre. Barre d'adresse au-dessus de la page (Réglages > Apparence) : les boutons sont dans la barre, avant le bouton des réglages du site.
+- [ ] Clic sur le bouton d'une extension à bulle (Proton Pass) : la bulle s'ouvre sous le bouton, prend la taille de sa page ; clic ailleurs : elle se ferme. Avec un split et la barre au-dessus des pages, la bulle s'ouvre sous le bouton du panneau cliqué et vise ce panneau.
+- [ ] La bulle vise la page affichée : changer d'onglet ou de Space puis rouvrir la bulle montre le nouveau site ; avec l'aperçu ouvert (Maj+clic), elle vise l'aperçu.
+- [ ] Badge : une extension qui compte (uBlock Origin Lite : nombre de requêtes bloquées) montre un petit badge sur son bouton, qui change d'une page à l'autre.
+- [ ] Clic droit sur un bouton : « Options… » (si l'extension en a) ouvre sa page d'options dans un nouvel onglet ; « Masquer le bouton » le retire de la rangée (l'extension continue d'agir) ; « Gérer les extensions… » ouvre Réglages sur l'onglet Extensions.
+- [ ] Réglages > Extensions, menu (…) > « Afficher le bouton près de l'adresse » : coché par défaut ; décoché, le bouton disparaît ; recoché, il revient. Quitte et relance : le choix est gardé.
+- [ ] Fenêtre privée (⇧⌘N) : seules les extensions autorisées dans les fenêtres privées ont un bouton.
+- [ ] Extension désactivée (interrupteur des réglages) : son bouton disparaît ; réactivée, il revient.
