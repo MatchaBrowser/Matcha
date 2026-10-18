@@ -2,11 +2,12 @@ import AppKit
 import OSLog
 import WebKit
 
-/// Délégué de navigation et d'interface des vues web d'un `TabHost` (les onglets d'un Space et leur aperçu, ou
-/// les mini-fenêtres) : nouvelles fenêtres, fermeture par la page, liens vers d'autres apps, clics avec
-/// modificateur, aperçu (Peek), téléchargements, permissions des sites (`+Permissions`), historique (`+History`), arrêt
-/// du processus d'une page (`+Crash`). Les règles viennent de `NavigationPolicy`, `DownloadPolicy`,
-/// `SitePermissionPolicy` et `PageCrashPolicy` ; l'hôte décide où vont les pages.
+/// Délégué de navigation et d'interface des vues web d'un `TabHost` (les onglets d'un Space et leur aperçu, les
+/// mini-fenêtres ou les fenêtres de connexion) : nouvelles fenêtres, fenêtres de connexion (`PopupWindowManager`),
+/// fermeture par la page, liens vers d'autres apps, clics avec modificateur, aperçu (Peek), téléchargements,
+/// permissions des sites (`+Permissions`), historique (`+History`), arrêt du processus d'une page (`+Crash`). Les
+/// règles viennent de `NavigationPolicy`, `PopupWindowFeatures`, `DownloadPolicy`, `SitePermissionPolicy` et
+/// `PageCrashPolicy` ; l'hôte décide où vont les pages.
 @MainActor
 final class NavigationCoordinator: NSObject {
     weak var tabHost: (any TabHost)?
@@ -75,6 +76,7 @@ final class NavigationCoordinator: NSObject {
             scope: tabHost?.downloadScope ?? .regular,
             pageURL: referrer ?? webView.backForwardList.currentItem?.url,
         )
+        tabHost?.downloadDidStart(in: webView)
     }
 
     /// Lien à ouvrir dans l'aperçu : refusé (le lien suit son cours) si l'hôte ne peut pas l'ouvrir.
@@ -160,14 +162,27 @@ extension NavigationCoordinator: WKNavigationDelegate {
 
 extension NavigationCoordinator: WKUIDelegate {
     /// Lien `target=_blank` ou `window.open` : la nouvelle vue doit être créée avec la configuration
-    /// fournie, sans quoi `window.opener` ne fonctionne pas. WebKit y charge ensuite la requête.
+    /// fournie, sans quoi `window.opener` ne fonctionne pas. WebKit y charge ensuite la requête. Une fenêtre dont la
+    /// page donne la taille (connexion Google, Apple, banque) s'ouvre dans sa propre petite fenêtre (tâche 5.8), même
+    /// depuis un aperçu (qui reste un aperçu) ou une mini-fenêtre ; sinon, l'hôte en fait un onglet (ou une
+    /// mini-fenêtre).
     func webView(
         _ webView: WKWebView,
         createWebViewWith configuration: WKWebViewConfiguration,
-        for _: WKNavigationAction,
-        windowFeatures _: WKWindowFeatures,
+        for navigationAction: WKNavigationAction,
+        windowFeatures: WKWindowFeatures,
     ) -> WKWebView? {
-        tabHost?.openWindow(configuration: configuration, from: webView)
+        guard let tabHost else {
+            return nil
+        }
+        let features = PopupWindowFeatures(windowFeatures)
+        guard features.opensPopupWindow, let popupWindows = tabHost.popupWindows else {
+            return tabHost.openWindow(configuration: configuration, from: webView)
+        }
+        // Jamais l'adresse : l'hôte seulement.
+        let host = navigationAction.request.url?.host() ?? "?"
+        Logger.browser.info("Fenêtre de connexion ouverte (\(host, privacy: .private))")
+        return popupWindows.open(configuration: configuration, features: features, opener: PopupOpener(host: tabHost, webView: webView))
     }
 
     /// La page a appelé `window.close()`.

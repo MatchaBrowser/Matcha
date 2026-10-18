@@ -26,8 +26,9 @@ extension TabManager: TabHost {
         insertTab(configuration: configuration, after: insertionAnchor(for: webView), select: !inBackground).load(url)
     }
 
-    /// Fenêtre ouverte par l'aperçu : il devient d'abord un onglet, pour que `window.opener` reste valable.
-    /// Tâche 5.8 : une fenêtre de connexion (taille donnée) ira dans sa propre fenêtre, sans `openPeekAsTab`.
+    /// Fenêtre sans taille ouverte par l'aperçu : il devient d'abord un onglet, pour que `window.opener` reste
+    /// valable. Une fenêtre de connexion (taille donnée, tâche 5.8) va dans sa propre fenêtre et l'aperçu reste un
+    /// aperçu (`NavigationCoordinator`).
     func openWindow(configuration: WKWebViewConfiguration, from webView: WKWebView) -> WKWebView? {
         let opener = tab(for: webView) ?? (isPeek(webView) ? openPeekAsTab() : nil)
         return insertTab(configuration: configuration, after: opener, select: true).makeWebViewIfNeeded()

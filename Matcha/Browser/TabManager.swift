@@ -30,6 +30,8 @@ final class TabManager {
     @ObservationIgnored var history: HistoryScope?
     /// Ce qui est affiché dans les fenêtres de la session (tâches 5.6 et 5.7), donné par la session.
     @ObservationIgnored weak var lifecycle: TabLifecycleService?
+    /// Fenêtres de connexion de la session (tâche 5.8), données par la session ; nil (tests) : des onglets.
+    @ObservationIgnored weak var popupWindows: PopupWindowManager?
 
     init(websiteDataStore: WKWebsiteDataStore, faviconService: FaviconService = .shared, downloadScope: DownloadScope = .regular) {
         self.websiteDataStore = websiteDataStore

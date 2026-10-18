@@ -7,7 +7,7 @@ import WebKit
 /// veille (capture, état de navigation retenu, vue web libérée) ; il reste dans la barre latérale et se recrée quand on
 /// l'affiche. Une vérification par minute, et à chaque alerte mémoire du système : la moitié la plus ancienne des onglets
 /// cachés (alerte simple), ou tous (alerte critique), sans capture. Règles : `TabSuspensionPolicy`. Ne voit que les
-/// onglets rangés des Spaces : jamais l'aperçu ni les pages des mini-fenêtres.
+/// onglets rangés des Spaces : jamais l'aperçu, les pages des mini-fenêtres ni celles des fenêtres de connexion.
 @MainActor
 @Observable
 final class TabLifecycleService {
@@ -199,6 +199,7 @@ final class TabLifecycleService {
             isLoaded: webView != nil,
             hasPendingPermissionPrompt: tab.permissionPrompts.current != nil,
             isCapturingMedia: webView.map { $0.cameraCaptureState != .none || $0.microphoneCaptureState != .none } ?? false,
+            hasOpenPopupWindow: session?.popupWindows.hasOpenWindow(openedBy: tab) ?? false,
         )
     }
 

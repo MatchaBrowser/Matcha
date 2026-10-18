@@ -13,6 +13,7 @@ struct TabSuspensionPolicyTests {
         isLoaded: Bool = true,
         prompt: Bool = false,
         capture: Bool = false,
+        popup: Bool = false,
     ) -> TabLifecycleCandidate {
         TabLifecycleCandidate(
             id: id,
@@ -20,6 +21,7 @@ struct TabSuspensionPolicyTests {
             isLoaded: isLoaded,
             hasPendingPermissionPrompt: prompt,
             isCapturingMedia: capture,
+            hasOpenPopupWindow: popup,
         )
     }
 
@@ -37,6 +39,8 @@ struct TabSuspensionPolicyTests {
         #expect(!TabSuspensionPolicy.isEligible(candidate(hiddenFor: 40, isLoaded: false)))
         #expect(!TabSuspensionPolicy.isEligible(candidate(hiddenFor: 40, prompt: true)))
         #expect(!TabSuspensionPolicy.isEligible(candidate(hiddenFor: 40, capture: true)))
+        // Tâche 5.8 : la page d'origine d'une fenêtre de connexion ouverte garde son lien `window.opener`.
+        #expect(!TabSuspensionPolicy.isEligible(candidate(hiddenFor: 40, popup: true)))
     }
 
     @Test func `inactivity takes tabs hidden longer than the delay, oldest first`() {
@@ -54,6 +58,7 @@ struct TabSuspensionPolicyTests {
             candidate(hiddenFor: 60, isLoaded: false),
             candidate(hiddenFor: 60, prompt: true),
             candidate(hiddenFor: 60, capture: true),
+            candidate(hiddenFor: 60, popup: true),
         ]
         #expect(pool(candidates, .inactivity).isEmpty)
     }

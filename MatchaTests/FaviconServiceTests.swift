@@ -58,7 +58,9 @@ struct FaviconServiceTests {
         let manager = TabManager(websiteDataStore: .nonPersistent(), faviconService: FaviconService(directory: nil))
         let tab = manager.insertTab(configuration: TestPages.configuration(), after: nil, select: true)
         tab.load(TestPages.url("avec-icone", body: "<link rel='icon' href='\(Self.pngURL.absoluteString)'>"))
-        try await waitUntil { tab.favicon != nil }
+        // Chargement, lecture des icônes dans la page puis téléchargement : 0,2 s seul, mais près de 10 s quand toute la
+        // suite tourne (vues web et fil principal partagés), déjà avant la tâche 5.8.
+        try await waitUntil(timeout: .seconds(30)) { tab.favicon != nil }
     }
 
     @Test func `an icon that could not be found is retried on the next load`() async throws {

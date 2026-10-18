@@ -43,6 +43,8 @@ extension BrowserSession {
         guard profiles.count > 1, profiles.contains(where: { $0.id == profile.id }) else {
             return
         }
+        // Ses fenêtres de connexion (tâche 5.8) se ferment d'abord : leurs pages n'utilisent plus ses données.
+        popupWindows.closeWindows(using: dataStore(for: profile))
         for space in spaces(of: profile) {
             space.close()
             removeSpace(space)

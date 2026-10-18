@@ -187,6 +187,29 @@ struct TabLifecycleServiceTests {
         #expect(peek.tab.isLoaded)
     }
 
+    /// Tâche 5.8 : tant que la fenêtre de connexion ouverte par un onglet l'est encore, l'onglet garde sa page, sans
+    /// quoi `window.opener` ne la retrouverait plus.
+    @Test func `a tab with an open sign-in window is never suspended`() async throws {
+        session.popupWindows.prepareForTests()
+        let tabs = openTabs(2)
+        let opener = tabs[0]
+        let popupWebView = try #require(manager.coordinator.webView(
+            opener.loadedWebView,
+            createWebViewWith: opener.configuration,
+            for: FakeNavigationAction(url: TestPages.url("connexion"), modifierFlags: []),
+            windowFeatures: FakeWindowFeatures(width: 500, height: 600),
+        ))
+        let popup = try #require(session.popupWindows.window(for: popupWebView))
+        clock.advance(3600)
+
+        #expect(await service.check(.memoryCritical) == 0)
+        #expect(opener.isLoaded)
+
+        popup.close()
+        #expect(await service.check(.memoryCritical) == 1)
+        #expect(opener.suspension.isSuspended)
+    }
+
     /// Un favori est commun aux Spaces du profil : un seul onglet, examiné une fois.
     @Test func `a favorite shared by two Spaces is shown in the displayed one`() async {
         let favorite = openTabs(1)[0]

@@ -11,6 +11,9 @@ nonisolated struct TabLifecycleCandidate: Equatable, Sendable {
     let hasPendingPermissionPrompt: Bool
     /// Caméra ou micro en cours d'utilisation (même coupés).
     let isCapturingMedia: Bool
+    /// Fenêtre de connexion ouverte par la page, encore ouverte (tâche 5.8) : en veille, la page ne serait plus son
+    /// `window.opener`, et la connexion échouerait.
+    let hasOpenPopupWindow: Bool
 }
 
 /// Ce qui déclenche une vérification.
@@ -24,8 +27,9 @@ nonisolated enum TabSuspensionReason: String, Sendable {
 }
 
 /// Règles de la mise en veille (tâche 5.6). Jamais : un onglet affiché (tous les panneaux d'un split, l'onglet d'origine
-/// d'un aperçu), sans vue web, qui attend une réponse de permission, qui utilise la caméra ou le micro, ou qui joue
-/// du son (vérifié ensuite, auprès de WebKit). « Jamais » dans les réglages : rien, même pendant une alerte mémoire.
+/// d'un aperçu), sans vue web, qui attend une réponse de permission, qui utilise la caméra ou le micro, qui a ouvert
+/// une fenêtre de connexion encore ouverte (tâche 5.8), ou qui joue du son (vérifié ensuite, auprès de WebKit).
+/// « Jamais » dans les réglages : rien, même pendant une alerte mémoire.
 nonisolated enum TabSuspensionPolicy {
     /// Pendant une alerte simple, un onglet caché depuis moins longtemps est épargné : on revient souvent à l'onglet
     /// qu'on vient de quitter.
@@ -33,6 +37,7 @@ nonisolated enum TabSuspensionPolicy {
 
     static func isEligible(_ candidate: TabLifecycleCandidate) -> Bool {
         candidate.hiddenSince != nil && candidate.isLoaded && !candidate.hasPendingPermissionPrompt && !candidate.isCapturingMedia
+            && !candidate.hasOpenPopupWindow
     }
 
     /// Onglets à examiner, du plus anciennement caché au plus récent ; `delay` nil (« Jamais ») : aucun. Le son se

@@ -4,7 +4,8 @@ import WebKit
 
 /// Vue AppKit qui porte la vue web d'une mini-fenêtre. Elle seule l'ajoute et la retire : SwiftUI ne manipule
 /// jamais la vue web, qui peut ainsi passer dans un Space sans rechargement (« Ouvrir dans le Space ») : elle est
-/// retirée ici avant que la carte de la fenêtre principale ne l'affiche, et n'a jamais deux parents.
+/// retirée ici avant que la carte de la fenêtre principale ne l'affiche, et n'a jamais deux parents. Les fenêtres de
+/// connexion (tâche 5.8) s'en servent aussi.
 final class MiniWebViewContainer: NSView {
     private(set) weak var webView: WKWebView?
 

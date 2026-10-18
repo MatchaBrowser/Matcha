@@ -3637,6 +3637,35 @@
         }
       }
     },
+    "Not Secure" : {
+      "comment" : "Sign-in window address bar: the page is not encrypted (http)",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nicht sicher"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No seguro"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Non sécurisé"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Non sicuro"
+          }
+        }
+      }
+    },
     "Ocean" : {
       "comment" : "Space theme preset",
       "localizations" : {
@@ -5080,6 +5109,35 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Cerca o inserisci indirizzo"
+          }
+        }
+      }
+    },
+    "Secure Connection" : {
+      "comment" : "Sign-in window address bar: lock icon of an encrypted (https) page",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sichere Verbindung"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Conexión segura"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Connexion sécurisée"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Connessione sicura"
           }
         }
       }

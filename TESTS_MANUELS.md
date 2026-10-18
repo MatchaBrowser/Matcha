@@ -120,7 +120,7 @@ Ou ⌘R dans Xcode.
 - [ ] Connecte-toi à un site, va sur une 2ᵉ page, lance une vidéo, puis « Ouvrir dans … » (ou ⌘O) : la page arrive en tête des onglets du jour, sélectionnée, sans rechargement (vidéo qui continue, toujours connecté) ; Précédent ramène à la 1ʳᵉ page.
 - [ ] Deux profils : ouvre une mini-fenêtre depuis un Space du 2ᵉ profil, puis affiche un Space du 1ᵉʳ : le bouton nomme un Space du 2ᵉ profil, et l'ouverture y ramène la fenêtre principale avec la page connectée.
 - [ ] Fenêtre principale fermée (⇧⌘W) : ⌥⌘N, une page, ⌘O : la fenêtre revient sur le bon Space avec l'onglet. Puis, fenêtre fermée et une mini-fenêtre ouverte : clic sur l'icône du Dock ; la fenêtre principale revient-elle ? (Sinon : menu Fenêtre, et dis-le-moi.)
-- [ ] « Se connecter avec Google » dans une mini-fenêtre : la fenêtre de connexion s'ouvre en mini-fenêtre et se ferme d'elle-même. ⌘-clic sur un lien : un onglet arrive en arrière-plan dans le Space, sans que la fenêtre principale passe devant. Maj+clic : le lien s'ouvre dans la mini-fenêtre (pas d'aperçu). Un lien `mailto:` ouvre Mail.
+- [ ] « Se connecter avec Google » dans une mini-fenêtre : la fenêtre de connexion s'ouvre dans une petite fenêtre au-dessus de la mini-fenêtre (tâche 5.8) et se ferme d'elle-même. ⌘-clic sur un lien : un onglet arrive en arrière-plan dans le Space, sans que la fenêtre principale passe devant. Maj+clic : le lien s'ouvre dans la mini-fenêtre (pas d'aperçu). Un lien `mailto:` ouvre Mail.
 - [ ] Dans une mini-fenêtre : ⌘T, ⌘L, ⌘R, ⌘[, ⌘], ⌘O, ⌘W (titre « Fermer la mini-fenêtre » dans le menu Fichier), ⇧⌘W, et ⇧⌘C avec la confirmation « URL copiée » en bas de la mini-fenêtre.
 - [ ] Safari en plein écran, ⌥⌘N : la mini-fenêtre apparaît par-dessus, sur le même bureau. Fenêtre de Matcha sur le bureau 1, toi sur le bureau 2 dans une autre app : ⌥⌘N l'ouvre sur le bureau 2, sans changer de bureau. Pareil avec Stage Manager. Deux écrans : elle s'ouvre sur l'écran du pointeur.
 - [ ] Fenêtre privée au premier plan, ⌥⌘N : la mini-fenêtre n'est pas privée (tes cookies habituels) et sa page va dans la fenêtre principale.
@@ -300,7 +300,7 @@ Pour ne pas attendre 30 minutes : Réglages > Général > « Libérer la mémoir
 - [ ] Quitte et relance Matcha avec des onglets en veille : ils sont toujours là, à la bonne page, avec leur historique.
 - [ ] Fenêtre privée (⇧⌘N) : mêmes règles ; ses onglets en veille reviennent pareil (rien n'est enregistré).
 - [ ] Une page qui joue du son par Web Audio (un jeu, une radio en ligne, un synthétiseur en ligne) dans un onglet caché : note si elle est mise en veille malgré le son (WebKit pourrait ne signaler que les éléments audio et vidéo).
-- Connu : le contenu non enregistré d'une page est perdu à la veille (formulaires, position d'une vidéo, état d'un jeu) ; une fenêtre ouverte par une page (connexion « avec Google »…) perd le lien avec sa page d'origine si celle-ci est mise en veille pendant ce temps ; un partage d'écran sans caméra ni micro n'est pas détecté.
+- Connu : le contenu non enregistré d'une page est perdu à la veille (formulaires, position d'une vidéo, état d'un jeu) ; une fenêtre ouverte en onglet par une page (`window.open` sans taille) perd le lien avec sa page d'origine si celle-ci est mise en veille pendant ce temps (les fenêtres de connexion de la 5.8, elles, le gardent) ; un partage d'écran sans caméra ni micro n'est pas détecté.
 
 ### 5.7 Plantage d'une page
 
@@ -321,3 +321,27 @@ Pour faire planter une page sans risque : Moniteur d'activité (Applications > U
 - [ ] Historique (⌘Y) : le rechargement après un plantage n'ajoute pas de visite (pas de ligne en plus, heure inchangée), ni celui du bouton « Recharger » du message.
 - [ ] Langues : le message et son bouton en anglais, allemand, espagnol et italien (Réglages Système > Général > Langue et région > Applications > Matcha).
 - Connu : comme pour la mise en veille, le contenu non enregistré de la page est perdu (formulaire, position d'une vidéo). Pas de test d'interface automatique : aucune façon publique de faire planter une page (seuls les tests unitaires appellent directement le délégué de WebKit).
+
+### 5.8 Fenêtres de connexion
+
+Pour ouvrir à coup sûr une fenêtre avec une taille : https://www.w3schools.com/jsref/met_win_open.asp, un exemple « Try it Yourself » dont le code donne `width=…,height=…`, puis le bouton de l'exemple (et, pour comparer, un exemple sans taille). Le journal : Console.app, filtre « Browser » (une ligne « Fenêtre de connexion ouverte » avec le site, jamais l'adresse).
+
+- [ ] Exemple avec une taille : une petite fenêtre s'ouvre, centrée sur la fenêtre du navigateur, la page à la taille demandée (sous la barre), et non un onglet (barre latérale inchangée). Le titre de la page est dans la barre de titre ; dessous, une fine barre avec le cadenas et le site. Ni bouton Précédent ni champ d'adresse ; le bouton jaune (réduire) est grisé.
+- [ ] Exemple sans taille, ou lien « nouvelle fenêtre » : un onglet, comme avant.
+- [ ] Clique sur la fenêtre du navigateur : la fenêtre de connexion reste devant. Déplace la fenêtre du navigateur : elle la suit. Déplace ou redimensionne la fenêtre de connexion seule : la fenêtre du navigateur ne bouge pas.
+- [ ] ⌘W ferme la fenêtre de connexion, jamais l'onglet derrière ; le bouton rouge et ⇧⌘W aussi. Moniteur d'activité : son processus « Web Content » disparaît. ⎋ ne la ferme pas.
+- [ ] « Se connecter avec Google » sur un site qui ouvre une petite fenêtre pour ça (par exemple Canva ou Figma ; si le site change de page au lieu d'ouvrir une fenêtre, essaie-en un autre) : la barre montre accounts.google.com avec le cadenas ; connecte-toi : la fenêtre se ferme d'elle-même et la page d'origine est connectée.
+- [ ] « Se connecter avec Apple » (fenêtre sur appleid.apple.com) : même chose. Avec un code à deux facteurs, la fenêtre reste devant pendant que tu le tapes.
+- [ ] PayPal : https://developer.paypal.com/demo/checkout/ , bouton PayPal : la fenêtre de paiement s'ouvre (paypal.com, cadenas) ; ferme-la, ou va au bout : la page d'origine le voit.
+- [ ] Ta banque, ou un site qui ouvre une validation (3-D Secure) ou un document dans une petite fenêtre : même comportement ; un relevé PDF s'affiche dans la fenêtre ; un fichier qui ne fait que se télécharger : la fenêtre se ferme d'elle-même et le fichier arrive dans les téléchargements de la fenêtre.
+- [ ] La barre montre toujours le vrai site, quel que soit le titre de la page. Survole-la : l'adresse complète en bulle d'aide. Si tu tombes sur une fenêtre de connexion en http (sans « s ») : ⚠ et « Non sécurisé » en rouge.
+- [ ] Depuis un aperçu (Maj+clic sur un lien vers un site qui propose « Se connecter avec Google » en fenêtre) : la fenêtre de connexion s'ouvre au-dessus, l'aperçu reste un aperçu (pas d'onglet en plus) ; une fois connecté, l'aperçu montre la page connectée.
+- [ ] Depuis une mini-fenêtre (⌥⌘N) : la fenêtre de connexion s'ouvre au-dessus de la mini-fenêtre, sans autre mini-fenêtre ; elle reste devant quand tu cliques la mini-fenêtre. Passe sur une autre app (Finder) : les deux passent derrière le Finder ; reviens sur Matcha : la fenêtre de connexion est toujours devant la mini-fenêtre.
+- [ ] Fenêtre privée (⇧⌘N) : la fenêtre de connexion est sombre, et la connexion n'apparaît pas dans la fenêtre normale. Ferme la fenêtre privée : sa fenêtre de connexion se ferme aussi.
+- [ ] Ferme la fenêtre du navigateur (⇧⌘W sur elle) pendant qu'une fenêtre de connexion est ouverte : la fenêtre de connexion reste à l'écran et utilisable.
+- [ ] Dans une fenêtre de connexion, ⌘-clic sur un lien (« Conditions », « Aide ») : un onglet en arrière-plan dans la fenêtre du navigateur, sous l'onglet d'origine ; un lien « nouvelle fenêtre » : un onglet au premier plan. Maj+clic : le lien s'ouvre dans la fenêtre de connexion (pas d'aperçu).
+- [ ] Mémoire (5.6, avec le délai court) : ouvre une fenêtre de connexion depuis un onglet, passe sur un autre onglet et laisse passer le délai : l'onglet d'origine ne se met pas en veille tant que la fenêtre est ouverte (la connexion aboutit) ; ferme-la et attends encore : il peut se mettre en veille.
+- [ ] Plantage (5.7) : force à quitter le processus de la page de la fenêtre de connexion : elle se recharge dedans.
+- [ ] Plein écran : fenêtre du navigateur en plein écran, ouvre une fenêtre de connexion : elle s'ouvre par-dessus, dans le même espace. Deux écrans : fenêtre du navigateur sur le second, la fenêtre de connexion s'ouvre sur celui-là.
+- [ ] Langues : « Non sécurisé » en allemand, espagnol et italien. VoiceOver : « Connexion sécurisée » sur le cadenas, puis « Adresse » et le site.
+- Connu : la position demandée par la page est ignorée (fenêtre centrée sur la fenêtre d'origine) ; ⌘R, ⌘F, ⌘P et le zoom n'agissent pas dans la fenêtre de connexion, et le menu Fichier y appelle ⌘W « Fermer l'onglet » (il ferme bien la fenêtre de connexion) ; depuis un aperçu, fermer l'aperçu pendant la connexion (clic à côté, autre onglet) la fait échouer. Pas de test d'interface automatique : aucune page locale n'ouvre de fenêtre avec une taille, et les tests ne peuvent ni servir ni écrire de page.

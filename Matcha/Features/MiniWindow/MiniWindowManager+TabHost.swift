@@ -3,8 +3,10 @@ import OSLog
 import WebKit
 
 /// Les pages des mini-fenêtres vues par le délégué de navigation (`NavigationCoordinator`) :
-/// - `target=_blank` et `window.open` : une nouvelle mini-fenêtre, créée avec la configuration fournie par
-///   WebKit (`window.opener` reste valable), même profil ;
+/// - `target=_blank` et `window.open` sans taille : une nouvelle mini-fenêtre, créée avec la configuration fournie
+///   par WebKit (`window.opener` reste valable), même profil ;
+/// - `window.open` avec une taille (fenêtre de connexion, tâche 5.8) : une petite fenêtre au-dessus de la
+///   mini-fenêtre (`PopupWindowManager` de la session principale) ;
 /// - ⌘-clic, clic du milieu, ⇧⌘-clic : un onglet en arrière-plan dans le Space visé, la fenêtre principale ne
 ///   passe pas devant ; sans Space de ce profil, une nouvelle mini-fenêtre (jamais les cookies d'un autre profil) ;
 /// - `window.close()` : la mini-fenêtre se ferme ;
@@ -13,7 +15,6 @@ import WebKit
 /// - permissions des sites : décisions du profil de la mini-fenêtre, bandeau dans sa page ;
 /// - historique : visites retenues pour le profil de la mini-fenêtre, sans Space ;
 /// - processus de la page arrêté : la page est visible tant que sa mini-fenêtre est ouverte, elle se recharge.
-/// Tâche 5.8 : `windowFeatures` (fenêtres de connexion) est encore ignoré.
 extension MiniWindowManager: TabHost {
     var faviconService: FaviconService {
         session.faviconService
@@ -80,6 +81,11 @@ extension MiniWindowManager: TabHost {
     /// Zoom par site de la session principale : une mini-fenêtre n'est jamais privée (tâche 5.4).
     var siteZooms: SiteZoomStore? {
         session.siteZooms
+    }
+
+    /// Fenêtres de connexion de la session principale (tâche 5.8).
+    var popupWindows: PopupWindowManager? {
+        session.popupWindows
     }
 
     /// Décisions du profil de la mini-fenêtre (jamais privée : elles sont enregistrées).

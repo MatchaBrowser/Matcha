@@ -67,4 +67,10 @@ Fonctions livrées avec une limite, faute d'API publique ou par choix de simplic
 - **Applications web épinglées** (messagerie, discussion) : en veille, elles ne se mettent plus à jour (compteur du titre figé) jusqu'à leur affichage. Piste : un réglage pour garder chargés les épinglés et les favoris.
 - **Son par Web Audio** : `requestMediaPlaybackState` ne signale peut-être que les éléments audio et vidéo ; à vérifier à la main.
 - **Partage d'écran sans caméra ni micro** : aucune API publique ne le signale ; l'onglet peut se mettre en veille.
-- **Fenêtre ouverte par une page** (connexion « avec Google »…) : si la page d'origine se met en veille pendant ce temps, `window.opener` ne la retrouve plus.
+- **Fenêtre ouverte en onglet par une page** (`window.open` sans taille) : si la page d'origine se met en veille pendant ce temps, `window.opener` ne la retrouve plus. Les fenêtres de connexion (5.8) protègent, elles, leur page d'origine. Piste : la même règle pour un onglet ouvert par `window.open` tant qu'il est ouvert.
+
+### Fenêtres de connexion (5.8)
+
+- **Position demandée ignorée** : la fenêtre est centrée sur sa fenêtre d'origine. Sans le délégué privé de WebKit, la page lit `screenX`, `outerWidth` et `outerHeight` à 0 et ne peut pas calculer une position juste ; `window.moveTo` et `window.resizeTo` sont sans effet (vérifié).
+- **Menus de page** (⌘R, ⌘F, ⌘P, zoom, ⌘[ et ⌘]) : sans effet dans une fenêtre de connexion (ils visent la fenêtre de navigation ou la mini-fenêtre). Le glissement à deux doigts revient en arrière. Dans le menu Fichier, ⌘W s'appelle encore « Fermer l'onglet » quand elle est au premier plan (il la ferme bien). Piste : suivre la fenêtre de connexion active comme la mini-fenêtre active (`FrontPage`).
+- **Ouverte depuis un aperçu** : si l'aperçu se ferme pendant la connexion (clic à côté de lui dans la fenêtre, autre onglet, ⌘T), sa page disparaît et la connexion ne peut plus la prévenir. Piste : garder l'aperçu ouvert tant qu'il a une fenêtre de connexion.
