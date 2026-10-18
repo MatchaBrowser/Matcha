@@ -521,3 +521,14 @@ Arc installé sur le Mac, avec quelques Spaces, dossiers et favoris. L'import aj
 - [ ] Naviguer dans un onglet du jour : l'autre Mac reçoit la nouvelle adresse une fois la page stable (5 s), sans changer la page qu'il affiche ; un onglet fermé ailleurs disparaît, sauf s'il est affiché (il reste jusqu'à ce qu'on le ferme).
 - [ ] Ajouter un favori dans un Space, en changer, quitter, relancer : le favori est toujours là dans tous les Spaces du profil (défaut corrigé en préparant la synchro).
 - [ ] Réglages > Extensions : une extension installée sur l'autre Mac apparaît sous « Depuis vos autres Mac » ; « Ajouter… » ouvre l'écran des permissions (extension Safari : si son app manque, « Obtenir l'app » ouvre sa page de l'App Store) ; « Ignorer » la retire de la liste sur ce Mac seulement. Désinstallée sur un Mac, elle l'est sur l'autre.
+
+## Phase 8
+
+### 8.2 et 8.3 Liens d'autres apps, navigateur par défaut
+
+Après la 8.1 (l'app déclarée comme navigateur).
+
+- [ ] Réglages > Général : « Navigateur par défaut » montre « Choisir par défaut… » ; un clic, macOS demande confirmation ; accepté, la ligne dit « Matcha est votre navigateur par défaut. ». Changé dans Réglages Système, la ligne suit au retour dans Matcha.
+- [ ] Matcha par défaut, un lien cliqué dans Mail (ou `open https://example.com` dans le Terminal) : une mini-fenêtre s'ouvre sur la page ; Matcha fermé, le lien le lance et s'ouvre de même. Aucune autre fenêtre n'apparaît (ni privée, ni historique).
+- [ ] « Ouvrir les liens d'autres apps dans » : « Un nouvel onglet du Space affiché » : le lien s'ouvre en onglet du jour du Space affiché, la fenêtre principale passe devant (rouverte si elle était fermée).
+- [ ] Un fichier `.html` ouvert depuis le Finder avec Matcha s'ouvre de même.

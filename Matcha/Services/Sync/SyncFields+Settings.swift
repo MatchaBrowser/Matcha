@@ -55,6 +55,7 @@ nonisolated enum SyncedSettings {
         BrowserSettings.Key.newTabPage: .choice(Set(NewTabPage.allCases.map(\.rawValue))),
         BrowserSettings.Key.addressBarPosition: .choice(Set(AddressBarPosition.allCases.map(\.rawValue))),
         BrowserSettings.Key.tabSuspensionDelay: .minutes(Set(TabSuspensionDelay.allCases.map(\.rawValue))),
+        BrowserSettings.Key.externalLinkDestination: .choice(Set(ExternalLinkDestination.allCases.map(\.rawValue))),
     ]
 
     /// Clés synchronisées, triées.

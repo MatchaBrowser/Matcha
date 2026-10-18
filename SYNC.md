@@ -157,6 +157,7 @@ Une extension a un enregistrement, dont l'identifiant vient de son identifiant d
   | `newTabPage` | `blank`, `homePage` |
   | `addressBarPosition` | `sidebar`, `top` |
   | `tabSuspensionDelay` | nombre de minutes : `15`, `30`, `60`, `120`, ou `0` (jamais) |
+  | `externalLinkDestination` | `miniWindow`, `space` |
 
   Une clé hors de cette liste, ou une valeur inconnue, est ignorée à la réception. Ajouter un réglage à la liste ne demande pas de nouveau `schema`.
 - **`sitePermission`** : la décision d'un profil pour une origine et une permission. Revenir à « Demander » supprime l'enregistrement.

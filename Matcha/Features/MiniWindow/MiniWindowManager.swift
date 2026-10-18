@@ -30,6 +30,8 @@ final class MiniWindowManager {
     @ObservationIgnored var lastMainSpaceID: UUID?
     /// Page à montrer dès que la fenêtre principale rouvre.
     @ObservationIgnored var pendingReveal: (spaceID: UUID, tab: BrowserTab)?
+    /// Rouvre la fenêtre principale fermée ; donné par elle à son apparition.
+    @ObservationIgnored var openMainWindow: (@MainActor () -> Void)?
 
     /// Configuration WebKit d'une nouvelle page, pour le magasin de son profil (remplacée dans les tests).
     @ObservationIgnored var makeConfiguration: @MainActor (WKWebsiteDataStore) -> WKWebViewConfiguration =

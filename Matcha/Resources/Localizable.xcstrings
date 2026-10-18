@@ -926,6 +926,64 @@
         }
       }
     },
+    "A Mini Window" : {
+      "comment" : "Settings > General: links from other apps open in a mini window",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Einem Mini-Fenster"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Una miniventana"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Une mini-fenêtre"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Una minifinestra"
+          }
+        }
+      }
+    },
+    "A New Tab in the Current Space" : {
+      "comment" : "Settings > General: links from other apps open in a new tab of the Space shown",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Einem neuen Tab im aktuellen Space"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Una pestaña nueva del Space actual"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Un nouvel onglet du Space affiché"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Un nuovo pannello dello Space attuale"
+          }
+        }
+      }
+    },
     "Above the Page" : {
       "comment" : "Address bar position option",
       "localizations" : {
@@ -3535,6 +3593,35 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Dati cancellati: %@."
+          }
+        }
+      }
+    },
+    "Default Browser" : {
+      "comment" : "Settings > General: label of the default browser row",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Standardbrowser"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Navegador predeterminado"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Navigateur par défaut"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Browser predefinito"
           }
         }
       }
@@ -6358,6 +6445,64 @@
         }
       }
     },
+    "Links you click in Mail, Messages or other apps open in Matcha when it is your default browser." : {
+      "comment" : "Settings > General: note under the default browser settings",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Links, die du in Mail, Nachrichten oder anderen Apps klickst, öffnen sich in Matcha, wenn es dein Standardbrowser ist."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Los enlaces en los que haces clic en Mail, Mensajes u otras apps se abren en Matcha cuando es tu navegador predeterminado."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Les liens cliqués dans Mail, Messages ou d'autres apps s'ouvrent dans Matcha quand il est votre navigateur par défaut."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "I link su cui fai clic in Mail, Messaggi o altre app si aprono in Matcha quando è il tuo browser predefinito."
+          }
+        }
+      }
+    },
+    "Make Default…" : {
+      "comment" : "Settings > General: makes Matcha the default browser (macOS asks to confirm)",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Als Standard festlegen …"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Usar como predeterminado…"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Choisir par défaut…"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Imposta come predefinito…"
+          }
+        }
+      }
+    },
     "Manage Extensions…" : {
       "localizations" : {
         "de" : {
@@ -6439,6 +6584,35 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Matcha usa la lingua di macOS. Per usare un’altra lingua solo in Matcha, sceglila in Impostazioni di Sistema."
+          }
+        }
+      }
+    },
+    "Matcha is your default browser." : {
+      "comment" : "Settings > General: Matcha is already the default browser",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Matcha ist dein Standardbrowser."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Matcha es tu navegador predeterminado."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Matcha est votre navigateur par défaut."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Matcha è il tuo browser predefinito."
           }
         }
       }
@@ -7732,6 +7906,35 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Apri in Split View"
+          }
+        }
+      }
+    },
+    "Open links from other apps in" : {
+      "comment" : "Settings > General: picker of where links from other apps open",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Links aus anderen Apps öffnen in"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Abrir los enlaces de otras apps en"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ouvrir les liens d'autres apps dans"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Apri i link di altre app in"
           }
         }
       }
@@ -12364,6 +12567,35 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "ad es. apple.com"
+          }
+        }
+      }
+    },
+    "macOS asks you to confirm" : {
+      "comment" : "Settings > General: help of the Make Default button",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "macOS bittet dich um Bestätigung"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "macOS te pide que lo confirmes"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "macOS vous demande de confirmer"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "macOS ti chiede di confermare"
           }
         }
       }

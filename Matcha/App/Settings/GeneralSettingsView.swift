@@ -2,8 +2,8 @@ import AppKit
 import KeyboardShortcuts
 import SwiftUI
 
-/// Réglages généraux : page d'accueil, nouveaux onglets, recherche et suggestions, aperçu des liens, mémoire des onglets
-/// inactifs, raccourci de la mini-fenêtre, fermeture de l'app, langue.
+/// Réglages généraux : navigateur par défaut et liens d'autres apps, page d'accueil, nouveaux onglets, recherche et
+/// suggestions, aperçu des liens, mémoire des onglets inactifs, raccourci de la mini-fenêtre, fermeture de l'app, langue.
 struct GeneralSettingsView: View {
     @AppStorage(BrowserSettings.Key.homePage) private var homePage = BrowserSettings.homePage
     @AppStorage(BrowserSettings.Key.newTabPage) private var newTabPage = BrowserSettings.newTabPage
@@ -15,6 +15,7 @@ struct GeneralSettingsView: View {
 
     var body: some View {
         Form {
+            DefaultBrowserSection()
             Section {
                 TextField("Homepage", text: $homePage, prompt: Text("e.g. apple.com"))
                     .accessibilityIdentifier("homePageField")

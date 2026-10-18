@@ -11,6 +11,7 @@ struct MainWindowLinkModifier: ViewModifier {
 
     /// Absent des fenêtres privées.
     @Environment(MiniWindowManager.self) private var miniWindows: MiniWindowManager?
+    @Environment(\.openWindow) private var openWindow
 
     func body(content: Content) -> some View {
         content
@@ -28,6 +29,8 @@ struct MainWindowLinkModifier: ViewModifier {
             return
         }
         miniWindows.linkMainWindow(BrowserWindowLink(windowModel: model, window: window, dismissCommandBar: dismissCommandBar))
+        // Pour rouvrir la fenêtre principale fermée (liens d'autres apps, tâche 8.2).
+        miniWindows.openMainWindow = { [openWindow] in openWindow(id: MatchaApp.browserWindowID) }
     }
 }
 

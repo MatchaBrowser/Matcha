@@ -1,7 +1,12 @@
 import AppKit
 
-/// Délégué de l'application : confirmation avant de quitter.
+/// Délégué de l'application : liens ouverts par d'autres apps, confirmation avant de quitter.
 final class AppDelegate: NSObject, NSApplicationDelegate {
+    /// Adresses web et fichiers HTML que macOS confie à Matcha (tâche 8.2).
+    func application(_: NSApplication, open urls: [URL]) {
+        IncomingLinks.shared.receive(urls)
+    }
+
     func applicationShouldTerminate(_: NSApplication) -> NSApplication.TerminateReply {
         guard BrowserSettings.confirmsBeforeQuitting() else {
             return .terminateNow

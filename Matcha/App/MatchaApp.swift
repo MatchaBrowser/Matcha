@@ -46,6 +46,10 @@ struct MatchaApp: App {
         if !session.isInMemory {
             ExtensionManager.shared.start()
         }
+        // Liens d'autres apps (tâche 8.2), y compris celui qui a lancé l'app.
+        IncomingLinks.shared.handler = { [miniWindows] urls in
+            miniWindows.openFromOtherApp(urls, destination: ExternalLinkDestination.current())
+        }
         _session = State(initialValue: session)
         _miniWindows = State(initialValue: miniWindows)
     }
@@ -58,6 +62,8 @@ struct MatchaApp: App {
                 .environment(DownloadManager.shared)
         }
         .windowStyle(.hiddenTitleBar)
+        // Les liens d'autres apps passent par le délégué (`IncomingLinks`) : aucune fenêtre n'est créée pour eux.
+        .handlesExternalEvents(matching: [])
         .commands {
             BrowserCommands(miniWindows: miniWindows)
         }
@@ -69,6 +75,7 @@ struct MatchaApp: App {
                 .environment(DownloadManager.shared)
         }
         .windowStyle(.hiddenTitleBar)
+        .handlesExternalEvents(matching: [])
         // Sans ses commandes par défaut (« Close », « Close All ») qui écraseraient ⌘W et ⇧⌘W.
         .commandsRemoved()
 
@@ -81,6 +88,7 @@ struct MatchaApp: App {
         .defaultSize(width: 760, height: 560)
         .defaultLaunchBehavior(.suppressed)
         .restorationBehavior(.disabled)
+        .handlesExternalEvents(matching: [])
         .commandsRemoved()
 
         Settings {

@@ -16,6 +16,7 @@ nonisolated enum BrowserSettings {
         static let opensPinnedLinksInPeek = "opensPinnedLinksInPeek"
         static let tabSuspensionDelay = "tabSuspensionDelay"
         static let blocksAdsAndTrackers = "blocksAdsAndTrackers"
+        static let externalLinkDestination = "externalLinkDestination"
     }
 
     static let searchEngine = SearchEngine.defaultEngine
@@ -37,6 +38,8 @@ nonisolated enum BrowserSettings {
     static let tabSuspensionDelay = TabSuspensionDelay.thirtyMinutes
     /// Bloqueur de publicités et de traqueurs (tâche 6.2), actif dès que des listes sont livrées.
     static let blocksAdsAndTrackers = true
+    /// Liens d'autres apps (tâche 8.2) : dans une mini-fenêtre, comme Little Arc.
+    static let externalLinkDestination = ExternalLinkDestination.miniWindow
 
     /// Adresse de la page d'accueil saisie dans les réglages, interprétée comme dans la barre d'adresse ;
     /// nil si elle est vide.
