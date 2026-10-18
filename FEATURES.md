@@ -36,6 +36,25 @@ Fonctions retirées du plan pour l'instant. **Ne pas les reprendre sans mon acco
 
 ---
 
+## Bloqueur de publicités intégré (ex-tâches 6.1 et 6.2)
+
+**Reporté le 2026-10-18.** En attendant, on utilise une extension existante (uBlock Origin Lite, essayée en 6.6) ; le bloqueur intégré au navigateur viendra plus tard.
+
+**Texte d'origine :**
+- 6.1 Listes de blocage (`scripts/build-blocklists.sh`). Télécharger EasyList et EasyPrivacy, les convertir au format de blocage de WebKit avec le ConverterTool d'AdGuard (SafariConverterLib), écrire les JSON dans `Resources/Blocklists/`. **[MANUEL]** Je vérifie la licence de l'outil avant d'en intégrer quoi que ce soit dans l'app.
+- 6.2 Bloqueur natif (`Services/ContentBlockerService.swift`). Compiler les JSON avec `WKContentRuleListStore.default()` (réutiliser la version compilée via `lookUpContentRuleList` si l'identifiant et la version n'ont pas changé), ajouter les listes à tous les `userContentController`. Si le compilateur refuse une liste trop grosse, la découper. Exceptions par site avec une petite liste dynamique (`ignore-previous-rules`).
+
+**État :** la 6.2 est faite et testée (commit « 6.2 — Bloqueur natif ») ; la 6.1 n'est pas commencée, aucune liste n'est livrée. Le code reste dans l'app : `Services/ContentBlocker/`, réglages `App/Settings/ContentBlockerSettingsSection.swift`, `ContentBlockerExceptionsSection.swift`, `BlocklistCreditsSection.swift`, ligne du panneau du site `Features/Permissions/ContentBlockerRow.swift`, et leurs tests unitaires. `ContentBlockerService.isAvailable` (faux) cache ces réglages et empêche le lancement du service ; les pages gardent leur contrôleur de contenu propre, sans liste.
+
+**À savoir si on le reprend :**
+- Passer `ContentBlockerService.isAvailable` à vrai, puis faire la 6.1 ; les contrôles de `TESTS_MANUELS.md` (6.2) sont prêts.
+- Licences : vérifier celles des listes et du convertisseur avant d'intégrer quoi que ce soit (étape [MANUEL] de la 6.1).
+- Manifeste attendu : `Resources/Blocklists/blocklists.json` (`DECISIONS.md`, 2026-10-18) ; 150 000 règles au plus par fichier (limite de WebKit, vérifiée), la découpe automatique n'étant qu'un filet.
+- Une règle `ignore-previous-rules` n'agit que dans sa propre liste : d'où un contrôleur de contenu par page, et les listes posées ou retirées avant chaque navigation selon le site (exceptions).
+- Avec une extension de blocage installée, les deux bloqueraient en double : décider lequel prime (réglage, ou bloqueur intégré coupé quand une telle extension est active).
+
+---
+
 ## Limites connues, à contourner
 
 Fonctions livrées avec une limite, faute d'API publique ou par choix de simplicité. À reprendre quand on aura une solution.

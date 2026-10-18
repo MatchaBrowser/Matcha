@@ -15,6 +15,10 @@ import WebKit
 @Observable
 final class ContentBlockerService {
     static let shared = ContentBlockerService(defaults: .standard)
+    /// Faux tant que le bloqueur est mis de côté (`FEATURES.md`) : il n'est pas lancé et ses réglages sont cachés
+    /// (Confidentialité, réglages du site) ; son code et ses tests restent. Une extension (uBlock Origin Lite) en tient
+    /// lieu en attendant.
+    static let isAvailable = false
 
     enum State: Equatable {
         /// Pas lancé (app hôte des tests unitaires, tests).

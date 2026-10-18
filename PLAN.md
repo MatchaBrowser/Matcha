@@ -139,8 +139,8 @@ Feuille de route de développement, à suivre dans l'ordre. Les règles de trava
 
 ## Phase 6 — Bloqueur, extensions, mots de passe
 
-- [ ] **6.1 Listes de blocage** (`scripts/build-blocklists.sh`). Télécharger EasyList et EasyPrivacy, les convertir au format de blocage de WebKit avec le ConverterTool d'AdGuard (SafariConverterLib), écrire les JSON dans `Resources/Blocklists/`. **[MANUEL]** Je vérifie la licence de l'outil avant d'en intégrer quoi que ce soit dans l'app.
-- [x] **6.2 Bloqueur natif** (`Services/ContentBlockerService.swift`). Compiler les JSON avec `WKContentRuleListStore.default()` (réutiliser la version compilée via `lookUpContentRuleList` si l'identifiant et la version n'ont pas changé), ajouter les listes à tous les `userContentController`. Si le compilateur refuse une liste trop grosse, la découper. Exceptions par site avec une petite liste dynamique (`ignore-previous-rules`).
+- **6.1 Listes de blocage** : reportée, voir `FEATURES.md`.
+- **6.2 Bloqueur natif** : reportée (code gardé, interface cachée), voir `FEATURES.md`.
 - [x] **6.3 Infrastructure des extensions** (`Services/ExtensionManager.swift`). Un `WKWebExtensionController` unique, branché sur la configuration de toutes les vues (`webExtensionController`). Implémenter `WKWebExtensionControllerDelegate` : fenêtres ouvertes, fenêtre active, ouverture d'onglet et de fenêtre, popup d'action, demande de permissions. `BrowserTab` adopte `WKWebExtensionTab`, le modèle de fenêtre adopte `WKWebExtensionWindow` ; prévenir le contrôleur à chaque ouverture, activation, fermeture et changement d'onglet ou de fenêtre. Modèle de référence : le dépôt open source zer0.
 - [ ] **6.4 Installation.** Depuis un dossier décompressé, ou un `.crx` / `.zip` choisi par l'utilisateur : retirer l'en-tête CRX3, décompresser dans `Application Support/Extensions/<id>/`, charger le contexte. Écran des permissions demandées, décisions mémorisées.
 - [ ] **6.5 Boutons d'extensions.** Rangée d'icônes sous le champ d'adresse ; clic = popup de l'action dans un `NSPopover` ; badge de texte.

@@ -2,9 +2,9 @@ import SwiftUI
 
 /// Panneau des réglages du site de l'onglet affiché (tâche 5.2) : sous la pastille d'adresse de la barre latérale, ou
 /// en haut de la carte sous la barre d'adresse au-dessus de la page. Caméra et micro (« Demander », « Autoriser »,
-/// « Refuser », décisions du profil), le zoom du site (tâche 5.4), le bloqueur sur ce site (tâche 6.2), puis les cookies
-/// et données du site, effacés (ce site seulement) après confirmation. Il suit l'onglet affiché et ne s'ouvre ni ne se
-/// ferme de lui-même (bouton, ×).
+/// « Refuser », décisions du profil), le zoom du site (tâche 5.4), le bloqueur sur ce site (tâche 6.2, caché tant qu'il
+/// est mis de côté), puis les cookies et données du site, effacés (ce site seulement) après confirmation. Il suit
+/// l'onglet affiché et ne s'ouvre ni ne se ferme de lui-même (bouton, ×).
 struct SiteSettingsPanel: View {
     let model: WindowModel
     /// Onglets du Space de la barre ou de la carte qui montre le panneau.
@@ -26,7 +26,7 @@ struct SiteSettingsPanel: View {
                         permissionRow(kind, origin: origin, scope: scope)
                     }
                     SiteZoomRow(tab: tab, siteZooms: tabManager.siteZooms)
-                    if let contentBlocking = tabManager.contentBlocking {
+                    if ContentBlockerService.isAvailable, let contentBlocking = tabManager.contentBlocking {
                         ContentBlockerRow(tab: tab, scope: contentBlocking)
                     }
                     HStack(spacing: 8) {

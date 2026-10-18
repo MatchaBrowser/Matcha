@@ -435,9 +435,13 @@ En plus du plan : un symbole parmi 45, ou un emoji, pour l'icône d'un Space, co
 
 ## Phase 6
 
-### 6.2 Bloqueur natif
+### 6.2 Bloqueur natif (mis de côté)
 
-Aucune liste n'est livrée tant que la tâche 6.1 (EasyList, EasyPrivacy) n'est pas faite : le bloqueur est inactif. Les tests unitaires vérifient le blocage avec de petites listes d'essai ; les contrôles avec de vraies publicités sont à faire avec les listes (dernier point, à compléter en 6.1). Journal : app Console, recherche `subsystem:com.matchabrowser.matcha category:ContentBlocker`.
+Mis de côté le 2026-10-18 (`FEATURES.md`) : son code reste, son interface est cachée. À contrôler maintenant :
+
+- [ ] Réglages > Confidentialité : plus de section « Publicités et traqueurs », « Exceptions du bloqueur » ni « Crédits des listes de blocage ». Réglages du site : plus de ligne « Bloquer les publicités et traqueurs » sous « Zoom ». Journal : aucune ligne de la catégorie `ContentBlocker` au lancement.
+
+Contrôles à faire quand on le reprendra. Aucune liste n'est livrée tant que la tâche 6.1 (EasyList, EasyPrivacy) n'est pas faite : le bloqueur est inactif. Les tests unitaires vérifient le blocage avec de petites listes d'essai ; les contrôles avec de vraies publicités sont à faire avec les listes (dernier point, à compléter en 6.1). Journal : app Console, recherche `subsystem:com.matchabrowser.matcha category:ContentBlocker`.
 
 - [ ] Lancement : Matcha s'ouvre aussi vite qu'avant, pages comprises. Dans le journal : « Aucune liste de blocage livrée : bloqueur inactif », puis « Listes prêtes : 0 (0 compilées) » avec une durée de quelques millisecondes.
 - [ ] Réglages > Confidentialité, sous « Autorisations des sites » : section « Publicités et traqueurs » avec « Bloquer les publicités et traqueurs » coché mais grisé et « Aucune liste de blocage n'est installée. » ; section « Exceptions du bloqueur » : « Aucune exception. » ; section « Crédits des listes de blocage » : « Les auteurs et les licences des listes de blocage s'afficheront ici. ». La fenêtre des réglages tient sur l'écran sans barre de défilement : dis-moi si elle te paraît trop haute (le bloqueur pourrait avoir son propre onglet).
