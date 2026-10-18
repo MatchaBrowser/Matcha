@@ -1,25 +1,46 @@
 import SwiftUI
 
-/// Ligne du haut de la barre latérale : place des boutons de la fenêtre, puis, selon les réglages,
-/// précédent, suivant, recharger et Accueil.
+/// Ligne du haut de la barre latérale : place des boutons de la fenêtre, bouton qui masque ou affiche la barre (comme
+/// ⌘S), puis, selon les réglages, précédent, suivant, recharger et Accueil.
 struct SidebarTopBar: View {
     static let height = 32.0
     /// Place des boutons rouge, orange et vert de la fenêtre.
-    static let windowButtonsWidth = 78.0
+    static let windowButtonsWidth = 70.0
 
     let tab: BrowserTab?
     var showsNavigationButtons = true
     /// Action du bouton Accueil ; nil pour ne pas l'afficher.
     var goHome: (() -> Void)?
+    /// Masque la barre (affichée) ou la fixe (barre flottante) ; nil pour ne pas afficher le bouton.
+    var sidebarToggle: SidebarToggle?
 
     var body: some View {
         HStack(spacing: 2) {
-            Spacer(minLength: Self.windowButtonsWidth)
+            Color.clear.frame(width: Self.windowButtonsWidth)
+            if let sidebarToggle {
+                Button(action: sidebarToggle.toggle) {
+                    Label(sidebarToggle.title, systemImage: "sidebar.left")
+                }
+                .help(sidebarToggle.title)
+                .accessibilityIdentifier("sidebarToggleButton")
+            }
+            Spacer(minLength: 0)
             NavigationButtons(tab: tab, showsHistoryButtons: showsNavigationButtons, goHome: goHome)
         }
         .labelStyle(.iconOnly)
         .buttonStyle(SidebarIconButtonStyle())
         .frame(height: Self.height)
+    }
+}
+
+/// Bouton de la barre qui la masque ou l'affiche.
+struct SidebarToggle {
+    /// Barre affichée (sinon : flottante, apparue au survol du bord).
+    let isVisible: Bool
+    let toggle: () -> Void
+
+    var title: LocalizedStringKey {
+        isVisible ? "Hide Sidebar" : "Show Sidebar"
     }
 }
 

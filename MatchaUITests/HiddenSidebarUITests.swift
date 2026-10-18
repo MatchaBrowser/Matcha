@@ -24,6 +24,29 @@ final class HiddenSidebarUITests: XCTestCase {
     }
 
     @MainActor
+    func testTheButtonNextToTheWindowButtonsHidesThenPinsTheSidebar() {
+        let app = launchApp()
+        let window = app.windows.firstMatch
+        let newTabButton = app.buttons["newTabButton"]
+        let toggle = app.buttons["sidebarToggleButton"]
+        XCTAssertTrue(toggle.waitForExistence(timeout: 5))
+        XCTAssertEqual(toggle.label, "Masquer la barre latérale")
+
+        toggle.click()
+        moveAwayFromLeftEdge(in: window)
+        XCTAssertTrue(newTabButton.waitForNonExistence(timeout: 3))
+
+        // Barre apparue au survol du bord : le même bouton la fixe.
+        window.coordinate(withNormalizedOffset: CGVector(dx: 0, dy: 0.5)).withOffset(CGVector(dx: 3, dy: 0)).hover()
+        XCTAssertTrue(toggle.waitForExistence(timeout: 3))
+        XCTAssertEqual(toggle.label, "Afficher la barre latérale")
+        toggle.click()
+        moveAwayFromLeftEdge(in: window)
+        XCTAssertTrue(newTabButton.waitForExistence(timeout: 3))
+        XCTAssertTrue(window.buttons[XCUIIdentifierCloseWindow].exists)
+    }
+
+    @MainActor
     func testHoveringTheLeftEdgeRevealsTheHiddenSidebar() {
         let app = launchApp()
         let window = app.windows.firstMatch

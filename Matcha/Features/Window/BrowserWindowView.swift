@@ -166,6 +166,7 @@ struct BrowserWindowView: View {
                 showsAddressBar: addressBarPosition == .sidebar,
                 showsNavigationButtons: showsNavigationButtons,
                 goHome: homeButtonAction,
+                sidebarToggle: SidebarToggle(isVisible: isSidebarVisible, toggle: toggleSidebar),
             )
             .id(space.id)
             .transition(.push(from: model.transitionEdge))

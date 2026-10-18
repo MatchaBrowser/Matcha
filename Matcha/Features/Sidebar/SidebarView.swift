@@ -16,13 +16,20 @@ struct SidebarView: View {
     var showsNavigationButtons = true
     /// Action du bouton Accueil ; nil pour ne pas l'afficher.
     var goHome: (() -> Void)?
+    /// Bouton qui masque ou affiche la barre, à côté des boutons de la fenêtre.
+    var sidebarToggle: SidebarToggle?
 
     @Environment(DownloadManager.self) private var downloads
 
     var body: some View {
         VStack(alignment: .leading, spacing: 10) {
             if showsAddressBar {
-                SidebarTopBar(tab: tabManager.selectedTab, showsNavigationButtons: showsNavigationButtons, goHome: goHome)
+                SidebarTopBar(
+                    tab: tabManager.selectedTab,
+                    showsNavigationButtons: showsNavigationButtons,
+                    goHome: goHome,
+                    sidebarToggle: sidebarToggle,
+                )
                 // Badge du zoom de l'onglet sélectionné, même quand un aperçu est ouvert (il a le sien).
                 HStack(spacing: 4) {
                     AddressPill(tab: tabManager.selectedTab, edit: editAddress)
@@ -42,7 +49,7 @@ struct SidebarView: View {
                     .transition(.move(edge: .top).combined(with: .opacity))
                 }
             } else {
-                SidebarTopBar(tab: tabManager.selectedTab, showsNavigationButtons: false)
+                SidebarTopBar(tab: tabManager.selectedTab, showsNavigationButtons: false, sidebarToggle: sidebarToggle)
             }
             FavoritesGrid(tabManager: tabManager)
             ScrollView {
