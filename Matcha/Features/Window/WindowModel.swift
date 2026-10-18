@@ -16,7 +16,8 @@ final class WindowModel {
     private(set) var transitionEdge = Edge.trailing
     /// Confirmation montrée à chaque adresse copiée depuis cette fenêtre.
     let copyConfirmation = CopyConfirmationModel()
-    /// Liste des téléchargements ouverte (tâche 5.1) ; la barre masquée reste affichée tant qu'elle l'est.
+    /// Panneau des téléchargements ouvert (tâche 5.1), par le bouton du pied de la barre ou ⌥⌘L ; seul l'utilisateur
+    /// l'ouvre et le ferme. Barre masquée, il réapparaît avec la barre flottante.
     var isDownloadsPresented = false
     /// Panneau des réglages du site ouvert (tâche 5.2), pour l'onglet affiché ; seul l'utilisateur l'ouvre et le ferme.
     var isSiteSettingsPresented = false

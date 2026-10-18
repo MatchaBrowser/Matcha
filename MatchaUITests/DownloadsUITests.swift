@@ -1,7 +1,8 @@
 import XCTest
 
-/// Téléchargements (tâche 5.1) : bouton du pied de la barre, liste, vrai fichier en quarantaine, fenêtre privée, barre
-/// masquée. Sans réseau ; fichiers écrits dans ~/Downloads/MatchaUITests puis effacés (voir `UITestSupport+Downloads`).
+/// Téléchargements (tâche 5.1) : liste, vrai fichier en quarantaine, fenêtre privée, barre masquée. Sans réseau ;
+/// fichiers écrits dans ~/Downloads/MatchaUITests puis effacés (voir `UITestSupport+Downloads`). Bouton toujours
+/// visible, panneau vide et ⌥⌘L : `DownloadsPanelUITests`.
 final class DownloadsUITests: XCTestCase {
     override func setUpWithError() throws {
         continueAfterFailure = false
@@ -24,10 +25,11 @@ final class DownloadsUITests: XCTestCase {
         let name = URL(fileURLWithPath: source).lastPathComponent
         let app = launchForDownloads()
         let button = downloadsButton(in: app)
-        XCTAssertFalse(button.exists)
+        XCTAssertTrue(button.waitForExistence(timeout: 3))
+        let file = downloadsTestFolder.appendingPathComponent(name)
 
         download(source, in: app)
-        XCTAssertTrue(button.waitForExistence(timeout: 10))
+        XCTAssertTrue(waitForFile(file))
         // Rien ne s'ouvre de soi-même : ni la liste, ni le fichier.
         XCTAssertFalse(downloadsPanel(in: app).waitForExistence(timeout: 1))
 
@@ -35,6 +37,7 @@ final class DownloadsUITests: XCTestCase {
         XCTAssertTrue(downloadsPanel(in: app).waitForExistence(timeout: 3))
         let row = downloadRows(in: app).firstMatch
         XCTAssertTrue(row.waitForExistence(timeout: 3))
+        XCTAssertFalse(downloadsEmptyState(in: app).exists)
         XCTAssertEqual(downloadRows(in: app).count, 1)
         XCTAssertEqual(row.label, name)
         // Terminé : « Afficher dans le Finder » remplace « Annuler ».
@@ -42,18 +45,22 @@ final class DownloadsUITests: XCTestCase {
         XCTAssertFalse(row.buttons["downloadCancelButton"].exists)
 
         // Hors de l'app : le vrai fichier, complet, en quarantaine au nom de Matcha.
-        let file = downloadsTestFolder.appendingPathComponent(name)
         let size = try FileManager.default.attributesOfItem(atPath: file.path)[.size] as? Int
         XCTAssertEqual(size, try FileManager.default.attributesOfItem(atPath: source)[.size] as? Int)
         let quarantine = try XCTUnwrap(quarantineAttribute(of: file), "Fichier sans attribut de quarantaine")
         XCTAssertTrue(quarantine.contains(";Matcha;"), quarantine)
 
-        // « Effacer » vide la liste sans toucher au fichier : la liste se ferme, le bouton disparaît.
+        // « Effacer » vide la liste sans toucher au fichier : le panneau reste ouvert, vide, et « Effacer » se grise ;
+        // le bouton reste.
         let clear = app.buttons["downloadsClearButton"]
         XCTAssertTrue(clear.waitForExistence(timeout: 3))
+        XCTAssertTrue(clear.isEnabled)
         clear.click()
-        XCTAssertTrue(button.waitForNonExistence(timeout: 3))
-        XCTAssertFalse(downloadsPanel(in: app).exists)
+        XCTAssertTrue(row.waitForNonExistence(timeout: 3))
+        XCTAssertTrue(downloadsEmptyState(in: app).waitForExistence(timeout: 3))
+        XCTAssertTrue(downloadsPanel(in: app).exists)
+        XCTAssertFalse(clear.isEnabled)
+        XCTAssertTrue(button.exists)
         XCTAssertTrue(FileManager.default.fileExists(atPath: file.path))
         app.terminate()
     }
@@ -66,7 +73,7 @@ final class DownloadsUITests: XCTestCase {
         let app = launchForDownloads()
 
         download(source, in: app)
-        XCTAssertTrue(downloadsButton(in: app).waitForExistence(timeout: 10))
+        XCTAssertTrue(waitForFile(downloadsTestFolder.appendingPathComponent("\(base)\(pathExtension)")))
         download(source, in: app)
         downloadsButton(in: app).click()
         XCTAssertTrue(waitForCount(downloadRows(in: app), 2, timeout: 10))
@@ -80,27 +87,39 @@ final class DownloadsUITests: XCTestCase {
     }
 
     /// Une fenêtre privée a sa propre liste, que la fenêtre principale ne montre pas ; à sa fermeture, le fichier
-    /// reste dans le dossier (l'oubli de la liste est vérifié par `DownloadManagerTests`).
+    /// reste dans le dossier et la liste est oubliée (vérifié aussi par `DownloadManagerTests`).
     @MainActor
     func testPrivateWindowHasItsOwnDownloadsList() throws {
         let source = try undisplayableFile()
         let app = launchForDownloads()
+        // Panneau de la fenêtre principale ouvert d'abord : il reste visible derrière la fenêtre privée.
+        let mainWindow = app.windows.matching(NSPredicate(format: "title != %@", "Navigation privée")).firstMatch
+        downloadsButton(in: mainWindow).click()
+        XCTAssertTrue(downloadsEmptyState(in: mainWindow).waitForExistence(timeout: 3))
         let privateWindow = openPrivateWindow(in: app)
+        XCTAssertTrue(downloadsButton(in: privateWindow).exists)
 
         download(source, in: app, window: privateWindow)
-        XCTAssertTrue(downloadsButton(in: privateWindow).waitForExistence(timeout: 10))
-        // La fenêtre principale ne montre pas les téléchargements privés.
-        XCTAssertEqual(app.buttons.matching(identifier: "downloadsButton").count, 1)
         let file = downloadsTestFolder.appendingPathComponent(URL(fileURLWithPath: source).lastPathComponent)
         XCTAssertTrue(waitForFile(file))
+        downloadsButton(in: privateWindow).click()
+        XCTAssertTrue(waitForCount(downloadRows(in: privateWindow), 1))
+        // La fenêtre principale ne montre pas les téléchargements privés.
+        XCTAssertEqual(downloadRows(in: mainWindow).count, 0)
+        XCTAssertTrue(downloadsEmptyState(in: mainWindow).exists)
 
         app.typeKey("w", modifierFlags: [.command, .shift])
         XCTAssertTrue(privateWindow.waitForNonExistence(timeout: 5))
-        XCTAssertFalse(downloadsButton(in: app).exists)
+        XCTAssertTrue(downloadsButton(in: app).exists)
         XCTAssertTrue(FileManager.default.fileExists(atPath: file.path))
-        // Une nouvelle fenêtre privée repart sans liste.
+        // Une nouvelle fenêtre privée repart sans liste : bouton présent, panneau fermé, vide une fois ouvert.
         let newPrivateWindow = openPrivateWindow(in: app)
-        XCTAssertFalse(downloadsButton(in: newPrivateWindow).waitForExistence(timeout: 1))
+        let newButton = downloadsButton(in: newPrivateWindow)
+        XCTAssertTrue(newButton.waitForExistence(timeout: 3))
+        XCTAssertFalse(downloadsPanel(in: newPrivateWindow).exists)
+        newButton.click()
+        XCTAssertTrue(downloadsEmptyState(in: newPrivateWindow).waitForExistence(timeout: 3))
+        XCTAssertEqual(downloadRows(in: newPrivateWindow).count, 0)
         app.terminate()
     }
 
@@ -112,8 +131,9 @@ final class DownloadsUITests: XCTestCase {
         let app = launchForDownloads()
         let window = app.windows.firstMatch
         download(source, in: app)
+        XCTAssertTrue(waitForFile(downloadsTestFolder.appendingPathComponent(URL(fileURLWithPath: source).lastPathComponent)))
         let button = downloadsButton(in: app)
-        XCTAssertTrue(button.waitForExistence(timeout: 10))
+        XCTAssertTrue(button.exists)
 
         moveAwayFromLeftEdge(in: window)
         app.typeKey("s", modifierFlags: .command)

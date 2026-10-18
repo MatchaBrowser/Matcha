@@ -2,7 +2,7 @@ import SwiftUI
 
 /// Barre latérale, de haut en bas : navigation, adresse (badge du zoom, bouton des réglages du site), panneau des réglages du site
 /// s'il est ouvert, favoris, épinglés, nouvel onglet, onglets du jour, panneau des téléchargements s'il est ouvert,
-/// Spaces (et à gauche, le bouton des téléchargements).
+/// Spaces (et à gauche, le bouton des téléchargements, toujours là).
 struct SidebarView: View {
     let model: WindowModel
     let tabManager: TabManager
@@ -53,7 +53,8 @@ struct SidebarView: View {
             .contextMenu {
                 Button("New Folder") { tabManager.newFolder() }
             }
-            if model.isDownloadsPresented, !downloads.items(in: model.session.downloadScope).isEmpty {
+            // Ouvert même vide : il le dit, et mène au dossier Téléchargements.
+            if model.isDownloadsPresented {
                 DownloadsPanel(downloads: downloads, scope: model.session.downloadScope) {
                     withAnimation(.easeOut(duration: 0.2)) { model.isDownloadsPresented = false }
                 }

@@ -44,6 +44,10 @@ struct BrowserCommands: Commands {
         windowActions?.isSidebarVisible == false ? "Show Sidebar" : "Hide Sidebar"
     }
 
+    private var downloadsToggleTitle: LocalizedStringKey {
+        windowActions?.isDownloadsPanelShown == true ? "Hide Downloads" : "Show Downloads"
+    }
+
     var body: some Commands {
         CommandGroup(replacing: .newItem) {
             Button("New Tab") {
@@ -129,6 +133,14 @@ struct BrowserCommands: Commands {
             }
             .keyboardShortcut("s")
             .disabled(windowActions == nil)
+
+            // Présentation > « Afficher les téléchargements » (⌥⌘L), comme dans Safari. Grisé hors d'une fenêtre de
+            // navigation (Réglages, historique) et quand une mini-fenêtre est active : elle n'a pas de barre latérale.
+            Button(downloadsToggleTitle) {
+                windowActions?.toggleDownloads()
+            }
+            .keyboardShortcut("l", modifiers: [.command, .option])
+            .disabled(windowActions == nil || miniWindow != nil)
         }
 
         CommandGroup(after: .toolbar) {

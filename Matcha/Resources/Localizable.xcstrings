@@ -2708,6 +2708,35 @@
         }
       }
     },
+    "Hide Downloads" : {
+      "comment" : "View menu item (⌥⌘L) that closes the downloads panel at the bottom of the sidebar",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Downloads ausblenden"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ocultar descargas"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Masquer les téléchargements"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nascondi download"
+          }
+        }
+      }
+    },
     "Hide Sidebar" : {
       "comment" : "View menu",
       "localizations" : {
@@ -3521,6 +3550,35 @@
         }
       }
     },
+    "No Downloads" : {
+      "comment" : "Empty state of the downloads panel at the bottom of the sidebar",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Keine Downloads"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No hay descargas"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aucun téléchargement"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nessun download"
+          }
+        }
+      }
+    },
     "No History" : {
       "comment" : "Title of the empty History window",
       "localizations" : {
@@ -4009,6 +4067,35 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "I pannelli aperti verranno chiusi."
+          }
+        }
+      }
+    },
+    "Open the Downloads folder in the Finder" : {
+      "comment" : "Help tag of the Show Downloads Folder button of the empty downloads panel",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Den Ordner „Downloads“ im Finder öffnen"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Abrir la carpeta Descargas en el Finder"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ouvrir le dossier Téléchargements dans le Finder"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Apri la cartella Download nel Finder"
           }
         }
       }
@@ -5427,6 +5514,64 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Mostra i pulsanti Indietro, Avanti e Ricarica"
+          }
+        }
+      }
+    },
+    "Show Downloads" : {
+      "comment" : "View menu item (⌥⌘L) that opens the downloads panel at the bottom of the sidebar",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Downloads einblenden"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mostrar descargas"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Afficher les téléchargements"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mostra download"
+          }
+        }
+      }
+    },
+    "Show Downloads Folder" : {
+      "comment" : "Button of the empty downloads panel that opens the Downloads folder in the Finder",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ordner „Downloads“ anzeigen"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mostrar la carpeta Descargas"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Afficher le dossier Téléchargements"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mostra la cartella Download"
           }
         }
       }

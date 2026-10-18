@@ -64,6 +64,11 @@ struct BrowserWindowView: View {
         !isSidebarVisible && isFloatingSidebarHovered
     }
 
+    /// Panneau des téléchargements visible : ouvert, dans la barre fixe ou flottante.
+    private var isDownloadsPanelShown: Bool {
+        model.isDownloadsPresented && (isSidebarVisible || isFloatingSidebarShown)
+    }
+
     var body: some View {
         HStack(spacing: 0) {
             if isSidebarVisible {
@@ -211,6 +216,8 @@ struct BrowserWindowView: View {
             closeCommandBar: commandBarExecutor.cancel,
             toggleSidebar: toggleSidebar,
             isSidebarVisible: isSidebarVisible,
+            toggleDownloads: toggleDownloads,
+            isDownloadsPanelShown: isDownloadsPanelShown,
             // `hasURL` et non `url` : la fenêtre n'est pas recalculée à chaque changement d'adresse.
             copyURL: tabManager.frontTab?.hasURL == true ? { model.copySelectedTabURL() } : nil,
             goHome: homeURL.map { url in { goHome(to: url) } },
@@ -249,6 +256,18 @@ struct BrowserWindowView: View {
         withAnimation(.easeInOut(duration: 0.2)) {
             isSidebarVisible.toggle()
             isFloatingSidebarHovered = false
+        }
+    }
+
+    /// ⌥⌘L : masque le panneau des téléchargements s'il est visible ; sinon affiche la barre masquée, puis l'ouvre.
+    private func toggleDownloads() {
+        let show = !isDownloadsPanelShown
+        withAnimation(.easeInOut(duration: 0.2)) {
+            if show, !isSidebarVisible {
+                isSidebarVisible = true
+                isFloatingSidebarHovered = false
+            }
+            model.isDownloadsPresented = show
         }
     }
 

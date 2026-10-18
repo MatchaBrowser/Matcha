@@ -1,8 +1,8 @@
 import SwiftUI
 
-/// Bouton « Téléchargements » du pied de la barre latérale, visible dès que la fenêtre a un téléchargement dans cette
-/// session : anneau de progression pendant qu'un fichier arrive, petit rebond à chaque fichier terminé. Un clic
-/// ouvre le panneau des téléchargements, en bas de la barre ; rien ne l'ouvre de soi-même.
+/// Bouton « Téléchargements » du pied de la barre latérale, toujours là, même sans téléchargement : anneau de
+/// progression pendant qu'un fichier arrive, petit rebond à chaque fichier terminé. Un clic ouvre ou ferme le panneau
+/// des téléchargements, en bas de la barre (comme ⌥⌘L) ; rien ne l'ouvre de soi-même.
 struct DownloadsButton: View {
     @Bindable var model: WindowModel
     let downloads: DownloadManager
@@ -12,24 +12,20 @@ struct DownloadsButton: View {
     }
 
     var body: some View {
-        let items = downloads.items(in: scope)
-        if !items.isEmpty {
-            let active = items.filter(\.isActive)
-            Button {
-                withAnimation(.easeOut(duration: 0.2)) { model.isDownloadsPresented.toggle() }
-            } label: {
-                DownloadsIcon(
-                    isDownloading: !active.isEmpty,
-                    fraction: DownloadProgressSummary.overallFraction(of: active.map { ($0.completedBytes, $0.totalBytes) }),
-                    finishedCount: downloads.finishedCount(in: scope),
-                )
-            }
-            .buttonStyle(SidebarIconButtonStyle())
-            .help("Downloads")
-            .accessibilityLabel("Downloads")
-            .accessibilityIdentifier("downloadsButton")
-            .transition(.opacity)
+        let active = downloads.items(in: scope).filter(\.isActive)
+        Button {
+            withAnimation(.easeOut(duration: 0.2)) { model.isDownloadsPresented.toggle() }
+        } label: {
+            DownloadsIcon(
+                isDownloading: !active.isEmpty,
+                fraction: DownloadProgressSummary.overallFraction(of: active.map { ($0.completedBytes, $0.totalBytes) }),
+                finishedCount: downloads.finishedCount(in: scope),
+            )
         }
+        .buttonStyle(SidebarIconButtonStyle())
+        .help("Downloads")
+        .accessibilityLabel("Downloads")
+        .accessibilityIdentifier("downloadsButton")
     }
 }
 

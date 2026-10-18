@@ -11,6 +11,10 @@ struct WindowActions {
     /// Masque ou affiche la barre latérale.
     let toggleSidebar: () -> Void
     let isSidebarVisible: Bool
+    /// Ouvre ou ferme le panneau des téléchargements (⌥⌘L) ; barre masquée, elle s'affiche d'abord.
+    let toggleDownloads: () -> Void
+    /// Panneau des téléchargements visible (ouvert, dans une barre affichée) : le menu propose de le masquer.
+    let isDownloadsPanelShown: Bool
     /// Copie l'adresse de l'onglet affiché et confirme « URL copiée » (⇧⌘C), comme l'action de la
     /// barre de commande ; nil si l'onglet affiché n'a pas d'adresse.
     let copyURL: (() -> Void)?

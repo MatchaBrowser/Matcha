@@ -38,8 +38,9 @@ import XCTest
 ///   fenêtre du navigateur active : la mini-fenêtre reste devant), `23-mini-remise` (⌘O, la page dans le Space).
 ///   Sans réseau : `MATCHA_SCREENSHOT_MINI=about:blank?mini` ;
 /// - `MATCHA_SCREENSHOT_DOWNLOADS` : chemin d'un fichier local que WebKit n'affiche pas (« 1 » : celui des tests
-///   des téléchargements), téléchargé dans ~/Downloads/MatchaUITests, effacé à la fin : `24-telechargement-bouton`
-///   (bouton du pied de la barre), `25-telechargements-liste` (liste ouverte) ;
+///   des téléchargements), téléchargé dans ~/Downloads/MatchaUITests, effacé à la fin : `36-telechargements-vide`
+///   (panneau vide, avant le téléchargement), `24-telechargement-bouton` (bouton du pied de la barre),
+///   `25-telechargements-liste` (liste ouverte) ;
 /// - `MATCHA_SCREENSHOT_SITE_SETTINGS` : panneau des réglages du site de l'onglet affiché (`26-reglages-site`), puis la
 ///   confirmation de l'effacement de ses données (`27-reglages-site-effacer`) ; sans `MATCHA_SCREENSHOT_URLS`, ouvre
 ///   https://example.com (réseau). Avec `…_SETTINGS_VALUES=addressBarPosition=top` : en haut de la carte ;

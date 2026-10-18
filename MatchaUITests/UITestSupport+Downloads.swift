@@ -47,14 +47,34 @@ extension XCTestCase {
         scope.buttons["downloadsButton"]
     }
 
+    /// `scope` : l'app, ou une fenêtre précise (chaque fenêtre a son panneau).
     @MainActor
-    func downloadsPanel(in app: XCUIApplication) -> XCUIElement {
-        app.descendants(matching: .any).matching(identifier: "downloadsPanel").firstMatch
+    func downloadsPanel(in scope: XCUIElement) -> XCUIElement {
+        scope.descendants(matching: .any).matching(identifier: "downloadsPanel").firstMatch
     }
 
     @MainActor
-    func downloadRows(in app: XCUIApplication) -> XCUIElementQuery {
-        app.descendants(matching: .any).matching(identifier: "downloadRow")
+    func downloadRows(in scope: XCUIElement) -> XCUIElementQuery {
+        scope.descendants(matching: .any).matching(identifier: "downloadRow")
+    }
+
+    /// Texte « Aucun téléchargement » du panneau vide.
+    @MainActor
+    func downloadsEmptyState(in scope: XCUIElement) -> XCUIElement {
+        scope.descendants(matching: .any).matching(identifier: "downloadsEmptyState").firstMatch
+    }
+
+    /// Bouton « Afficher le dossier Téléchargements » du panneau vide ; jamais cliqué par les tests (il ouvrirait le
+    /// Finder). Cherché par son identifiant seul : son style de lien peut en faire un lien pour l'accessibilité.
+    @MainActor
+    func downloadsShowFolderButton(in scope: XCUIElement) -> XCUIElement {
+        scope.descendants(matching: .any).matching(identifier: "downloadsShowFolderButton").firstMatch
+    }
+
+    /// Présentation > « Afficher les téléchargements » / « Masquer les téléchargements » (⌥⌘L).
+    @MainActor
+    func toggleDownloadsWithKeyboard(in app: XCUIApplication) {
+        app.typeKey("l", modifierFlags: [.command, .option])
     }
 
     /// Valeur de `com.apple.quarantine` (« drapeaux;date;app;événement »), nil si le fichier ne la porte pas.
