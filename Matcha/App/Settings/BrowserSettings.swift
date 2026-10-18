@@ -17,6 +17,7 @@ nonisolated enum BrowserSettings {
         static let tabSuspensionDelay = "tabSuspensionDelay"
         static let blocksAdsAndTrackers = "blocksAdsAndTrackers"
         static let externalLinkDestination = "externalLinkDestination"
+        static let showsDeveloperTools = "showsDeveloperTools"
     }
 
     static let searchEngine = SearchEngine.defaultEngine
@@ -38,6 +39,12 @@ nonisolated enum BrowserSettings {
     static let tabSuspensionDelay = TabSuspensionDelay.thirtyMinutes
     /// Bloqueur de publicités et de traqueurs (tâche 6.2), actif dès que des listes sont livrées.
     static let blocksAdsAndTrackers = true
+    // Outils pour développeurs web (`WebInspection`) : comme Safari, désactivés par défaut ; activés en Debug.
+    #if DEBUG
+        static let showsDeveloperTools = true
+    #else
+        static let showsDeveloperTools = false
+    #endif
     /// Liens d'autres apps (tâche 8.2) : dans une mini-fenêtre, comme Little Arc.
     static let externalLinkDestination = ExternalLinkDestination.miniWindow
 

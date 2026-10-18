@@ -34,6 +34,27 @@ final class BrowserWebView: WKWebView {
     /// vue libérée par son onglet.
     weak var audio: PageAudio?
 
+    /// Inspectable selon le réglage des outils pour développeurs, suivi tant que la vue existe.
+    override init(frame: CGRect, configuration: WKWebViewConfiguration) {
+        super.init(frame: frame, configuration: configuration)
+        WebInspection.apply(to: self)
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(webInspectionDidChange),
+            name: WebInspection.didChange,
+            object: nil,
+        )
+    }
+
+    @available(*, unavailable)
+    required init?(coder _: NSCoder) {
+        fatalError("init(coder:) n'est pas pris en charge")
+    }
+
+    @objc private func webInspectionDidChange() {
+        WebInspection.apply(to: self)
+    }
+
     override func willOpenMenu(_ menu: NSMenu, with event: NSEvent) {
         super.willOpenMenu(menu, with: event)
         rewritePageMenu(menu)

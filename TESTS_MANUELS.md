@@ -540,3 +540,8 @@ Après la 8.1 (l'app déclarée comme navigateur).
 - [ ] Clé EdDSA de Sparkle créée par `generate_keys` (dans le trousseau), et sa copie de secours (`generate_keys -x`) rangée hors du Mac ; sa clé publique dans `SUPublicEDKey`.
 - [ ] `brew install create-dmg`, `gh auth login` ; GitHub Pages servi depuis la branche `gh-pages` du dépôt (créée par la première publication).
 - [ ] `scripts/release.sh <version> --dry-run` : image disque notarisée et appcast.xml préparés dans `build/release/<version>`, rien de publié.
+
+### Outils pour développeurs web (hors plan)
+
+- [ ] Réglages > Avancé : « Afficher les fonctions pour les développeurs web » (coché en Debug, décoché dans la version publiée). Coché : clic droit dans une page > « Inspecter l'élément » ouvre l'inspecteur web sous la page, dans Matcha ; décoché : l'élément disparaît aussitôt des pages ouvertes.
+- [ ] Coché, la page est aussi visible dans Safari > Développement > (ce Mac) > Matcha, ainsi que les pages des extensions.

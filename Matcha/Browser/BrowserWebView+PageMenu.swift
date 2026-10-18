@@ -26,8 +26,9 @@ final class PageMenuChoice: NSObject {
 
 /// Menu contextuel des pages (tâche 5.9). « Ouvrir le lien dans un nouvel onglet » et « Ouvrir l'image dans un nouvel
 /// onglet » prennent la place des éléments « … dans une nouvelle fenêtre » de WebKit ; « Ouvrir dans un aperçu » suit
-/// le premier, dans les onglets. Le reste (« Copier le lien », « Télécharger le fichier lié », « Inspecter
-/// l'élément »…) est le menu de WebKit, inchangé ; sans les identifiants attendus, le menu entier l'est.
+/// le premier, dans les onglets. Le reste (« Copier le lien », « Télécharger le fichier lié », « Inspecter l'élément »
+/// avec les outils pour développeurs…) est le menu de WebKit, inchangé ; sans les identifiants attendus, le menu entier
+/// l'est.
 ///
 /// Un élément de Matcha retient le choix (`pageMenuIntent`) puis déclenche l'élément de WebKit qu'il remplace, par
 /// `NSApp.sendAction` avec l'action, la cible et l'élément de WebKit eux-mêmes : WebKit ouvre alors la fenêtre du lien,

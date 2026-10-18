@@ -22,6 +22,7 @@ enum WebConfigurationFactory {
         let configuration = WKWebViewConfiguration()
         configuration.websiteDataStore = websiteDataStore
         configuration.preferences.isElementFullscreenEnabled = true
+        WebInspection.apply(to: configuration.preferences)
         configuration.applicationNameForUserAgent = applicationNameForUserAgent
         configuration.userContentController = makeUserContentController()
         ExtensionManager.shared.attach(to: configuration)

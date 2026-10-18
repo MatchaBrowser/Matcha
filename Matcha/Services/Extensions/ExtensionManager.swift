@@ -54,6 +54,7 @@ final class ExtensionManager: NSObject {
         // Pages des extensions (popup, options, arrière-plan) : présentées aux sites comme Safari, comme les onglets.
         let pages = WKWebViewConfiguration()
         pages.applicationNameForUserAgent = WebConfigurationFactory.applicationNameForUserAgent
+        WebInspection.apply(to: pages.preferences)
         configuration.webViewConfiguration = pages
         controller = WKWebExtensionController(configuration: configuration)
         self.store = store
@@ -62,6 +63,13 @@ final class ExtensionManager: NSObject {
         controller.delegate = self
         windows.sink = controller
         observeContexts()
+        // Outils pour développeurs : pages des extensions inspectables (Safari > Développement) selon le réglage.
+        observers
+            .append(NotificationCenter.default.addObserver(forName: WebInspection.didChange, object: nil, queue: .main) { [weak self] _ in
+                MainActor.assumeIsolated {
+                    self?.contexts.values.forEach { $0.isInspectable = WebInspection.isEnabled() }
+                }
+            })
         // Bulle d'une action sous le bouton de son extension (dans la fenêtre et, s'il y en a plusieurs, la carte de
         // l'onglet visé), sinon au coin haut droit de la fenêtre.
         popups.anchor = { [weak self] action, window in
@@ -148,9 +156,7 @@ final class ExtensionManager: NSObject {
         if let baseURL = URL(string: "\(Self.scheme)://\(identifier)/") {
             context.baseURL = baseURL
         }
-        #if DEBUG
-            context.isInspectable = true
-        #endif
+        context.isInspectable = WebInspection.isEnabled()
         (store.state(for: identifier) ?? ExtensionState()).apply(to: context)
         // WebKit demande les fenêtres ouvertes pendant le chargement : elles doivent être à jour.
         windows.update()

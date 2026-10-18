@@ -1300,6 +1300,35 @@
         }
       }
     },
+    "Adds Inspect Element to the menu of pages: the Web Inspector opens in Matcha. Pages and extensions can also be inspected from the Develop menu of Safari." : {
+      "comment" : "Settings > Advanced: note under the web developers option",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fügt dem Menü der Seiten „Element untersuchen“ hinzu: Der Webinformationen-Inspektor öffnet sich in Matcha. Seiten und Erweiterungen lassen sich auch über das Menü „Entwickler“ von Safari untersuchen."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Añade «Inspeccionar elemento» al menú de las páginas: el inspector web se abre en Matcha. Las páginas y extensiones también se pueden inspeccionar desde el menú Desarrollo de Safari."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ajoute « Inspecter l'élément » au menu des pages : l'inspecteur web s'ouvre dans Matcha. Pages et extensions peuvent aussi être inspectées depuis le menu Développement de Safari."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aggiunge «Ispeziona elemento» al menu delle pagine: la finestra di ispezione web si apre in Matcha. Pagine ed estensioni si possono ispezionare anche dal menu Sviluppo di Safari."
+          }
+        }
+      }
+    },
     "Ads and Trackers" : {
       "comment" : "Settings > Privacy: section of the content blocker",
       "localizations" : {
@@ -1325,6 +1354,35 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Pubblicità e tracker"
+          }
+        }
+      }
+    },
+    "Advanced" : {
+      "comment" : "Settings: tab of advanced settings",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Erweitert"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Avanzado"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Avancé"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Avanzate"
           }
         }
       }
@@ -8364,6 +8422,35 @@
         }
       }
     },
+    "Pages and extensions can be inspected from the Develop menu of Safari." : {
+      "comment" : "Settings > Advanced: note under the web developers option, when WebKit has no in-app inspector",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Seiten und Erweiterungen lassen sich über das Menü „Entwickler“ von Safari untersuchen."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Las páginas y extensiones se pueden inspeccionar desde el menú Desarrollo de Safari."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pages et extensions peuvent être inspectées depuis le menu Développement de Safari."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pagine ed estensioni si possono ispezionare dal menu Sviluppo di Safari."
+          }
+        }
+      }
+    },
     "Pages visited during this period are removed from the history of “%@”. Cookies and website data are kept." : {
       "comment" : "Clear History dialog, with several profiles; %@ is the profile name",
       "localizations" : {
@@ -10579,6 +10666,35 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Mostra la cartella Download"
+          }
+        }
+      }
+    },
+    "Show features for web developers" : {
+      "comment" : "Settings > Advanced: shows the Web Inspector in the menu of pages",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Funktionen für Webentwickler anzeigen"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mostrar funciones para desarrolladores web"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Afficher les fonctions pour les développeurs web"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mostra funzionalità per sviluppatori web"
           }
         }
       }

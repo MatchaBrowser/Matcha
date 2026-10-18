@@ -112,9 +112,6 @@ final class BrowserTab: Identifiable {
         let webView = BrowserWebView(frame: .zero, configuration: configuration)
         webView.allowsBackForwardNavigationGestures = true
         webView.allowsMagnification = true
-        #if DEBUG
-            webView.isInspectable = true
-        #endif
         webView.navigationDelegate = delegate
         webView.uiDelegate = delegate
         webView.pageZoom = pageZoom

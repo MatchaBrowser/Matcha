@@ -11,6 +11,7 @@ final class SettingsSelection {
         case profiles
         case privacy
         case extensions
+        case advanced
     }
 
     static let shared = SettingsSelection()

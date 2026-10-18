@@ -21,6 +21,9 @@ struct SettingsView: View {
             ExtensionsSettingsView()
                 .tabItem { Label("Extensions", systemImage: "puzzlepiece.extension") }
                 .tag(SettingsSelection.Tab.extensions)
+            AdvancedSettingsView()
+                .tabItem { Label("Advanced", systemImage: "gearshape.2") }
+                .tag(SettingsSelection.Tab.advanced)
         }
         .frame(width: 520)
     }
