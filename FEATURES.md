@@ -133,6 +133,7 @@ Fonctions livrées avec une limite, faute d'API publique ou par choix de simplic
 - **Signature des `.crx`** : non vérifiée ; l'utilisateur choisit le fichier et voit les permissions avant d'installer. Une extension Safari d'app, elle, est vérifiée par WebKit (manifeste contrôlé par la signature du `.appex`).
 - **Mises à jour** : rien n'est mis à jour seul. Une extension Safari suit son app (App Store) ; un fichier se réinstalle par-dessus (« Mettre à jour l'extension »), ses données gardées.
 - **Permissions facultatives** (`optional_permissions`) : pas montrées à l'installation ; l'extension les demande en cours de route (alerte de la 6.3).
+- **Menu de Bitwarden dans les champs** (icône et suggestions au focus d'un champ) : ne s'affiche pas. Son conteneur (`overlay/menu.html`) n'accepte que les adresses `chrome-extension:`, `moz-extension:` ou `safari-web-extension:` (`isExtensionUrlWithOrigin`) ; Matcha sert les pages d'extension sous `webkit-extension:`, et WebKit ne charge pas dans les pages web d'une autre app les pages servies sous ces trois schémas (vérifié par des tests, `DECISIONS.md`). Le reste marche : bulle de l'extension, remplissage depuis la bulle, badge. Pistes : demander à Bitwarden d'accepter `webkit-extension:` (une ligne dans `isExtensionUrlWithOrigin`), ou les raccourcis des extensions (`commands`, ⌘⇧L de Bitwarden : `WKWebExtensionContext.performCommand(for:)` sur les touches).
 
 ### Boutons des extensions (6.5)
 
