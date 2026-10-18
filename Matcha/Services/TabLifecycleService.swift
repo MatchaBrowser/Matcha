@@ -141,6 +141,12 @@ final class TabLifecycleService {
         tracker.hiddenSince(tab.id)
     }
 
+    /// Vrai si `tab` est affiché dans une fenêtre ouverte de la session (tâche 5.7 : une page dont le processus s'arrête
+    /// se recharge tout de suite).
+    func isVisible(_ tab: BrowserTab) -> Bool {
+        visibleTabIDs().contains(tab.id)
+    }
+
     /// Relit ce qui est affiché et note l'heure des changements.
     func refreshVisibility() {
         tracker.update(visible: visibleTabIDs(), present: Set(openTabs().map(\.id)), now: now())

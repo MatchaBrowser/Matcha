@@ -4594,7 +4594,7 @@
       }
     },
     "Reload" : {
-      "comment" : "Toolbar button: reload the page",
+      "comment" : "Toolbar button: reload the page; also the button of the message shown on a page that had a problem",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -5917,6 +5917,35 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Questa pagina"
+          }
+        }
+      }
+    },
+    "This page had a problem" : {
+      "comment" : "Title of the message shown in place of a page whose content stopped working several times in a row",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bei dieser Seite ist ein Problem aufgetreten"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Esta página ha tenido un problema"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cette page a rencontré un problème"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Si è verificato un problema con questa pagina"
           }
         }
       }

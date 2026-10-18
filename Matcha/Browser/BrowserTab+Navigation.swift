@@ -14,20 +14,34 @@ extension BrowserTab {
         return url?.absoluteString ?? String(localized: "New Tab")
     }
 
-    /// Les commandes de navigation mènent ailleurs que la page sortie de veille : plus de capture par-dessus.
+    /// Les commandes de navigation mènent ailleurs que la page sortie de veille : plus de capture par-dessus ; une page
+    /// plantée (tâche 5.7) quitte son message.
     func goBack() {
         suspension.endRestoring()
+        crash.pageWillNavigate()
         webView?.goBack()
     }
 
     func goForward() {
         suspension.endRestoring()
+        crash.pageWillNavigate()
         webView?.goForward()
     }
 
+    /// Après un arrêt du processus (tâche 5.7 : rechargement automatique, bouton du message, ⌘R), le rechargement
+    /// n'est pas une nouvelle visite de l'historique, comme la sortie de veille ; une page arrêtée avant d'avoir rien
+    /// affiché (rien à recharger) charge son adresse.
     func reload() {
         suspension.endRestoring()
-        webView?.reload()
+        guard crash.isRecovering else {
+            webView?.reload()
+            return
+        }
+        crash.pageWillNavigate()
+        history.pageWillResume(url: url)
+        if webView?.reload() == nil, let url {
+            load(url)
+        }
     }
 
     func stop() {

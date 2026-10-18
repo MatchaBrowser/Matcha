@@ -42,6 +42,8 @@ final class BrowserTab: Identifiable {
     let history = PageHistory()
     /// Mise en veille pour la mémoire (tâche 5.6).
     let suspension = TabSuspension()
+    /// Reprise après un arrêt du processus de la page (tâche 5.7).
+    let crash = PageCrashRecovery()
     /// Zoom de la page (`WKWebView.pageZoom`, tâche 5.4), recopié ici pour les menus : il ne change que par
     /// `setPageZoom`. Le zoom par pincement (`magnification`) est à part.
     private(set) var pageZoom = ZoomLevels.actualSize
@@ -71,6 +73,7 @@ final class BrowserTab: Identifiable {
         find.performer = self
         history.page = self
         suspension.page = self
+        crash.page = self
     }
 
     /// Onglet restauré depuis l'enregistrement : il affiche `url` et `title`, et ne crée sa vue web
@@ -196,8 +199,9 @@ final class BrowserTab: Identifiable {
 
     func load(_ url: URL) {
         let webView = makeWebViewIfNeeded()
-        // Une autre page que celle de la veille : plus de capture par-dessus.
+        // Une autre page que celle de la veille : plus de capture par-dessus ; une page plantée quitte son message.
         suspension.endRestoring()
+        crash.pageWillNavigate()
         load(url, in: webView)
     }
 
@@ -209,8 +213,8 @@ final class BrowserTab: Identifiable {
         webView?.pageZoom = zoom
     }
 
-    /// Libère la vue web : observation, son, chargement, délégués ; refuse les demandes de permission en attente et
-    /// oublie la recherche dans la page.
+    /// Libère la vue web : observation, son, chargement, délégués ; refuse les demandes de permission en attente,
+    /// oublie la recherche dans la page et la reprise d'un arrêt du processus (message compris).
     private func releaseWebView() {
         observations = []
         permissionPrompts.denyAll()
@@ -224,6 +228,7 @@ final class BrowserTab: Identifiable {
         webView = nil
         isLoading = false
         progress = 0
+        crash.end()
     }
 
     private func load(_ url: URL, in webView: WKWebView) {
@@ -250,15 +255,15 @@ final class BrowserTab: Identifiable {
     private func observe(_ webView: WKWebView) {
         observations = [
             webView.observe(\.title, options: .initial, changeHandler: sync { tab, webView in
-                // Sortie de veille : l'onglet garde son titre jusqu'à celui de la page rechargée.
-                if tab.suspension.isRestoring, webView.title?.isEmpty != false {
+                // Sortie de veille, arrêt du processus : l'onglet garde son titre jusqu'à celui de la page rechargée.
+                if tab.keepsTitleAndAddress, webView.title?.isEmpty != false {
                     return
                 }
                 tab.title = webView.title
                 tab.history.titleDidChange(to: webView.title, pageURL: webView.url)
             }),
             webView.observe(\.url, options: .initial, changeHandler: sync { tab, webView in
-                if tab.suspension.isRestoring, webView.url == nil {
+                if tab.keepsTitleAndAddress, webView.url == nil {
                     return
                 }
                 tab.suspension.pageURLDidChange(to: webView.url)

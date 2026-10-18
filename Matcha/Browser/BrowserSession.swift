@@ -80,6 +80,7 @@ final class BrowserSession {
             )
         }
         tabLifecycle.session = self
+        spaces.forEach { $0.tabManager.lifecycle = tabLifecycle }
         terminationObserver = NotificationCenter.default.addObserver(
             forName: NSApplication.willTerminateNotification,
             object: nil,
@@ -170,6 +171,7 @@ final class BrowserSession {
     }
 
     func appendSpace(_ space: SpaceSession) {
+        space.tabManager.lifecycle = tabLifecycle
         spaces.append(space)
     }
 

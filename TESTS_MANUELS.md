@@ -301,3 +301,23 @@ Pour ne pas attendre 30 minutes : Réglages > Général > « Libérer la mémoir
 - [ ] Fenêtre privée (⇧⌘N) : mêmes règles ; ses onglets en veille reviennent pareil (rien n'est enregistré).
 - [ ] Une page qui joue du son par Web Audio (un jeu, une radio en ligne, un synthétiseur en ligne) dans un onglet caché : note si elle est mise en veille malgré le son (WebKit pourrait ne signaler que les éléments audio et vidéo).
 - Connu : le contenu non enregistré d'une page est perdu à la veille (formulaires, position d'une vidéo, état d'un jeu) ; une fenêtre ouverte par une page (connexion « avec Google »…) perd le lien avec sa page d'origine si celle-ci est mise en veille pendant ce temps ; un partage d'écran sans caméra ni micro n'est pas détecté.
+
+### 5.7 Plantage d'une page
+
+Pour faire planter une page sans risque : Moniteur d'activité (Applications > Utilitaires), onglet Processeur, champ de recherche « Web Content ». Chaque page de Matcha a son processus (« Matcha Web Content », ou le site de la page dans le nom sur un macOS récent ; sinon « com.apple.WebKit.WebContent »). Pour être sûr de viser le bon : ferme Safari, et repère le processus qui apparaît quand tu ouvres la page (le plus récent a le PID le plus élevé, colonne PID). Sélectionne-le, bouton ⓧ en haut de la fenêtre, puis « Forcer à quitter ». Ça ne touche que cette page. Le journal : Console.app, filtre « Browser » (une ligne « Processus de la page arrêté » par plantage, avec le nombre de plantages en 30 s ; jamais l'adresse).
+
+- [ ] Onglet affiché : ouvre un site (Wikipédia), suis un lien, puis force à quitter le processus de la page : elle se recharge aussitôt, à la même adresse (une page blanche un court instant au plus). Dans la barre latérale, le titre et l'icône de l'onglet ne bougent pas. Précédent (⌘[) ramène à la page d'avant.
+- [ ] Onglet caché : ouvre une page, note son processus, passe sur un autre onglet, puis force à quitter ce processus : rien ne change dans la barre (titre, icône, × au survol). Clique l'onglet : la page se recharge, Précédent marche.
+- [ ] Autre Space : même chose avec l'onglet sélectionné d'un Space que tu quittes ; il se recharge quand tu reviens sur ce Space. Fenêtre principale fermée (⇧⌘W, Matcha reste ouvert) : la page se recharge quand tu rouvres la fenêtre.
+- [ ] Split : force à quitter le processus du panneau qui n'est pas actif : il se recharge tout de suite ; l'autre panneau ne bouge pas.
+- [ ] Aperçu (Maj+clic sur un lien) : force à quitter le processus de la page de l'aperçu : elle se recharge dans l'aperçu, qui reste ouvert ; la page derrière ne bouge pas.
+- [ ] Mini-fenêtre (⌥⌘N) : force à quitter le processus de sa page : elle se recharge, même si la mini-fenêtre est derrière la fenêtre principale.
+- [ ] Deux fois de suite : force à quitter le processus d'une page affichée, puis, dès qu'elle s'est rechargée (moins de 30 s après), celui de la page rechargée. **Attendu :** plus de rechargement ; à la place de la page, un message calme « Cette page a rencontré un problème », le site en dessous et un bouton « Recharger », dans la carte (pas de fenêtre ni d'alerte). Le titre et l'icône de l'onglet n'ont pas changé. « Recharger » (ou ⌘R) ramène la page. Même chose dans un aperçu et dans une mini-fenêtre. Recommence en attendant plus de 30 s entre les deux : la page se recharge seule les deux fois.
+- [ ] Message dans un split : un clic sur le message du panneau qui n'est pas actif le rend actif ; son bouton « Recharger » recharge ce panneau-là.
+- [ ] Message puis autre chose : avec le message affiché, ⌘L et une autre adresse, ou Précédent : le message part et la page demandée s'affiche.
+- [ ] Recherche dans la page (⌘F) ouverte, un mot trouvé, puis plantage : la barre reste ouverte avec son texte, sans résultat ; Entrée retrouve le mot dans la page rechargée.
+- [ ] Zoom : un site à 125 % revient à 125 % après le plantage (badge toujours là).
+- [ ] Demande de permission en attente (bandeau caméra ou micro, https://webcamtests.com) : au plantage, le bandeau disparaît (demande refusée) ; la page rechargée peut redemander.
+- [ ] Historique (⌘Y) : le rechargement après un plantage n'ajoute pas de visite (pas de ligne en plus, heure inchangée), ni celui du bouton « Recharger » du message.
+- [ ] Langues : le message et son bouton en anglais, allemand, espagnol et italien (Réglages Système > Général > Langue et région > Applications > Matcha).
+- Connu : comme pour la mise en veille, le contenu non enregistré de la page est perdu (formulaire, position d'une vidéo). Pas de test d'interface automatique : aucune façon publique de faire planter une page (seuls les tests unitaires appellent directement le délégué de WebKit).

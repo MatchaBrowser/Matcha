@@ -114,6 +114,14 @@ final class FindSession {
         hasSelectedMatch = false
     }
 
+    /// Le processus de la page s'est arrêté (tâche 5.7) : la recherche en attente est annulée et le résultat oublié,
+    /// sans rien demander à la page (il n'y a plus d'occurrence sélectionnée). La barre et son texte restent : ⌘G
+    /// cherche de nouveau dans la page rechargée.
+    func pageDidTerminate() {
+        cancelSearch()
+        pageDidChange()
+    }
+
     // MARK: Recherche
 
     /// Nouveau texte du champ : recherché vers l'avant après `typingDelay`, sauf s'il est vide.

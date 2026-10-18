@@ -4,9 +4,9 @@ import WebKit
 
 /// Délégué de navigation et d'interface des vues web d'un `TabHost` (les onglets d'un Space et leur aperçu, ou
 /// les mini-fenêtres) : nouvelles fenêtres, fermeture par la page, liens vers d'autres apps, clics avec
-/// modificateur, aperçu (Peek), téléchargements, permissions des sites (`+Permissions`), historique (`+History`). Les
-/// règles viennent de `NavigationPolicy`, `DownloadPolicy` et `SitePermissionPolicy` ; l'hôte décide où vont les
-/// pages.
+/// modificateur, aperçu (Peek), téléchargements, permissions des sites (`+Permissions`), historique (`+History`), arrêt
+/// du processus d'une page (`+Crash`). Les règles viennent de `NavigationPolicy`, `DownloadPolicy`,
+/// `SitePermissionPolicy` et `PageCrashPolicy` ; l'hôte décide où vont les pages.
 @MainActor
 final class NavigationCoordinator: NSObject {
     weak var tabHost: (any TabHost)?
@@ -18,6 +18,8 @@ final class NavigationCoordinator: NSObject {
     /// Réglage « liens des favoris et des épinglés vers d'autres sites dans l'aperçu », lu à chaque clic ;
     /// remplaçable dans les tests.
     var opensPinnedLinksInPeek: () -> Bool = { BrowserSettings.pinnedLinksOpenInPeek() }
+    /// Heure des arrêts du processus des pages (tâche 5.7) ; remplacée dans les tests.
+    var now: () -> Date = { .now }
 
     private func request(for navigationAction: WKNavigationAction, in webView: WKWebView) -> NavigationRequest {
         let url = navigationAction.request.url
@@ -102,8 +104,10 @@ extension NavigationCoordinator: WKNavigationDelegate {
         guard let tabHost, let tab = tabHost.page(for: webView) else {
             return
         }
-        // Page sortie de veille rechargée (tâche 5.6) : sa capture laisse la place à la page.
+        // Page sortie de veille rechargée (tâche 5.6) : sa capture laisse la place à la page ; page rechargée après un
+        // arrêt de son processus (5.7) : l'onglet suit de nouveau sa vue web.
         tab.suspension.endRestoring()
+        tab.crash.end()
         tabHost.faviconService.refreshIcon(of: tab)
         // Retenu à chaque page chargée : un plantage ne fait pas perdre l'historique.
         tab.captureInteractionState()

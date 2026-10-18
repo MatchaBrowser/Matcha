@@ -28,6 +28,8 @@ final class TabManager {
     @ObservationIgnored var siteZooms: SiteZoomStore?
     /// Historique des pages de ce Space (tâche 5.5), donné par le Space ; nil : rien n'est retenu (fenêtre privée).
     @ObservationIgnored var history: HistoryScope?
+    /// Ce qui est affiché dans les fenêtres de la session (tâches 5.6 et 5.7), donné par la session.
+    @ObservationIgnored weak var lifecycle: TabLifecycleService?
 
     init(websiteDataStore: WKWebsiteDataStore, faviconService: FaviconService = .shared, downloadScope: DownloadScope = .regular) {
         self.websiteDataStore = websiteDataStore

@@ -5,7 +5,7 @@ import WebKit
 /// Aperçu (Peek, tâche 4.4) : une page ouverte par-dessus les pages affichées, hors de la barre latérale. C'est
 /// un `BrowserTab` que la barre ne connaît pas ; « Ouvrir en onglet » range ce même objet : même vue web, même
 /// historique, rien n'est rechargé. Il n'est jamais enregistré.
-/// Tâche 5.7 : une page d'aperçu plantée est visible, elle se recharge.
+/// Tâche 5.7 : une page d'aperçu plantée est visible (`isVisible`), elle se recharge.
 /// Tâche 6.3 : l'aperçu n'est un onglet des extensions qu'une fois ouvert en onglet.
 extension TabManager {
     /// Page au premier plan : l'aperçu s'il est ouvert, sinon l'onglet sélectionné, qui est aussi le panneau

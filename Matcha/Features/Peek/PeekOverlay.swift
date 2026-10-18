@@ -74,6 +74,12 @@ struct PeekOverlay: View {
             FindBar(page: peek.tab)
             PermissionBanner(prompts: peek.tab.permissionPrompts)
             PeekWebHost(webView: webView) { PeekActions.close(in: tabManager) }
+                // Page plantée plusieurs fois de suite (tâche 5.7) : le message, jusqu'au rechargement.
+                .overlay {
+                    if peek.tab.crash.isShowingProblem {
+                        PageProblemView(page: peek.tab)
+                    }
+                }
         }
         .background(.background)
         .clipShape(.rect(cornerRadius: BrowserWindowView.cardCornerRadius))

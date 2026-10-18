@@ -30,4 +30,7 @@ protocol TabHost: AnyObject {
     var siteZooms: SiteZoomStore? { get }
     /// Historique où retenir les visites de `webView` (tâche 5.5) ; nil : rien n'est retenu (fenêtre privée).
     func historyScope(for webView: WKWebView) -> HistoryScope?
+    /// Vrai si `page` est à l'écran (tâche 5.7) : une page dont le processus s'arrête se recharge tout de suite si
+    /// elle est visible, sinon quand on l'affiche.
+    func isVisible(_ page: BrowserTab) -> Bool
 }

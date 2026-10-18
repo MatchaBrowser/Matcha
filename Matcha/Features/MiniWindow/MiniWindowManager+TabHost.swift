@@ -11,7 +11,8 @@ import WebKit
 /// - pas d'aperçu : un Maj+clic reste un clic (`NavigationSource.other`) ;
 /// - téléchargements : dans la liste de la fenêtre principale ;
 /// - permissions des sites : décisions du profil de la mini-fenêtre, bandeau dans sa page ;
-/// - historique : visites retenues pour le profil de la mini-fenêtre, sans Space.
+/// - historique : visites retenues pour le profil de la mini-fenêtre, sans Space ;
+/// - processus de la page arrêté : la page est visible tant que sa mini-fenêtre est ouverte, elle se recharge.
 /// Tâche 5.8 : `windowFeatures` (fenêtres de connexion) est encore ignoré.
 extension MiniWindowManager: TabHost {
     var faviconService: FaviconService {
@@ -69,6 +70,11 @@ extension MiniWindowManager: TabHost {
 
     func closePage(of webView: WKWebView) {
         window(for: webView)?.close()
+    }
+
+    /// Mini-fenêtre ouverte, même au second plan (comme une fenêtre réduite pour la mise en veille, tâche 5.6).
+    func isVisible(_ page: BrowserTab) -> Bool {
+        window(for: page) != nil
     }
 
     /// Zoom par site de la session principale : une mini-fenêtre n'est jamais privée (tâche 5.4).

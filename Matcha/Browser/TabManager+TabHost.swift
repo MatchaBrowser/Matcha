@@ -52,6 +52,19 @@ extension TabManager: TabHost {
         history
     }
 
+    /// L'aperçu est visible : il ne s'ouvre que par-dessus une page affichée et se ferme avec elle. Un onglet l'est s'il
+    /// est affiché dans une fenêtre ouverte (sélectionné ou panneau de son split, dans le Space affiché : notion de la
+    /// tâche 5.6) ; sans ce suivi (tests), s'il est affiché par ce Space.
+    func isVisible(_ page: BrowserTab) -> Bool {
+        if peek?.tab === page {
+            return true
+        }
+        guard tab(withID: page.id) === page else {
+            return false
+        }
+        return lifecycle?.isVisible(page) ?? displayedTabIDs.contains(page.id)
+    }
+
     func closePage(of webView: WKWebView) {
         if isPeek(webView) {
             PeekActions.close(in: self)

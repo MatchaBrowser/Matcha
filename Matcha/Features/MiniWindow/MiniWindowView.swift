@@ -65,8 +65,9 @@ struct MiniWindowView: View {
         .onChange(of: settings) { _, settings in controller.commandBar.apply(settings) }
     }
 
-    /// Page de la mini-fenêtre (conteneur AppKit, jamais recréé), ou une invite tant qu'elle n'a rien chargé ; au-dessus,
-    /// sa barre de recherche (tâche 5.3) et le bandeau de ses demandes de permission (tâche 5.2).
+    /// Page de la mini-fenêtre (conteneur AppKit, jamais recréé), ou une invite tant qu'elle n'a rien chargé, ou le
+    /// message d'une page plantée plusieurs fois de suite (tâche 5.7) ; au-dessus, sa barre de recherche (tâche 5.3) et
+    /// le bandeau de ses demandes de permission (tâche 5.2).
     private var page: some View {
         VStack(spacing: 0) {
             FindBar(page: tab)
@@ -81,6 +82,8 @@ struct MiniWindowView: View {
                     )
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
                     .background(.background)
+                } else if tab.crash.isShowingProblem {
+                    PageProblemView(page: tab)
                 }
             }
         }
