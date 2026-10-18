@@ -34,6 +34,8 @@ protocol TabHost: AnyObject {
     func sitePermissions(for webView: WKWebView) -> SitePermissionScope?
     /// Zoom des pages par site (tâche 5.4) ; nil : les pages gardent leur zoom d'une page à l'autre.
     var siteZooms: SiteZoomStore? { get }
+    /// Bloqueur de la session (tâche 6.2) ; nil (tests) : les pages ne sont pas suivies par le bloqueur.
+    var contentBlocking: ContentBlockerScope? { get }
     /// Historique où retenir les visites de `webView` (tâche 5.5) ; nil : rien n'est retenu (fenêtre privée).
     func historyScope(for webView: WKWebView) -> HistoryScope?
     /// Vrai si `page` est à l'écran (tâche 5.7) : une page dont le processus s'arrête se recharge tout de suite si
@@ -46,4 +48,9 @@ protocol TabHost: AnyObject {
 extension TabHost {
     /// Rien par défaut : un onglet ouvert pour un téléchargement reste ouvert (`FEATURES.md`).
     func downloadDidStart(in _: WKWebView) {}
+
+    /// Sans bloqueur par défaut (hôtes des tests).
+    var contentBlocking: ContentBlockerScope? {
+        nil
+    }
 }

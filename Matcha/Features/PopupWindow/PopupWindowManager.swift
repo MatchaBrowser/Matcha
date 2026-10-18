@@ -17,6 +17,8 @@ final class PopupWindowManager {
     let siteZooms: SiteZoomStore?
     /// Fenêtre privée : fenêtres de connexion sombres, comme elle.
     let isPrivate: Bool
+    /// Bloqueur de la session (tâche 6.2), donné par la session ; nil (tests) : les pages ne sont pas suivies.
+    var contentBlocking: ContentBlockerScope?
     /// Délégué de navigation des pages des fenêtres de connexion.
     let coordinator = NavigationCoordinator()
     /// Fenêtres ouvertes, de la plus ancienne à la plus récente.

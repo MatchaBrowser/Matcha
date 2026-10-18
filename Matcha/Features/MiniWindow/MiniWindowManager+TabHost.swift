@@ -98,6 +98,11 @@ extension MiniWindowManager: TabHost {
         session.popupWindows
     }
 
+    /// Bloqueur de la session principale (tâche 6.2) : ses exceptions enregistrées.
+    var contentBlocking: ContentBlockerScope? {
+        session.contentBlocking
+    }
+
     /// Décisions du profil de la mini-fenêtre (jamais privée : elles sont enregistrées).
     func sitePermissions(for webView: WKWebView) -> SitePermissionScope? {
         window(for: webView).map { SitePermissionScope(store: session.sitePermissions, profileID: $0.profileID) }

@@ -25,4 +25,6 @@ nonisolated extension Logger {
     static let history = Logger(subsystem: subsystem, category: "History")
     /// Mémoire des onglets (mise en veille des onglets cachés) ; jamais d'adresse, seulement des nombres.
     static let tabLifecycle = Logger(subsystem: subsystem, category: "TabLifecycle")
+    /// Bloqueur de publicités et de traqueurs : listes, durées, nombres ; jamais d'adresse ni de site.
+    static let contentBlocker = Logger(subsystem: subsystem, category: "ContentBlocker")
 }

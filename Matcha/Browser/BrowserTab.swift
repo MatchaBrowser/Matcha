@@ -66,11 +66,11 @@ final class BrowserTab: Identifiable {
     @ObservationIgnored private var pendingInteractionState: Data?
     @ObservationIgnored private var observations: [NSKeyValueObservation] = []
 
-    /// La première vue web est créée avec exactement cette configuration : c'est obligatoire
-    /// pour les vues demandées par WebKit (`window.open`, liens `target=_blank`).
+    /// La première vue web est créée avec exactement cette configuration (obligatoire pour `window.open`), sauf si son
+    /// contrôleur de contenu sert déjà à une autre page : copie avec un contrôleur neuf (bloqueur, tâche 6.2).
     init(id: UUID = UUID(), configuration: WKWebViewConfiguration, openerID: BrowserTab.ID? = nil) {
         self.id = id
-        self.configuration = configuration
+        self.configuration = WebConfigurationFactory.pageConfiguration(from: configuration)
         self.openerID = openerID
         find.performer = self
         history.page = self

@@ -32,6 +32,8 @@ final class TabManager {
     @ObservationIgnored weak var lifecycle: TabLifecycleService?
     /// Fenêtres de connexion de la session (tâche 5.8), données par la session ; nil (tests) : des onglets.
     @ObservationIgnored weak var popupWindows: PopupWindowManager?
+    /// Bloqueur de la session (tâche 6.2), donné par la session ; nil (tests) : les pages ne sont pas suivies.
+    @ObservationIgnored var contentBlocking: ContentBlockerScope?
 
     init(websiteDataStore: WKWebsiteDataStore, faviconService: FaviconService = .shared, downloadScope: DownloadScope = .regular) {
         self.websiteDataStore = websiteDataStore

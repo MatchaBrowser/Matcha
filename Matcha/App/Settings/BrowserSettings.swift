@@ -15,6 +15,7 @@ nonisolated enum BrowserSettings {
         static let showsSearchSuggestions = "showsSearchSuggestions"
         static let opensPinnedLinksInPeek = "opensPinnedLinksInPeek"
         static let tabSuspensionDelay = "tabSuspensionDelay"
+        static let blocksAdsAndTrackers = "blocksAdsAndTrackers"
     }
 
     static let searchEngine = SearchEngine.defaultEngine
@@ -34,6 +35,8 @@ nonisolated enum BrowserSettings {
     static let opensPinnedLinksInPeek = false
     /// Mémoire libérée après 30 minutes sans affichage (tâche 5.6).
     static let tabSuspensionDelay = TabSuspensionDelay.thirtyMinutes
+    /// Bloqueur de publicités et de traqueurs (tâche 6.2), actif dès que des listes sont livrées.
+    static let blocksAdsAndTrackers = true
 
     /// Adresse de la page d'accueil saisie dans les réglages, interprétée comme dans la barre d'adresse ;
     /// nil si elle est vide.
@@ -60,5 +63,14 @@ nonisolated enum BrowserSettings {
         let stored = defaults.object(forKey: Key.tabSuspensionDelay)
         let minutes = (stored as? NSNumber)?.intValue ?? (stored as? String).flatMap { Int($0) }
         return minutes.flatMap(TabSuspensionDelay.init(rawValue:)) ?? tabSuspensionDelay
+    }
+
+    /// Valeur du réglage du bloqueur dans `defaults` (« YES » et « NO » des arguments de lancement compris), ou sa
+    /// valeur par défaut ; sans réglages (tests), la valeur par défaut.
+    static func blocksAdsAndTrackers(in defaults: UserDefaults?) -> Bool {
+        guard let defaults, defaults.object(forKey: Key.blocksAdsAndTrackers) != nil else {
+            return blocksAdsAndTrackers
+        }
+        return defaults.bool(forKey: Key.blocksAdsAndTrackers)
     }
 }

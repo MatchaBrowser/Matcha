@@ -1,0 +1,6 @@
+[
+  {
+    "trigger" : { "url-filter" : "^obtest://blocked\\.test/" },
+    "action" : { "type" : "block" }
+  }
+]

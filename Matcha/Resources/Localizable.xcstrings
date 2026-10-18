@@ -212,6 +212,101 @@
         }
       }
     },
+    "%lld rules" : {
+      "comment" : "Settings > Privacy: number of rules of a blocklist",
+      "localizations" : {
+        "de" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld Regel"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld Regeln"
+                }
+              }
+            }
+          }
+        },
+        "en" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld rule"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld rules"
+                }
+              }
+            }
+          }
+        },
+        "es" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld regla"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld reglas"
+                }
+              }
+            }
+          }
+        },
+        "fr" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld règle"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld règles"
+                }
+              }
+            }
+          }
+        },
+        "it" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld regola"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld regole"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "1 hour" : {
       "comment" : "Option of “Free memory of inactive tabs after”",
       "localizations" : {
@@ -531,6 +626,35 @@
         }
       }
     },
+    "Ads and Trackers" : {
+      "comment" : "Settings > Privacy: section of the content blocker",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Werbung und Tracker"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Anuncios y rastreadores"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Publicités et traqueurs"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pubblicità e tracker"
+          }
+        }
+      }
+    },
     "Airplane" : {
       "comment" : "Icon choice (SF Symbol)",
       "localizations" : {
@@ -585,6 +709,35 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Tutta la cronologia"
+          }
+        }
+      }
+    },
+    "All profiles and private windows, from the next page load. To turn it off for one website, use the site settings." : {
+      "comment" : "Settings > Privacy: footer of the content blocker section",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Für alle Profile und privaten Fenster, ab dem nächsten Laden einer Seite. Um ihn für eine Website auszuschalten, nutze die Website-Einstellungen."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Para todos los perfiles y las ventanas privadas, desde la próxima carga de una página. Para desactivarlo en un sitio web, usa los ajustes del sitio web."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pour tous les profils et les fenêtres privées, dès le prochain chargement d'une page. Pour le désactiver sur un site, utilisez les réglages du site."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Per tutti i profili e le finestre private, dal prossimo caricamento di una pagina. Per disattivarlo su un sito web, usa le impostazioni del sito web."
           }
         }
       }
@@ -874,6 +1027,151 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Sfondo"
+          }
+        }
+      }
+    },
+    "Block Ads and Trackers" : {
+      "comment" : "Site settings: switch that turns the content blocker on or off for this website",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Werbung und Tracker blockieren"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bloquear anuncios y rastreadores"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bloquer les publicités et traqueurs"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Blocca pubblicità e tracker"
+          }
+        }
+      }
+    },
+    "Block Again" : {
+      "comment" : "Settings > Privacy: removes a content blocker exception; ads are blocked again on that website",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wieder blockieren"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Volver a bloquear"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bloquer à nouveau"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Blocca di nuovo"
+          }
+        }
+      }
+    },
+    "Block ads and trackers" : {
+      "comment" : "Settings > Privacy: turns the content blocker on or off for all websites",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Werbung und Tracker blockieren"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bloquear anuncios y rastreadores"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bloquer les publicités et traqueurs"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Blocca pubblicità e tracker"
+          }
+        }
+      }
+    },
+    "Blocker Exceptions" : {
+      "comment" : "Settings > Privacy: section listing the websites where the content blocker is off",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ausnahmen des Blockers"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Excepciones del bloqueador"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Exceptions du bloqueur"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Eccezioni del bloccatore"
+          }
+        }
+      }
+    },
+    "Blocklist Credits" : {
+      "comment" : "Settings > Privacy: section crediting the authors and licenses of the blocklists",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Urheber der Blocklisten"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Créditos de las listas de bloqueo"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Crédits des listes de blocage"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Crediti delle liste di blocco"
           }
         }
       }
@@ -5094,6 +5392,64 @@
         }
       }
     },
+    "No blocklist is installed." : {
+      "comment" : "Site settings and Settings > Privacy: the content blocker has no list, so it is inactive",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Keine Blockliste installiert."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No hay ninguna lista de bloqueo instalada."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aucune liste de blocage n'est installée."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nessuna lista di blocco installata."
+          }
+        }
+      }
+    },
+    "No exceptions." : {
+      "comment" : "Settings > Privacy: the content blocker is active on every website",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Keine Ausnahmen."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No hay excepciones."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aucune exception."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nessuna eccezione."
+          }
+        }
+      }
+    },
     "No saved decisions." : {
       "comment" : "Settings > Privacy: no website has a saved camera or microphone decision",
       "localizations" : {
@@ -6162,6 +6518,35 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Riproduzione audio in corso"
+          }
+        }
+      }
+    },
+    "Preparing the blocklists…" : {
+      "comment" : "Site settings and Settings > Privacy: the content blocker is not ready yet (launch)",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Blocklisten werden vorbereitet …"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Preparando las listas de bloqueo…"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Préparation des listes de blocage…"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Preparazione delle liste di blocco…"
           }
         }
       }
@@ -8190,6 +8575,35 @@
         }
       }
     },
+    "The authors and licenses of the blocklists appear here." : {
+      "comment" : "Settings > Privacy: placeholder of the blocklist credits when no list is installed",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hier erscheinen die Urheber und Lizenzen der Blocklisten."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aquí aparecerán los autores y las licencias de las listas de bloqueo."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Les auteurs et les licences des listes de blocage s'afficheront ici."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Qui compariranno gli autori e le licenze delle liste di blocco."
+          }
+        }
+      }
+    },
     "The page couldn't be exported as PDF." : {
       "comment" : "Alert after File > Export as PDF… failed",
       "localizations" : {
@@ -8480,6 +8894,35 @@
         }
       }
     },
+    "Turned off in Settings > Privacy." : {
+      "comment" : "Site settings: the content blocker is turned off for all websites in the app settings",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "In Einstellungen > Datenschutz ausgeschaltet."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Desactivado en Ajustes > Privacidad."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Désactivé dans Réglages > Confidentialité."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Disattivato in Impostazioni > Privacy."
+          }
+        }
+      }
+    },
     "Turquoise" : {
       "comment" : "Folder color swatch",
       "localizations" : {
@@ -8625,6 +9068,35 @@
         }
       }
     },
+    "Version %@, compiled %@" : {
+      "comment" : "Settings > Privacy: under a blocklist name; first %@ is its version (2026.10.18), second when it was prepared",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Version %1$@, kompiliert am %2$@"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Versión %1$@, compilada el %2$@"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Version %1$@, compilée le %2$@"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Versione %1$@, compilata il %2$@"
+          }
+        }
+      }
+    },
     "Website Permissions" : {
       "comment" : "Settings > Privacy: section listing the saved camera and microphone decisions",
       "localizations" : {
@@ -8650,6 +9122,35 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Autorizzazioni dei siti web"
+          }
+        }
+      }
+    },
+    "Websites where you turned off the blocker in the site settings, with their subdomains. Never from private windows." : {
+      "comment" : "Settings > Privacy: footer of the content blocker exceptions",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Websites, auf denen du den Blocker in den Website-Einstellungen ausgeschaltet hast, mit ihren Subdomains. Nie aus privaten Fenstern."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sitios web en los que desactivaste el bloqueador en los ajustes del sitio web, con sus subdominios. Nunca desde ventanas privadas."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sites où vous avez désactivé le bloqueur dans les réglages du site, avec leurs sous-domaines. Jamais depuis les fenêtres privées."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Siti web in cui hai disattivato il bloccatore nelle impostazioni del sito web, con i loro sottodomini. Mai dalle finestre private."
           }
         }
       }

@@ -1,0 +1,19 @@
+{
+  "format" : 1,
+  "lists" : [
+    {
+      "identifier" : "test-block",
+      "name" : "Test Block",
+      "version" : "1",
+      "file" : "blocker-test-block.json",
+      "license" : "Test license",
+      "homepage" : "https://example.com/lists"
+    },
+    {
+      "identifier" : "test-hide",
+      "name" : "Test Hide",
+      "version" : "1",
+      "file" : "blocker-test-hide.json"
+    }
+  ]
+}

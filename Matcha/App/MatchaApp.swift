@@ -27,9 +27,11 @@ struct MatchaApp: App {
         // Rien n'est retenu (taille, Space affiché) avec une base de test.
         let miniWindows = MiniWindowManager(session: session, defaults: session.isInMemory ? nil : .standard)
         // Raccourci global de la mini-fenêtre, sauf dans l'app hôte des tests unitaires : il serait pris à
-        // l'utilisateur, et son premier accès écrirait ⌥⌘N dans ses réglages (même identifiant d'app).
+        // l'utilisateur, et son premier accès écrirait ⌥⌘N dans ses réglages (même identifiant d'app). Bloqueur (tâche
+        // 6.2) : listes relues ou compilées en tâche de fond, sauf là aussi (les tests ont leur propre magasin).
         if ProcessInfo.processInfo.environment["XCTestConfigurationFilePath"] == nil {
             miniWindows.start()
+            ContentBlockerService.shared.start()
         }
         _session = State(initialValue: session)
         _miniWindows = State(initialValue: miniWindows)

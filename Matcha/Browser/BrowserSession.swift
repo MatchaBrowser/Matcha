@@ -47,6 +47,9 @@ final class BrowserSession {
     /// Fenêtres de connexion ouvertes par les pages de la session (tâche 5.8) : privées et fermées avec elle pour une
     /// fenêtre privée.
     @ObservationIgnored let popupWindows: PopupWindowManager
+    /// Bloqueur (tâche 6.2) : celui de l'app, avec les exceptions enregistrées ; celles changées dans une fenêtre privée
+    /// ou une base de test restent en mémoire.
+    @ObservationIgnored let contentBlocking: ContentBlockerScope
     private(set) var spaces: [SpaceSession] = []
     private(set) var profiles: [ProfileRecord] = []
     /// Magasin de données (cookies, stockage) de chaque profil, par identifiant de profil.
@@ -55,7 +58,7 @@ final class BrowserSession {
 
     /// Ouvre les Spaces enregistrés ; au premier lancement, crée le profil « Personnel » et le Space « Perso »
     /// (« Personal » et « Home » en anglais).
-    init(container: ModelContainer, isPrivate: Bool = false) {
+    init(container: ModelContainer, isPrivate: Bool = false, contentBlocker: ContentBlockerService = .shared) {
         self.container = container
         self.isPrivate = isPrivate
         faviconService = isPrivate ? FaviconService(directory: nil) : .shared
@@ -71,6 +74,8 @@ final class BrowserSession {
             siteZooms: siteZooms,
             isPrivate: isPrivate,
         )
+        contentBlocking = ContentBlockerScope(service: contentBlocker, savesExceptions: !isPrivate && !isInMemory)
+        popupWindows.contentBlocking = contentBlocking
         var records = (try? context.fetch(FetchDescriptor<SpaceRecord>(sortBy: [SortDescriptor(\.order)]))) ?? []
         if records.isEmpty {
             records = [Self.createDefaultSpace(in: context)]
@@ -184,10 +189,12 @@ final class BrowserSession {
         spaces.append(space)
     }
 
-    /// Les onglets du Space suivent la mise en veille de la session et y ouvrent leurs fenêtres de connexion.
+    /// Les onglets du Space suivent la mise en veille et le bloqueur de la session, et y ouvrent leurs fenêtres de
+    /// connexion.
     private func connect(_ space: SpaceSession) {
         space.tabManager.lifecycle = tabLifecycle
         space.tabManager.popupWindows = popupWindows
+        space.tabManager.contentBlocking = contentBlocking
     }
 
     func removeSpace(_ space: SpaceSession) {

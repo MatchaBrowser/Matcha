@@ -6,9 +6,9 @@ import WebKit
 /// mini-fenêtres ou les fenêtres de connexion) : nouvelles fenêtres, fenêtres de connexion (`PopupWindowManager`),
 /// fermeture par la page, liens vers d'autres apps, clics avec modificateur, aperçu (Peek), téléchargements,
 /// permissions des sites (`+Permissions`), historique (`+History`), arrêt du processus d'une page (`+Crash`), menu
-/// contextuel des pages (`+PageMenu`). Les règles viennent de `NavigationPolicy`, `PopupWindowFeatures`,
-/// `DownloadPolicy`, `SitePermissionPolicy`, `PageCrashPolicy` et `PendingPageMenuIntent` ; l'hôte décide où vont les
-/// pages.
+/// contextuel des pages (`+PageMenu`), bloqueur (tâche 6.2). Les règles viennent de `NavigationPolicy`,
+/// `PopupWindowFeatures`, `DownloadPolicy`, `SitePermissionPolicy`, `PageCrashPolicy` et `PendingPageMenuIntent` ;
+/// l'hôte décide où vont les pages.
 @MainActor
 final class NavigationCoordinator: NSObject {
     weak var tabHost: (any TabHost)?
@@ -71,13 +71,33 @@ final class NavigationCoordinator: NSObject {
         tabHost?.downloadDidStart(in: webView)
     }
 
-    /// Lien à ouvrir dans l'aperçu : refusé (le lien suit son cours) si l'hôte ne peut pas l'ouvrir.
-    private func openInPeek(_ url: URL, from webView: WKWebView, decisionHandler: @MainActor @Sendable (WKNavigationActionPolicy) -> Void) {
-        guard let tabHost, tabHost.openInPeek(url, from: webView, openingPoint: webView.pointerPeekPoint) else {
-            decisionHandler(.allow)
+    /// Lien à ouvrir dans l'aperçu ; faux si l'hôte ne peut pas l'ouvrir (le lien suit alors son cours).
+    private func openInPeek(_ url: URL, from webView: WKWebView) -> Bool {
+        tabHost?.openInPeek(url, from: webView, openingPoint: webView.pointerPeekPoint) == true
+    }
+
+    /// Navigation autorisée. Bloqueur (tâche 6.2) : pour le document principal, les listes de la page sont d'abord
+    /// posées, ou retirées si le site de destination est en exception ; elles valent ainsi dès ce chargement (vérifié).
+    private func allow(
+        _ navigationAction: WKNavigationAction,
+        in webView: WKWebView,
+        decisionHandler: @MainActor @Sendable (WKNavigationActionPolicy) -> Void,
+    ) {
+        if navigationAction.targetFrame?.isMainFrame == true {
+            tabHost?.contentBlocking?.prepare(webView, for: navigationAction.request.url)
+        }
+        decisionHandler(.allow)
+    }
+
+    /// Bloqueur (tâche 6.2) : une navigation autorisée qui n'aboutit pas (erreur réseau, réponse devenue un
+    /// téléchargement) laisse la page affichée, dont les listes reviennent à l'état de son document. Sauf annulation :
+    /// c'est le plus souvent qu'une autre navigation la remplace, déjà préparée.
+    func provisionalNavigationDidFail(in webView: WKWebView, error: any Error) {
+        let error = error as NSError
+        guard error.domain != NSURLErrorDomain || error.code != NSURLErrorCancelled else {
             return
         }
-        decisionHandler(.cancel)
+        tabHost?.contentBlocking?.prepare(webView, for: webView.backForwardList.currentItem?.url)
     }
 }
 
@@ -89,6 +109,8 @@ extension NavigationCoordinator: WKNavigationDelegate {
         guard let tabHost, let tab = tabHost.page(for: webView) else {
             return
         }
+        // Bloqueur (tâche 6.2) : recalé sur le document affiché (redirection, retour depuis le cache).
+        tabHost.contentBlocking?.prepare(webView, for: webView.url)
         tab.permissionPrompts.denyAll()
         tab.audio.reset()
         tab.favicon = webView.url?.host().flatMap(tabHost.faviconService.cachedIcon(forHost:))
@@ -117,7 +139,7 @@ extension NavigationCoordinator: WKNavigationDelegate {
     ) {
         switch NavigationPolicy.decide(request(for: navigationAction, in: webView)) {
         case .allow:
-            decisionHandler(.allow)
+            allow(navigationAction, in: webView, decisionHandler: decisionHandler)
         case .cancel:
             decisionHandler(.cancel)
         case let .openExternally(url):
@@ -128,7 +150,11 @@ extension NavigationCoordinator: WKNavigationDelegate {
             // Même configuration que la vue d'origine : même profil.
             tabHost?.openLink(url, configuration: webView.configuration, from: webView, inBackground: inBackground)
         case let .openInPeek(url):
-            openInPeek(url, from: webView, decisionHandler: decisionHandler)
+            if openInPeek(url, from: webView) {
+                decisionHandler(.cancel)
+            } else {
+                allow(navigationAction, in: webView, decisionHandler: decisionHandler)
+            }
         case .download:
             decisionHandler(.download)
         }
@@ -168,6 +194,8 @@ extension NavigationCoordinator: WKUIDelegate {
         guard let tabHost else {
             return nil
         }
+        // La nouvelle page a son propre contrôleur de contenu (bloqueur, tâche 6.2), pas celui de la page d'origine.
+        WebConfigurationFactory.giveOwnContentController(to: configuration)
         let features = PopupWindowFeatures(windowFeatures)
         if let intent = takePageMenuIntent(of: webView, for: navigationAction, features: features) {
             return openWindow(for: intent, configuration: configuration, url: navigationAction.request.url, from: webView, in: tabHost)

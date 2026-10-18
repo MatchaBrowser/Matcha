@@ -29,4 +29,39 @@ struct WebConfigurationFactoryTests {
         #expect(script.injectionTime == .atDocumentStart)
         #expect(!script.isForMainFrameOnly)
     }
+
+    /// Tâche 6.2 : chaque page a son propre contrôleur de contenu, que le bloqueur règle sans toucher aux autres.
+    @Test func `a new page keeps a configuration whose controller is free`() {
+        let configuration = WebConfigurationFactory.makeConfiguration(websiteDataStore: .nonPersistent())
+        let controller = configuration.userContentController
+        let tab = BrowserTab(configuration: configuration)
+        #expect(tab.configuration === configuration)
+        #expect(tab.loadedWebView.configuration.userContentController === controller)
+    }
+
+    /// Page dupliquée, aperçu, lien ⌘-clic : une copie de la configuration (même profil, même gestionnaire de schéma),
+    /// avec un contrôleur neuf qui a lui aussi le script de son ; la page d'origine garde le sien.
+    @Test func `a page reusing another page's configuration gets its own controller`() {
+        let configuration = TestPages.configuration()
+        let source = BrowserTab(configuration: configuration)
+        let sourceController = source.loadedWebView.configuration.userContentController
+        let copy = BrowserTab(configuration: source.configuration)
+        let copyConfiguration = copy.loadedWebView.configuration
+        #expect(copyConfiguration.userContentController !== sourceController)
+        #expect(copyConfiguration.websiteDataStore === configuration.websiteDataStore)
+        #expect(copyConfiguration.urlSchemeHandler(forURLScheme: TestPages.scheme) != nil)
+        #expect(copyConfiguration.userContentController.userScripts.contains { $0.source == PageAudioScript.source })
+        #expect(source.loadedWebView.configuration.userContentController === sourceController)
+        #expect(source.configuration.userContentController === sourceController)
+    }
+
+    /// Fenêtre demandée par WebKit : la configuration fournie reçoit un contrôleur neuf, sur elle-même.
+    @Test func `a window requested by webkit gets its own controller in place`() {
+        let configuration = WebConfigurationFactory.makeConfiguration(websiteDataStore: .nonPersistent())
+        let shared = configuration.userContentController
+        WebConfigurationFactory.giveOwnContentController(to: configuration)
+        #expect(configuration.userContentController !== shared)
+        #expect(configuration.userContentController.userScripts.contains { $0.source == PageAudioScript.source })
+        #expect(BrowserTab(configuration: configuration).configuration === configuration)
+    }
 }
