@@ -10,7 +10,7 @@ Trois modes, au choix dans Réglages > Synchronisation :
 
 | Mode | Stockage | Protection | Disponible |
 | --- | --- | --- | --- |
-| iCloud | base privée CloudKit du compte Apple | chiffrement de CloudKit (`encryptedValues`), sans mot de passe maître | oui |
+| iCloud | base privée CloudKit du compte Apple | chiffrement de CloudKit (`encryptedValues`), sans mot de passe maître | non : reporté (`FEATURES.md`), § 6 gardé pour la reprise |
 | Serveur privé | serveur installé par l'utilisateur (API v1, § 4) | chiffrement de bout en bout par mot de passe maître (§ 3) | oui |
 | Serveur public | serveur hébergé par Matcha, même API | idem | non : option grisée « Bientôt disponible » |
 
@@ -551,6 +551,8 @@ Disponible si `features` contient `blobs`. Toutes les routes sont authentifiées
 ---
 
 ## 6. iCloud
+
+Reporté le 2026-10-18 (`FEATURES.md`) : la synchro passe d'abord par un serveur. Ce qui suit reste la spécification pour la reprise.
 
 - Moteur : `CKSyncEngine`, sur la base privée du conteneur `iCloud.com.matchabrowser.matcha` (tâche 7.3), zone `Matcha`.
 - Un `CKRecord` de type `Item` par enregistrement. Son `recordName` est l'`id`. Le contenu JSON du § 2.2 va dans `encryptedValues["payload"]`, sans complément ni chiffrement par Matcha : CloudKit le chiffre avec des clés du trousseau iCloud.

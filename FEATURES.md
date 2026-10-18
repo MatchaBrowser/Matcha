@@ -55,6 +55,18 @@ Fonctions retirées du plan pour l'instant. **Ne pas les reprendre sans mon acco
 
 ---
 
+## Synchro par iCloud (ex-tâches 7.3 et 7.6)
+
+**Reportée le 2026-10-18**, à la demande de l'utilisateur : la synchro passe d'abord par un serveur (privé, puis public). Le moteur reste commun à tous les transports (`SyncTransport`), et `SYNC.md` (§ 6) garde la spécification d'iCloud.
+
+**Texte d'origine :**
+- 7.3 [MANUEL] iCloud. Nécessite le compte développeur payant. Cible Matcha > Signing & Capabilities : ajouter iCloud, cocher CloudKit, conteneur `iCloud.com.matchabrowser.matcha` ; ajouter aussi Push Notifications (c'est par là que `CKSyncEngine` apprend qu'il y a des changements).
+- 7.6 Transport iCloud (`Services/Sync/CloudKitTransport.swift`). `CKSyncEngine` sur la base privée, zone `Matcha`, un `CKRecord` par enregistrement, contenu dans `encryptedValues` (chiffré par CloudKit, sans mot de passe maître) ; paquets d'extension en `CKAsset`, chiffrés par Matcha (`SYNC.md`, § 6). L'état du moteur est conservé. Si le compte iCloud change ou se déconnecte, la synchro s'arrête et les données locales restent.
+
+**À savoir si on la reprend :** le choix « iCloud » s'ajoute à Réglages > Synchronisation (7.9) ; les modèles SwiftData restent compatibles avec CloudKit (règles de `CLAUDE.md`), même si la synchro ne passe pas par le miroir automatique de SwiftData.
+
+---
+
 ## Limites connues, à contourner
 
 Fonctions livrées avec une limite, faute d'API publique ou par choix de simplicité. À reprendre quand on aura une solution.
