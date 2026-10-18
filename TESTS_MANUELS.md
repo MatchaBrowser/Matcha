@@ -545,3 +545,9 @@ Après la 8.1 (l'app déclarée comme navigateur).
 
 - [ ] Réglages > Avancé : « Afficher les fonctions pour les développeurs web » (coché en Debug, décoché dans la version publiée). Coché : clic droit dans une page > « Inspecter l'élément » ouvre l'inspecteur web sous la page, dans Matcha ; décoché : l'élément disparaît aussitôt des pages ouvertes.
 - [ ] Coché, la page est aussi visible dans Safari > Développement > (ce Mac) > Matcha, ainsi que les pages des extensions.
+
+### Menu d'une page (hors plan)
+
+- [ ] Clic droit sur le fond d'une page : Précédent, Suivant (grisés s'il n'y a pas d'historique), Recharger ; Enregistrer sous…, Imprimer… ; Afficher le code source (puis Inspecter l'élément avec les outils pour développeurs). Sur un lien, une image ou un texte sélectionné, le menu de WebKit ne change pas (sauf « Ouvrir … dans un nouvel onglet » et l'aperçu).
+- [ ] « Enregistrer sous… » : feuille d'enregistrement au titre de la page, « Format » Archive web ou Code source de la page ; l'archive se rouvre dans Safari avec ses images.
+- [ ] « Afficher le code source » : un nouvel onglet « Source de … », lignes numérotées, en clair comme en sombre ; d'une page où l'on est connecté, le code de la page connectée ; quitte et relance : l'onglet relit le code.

@@ -194,4 +194,14 @@ final class PageMenuIntegrationTests {
         #expect(manager.selectedTab === page)
         try await waitUntil { manager.tabs[1].url == image }
     }
+
+    @Test func `the menu of a page gets back, forward, save, print and source`() async throws {
+        _ = try await showPage("<div style='height:600px'></div>", element: "DIV")
+        let driver = try await rightClick(choosing: nil)
+        let reload = try #require(driver.identifiers.firstIndex(of: "WKMenuItemIdentifierReload"))
+        #expect(Array(driver.identifiers[..<reload]) == ["MatchaMenuItemIdentifierGoBack", "MatchaMenuItemIdentifierGoForward"])
+        #expect(driver.identifiers.contains("MatchaMenuItemIdentifierSaveAs"))
+        #expect(driver.identifiers.contains("MatchaMenuItemIdentifierPrint"))
+        #expect(driver.identifiers.contains("MatchaMenuItemIdentifierViewSource"))
+    }
 }

@@ -126,4 +126,26 @@ final class PageMenuUITests: XCTestCase {
         XCTAssertEqual(miniWindows(in: app).count, 1)
         XCTAssertEqual(addressPill(in: mini).value as? String, "index.html")
     }
+
+    /// Menu d'une page (hors d'un lien) : Précédent, Suivant, Recharger, Enregistrer sous…, Imprimer…, Afficher le code
+    /// source ; ce dernier ouvre le code dans un nouvel onglet au premier plan.
+    @MainActor
+    func testThePageMenuOpensTheSourceInANewTab() throws {
+        let app = try launchOnLocalDocs()
+        let page = app.webViews.firstMatch
+        let title = page.staticTexts["Postfix Documentation"]
+        XCTAssertTrue(title.waitForExistence(timeout: 5))
+        // Sous le titre, à droite du tampon : le fond de la page.
+        page.coordinate(withNormalizedOffset: CGVector(dx: 0.9, dy: 0.06)).rightClick()
+        for item in ["Précédent", "Suivant", "Recharger", "Enregistrer sous…", "Imprimer…"] {
+            XCTAssertTrue(menuItem(item, in: app).waitForExistence(timeout: 3), item)
+        }
+        XCTAssertFalse(menuItem("Précédent", in: app).isEnabled)
+        menuItem("Afficher le code source", in: app).click()
+
+        XCTAssertTrue(waitForCount(tabRows(in: app), 2, timeout: 5))
+        XCTAssertTrue(waitForValue(of: addressPill(in: app)) { $0.hasPrefix("matcha-source:") || $0.contains("index.html") })
+        let source = app.webViews.firstMatch.staticTexts.matching(NSPredicate(format: "value CONTAINS 'Postfix Documentation'")).firstMatch
+        XCTAssertTrue(source.waitForExistence(timeout: 10))
+    }
 }

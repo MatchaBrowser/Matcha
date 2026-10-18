@@ -15,6 +15,26 @@ extension NavigationCoordinator: PageMenuDelegate {
         tabHost?.navigationSource(of: webView) == .tab
     }
 
+    /// Enregistrer sous… et Imprimer… : sur la page de `webView` ; Afficher le code source : dans un nouvel onglet
+    /// au premier plan, après elle (comme un lien ouvert dans un nouvel onglet), même profil.
+    func pageMenu(perform command: PageCommand, in webView: WKWebView) {
+        guard let tabHost, let page = tabHost.page(for: webView) else {
+            return
+        }
+        switch command {
+        case .saveAs:
+            PageSaver.start(for: page)
+        case .print:
+            PagePrinter.print(page)
+        case .viewSource:
+            if let viewer = PageSource.viewerURL(for: page.url) {
+                tabHost.openLink(viewer, configuration: webView.configuration, from: webView, inBackground: false)
+            }
+        case .goBack, .goForward:
+            break
+        }
+    }
+
     /// Choix du menu contextuel de `webView` que cette fenêtre doit suivre, s'il y en a un ; il est alors oublié.
     /// Une fenêtre demandée par la page elle-même (lien `target=_blank`, formulaire, taille donnée, ou après
     /// l'échéance) ne le prend jamais.

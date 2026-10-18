@@ -6,11 +6,11 @@ nonisolated enum PDFExportFile {
     static let fallbackName = "page"
 
     /// Nom proposé : le titre de la page rendu sûr (« / » devient « - », comme « : »), sinon l'hôte, sinon le nom du
-    /// fichier local, sinon `fallbackName` ; « .pdf » ajouté s'il n'y est pas déjà, 255 octets au plus.
-    static func name(title: String?, url: URL?) -> String {
+    /// fichier local, sinon `fallbackName` ; « .pdf » (ou `fileExtension`) ajouté, 255 octets au plus.
+    static func name(title: String?, url: URL?, fileExtension: String = "pdf") -> String {
         let candidates = [title, url?.host(percentEncoded: false), url.flatMap { $0.isFileURL ? $0.lastPathComponent : nil }]
         let base = candidates.lazy.compactMap { $0.map(baseName) }.first { !$0.isEmpty } ?? fallbackName
-        return DownloadFileName.sanitized(base + ".pdf")
+        return DownloadFileName.sanitized(base + "." + fileExtension)
     }
 
     /// Écrit `data` d'un seul coup : dans un fichier temporaire du même volume, qui prend ensuite la place de

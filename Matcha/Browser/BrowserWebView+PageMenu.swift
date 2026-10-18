@@ -8,6 +8,8 @@ protocol PageMenuDelegate: AnyObject {
     /// Vrai si « Ouvrir dans un aperçu » a un sens dans `webView` : un onglet de la barre (ni l'aperçu, où un lien
     /// se charge déjà sur place, ni une mini-fenêtre ou une fenêtre de connexion, qui n'ont pas d'aperçu).
     func pageMenuOffersPeek(in webView: WKWebView) -> Bool
+    /// Enregistrer sous…, Imprimer…, Afficher le code source, choisis dans le menu de la page de `webView`.
+    func pageMenu(perform command: PageCommand, in webView: WKWebView)
 }
 
 /// Élément de Matcha dans le menu : ce qu'il fait, l'élément de WebKit qu'il déclenche et le point d'où un aperçu
@@ -37,6 +39,9 @@ extension BrowserWebView {
     /// Réécrit `menu`, que WebKit s'apprête à ouvrir. Un choix encore en attente (menu précédent) est oublié.
     func rewritePageMenu(_ menu: NSMenu) {
         pageMenuIntent.cancel()
+        if addPageCommands(to: menu) {
+            return
+        }
         let offersPeek = (uiDelegate as? any PageMenuDelegate)?.pageMenuOffersPeek(in: self) ?? false
         let replacements = PageMenuPlan.replacements(for: menu.items.map { $0.identifier?.rawValue }, offersPeek: offersPeek)
         guard !replacements.isEmpty else {

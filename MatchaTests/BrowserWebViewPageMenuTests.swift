@@ -25,6 +25,13 @@ final class FakePageMenuDelegate: NSObject, WKUIDelegate, PageMenuDelegate {
     func pageMenuOffersPeek(in _: WKWebView) -> Bool {
         offersPeek
     }
+
+    /// Commandes de la page demandées (enregistrer, imprimer, code source).
+    private(set) var performed: [PageCommand] = []
+
+    func pageMenu(perform command: PageCommand, in _: WKWebView) {
+        performed.append(command)
+    }
 }
 
 /// Menu contextuel des pages (tâche 5.9) sur un faux menu qui reprend les identifiants, l'action et l'état des
@@ -163,5 +170,31 @@ struct BrowserWebViewPageMenuTests {
         webView.pageMenuIntent.choose(.peek, openingPoint: PeekLayout.center, at: .now)
         webView.rewritePageMenu(webKitMenu(["WKMenuItemIdentifierReload", nil]))
         #expect(webView.pageMenuIntent.intent == nil)
+    }
+
+    // MARK: Menu d'une page
+
+    @Test func `the page menu gets back, forward, save, print and source`() {
+        let menu = webKitMenu(["WKMenuItemIdentifierReload"])
+        webView.rewritePageMenu(menu)
+        let identifiers = menu.items.map { $0.isSeparatorItem ? nil : $0.identifier?.rawValue }
+        #expect(identifiers == [
+            "MatchaMenuItemIdentifierGoBack", "MatchaMenuItemIdentifierGoForward", "WKMenuItemIdentifierReload", nil,
+            "MatchaMenuItemIdentifierSaveAs", "MatchaMenuItemIdentifierPrint", nil, "MatchaMenuItemIdentifierViewSource",
+        ])
+        // Page sans historique ni adresse : rien n'est possible.
+        #expect(menu.items.filter { $0.identifier?.rawValue.hasPrefix("MatchaMenuItemIdentifier") == true }.allSatisfy { !$0.isEnabled })
+        #expect(menu.items[0].image != nil)
+    }
+
+    @Test func `save, print and source go to the delegate`() throws {
+        let menu = webKitMenu(["WKMenuItemIdentifierReload"])
+        webView.rewritePageMenu(menu)
+        for identifier in ["MatchaMenuItemIdentifierSaveAs", "MatchaMenuItemIdentifierPrint", "MatchaMenuItemIdentifierViewSource"] {
+            // Désactivés sur cette page sans adresse : leur action est envoyée directement.
+            let item = try #require(menu.items.first { $0.identifier?.rawValue == identifier })
+            try NSApp.sendAction(#require(item.action), to: item.target, from: item)
+        }
+        #expect(delegate.performed == [.saveAs, .print, .viewSource])
     }
 }

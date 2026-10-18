@@ -25,6 +25,8 @@ enum WebConfigurationFactory {
         WebInspection.apply(to: configuration.preferences)
         configuration.applicationNameForUserAgent = applicationNameForUserAgent
         configuration.userContentController = makeUserContentController()
+        // « Afficher le code source » (menu d'une page).
+        configuration.setURLSchemeHandler(PageSourceSchemeHandler.shared, forURLScheme: PageSource.scheme)
         ExtensionManager.shared.attach(to: configuration)
         return configuration
     }
