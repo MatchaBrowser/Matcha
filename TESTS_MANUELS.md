@@ -532,3 +532,11 @@ Après la 8.1 (l'app déclarée comme navigateur).
 - [ ] Matcha par défaut, un lien cliqué dans Mail (ou `open https://example.com` dans le Terminal) : une mini-fenêtre s'ouvre sur la page ; Matcha fermé, le lien le lance et s'ouvre de même. Aucune autre fenêtre n'apparaît (ni privée, ni historique).
 - [ ] « Ouvrir les liens d'autres apps dans » : « Un nouvel onglet du Space affiché » : le lien s'ouvre en onglet du jour du Space affiché, la fenêtre principale passe devant (rouverte si elle était fermée).
 - [ ] Un fichier `.html` ouvert depuis le Finder avec Matcha s'ouvre de même.
+
+### 8.4 et 8.5 Préparation de la publication (une fois)
+
+- [ ] Certificat « Developer ID Application » dans le trousseau (Xcode > Réglages > Comptes > Gérer les certificats > + ; rôle Account Holder).
+- [ ] Profil de notarisation : `xcrun notarytool store-credentials matcha-notary --apple-id <identifiant Apple> --team-id 5ZXE2LBS37` (mot de passe d'app créé sur account.apple.com).
+- [ ] Clé EdDSA de Sparkle créée par `generate_keys` (dans le trousseau), et sa copie de secours (`generate_keys -x`) rangée hors du Mac ; sa clé publique dans `SUPublicEDKey`.
+- [ ] `brew install create-dmg`, `gh auth login` ; GitHub Pages servi depuis la branche `gh-pages` du dépôt (créée par la première publication).
+- [ ] `scripts/release.sh <version> --dry-run` : image disque notarisée et appcast.xml préparés dans `build/release/<version>`, rien de publié.
