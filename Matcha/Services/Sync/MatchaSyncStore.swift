@@ -8,10 +8,13 @@ import SwiftData
 final class MatchaSyncStore: SyncLocalStore {
     let session: BrowserSession
     let defaults: UserDefaults
+    /// Extensions installées et proposées ; nil : elles ne voyagent pas (tests).
+    let extensions: ExtensionSyncAdapter?
 
-    init(session: BrowserSession, defaults: UserDefaults) {
+    init(session: BrowserSession, defaults: UserDefaults, extensions: ExtensionSyncAdapter? = nil) {
         self.session = session
         self.defaults = defaults
+        self.extensions = extensions
     }
 
     func snapshot() -> [UUID: SyncFields] {
@@ -38,6 +41,12 @@ final class MatchaSyncStore: SyncLocalStore {
                 result[tab.id] = .tab(fields)
             }
         }
+        addPreferences(to: &result)
+        return result
+    }
+
+    /// Décisions de site, réglages, zooms et extensions.
+    private func addPreferences(to result: inout [UUID: SyncFields]) {
         for entry in session.sitePermissions.entries {
             let key = entry.key
             let id = SyncIdentifier.sitePermission(profileID: key.profileID, origin: key.origin.key, kind: key.kind.rawValue)
@@ -56,13 +65,24 @@ final class MatchaSyncStore: SyncLocalStore {
         for (site, level) in session.siteZooms.levels {
             result[SyncIdentifier.siteZoom(site)] = .siteZoom(SyncSiteZoomFields(site: site, level: level))
         }
-        return result
+        for (identifier, fields) in extensions?.fields() ?? [:] {
+            result[SyncIdentifier.webExtension(identifier)] = .webExtension(fields)
+        }
+    }
+
+    func prepare(using transport: any SyncTransport) async {
+        extensions?.transport = transport
+        await extensions?.preparePackages(using: transport)
+    }
+
+    func finish(using transport: any SyncTransport) async {
+        await extensions?.deleteObsoletePackages(using: transport)
     }
 
     func apply(_ changes: [SyncLocalChange]) -> Set<UUID> {
         // Ce qui n'est pas encore enregistré (moins d'une seconde) l'est d'abord : rien ne se perd à la reprise.
         session.saveAll()
-        let writer = SyncRecordWriter(session: session, defaults: defaults)
+        let writer = SyncRecordWriter(session: session, defaults: defaults, extensions: extensions)
         var waiting: Set<UUID> = []
         for change in changes {
             switch change {

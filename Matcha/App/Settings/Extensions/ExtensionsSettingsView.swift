@@ -5,7 +5,7 @@ import SwiftUI
 /// (`.crx` de Chrome, `.xpi` de Firefox, `.zip`) ou un dossier décompressé (et le lien vers les modules de Firefox).
 /// Chaque ajout passe par l'écran des permissions.
 struct ExtensionsSettingsView: View {
-    @State private var model = ExtensionsSettingsModel(manager: .shared)
+    @State private var model = ExtensionsSettingsModel(manager: .shared, syncAdapter: .shared)
     @State private var pendingRemoval: ExtensionsSettingsModel.Installed?
 
     var body: some View {
@@ -21,6 +21,7 @@ struct ExtensionsSettingsView: View {
                     InstalledExtensionRow(item: item, model: model) { pendingRemoval = item }
                 }
             }
+            SyncedExtensionsSection(model: model)
             Section {
                 ForEach(model.appExtensions) { appExtension in
                     SafariExtensionRow(appExtension: appExtension, isInstalled: model.isInstalled(appExtension)) {

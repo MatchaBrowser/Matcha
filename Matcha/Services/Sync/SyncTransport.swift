@@ -13,6 +13,19 @@ protocol SyncTransport: Sendable {
     /// Changements écrits après `cursor` (nil : depuis le début), par version croissante. Lance
     /// `SyncTransportError.cursorExpired` si le curseur est trop ancien.
     func changes(since cursor: String?) async throws -> SyncChangePage
+
+    /// Vrai si le transport garde les paquets d'extension (`SYNC.md` § 4.7) ; sinon, une extension installée depuis un
+    /// fichier voyage sans son paquet.
+    var supportsBlobs: Bool { get }
+
+    /// Envoie un paquet déjà chiffré ; sans effet si le même existe déjà sous cet identifiant.
+    func putBlob(_ data: Data, id: UUID) async throws
+
+    /// Paquet chiffré `id` ; lance `SyncTransportError.blobNotFound` s'il n'est pas (encore) là.
+    func blob(id: UUID) async throws -> Data
+
+    /// Supprime le paquet `id` (sans erreur s'il n'existe pas).
+    func deleteBlob(id: UUID) async throws
 }
 
 /// Changement envoyé : `baseVersion` est la version sur laquelle il repose, nil pour une création.
@@ -48,4 +61,8 @@ nonisolated struct SyncChangePage: Equatable, Sendable {
 nonisolated enum SyncTransportError: Error, Equatable {
     /// Curseur trop ancien (`410 cursor_expired`) : tout relire depuis le début.
     case cursorExpired
+    /// Paquet absent (`404`) : il arrivera peut-être plus tard.
+    case blobNotFound
+    /// Un autre paquet porte déjà cet identifiant (`409 blob_exists`).
+    case blobExists
 }

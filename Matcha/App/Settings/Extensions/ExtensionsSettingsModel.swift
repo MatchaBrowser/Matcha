@@ -27,7 +27,11 @@ final class ExtensionsSettingsModel {
     }
 
     let manager: ExtensionManager
+    /// Extensions proposées par vos autres Mac (tâche 7.4).
+    let syncAdapter: ExtensionSyncAdapter
     @ObservationIgnored private let installer: ExtensionInstaller
+    /// Extension proposée en cours d'ajout : retirée des propositions une fois installée.
+    @ObservationIgnored var installingOffer: SyncExtensionFields?
     /// Extensions Safari des apps installées.
     private(set) var appExtensions: [SafariAppExtension] = []
     /// Extension préparée, montrée dans l'écran des permissions.
@@ -38,8 +42,9 @@ final class ExtensionsSettingsModel {
     /// Change à chaque action, pour relire ce qui n'est pas suivi (activée, fenêtres privées).
     private(set) var revision = 0
 
-    init(manager: ExtensionManager) {
+    init(manager: ExtensionManager, syncAdapter: ExtensionSyncAdapter) {
         self.manager = manager
+        self.syncAdapter = syncAdapter
         installer = ExtensionInstaller(manager: manager)
     }
 
@@ -123,6 +128,10 @@ final class ExtensionsSettingsModel {
         }
         do {
             try await installer.install(candidate, allowsPrivateWindows: allowsPrivateWindows)
+            if let offer = installingOffer, offer.identifier == candidate.identifier {
+                syncAdapter.didInstallOffer(offer)
+            }
+            installingOffer = nil
         } catch {
             installer.discard(candidate)
             Logger.extensions.error("Extension non installée : \(error.localizedDescription, privacy: .public)")
@@ -132,13 +141,14 @@ final class ExtensionsSettingsModel {
 
     /// Refus dans l'écran des permissions : rien n'est installé.
     func cancel(_ candidate: ExtensionInstallCandidate) {
+        installingOffer = nil
         installer.discard(candidate)
         if self.candidate?.id == candidate.id {
             self.candidate = nil
         }
     }
 
-    private func prepare(_ make: (ExtensionInstaller) async throws -> ExtensionInstallCandidate) async {
+    func prepare(_ make: (ExtensionInstaller) async throws -> ExtensionInstallCandidate) async {
         errorMessage = nil
         isWorking = true
         defer { isWorking = false }

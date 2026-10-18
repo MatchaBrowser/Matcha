@@ -67,6 +67,33 @@ actor InMemorySyncServer {
     func content(of id: UUID) -> SyncContent? {
         records[id]?.content
     }
+
+    // MARK: Paquets
+
+    private(set) var blobs: [UUID: Data] = [:]
+
+    func putBlob(_ data: Data, id: UUID) throws {
+        if let existing = blobs[id], existing != data {
+            throw SyncTransportError.blobExists
+        }
+        blobs[id] = data
+    }
+
+    func blob(id: UUID) throws -> Data {
+        guard let data = blobs[id] else {
+            throw SyncTransportError.blobNotFound
+        }
+        return data
+    }
+
+    func deleteBlob(id: UUID) {
+        blobs[id] = nil
+    }
+
+    /// Remplace le paquet `id` sans contrôle (paquet altéré par le serveur).
+    func replaceBlob(_ data: Data, id: UUID) {
+        blobs[id] = data
+    }
 }
 
 /// Transport vers un `InMemorySyncServer`.
@@ -80,6 +107,22 @@ struct InMemorySyncTransport: SyncTransport {
 
     func changes(since cursor: String?) async throws -> SyncChangePage {
         try await server.changes(since: cursor)
+    }
+
+    var supportsBlobs: Bool {
+        true
+    }
+
+    func putBlob(_ data: Data, id: UUID) async throws {
+        try await server.putBlob(data, id: id)
+    }
+
+    func blob(id: UUID) async throws -> Data {
+        try await server.blob(id: id)
+    }
+
+    func deleteBlob(id: UUID) async throws {
+        await server.deleteBlob(id: id)
     }
 }
 

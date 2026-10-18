@@ -8,6 +8,7 @@ import SwiftData
 final class SyncRecordWriter {
     let session: BrowserSession
     let defaults: UserDefaults
+    let extensions: ExtensionSyncAdapter?
     let context: ModelContext
     var profiles: [UUID: ProfileRecord]
     var spaces: [UUID: SpaceRecord]
@@ -15,9 +16,10 @@ final class SyncRecordWriter {
     var tabs: [UUID: TabRecord]
     private(set) var changes = BrowserSession.SyncChanges()
 
-    init(session: BrowserSession, defaults: UserDefaults) {
+    init(session: BrowserSession, defaults: UserDefaults, extensions: ExtensionSyncAdapter?) {
         self.session = session
         self.defaults = defaults
+        self.extensions = extensions
         context = session.container.mainContext
         profiles = Self.byID((try? context.fetch(FetchDescriptor<ProfileRecord>())) ?? [], id: \.id)
         spaces = Self.byID((try? context.fetch(FetchDescriptor<SpaceRecord>())) ?? [], id: \.id)
@@ -45,8 +47,8 @@ final class SyncRecordWriter {
         case let .siteZoom(fields):
             session.siteZooms.setLevel(fields.level, forSite: fields.site)
             return true
-        case .webExtension:
-            // Extensions : section « Depuis vos autres Mac » (à venir).
+        case let .webExtension(fields):
+            extensions?.apply(fields)
             return true
         }
     }

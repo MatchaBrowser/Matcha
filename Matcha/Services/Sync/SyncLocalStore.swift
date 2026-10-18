@@ -14,6 +14,18 @@ protocol SyncLocalStore: AnyObject {
     /// Vrai si ce Mac n'a que les données de son premier lancement (`SYNC.md` § 5) : à la première synchro, il prend
     /// alors les données synchronisées et retire les siennes.
     var hasOnlyFirstLaunchData: Bool { get }
+
+    /// Avant un cycle : ce qui doit partir avant les enregistrements qui le citent (paquets d'extension).
+    func prepare(using transport: any SyncTransport) async
+
+    /// Après un cycle réussi : ménage sur le serveur (anciens paquets).
+    func finish(using transport: any SyncTransport) async
+}
+
+extension SyncLocalStore {
+    func prepare(using _: any SyncTransport) async {}
+
+    func finish(using _: any SyncTransport) async {}
 }
 
 /// Changement reçu, à appliquer sur ce Mac.

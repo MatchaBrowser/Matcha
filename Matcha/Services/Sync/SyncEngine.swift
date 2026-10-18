@@ -53,6 +53,7 @@ final class SyncEngine {
         isSyncing = true
         report = Report()
         defer { isSyncing = false }
+        await store.prepare(using: transport)
         if state.hasCompletedFirstSync {
             detectLocalChanges()
             try await push()
@@ -63,6 +64,7 @@ final class SyncEngine {
         // Changements de ce Mac plus récents que ceux lus : repartent sur la version lue.
         try await push()
         save()
+        await store.finish(using: transport)
         let (sent, received, conflicts) = (report.sent, report.received, report.conflicts)
         Logger.sync.info(
             "Synchro : \(sent, privacy: .public) envoyés, \(received, privacy: .public) reçus, \(conflicts, privacy: .public) conflits",

@@ -5052,6 +5052,35 @@
         }
       }
     },
+    "From Your Other Macs" : {
+      "comment" : "Settings > Extensions: section of the extensions installed on the user's other Macs",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Von deinen anderen Macs"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "De tus otros Mac"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Depuis vos autres Mac"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dai tuoi altri Mac"
+          }
+        }
+      }
+    },
     "From a File" : {
       "localizations" : {
         "de" : {
@@ -5163,6 +5192,35 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Generali"
+          }
+        }
+      }
+    },
+    "Get the App" : {
+      "comment" : "Settings > Extensions: opens the App Store page of the app that contains a Safari extension",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "App laden"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Obtener la app"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Obtenir l'app"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ottieni l'app"
           }
         }
       }
@@ -5666,6 +5724,35 @@
         }
       }
     },
+    "Ignore" : {
+      "comment" : "Settings > Extensions: hides an extension offered by another Mac, on this Mac only",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ignorieren"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ignorar"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ignorer"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ignora"
+          }
+        }
+      }
+    },
     "Import" : {
       "comment" : "Arc import preview: button that imports",
       "localizations" : {
@@ -5897,6 +5984,35 @@
         }
       }
     },
+    "Installed on your other Macs. Nothing is added to this Mac without your consent." : {
+      "comment" : "Settings > Extensions: footer of the section of extensions from other Macs",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Auf deinen anderen Macs installiert. Ohne deine Zustimmung wird diesem Mac nichts hinzugefügt."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Instaladas en tus otros Mac. No se añade nada a este Mac sin tu consentimiento."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Installées sur vos autres Mac. Rien n'est ajouté à ce Mac sans votre accord."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Installate sugli altri tuoi Mac. Niente viene aggiunto a questo Mac senza il tuo consenso."
+          }
+        }
+      }
+    },
     "It only appears once you choose a homepage in the General tab." : {
       "comment" : "Settings > Appearance: note under “Show Home button”",
       "localizations" : {
@@ -5978,6 +6094,35 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "I suoi Space, pannelli, Preferiti, cookie e accessi verranno eliminati."
+          }
+        }
+      }
+    },
+    "Its package isn't available. Install it from its file." : {
+      "comment" : "Settings > Extensions: help of an extension from another Mac whose package can't be downloaded",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ihr Paket ist nicht verfügbar. Installiere sie aus ihrer Datei."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Su paquete no está disponible. Instálala desde su archivo."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Son paquet n'est pas disponible. Installez-la depuis son fichier."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Il suo pacchetto non è disponibile. Installala dal suo file."
           }
         }
       }
@@ -10819,6 +10964,35 @@
         }
       }
     },
+    "The app that contains this Safari extension isn't on this Mac" : {
+      "comment" : "Settings > Extensions: help of the Get the App button",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Die App mit dieser Safari-Erweiterung ist nicht auf diesem Mac"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "La app que contiene esta extensión de Safari no está en este Mac"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "L'app qui contient cette extension Safari n'est pas sur ce Mac"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "L'app che contiene questa estensione di Safari non è su questo Mac"
+          }
+        }
+      }
+    },
     "The authors and licenses of the blocklists appear here." : {
       "comment" : "Settings > Privacy: placeholder of the blocklist credits when no list is installed",
       "localizations" : {
@@ -11395,6 +11569,34 @@
         }
       }
     },
+    "Unavailable" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nicht verfügbar"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No disponible"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Indisponible"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Non disponibile"
+          }
+        }
+      }
+    },
     "Unpin Split View" : {
       "comment" : "Context menu of a tab in a pinned split view: moves the whole split to Today",
       "localizations" : {
@@ -11534,6 +11736,35 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Vuoi aggiornare “%@”?"
+          }
+        }
+      }
+    },
+    "Update…" : {
+      "comment" : "Settings > Extensions: installs the new version of an extension, received from another Mac, after the permissions screen",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aktualisieren …"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Actualizar…"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mettre à jour…"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aggiorna…"
           }
         }
       }

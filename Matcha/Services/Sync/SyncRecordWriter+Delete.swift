@@ -23,7 +23,12 @@ extension SyncRecordWriter {
         case .setting, .sitePermission, .siteZoom:
             deletePreference(id, type)
         case .webExtension:
-            break
+            if let extensions {
+                let known = extensions.manager.installedIdentifiers + extensions.synced.offers.keys
+                if let identifier = known.first(where: { SyncIdentifier.webExtension($0) == id }) {
+                    extensions.remove(identifier: identifier)
+                }
+            }
         }
     }
 

@@ -511,3 +511,13 @@ Arc installé sur le Mac, avec quelques Spaces, dossiers et favoris. L'import aj
 - [ ] « Importer aussi les onglets ouverts » coché : les onglets ouverts d'Arc rejoignent les onglets du jour de leur Space (les split views d'Arc deviennent des onglets séparés).
 - [ ] Avec plusieurs profils dans Matcha : le menu « Profil » de l'aperçu choisit le profil des Spaces du profil principal d'Arc. Un profil ajouté dans Arc devient un profil de Matcha (même nom que son dossier, « Profile 1 »), réutilisé par un nouvel import.
 - [ ] Quitte et relance : les Spaces importés sont là, toujours sans page chargée d'elle-même.
+
+### 7.4 Moteur de synchro
+
+À faire quand la synchro se configure (serveur privé, tâches 7.7 et 7.9), avec deux Mac (ou deux comptes macOS) :
+
+- [ ] Le second Mac, au premier lancement, prend les Spaces, dossiers, favoris, épinglés, onglets du jour et réglages du premier, sans rien charger : aucune page ne s'ouvre d'elle-même, aucun onglet n'est sélectionné dans un Space reçu.
+- [ ] Renommer un Space, déplacer un épinglé dans un dossier, ajouter un favori, changer de moteur de recherche : l'autre Mac le reçoit en quelques secondes ; rien ne revient en écho (rien ne bouge en boucle).
+- [ ] Naviguer dans un onglet du jour : l'autre Mac reçoit la nouvelle adresse une fois la page stable (5 s), sans changer la page qu'il affiche ; un onglet fermé ailleurs disparaît, sauf s'il est affiché (il reste jusqu'à ce qu'on le ferme).
+- [ ] Ajouter un favori dans un Space, en changer, quitter, relancer : le favori est toujours là dans tous les Spaces du profil (défaut corrigé en préparant la synchro).
+- [ ] Réglages > Extensions : une extension installée sur l'autre Mac apparaît sous « Depuis vos autres Mac » ; « Ajouter… » ouvre l'écran des permissions (extension Safari : si son app manque, « Obtenir l'app » ouvre sa page de l'App Store) ; « Ignorer » la retire de la liste sur ce Mac seulement. Désinstallée sur un Mac, elle l'est sur l'autre.
