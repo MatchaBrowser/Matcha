@@ -77,6 +77,7 @@ Un enregistrement porte l'identifiant (`id`, UUID) de son modèle SwiftData. Son
 - `modifiedAt` vient d'une horloge hybride : la plus grande valeur entre l'heure du Mac et le plus grand `modifiedAt` déjà reçu + 1 ms, en UTC à la milliseconde. Un appareil qui a reçu une modification écrit toujours après elle, même si son horloge retarde.
 - `modifiedBy` est l'identifiant de l'appareil : un UUID créé à la première activation de la synchro.
 - `deleted: true` marque une suppression. `fields` est alors vide.
+- Dans `fields`, un champ absent vaut `null`. Les clés sont écrites triées.
 - `schema` donne la version du format de `fields` pour ce type. Si un client reçoit un `schema` plus récent que le sien, il garde le contenu tel quel, ne modifie pas l'enregistrement et propose de mettre Matcha à jour. Les champs inconnus d'un `schema` connu sont ignorés.
 - **Identifiants tirés d'une clé.** Ce qui n'a pas d'objet propre, ou que deux Mac peuvent créer chacun de leur côté, a un identifiant calculé, le même sur tous les Mac : UUID version 5 (SHA-1, RFC 9562), espace de noms `393070D0-1478-44F6-82BF-07476B17D5F5`, nom :
 
@@ -91,7 +92,7 @@ Un enregistrement porte l'identifiant (`id`, UUID) de son modèle SwiftData. Son
 
 ### 2.3 Règles
 
-- **Conflits :** enregistrement par enregistrement, la modification la plus récente gagne. On compare `modifiedAt`, puis `modifiedBy` en cas d'égalité (le plus grand gagne). Une suppression est une modification comme une autre : si une modification est plus récente qu'une suppression, elle recrée l'enregistrement.
+- **Conflits :** enregistrement par enregistrement, la modification la plus récente gagne. On compare `modifiedAt` (à la milliseconde), puis `modifiedBy` en cas d'égalité : le plus grand gagne, les deux UUID étant écrits en minuscules et comparés caractère par caractère. Une suppression est une modification comme une autre : si une modification est plus récente qu'une suppression, elle recrée l'enregistrement.
 - **Cascade :** l'appareil qui supprime un profil, un Space ou un dossier envoie aussi la suppression de tout ce qu'il contient (dossiers, onglets, décisions de site du profil).
 - **Ordre d'application** d'un lot reçu : profils, Spaces, dossiers, onglets, extensions, réglages, décisions de site, Boosts. Si le parent d'un enregistrement est inconnu, l'enregistrement reste masqué jusqu'à la lecture suivante.
 - **Rangs :** deux appareils peuvent donner le même `order`. À l'affichage, l'`id` les départage.
