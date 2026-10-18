@@ -18,6 +18,7 @@ extension DownloadManager: WKDownloadDelegate {
             Logger.downloads.error("Dossier Téléchargements introuvable : téléchargement abandonné")
             stopTracking(item)
             item.markFailed(reason: String(localized: "The Downloads folder is not available."))
+            saveList()
             completionHandler(nil)
             return
         }
@@ -32,6 +33,7 @@ extension DownloadManager: WKDownloadDelegate {
         releaseReservation(of: item)
         guard let destination = item.destinationURL else {
             item.markFailed(reason: nil)
+            saveList()
             return
         }
         // Avant que la liste ne propose d'ouvrir le fichier.
@@ -39,6 +41,7 @@ extension DownloadManager: WKDownloadDelegate {
         let size = try? destination.resourceValues(forKeys: [.fileSizeKey]).fileSize
         item.markFinished(size: size.map(Int64.init))
         recordFinish(in: item.scope)
+        saveList()
         Logger.downloads.info("Téléchargement terminé (\(Self.origin(of: item), privacy: .public))")
     }
 
@@ -57,6 +60,7 @@ extension DownloadManager: WKDownloadDelegate {
             )
         }
         discardPartialFile(of: item)
+        saveList()
     }
 
     /// Le fichier doit porter l'attribut de quarantaine ; la sandbox le pose d'elle-même, Matcha le pose s'il manque.

@@ -3492,6 +3492,35 @@
         }
       }
     },
+    "File not found" : {
+      "comment" : "State of a finished download whose file was deleted or moved",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Datei nicht gefunden"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Archivo no encontrado"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fichier introuvable"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "File non trovato"
+          }
+        }
+      }
+    },
     "Filled Folder" : {
       "comment" : "Icon choice (SF Symbol)",
       "localizations" : {
@@ -4827,6 +4856,35 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Matcha usa la lingua di macOS. Per usare un’altra lingua solo in Matcha, sceglila in Impostazioni di Sistema."
+          }
+        }
+      }
+    },
+    "Matcha quit before the download finished." : {
+      "comment" : "Reason shown for a download that was still in progress when the app quit",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Matcha wurde beendet, bevor der Download abgeschlossen war."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Matcha se cerró antes de que terminara la descarga."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Matcha a été quitté avant la fin du téléchargement."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Matcha è stato chiuso prima del termine del download."
           }
         }
       }

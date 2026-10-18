@@ -6,14 +6,15 @@ import WebKit
 
 /// Téléchargements de toute l'app (tâche 5.1) : ceux de toutes les fenêtres, aperçus et mini-fenêtres arrivent ici
 /// par `NavigationCoordinator`. Chaque fichier est écrit dans le dossier Téléchargements (`DownloadLocation`), sous un
-/// nom libre choisi au moment où WebKit le demande. La liste ne vit que le temps de la session de l'app : rien n'est
-/// enregistré. Rien ne s'ouvre de soi-même, ni la liste ni le fichier.
+/// nom libre choisi au moment où WebKit le demande. La liste des fenêtres ordinaires est retenue d'un lancement à
+/// l'autre (`SavedDownloadList`) jusqu'à « Effacer » ; celle d'une fenêtre privée, jamais. Rien ne s'ouvre de soi-même,
+/// ni la liste ni le fichier.
 @MainActor
 @Observable
 final class DownloadManager: NSObject {
     static let shared = DownloadManager()
 
-    /// Téléchargements de cette session de l'app, du plus récent au plus ancien.
+    /// Téléchargements de cette session de l'app et ceux repris de la liste retenue, du plus récent au plus ancien.
     private(set) var items: [DownloadItem] = []
     /// Téléchargements terminés depuis le lancement, par fenêtre : le bouton de la barre rebondit à chacun.
     private(set) var finishedCounts: [DownloadScope: Int] = [:]
@@ -25,6 +26,8 @@ final class DownloadManager: NSObject {
     /// (comparés sans tenir compte de la casse, comme le disque).
     @ObservationIgnored private var reservedNames: Set<String> = []
     @ObservationIgnored private var terminationObserver: (any NSObjectProtocol)?
+    /// Réglages où la liste est retenue ; nil (tests, base de test) : rien n'est lu ni écrit.
+    @ObservationIgnored private var defaults: UserDefaults?
 
     /// `directory` : relu à chaque téléchargement ; remplacé dans les tests par un dossier temporaire.
     init(directory: @escaping @MainActor () -> URL? = { DownloadLocation.directory() }) {
@@ -35,8 +38,30 @@ final class DownloadManager: NSObject {
             object: nil,
             queue: .main,
         ) { [weak self] _ in
-            MainActor.assumeIsolated { self?.removePartialFiles() }
+            MainActor.assumeIsolated {
+                self?.removePartialFiles()
+                self?.saveList(includingActive: true)
+            }
         }
+    }
+
+    /// Reprend la liste retenue au lancement précédent, puis la retient à chaque fin de téléchargement et à chaque
+    /// « Effacer ». Une fois, au lancement.
+    func restoreList(from defaults: UserDefaults) {
+        self.defaults = defaults
+        let saved = SavedDownloadList.load(from: defaults)
+        items.append(contentsOf: saved.map(DownloadItem.init(saved:)))
+        Logger.downloads.info("Liste des téléchargements reprise : \(saved.count, privacy: .public)")
+    }
+
+    /// Retient les téléchargements des fenêtres ordinaires qui ne sont plus en cours ; à la fermeture de l'app, aussi
+    /// ceux en cours, comme interrompus.
+    func saveList(includingActive: Bool = false) {
+        guard let defaults else {
+            return
+        }
+        let saved = items.filter { $0.scope == .regular && (includingActive || !$0.isActive) }.map(\.savedDownload)
+        SavedDownloadList.save(saved, to: defaults)
     }
 
     /// Téléchargements que montre une fenêtre, du plus récent au plus ancien.
@@ -70,6 +95,7 @@ final class DownloadManager: NSObject {
         let download = item.download
         stopTracking(item)
         item.markCancelled()
+        saveList()
         Logger.downloads.info("Téléchargement annulé (\(Self.origin(of: item), privacy: .public))")
         guard let download else {
             discardPartialFile(of: item)
@@ -83,6 +109,7 @@ final class DownloadManager: NSObject {
     /// « Effacer » : retire de la liste d'une fenêtre ce qui n'est plus en cours ; aucun fichier n'est effacé.
     func clear(in scope: DownloadScope) {
         items.removeAll { $0.scope == scope && !$0.isActive }
+        saveList()
     }
 
     /// Fenêtre privée fermée : ses téléchargements en cours sont annulés (fichiers partiels effacés), ceux qui sont

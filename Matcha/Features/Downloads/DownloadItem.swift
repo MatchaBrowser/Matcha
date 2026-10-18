@@ -17,15 +17,16 @@ nonisolated enum DownloadScope: Hashable, Sendable {
     case privateWindow(UUID)
 }
 
-/// Un téléchargement de cette session de l'app, tel que la liste l'affiche. L'objet WebKit (`WKDownload`) et le
-/// suivi de sa progression ne vivent que le temps du téléchargement.
+/// Un téléchargement tel que la liste l'affiche : de cette session de l'app, ou repris de la liste retenue
+/// (`SavedDownload`). L'objet WebKit (`WKDownload`) et le suivi de sa progression ne vivent que le temps du
+/// téléchargement.
 @MainActor
 @Observable
 final class DownloadItem: Identifiable {
     /// Intervalle minimal entre deux mises à jour de la progression : WebKit la signale à chaque paquet reçu.
     static let progressInterval = Duration.milliseconds(100)
 
-    let id = UUID()
+    let id: UUID
     let scope: DownloadScope
     /// Adresse demandée (avant redirection).
     let sourceURL: URL?
@@ -48,6 +49,7 @@ final class DownloadItem: Identifiable {
     @ObservationIgnored private var lastProgressUpdate: ContinuousClock.Instant?
 
     init(download: WKDownload?, scope: DownloadScope, sourceURL: URL?, pageURL: URL?) {
+        id = UUID()
         self.download = download
         self.scope = scope
         self.sourceURL = sourceURL
@@ -55,8 +57,66 @@ final class DownloadItem: Identifiable {
         fileName = DownloadFileName.make(suggested: nil, url: sourceURL, mimeType: nil)
     }
 
+    /// Téléchargement repris de la liste retenue (fenêtres ordinaires) ; un téléchargement interrompu par la fermeture
+    /// de l'app revient en échec.
+    init(saved: SavedDownload) {
+        id = saved.id
+        scope = .regular
+        sourceURL = nil
+        pageURL = nil
+        fileName = saved.fileName
+        destinationURL = saved.fileURL
+        completedBytes = saved.byteCount
+        failureReason = saved.failureReason
+        switch saved.outcome {
+        case .finished:
+            state = .finished
+            totalBytes = saved.byteCount
+        case .failed:
+            state = .failed
+        case .cancelled:
+            state = .cancelled
+        case .interrupted:
+            state = .failed
+            failureReason = String(
+                localized: "Matcha quit before the download finished.",
+                comment: "Reason shown for a download that was still in progress when the app quit",
+            )
+        }
+    }
+
     var isActive: Bool {
         state == .downloading
+    }
+
+    /// Fichier terminé introuvable : effacé ou déplacé depuis.
+    var isFileMissing: Bool {
+        guard state == .finished else {
+            return false
+        }
+        guard let destinationURL else {
+            return true
+        }
+        return !FileManager.default.fileExists(atPath: destinationURL.path)
+    }
+
+    /// Ce que la liste retient de ce téléchargement ; encore en cours (fermeture de l'app), il est retenu comme
+    /// interrompu.
+    var savedDownload: SavedDownload {
+        let outcome: SavedDownload.Outcome = switch state {
+        case .downloading: .interrupted
+        case .finished: .finished
+        case .failed: .failed
+        case .cancelled: .cancelled
+        }
+        return SavedDownload(
+            id: id,
+            fileName: fileName,
+            fileURL: destinationURL,
+            outcome: outcome,
+            byteCount: completedBytes,
+            failureReason: failureReason,
+        )
     }
 
     /// Part reçue, de 0 à 1 ; nil si la taille est inconnue.

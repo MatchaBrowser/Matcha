@@ -4,7 +4,7 @@ import UniformTypeIdentifiers
 
 /// Ligne de la liste des téléchargements : icône, nom, progression ou état, et ses boutons (annuler pendant le
 /// téléchargement, afficher dans le Finder ensuite). Un double-clic sur un fichier terminé l'ouvre : seul geste qui
-/// ouvre un fichier téléchargé.
+/// ouvre un fichier téléchargé. Un fichier effacé ou déplacé depuis est « introuvable » : ni bouton ni double-clic.
 struct DownloadRow: View {
     static let height = 58.0
 
@@ -37,7 +37,7 @@ struct DownloadRow: View {
         .frame(height: Self.height)
         .contentShape(Rectangle())
         .onTapGesture(count: 2) {
-            if item.state == .finished, let url = item.destinationURL {
+            if item.state == .finished, !item.isFileMissing, let url = item.destinationURL {
                 NSWorkspace.shared.open(url)
             }
         }
@@ -67,7 +67,7 @@ struct DownloadRow: View {
             .help("Cancel")
             .accessibilityIdentifier("downloadCancelButton")
         case .finished:
-            if let url = item.destinationURL {
+            if !item.isFileMissing, let url = item.destinationURL {
                 Button("Show in Finder", systemImage: "magnifyingglass.circle.fill") {
                     NSWorkspace.shared.activateFileViewerSelecting([url])
                 }
@@ -80,7 +80,8 @@ struct DownloadRow: View {
         }
     }
 
-    /// « 12 Mo sur 40 Mo » pendant le téléchargement, la taille une fois terminé, sinon l'état.
+    /// « 12 Mo sur 40 Mo » pendant le téléchargement, la taille une fois terminé (ou « Fichier introuvable »), sinon
+    /// l'état.
     private var status: String {
         switch item.state {
         case .downloading:
@@ -94,6 +95,9 @@ struct DownloadRow: View {
                 comment: "Progress of a download: bytes received of the total size, e.g. 12 MB of 40 MB",
             )
         case .finished:
+            if item.isFileMissing {
+                return String(localized: "File not found", comment: "State of a finished download whose file was deleted or moved")
+            }
             return DownloadProgressSummary.byteCount(item.completedBytes)
         case .failed:
             return String(localized: "Failed", comment: "State of a download that failed")
