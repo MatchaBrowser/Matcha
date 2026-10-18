@@ -40,8 +40,17 @@ extension BrowserSession {
     /// permission et son historique.
     /// Le dernier profil ne peut pas être supprimé.
     func deleteProfile(_ profile: ProfileRecord) async {
-        guard profiles.count > 1, profiles.contains(where: { $0.id == profile.id }) else {
+        guard let identifier = removeProfile(profile) else {
             return
+        }
+        await removeWebsiteData(ofProfile: identifier)
+    }
+
+    /// Supprime le profil, ses Spaces, ses favoris, ses décisions de permission et son historique ; renvoie son
+    /// identifiant, ou nil si c'est le dernier profil. Ses données de sites restent à effacer (`removeWebsiteData`).
+    func removeProfile(_ profile: ProfileRecord) -> UUID? {
+        guard profiles.count > 1, profiles.contains(where: { $0.id == profile.id }) else {
+            return nil
         }
         // Ses fenêtres de connexion (tâche 5.8) se ferment d'abord : leurs pages n'utilisent plus ses données.
         popupWindows.closeWindows(using: dataStore(for: profile))
@@ -55,8 +64,14 @@ extension BrowserSession {
         save(container.mainContext)
         refreshProfiles()
         forgetDataStore(of: identifier)
+        favoritesHolders[identifier] = nil
         sitePermissions.removeAll(profileID: identifier)
         history?.removeAll(profileID: identifier)
+        return identifier
+    }
+
+    /// Efface les données de sites (cookies, stockage) d'un profil supprimé.
+    func removeWebsiteData(ofProfile identifier: UUID) async {
         guard !isInMemory else {
             return
         }

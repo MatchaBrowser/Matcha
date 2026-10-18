@@ -13,6 +13,8 @@ final class SpaceSession: Identifiable {
     @ObservationIgnored let tabManager: TabManager
     @ObservationIgnored let store: SpaceStore
     @ObservationIgnored private let context: ModelContext
+    /// Profil du Space à son ouverture : ses onglets en ont les données (cookies, stockage).
+    @ObservationIgnored let openedProfileID: UUID?
     /// Couleurs du fond et de la barre latérale.
     private(set) var theme: SpaceTheme
 
@@ -36,6 +38,7 @@ final class SpaceSession: Identifiable {
     ) {
         self.record = record
         self.context = context
+        openedProfileID = record.profile?.id
         theme = SpaceTheme.decoded(from: record.themeData) ?? .default
         tabManager = TabManager(websiteDataStore: websiteDataStore, faviconService: faviconService, downloadScope: downloadScope)
         tabManager.sitePermissions = sitePermissions.map { SitePermissionScope(store: $0, profileID: record.profile?.id) }
@@ -55,6 +58,14 @@ final class SpaceSession: Identifiable {
             try context.save()
         } catch {
             Logger.app.error("Thème non enregistré : \(error.localizedDescription, privacy: .public)")
+        }
+    }
+
+    /// Relit le thème enregistré (changé par un autre Mac).
+    func reloadTheme() {
+        let saved = SpaceTheme.decoded(from: record.themeData) ?? .default
+        if saved != theme {
+            theme = saved
         }
     }
 

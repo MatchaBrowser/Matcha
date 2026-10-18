@@ -5,8 +5,9 @@ struct WeakTabManager {
     weak var manager: TabManager?
 }
 
-/// Favoris d'un profil, communs à ses Spaces : un seul Space les tient à la fois (le dernier affiché, sinon le premier
-/// du profil), et lui seul les enregistre. Les autres Spaces en gardent une copie, reprise du Space qui les tient quand
+/// Favoris d'un profil, communs à ses Spaces (profil d'ouverture : `openedProfileID`) : un seul Space les tient à la
+/// fois (le dernier affiché, sinon le premier du profil), et lui seul les enregistre. Les autres Spaces en gardent une copie, reprise du
+/// Space qui les tient quand
 /// ils s'affichent (`adoptFavorites`) : sans ça, un Space resté en arrière-plan écraserait à son enregistrement les
 /// favoris ajoutés ailleurs.
 extension BrowserSession {
@@ -15,13 +16,13 @@ extension BrowserSession {
         if let profileID, let manager = favoritesHolders[profileID]?.manager, spaces.contains(where: { $0.tabManager === manager }) {
             return manager
         }
-        return spaces.first { $0.record.profile?.id == profileID }?.tabManager
+        return spaces.first { $0.openedProfileID == profileID }?.tabManager
     }
 
     /// `space` s'affiche : il reprend les favoris de son profil (mêmes onglets, mêmes vues web ; leurs liens s'ouvrent
     /// désormais chez lui) et les tient.
     func showFavorites(in space: SpaceSession) {
-        let profileID = space.record.profile?.id
+        let profileID = space.openedProfileID
         if let holder = favoritesHolder(of: profileID), holder !== space.tabManager {
             space.tabManager.adoptFavorites(from: holder)
         }
@@ -32,17 +33,20 @@ extension BrowserSession {
 
     /// Vrai si `space` tient les favoris de son profil (et les enregistre).
     func holdsFavorites(_ space: SpaceSession) -> Bool {
-        favoritesHolder(of: space.record.profile?.id) === space.tabManager
+        favoritesHolder(of: space.openedProfileID) === space.tabManager
     }
 
-    /// `space` va disparaître : s'il tenait les favoris, ils sont enregistrés et passent à un autre Space du profil.
-    func handOverFavorites(from space: SpaceSession) {
+    /// `space` va disparaître : s'il tenait les favoris, ils sont enregistrés (sauf `saving` faux : ils le sont déjà) et
+    /// passent à un autre Space du profil.
+    func handOverFavorites(from space: SpaceSession, saving: Bool = true) {
         guard holdsFavorites(space) else {
             return
         }
-        space.saveNow()
-        let profileID = space.record.profile?.id
-        guard let heir = spaces.first(where: { $0 !== space && $0.record.profile?.id == profileID }) else {
+        if saving {
+            space.saveNow()
+        }
+        let profileID = space.openedProfileID
+        guard let heir = spaces.first(where: { $0 !== space && $0.openedProfileID == profileID }) else {
             return
         }
         heir.tabManager.adoptFavorites(from: space.tabManager)

@@ -107,9 +107,16 @@ nonisolated extension SidebarLayout {
     /// Chaque dossier placé est retiré de `folders`.
     private mutating func fillPinned(in parent: UUID?, tabs: [UUID: SidebarPosition], folders: inout [UUID: FolderEntry]) {
         enum Item { case tab(UUID), folder(FolderEntry) }
+        func key(of item: Item) -> String {
+            switch item {
+            case let .tab(id): id.uuidString
+            case let .folder(entry): entry.id.uuidString
+            }
+        }
         let children = tabs.filter { $0.value.folderID == parent }.map { (order: $0.value.order, item: Item.tab($0.key)) }
             + folders.values.filter { $0.parentID == parent }.map { (order: $0.order, item: Item.folder($0)) }
-        for child in children.sorted(by: { $0.order < $1.order }) {
+        // Rangs égaux (deux Mac synchronisés) : l'identifiant départage.
+        for child in children.sorted(by: { ($0.order, key(of: $0.item)) < ($1.order, key(of: $1.item)) }) {
             switch child.item {
             case let .tab(id):
                 setPlace(id, to: .pinned)
@@ -152,7 +159,8 @@ nonisolated extension SidebarLayout {
         }
     }
 
+    /// Par rang, puis par identifiant (rangs égaux venus de deux Mac synchronisés).
     private static func byOrder(_ lhs: (key: UUID, value: SidebarPosition), _ rhs: (key: UUID, value: SidebarPosition)) -> Bool {
-        lhs.value.order < rhs.value.order
+        (lhs.value.order, lhs.key.uuidString) < (rhs.value.order, rhs.key.uuidString)
     }
 }

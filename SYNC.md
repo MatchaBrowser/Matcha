@@ -104,7 +104,7 @@ Un enregistrement porte l'identifiant (`id`, UUID) de son modèle SwiftData. Son
 Les onglets du jour de chaque Space voyagent comme une session : on retrouve sur l'autre Mac les onglets ouverts, dans le même ordre.
 
 - **Envois regroupés.** Une page change d'adresse et de titre à chaque navigation. Un onglet du jour n'est envoyé qu'une fois stable depuis 5 secondes, et au plus toutes les 30 secondes s'il change sans cesse ; seuls comptent l'adresse et le titre d'une page chargée (pas les redirections, ni les états de chargement). Ouvrir, fermer, déplacer ou épingler un onglet part au bout de 2 secondes, comme le reste.
-- **À la réception,** un onglet ajouté par un autre Mac prend sa place dans la barre sans être chargé ni sélectionné : il se charge quand on l'ouvre, comme au lancement. Une nouvelle adresse reçue pour un onglet affiché ne change pas la page sous les yeux de l'utilisateur : elle vaut à la prochaine ouverture. Un onglet fermé ailleurs se ferme ici, sauf s'il est affiché : il se ferme alors quand l'utilisateur en sélectionne un autre.
+- **À la réception,** un onglet ajouté par un autre Mac prend sa place dans la barre sans être chargé ni sélectionné : il se charge quand on l'ouvre, comme au lancement. Une nouvelle adresse reçue pour un onglet affiché ne change pas la page sous les yeux de l'utilisateur : elle vaut à la prochaine ouverture. Un onglet fermé ailleurs se ferme ici, sauf s'il est affiché : il reste alors à sa place, jusqu'à ce que l'utilisateur le ferme. Un Space reçu s'ouvre sans onglet sélectionné.
 - **« Effacer »** (vider les onglets du jour d'un Space) envoie la suppression de chacun de ses onglets.
 - Un onglet sans adresse (nouvel onglet vide) voyage avec `url: null`.
 

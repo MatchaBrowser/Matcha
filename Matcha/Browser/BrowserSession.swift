@@ -210,6 +210,11 @@ final class BrowserSession {
         spaces.removeAll { $0 === space }
     }
 
+    /// Range les Spaces dans l'ordre de leurs enregistrements (rangs égaux : l'identifiant départage).
+    func sortSpaces() {
+        spaces.sort { ($0.record.order, $0.id.uuidString) < ($1.record.order, $1.id.uuidString) }
+    }
+
     /// Supprime les fichiers de la base `name` (`<name>.store`, `-shm`, `-wal`) dans Application Support.
     private static func deleteStore(named name: String) {
         let manager = FileManager.default
