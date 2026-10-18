@@ -532,18 +532,20 @@ Disponible si `features` contient `blobs`. Toutes les routes sont authentifiées
 
 **Déclencheurs :** une modification locale (regroupée sur 2 secondes ; 5 secondes de stabilité pour l'adresse d'un onglet du jour, § 2.4), le lancement, le retour au premier plan, un événement du serveur, une lecture toutes les 15 minutes sans flux d'événements, et le bouton « Synchroniser maintenant ». Une seule synchro tourne à la fois.
 
-**Changements locaux :** pour les modèles SwiftData (profils, Spaces, dossiers, onglets, décisions de site), l'historique de SwiftData ; pour ce que l'app garde dans ses réglages (réglages synchronisés, zoom des sites, état des extensions), une comparaison avec le dernier état envoyé, à chaque notification de changement des réglages.
+**Changements locaux :** pour tous les types, une comparaison, enregistrement par enregistrement, de l'état actuel de ce Mac avec celui de sa dernière synchro (ce qu'il a envoyé, ou ce qu'il avait juste après avoir appliqué un changement reçu). Un changement reçu n'est donc jamais renvoyé en écho, et un enregistrement que ce Mac garde tel quel (onglet affiché) ne repart pas. Un enregistrement en attente de son parent n'est pas pris pour une suppression ; un contenu d'un format plus récent n'est jamais modifié ici ; un changement refusé par le serveur ne repart que s'il change.
 
 **Un cycle :**
 1. **Envoyer** les changements en attente, par lots. Un nouveau paquet d'extension part avant l'enregistrement qui le cite (§ 4.7). Pour chaque conflit, déchiffrer `current` et appliquer la règle du § 2.3. Si le serveur a la version la plus récente, elle est appliquée en local et le changement local est abandonné. Sinon, le changement local repart avec `baseVersion` = `current.version`.
 2. **Lire** les changements depuis le curseur jusqu'à `hasMore: false`. Déchiffrer chaque contenu, le vérifier, l'appliquer (§ 2.3) face aux changements locaux encore en attente.
-3. **Garder** le curseur et le jeton d'historique de SwiftData.
+3. **Garder** le curseur et l'état de chaque enregistrement (`SyncState`, dans Application Support), après chaque lot : un cycle interrompu reprend où il en était.
 
 **Première synchro, ou changement de mode :**
 - Si les données synchronisées sont vides, le client envoie tout.
-- Si ce Mac n'a que les données du premier lancement (profil « Personnel », Space « Perso », aucun favori ni épinglé, au plus un onglet du jour vide), il prend les données synchronisées et retire les siennes. Sans ça, chaque Mac ajouterait son propre « Perso ».
+- Si ce Mac n'a que les données du premier lancement (profil « Personnel », Space « Perso », aucun favori ni épinglé, au plus un onglet du jour vide), il prend les données synchronisées et retire les siennes, comme avec « Remplacer les données de ce Mac ». Sans ça, chaque Mac ajouterait son propre « Perso ».
 - Sinon, il demande : **Fusionner** (par défaut : union par identifiant, règle du § 2.3), **Remplacer les données de ce Mac**, ou **Remplacer les données synchronisées**.
-- En fusion, pour les réglages, les décisions de site et l'état des extensions déjà présents dans les données synchronisées, ce sont eux qui s'appliquent : ce Mac n'ajoute que ce qui n'y est pas encore. Sinon le dernier Mac branché imposerait ses réglages à tous. Les extensions des autres Mac arrivent sous « Depuis vos autres Mac » (§ 2.5).
+- En fusion, un enregistrement présent des deux côtés prend la valeur synchronisée : pour les réglages, les décisions de site et l'état des extensions, ce Mac n'ajoute que ce qui n'y est pas encore. Sinon le dernier Mac branché imposerait ses réglages à tous. Les extensions des autres Mac arrivent sous « Depuis vos autres Mac » (§ 2.5).
+- « Remplacer les données de ce Mac » retire de ce Mac les profils, Spaces, dossiers, onglets, décisions de site et zooms absents des données synchronisées ; ses réglages et extensions qui n'y sont pas restent sur ce Mac, sans partir (ils partiront à leur prochaine modification).
+- « Remplacer les données synchronisées » envoie la suppression de ce qui n'est pas sur ce Mac, puis tout ce qu'il a, daté après tout ce qui a été lu.
 
 **Curseur expiré :** le client relit tout depuis le début. Un enregistrement local absent du serveur et sans changement en attente est supprimé.
 

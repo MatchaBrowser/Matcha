@@ -31,4 +31,6 @@ nonisolated extension Logger {
     static let extensions = Logger(subsystem: subsystem, category: "Extensions")
     /// Import depuis d'autres navigateurs : des nombres seulement ; jamais d'adresse, de titre ni de nom.
     static let imports = Logger(subsystem: subsystem, category: "Import")
+    /// Synchronisation : des nombres et des états seulement ; jamais de contenu, d'adresse ni de nom.
+    static let sync = Logger(subsystem: subsystem, category: "Sync")
 }

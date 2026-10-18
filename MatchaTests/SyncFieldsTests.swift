@@ -110,7 +110,7 @@ struct SyncFieldsTests {
         #expect(!SyncedSettings.keys.contains("blocksAdsAndTrackers"))
     }
 
-    @Test func `a today tab that only changed page waits to be stable`() throws {
+    @Test func `a today tab that only changed page waits to be stable`() {
         let tab = emptyTodayTab()
         var navigated = tab
         navigated.url = URL(string: "https://example.com")
