@@ -241,7 +241,7 @@ Si le mot de passe et la clé de secours sont tous les deux perdus, les données
 
 ### 3.8 Sur le Mac
 
-- **Trousseau** (`kSecClassGenericPassword`, service `com.matchabrowser.matcha.sync`, `kSecAttrAccessibleAfterFirstUnlockThisDeviceOnly`, sans synchronisation par iCloud) : `accountKey`, jetons, identifiant de l'appareil.
+- **Trousseau** (`kSecClassGenericPassword`, service `com.matchabrowser.matcha.sync`, trousseau de session de ce Mac, jamais synchronisé par iCloud ; dans le bac à sable, ses éléments ne sont lisibles que par Matcha) : `accountKey`, jetons, identifiant de l'appareil. Le trousseau protégé par l'appareil (`kSecUseDataProtectionKeychain`, `kSecAttrAccessibleAfterFirstUnlockThisDeviceOnly`) demande un identifiant d'app signé par un profil de provisionnement : à reprendre si l'app en a un.
 - **Jamais enregistrés :** mot de passe maître, `masterKey`, `recoveryKey`.
 - **Base SwiftData :** en clair, comme aujourd'hui, protégée par la session macOS et FileVault.
 
@@ -254,6 +254,22 @@ Si le mot de passe et la clé de secours sont tous les deux perdus, les données
 **Limites connues de la v1 :**
 - Le serveur reçoit `authKey`. S'il est malveillant, il peut tester des mots de passe hors ligne, au prix d'un calcul PBKDF2 par essai. La longueur minimale et la jauge de solidité servent à ça.
 - Un serveur malveillant peut cacher des enregistrements ou renvoyer d'anciennes versions sans être détecté. Il ne peut en revanche ni lire, ni fabriquer, ni déplacer un contenu.
+
+### 3.10 Vecteurs de test
+
+Calculés par une implémentation indépendante (Python `cryptography`) ; un client ou un serveur doit les retrouver (`SyncCryptoTests`). Entrées : mot de passe `Café crème, 2026 !` (NFKD : `43616665cc8120637265cc806d652c20323032362021`), `salt` = octets 0 à 15, 600 000 itérations ; `accountKey` = octets 32 à 63 ; `recoveryKey` = octets 64 à 83 ; nonces = octets 100 à 111 (enveloppe), 112 à 123 (enveloppe de secours), 124 à 135 (enregistrement), 136 à 147 (paquet).
+
+| Valeur | Résultat |
+| --- | --- |
+| `authKey` | `5181174923363be5cfc1ddd47761224fe7653b627bb8a16b9b56e44cbf3bb477` |
+| `wrapKey` | `ef4e8ca94c79a8831d0be6956954257ea820aae32daad637623c33d573978bbd` |
+| `dataKey` | `681021aae32d4b8896879d3b68426f203ffe80a3505f4f88688e393b71c8da7c` |
+| `recoveryAuthKey` | `e09957c068a62d3d182a3eb20567f6081ae9d5ad89034125ffc2376aad9b2ee0` |
+| `recoveryWrapKey` | `c99ca23f11c93fad7ae8bfc65d45937f1d3ba0bbb9f47770d68dccc3c41ee275` |
+| `wrappedAccountKey` (base 64) | `ZGVmZ2hpamtsbW5vtSkcc3+EmMJgIoX82mvpDSrkO645VA8Tv2uuthfFNFVN2Rq2ZgR73kssLbiYmJgk` |
+| Clé de secours affichée | `810M-4GT4-8N34-EJ29-995M-RKAE-9X85-2MJK` |
+
+L'enregistrement chiffré (identifiant `7C4B2E9A-1D3F-4B6E-8A0C-5E2D9F1B3A76`, `keyVersion` 1) et le paquet (identifiant `5A1C9E3B-7D2F-4B8A-9C6E-1F0D3B7A2E58`, clé = octets 150 à 181) sont dans les tests.
 
 ---
 
