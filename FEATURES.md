@@ -65,7 +65,7 @@ Fonctions livrées avec une limite, faute d'API publique ou par choix de simplic
 
 - **Texte saisi perdu** : un onglet mis en veille recharge sa page en revenant ; ce qui n'a pas été envoyé (formulaire, brouillon) est perdu, comme l'état d'une app web ou la position d'une vidéo. Piste : demander à la page, par un script dans un monde isolé (`WKContentWorld`), si un champ a été modifié, et l'épargner, comme le fait Chrome.
 - **Applications web épinglées** (messagerie, discussion) : en veille, elles ne se mettent plus à jour (compteur du titre figé) jusqu'à leur affichage. Piste : un réglage pour garder chargés les épinglés et les favoris.
-- **Son par Web Audio** : `requestMediaPlaybackState` ne signale peut-être que les éléments audio et vidéo ; à vérifier à la main.
+- **Média arrêté** : `requestMediaPlaybackState` répond « en lecture » dès qu'un média de la page n'est pas en pause, même chargé sans avoir été lancé ou coupé (vérifié en 5.10) : un tel onglet ne se met jamais en veille. Il voit bien Web Audio et `new Audio()` (vérifié). Piste : une API publique de WebKit qui dirait si la page est audible.
 - **Partage d'écran sans caméra ni micro** : aucune API publique ne le signale ; l'onglet peut se mettre en veille.
 - **Fenêtre ouverte en onglet par une page** (`window.open` sans taille) : si la page d'origine se met en veille pendant ce temps, `window.opener` ne la retrouve plus. Les fenêtres de connexion (5.8) protègent, elles, leur page d'origine. Piste : la même règle pour un onglet ouvert par `window.open` tant qu'il est ouvert.
 
@@ -82,3 +82,10 @@ Fonctions livrées avec une limite, faute d'API publique ou par choix de simplic
 - **`window.open` simultané** : une fenêtre ouverte par la page dans les quelques millisecondes entre le choix et la fenêtre de WebKit prend le choix à sa place. Aucune information publique ne distingue les deux.
 - **« Ouvrir dans un aperçu »** charge l'adresse sans `Referer`, comme Maj+clic.
 - **« Ouvrir le lien en split »** : renvoyé de la 4.3 vers la 5.9 (`DECISIONS.md`), absent du texte de la 5.9 ; pas fait. À décider avec toi.
+
+### Son (5.10)
+
+- **Son non détecté** : pas de haut-parleur pour le son de Web Audio (jeux, synthétiseurs, certains lecteurs), d'un élément audio hors de la page (`new Audio()`) ou d'un média dans un shadow DOM : le script ne voit que les éléments audio et vidéo du document (iframes comprises). Aucune API publique ne dit si une page est audible (`_isPlayingAudio` est privé), et `requestMediaPlaybackState` allumerait l'icône sur toute page qui a une vidéo arrêtée. Piste : surveiller les prochains SDK.
+- **Pas de coupure du son**, seulement la pause : couper le son d'une page n'existe que dans l'API privée de WebKit.
+- **Dossier replié** : un épinglé qui joue du son dans un dossier replié ne se voit pas. Piste : un haut-parleur sur la ligne du dossier.
+- **Vidéo sans piste audio et non coupée** (rare : ces vidéos sont presque toujours coupées) : le haut-parleur s'affiche. Piste : `audioTracks`, à vérifier sur les lecteurs en flux (YouTube).

@@ -48,6 +48,7 @@ struct SplitRowView: View {
                     tabManager: tabManager,
                     isActive: isDisplayed && tabManager.selectedTabID == tab.id,
                     showsTitle: showsTitles,
+                    isLast: index == tabs.count - 1,
                 )
             }
         }
@@ -86,13 +87,19 @@ struct SplitRowView: View {
     }
 }
 
-/// Morceau d'un onglet dans la ligne d'un split : icône, et titre si la place le permet.
+/// Morceau d'un onglet dans la ligne d'un split : icône, titre si la place le permet, et haut-parleur pendant que sa
+/// page joue du son (tâche 5.10).
 private struct SplitSegmentView: View {
+    /// Place du × de la ligne, posé sur le dernier morceau au survol (avec sa marge de 3 pt).
+    static let closeButtonInset = SidebarIconButtonStyle.size + 3
+
     let tab: BrowserTab
     let tabManager: TabManager
     /// Panneau actif du split affiché.
     let isActive: Bool
     let showsTitle: Bool
+    /// Dernier morceau, sous le × de la ligne au survol.
+    let isLast: Bool
 
     var body: some View {
         HStack(spacing: 6) {
@@ -104,8 +111,16 @@ private struct SplitSegmentView: View {
                     // Onglet épinglé déchargé : présent mais en retrait. Un onglet en veille (tâche 5.6) ne change pas.
                     .foregroundStyle(tab.appearsLoaded ? .primary : .secondary)
             }
+            if tab.isPlayingAudio {
+                if showsTitle {
+                    Spacer(minLength: 0)
+                }
+                PauseAudioButton(tab: tab, style: .segment)
+            }
         }
-        .padding(.horizontal, 6)
+        .padding(.leading, 6)
+        // Dernier morceau qui joue du son : le haut-parleur reste à gauche du ×, sans bouger quand il apparaît.
+        .padding(.trailing, isLast && tab.isPlayingAudio ? Self.closeButtonInset : 6)
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: showsTitle ? .leading : .center)
         .background {
             if isActive {
@@ -123,5 +138,6 @@ private struct SplitSegmentView: View {
         .accessibilityAddTraits(isActive ? [.isButton, .isSelected] : .isButton)
         .accessibilityAction { TabActivation.activate(tab, in: tabManager) }
         .accessibilityIdentifier("splitSegment")
+        .tabAudioAccessibility(tab)
     }
 }

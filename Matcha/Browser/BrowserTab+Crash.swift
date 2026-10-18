@@ -9,11 +9,12 @@ extension BrowserTab {
     }
 
     /// Appelé pendant que WebKit prévient le délégué : la vue web a encore son adresse, son titre et son état de
-    /// navigation. Les demandes de permission en attente sont refusées et la recherche dans la page oubliée (il n'y a
-    /// plus de page) ; zoom, icône, titre et adresse restent.
+    /// navigation. Les demandes de permission en attente sont refusées, la recherche dans la page oubliée et l'icône du
+    /// son éteinte (il n'y a plus de page) ; zoom, icône, titre et adresse restent.
     func webContentProcessDidTerminate(_ action: PageCrashAction) {
         permissionPrompts.denyAll()
         find.pageDidTerminate()
+        audio.reset()
         switch action {
         case .reload:
             // Au tour suivant de la boucle principale : WebKit finit d'abord de traiter l'arrêt (il efface l'adresse et

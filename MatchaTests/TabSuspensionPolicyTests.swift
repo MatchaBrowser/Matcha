@@ -13,6 +13,7 @@ struct TabSuspensionPolicyTests {
         isLoaded: Bool = true,
         prompt: Bool = false,
         capture: Bool = false,
+        audio: Bool = false,
         popup: Bool = false,
     ) -> TabLifecycleCandidate {
         TabLifecycleCandidate(
@@ -21,6 +22,7 @@ struct TabSuspensionPolicyTests {
             isLoaded: isLoaded,
             hasPendingPermissionPrompt: prompt,
             isCapturingMedia: capture,
+            isPlayingAudio: audio,
             hasOpenPopupWindow: popup,
         )
     }
@@ -39,6 +41,8 @@ struct TabSuspensionPolicyTests {
         #expect(!TabSuspensionPolicy.isEligible(candidate(hiddenFor: 40, isLoaded: false)))
         #expect(!TabSuspensionPolicy.isEligible(candidate(hiddenFor: 40, prompt: true)))
         #expect(!TabSuspensionPolicy.isEligible(candidate(hiddenFor: 40, capture: true)))
+        // Tâche 5.10 : l'icône haut-parleur suffit, sans demander à WebKit.
+        #expect(!TabSuspensionPolicy.isEligible(candidate(hiddenFor: 40, audio: true)))
         // Tâche 5.8 : la page d'origine d'une fenêtre de connexion ouverte garde son lien `window.opener`.
         #expect(!TabSuspensionPolicy.isEligible(candidate(hiddenFor: 40, popup: true)))
     }
@@ -58,6 +62,7 @@ struct TabSuspensionPolicyTests {
             candidate(hiddenFor: 60, isLoaded: false),
             candidate(hiddenFor: 60, prompt: true),
             candidate(hiddenFor: 60, capture: true),
+            candidate(hiddenFor: 60, audio: true),
             candidate(hiddenFor: 60, popup: true),
         ]
         #expect(pool(candidates, .inactivity).isEmpty)

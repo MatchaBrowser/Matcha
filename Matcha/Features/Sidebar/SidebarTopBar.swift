@@ -25,6 +25,9 @@ struct SidebarTopBar: View {
 
 /// Bouton-icône carré de la barre latérale, surligné au survol.
 struct SidebarIconButtonStyle: ButtonStyle {
+    /// Côté du bouton, en points.
+    static let size = 26.0
+
     func makeBody(configuration: Configuration) -> some View {
         SidebarIconButton(configuration: configuration)
     }
@@ -39,7 +42,7 @@ private struct SidebarIconButton: View {
     var body: some View {
         configuration.label
             .font(.system(size: 13, weight: .semibold))
-            .frame(width: 26, height: 26)
+            .frame(width: SidebarIconButtonStyle.size, height: SidebarIconButtonStyle.size)
             .background(
                 RoundedRectangle(cornerRadius: 6)
                     .fill(Color.primary.opacity(isHovered && isEnabled ? 0.1 : 0)),

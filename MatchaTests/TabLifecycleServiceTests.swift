@@ -112,6 +112,21 @@ struct TabLifecycleServiceTests {
         #expect(allLoaded)
     }
 
+    /// Tâche 5.10 : l'icône haut-parleur suffit, sans attendre la réponse de WebKit.
+    @Test func `a tab whose page plays sound is kept without asking WebKit`() async {
+        let tabs = openTabs(2)
+        tabs[0].audio.receive(PageAudioReport(frame: "main", isAudible: true))
+        clock.advance(31 * 60)
+        #expect(await service.check(.inactivity) == 0)
+        #expect(tabs[0].isLoaded)
+        #expect(fakes.mediaRequests == 0)
+
+        // Plus de son : WebKit est de nouveau consulté.
+        tabs[0].audio.reset()
+        #expect(await service.check(.inactivity) == 1)
+        #expect(fakes.mediaRequests == 1)
+    }
+
     @Test func `never suspends nothing, even under memory pressure`() async {
         let tabs = openTabs(2)
         settings.delay = nil

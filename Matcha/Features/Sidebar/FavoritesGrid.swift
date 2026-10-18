@@ -27,7 +27,8 @@ struct FavoritesGrid: View {
     }
 }
 
-/// Tuile d'un favori ; un onglet déposé dessus s'insère avant elle.
+/// Tuile d'un favori, avec une pastille haut-parleur pendant que sa page joue du son (tâche 5.10) ; un onglet déposé
+/// dessus s'insère avant elle.
 private struct FavoriteTile: View {
     let tab: BrowserTab
     let tabManager: TabManager
@@ -58,6 +59,12 @@ private struct FavoriteTile: View {
                         .offset(x: -4)
                 }
             }
+            .overlay(alignment: .topTrailing) {
+                if tab.isPlayingAudio {
+                    PauseAudioButton(tab: tab, style: .badge)
+                        .padding(3)
+                }
+            }
             .contentShape(Rectangle())
             .onTapGesture { TabActivation.activate(tab, in: tabManager) }
             .onHover { isHovered = $0 }
@@ -70,5 +77,6 @@ private struct FavoriteTile: View {
             .accessibilityAddTraits(isSelected ? [.isButton, .isSelected] : .isButton)
             .accessibilityAction { TabActivation.activate(tab, in: tabManager) }
             .accessibilityIdentifier("favoriteTile")
+            .tabAudioAccessibility(tab)
     }
 }

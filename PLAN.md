@@ -131,7 +131,7 @@ Feuille de route de développement, à suivre dans l'ordre. Les règles de trava
 - [x] **5.7 Plantage d'une page.** `webViewWebContentProcessDidTerminate` : recharger si l'onglet est visible, sinon recharger à sa prochaine sélection. Une page d'aperçu plantée est visible : elle se recharge.
 - [x] **5.8 Fenêtres de connexion.** Dans `createWebViewWith`, si `windowFeatures` donne une taille (fenêtre de connexion Google, Apple, banque), ouvrir une petite `NSWindow` dédiée au lieu d'un onglet ; `webViewDidClose` la ferme. Depuis un aperçu, la fenêtre de connexion s'ouvre sans faire de l'aperçu un onglet. Valable aussi dans une mini-fenêtre (`TabHost.openWindow` de `MiniWindowManager`).
 - [x] **5.9 Menu contextuel des pages.** Sous-classe `BrowserWebView: WKWebView`, surcharge de `willOpenMenu(_:with:)` : « Ouvrir dans un nouvel onglet » à la place de « nouvelle fenêtre », ajout de « Ouvrir dans Peek » et « Copier le lien ». Les identifiants des éléments du menu ne sont pas documentés : code défensif, on garde le menu d'origine si un identifiant manque. « Ouvrir dans Peek » (libellé « Open in Peek », « Ouvrir dans un aperçu ») appelle `TabManager.openPeek(_:from:openingPoint:)`. Depuis un aperçu, « Ouvrir dans un nouvel onglet » crée un onglet en arrière-plan après l'onglet d'origine, sans faire de l'aperçu un onglet.
-- [ ] **5.10 Son.** Icône haut-parleur sur les onglets qui jouent du son ; clic = pause (`pauseAllMediaPlayback`).
+- [x] **5.10 Son.** Icône haut-parleur sur les onglets qui jouent du son ; clic = pause (`pauseAllMediaPlayback`).
 
 **Fini quand [À VOIR]** une semaine complète sans revenir à Arc ni à Safari, sans plantage.
 

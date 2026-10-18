@@ -11,6 +11,8 @@ nonisolated struct TabLifecycleCandidate: Equatable, Sendable {
     let hasPendingPermissionPrompt: Bool
     /// Caméra ou micro en cours d'utilisation (même coupés).
     let isCapturingMedia: Bool
+    /// Son en cours d'après le script de la page (icône haut-parleur, tâche 5.10) : occupé, sans attendre WebKit.
+    let isPlayingAudio: Bool
     /// Fenêtre de connexion ouverte par la page, encore ouverte (tâche 5.8) : en veille, la page ne serait plus son
     /// `window.opener`, et la connexion échouerait.
     let hasOpenPopupWindow: Bool
@@ -28,8 +30,8 @@ nonisolated enum TabSuspensionReason: String, Sendable {
 
 /// Règles de la mise en veille (tâche 5.6). Jamais : un onglet affiché (tous les panneaux d'un split, l'onglet d'origine
 /// d'un aperçu), sans vue web, qui attend une réponse de permission, qui utilise la caméra ou le micro, qui a ouvert
-/// une fenêtre de connexion encore ouverte (tâche 5.8), ou qui joue du son (vérifié ensuite, auprès de WebKit).
-/// « Jamais » dans les réglages : rien, même pendant une alerte mémoire.
+/// une fenêtre de connexion encore ouverte (tâche 5.8), ou qui joue du son : d'après son icône haut-parleur (tâche
+/// 5.10), sinon vérifié ensuite auprès de WebKit. « Jamais » dans les réglages : rien, même pendant une alerte mémoire.
 nonisolated enum TabSuspensionPolicy {
     /// Pendant une alerte simple, un onglet caché depuis moins longtemps est épargné : on revient souvent à l'onglet
     /// qu'on vient de quitter.
@@ -37,11 +39,11 @@ nonisolated enum TabSuspensionPolicy {
 
     static func isEligible(_ candidate: TabLifecycleCandidate) -> Bool {
         candidate.hiddenSince != nil && candidate.isLoaded && !candidate.hasPendingPermissionPrompt && !candidate.isCapturingMedia
-            && !candidate.hasOpenPopupWindow
+            && !candidate.isPlayingAudio && !candidate.hasOpenPopupWindow
     }
 
-    /// Onglets à examiner, du plus anciennement caché au plus récent ; `delay` nil (« Jamais ») : aucun. Le son se
-    /// vérifie ensuite, sur ces onglets seulement.
+    /// Onglets à examiner, du plus anciennement caché au plus récent ; `delay` nil (« Jamais ») : aucun. Le son que
+    /// l'icône ne montre pas (Web Audio, élément hors de la page) se vérifie ensuite, sur ces onglets seulement.
     static func pool(_ candidates: [TabLifecycleCandidate], reason: TabSuspensionReason, delay: TimeInterval?, now: Date) -> [UUID] {
         guard let delay else {
             return []

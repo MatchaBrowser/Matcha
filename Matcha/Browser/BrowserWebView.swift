@@ -30,6 +30,9 @@ final class BrowserWebView: WKWebView {
     weak var sidebarDropTarget: (any SidebarItemDropTarget)?
     /// Choix du menu contextuel en attente de la fenêtre que WebKit ouvre pour lui, lu par `NavigationCoordinator`.
     var pageMenuIntent = PendingPageMenuIntent()
+    /// Son de l'onglet dont c'est la vue web (tâche 5.10), destinataire des messages du script de son ; nil une fois la
+    /// vue libérée par son onglet.
+    weak var audio: PageAudio?
 
     override func willOpenMenu(_ menu: NSMenu, with event: NSEvent) {
         super.willOpenMenu(menu, with: event)

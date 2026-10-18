@@ -44,6 +44,8 @@ final class BrowserTab: Identifiable {
     let suspension = TabSuspension()
     /// Reprise après un arrêt du processus de la page (tâche 5.7).
     let crash = PageCrashRecovery()
+    /// Son joué par la page : icône haut-parleur de la barre latérale (tâche 5.10).
+    let audio = PageAudio()
     /// Zoom de la page (`WKWebView.pageZoom`, tâche 5.4), recopié ici pour les menus : il ne change que par
     /// `setPageZoom`. Le zoom par pincement (`magnification`) est à part.
     private(set) var pageZoom = ZoomLevels.actualSize
@@ -116,6 +118,7 @@ final class BrowserTab: Identifiable {
         webView.navigationDelegate = delegate
         webView.uiDelegate = delegate
         webView.pageZoom = pageZoom
+        webView.audio = audio
         // Copie réutilisable pour les prochaines vues (rechargement, duplication).
         configuration = webView.configuration
         self.webView = webView
@@ -213,13 +216,15 @@ final class BrowserTab: Identifiable {
         webView?.pageZoom = zoom
     }
 
-    /// Libère la vue web : observation, son, chargement, délégués ; refuse les demandes de permission en attente,
-    /// oublie la recherche dans la page et la reprise d'un arrêt du processus (message compris).
+    /// Libère la vue web : observation, son (icône comprise), chargement, délégués ; refuse les demandes de permission
+    /// en attente, oublie la recherche dans la page et la reprise d'un arrêt du processus (message compris).
     private func releaseWebView() {
         observations = []
         permissionPrompts.denyAll()
         find.reset()
+        audio.reset()
         if let webView {
+            (webView as? BrowserWebView)?.audio = nil
             webView.pauseAllMediaPlayback(completionHandler: nil)
             webView.stopLoading()
             webView.navigationDelegate = nil

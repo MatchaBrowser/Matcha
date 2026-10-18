@@ -84,12 +84,13 @@ final class NavigationCoordinator: NSObject {
 extension NavigationCoordinator: WKNavigationDelegate {
     /// Nouvelle page affichée (onglet, aperçu ou mini-fenêtre) : icône connue de son domaine, ou pastille en
     /// attendant mieux, et zoom de son site (tâche 5.4). Les demandes de permission de l'ancienne page n'ont plus
-    /// d'objet : refusées.
+    /// d'objet : refusées ; son son s'est arrêté avec elle (tâche 5.10).
     func webView(_ webView: WKWebView, didCommit _: WKNavigation!) {
         guard let tabHost, let tab = tabHost.page(for: webView) else {
             return
         }
         tab.permissionPrompts.denyAll()
+        tab.audio.reset()
         tab.favicon = webView.url?.host().flatMap(tabHost.faviconService.cachedIcon(forHost:))
         tabHost.siteZooms?.pageDidCommit(tab, url: webView.url)
     }

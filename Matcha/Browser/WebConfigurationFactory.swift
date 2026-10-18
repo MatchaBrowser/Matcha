@@ -1,6 +1,6 @@
 import WebKit
 
-/// Fabrique la configuration WebKit commune à toutes les vues web.
+/// Fabrique la configuration WebKit commune à toutes les vues web, avec le script de son (tâche 5.10).
 /// Plus tard, le bloqueur, les Boosts et les extensions s'y brancheront.
 @MainActor
 enum WebConfigurationFactory {
@@ -18,6 +18,7 @@ enum WebConfigurationFactory {
         configuration.websiteDataStore = websiteDataStore
         configuration.preferences.isElementFullscreenEnabled = true
         configuration.applicationNameForUserAgent = applicationNameForUserAgent
+        PageAudioScript.install(in: configuration.userContentController)
         return configuration
     }
 }

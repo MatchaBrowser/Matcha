@@ -199,6 +199,7 @@ final class TabLifecycleService {
             isLoaded: webView != nil,
             hasPendingPermissionPrompt: tab.permissionPrompts.current != nil,
             isCapturingMedia: webView.map { $0.cameraCaptureState != .none || $0.microphoneCaptureState != .none } ?? false,
+            isPlayingAudio: tab.isPlayingAudio,
             hasOpenPopupWindow: session?.popupWindows.hasOpenWindow(openedBy: tab) ?? false,
         )
     }

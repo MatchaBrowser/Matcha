@@ -16,7 +16,9 @@ struct TabLifecycleProbes {
 
     static let webKit = TabLifecycleProbes(isPlayingMedia: isPlayingMedia(in:), snapshot: snapshot(of:url:))
 
-    /// `requestMediaPlaybackState` : seul « en lecture » compte (une vidéo en pause peut se décharger).
+    /// `requestMediaPlaybackState` : seul « en lecture » compte (une vidéo en pause peut se décharger). Prudent :
+    /// vérifié (tâche 5.10), WebKit répond « en lecture » dès qu'un média de la page n'est pas en pause, même chargé
+    /// mais jamais lancé ou coupé (Web Audio et `new Audio()` compris), et « en pause » dès qu'un seul l'est.
     static func isPlayingMedia(in webView: WKWebView) async -> Bool {
         await CallbackTimeout.value(timeout: timeout, fallback: true) { done in
             webView.requestMediaPlaybackState { state in

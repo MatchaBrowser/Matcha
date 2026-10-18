@@ -1,7 +1,8 @@
 import SwiftUI
 
-/// Ligne d'un onglet épinglé ou du jour : icône, titre, bouton de fermeture au survol.
-/// On peut la faire glisser ; un onglet déposé dessus s'insère avant elle, à `dropDestination`.
+/// Ligne d'un onglet épinglé ou du jour : icône, titre, haut-parleur pendant que la page joue du son (tâche 5.10),
+/// bouton de fermeture au survol. On peut la faire glisser ; un onglet déposé dessus s'insère avant elle, à
+/// `dropDestination`.
 struct TabRowView: View {
     let tab: BrowserTab
     let tabManager: TabManager
@@ -23,11 +24,18 @@ struct TabRowView: View {
                 // Onglet épinglé déchargé : présent mais en retrait. Un onglet en veille (tâche 5.6) ne change pas.
                 .foregroundStyle(tab.appearsLoaded ? .primary : .secondary)
             Spacer(minLength: 0)
-            if isHovered, tab.appearsLoaded {
-                Button("Close Tab", systemImage: "xmark") { tabManager.close(tab) }
-                    .labelStyle(.iconOnly)
-                    .buttonStyle(SidebarIconButtonStyle())
-                    .scaleEffect(0.85)
+            if tab.isPlayingAudio {
+                HStack(spacing: 0) {
+                    PauseAudioButton(tab: tab)
+                    if isHovered {
+                        closeButton
+                    } else {
+                        // Place du × : le haut-parleur ne bouge pas quand il apparaît, un clic ne ferme pas l'onglet.
+                        Color.clear.frame(width: SidebarIconButtonStyle.size)
+                    }
+                }
+            } else if isHovered, tab.appearsLoaded {
+                closeButton
             }
         }
         .padding(.leading, 8)
@@ -52,10 +60,15 @@ struct TabRowView: View {
         .accessibilityAction { TabActivation.activate(tab, in: tabManager) }
         .accessibilityAction(named: "Close Tab") { tabManager.close(tab) }
         .accessibilityIdentifier("tabRow")
-        #if DEBUG
-            // Tests d'interface (tâche 5.6) : un onglet en veille se reconnaît sans rien changer à l'affichage.
-            .accessibilityValue(Text(verbatim: tab.suspension.isSuspended ? "suspended" : ""))
-        #endif
+        // « Lecture audio » ; en Debug, « suspended » pour un onglet en veille (tests d'interface de la tâche 5.6).
+        .tabAudioAccessibility(tab)
+    }
+
+    private var closeButton: some View {
+        Button("Close Tab", systemImage: "xmark") { tabManager.close(tab) }
+            .labelStyle(.iconOnly)
+            .buttonStyle(SidebarIconButtonStyle())
+            .scaleEffect(0.85)
     }
 }
 

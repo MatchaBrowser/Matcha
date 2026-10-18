@@ -4187,6 +4187,35 @@
         }
       }
     },
+    "Pause Audio" : {
+      "comment" : "Speaker button of a tab that plays sound (help tag and accessibility action): pauses all media of the page",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Audio pausieren"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pausar audio"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mettre le son en pause"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Metti in pausa l'audio"
+          }
+        }
+      }
+    },
     "Peek" : {
       "comment" : "Accessibility label of the floating preview opened by Shift-clicking a link",
       "localizations" : {
@@ -4357,6 +4386,35 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Fissati"
+          }
+        }
+      }
+    },
+    "Playing Audio" : {
+      "comment" : "Accessibility value of a tab that plays sound",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Audiowiedergabe läuft"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Reproduciendo audio"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lecture audio en cours"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Riproduzione audio in corso"
           }
         }
       }

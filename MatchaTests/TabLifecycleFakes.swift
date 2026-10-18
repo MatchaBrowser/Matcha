@@ -6,13 +6,18 @@ import WebKit
 @MainActor
 final class FakeTabProbes {
     var playing: Set<ObjectIdentifier> = []
+    /// Questions posées à WebKit sur le son (tâche 5.10 : jamais pour un onglet dont l'icône montre qu'il en joue).
+    var mediaRequests = 0
     var snapshotRequests = 0
     /// Appelé pendant chaque capture (l'utilisateur affiche l'onglet pendant ce temps…).
     var duringSnapshot: (() -> Void)?
 
     func probes() -> TabLifecycleProbes {
         TabLifecycleProbes(
-            isPlayingMedia: { [self] webView in playing.contains(ObjectIdentifier(webView)) },
+            isPlayingMedia: { [self] webView in
+                mediaRequests += 1
+                return playing.contains(ObjectIdentifier(webView))
+            },
             snapshot: { [self] _, url in
                 snapshotRequests += 1
                 duringSnapshot?()
