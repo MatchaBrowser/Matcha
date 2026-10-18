@@ -15,6 +15,9 @@ final class SpaceStore {
     private var pendingSave: Task<Void, Never>?
     /// Vrai une fois le Space supprimé : plus rien n'est enregistré.
     private var isStopped = false
+    /// Vrai si ce Space tient les favoris de son profil : sinon ils ne sont ni écrits ni supprimés
+    /// (`BrowserSession+Favorites`). Toujours vrai hors d'une session (tests).
+    var savesFavorites: () -> Bool = { true }
 
     init(space: SpaceRecord, context: ModelContext) {
         self.space = space
@@ -114,9 +117,11 @@ final class SpaceStore {
     func save(tabs: [StoredTab], layout: SidebarLayout) {
         let folders = saveFolders(layout.folderEntries)
         let positions = layout.positions
-        var existing = Dictionary(tabRecords().map { ($0.id, $0) }) { first, _ in first }
+        let includesFavorites = savesFavorites()
+        let records = includesFavorites ? tabRecords() : space.tabs ?? []
+        var existing = Dictionary(records.map { ($0.id, $0) }) { first, _ in first }
         for stored in tabs {
-            guard let position = positions[stored.id] else {
+            guard let position = positions[stored.id], includesFavorites || position.place != .favorite else {
                 continue
             }
             let record = existing.removeValue(forKey: stored.id) ?? insertedTab(id: stored.id)

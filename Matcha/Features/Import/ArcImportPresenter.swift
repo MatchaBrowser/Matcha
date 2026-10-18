@@ -24,7 +24,7 @@ struct ArcImportPresenter: ViewModifier {
     }
 
     private func perform(_ sidebar: ArcSidebar, options: ArcImportOptions) {
-        let importer = ArcImporter(session: model.session, displayedSpace: model.space)
+        let importer = ArcImporter(session: model.session)
         let (_, spaces) = importer.importSidebar(sidebar, options: options)
         if let first = spaces.first {
             withAnimation(.easeInOut(duration: 0.3)) { model.select(first) }

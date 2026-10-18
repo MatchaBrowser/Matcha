@@ -17,7 +17,7 @@ struct ArcImporterTests {
     }
 
     private func importer() -> ArcImporter {
-        var importer = ArcImporter(session: session, displayedSpace: session.spaces.first)
+        var importer = ArcImporter(session: session)
         importer.symbolExists = { ["star.fill"].contains($0) }
         return importer
     }
@@ -76,7 +76,8 @@ struct ArcImporterTests {
         let displayed = try #require(session.spaces.first)
         let (_, spaces) = importer().importSidebar(sidebar, options: ArcImportOptions())
         #expect(displayed.tabManager.favoriteTabs.map(\.title) == ["Mail", "Agenda"])
-        // Les Spaces importés du même profil partagent les mêmes onglets.
+        // Un Space importé du même profil reprend les mêmes onglets en s'affichant.
+        session.showFavorites(in: spaces[0])
         #expect(spaces[0].tabManager.favoriteTabs.map(\.id) == displayed.tabManager.favoriteTabs.map(\.id))
 
         // Un second import n'ajoute pas les adresses déjà en favori, et reprend le profil de même nom.

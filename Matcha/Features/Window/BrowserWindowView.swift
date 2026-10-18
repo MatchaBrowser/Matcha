@@ -125,6 +125,7 @@ struct BrowserWindowView: View {
         // focus, et l'enlèverait au champ de nom d'un nouveau dossier.
         // Sans onglet sélectionné, la page vide invite à ⌘T : la barre ne s'ouvre jamais d'elle-même.
         .onAppear {
+            session.showFavorites(in: space)
             tabManager.loadSelectedTab()
             // Les onglets affichés par cette fenêtre ne sont jamais mis en veille (tâche 5.6).
             session.tabLifecycle.windowDidAppear(model)
@@ -136,6 +137,12 @@ struct BrowserWindowView: View {
             session.tabLifecycle.windowDidDisappear(model)
         }
         .task { await session.removeOrphanDataStores() }
+        // Deux fenêtres sur deux Spaces d'un même profil : la fenêtre active tient les favoris (et les enregistre).
+        .onReceive(NotificationCenter.default.publisher(for: NSWindow.didBecomeKeyNotification)) { notification in
+            if let window, notification.object as? NSWindow === window {
+                session.showFavorites(in: space)
+            }
+        }
         // « Effacer… » des réglages du site (tâche 5.2) : l'alerte appartient à la fenêtre.
         .modifier(SiteDataClearConfirmation(model: model))
         .modifier(ArcImportPresenter(model: model))

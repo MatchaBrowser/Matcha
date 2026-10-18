@@ -54,6 +54,8 @@ final class BrowserSession {
     private(set) var profiles: [ProfileRecord] = []
     /// Magasin de données (cookies, stockage) de chaque profil, par identifiant de profil.
     @ObservationIgnored private var dataStores: [UUID: WKWebsiteDataStore] = [:]
+    /// Space qui tient les favoris de chaque profil (`BrowserSession+Favorites`).
+    @ObservationIgnored var favoritesHolders: [UUID: WeakTabManager] = [:]
     @ObservationIgnored private var terminationObserver: (any NSObjectProtocol)?
 
     /// Ouvre les Spaces enregistrés ; au premier lancement, crée le profil « Personnel » et le Space « Perso »
@@ -195,6 +197,13 @@ final class BrowserSession {
         space.tabManager.lifecycle = tabLifecycle
         space.tabManager.popupWindows = popupWindows
         space.tabManager.contentBlocking = contentBlocking
+        // Seul le Space qui tient les favoris du profil les enregistre.
+        space.store.savesFavorites = { [weak self, weak space] in
+            guard let self, let space else {
+                return false
+            }
+            return holdsFavorites(space)
+        }
     }
 
     func removeSpace(_ space: SpaceSession) {

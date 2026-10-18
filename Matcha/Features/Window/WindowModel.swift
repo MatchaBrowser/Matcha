@@ -60,7 +60,7 @@ final class WindowModel {
         return (space, tab)
     }
 
-    /// Affiche `target`. S'il partage le profil du Space affiché, il en reprend les favoris.
+    /// Affiche `target`, qui reprend et tient désormais les favoris de son profil.
     func select(_ target: SpaceSession) {
         let current = space
         guard target !== current, let targetIndex = session.spaces.firstIndex(where: { $0 === target }) else {
@@ -70,9 +70,8 @@ final class WindowModel {
         // aperçu se ferme.
         current.tabManager.displayedTabs.forEach { $0.captureInteractionState() }
         current.tabManager.closePeek()
-        if target.record.profile?.id == current.record.profile?.id {
-            target.tabManager.adoptFavorites(from: current.tabManager)
-        }
+        // Il reprend les favoris de son profil, tenus jusque-là par un autre Space.
+        session.showFavorites(in: target)
         transitionEdge = targetIndex > spaceIndex ? .trailing : .leading
         // La bulle d'un Space ne survit pas à un changement de Space (sauf `editSpace`, qui la rouvre).
         editedSpaceID = nil

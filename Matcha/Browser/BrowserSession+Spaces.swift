@@ -67,6 +67,7 @@ extension BrowserSession {
         guard spaces.count > 1, spaces.contains(where: { $0 === space }) else {
             return
         }
+        handOverFavorites(from: space)
         space.close()
         removeSpace(space)
         let context = container.mainContext

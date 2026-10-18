@@ -23,13 +23,11 @@ struct ImportSummary: Equatable {
 /// Importe une barre d'Arc (tâche 7.1) : chaque Space d'Arc devient un nouveau Space (nom, icône, couleurs, épinglés et
 /// dossiers, et ses onglets ouverts si on le demande), les profils ajoutés dans Arc deviennent des profils, les favoris
 /// rejoignent ceux de leur profil (sans doublon d'adresse). Les nouveaux Spaces sont enregistrés avec leur contenu,
-/// puis ouverts ; les favoris d'un profil déjà ouvert passent par le Space qui les tient (`displayedSpace` s'il est de
-/// ce profil), puis sont partagés avec les autres Spaces du profil, comme un changement de Space.
+/// puis ouverts ; les favoris d'un profil déjà ouvert rejoignent le Space qui les tient (`favoritesHolder`), et les
+/// autres Spaces du profil les reprennent en s'affichant.
 @MainActor
 struct ArcImporter {
     let session: BrowserSession
-    /// Space affiché par la fenêtre qui importe.
-    let displayedSpace: SpaceSession?
     /// Vrai si le symbole SF existe sur ce Mac (remplacé dans les tests).
     var symbolExists: (String) -> Bool = { NSImage(systemSymbolName: $0, accessibilityDescription: nil) != nil }
 
@@ -185,8 +183,8 @@ struct ArcImporter {
         }
     }
 
-    /// Favoris des profils déjà là : à la fin de ceux du Space qui les tient, sans les adresses déjà en favori, puis
-    /// partagés avec les autres Spaces du profil. Renvoie le nombre de favoris ajoutés.
+    /// Favoris des profils déjà là : à la fin de ceux du Space qui les tient, sans les adresses déjà en favori. Renvoie
+    /// le nombre de favoris ajoutés.
     private func importFavorites(
         _ favorites: [ArcSidebar.Profile: [ImportedTab]],
         profiles: [ArcSidebar.Profile: ProfileRecord],
@@ -197,14 +195,12 @@ struct ArcImporter {
             guard let profile = profiles[key], !created.contains(where: { $0 === profile }) else {
                 continue
             }
-            let spaces = session.spaces(of: profile)
-            let holder = displayedSpace.flatMap { $0.record.profile?.id == profile.id ? $0 : nil } ?? spaces.first
-            guard let holder else {
+            guard let holder = session.favoritesHolder(of: profile.id) else {
                 continue
             }
-            let present = Set(holder.tabManager.favoriteTabs.compactMap { $0.pinnedURL ?? $0.url })
+            let present = Set(holder.favoriteTabs.compactMap { $0.pinnedURL ?? $0.url })
             let new = Self.withoutDuplicates(tabs).filter { !present.contains($0.url) }
-            holder.tabManager.appendFavorites(new.map { tab in
+            holder.appendFavorites(new.map { tab in
                 StoredTab(
                     id: UUID(),
                     url: tab.url,
@@ -215,9 +211,6 @@ struct ArcImporter {
                     interactionState: nil,
                 )
             })
-            for space in spaces where space !== holder {
-                space.tabManager.adoptFavorites(from: holder.tabManager)
-            }
             added += new.count
         }
         return added
