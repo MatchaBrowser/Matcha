@@ -17,9 +17,11 @@ extension TabManager {
     /// Ouvre une copie de l'onglet juste après lui, avec son historique, et la sélectionne.
     @discardableResult
     func duplicate(_ tab: BrowserTab) -> BrowserTab {
-        // Même configuration : même profil. L'état d'interaction emporte l'historique précédent/suivant.
+        // Même configuration : même profil. L'état d'interaction emporte l'historique précédent/suivant ; celui d'un
+        // onglet en veille (tâche 5.6) est son état retenu.
         let copy = insertTab(configuration: tab.configuration, after: tab, select: true)
-        if let state = tab.webView?.interactionState {
+        let suspendedState = tab.suspension.isSuspended ? tab.savedInteractionState : nil
+        if let state = tab.webView?.interactionState ?? suspendedState {
             copy.webView?.interactionState = state
         } else if let url = tab.url {
             copy.load(url)

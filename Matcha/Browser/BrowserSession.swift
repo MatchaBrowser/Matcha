@@ -41,6 +41,9 @@ final class BrowserSession {
     @ObservationIgnored let siteZooms: SiteZoomStore
     /// Historique de navigation (tâche 5.5) ; nil pour une fenêtre privée : rien n'est retenu.
     @ObservationIgnored let history: HistoryStore?
+    /// Mise en veille des onglets cachés (tâche 5.6), lancée par l'ouverture de la fenêtre ; mêmes règles en fenêtre
+    /// privée.
+    @ObservationIgnored let tabLifecycle = TabLifecycleService()
     private(set) var spaces: [SpaceSession] = []
     private(set) var profiles: [ProfileRecord] = []
     /// Magasin de données (cookies, stockage) de chaque profil, par identifiant de profil.
@@ -76,6 +79,7 @@ final class BrowserSession {
                 history: history,
             )
         }
+        tabLifecycle.session = self
         terminationObserver = NotificationCenter.default.addObserver(
             forName: NSApplication.willTerminateNotification,
             object: nil,

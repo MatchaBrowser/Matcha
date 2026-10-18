@@ -86,6 +86,9 @@ extension XCTestCase {
         // Pas de raccourci global pour la mini-fenêtre (texte « NO » : aucun raccourci, rien n'est écrit) : ⌥⌘N
         // reste à la Matcha de l'utilisateur. Le test du raccourci en impose un autre.
         "KeyboardShortcuts_openMiniWindow": "NO",
+        // Aucune mise en veille des onglets cachés (« Jamais ») : un test lent ne voit pas ses pages se recharger. Le test
+        // de la mise en veille donne un délai court (`tabSuspensionDelaySeconds`, Debug seulement).
+        "tabSuspensionDelay": "0",
     ]
 
     /// Langue imposée à chaque lancement : les tests cherchent les éléments par leurs textes français,

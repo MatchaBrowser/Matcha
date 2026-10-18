@@ -23,6 +23,8 @@ final class SettingsUITests: XCTestCase {
         XCTAssertTrue(peekToggle.exists)
         // Case ou interrupteur : valeur 0 (nombre ou texte selon le contrôle).
         XCTAssertEqual(peekToggle.value.map { "\($0)" }, "0")
+        // Mémoire des onglets inactifs (tâche 5.6) : le choix est là (lu seulement, jamais modifié ici).
+        XCTAssertTrue(app.descendants(matching: .any).matching(identifier: "tabSuspensionDelayPicker").firstMatch.exists)
 
         app.typeKey("w", modifierFlags: .command)
         XCTAssertTrue(picker.waitForNonExistence(timeout: 3))

@@ -2,7 +2,8 @@ import SwiftUI
 
 /// Carte aux coins arrondis d'un panneau : la page de l'onglet, avec la barre d'adresse au-dessus si les
 /// réglages la placent là (et dessous, le panneau des réglages du site), puis la barre de recherche et le bandeau des
-/// demandes de permission de la page. Un onglet qui n'a encore rien chargé, ou l'absence d'onglet, affiche un accueil.
+/// demandes de permission de la page. Un onglet qui n'a encore rien chargé, ou l'absence d'onglet, affiche un accueil ;
+/// un onglet sorti de veille montre sa capture le temps du rechargement.
 struct PageCard: View {
     let tab: BrowserTab?
     /// Panneau actif d'un split : bordure de la couleur d'accentuation.
@@ -100,6 +101,15 @@ struct PageCard: View {
         if let tab, tab.url != nil, let webView = tab.webView {
             WebView(webView: webView, sidebarDropTarget: sidebarDropTarget)
                 .id(ObjectIdentifier(webView))
+                // Onglet sorti de veille (tâche 5.6) : sa capture, le temps que la page se recharge. Elle est là dès
+                // l'affichage (pas de page blanche) et s'efface en fondu.
+                .overlay {
+                    if let cover = tab.suspension.cover {
+                        SuspendedPageCover(cover: cover)
+                            .transition(.asymmetric(insertion: .identity, removal: .opacity))
+                    }
+                }
+                .animation(.easeOut(duration: 0.2), value: tab.suspension.cover == nil)
         } else {
             ContentUnavailableView(emptyPageTitle, systemImage: "globe", description: Text(emptyPageDescription))
                 // Occupe toute la hauteur, comme la vue web : sinon la colonne entière est centrée verticalement.

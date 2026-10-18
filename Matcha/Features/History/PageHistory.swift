@@ -16,6 +16,8 @@ final class PageHistory {
     private var lastVisitHasTitle = false
     /// Adresse du dernier document chargé : un changement d'adresse sans chargement doit rester sur son origine.
     private var loadedURL: URL?
+    /// Clé de la page rechargée par la sortie de veille (tâche 5.6) : son prochain chargement n'est pas une visite.
+    private var resumedURLKey: String?
     private var pendingChange: Task<Void, Never>?
 
     /// Un document a fini de se charger dans la page (`didFinish` du cadre principal).
@@ -23,12 +25,24 @@ final class PageHistory {
         cancelPendingChange()
         self.scope = scope
         loadedURL = url
+        let resumedKey = resumedURLKey
+        resumedURLKey = nil
+        if let resumedKey, HistoryRecordingPolicy.storedURL(for: url).map(CommandText.urlKey) == resumedKey {
+            return
+        }
         record(url: url, title: title)
+    }
+
+    /// La page sort de veille et va recharger `url` (tâche 5.6) : ce rechargement, que l'utilisateur n'a pas demandé,
+    /// n'est pas une nouvelle visite. Une autre adresse chargée d'abord en est une.
+    func pageWillResume(url: URL?) {
+        resumedURLKey = HistoryRecordingPolicy.storedURL(for: url).map(CommandText.urlKey)
     }
 
     /// Chargement échoué ou interrompu : une adresse changée en attente n'est pas retenue.
     func navigationDidFail() {
         cancelPendingChange()
+        resumedURLKey = nil
     }
 
     /// L'adresse de la page a changé. Sans chargement en cours, c'est la page elle-même : l'adresse est retenue si
@@ -77,6 +91,7 @@ final class PageHistory {
         lastVisit = nil
         lastVisitHasTitle = false
         loadedURL = nil
+        resumedURLKey = nil
     }
 
     private func record(url: URL?, title: String?) {

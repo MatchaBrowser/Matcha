@@ -2,8 +2,8 @@ import AppKit
 import KeyboardShortcuts
 import SwiftUI
 
-/// Réglages généraux : page d'accueil, nouveaux onglets, recherche et suggestions, aperçu des liens, raccourci de
-/// la mini-fenêtre, fermeture de l'app, langue.
+/// Réglages généraux : page d'accueil, nouveaux onglets, recherche et suggestions, aperçu des liens, mémoire des onglets
+/// inactifs, raccourci de la mini-fenêtre, fermeture de l'app, langue.
 struct GeneralSettingsView: View {
     @AppStorage(BrowserSettings.Key.homePage) private var homePage = BrowserSettings.homePage
     @AppStorage(BrowserSettings.Key.newTabPage) private var newTabPage = BrowserSettings.newTabPage
@@ -11,6 +11,7 @@ struct GeneralSettingsView: View {
     @AppStorage(BrowserSettings.Key.showsSearchSuggestions) private var showsSearchSuggestions = BrowserSettings.showsSearchSuggestions
     @AppStorage(BrowserSettings.Key.confirmBeforeQuitting) private var confirmBeforeQuitting = BrowserSettings.confirmBeforeQuitting
     @AppStorage(BrowserSettings.Key.opensPinnedLinksInPeek) private var opensPinnedLinksInPeek = BrowserSettings.opensPinnedLinksInPeek
+    @AppStorage(BrowserSettings.Key.tabSuspensionDelay) private var tabSuspensionDelay = BrowserSettings.tabSuspensionDelay
 
     var body: some View {
         Form {
@@ -46,6 +47,22 @@ struct GeneralSettingsView: View {
                 Shift-click a link to open it in Peek without leaving the page. \
                 With this option, Favorites and pinned tabs stay on their website.
                 """, comment: "Settings > General: note under the Peek toggle")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+            }
+            Section {
+                Picker("Free memory of inactive tabs after", selection: $tabSuspensionDelay) {
+                    ForEach(TabSuspensionDelay.allCases) { delay in
+                        Text(delay.title).tag(delay)
+                    }
+                }
+                .accessibilityIdentifier("tabSuspensionDelayPicker")
+            } footer: {
+                Text("""
+                Tabs you haven't looked at for this long free their memory, and sooner when your Mac runs low on memory. \
+                They stay in the sidebar and reload when you show them; text typed in a page may be lost. \
+                Tabs playing sound or using the camera or microphone are never affected.
+                """, comment: "Settings > General: note under “Free memory of inactive tabs after”")
                     .font(.caption)
                     .foregroundStyle(.secondary)
             }

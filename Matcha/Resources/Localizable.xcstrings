@@ -212,6 +212,122 @@
         }
       }
     },
+    "1 hour" : {
+      "comment" : "Option of “Free memory of inactive tabs after”",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "1 Stunde"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "1 hora"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "1 heure"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "1 ora"
+          }
+        }
+      }
+    },
+    "15 minutes" : {
+      "comment" : "Option of “Free memory of inactive tabs after”",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "15 Minuten"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "15 minutos"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "15 minutes"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "15 minuti"
+          }
+        }
+      }
+    },
+    "2 hours" : {
+      "comment" : "Option of “Free memory of inactive tabs after”",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "2 Stunden"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "2 horas"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "2 heures"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "2 ore"
+          }
+        }
+      }
+    },
+    "30 minutes" : {
+      "comment" : "Option of “Free memory of inactive tabs after”",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "30 Minuten"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "30 minutos"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "30 minutes"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "30 minuti"
+          }
+        }
+      }
+    },
     "Above the Page" : {
       "comment" : "Address bar position option",
       "localizations" : {
@@ -2506,6 +2622,34 @@
         }
       }
     },
+    "Free memory of inactive tabs after" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Speicher inaktiver Tabs freigeben nach"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Liberar la memoria de las pestañas inactivas tras"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Libérer la mémoire des onglets inactifs après"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Libera la memoria dei pannelli inattivi dopo"
+          }
+        }
+      }
+    },
     "General" : {
       "comment" : "Settings tab",
       "localizations" : {
@@ -3086,6 +3230,35 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Nome"
+          }
+        }
+      }
+    },
+    "Never" : {
+      "comment" : "Option of “Free memory of inactive tabs after”",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nie"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nunca"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Jamais"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mai"
           }
         }
       }
@@ -5600,6 +5773,35 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Pannelli"
+          }
+        }
+      }
+    },
+    "Tabs you haven't looked at for this long free their memory, and sooner when your Mac runs low on memory. They stay in the sidebar and reload when you show them; text typed in a page may be lost. Tabs playing sound or using the camera or microphone are never affected." : {
+      "comment" : "Settings > General: note under “Free memory of inactive tabs after”",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tabs, die du so lange nicht angesehen hast, geben ihren Speicher frei – früher, wenn dein Mac wenig Speicher hat. Sie bleiben in der Seitenleiste und werden neu geladen, wenn du sie anzeigst; in eine Seite eingegebener Text kann verloren gehen. Tabs, die Ton abspielen oder Kamera oder Mikrofon verwenden, sind nie betroffen."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Las pestañas que no hayas mirado durante este tiempo liberan su memoria, y antes si tu Mac se queda sin memoria. Siguen en la barra lateral y se vuelven a cargar cuando las muestras; el texto escrito en una página puede perderse. Las pestañas que reproducen sonido o usan la cámara o el micrófono nunca se ven afectadas."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Les onglets que vous n'avez pas regardés depuis ce délai libèrent leur mémoire, et plus tôt quand le Mac en manque. Ils restent dans la barre latérale et se rechargent quand vous les affichez ; un texte saisi dans une page peut être perdu. Les onglets qui jouent du son ou utilisent la caméra ou le micro ne sont jamais concernés."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "I pannelli che non guardi da questo tempo liberano la loro memoria, e prima se il Mac ne ha poca. Restano nella barra laterale e si ricaricano quando li mostri; il testo inserito in una pagina potrebbe andare perso. I pannelli che riproducono audio o usano la fotocamera o il microfono non vengono mai toccati."
           }
         }
       }

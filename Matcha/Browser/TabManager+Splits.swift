@@ -103,8 +103,9 @@ extension TabManager {
         updateLayout { $0.setSplitFractions(groupID, fractions) }
     }
 
+    /// Un onglet du split est chargé, ou en veille (tâche 5.6) : le split peut se fermer.
     func hasLoadedTab(inSplit groupID: UUID) -> Bool {
-        layout.split(withID: groupID)?.tabIDs.contains { tab(withID: $0)?.isLoaded == true } ?? false
+        layout.split(withID: groupID)?.tabIDs.contains { tab(withID: $0)?.appearsLoaded == true } ?? false
     }
 
     /// Applique `change` ; si `tab`, panneau actif, a quitté son split, son voisin devient actif : le reste du

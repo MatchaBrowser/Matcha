@@ -23,4 +23,6 @@ nonisolated extension Logger {
     static let permissions = Logger(subsystem: subsystem, category: "Permissions")
     /// Historique de navigation ; jamais d'adresse ni de titre, seulement des nombres.
     static let history = Logger(subsystem: subsystem, category: "History")
+    /// Mémoire des onglets (mise en veille des onglets cachés) ; jamais d'adresse, seulement des nombres.
+    static let tabLifecycle = Logger(subsystem: subsystem, category: "TabLifecycle")
 }

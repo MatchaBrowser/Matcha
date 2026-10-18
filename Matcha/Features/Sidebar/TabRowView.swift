@@ -20,10 +20,10 @@ struct TabRowView: View {
             Text(tab.displayTitle)
                 .lineLimit(1)
                 .truncationMode(.tail)
-                // Onglet épinglé déchargé : présent mais en retrait.
-                .foregroundStyle(tab.isLoaded ? .primary : .secondary)
+                // Onglet épinglé déchargé : présent mais en retrait. Un onglet en veille (tâche 5.6) ne change pas.
+                .foregroundStyle(tab.appearsLoaded ? .primary : .secondary)
             Spacer(minLength: 0)
-            if isHovered, tab.isLoaded {
+            if isHovered, tab.appearsLoaded {
                 Button("Close Tab", systemImage: "xmark") { tabManager.close(tab) }
                     .labelStyle(.iconOnly)
                     .buttonStyle(SidebarIconButtonStyle())
@@ -52,6 +52,10 @@ struct TabRowView: View {
         .accessibilityAction { TabActivation.activate(tab, in: tabManager) }
         .accessibilityAction(named: "Close Tab") { tabManager.close(tab) }
         .accessibilityIdentifier("tabRow")
+        #if DEBUG
+            // Tests d'interface (tâche 5.6) : un onglet en veille se reconnaît sans rien changer à l'affichage.
+            .accessibilityValue(Text(verbatim: tab.suspension.isSuspended ? "suspended" : ""))
+        #endif
     }
 }
 

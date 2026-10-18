@@ -102,6 +102,8 @@ extension NavigationCoordinator: WKNavigationDelegate {
         guard let tabHost, let tab = tabHost.page(for: webView) else {
             return
         }
+        // Page sortie de veille rechargée (tâche 5.6) : sa capture laisse la place à la page.
+        tab.suspension.endRestoring()
         tabHost.faviconService.refreshIcon(of: tab)
         // Retenu à chaque page chargée : un plantage ne fait pas perdre l'historique.
         tab.captureInteractionState()

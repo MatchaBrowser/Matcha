@@ -68,7 +68,7 @@ struct TabContextMenu: View {
             Button("Delete Tab") { tabManager.delete(tab) }
         } else {
             Button("Close Tab") { tabManager.close(tab) }
-                .disabled(!tab.isLoaded)
+                .disabled(!tab.appearsLoaded)
             Button("Delete Tab") { tabManager.delete(tab) }
         }
     }

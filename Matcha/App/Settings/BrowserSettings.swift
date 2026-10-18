@@ -14,6 +14,7 @@ nonisolated enum BrowserSettings {
         static let showsNavigationButtons = "showsNavigationButtons"
         static let showsSearchSuggestions = "showsSearchSuggestions"
         static let opensPinnedLinksInPeek = "opensPinnedLinksInPeek"
+        static let tabSuspensionDelay = "tabSuspensionDelay"
     }
 
     static let searchEngine = SearchEngine.defaultEngine
@@ -31,6 +32,8 @@ nonisolated enum BrowserSettings {
     /// Liens d'un favori ou d'un épinglé vers un autre site ouverts dans l'aperçu (tâche 4.4), comme dans Arc ;
     /// désactivé par défaut : un clic ordinaire garde son comportement tant qu'on ne l'a pas choisi.
     static let opensPinnedLinksInPeek = false
+    /// Mémoire libérée après 30 minutes sans affichage (tâche 5.6).
+    static let tabSuspensionDelay = TabSuspensionDelay.thirtyMinutes
 
     /// Adresse de la page d'accueil saisie dans les réglages, interprétée comme dans la barre d'adresse ;
     /// nil si elle est vide.
@@ -49,5 +52,13 @@ nonisolated enum BrowserSettings {
         defaults.object(forKey: Key.opensPinnedLinksInPeek) == nil
             ? opensPinnedLinksInPeek
             : defaults.bool(forKey: Key.opensPinnedLinksInPeek)
+    }
+
+    /// Délai de mise en veille des onglets cachés dans `defaults` (minutes, nombre ou texte d'un argument de lancement
+    /// comme « -tabSuspensionDelay 0 »), ou sa valeur par défaut si la valeur manque ou n'est pas une option.
+    static func tabSuspensionDelay(in defaults: UserDefaults = .standard) -> TabSuspensionDelay {
+        let stored = defaults.object(forKey: Key.tabSuspensionDelay)
+        let minutes = (stored as? NSNumber)?.intValue ?? (stored as? String).flatMap { Int($0) }
+        return minutes.flatMap(TabSuspensionDelay.init(rawValue:)) ?? tabSuspensionDelay
     }
 }

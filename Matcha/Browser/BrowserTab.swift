@@ -5,7 +5,7 @@ import WebKit
 
 /// Un onglet en cours d'exécution : il possède sa vue web et expose son état à l'interface.
 /// L'état est recopié depuis la vue web par observation KVO. La vue web peut être libérée
-/// (`unload`) puis recréée à la demande (`makeWebViewIfNeeded`).
+/// (`unload`, ou `suspend` pour la mémoire) puis recréée à la demande (`makeWebViewIfNeeded`).
 @MainActor
 @Observable
 final class BrowserTab: Identifiable {
@@ -40,6 +40,8 @@ final class BrowserTab: Identifiable {
     let find = FindSession()
     /// Visites de la page retenues dans l'historique (tâche 5.5).
     let history = PageHistory()
+    /// Mise en veille pour la mémoire (tâche 5.6).
+    let suspension = TabSuspension()
     /// Zoom de la page (`WKWebView.pageZoom`, tâche 5.4), recopié ici pour les menus : il ne change que par
     /// `setPageZoom`. Le zoom par pincement (`magnification`) est à part.
     private(set) var pageZoom = ZoomLevels.actualSize
@@ -68,6 +70,7 @@ final class BrowserTab: Identifiable {
         self.openerID = openerID
         find.performer = self
         history.page = self
+        suspension.page = self
     }
 
     /// Onglet restauré depuis l'enregistrement : il affiche `url` et `title`, et ne crée sa vue web
@@ -88,18 +91,14 @@ final class BrowserTab: Identifiable {
         webView != nil
     }
 
-    /// Titre à afficher : titre de la page, sinon hôte, sinon « Nouvel onglet ».
-    var displayTitle: String {
-        if let title, !title.isEmpty {
-            return title
-        }
-        if let host = url?.host(), !host.isEmpty {
-            return host
-        }
-        return url?.absoluteString ?? String(localized: "New Tab")
+    /// Affiché comme chargé dans la barre latérale (titre plein, bouton de fermeture) : vue web présente, ou mise en
+    /// veille pour la mémoire, qui ne doit rien changer à l'affichage (tâche 5.6).
+    var appearsLoaded: Bool {
+        webView != nil || suspension.isSuspended
     }
 
-    /// Vue web de l'onglet, créée si besoin ; un onglet déchargé recharge alors son adresse.
+    /// Vue web de l'onglet, créée si besoin ; un onglet déchargé recharge alors son adresse, un onglet en veille sa
+    /// page et son historique, sans compter une nouvelle visite.
     @discardableResult
     func makeWebViewIfNeeded() -> WKWebView {
         if let webView {
@@ -117,6 +116,11 @@ final class BrowserTab: Identifiable {
         // Copie réutilisable pour les prochaines vues (rechargement, duplication).
         configuration = webView.configuration
         self.webView = webView
+        if suspension.isSuspended {
+            // Avant l'observation : le titre vide et l'adresse absente de la vue neuve ne remplacent pas ceux de l'onglet.
+            suspension.didResume(url: url)
+            history.pageWillResume(url: url)
+        }
         observe(webView)
         if let state = pendingInteractionState {
             // Restauration : page, historique et défilement, sans recharger depuis l'adresse.
@@ -130,64 +134,71 @@ final class BrowserTab: Identifiable {
         return webView
     }
 
-    /// Retient l'état de navigation de la vue web, pour la restaurer plus tard.
-    func captureInteractionState() {
+    /// Retient l'état de navigation de la vue web, pour la restaurer plus tard ; faux s'il n'a pas pu être lu.
+    @discardableResult
+    func captureInteractionState() -> Bool {
         guard let webView else {
-            return
+            return false
         }
         guard let state = webView.interactionState as? Data else {
             Logger.browser.notice("État de navigation illisible : l'onglet sera restauré depuis son adresse")
-            return
+            return false
         }
         savedInteractionState = state
+        return true
     }
 
     /// Libère la vue web (mémoire, son, processus), refuse les demandes de permission en attente, oublie la recherche
     /// dans la page et revient à 100 % (le zoom du site reviendra avec la page). L'onglet affiche désormais `url` et
     /// `title`, et chargera `url` quand on le rouvrira.
     func unload(resettingTo url: URL?, title: String?) {
-        observations = []
-        permissionPrompts.denyAll()
-        find.reset()
+        releaseWebView()
         history.reset()
-        if let webView {
-            webView.pauseAllMediaPlayback(completionHandler: nil)
-            webView.stopLoading()
-            webView.navigationDelegate = nil
-            webView.uiDelegate = nil
-        }
-        webView = nil
+        suspension.reset()
         pendingURL = url
         // Retour à l'adresse d'origine : l'historique est oublié.
         pendingInteractionState = nil
         savedInteractionState = nil
         setURL(url)
         self.title = title
-        isLoading = false
-        progress = 0
         canGoBack = false
         canGoForward = false
         pageZoom = ZoomLevels.actualSize
     }
 
+    /// Met l'onglet en veille pour la mémoire (tâche 5.6) : son état de navigation est retenu et sa vue web libérée,
+    /// comme `unload`, mais il garde son adresse, son titre, son icône, son zoom et son historique précédent/suivant.
+    /// Recréé, il rouvre la même page (depuis son adresse si l'état n'a pas pu être lu). `snapshot` : sa capture.
+    func suspend(snapshot: TabSnapshot?, at date: Date = .now) {
+        guard webView != nil else {
+            return
+        }
+        if !captureInteractionState() {
+            // Un état plus ancien que la page affichée (retenu au dernier chargement) ne doit pas la remplacer.
+            savedInteractionState = nil
+        }
+        releaseWebView()
+        history.reset()
+        pendingURL = url
+        pendingInteractionState = savedInteractionState
+        suspension.didSuspend(snapshot: snapshot, at: date)
+    }
+
+    /// Relit le titre et l'adresse de la vue web (fin du rechargement d'un onglet sorti de veille). Une vue sans
+    /// adresse (rechargement échoué) ne vide pas l'onglet.
+    func syncWithWebView() {
+        guard let webView, webView.url != nil else {
+            return
+        }
+        title = webView.title
+        setURL(webView.url)
+    }
+
     func load(_ url: URL) {
-        load(url, in: makeWebViewIfNeeded())
-    }
-
-    func goBack() {
-        webView?.goBack()
-    }
-
-    func goForward() {
-        webView?.goForward()
-    }
-
-    func reload() {
-        webView?.reload()
-    }
-
-    func stop() {
-        webView?.stopLoading()
+        let webView = makeWebViewIfNeeded()
+        // Une autre page que celle de la veille : plus de capture par-dessus.
+        suspension.endRestoring()
+        load(url, in: webView)
     }
 
     /// Zoom de la page (100 % = 1) ; gardé pour la vue web recréée après un déchargement.
@@ -196,6 +207,23 @@ final class BrowserTab: Identifiable {
             pageZoom = zoom
         }
         webView?.pageZoom = zoom
+    }
+
+    /// Libère la vue web : observation, son, chargement, délégués ; refuse les demandes de permission en attente et
+    /// oublie la recherche dans la page.
+    private func releaseWebView() {
+        observations = []
+        permissionPrompts.denyAll()
+        find.reset()
+        if let webView {
+            webView.pauseAllMediaPlayback(completionHandler: nil)
+            webView.stopLoading()
+            webView.navigationDelegate = nil
+            webView.uiDelegate = nil
+        }
+        webView = nil
+        isLoading = false
+        progress = 0
     }
 
     private func load(_ url: URL, in webView: WKWebView) {
@@ -222,10 +250,18 @@ final class BrowserTab: Identifiable {
     private func observe(_ webView: WKWebView) {
         observations = [
             webView.observe(\.title, options: .initial, changeHandler: sync { tab, webView in
+                // Sortie de veille : l'onglet garde son titre jusqu'à celui de la page rechargée.
+                if tab.suspension.isRestoring, webView.title?.isEmpty != false {
+                    return
+                }
                 tab.title = webView.title
                 tab.history.titleDidChange(to: webView.title, pageURL: webView.url)
             }),
             webView.observe(\.url, options: .initial, changeHandler: sync { tab, webView in
+                if tab.suspension.isRestoring, webView.url == nil {
+                    return
+                }
+                tab.suspension.pageURLDidChange(to: webView.url)
                 tab.setURL(webView.url)
                 // Chargement lu sur la vue web : WebKit change l'adresse et le chargement ensemble, avant que l'onglet
                 // n'ait recopié le second.

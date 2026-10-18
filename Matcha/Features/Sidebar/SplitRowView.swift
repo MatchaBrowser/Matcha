@@ -101,8 +101,8 @@ private struct SplitSegmentView: View {
                 Text(tab.displayTitle)
                     .lineLimit(1)
                     .truncationMode(.tail)
-                    // Onglet épinglé déchargé : présent mais en retrait.
-                    .foregroundStyle(tab.isLoaded ? .primary : .secondary)
+                    // Onglet épinglé déchargé : présent mais en retrait. Un onglet en veille (tâche 5.6) ne change pas.
+                    .foregroundStyle(tab.appearsLoaded ? .primary : .secondary)
             }
         }
         .padding(.horizontal, 6)

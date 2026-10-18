@@ -60,3 +60,11 @@ Fonctions livrées avec une limite, faute d'API publique ou par choix de simplic
 ### Spaces (4.0)
 
 - **Sous-menu Icône d'un Space** : il affiche les noms techniques des symboles (« circle.fill »…). Piste : n'afficher que les icônes, ou des noms traduits.
+
+### Mémoire des onglets (5.6)
+
+- **Texte saisi perdu** : un onglet mis en veille recharge sa page en revenant ; ce qui n'a pas été envoyé (formulaire, brouillon) est perdu, comme l'état d'une app web ou la position d'une vidéo. Piste : demander à la page, par un script dans un monde isolé (`WKContentWorld`), si un champ a été modifié, et l'épargner, comme le fait Chrome.
+- **Applications web épinglées** (messagerie, discussion) : en veille, elles ne se mettent plus à jour (compteur du titre figé) jusqu'à leur affichage. Piste : un réglage pour garder chargés les épinglés et les favoris.
+- **Son par Web Audio** : `requestMediaPlaybackState` ne signale peut-être que les éléments audio et vidéo ; à vérifier à la main.
+- **Partage d'écran sans caméra ni micro** : aucune API publique ne le signale ; l'onglet peut se mettre en veille.
+- **Fenêtre ouverte par une page** (connexion « avec Google »…) : si la page d'origine se met en veille pendant ce temps, `window.opener` ne la retrouve plus.

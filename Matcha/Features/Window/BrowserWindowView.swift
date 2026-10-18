@@ -119,11 +119,16 @@ struct BrowserWindowView: View {
         // Pas de `.defaultFocus` : SwiftUI rendrait le clavier à un champ dès que plus rien n'a le
         // focus, et l'enlèverait au champ de nom d'un nouveau dossier.
         // Sans onglet sélectionné, la page vide invite à ⌘T : la barre ne s'ouvre jamais d'elle-même.
-        .onAppear { tabManager.loadSelectedTab() }
+        .onAppear {
+            tabManager.loadSelectedTab()
+            // Les onglets affichés par cette fenêtre ne sont jamais mis en veille (tâche 5.6).
+            session.tabLifecycle.windowDidAppear(model)
+        }
         .onDisappear {
             model.copyConfirmation.cancel()
             // Fenêtre fermée : l'aperçu ne reste pas ouvert (son, processus) sans elle.
             tabManager.closePeek()
+            session.tabLifecycle.windowDidDisappear(model)
         }
         .task { await session.removeOrphanDataStores() }
         // « Effacer… » des réglages du site (tâche 5.2) : l'alerte appartient à la fenêtre.
