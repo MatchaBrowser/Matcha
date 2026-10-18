@@ -140,6 +140,8 @@ struct BrowserWindowView: View {
         .modifier(SiteDataClearConfirmation(model: model))
         // Les mini-fenêtres envoient leurs pages dans cette fenêtre (tâche 4.5).
         .linkedToMiniWindows(session: session, model: model, window: window) { [commandBar] in commandBar.dismiss() }
+        // Fenêtre et onglets vus par les extensions (tâche 6.3).
+        .seenByExtensions(model: model, window: window)
         .environment(model)
         .focusedSceneValue(\.tabManager, tabManager)
         .focusedSceneValue(\.windowActions, windowActions)

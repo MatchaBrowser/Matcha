@@ -6,7 +6,8 @@ import WebKit
 /// un `BrowserTab` que la barre ne connaît pas ; « Ouvrir en onglet » range ce même objet : même vue web, même
 /// historique, rien n'est rechargé. Il n'est jamais enregistré.
 /// Tâche 5.7 : une page d'aperçu plantée est visible (`isVisible`), elle se recharge.
-/// Tâche 6.3 : l'aperçu n'est un onglet des extensions qu'une fois ouvert en onglet.
+/// Tâche 6.3 : pour les extensions, l'aperçu ouvert est un onglet, juste après son onglet d'origine, et l'onglet actif
+/// (`ExtensionWindows`).
 extension TabManager {
     /// Page au premier plan : l'aperçu s'il est ouvert, sinon l'onglet sélectionné, qui est aussi le panneau
     /// actif d'un split (⌘R, ⌘[, ⌘], ⇧⌘C ; 5.3, 5.4).

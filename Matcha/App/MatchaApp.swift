@@ -33,6 +33,12 @@ struct MatchaApp: App {
             miniWindows.start()
             ContentBlockerService.shared.start()
         }
+        // Extensions (tâche 6.3) : les mini-fenêtres leur sont des fenêtres ; les extensions installées se chargent en
+        // tâche de fond, sauf avec une base de test (tests d'interface) : jamais celles de l'utilisateur.
+        ExtensionManager.shared.windows.miniWindows = miniWindows
+        if !session.isInMemory {
+            ExtensionManager.shared.start()
+        }
         _session = State(initialValue: session)
         _miniWindows = State(initialValue: miniWindows)
     }

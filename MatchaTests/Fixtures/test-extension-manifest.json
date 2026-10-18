@@ -1,0 +1,18 @@
+{
+  "manifest_version": 3,
+  "name": "Matcha Test Extension",
+  "version": "1.0",
+  "description": "Test extension of the Matcha unit tests.",
+  "background": {
+    "service_worker": "test-extension-background.js"
+  },
+  "content_scripts": [
+    {
+      "matches": ["obtest://*/*"],
+      "js": ["test-extension-content.js"],
+      "run_at": "document_end"
+    }
+  ],
+  "host_permissions": ["obtest://*/*"],
+  "permissions": ["tabs"]
+}

@@ -1,8 +1,9 @@
 import WebKit
 
-/// Fabrique la configuration WebKit commune à toutes les vues web, avec le script de son (tâche 5.10). Chaque page a son
-/// propre contrôleur de contenu (`pageConfiguration`) : le bloqueur (tâche 6.2) y pose ou retire ses listes page par
-/// page. Plus tard, les Boosts et les extensions s'y brancheront.
+/// Fabrique la configuration WebKit commune à toutes les vues web, avec le script de son (tâche 5.10) et le contrôleur
+/// des extensions (tâche 6.3, fenêtres privées comprises : les extensions n'y ont accès que si l'utilisateur le permet).
+/// Chaque page a son propre contrôleur de contenu (`pageConfiguration`) : le bloqueur (tâche 6.2) y pose ou retire ses
+/// listes page par page ; WebKit y injecte les scripts des extensions.
 @MainActor
 enum WebConfigurationFactory {
     /// Version de Safari annoncée aux sites, pour qu'ils traitent l'app comme Safari.
@@ -23,6 +24,7 @@ enum WebConfigurationFactory {
         configuration.preferences.isElementFullscreenEnabled = true
         configuration.applicationNameForUserAgent = applicationNameForUserAgent
         configuration.userContentController = makeUserContentController()
+        ExtensionManager.shared.attach(to: configuration)
         return configuration
     }
 

@@ -42,12 +42,15 @@ final class NavigationCoordinator: NSObject {
         )
     }
 
-    /// Vrai si WebKit charge lui-même ce schéma ou si la configuration de la vue lui associe un gestionnaire.
+    /// Vrai si WebKit charge lui-même ce schéma ou si la configuration de la vue lui associe un gestionnaire. Les pages
+    /// des extensions (`webkit-extension:`, tâche 6.3) sont servies par WebKit sans gestionnaire visible : jamais confiées
+    /// à une autre app (WebKit refuse lui-même de les charger dans une vue qui n'est pas celle de leur extension).
     func handles(_ url: URL, in webView: WKWebView) -> Bool {
         guard let scheme = url.scheme?.lowercased() else {
             return true
         }
         return WKWebView.handlesURLScheme(scheme) || webView.configuration.urlSchemeHandler(forURLScheme: scheme) != nil
+            || scheme == ExtensionManager.scheme
     }
 
     func open(externally url: URL) {

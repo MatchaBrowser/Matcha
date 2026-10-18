@@ -3362,6 +3362,78 @@
         }
       }
     },
+    "Extension Prompt Allow" : {
+      "comment" : "Extension permission alert: grant what the extension asks for",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Erlauben"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Allow"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Permitir"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Autoriser"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Consenti"
+          }
+        }
+      }
+    },
+    "Extension Prompt Deny" : {
+      "comment" : "Extension permission alert: refuse what the extension asks for",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nicht erlauben"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Don't Allow"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No permitir"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Refuser"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Non consentire"
+          }
+        }
+      }
+    },
     "Failed" : {
       "comment" : "State of a download that failed",
       "localizations" : {
@@ -6290,6 +6362,35 @@
         }
       }
     },
+    "Permissions: %@" : {
+      "comment" : "Extension permission alert; %@ lists technical permission names",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Berechtigungen: %@"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Permisos: %@"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Permissions : %@"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Autorizzazioni: %@"
+          }
+        }
+      }
+    },
     "Person" : {
       "comment" : "Icon choice (SF Symbol)",
       "localizations" : {
@@ -9155,6 +9256,64 @@
         }
       }
     },
+    "Websites: %@" : {
+      "comment" : "Extension permission alert; %@ lists websites or address patterns",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Websites: %@"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sitios web: %@"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sites : %@"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Siti web: %@"
+          }
+        }
+      }
+    },
+    "Websites: all websites" : {
+      "comment" : "Extension permission alert: access to every website",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Websites: alle Websites"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sitios web: todos los sitios web"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sites : tous les sites"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Siti web: tutti i siti web"
+          }
+        }
+      }
+    },
     "What you type in the command bar is sent to %@ to suggest searches. Never in private windows." : {
       "comment" : "Settings > General: note under the search suggestions toggle; %@ is the search engine name (Google, DuckDuckGo, Bing)",
       "localizations" : {
@@ -9548,6 +9707,35 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "ad es. apple.com"
+          }
+        }
+      }
+    },
+    "“%@” Requests Additional Access" : {
+      "comment" : "Alert shown when a browser extension asks for more permissions; %@ is the extension name",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "„%@“ fordert zusätzlichen Zugriff an"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "“%@” solicita acceso adicional"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "« %@ » demande un accès supplémentaire"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "“%@” richiede un accesso aggiuntivo"
           }
         }
       }

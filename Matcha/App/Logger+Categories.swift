@@ -27,4 +27,6 @@ nonisolated extension Logger {
     static let tabLifecycle = Logger(subsystem: subsystem, category: "TabLifecycle")
     /// Bloqueur de publicités et de traqueurs : listes, durées, nombres ; jamais d'adresse ni de site.
     static let contentBlocker = Logger(subsystem: subsystem, category: "ContentBlocker")
+    /// Extensions web : chargement, fenêtres et onglets ouverts pour elles, demandes de permissions ; jamais d'adresse.
+    static let extensions = Logger(subsystem: subsystem, category: "Extensions")
 }
