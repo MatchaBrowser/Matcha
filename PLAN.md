@@ -171,6 +171,8 @@ Feuille de route de développement, à suivre dans l'ordre. Les règles de trava
   - État affiché (« Synchronisé il y a 2 min », erreurs compréhensibles) et bouton « Synchroniser maintenant ».
   - Premier envoi vers un mode qui contient déjà des données : Fusionner (par défaut), Remplacer les données de ce Mac, Remplacer les données synchronisées.
 
+**2026-10-18 :** l'utilisateur fera le serveur de synchro plus tard (7.7 à 7.9) ; la phase 8 commence avant la fin de la phase 7 (7.2 aussi reste à faire).
+
 Le serveur public (même API, hébergé par nous) n'a pas encore de tâche. Il attend les décisions sur l'hébergement, les quotas et les conditions d'utilisation (`SYNC.md`, § 7).
 
 **Fini quand [À VOIR]** un second Mac retrouve tes Spaces, dossiers, favoris, épinglés, onglets du jour, extensions (après ton accord) et réglages par ton serveur privé, et la base du serveur ne contient aucune donnée lisible.
