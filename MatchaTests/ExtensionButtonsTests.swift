@@ -113,4 +113,42 @@ struct ExtensionButtonsTests {
         anchors.unregister(right)
         #expect(anchors.view(for: "ext", tabID: tab, in: first) === left)
     }
+
+    // MARK: Messages natifs
+
+    @Test func `native message replies are spaced per extension`() {
+        var throttle = NativeMessageThrottle()
+        let start = ContinuousClock.now
+        #expect(throttle.delay(for: "bitwarden", at: start) == .zero)
+        // Boucle : le message suivant, aussitôt, attend une seconde, puis encore une.
+        #expect(throttle.delay(for: "bitwarden", at: start) == .seconds(1))
+        #expect(throttle.delay(for: "bitwarden", at: start + .milliseconds(500)) == .milliseconds(1500))
+        // Une autre extension n'attend pas.
+        #expect(throttle.delay(for: "proton", at: start) == .zero)
+        // Longtemps après : de nouveau tout de suite.
+        #expect(throttle.delay(for: "bitwarden", at: start + .seconds(10)) == .zero)
+    }
+
+    @Test func `native messages are refused with an error`() async throws {
+        let manager = TestExtension.manager()
+        let folder = try TestExtension.makeFolder()
+        defer { try? FileManager.default.removeItem(at: folder) }
+        let manifestURL = folder.appendingPathComponent("manifest.json")
+        var manifest = try #require(JSONSerialization.jsonObject(with: Data(contentsOf: manifestURL)) as? [String: Any])
+        manifest["action"] = ["default_title": "Native"]
+        manifest["permissions"] = ["nativeMessaging"]
+        try JSONSerialization.data(withJSONObject: manifest).write(to: manifestURL)
+        let script = """
+        browser.runtime.sendNativeMessage("com.example.app", { command: "sleep" })
+            .then(() => browser.action.setBadgeText({ text: "ok" }))
+            .catch(() => browser.action.setBadgeText({ text: "err" }));
+        """
+        try Data(script.utf8).write(to: folder.appendingPathComponent("test-extension-background.js"))
+        let identifier = TestExtension.uniqueIdentifier("native")
+        let context = try await manager.load(resourceBaseURL: folder, identifier: identifier)
+        context.setPermissionStatus(.grantedExplicitly, for: .nativeMessaging)
+        try await TestExtension.waitForBackground(of: context)
+        try await waitUntil { manager.action(of: identifier, for: nil)?.badgeText == "err" }
+        manager.unload(identifier: identifier)
+    }
 }

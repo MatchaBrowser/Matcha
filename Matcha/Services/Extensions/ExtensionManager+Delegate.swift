@@ -130,6 +130,39 @@ extension ExtensionManager: WKWebExtensionControllerDelegate {
         ask(request) { completionHandler($0 ? urls : [], nil) }
     }
 
+    // MARK: Messages natifs
+
+    /// Messages vers une app (`runtime.sendNativeMessage`) : refusés, comme WebKit le ferait (le passage vers l'app d'une
+    /// extension Safari est réservé à Safari), mais par Matcha, sans essai d'ouvrir l'app, et avec des réponses
+    /// espacées (`NativeMessageThrottle`) : une extension qui en envoie en boucle n'occupe plus le processeur.
+    func webExtensionController(
+        _: WKWebExtensionController,
+        sendMessage _: Any,
+        toApplicationWithIdentifier _: String?,
+        for context: WKWebExtensionContext,
+        replyHandler: @escaping @Sendable (Any?, (any Error)?) -> Void,
+    ) {
+        let identifier = context.uniqueIdentifier
+        if nativeMessageSenders.insert(identifier).inserted {
+            Logger.extensions.notice("Messages natifs refusés (\(identifier, privacy: .public))")
+        }
+        let delay = nativeMessages.delay(for: identifier, at: .now)
+        Task {
+            try? await Task.sleep(for: delay)
+            replyHandler(nil, ExtensionError.nativeMessagingUnsupported)
+        }
+    }
+
+    /// Connexion durable vers une app (`runtime.connectNative`) : refusée.
+    func webExtensionController(
+        _: WKWebExtensionController,
+        connectUsing _: WKWebExtension.MessagePort,
+        for _: WKWebExtensionContext,
+        completionHandler: @escaping @Sendable ((any Error)?) -> Void,
+    ) {
+        completionHandler(ExtensionError.nativeMessagingUnsupported)
+    }
+
     // MARK: Actions
 
     /// Bulle de l'action, dans la fenêtre de son onglet, sinon la fenêtre active.

@@ -479,6 +479,7 @@ Réglages (⌘,) > Extensions. Extensions Safari : celles des apps de /Applicati
 - [ ] Menu (…) > « Supprimer… » : confirmation « Supprimer « … » ? » ; l'extension disparaît de la liste ; une extension Safari redevient « Ajouter… » plus bas, et son app est toujours là.
 - [ ] Quitte et relance Matcha : les extensions installées sont toujours là, avec leurs réglages.
 - [ ] Langues : l'onglet et l'écran des permissions en allemand, espagnol et italien ; aucun texte coupé.
+- [ ] Bitwarden (extension Safari de l'app Bitwarden) installé et actif : Moniteur d'activité, Matcha et ses processus « WebKit » restent sous quelques % de processeur au repos (avant le correctif, sa boucle d'attente occupait 40 %).
 - Connu : les messages natifs vers l'app de l'extension ne marchent pas (`FEATURES.md`).
 
 ### 6.5 Boutons des extensions

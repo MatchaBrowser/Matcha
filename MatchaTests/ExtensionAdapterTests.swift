@@ -72,6 +72,8 @@ struct ExtensionAdapterTests {
             "webExtensionController:promptForPermissionMatchPatterns:inTab:forExtensionContext:completionHandler:",
             "webExtensionController:didUpdateAction:forExtensionContext:",
             "webExtensionController:presentPopupForAction:forExtensionContext:completionHandler:",
+            "webExtensionController:sendMessage:toApplicationWithIdentifier:forExtensionContext:replyHandler:",
+            "webExtensionController:connectUsingMessagePort:forExtensionContext:completionHandler:",
         ]
         for selector in delegateSelectors {
             #expect(manager.responds(to: NSSelectorFromString(selector)), "\(selector)")

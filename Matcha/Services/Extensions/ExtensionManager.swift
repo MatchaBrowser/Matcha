@@ -43,6 +43,10 @@ final class ExtensionManager: NSObject {
     private(set) var buttonsRevision = 0
     /// Boutons des extensions affichés, pour y ancrer leur bulle (tâche 6.5).
     @ObservationIgnored let buttonAnchors = ExtensionButtonAnchors()
+    /// Réponses aux messages natifs (refusés), espacées par extension.
+    @ObservationIgnored var nativeMessages = NativeMessageThrottle()
+    /// Extensions dont un message natif a déjà été refusé (une ligne de journal chacune).
+    @ObservationIgnored var nativeMessageSenders: Set<String> = []
     @ObservationIgnored var isStarted = false
     @ObservationIgnored var observers: [any NSObjectProtocol] = []
 
