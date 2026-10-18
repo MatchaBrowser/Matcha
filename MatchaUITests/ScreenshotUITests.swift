@@ -56,7 +56,11 @@ import XCTest
 /// - `MATCHA_SCREENSHOT_HISTORY` : fenêtre de l'historique (⌘Y) après la visite de deux pages de la documentation de
 ///   Postfix (sans réseau ; celles de `MATCHA_SCREENSHOT_URLS` si défini) : `33-historique` ; avec un texte (pas « 1 »),
 ///   ce texte cherché : `34-historique-recherche` ; puis le dialogue « Effacer l'historique… » : `35-historique-effacer`.
-///   Ex. `MATCHA_SCREENSHOT_HISTORY=basic`. Voir `ScreenshotUITests+History`.
+///   Ex. `MATCHA_SCREENSHOT_HISTORY=basic`. Voir `ScreenshotUITests+History` ;
+/// - `MATCHA_SCREENSHOT_FOLDER` : dossier épinglé personnalisé, nommé d'après la valeur (« Projets » pour « 1 »), et son
+///   sous-dossier « Client » (sans réseau) : panneau « Personnaliser… » ouvert sous le sous-dossier
+///   (`37-dossier-panneau`), puis les deux lignes, panneau fermé (`38-dossier-personnalise`). En sombre :
+///   `MATCHA_SCREENSHOT_SETTINGS_VALUES=AppleInterfaceStyle=Dark`. Voir `ScreenshotUITests+Folders`.
 ///
 /// La capture `1-vide` montre la fenêtre sans onglet : la page vide invite à ⌘T, la barre de commande
 /// ne s'ouvre jamais d'elle-même.
@@ -97,6 +101,7 @@ final class ScreenshotUITests: XCTestCase {
         try captureFindBar(in: app, window: window)
         try captureZoom(in: app, window: window)
         try captureHistory(in: app)
+        captureFolderCustomization(in: app, window: window)
         if environment["MATCHA_SCREENSHOT_PEEK"] != nil {
             captureHiddenSidebar(in: app, window: window)
         }

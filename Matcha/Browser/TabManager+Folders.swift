@@ -41,4 +41,23 @@ extension TabManager {
     func deleteFolder(_ id: UUID) {
         updateLayout { $0.removeFolder(id) }
     }
+
+    /// Donne au dossier `appearance` (icône, couleurs), telle qu'elle sera enregistrée (`FolderAppearance.normalized`).
+    /// Sans effet si rien ne change : pas d'enregistrement inutile pendant qu'on glisse dans le sélecteur de couleur.
+    func setFolderAppearance(_ id: UUID, _ appearance: FolderAppearance) {
+        let normalized = appearance.normalized
+        guard let folder = layout.pinned.folder(id), folder.appearance != normalized else {
+            return
+        }
+        updateLayout { $0.setFolderAppearance(id, normalized) }
+    }
+
+    /// Applique `change` à l'apparence actuelle du dossier (panneau de personnalisation).
+    func updateFolderAppearance(_ id: UUID, _ change: (inout FolderAppearance) -> Void) {
+        guard var appearance = layout.pinned.folder(id)?.appearance else {
+            return
+        }
+        change(&appearance)
+        setFolderAppearance(id, appearance)
+    }
 }

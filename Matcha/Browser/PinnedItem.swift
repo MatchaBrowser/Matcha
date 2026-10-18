@@ -27,6 +27,8 @@ nonisolated struct PinnedFolder: Equatable, Sendable, Identifiable {
     var name: String
     var isCollapsed = false
     var items: [PinnedItem] = []
+    /// Icône et couleurs choisies dans son panneau de personnalisation.
+    var appearance = FolderAppearance()
 }
 
 /// Opérations sur l'arbre des épinglés. Un dossier parent nil désigne la racine de la section.

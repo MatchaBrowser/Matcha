@@ -52,6 +52,21 @@ struct SidebarLayoutPersistenceTests {
         #expect(rebuilt == layout)
     }
 
+    /// Icône et couleurs de chaque dossier, sous-dossiers compris, passent par les entrées enregistrées.
+    @Test func `folder appearances survive the round trip`() {
+        var rich = richLayout()
+        let work = FolderAppearance(icon: .symbol("briefcase"), textColor: ThemeColor(rgb: 0x007AFF))
+        let client = FolderAppearance(icon: .emoji("🌿"), backgroundColor: ThemeColor(rgb: 0x34C759))
+        rich.layout.setFolderAppearance(rich.work, work)
+        rich.layout.setFolderAppearance(rich.client, client)
+        #expect(rich.layout.folderEntries.map(\.appearance) == [work, client])
+
+        let rebuilt = SidebarLayout(positions: rich.layout.positions, folders: rich.layout.folderEntries)
+        #expect(rebuilt == rich.layout)
+        #expect(rebuilt.pinned.folder(rich.client)?.appearance == client)
+        #expect(rebuilt.pinned.folder(rich.client)?.isCollapsed == true)
+    }
+
     @Test func `orders need not be contiguous`() {
         let positions = [
             ids[0]: SidebarPosition(place: .today, order: 30),

@@ -28,7 +28,7 @@ Trois modes, au choix dans Réglages > Synchronisation :
 | --- | --- | --- |
 | `profile` | `ProfileRecord` | `name`, `order` |
 | `space` | `SpaceRecord` | `name`, `symbol`, `theme` (objet `SpaceTheme` : `name`, `colors` = 2 ou 3 × `{red, green, blue}` de 0 à 1, `angle`) ou `null`, `order`, `profileId` |
-| `folder` | `FolderRecord` | `name`, `order`, `isCollapsed`, `spaceId`, `parentId` ou `null` |
+| `folder` | `FolderRecord` | `name`, `order`, `isCollapsed`, `spaceId`, `parentId` ou `null`, `icon` (`"symbol:<nom du symbole SF>"`, `"emoji:<un emoji>"`, ou `null` pour l'icône par défaut), `textColor` et `backgroundColor` (`"#RRGGBB"` en sRGB, ou `null` pour la couleur du système). Valeur illisible : la valeur par défaut ; un symbole inconnu de ce macOS est gardé, et la barre montre l'icône par défaut |
 | `tab` | `TabRecord` favori ou épinglé | `place` (`favorite` ou `pinned`), `url` et `title` d'origine (`pinnedURL`, `pinnedTitle`), `order`, `profileId` (favori) ou `spaceId` (épinglé), `folderId` ou `null` |
 | `boost` | `BoostRecord` (tâche 4.7) | `domain`, `css`, `js`, `isEnabled` |
 

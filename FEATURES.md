@@ -59,7 +59,13 @@ Fonctions livrées avec une limite, faute d'API publique ou par choix de simplic
 
 ### Spaces (4.0)
 
-- **Sous-menu Icône d'un Space** : il affiche les noms techniques des symboles (« circle.fill »…). Piste : n'afficher que les icônes, ou des noms traduits.
+- **Sous-menu Icône d'un Space** : il affiche les noms techniques des symboles (« circle.fill »…). Piste : n'afficher que les icônes, ou des noms traduits ; la grille d'icônes des dossiers (`SymbolPickerGrid`, symboles et noms traduits dans `SymbolChoice`) peut servir telle quelle, dans l'éditeur du thème.
+
+### Dossiers personnalisés
+
+- **Panneau ouvert en bas de la barre** : rien ne défile de soi-même ; il faut faire défiler les onglets pour voir tout le panneau. Piste : faire défiler juste assez pour montrer son en-tête et la grille.
+- **Une seule couleur pour le clair et le sombre** : un fond vif choisi en clair reste vif en sombre. Piste : une variante sombre tirée de la couleur, comme pour les thèmes des Spaces.
+- **Symboles** : 35 proposés, pas de recherche dans tous les symboles SF. L'emoji passe par le champ ou le visualiseur de caractères du système.
 
 ### Mémoire des onglets (5.6)
 

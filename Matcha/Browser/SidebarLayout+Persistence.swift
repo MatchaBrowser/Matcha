@@ -21,6 +21,7 @@ nonisolated struct FolderEntry: Equatable, Sendable {
     var parentID: UUID?
     /// Rang dans son conteneur, sur la même échelle que les onglets.
     var order: Int
+    var appearance = FolderAppearance()
 }
 
 /// Passage du rangement en mémoire à sa forme enregistrée (positions à plat), et retour.
@@ -117,6 +118,7 @@ nonisolated extension SidebarLayout {
                 folders[entry.id] = nil
                 addFolder(id: entry.id, named: entry.name, in: parent)
                 setFolderCollapsed(entry.id, entry.isCollapsed)
+                setFolderAppearance(entry.id, entry.appearance)
                 fillPinned(in: entry.id, tabs: tabs, folders: &folders)
             }
         }
@@ -138,7 +140,14 @@ nonisolated extension SidebarLayout {
             guard case let .folder(folder) = item else {
                 continue
             }
-            entries.append(FolderEntry(id: folder.id, name: folder.name, isCollapsed: folder.isCollapsed, parentID: parent, order: order))
+            entries.append(FolderEntry(
+                id: folder.id,
+                name: folder.name,
+                isCollapsed: folder.isCollapsed,
+                parentID: parent,
+                order: order,
+                appearance: folder.appearance,
+            ))
             collectFolders(folder.items, in: folder.id, entries: &entries)
         }
     }

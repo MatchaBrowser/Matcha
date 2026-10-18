@@ -141,6 +141,10 @@ nonisolated struct SidebarLayout: Equatable, Sendable {
         pinned.updateFolder(id) { $0.isCollapsed = isCollapsed }
     }
 
+    mutating func setFolderAppearance(_ id: UUID, _ appearance: FolderAppearance) {
+        pinned.updateFolder(id) { $0.appearance = appearance }
+    }
+
     /// Déplace un dossier parmi les épinglés. Refusé hors des épinglés, ou dans lui-même ou l'un de
     /// ses sous-dossiers.
     mutating func moveFolder(_ id: UUID, to destination: SidebarDestination) {

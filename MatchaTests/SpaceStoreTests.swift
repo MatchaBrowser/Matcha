@@ -48,6 +48,36 @@ struct SpaceStoreTests {
         #expect(store.space.folders?.first?.name == "Travail")
     }
 
+    /// Icône et couleurs des dossiers (sous-dossiers compris) : enregistrées en texte court, relues à l'identique ;
+    /// « Réinitialiser » vide les champs.
+    @Test func `folder appearances are saved and loaded back`() async throws {
+        let store = makeStore()
+        _ = try await fillManager()
+        let work = try #require(manager.layout.folderEntries.first?.id)
+        let client = manager.newFolder(in: work)
+        manager.setFolderAppearance(work, FolderAppearance(icon: .symbol("briefcase"), textColor: ThemeColor(rgb: 0xFF3B30)))
+        manager.setFolderAppearance(
+            client,
+            FolderAppearance(icon: .emoji("🌿"), backgroundColor: ThemeColor(red: 0.2, green: 0.4, blue: 0.6)),
+        )
+        store.saveNow(manager)
+
+        let records = Dictionary(uniqueKeysWithValues: (store.space.folders ?? []).map { ($0.id, $0) })
+        #expect(records[work]?.iconValue == "symbol:briefcase")
+        #expect(records[work]?.textColorHex == "#FF3B30")
+        #expect(records[work]?.backgroundColorHex == nil)
+        #expect(records[client]?.iconValue == "emoji:🌿")
+        #expect(records[client]?.backgroundColorHex == "#336699")
+        let (_, layout) = SpaceStore(space: store.space, context: container.mainContext).load()
+        #expect(layout == manager.layout)
+
+        manager.setFolderAppearance(client, .default)
+        store.saveNow(manager)
+        #expect(records[client]?.iconValue == nil)
+        #expect(records[client]?.backgroundColorHex == nil)
+        #expect(SpaceStore(space: store.space, context: container.mainContext).load().layout.pinned.folder(client)?.appearance == .default)
+    }
+
     @Test func `closed tabs and folders are deleted but archived tabs are kept`() async throws {
         let store = makeStore()
         let tabs = try await fillManager()

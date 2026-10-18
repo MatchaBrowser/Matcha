@@ -157,6 +157,76 @@ struct BrowserSchemaTests {
         #expect(reopened.index(for: profileID)?.entries["example.com"]?.title == "Exemple")
     }
 
+    /// Personnalisation des dossiers : une base créée avec le schéma d'avant (`FolderRecord` sans icône ni couleurs)
+    /// s'ouvre avec le schéma actuel (migration légère, faite par SwiftData : trois attributs optionnels ajoutés), sans
+    /// rien perdre ; ses dossiers ont l'apparence par défaut, puis enregistrent la leur.
+    @Test func `a store from before folder appearances opens and keeps its folders`() throws {
+        let directory = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString, isDirectory: true)
+        try FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)
+        defer { try? FileManager.default.removeItem(at: directory) }
+        let url = directory.appendingPathComponent("avant-apparence.store")
+        #expect(SchemaBeforeFolderAppearance.models.count == BrowserSchema.models.count)
+
+        let (folderID, childID) = try makeStoreBeforeFolderAppearances(at: url)
+
+        let schema = Schema(BrowserSchema.models)
+        let container = try ModelContainer(
+            for: schema,
+            configurations: ModelConfiguration(schema: schema, url: url, cloudKitDatabase: .none),
+        )
+        let context = container.mainContext
+        let space = try #require(context.fetch(FetchDescriptor<SpaceRecord>()).first)
+        let folders = Dictionary(uniqueKeysWithValues: (space.folders ?? []).map { ($0.id, $0) })
+        #expect(folders[folderID]?.name == "Travail")
+        #expect(folders[childID]?.parent?.id == folderID)
+        #expect(folders[childID]?.isCollapsed == true)
+        #expect(folders[childID]?.tabs?.first?.title == "Exemple")
+        #expect(folders[childID]?.iconValue == nil)
+        #expect(folders[childID]?.textColorHex == nil)
+        #expect(folders[childID]?.backgroundColorHex == nil)
+        let store = SpaceStore(space: space, context: context)
+        let (tabs, loadedLayout) = store.load()
+        var layout = loadedLayout
+        #expect(tabs.map(\.title) == ["Exemple"])
+        #expect(layout.pinned.folder(childID)?.appearance == .default)
+        #expect(layout.pinned.folder(childID)?.items.count == 1)
+
+        // L'apparence s'y écrit et s'y relit.
+        let appearance = FolderAppearance(icon: .symbol("star"), textColor: .white, backgroundColor: ThemeColor(rgb: 0x5856D6))
+        layout.setFolderAppearance(childID, appearance)
+        store.save(tabs: tabs, layout: layout)
+        #expect(folders[childID]?.iconValue == "symbol:star")
+        #expect(folders[childID]?.backgroundColorHex == "#5856D6")
+        // Relu depuis la base, par un autre contexte.
+        let reloaded = try #require(ModelContext(container).fetch(FetchDescriptor<FolderRecord>()).first { $0.id == childID })
+        #expect(reloaded.appearance == appearance)
+        #expect(reloaded.tabs?.count == 1)
+    }
+
+    /// Base créée avec le schéma d'avant la personnalisation des dossiers : un dossier « Travail », son sous-dossier
+    /// « Client » replié et un épinglé dedans. Renvoie les identifiants des deux dossiers.
+    private func makeStoreBeforeFolderAppearances(at url: URL) throws -> (folder: UUID, child: UUID) {
+        typealias Old = SchemaBeforeFolderAppearance
+        let schema = Schema(Old.models)
+        let container = try ModelContainer(
+            for: schema,
+            configurations: ModelConfiguration(schema: schema, url: url, cloudKitDatabase: .none),
+        )
+        let profile = Old.ProfileRecord(name: "Personnel")
+        let space = Old.SpaceRecord(name: "Perso", profile: profile)
+        let folder = Old.FolderRecord(name: "Travail", order: 1, isCollapsed: false)
+        folder.space = space
+        let child = Old.FolderRecord(name: "Client", order: 0, isCollapsed: true)
+        child.space = space
+        child.parent = folder
+        let pinned = Old.TabRecord(url: URL(string: "https://example.com"), title: "Exemple", placeValue: "pinned")
+        pinned.space = space
+        pinned.folder = child
+        container.mainContext.insert(profile)
+        try container.mainContext.save()
+        return (folder.id, child.id)
+    }
+
     @Test func `archived tabs have no sidebar place`() {
         let tab = TabRecord(place: .today)
         tab.place = nil

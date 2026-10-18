@@ -5,7 +5,8 @@ import OSLog
 import SwiftUI
 
 /// État d'une fenêtre : le Space affiché, le bord par lequel arrive le Space choisi (animation), la
-/// confirmation « URL copiée », la liste des téléchargements et le panneau des réglages du site.
+/// confirmation « URL copiée », la liste des téléchargements, le panneau des réglages du site et celui de la
+/// personnalisation d'un dossier.
 @MainActor
 @Observable
 final class WindowModel {
@@ -23,6 +24,9 @@ final class WindowModel {
     var isSiteSettingsPresented = false
     /// Effacement des données d'un site en attente de confirmation (alerte de la fenêtre).
     var siteDataClearRequest: SiteDataClearRequest?
+    /// Dossier d'épinglés dont le panneau de personnalisation est ouvert, sous sa ligne : un seul par fenêtre. Seul
+    /// l'utilisateur l'ouvre et le ferme (menu du dossier, ×, Échap) ; il ne se voit que dans le Space du dossier.
+    var customizedFolderID: UUID?
     /// Où retenir le Space affiché d'un lancement à l'autre ; nil pour ne rien retenir (tests).
     @ObservationIgnored private let defaults: UserDefaults?
 
@@ -114,6 +118,12 @@ final class WindowModel {
             selectSpace(at: index == 0 ? 1 : index - 1)
         }
         session.deleteSpace(target)
+    }
+
+    /// « Personnaliser… » du menu d'un dossier : ouvre son panneau (fermant celui d'un autre dossier), ou le ferme s'il
+    /// est déjà ouvert.
+    func toggleFolderCustomization(_ folderID: UUID) {
+        customizedFolderID = customizedFolderID == folderID ? nil : folderID
     }
 
     /// Copie `url` (menu contextuel d'un onglet) et confirme « URL copiée » dans cette fenêtre.

@@ -39,7 +39,14 @@ final class SpaceStore {
             }
         }
         let folders = (space.folders ?? []).map { folder in
-            FolderEntry(id: folder.id, name: folder.name, isCollapsed: folder.isCollapsed, parentID: folder.parent?.id, order: folder.order)
+            FolderEntry(
+                id: folder.id,
+                name: folder.name,
+                isCollapsed: folder.isCollapsed,
+                parentID: folder.parent?.id,
+                order: folder.order,
+                appearance: folder.appearance,
+            )
         }
         let tabs = records.map { record in
             StoredTab(
@@ -152,6 +159,7 @@ final class SpaceStore {
             record.name = entry.name
             record.order = entry.order
             record.isCollapsed = entry.isCollapsed
+            record.appearance = entry.appearance
             record.space = space
             saved[entry.id] = record
         }
