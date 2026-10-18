@@ -1,6 +1,35 @@
 {
   "sourceLanguage" : "en",
   "strings" : {
+    "“%@” Requests Additional Access" : {
+      "comment" : "Alert shown when a browser extension asks for more permissions; %@ is the extension name",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "„%@“ fordert zusätzlichen Zugriff an"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "“%@” solicita acceso adicional"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "« %@ » demande un accès supplémentaire"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "“%@” richiede un accesso aggiuntivo"
+          }
+        }
+      }
+    },
     "%@ of %@" : {
       "comment" : "Progress of a download: bytes received of the total size, e.g. 12 MB of 40 MB",
       "localizations" : {
@@ -113,101 +142,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "%@ vuole usare il tuo microfono."
-          }
-        }
-      }
-    },
-    "%lld Spaces" : {
-      "comment" : "Number of Spaces of a profile (Settings > Profiles)",
-      "localizations" : {
-        "de" : {
-          "variations" : {
-            "plural" : {
-              "one" : {
-                "stringUnit" : {
-                  "state" : "translated",
-                  "value" : "%lld Space"
-                }
-              },
-              "other" : {
-                "stringUnit" : {
-                  "state" : "translated",
-                  "value" : "%lld Spaces"
-                }
-              }
-            }
-          }
-        },
-        "en" : {
-          "variations" : {
-            "plural" : {
-              "one" : {
-                "stringUnit" : {
-                  "state" : "translated",
-                  "value" : "%lld Space"
-                }
-              },
-              "other" : {
-                "stringUnit" : {
-                  "state" : "translated",
-                  "value" : "%lld Spaces"
-                }
-              }
-            }
-          }
-        },
-        "es" : {
-          "variations" : {
-            "plural" : {
-              "one" : {
-                "stringUnit" : {
-                  "state" : "translated",
-                  "value" : "%lld Space"
-                }
-              },
-              "other" : {
-                "stringUnit" : {
-                  "state" : "translated",
-                  "value" : "%lld Spaces"
-                }
-              }
-            }
-          }
-        },
-        "fr" : {
-          "variations" : {
-            "plural" : {
-              "one" : {
-                "stringUnit" : {
-                  "state" : "translated",
-                  "value" : "%lld Space"
-                }
-              },
-              "other" : {
-                "stringUnit" : {
-                  "state" : "translated",
-                  "value" : "%lld Spaces"
-                }
-              }
-            }
-          }
-        },
-        "it" : {
-          "variations" : {
-            "plural" : {
-              "one" : {
-                "stringUnit" : {
-                  "state" : "translated",
-                  "value" : "%lld Space"
-                }
-              },
-              "other" : {
-                "stringUnit" : {
-                  "state" : "translated",
-                  "value" : "%lld Space"
-                }
-              }
-            }
           }
         }
       }
@@ -687,6 +621,101 @@
         }
       }
     },
+    "%lld Spaces" : {
+      "comment" : "Number of Spaces of a profile (Settings > Profiles)",
+      "localizations" : {
+        "de" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld Space"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld Spaces"
+                }
+              }
+            }
+          }
+        },
+        "en" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld Space"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld Spaces"
+                }
+              }
+            }
+          }
+        },
+        "es" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld Space"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld Spaces"
+                }
+              }
+            }
+          }
+        },
+        "fr" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld Space"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld Spaces"
+                }
+              }
+            }
+          }
+        },
+        "it" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld Space"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld Space"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "%lld tabs, added to Today in their Space" : {
       "comment" : "Arc import preview: below the option that also imports open tabs",
       "localizations" : {
@@ -811,35 +840,6 @@
         }
       }
     },
-    "15 minutes" : {
-      "comment" : "Option of “Free memory of inactive tabs after”",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "15 Minuten"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "15 minutos"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "15 minutes"
-          }
-        },
-        "it" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "15 minuti"
-          }
-        }
-      }
-    },
     "2 hours" : {
       "comment" : "Option of “Free memory of inactive tabs after”",
       "localizations" : {
@@ -865,6 +865,35 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "2 ore"
+          }
+        }
+      }
+    },
+    "15 minutes" : {
+      "comment" : "Option of “Free memory of inactive tabs after”",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "15 Minuten"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "15 minutos"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "15 minutes"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "15 minuti"
           }
         }
       }
@@ -1071,6 +1100,34 @@
         }
       }
     },
+    "Add “%@”?" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "„%@“ hinzufügen?"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "¿Añadir “%@”?"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ajouter « %@ » ?"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vuoi aggiungere “%@”?"
+          }
+        }
+      }
+    },
     "Add Color" : {
       "comment" : "Icon button: add a color to the Space theme",
       "localizations" : {
@@ -1157,30 +1214,30 @@
         }
       }
     },
-    "Add “%@”?" : {
+    "Add…" : {
       "localizations" : {
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "„%@“ hinzufügen?"
+            "value" : "Hinzufügen …"
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "¿Añadir “%@”?"
+            "value" : "Añadir…"
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Ajouter « %@ » ?"
+            "value" : "Ajouter…"
           }
         },
         "it" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Vuoi aggiungere “%@”?"
+            "value" : "Aggiungi…"
           }
         }
       }
@@ -1239,34 +1296,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Barra degli indirizzi"
-          }
-        }
-      }
-    },
-    "Add…" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Hinzufügen …"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Añadir…"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Ajouter…"
-          }
-        },
-        "it" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Aggiungi…"
           }
         }
       }
@@ -1416,6 +1445,34 @@
         }
       }
     },
+    "Allow in Private Windows" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "In privaten Fenstern erlauben"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Permitir en ventanas privadas"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Autoriser dans les fenêtres privées"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Consenti nelle finestre private"
+          }
+        }
+      }
+    },
     "Allow Once" : {
       "comment" : "Permission banner: allow for this request only, nothing is remembered",
       "localizations" : {
@@ -1441,34 +1498,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Consenti una volta"
-          }
-        }
-      }
-    },
-    "Allow in Private Windows" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "In privaten Fenstern erlauben"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Permitir en ventanas privadas"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Autoriser dans les fenêtres privées"
-          }
-        },
-        "it" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Consenti nelle finestre private"
           }
         }
       }
@@ -1762,6 +1791,35 @@
         }
       }
     },
+    "Block ads and trackers" : {
+      "comment" : "Settings > Privacy: turns the content blocker on or off for all websites",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Werbung und Tracker blockieren"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bloquear anuncios y rastreadores"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bloquer les publicités et traqueurs"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Blocca pubblicità e tracker"
+          }
+        }
+      }
+    },
     "Block Ads and Trackers" : {
       "comment" : "Site settings: switch that turns the content blocker on or off for this website",
       "localizations" : {
@@ -1816,35 +1874,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Blocca di nuovo"
-          }
-        }
-      }
-    },
-    "Block ads and trackers" : {
-      "comment" : "Settings > Privacy: turns the content blocker on or off for all websites",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Werbung und Tracker blockieren"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Bloquear anuncios y rastreadores"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Bloquer les publicités et traqueurs"
-          }
-        },
-        "it" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Blocca pubblicità e tracker"
           }
         }
       }
@@ -2231,6 +2260,34 @@
         }
       }
     },
+    "Change data you copy and paste" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Daten ändern, die du kopierst und einsetzt"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cambiar los datos que copias y pegas"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Modifier les données que vous copiez et collez"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Modificare i dati che copi e incolli"
+          }
+        }
+      }
+    },
     "Change Icon…" : {
       "comment" : "Space context menu: opens the Space editor on its icon section",
       "localizations" : {
@@ -2285,34 +2342,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Cambia lingua…"
-          }
-        }
-      }
-    },
-    "Change data you copy and paste" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Daten ändern, die du kopierst und einsetzt"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Cambiar los datos que copias y pegas"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Modifier les données que vous copiez et collez"
-          }
-        },
-        "it" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Modificare i dati che copi e incolli"
           }
         }
       }
@@ -2375,35 +2404,6 @@
         }
       }
     },
-    "Choose StorableSidebar.json, in Arc’s folder (~/Library/Application Support/Arc)." : {
-      "comment" : "Open panel and error alert of the Arc import",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Wähle StorableSidebar.json im Ordner von Arc (~/Library/Application Support/Arc)."
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Elige StorableSidebar.json, en la carpeta de Arc (~/Library/Application Support/Arc)."
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Choisissez StorableSidebar.json, dans le dossier d’Arc (~/Library/Application Support/Arc)."
-          }
-        },
-        "it" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Scegli StorableSidebar.json, nella cartella di Arc (~/Library/Application Support/Arc)."
-          }
-        }
-      }
-    },
     "Choose a .crx, .xpi or .zip file, or an unpacked extension folder." : {
       "localizations" : {
         "de" : {
@@ -2457,6 +2457,35 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Scegli un’emoji nel Visore caratteri"
+          }
+        }
+      }
+    },
+    "Choose StorableSidebar.json, in Arc’s folder (~/Library/Application Support/Arc)." : {
+      "comment" : "Open panel and error alert of the Arc import",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wähle StorableSidebar.json im Ordner von Arc (~/Library/Application Support/Arc)."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Elige StorableSidebar.json, en la carpeta de Arc (~/Library/Application Support/Arc)."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Choisissez StorableSidebar.json, dans le dossier d’Arc (~/Library/Application Support/Arc)."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Scegli StorableSidebar.json, nella cartella di Arc (~/Library/Application Support/Arc)."
           }
         }
       }
@@ -2543,6 +2572,63 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Cancella"
+          }
+        }
+      }
+    },
+    "Clear cookies and data for all websites?" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cookies und Daten aller Websites löschen?"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "¿Borrar las cookies y los datos de todos los sitios web?"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Effacer les cookies et les données de tous les sites ?"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vuoi cancellare i cookie e i dati di tutti i siti web?"
+          }
+        }
+      }
+    },
+    "Clear cookies and website data for “%@”?" : {
+      "comment" : "Site settings: confirmation title; %@ is the website",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cookies und Websitedaten von „%@“ löschen?"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "¿Borrar las cookies y los datos de “%@”?"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Effacer les cookies et les données de « %@ » ?"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vuoi cancellare i cookie e i dati di “%@”?"
           }
         }
       }
@@ -2677,63 +2763,6 @@
         }
       }
     },
-    "Clear cookies and data for all websites?" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Cookies und Daten aller Websites löschen?"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "¿Borrar las cookies y los datos de todos los sitios web?"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Effacer les cookies et les données de tous les sites ?"
-          }
-        },
-        "it" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Vuoi cancellare i cookie e i dati di tutti i siti web?"
-          }
-        }
-      }
-    },
-    "Clear cookies and website data for “%@”?" : {
-      "comment" : "Site settings: confirmation title; %@ is the website",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Cookies und Websitedaten von „%@“ löschen?"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "¿Borrar las cookies y los datos de “%@”?"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Effacer les cookies et les données de « %@ » ?"
-          }
-        },
-        "it" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Vuoi cancellare i cookie e i dati di “%@”?"
-          }
-        }
-      }
-    },
     "Clear…" : {
       "localizations" : {
         "de" : {
@@ -2758,6 +2787,35 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Cancella…"
+          }
+        }
+      }
+    },
+    "Close all Today tabs" : {
+      "comment" : "Help tag of the Clear button above the Today tabs",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Alle Tabs von heute schließen"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cerrar todas las pestañas de hoy"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fermer tous les onglets du jour"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Chiudi tutti i pannelli di oggi"
           }
         }
       }
@@ -3049,35 +3107,6 @@
         }
       }
     },
-    "Close all Today tabs" : {
-      "comment" : "Help tag of the Clear button above the Today tabs",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Alle Tabs von heute schließen"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Cerrar todas las pestañas de hoy"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Fermer tous les onglets du jour"
-          }
-        },
-        "it" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Chiudi tutti i pannelli di oggi"
-          }
-        }
-      }
-    },
     "Cloud" : {
       "comment" : "Icon choice (SF Symbol)",
       "localizations" : {
@@ -3194,6 +3223,114 @@
         }
       }
     },
+    "commandBar.keywords.copyURL" : {
+      "comment" : "Search words for the “Copy URL” action, space-separated, never displayed; keep the English words",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "kopieren link adresse url copy address"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "copy link address url"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "copiar enlace dirección url copy link address"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "copier lien adresse url copy link address"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "copia link indirizzo url copy address"
+          }
+        }
+      }
+    },
+    "commandBar.keywords.newSpace" : {
+      "comment" : "Search words for the “New Space” action, space-separated, never displayed; keep the English words",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "neu erstellen hinzufügen bereich space new create add"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "new create add space"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "nuevo crear añadir espacio space new create add"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "nouveau créer ajouter espace space new create add"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "nuovo crea aggiungi spazio space new create add"
+          }
+        }
+      }
+    },
+    "commandBar.keywords.settings" : {
+      "comment" : "Search words for the “Settings” action, space-separated, never displayed; keep the English words",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "einstellungen optionen settings preferences"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "settings preferences options"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ajustes preferencias opciones configuración settings preferences"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "réglages préférences paramètres options settings preferences"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "impostazioni preferenze opzioni settings preferences"
+          }
+        }
+      }
+    },
     "Communicate with apps on your Mac" : {
       "localizations" : {
         "de" : {
@@ -3251,6 +3388,34 @@
         }
       }
     },
+    "Cookies and website data" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cookies und Websitedaten"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cookies y datos de sitios web"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cookies et données des sites"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cookie e dati dei siti web"
+          }
+        }
+      }
+    },
     "Cookies and Website Data" : {
       "comment" : "Site settings: the cookies and data this website keeps on the Mac",
       "localizations" : {
@@ -3276,34 +3441,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Cookie e dati del sito web"
-          }
-        }
-      }
-    },
-    "Cookies and website data" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Cookies und Websitedaten"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Cookies y datos de sitios web"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Cookies et données des sites"
-          }
-        },
-        "it" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Cookie e dati dei siti web"
           }
         }
       }
@@ -4146,6 +4283,35 @@
         }
       }
     },
+    "e.g. apple.com" : {
+      "comment" : "Placeholder of the homepage field",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "z. B. apple.com"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "p. ej., apple.com"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ex. apple.com"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ad es. apple.com"
+          }
+        }
+      }
+    },
     "Each Arc Space becomes a new Space, with its pinned tabs and folders. Nothing you already have is changed." : {
       "comment" : "Arc import preview: explanation under the title",
       "localizations" : {
@@ -4707,6 +4873,35 @@
         }
       }
     },
+    "Find in Page" : {
+      "comment" : "Find bar: placeholder of the search field, accessibility label of the bar and of its field",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Auf der Seite suchen"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Buscar en la página"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rechercher dans la page"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Trova nella pagina"
+          }
+        }
+      }
+    },
     "Find Next" : {
       "comment" : "Edit > Find menu: selects the next match in the page (⌘G)",
       "localizations" : {
@@ -4761,35 +4956,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Trova precedente"
-          }
-        }
-      }
-    },
-    "Find in Page" : {
-      "comment" : "Find bar: placeholder of the search field, accessibility label of the bar and of its field",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Auf der Seite suchen"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Buscar en la página"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Rechercher dans la page"
-          }
-        },
-        "it" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Trova nella pagina"
           }
         }
       }
@@ -5139,31 +5305,31 @@
         }
       }
     },
-    "From Your Other Macs" : {
-      "comment" : "Settings > Extensions: section of the extensions installed on the user's other Macs",
+    "From a file" : {
+      "comment" : "Origin of an extension installed from a .crx, .xpi or .zip file or a folder",
       "localizations" : {
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Von deinen anderen Macs"
+            "value" : "Aus einer Datei"
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "De tus otros Mac"
+            "value" : "Desde un archivo"
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Depuis vos autres Mac"
+            "value" : "Depuis un fichier"
           }
         },
         "it" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Dai tuoi altri Mac"
+            "value" : "Da un file"
           }
         }
       }
@@ -5196,31 +5362,31 @@
         }
       }
     },
-    "From a file" : {
-      "comment" : "Origin of an extension installed from a .crx, .xpi or .zip file or a folder",
+    "From Your Other Macs" : {
+      "comment" : "Settings > Extensions: section of the extensions installed on the user's other Macs",
       "localizations" : {
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Aus einer Datei"
+            "value" : "Von deinen anderen Macs"
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Desde un archivo"
+            "value" : "De tus otros Mac"
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Depuis un fichier"
+            "value" : "Depuis vos autres Mac"
           }
         },
         "it" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Da un file"
+            "value" : "Dai tuoi altri Mac"
           }
         }
       }
@@ -6157,34 +6323,6 @@
         }
       }
     },
-    "Its Spaces, tabs, Favorites, cookies, and sign-ins will be deleted." : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Seine Spaces, Tabs, Favoriten, Cookies und Anmeldungen werden gelöscht."
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Se eliminarán sus Spaces, pestañas, Favoritos, cookies e inicios de sesión."
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Ses Spaces, onglets, favoris, cookies et connexions seront supprimés."
-          }
-        },
-        "it" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "I suoi Space, pannelli, Preferiti, cookie e accessi verranno eliminati."
-          }
-        }
-      }
-    },
     "Its package isn't available. Install it from its file." : {
       "comment" : "Settings > Extensions: help of an extension from another Mac whose package can't be downloaded",
       "localizations" : {
@@ -6238,6 +6376,34 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Le sue impostazioni e i suoi dati verranno eliminati. Un'estensione di Safari resta nella sua app."
+          }
+        }
+      }
+    },
+    "Its Spaces, tabs, Favorites, cookies, and sign-ins will be deleted." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Seine Spaces, Tabs, Favoriten, Cookies und Anmeldungen werden gelöscht."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Se eliminarán sus Spaces, pestañas, Favoritos, cookies e inicios de sesión."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ses Spaces, onglets, favoris, cookies et connexions seront supprimés."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "I suoi Space, pannelli, Preferiti, cookie e accessi verranno eliminati."
           }
         }
       }
@@ -6470,6 +6636,35 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "I link su cui fai clic in Mail, Messaggi o altre app si aprono in Matcha quando è il tuo browser predefinito."
+          }
+        }
+      }
+    },
+    "macOS asks you to confirm" : {
+      "comment" : "Settings > General: help of the Make Default button",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "macOS bittet dich um Bestätigung"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "macOS te pide que lo confirmes"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "macOS vous demande de confirmer"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "macOS ti chiede di confermare"
           }
         }
       }
@@ -7219,6 +7414,35 @@
         }
       }
     },
+    "No blocklist is installed." : {
+      "comment" : "Site settings and Settings > Privacy: the content blocker has no list, so it is inactive",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Keine Blockliste installiert."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No hay ninguna lista de bloqueo instalada."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aucune liste de blocage n'est installée."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nessuna lista di blocco installata."
+          }
+        }
+      }
+    },
     "No Color" : {
       "comment" : "Folder color swatch: use the system color",
       "localizations" : {
@@ -7273,121 +7497,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Nessun download"
-          }
-        }
-      }
-    },
-    "No History" : {
-      "comment" : "Title of the empty History window",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Kein Verlauf"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "No hay historial"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Aucun historique"
-          }
-        },
-        "it" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Nessuna cronologia"
-          }
-        }
-      }
-    },
-    "No Safari extensions were found in your apps. They are installed from the App Store." : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "In deinen Apps wurden keine Safari-Erweiterungen gefunden. Sie werden aus dem App Store installiert."
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "No se han encontrado extensiones de Safari en tus apps. Se instalan desde el App Store."
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Aucune extension Safari n'a été trouvée dans vos apps. Elles s'installent depuis l'App Store."
-          }
-        },
-        "it" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Non sono state trovate estensioni di Safari nelle tue app. Si installano dall'App Store."
-          }
-        }
-      }
-    },
-    "No Tabs" : {
-      "comment" : "Title of the empty page when no tab is selected",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Keine Tabs"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Ninguna pestaña"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Aucun onglet"
-          }
-        },
-        "it" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Nessun pannello"
-          }
-        }
-      }
-    },
-    "No blocklist is installed." : {
-      "comment" : "Site settings and Settings > Privacy: the content blocker has no list, so it is inactive",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Keine Blockliste installiert."
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "No hay ninguna lista de bloqueo instalada."
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Aucune liste de blocage n'est installée."
-          }
-        },
-        "it" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Nessuna lista di blocco installata."
           }
         }
       }
@@ -7449,6 +7558,35 @@
         }
       }
     },
+    "No History" : {
+      "comment" : "Title of the empty History window",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kein Verlauf"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No hay historial"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aucun historique"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nessuna cronologia"
+          }
+        }
+      }
+    },
     "No manifest.json file was found in this extension." : {
       "localizations" : {
         "de" : {
@@ -7473,6 +7611,34 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Nessun file manifest.json trovato in questa estensione."
+          }
+        }
+      }
+    },
+    "No Safari extensions were found in your apps. They are installed from the App Store." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "In deinen Apps wurden keine Safari-Erweiterungen gefunden. Sie werden aus dem App Store installiert."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No se han encontrado extensiones de Safari en tus apps. Se instalan desde el App Store."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aucune extension Safari n'a été trouvée dans vos apps. Elles s'installent depuis l'App Store."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Non sono state trovate estensioni di Safari nelle tue app. Si installano dall'App Store."
           }
         }
       }
@@ -7506,6 +7672,35 @@
         }
       }
     },
+    "No Tabs" : {
+      "comment" : "Title of the empty page when no tab is selected",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Keine Tabs"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ninguna pestaña"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aucun onglet"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nessun pannello"
+          }
+        }
+      }
+    },
     "Not Found" : {
       "comment" : "Find bar: the last search found nothing in the page",
       "localizations" : {
@@ -7531,35 +7726,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Non trovato"
-          }
-        }
-      }
-    },
-    "Not Secure" : {
-      "comment" : "Sign-in window address bar: the page is not encrypted (http)",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Nicht sicher"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "No seguro"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Non sécurisé"
-          }
-        },
-        "it" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Non sicuro"
           }
         }
       }
@@ -7593,6 +7759,35 @@
         }
       }
     },
+    "Not Secure" : {
+      "comment" : "Sign-in window address bar: the page is not encrypted (http)",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nicht sicher"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No seguro"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Non sécurisé"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Non sicuro"
+          }
+        }
+      }
+    },
     "Ocean" : {
       "comment" : "Space theme preset",
       "localizations" : {
@@ -7618,122 +7813,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Oceano"
-          }
-        }
-      }
-    },
-    "Open Image in New Tab" : {
-      "comment" : "Context menu of an image in a web page",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Bild in neuem Tab öffnen"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Abrir imagen en una pestaña nueva"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Ouvrir l'image dans un nouvel onglet"
-          }
-        },
-        "it" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Apri immagine in un nuovo pannello"
-          }
-        }
-      }
-    },
-    "Open Link in New Tab" : {
-      "comment" : "Context menu of a link in a web page",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Link in neuem Tab öffnen"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Abrir enlace en una pestaña nueva"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Ouvrir le lien dans un nouvel onglet"
-          }
-        },
-        "it" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Apri link in un nuovo pannello"
-          }
-        }
-      }
-    },
-    "Open Link in Peek" : {
-      "comment" : "Context menu of a link in a web page: opens it in Peek, over the page",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Link in der Vorschau öffnen"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Abrir enlace en una vista previa"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Ouvrir dans un aperçu"
-          }
-        },
-        "it" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Apri link in anteprima"
-          }
-        }
-      }
-    },
-    "Open Location…" : {
-      "comment" : "File menu: puts the focus in the address bar (⌘L)",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Ort öffnen …"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Abrir ubicación…"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Ouvrir l'adresse…"
-          }
-        },
-        "it" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Apri posizione…"
           }
         }
       }
@@ -7791,6 +7870,35 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Apri come pannello"
+          }
+        }
+      }
+    },
+    "Open Image in New Tab" : {
+      "comment" : "Context menu of an image in a web page",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bild in neuem Tab öffnen"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Abrir imagen en una pestaña nueva"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ouvrir l'image dans un nouvel onglet"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Apri immagine in un nuovo pannello"
           }
         }
       }
@@ -7910,6 +8018,64 @@
         }
       }
     },
+    "Open Link in New Tab" : {
+      "comment" : "Context menu of a link in a web page",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Link in neuem Tab öffnen"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Abrir enlace en una pestaña nueva"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ouvrir le lien dans un nouvel onglet"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Apri link in un nuovo pannello"
+          }
+        }
+      }
+    },
+    "Open Link in Peek" : {
+      "comment" : "Context menu of a link in a web page: opens it in Peek, over the page",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Link in der Vorschau öffnen"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Abrir enlace en una vista previa"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ouvrir dans un aperçu"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Apri link in anteprima"
+          }
+        }
+      }
+    },
     "Open links from other apps in" : {
       "comment" : "Settings > General: picker of where links from other apps open",
       "localizations" : {
@@ -7964,6 +8130,35 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Apri in anteprima i link dei Preferiti e dei pannelli fissati verso altri siti web"
+          }
+        }
+      }
+    },
+    "Open Location…" : {
+      "comment" : "File menu: puts the focus in the address bar (⌘L)",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ort öffnen …"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Abrir ubicación…"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ouvrir l'adresse…"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Apri posizione…"
           }
         }
       }
@@ -8749,35 +8944,6 @@
         }
       }
     },
-    "Press this shortcut in any app to open a mini window, even when Matcha is in the background. It uses the profile of the Space shown." : {
-      "comment" : "Settings > General: note under the mini window shortcut",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Drücke diesen Kurzbefehl in einer beliebigen App, um ein Mini-Fenster zu öffnen, auch wenn Matcha im Hintergrund ist. Es verwendet das Profil des angezeigten Space."
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Pulsa este atajo en cualquier app para abrir una miniventana, incluso con Matcha en segundo plano. Usa el perfil del Space que se muestra."
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Appuyez sur ce raccourci dans n'importe quelle app pour ouvrir une mini-fenêtre, même quand Matcha est en arrière-plan. Elle utilise le profil du Space affiché."
-          }
-        },
-        "it" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Premi questa scorciatoia in qualsiasi app per aprire una minifinestra, anche quando Matcha è in secondo piano. Usa il profilo dello Space mostrato."
-          }
-        }
-      }
-    },
     "Press ⌘L to search or enter an address." : {
       "comment" : "Description on the empty page of a tab that has not loaded anything yet",
       "localizations" : {
@@ -8832,6 +8998,35 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Premi ⌘T per cercare o inserire un indirizzo."
+          }
+        }
+      }
+    },
+    "Press this shortcut in any app to open a mini window, even when Matcha is in the background. It uses the profile of the Space shown." : {
+      "comment" : "Settings > General: note under the mini window shortcut",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Drücke diesen Kurzbefehl in einer beliebigen App, um ein Mini-Fenster zu öffnen, auch wenn Matcha im Hintergrund ist. Es verwendet das Profil des angezeigten Space."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pulsa este atajo en cualquier app para abrir una miniventana, incluso con Matcha en segundo plano. Usa el perfil del Space que se muestra."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Appuyez sur ce raccourci dans n'importe quelle app pour ouvrir une mini-fenêtre, même quand Matcha est en arrière-plan. Elle utilise le profil du Space affiché."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Premi questa scorciatoia in qualsiasi app per aprire una minifinestra, anche quando Matcha è in secondo piano. Usa il profilo dello Space mostrato."
           }
         }
       }
@@ -9496,6 +9691,34 @@
         }
       }
     },
+    "Remove “%@”?" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "„%@“ entfernen?"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "¿Eliminar “%@”?"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Supprimer « %@ » ?"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vuoi rimuovere “%@”?"
+          }
+        }
+      }
+    },
     "Remove Color" : {
       "comment" : "Icon button: remove the last color of the Space theme",
       "localizations" : {
@@ -9607,34 +9830,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Rimuovi da Split View"
-          }
-        }
-      }
-    },
-    "Remove “%@”?" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "„%@“ entfernen?"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "¿Eliminar “%@”?"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Supprimer « %@ » ?"
-          }
-        },
-        "it" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Vuoi rimuovere “%@”?"
           }
         }
       }
@@ -9985,6 +10180,34 @@
         }
       }
     },
+    "Search engine" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Suchmaschine"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Motor de búsqueda"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Moteur de recherche"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Motore di ricerca"
+          }
+        }
+      }
+    },
     "Search History" : {
       "comment" : "Placeholder of the search field of the History window",
       "localizations" : {
@@ -10010,34 +10233,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Cerca nella cronologia"
-          }
-        }
-      }
-    },
-    "Search engine" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Suchmaschine"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Motor de búsqueda"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Moteur de recherche"
-          }
-        },
-        "it" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Motore di ricerca"
           }
         }
       }
@@ -10416,6 +10611,34 @@
         }
       }
     },
+    "Show in Finder" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Im Finder zeigen"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mostrar en el Finder"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Afficher dans le Finder"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mostra nel Finder"
+          }
+        }
+      }
+    },
     "Show Last Tab" : {
       "comment" : "Tabs menu (⌘9): selects the last tab of the sidebar",
       "localizations" : {
@@ -10474,6 +10697,34 @@
         }
       }
     },
+    "Show notifications" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mitteilungen anzeigen"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mostrar notificaciones"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Afficher des notifications"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mostrare notifiche"
+          }
+        }
+      }
+    },
     "Show Previous Tab" : {
       "comment" : "Tabs menu (⌃⇧⇥): selects the previous tab in sidebar order",
       "localizations" : {
@@ -10503,91 +10754,6 @@
         }
       }
     },
-    "Show Sidebar" : {
-      "comment" : "View menu",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Seitenleiste einblenden"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Mostrar barra lateral"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Afficher la barre latérale"
-          }
-        },
-        "it" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Mostra barra laterale"
-          }
-        }
-      }
-    },
-    "Show in Finder" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Im Finder zeigen"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Mostrar en el Finder"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Afficher dans le Finder"
-          }
-        },
-        "it" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Mostra nel Finder"
-          }
-        }
-      }
-    },
-    "Show notifications" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Mitteilungen anzeigen"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Mostrar notificaciones"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Afficher des notifications"
-          }
-        },
-        "it" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Mostrare notifiche"
-          }
-        }
-      }
-    },
     "Show search engine suggestions" : {
       "comment" : "Settings > General: toggle under the search engine picker",
       "localizations" : {
@@ -10613,6 +10779,35 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Mostra i suggerimenti del motore di ricerca"
+          }
+        }
+      }
+    },
+    "Show Sidebar" : {
+      "comment" : "View menu",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Seitenleiste einblenden"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mostrar barra lateral"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Afficher la barre latérale"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mostra barra laterale"
           }
         }
       }
@@ -11110,63 +11305,6 @@
         }
       }
     },
-    "The Downloads folder is not available." : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Der Ordner „Downloads“ ist nicht verfügbar."
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "La carpeta Descargas no está disponible."
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Le dossier Téléchargements est introuvable."
-          }
-        },
-        "it" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "La cartella Download non è disponibile."
-          }
-        }
-      }
-    },
-    "The Last Hour" : {
-      "comment" : "Clear History: period",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Letzte Stunde"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "La última hora"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "La dernière heure"
-          }
-        },
-        "it" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "L'ultima ora"
-          }
-        }
-      }
-    },
     "The app that contains this Safari extension isn't on this Mac" : {
       "comment" : "Settings > Extensions: help of the Get the App button",
       "localizations" : {
@@ -11225,6 +11363,63 @@
         }
       }
     },
+    "The Downloads folder is not available." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Der Ordner „Downloads“ ist nicht verfügbar."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "La carpeta Descargas no está disponible."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Le dossier Téléchargements est introuvable."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "La cartella Download non è disponibile."
+          }
+        }
+      }
+    },
+    "The Last Hour" : {
+      "comment" : "Clear History: period",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Letzte Stunde"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "La última hora"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "La dernière heure"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "L'ultima ora"
+          }
+        }
+      }
+    },
     "The page couldn't be exported as PDF." : {
       "comment" : "Alert after File > Export as PDF… failed",
       "localizations" : {
@@ -11279,35 +11474,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Tema"
-          }
-        }
-      }
-    },
-    "This File Can’t Be Imported" : {
-      "comment" : "Alert title when the chosen file isn't Arc's sidebar",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Diese Datei kann nicht importiert werden"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Este archivo no se puede importar"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Ce fichier ne peut pas être importé"
-          }
-        },
-        "it" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Impossibile importare questo file"
           }
         }
       }
@@ -11392,6 +11558,35 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Questa estensione non richiede alcun permesso particolare."
+          }
+        }
+      }
+    },
+    "This File Can’t Be Imported" : {
+      "comment" : "Alert title when the chosen file isn't Arc's sidebar",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Diese Datei kann nicht importiert werden"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Este archivo no se puede importar"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ce fichier ne peut pas être importé"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Impossibile importare questo file"
           }
         }
       }
@@ -11743,36 +11938,8 @@
         }
       }
     },
-    "URL Copied" : {
-      "comment" : "Confirmation shown at the bottom of the page after copying its address (⇧⌘C)",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "URL kopiert"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "URL copiada"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "URL copiée"
-          }
-        },
-        "it" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "URL copiato"
-          }
-        }
-      }
-    },
     "Unavailable" : {
+      "comment" : "An extension from another Mac whose package can't be downloaded",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -11887,34 +12054,6 @@
         }
       }
     },
-    "Update Extension" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Erweiterung aktualisieren"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Actualizar extensión"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Mettre à jour l'extension"
-          }
-        },
-        "it" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Aggiorna estensione"
-          }
-        }
-      }
-    },
     "Update “%@”?" : {
       "localizations" : {
         "de" : {
@@ -11939,6 +12078,34 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Vuoi aggiornare “%@”?"
+          }
+        }
+      }
+    },
+    "Update Extension" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Erweiterung aktualisieren"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Actualizar extensión"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mettre à jour l'extension"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aggiorna estensione"
           }
         }
       }
@@ -11968,6 +12135,35 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Aggiorna…"
+          }
+        }
+      }
+    },
+    "URL Copied" : {
+      "comment" : "Confirmation shown at the bottom of the page after copying its address (⇧⌘C)",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "URL kopiert"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "URL copiada"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "URL copiée"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "URL copiato"
           }
         }
       }
@@ -12430,201 +12626,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Riduci"
-          }
-        }
-      }
-    },
-    "commandBar.keywords.copyURL" : {
-      "comment" : "Search words for the “Copy URL” action, space-separated, never displayed; keep the English words",
-      "extractionState" : "extracted_with_value",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "kopieren link adresse url copy address"
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "copy link address url"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "copiar enlace dirección url copy link address"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "copier lien adresse url copy link address"
-          }
-        },
-        "it" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "copia link indirizzo url copy address"
-          }
-        }
-      }
-    },
-    "commandBar.keywords.newSpace" : {
-      "comment" : "Search words for the “New Space” action, space-separated, never displayed; keep the English words",
-      "extractionState" : "extracted_with_value",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "neu erstellen hinzufügen bereich space new create add"
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "new create add space"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "nuevo crear añadir espacio space new create add"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "nouveau créer ajouter espace space new create add"
-          }
-        },
-        "it" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "nuovo crea aggiungi spazio space new create add"
-          }
-        }
-      }
-    },
-    "commandBar.keywords.settings" : {
-      "comment" : "Search words for the “Settings” action, space-separated, never displayed; keep the English words",
-      "extractionState" : "extracted_with_value",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "einstellungen optionen settings preferences"
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "settings preferences options"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "ajustes preferencias opciones configuración settings preferences"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "réglages préférences paramètres options settings preferences"
-          }
-        },
-        "it" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "impostazioni preferenze opzioni settings preferences"
-          }
-        }
-      }
-    },
-    "e.g. apple.com" : {
-      "comment" : "Placeholder of the homepage field",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "z. B. apple.com"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "p. ej., apple.com"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "ex. apple.com"
-          }
-        },
-        "it" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "ad es. apple.com"
-          }
-        }
-      }
-    },
-    "macOS asks you to confirm" : {
-      "comment" : "Settings > General: help of the Make Default button",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "macOS bittet dich um Bestätigung"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "macOS te pide que lo confirmes"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "macOS vous demande de confirmer"
-          }
-        },
-        "it" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "macOS ti chiede di confermare"
-          }
-        }
-      }
-    },
-    "“%@” Requests Additional Access" : {
-      "comment" : "Alert shown when a browser extension asks for more permissions; %@ is the extension name",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "„%@“ fordert zusätzlichen Zugriff an"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "“%@” solicita acceso adicional"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "« %@ » demande un accès supplémentaire"
-          }
-        },
-        "it" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "“%@” richiede un accesso aggiuntivo"
           }
         }
       }
