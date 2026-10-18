@@ -124,3 +124,12 @@ Fonctions livrées avec une limite, faute d'API publique ou par choix de simplic
 - **Cookies** (`browser.cookies`) : le magasin par défaut des extensions n'est celui d'aucun profil ; elles n'atteignent les cookies d'un profil que par ses onglets ouverts.
 - **Demandes de permissions** : alerte en feuille, tout ou rien ; l'écran intégré viendra avec la 6.4. Une extension déposée dans `Application Support/Extensions/` sans passer par l'installation (6.4) n'a aucune permission.
 - **Bulle d'une action** : ancrée en haut à droite de la fenêtre, en attendant les boutons des extensions (6.5).
+
+### Installation des extensions (6.4)
+
+- **Messages natifs** (`runtime.sendNativeMessage`, `connectNative`) : refusés par WebKit pour une extension Safari d'app chargée par Matcha (« Error creating NSExtension », puis « Native messaging is not supported » ; constaté avec Proton Pass). Ce passage vers l'app est réservé à Safari. Une extension qui en a besoin (déverrouillage par l'app, Touch ID de l'app…) perd ces fonctions. Piste : aucune avec les API publiques.
+- **Installer depuis les boutiques** (Chrome Web Store, addons.mozilla.org) : il faut d'abord télécharger le `.crx` ou le `.xpi`. Piste : un bouton « Ajouter à Matcha » sur la page d'une extension, qui télécharge son paquet.
+- **Identifiant Chrome** : une extension de Chrome installée depuis un `.crx` n'a pas son identifiant Chrome (tiré de sa clé publique) ; un site qui l'appelle par cet identifiant (`externally_connectable`) ne la trouve pas. Piste : lire la clé dans l'en-tête CRX3 (protobuf) ou le champ `key` du manifeste et en tirer l'identifiant, comme pour Safari.
+- **Signature des `.crx`** : non vérifiée ; l'utilisateur choisit le fichier et voit les permissions avant d'installer. Une extension Safari d'app, elle, est vérifiée par WebKit (manifeste contrôlé par la signature du `.appex`).
+- **Mises à jour** : rien n'est mis à jour seul. Une extension Safari suit son app (App Store) ; un fichier se réinstalle par-dessus (« Mettre à jour l'extension »), ses données gardées.
+- **Permissions facultatives** (`optional_permissions`) : pas montrées à l'installation ; l'extension les demande en cours de route (alerte de la 6.3).

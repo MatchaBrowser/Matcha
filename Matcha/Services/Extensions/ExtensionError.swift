@@ -13,6 +13,8 @@ nonisolated enum ExtensionError: Error, Equatable, LocalizedError {
     case invalidIdentifier(String)
     /// Une extension de même identifiant est déjà chargée.
     case alreadyLoaded(String)
+    /// Aucune extension installée sous cet identifiant (dossier absent, app supprimée).
+    case notInstalled(String)
 
     var errorDescription: String? {
         switch self {
@@ -26,6 +28,8 @@ nonisolated enum ExtensionError: Error, Equatable, LocalizedError {
             "Invalid extension identifier: \(identifier)"
         case let .alreadyLoaded(identifier):
             "An extension with identifier \(identifier) is already loaded."
+        case let .notInstalled(identifier):
+            "No extension is installed with identifier \(identifier)."
         }
     }
 }

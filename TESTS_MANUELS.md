@@ -464,3 +464,19 @@ Pas encore d'écran pour installer une extension (6.4) ni de boutons (6.5) : la 
 - [ ] Avec la 6.4 : son script agit dans un onglet, dans un onglet d'un autre Space après être passé sur ce Space, dans l'aperçu, dans une mini-fenêtre et dans une fenêtre de connexion ; il n'agit pas dans une fenêtre privée, jusqu'à ce que tu y autorises l'extension.
 - [ ] Avec la 6.5 : la popup d'une extension s'ouvre sous son bouton ; elle vise l'onglet affiché (le panneau actif d'un split, l'aperçu s'il est ouvert). Sa page d'options s'ouvre dans un nouvel onglet. Une extension qui demande une permission en cours de route montre une alerte « … demande un accès supplémentaire » avec « Refuser » par défaut ; rien n'est accordé sans « Autoriser ».
 - [ ] Avec la 6.6 : la fenêtre « détachée » d'un gestionnaire de mots de passe s'ouvre en mini-fenêtre ; changer de Space puis rouvrir sa popup vise bien l'onglet du Space affiché.
+
+### 6.4 Installation des extensions
+
+Réglages (⌘,) > Extensions. Extensions Safari : celles des apps de /Applications (Proton Pass for Safari, par exemple). Fichiers : un `.crx` de Chrome (récupéré par un site comme crxextractor.com), un `.xpi` de Firefox (page de l'extension sur addons.mozilla.org, « Télécharger le fichier » dans ses versions), un `.zip` ou un dossier décompressé.
+
+- [ ] L'onglet Extensions s'ouvre ; « Aucune extension installée. » au début ; « Extensions Safari de vos apps » liste les extensions trouvées, avec l'icône de leur app et « Dans <app> ».
+- [ ] « Ajouter… » sur une extension Safari : l'écran montre l'icône, « Ajouter « <nom> » ? », la version et l'app, la description, « Elle pourra : » avec des phrases lisibles (historique, presse-papiers, apps du Mac, tous les sites…), « Autoriser dans les fenêtres privées » décoché. « Annuler » : rien n'est installé. « Ajouter l'extension » : elle apparaît dans « Extensions installées », avec « Version … · Dans <app> », son interrupteur allumé et le menu (…).
+- [ ] Proton Pass (ou ton gestionnaire) : sa page de connexion (account.proton.me) s'ouvre et trouve l'extension (plus de « Proton Pass is missing permissions »).
+- [ ] « Choisir… » avec un `.crx`, un `.xpi`, un `.zip` puis un dossier décompressé : même écran, nom du fichier comme origine ; l'extension s'installe, « Depuis un fichier ». Le même fichier une seconde fois : « Mettre à jour « … » ? » et « Mettre à jour l'extension » ; une seule ligne reste.
+- [ ] Un fichier qui n'est pas une extension (une image, un PDF) : message rouge « Ce fichier n'est pas une extension… » ; une archive sans `manifest.json` : « Aucun fichier manifest.json… ».
+- [ ] Interrupteur éteint : l'extension n'agit plus (son script ne tourne plus sur les pages) ; quitte et relance : toujours éteinte. Rallumée : elle revient sans redemander ses permissions.
+- [ ] Menu (…) > « Autoriser dans les fenêtres privées » : son script agit dans une fenêtre privée (⇧⌘N) seulement une fois coché. « Options… » (si l'extension en a) : sa page d'options s'ouvre dans un nouvel onglet de la fenêtre principale.
+- [ ] Menu (…) > « Supprimer… » : confirmation « Supprimer « … » ? » ; l'extension disparaît de la liste ; une extension Safari redevient « Ajouter… » plus bas, et son app est toujours là.
+- [ ] Quitte et relance Matcha : les extensions installées sont toujours là, avec leurs réglages.
+- [ ] Langues : l'onglet et l'écran des permissions en allemand, espagnol et italien ; aucun texte coupé.
+- Connu : les messages natifs vers l'app de l'extension ne marchent pas (`FEATURES.md`).

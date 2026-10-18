@@ -12,6 +12,8 @@ struct SettingsView: View {
                 .tabItem { Label("Profiles", systemImage: "person.2") }
             PrivacySettingsView()
                 .tabItem { Label("Privacy", systemImage: "hand.raised") }
+            ExtensionsSettingsView()
+                .tabItem { Label("Extensions", systemImage: "puzzlepiece.extension") }
         }
         .frame(width: 520)
     }

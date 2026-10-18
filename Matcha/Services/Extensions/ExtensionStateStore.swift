@@ -15,6 +15,9 @@ nonisolated struct ExtensionState: Codable, Equatable, Sendable {
     /// Fenêtres privées : refusées par défaut, comme dans Safari ; seul l'utilisateur les ouvre à une extension (6.4).
     var hasAccessToPrivateData = false
     var hasRequestedOptionalAccessToAllHosts = false
+    /// Extension Safari d'une app (tâche 6.4) : chemin de son `.appex`, chargé sur place ; nil pour une extension copiée
+    /// dans le dossier des extensions.
+    var appExtensionPath: String?
 
     /// Sans les décisions expirées à `date`.
     func removingExpired(at date: Date) -> ExtensionState {
@@ -45,6 +48,12 @@ final class ExtensionStateStore {
     /// Identifiants connus.
     var identifiers: [String] {
         states.keys.sorted()
+    }
+
+    /// Extensions Safari d'apps installées (tâche 6.4) : (identifiant, `.appex`), triées par identifiant.
+    var appExtensions: [(identifier: String, url: URL)] {
+        states.compactMap { entry in entry.value.appExtensionPath.map { (entry.key, URL(filePath: $0)) } }
+            .sorted { $0.identifier < $1.identifier }
     }
 
     /// État retenu de l'extension `identifier`, nil si elle n'a jamais été chargée.

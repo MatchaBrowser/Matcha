@@ -35,10 +35,12 @@ final class ExtensionManager: NSObject {
     @ObservationIgnored let popups = ExtensionPopupPresenter()
     /// Extensions chargées, par identifiant.
     private(set) var contexts: [String: WKWebExtensionContext] = [:]
+    /// Extensions installées, chargées ou non, par identifiant (tâche 6.4) : de quoi les montrer dans les réglages.
+    private(set) var installed: [String: WKWebExtension] = [:]
     /// Change à chaque mise à jour d'une action (icône, titre, badge) : les boutons de la tâche 6.5 le suivront.
     private(set) var actionRevision = 0
-    @ObservationIgnored private var isStarted = false
-    @ObservationIgnored private var observers: [any NSObjectProtocol] = []
+    @ObservationIgnored var isStarted = false
+    @ObservationIgnored var observers: [any NSObjectProtocol] = []
 
     init(configuration: WKWebExtensionController.Configuration, store: ExtensionStateStore, directory: URL?) {
         // Pages des extensions (popup, options, arrière-plan) : présentées aux sites comme Safari, comme les onglets.
@@ -83,42 +85,45 @@ final class ExtensionManager: NSObject {
 
     // MARK: Chargement
 
-    /// Charge, en tâche de fond, les extensions actives du dossier des extensions. Sans effet au second appel.
-    func start() {
-        guard !isStarted, let directory else {
-            return
-        }
-        isStarted = true
-        let enabled = ExtensionInstallDirectory.installedExtensions(in: directory)
-            .filter { store.state(for: $0.identifier)?.isEnabled ?? true }
-        Task {
-            for (identifier, url) in enabled {
-                do {
-                    try await load(resourceBaseURL: url, identifier: identifier)
-                } catch {
-                    Logger.extensions.error("Extension non chargée : \(error.localizedDescription, privacy: .public)")
-                }
+    /// Lit l'extension installée `identifier` (dossier des extensions ou `.appex` d'une app), sans la charger ; elle
+    /// rejoint `installed`.
+    @discardableResult
+    func read(_ identifier: String) async throws -> WKWebExtension {
+        let webExtension: WKWebExtension
+        if let path = store.state(for: identifier)?.appExtensionPath {
+            guard let bundle = Bundle(url: URL(filePath: path)) else {
+                throw ExtensionError.notInstalled(identifier)
             }
+            webExtension = try await WKWebExtension(appExtensionBundle: bundle)
+        } else if let directory {
+            webExtension = try await WKWebExtension(resourceBaseURL: directory.appendingPathComponent(identifier, isDirectory: true))
+        } else {
+            throw ExtensionError.notInstalled(identifier)
         }
+        installed[identifier] = webExtension
+        return webExtension
     }
 
     /// Charge l'extension du dossier `url` (décompressé, avec son `manifest.json`) sous l'identifiant `identifier`, avec
     /// les décisions retenues pour lui ; elle est désormais active.
     @discardableResult
     func load(resourceBaseURL url: URL, identifier: String) async throws -> WKWebExtensionContext {
+        let webExtension = try await WKWebExtension(resourceBaseURL: url)
+        return try load(webExtension, identifier: identifier)
+    }
+
+    /// Charge `webExtension` sous l'identifiant `identifier`, avec les décisions retenues pour lui ; elle est désormais
+    /// active.
+    @discardableResult
+    func load(_ webExtension: WKWebExtension, identifier: String) throws -> WKWebExtensionContext {
         guard ExtensionInstallDirectory.isValidIdentifier(identifier) else {
             throw ExtensionError.invalidIdentifier(identifier)
         }
         guard contexts[identifier] == nil else {
             throw ExtensionError.alreadyLoaded(identifier)
         }
-        let webExtension = try await WKWebExtension(resourceBaseURL: url)
-        // Un autre chargement du même identifiant a pu aboutir pendant la lecture.
-        guard contexts[identifier] == nil else {
-            throw ExtensionError.alreadyLoaded(identifier)
-        }
         let context = WKWebExtensionContext(for: webExtension)
-        context.uniqueIdentifier = identifier
+        context.uniqueIdentifier = webExtensionIdentifier(for: identifier)
         if let baseURL = URL(string: "\(Self.scheme)://\(identifier)/") {
             context.baseURL = baseURL
         }
@@ -130,7 +135,8 @@ final class ExtensionManager: NSObject {
         windows.update()
         try controller.load(context)
         contexts[identifier] = context
-        store.setState(ExtensionState(context: context, isEnabled: true), for: identifier)
+        installed[identifier] = webExtension
+        store.setState(state(of: context, identifier: identifier, isEnabled: true), for: identifier)
         let errors = webExtension.errors.count
         Logger.extensions.info("Extension chargée (\(identifier, privacy: .public), \(errors, privacy: .public) erreur(s) du manifeste)")
         return context
@@ -141,7 +147,7 @@ final class ExtensionManager: NSObject {
         guard let context = contexts.removeValue(forKey: identifier) else {
             return
         }
-        saveState(of: context)
+        saveState(of: context, identifier: identifier)
         do {
             try controller.unload(context)
             Logger.extensions.info("Extension déchargée (\(identifier, privacy: .public))")
@@ -150,75 +156,13 @@ final class ExtensionManager: NSObject {
         }
     }
 
-    /// Active ou désactive l'extension installée `identifier` : elle est chargée depuis le dossier des extensions, ou
-    /// déchargée ; retenu pour les prochains lancements.
-    func setEnabled(_ isEnabled: Bool, identifier: String) async throws {
-        if isEnabled, contexts[identifier] == nil, let directory {
-            try await load(resourceBaseURL: directory.appendingPathComponent(identifier, isDirectory: true), identifier: identifier)
-        } else if !isEnabled {
-            unload(identifier: identifier)
-        }
-        var state = store.state(for: identifier) ?? ExtensionState()
-        state.isEnabled = isEnabled
-        store.setState(state, for: identifier)
-    }
-
-    // MARK: Décisions
-
-    /// Ouvre (ou ferme) les fenêtres privées à l'extension `identifier` : choix de l'utilisateur seulement (tâche 6.4) ;
-    /// retenu, et appliqué tout de suite si elle est chargée.
-    func setAccessToPrivateData(_ isAllowed: Bool, identifier: String) {
-        if let context = contexts[identifier] {
-            context.hasAccessToPrivateData = isAllowed
-            saveState(of: context)
-        } else {
-            var state = store.state(for: identifier) ?? ExtensionState()
-            state.hasAccessToPrivateData = isAllowed
-            store.setState(state, for: identifier)
-        }
-    }
-
-    /// Retient les décisions actuelles de `context` (permissions, sites, fenêtres privées).
-    func saveState(of context: WKWebExtensionContext) {
-        let identifier = context.uniqueIdentifier
-        guard contexts[identifier] === context || store.state(for: identifier) != nil else {
-            return
-        }
-        let isEnabled = store.state(for: identifier)?.isEnabled ?? true
-        store.setState(ExtensionState(context: context, isEnabled: isEnabled), for: identifier)
-    }
-
-    /// Retient les décisions de toutes les extensions chargées.
-    func saveAllStates() {
-        contexts.values.forEach(saveState(of:))
+    /// Oublie l'extension désinstallée `identifier` (`+Installed`).
+    func forget(_ identifier: String) {
+        installed[identifier] = nil
     }
 
     /// Une action a changé (tâche 6.5 : boutons des extensions).
     func actionDidUpdate() {
         actionRevision &+= 1
-    }
-
-    /// Décisions retenues dès que WebKit les change (réponse à une demande, `permissions.remove()`…), et à la fermeture
-    /// de l'app.
-    private func observeContexts() {
-        let names: [Notification.Name] = [
-            WKWebExtensionContext.permissionsWereGrantedNotification,
-            WKWebExtensionContext.permissionsWereDeniedNotification,
-            WKWebExtensionContext.grantedPermissionsWereRemovedNotification,
-            WKWebExtensionContext.deniedPermissionsWereRemovedNotification,
-            WKWebExtensionContext.permissionMatchPatternsWereGrantedNotification,
-            WKWebExtensionContext.permissionMatchPatternsWereDeniedNotification,
-            WKWebExtensionContext.grantedPermissionMatchPatternsWereRemovedNotification,
-            WKWebExtensionContext.deniedPermissionMatchPatternsWereRemovedNotification,
-        ]
-        // Toutes les extensions chargées sont relues (rien n'est écrit pour celles qui n'ont pas changé) : la
-        // notification ne traverse pas la frontière d'isolation.
-        for name in names + [NSApplication.willTerminateNotification] {
-            observers.append(NotificationCenter.default.addObserver(forName: name, object: nil, queue: .main) { [weak self] _ in
-                MainActor.assumeIsolated {
-                    self?.saveAllStates()
-                }
-            })
-        }
     }
 }
