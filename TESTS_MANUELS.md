@@ -428,6 +428,7 @@ En plus du plan : un symbole parmi 45, ou un emoji, pour l'icône d'un Space, co
 - [ ] Mini-fenêtre (⌥⌘N) : le bouton « Ouvrir dans ‹Space› » montre l'emoji ou le symbole du Space affiché ; change l'icône du Space : le bouton suit.
 - [ ] Apparence claire et sombre (Réglages Système > Apparence) : symboles lisibles, emoji en couleurs.
 - [ ] Langues : « Changer l'icône… » en allemand « Symbol ändern … », en espagnol « Cambiar icono… », en italien « Cambia icona… » ; « Thème » : « Thema », « Tema », « Tema ».
-- [ ] Facultatif, VoiceOver : le nom de chaque symbole.
-- [ ] Captures (vraie souris, ne touche à rien pendant ce temps) : `TEST_RUNNER_MATCHA_SCREENSHOT=1 TEST_RUNNER_MATCHA_SCREENSHOT_THEME=Forêt xcodebuild … test -only-testing:MatchaUITests/ScreenshotUITests` donne `7-theme-editeur`, l'éditeur complet. Tests d'interface `SpaceIconUITests` : écrits mais pas encore lancés.
+- [ ] Facultatif, VoiceOver : le nom de chaque symbole. Colle un emoji dans le champ : VoiceOver atteint toujours la bulle (grille et champ).
+- [ ] Le symbole au pied de la barre (dessiné désormais comme un texte, pour que la bulle reste accessible) est centré dans son rond, à la même taille qu'avant, pour le Space affiché comme pour les autres.
+- [ ] Captures (vraie souris, ne touche à rien pendant ce temps) : `TEST_RUNNER_MATCHA_SCREENSHOT=1 TEST_RUNNER_MATCHA_SCREENSHOT_THEME=Forêt xcodebuild … test -only-testing:MatchaUITests/ScreenshotUITests` donne `7-theme-editeur`, l'éditeur complet. Tests d'interface `SpaceIconUITests` : lancés le 2026-10-18, ils passent.
 - Connu : 45 symboles proposés, pas de recherche dans tous les symboles SF.

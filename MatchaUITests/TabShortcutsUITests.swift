@@ -31,10 +31,11 @@ final class TabShortcutsUITests: XCTestCase {
         waitForValue(of: addressPill(in: scope)) { $0 == self.address(name) }
     }
 
-    /// Vrai si la pastille de `scope` garde l'onglet `name` pendant une seconde.
+    /// Vrai si la pastille de `scope` garde l'onglet `name` pendant deux secondes. XCTest ne vérifie une attente
+    /// qu'au bout d'environ 1 s : une attente plus courte ne pourrait jamais voir de changement.
     @MainActor
     private func keepsDisplaying(_ name: String, in scope: XCUIElement) -> Bool {
-        !waitForValue(of: addressPill(in: scope), timeout: 1) { $0 != self.address(name) }
+        !waitForValue(of: addressPill(in: scope), timeout: 2) { $0 != self.address(name) }
     }
 
     @MainActor

@@ -78,7 +78,8 @@ final class HistoryUITests: XCTestCase {
         XCTAssertEqual(historyRows(in: window).count, 1)
 
         historyRow(titled: "Postfix Documentation", in: window).rightClick()
-        app.menuItems["Supprimer"].click()
+        // Menu de la ligne, dans la fenêtre : « Édition > Supprimer » de la barre des menus porte le même titre.
+        window.menuItems["Supprimer"].click()
         XCTAssertTrue(historyEmptyState(in: window).waitForExistence(timeout: 3))
         // Supprimé de l'historique, pas de la barre latérale.
         XCTAssertEqual(tabRows(in: app).count, 1)

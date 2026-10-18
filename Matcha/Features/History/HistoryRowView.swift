@@ -24,7 +24,9 @@ struct HistoryRowView: View {
                 .monospacedDigit()
         }
         .help(Text(verbatim: row.url.absoluteString))
+        // Texte statique : sous macOS, un simple groupe n'expose pas sa valeur (le domaine).
         .accessibilityElement(children: .ignore)
+        .accessibilityAddTraits(.isStaticText)
         .accessibilityLabel(Text(verbatim: row.title))
         .accessibilityValue(Text(verbatim: row.host))
         .accessibilityIdentifier("historyRow")

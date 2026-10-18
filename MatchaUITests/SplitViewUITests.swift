@@ -78,7 +78,8 @@ final class SplitViewUITests: XCTestCase {
         let app = launch(opening: ["one", "two"])
         let pane = orderedPagePanes(in: app)[0]
         dragTab(titled: address("one"), to: pane.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.5)), in: app)
-        XCTAssertFalse(waitForCount(pagePanes(in: app), 2, timeout: 1))
+        // XCTest ne vérifie une attente qu'au bout d'environ 1 s : 2 s au moins, sinon l'attente ne peut pas réussir.
+        XCTAssertFalse(waitForCount(pagePanes(in: app), 2, timeout: 2))
         XCTAssertEqual(pagePanes(in: app).count, 1)
         XCTAssertEqual(tabRows(in: app).count, 2)
         XCTAssertEqual(splitRows(in: app).count, 0)

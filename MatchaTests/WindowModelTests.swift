@@ -61,6 +61,21 @@ struct WindowModelTests {
         #expect(model.spaceIndex == 2)
     }
 
+    @Test func `editing another space shows it with its editor, which a later switch closes`() {
+        let first = model.space
+        model.newSpace()
+        let second = model.space
+        // « Changer l'icône… » sur un Space caché : il s'affiche, sa bulle s'ouvre (l'état survit à la barre recréée).
+        model.editSpace(first)
+        #expect(model.space === first)
+        #expect(model.editedSpaceID == first.id)
+        // Changer de Space ferme la bulle ; rester sur le même Space ne la ferme pas.
+        model.select(first)
+        #expect(model.editedSpaceID == first.id)
+        model.select(second)
+        #expect(model.editedSpaceID == nil)
+    }
+
     @Test func `each space keeps its own tabs but shares favorites`() {
         let first = model.space.tabManager
         let today = first.newTab()

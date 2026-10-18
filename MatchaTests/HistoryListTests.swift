@@ -1,3 +1,4 @@
+import AppKit
 import Foundation
 @testable import Matcha
 import Testing
@@ -26,6 +27,14 @@ struct HistoryListTests {
         #expect(HistoryPeriod.today.start(now: now, calendar: calendar) == date(18, 0))
         #expect(HistoryPeriod.todayAndYesterday.start(now: now, calendar: calendar) == date(17, 0))
         #expect(HistoryPeriod.allHistory.start(now: now, calendar: calendar) == nil)
+    }
+
+    @Test func `each button of the clear alert is its period, then cancel`() {
+        let first = NSApplication.ModalResponse.alertFirstButtonReturn.rawValue
+        let periods = (0 ..< 5).map { HistoryClearAlert.period(for: NSApplication.ModalResponse(rawValue: first + $0)) }
+        #expect(periods == [.lastHour, .today, .todayAndYesterday, .allHistory, nil])
+        #expect(HistoryClearAlert.period(for: .cancel) == nil)
+        #expect(HistoryClearAlert.period(for: .abort) == nil)
     }
 
     @Test func `clear periods follow daylight saving changes`() {

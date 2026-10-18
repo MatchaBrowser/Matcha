@@ -36,13 +36,14 @@ final class AudioUITests: XCTestCase {
         XCTAssertFalse(row.isSelected)
         XCTAssertEqual(tabRows(in: app).count, 2)
 
-        // En pause, pas terminée : le haut-parleur ne revient pas, ni quand on affiche l'onglet.
+        // En pause, pas terminée : le haut-parleur ne revient pas, ni quand on affiche l'onglet. Lecture directe : une
+        // attente par prédicat ne le vérifie qu'au bout d'une seconde environ, jamais avec un délai d'une seconde.
         Thread.sleep(forTimeInterval: 3)
-        XCTAssertTrue(waitUntilSilent(row, timeout: 1))
+        XCTAssertNotEqual(row.value as? String, Self.playing)
         row.click()
         XCTAssertTrue(row.isSelected)
         Thread.sleep(forTimeInterval: 3)
-        XCTAssertTrue(waitUntilSilent(row, timeout: 1))
+        XCTAssertNotEqual(row.value as? String, Self.playing)
     }
 
     /// Premier morceau trouvé ; le test est ignoré sans lui.

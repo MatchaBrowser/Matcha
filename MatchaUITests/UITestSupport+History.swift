@@ -36,11 +36,16 @@ extension XCTestCase {
         scope.staticTexts.matching(NSPredicate(format: "label == %@ OR value == %@", "Aucun historique", "Aucun historique")).firstMatch
     }
 
-    /// Bouton d'une alerte ou d'une feuille de l'app (le dialogue d'effacement peut être l'un ou l'autre).
+    /// Bouton d'une alerte ou d'une feuille de l'app (le dialogue d'effacement peut être l'un ou l'autre). Requête
+    /// résolue à chaque usage : le bouton peut être demandé avant que le dialogue n'apparaisse.
     @MainActor
     func dialogButton(_ title: String, in app: XCUIApplication) -> XCUIElement {
-        let sheetButton = app.sheets.buttons[title].firstMatch
-        return sheetButton.exists ? sheetButton : app.dialogs.buttons[title].firstMatch
+        let dialogs = app.descendants(matching: .any).matching(NSPredicate(
+            format: "elementType == %lu OR elementType == %lu",
+            XCUIElement.ElementType.sheet.rawValue,
+            XCUIElement.ElementType.dialog.rawValue,
+        ))
+        return dialogs.buttons[title].firstMatch
     }
 
     /// Documentation de Postfix ouverte (sans réseau), puis sa page « Basic configuration » dans le même onglet :

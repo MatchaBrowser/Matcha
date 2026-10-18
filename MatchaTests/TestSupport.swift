@@ -39,9 +39,11 @@ struct WaitTimeoutError: Error, CustomStringConvertible {
     }
 }
 
-/// Attend que `condition` devienne vraie, en la vérifiant toutes les 20 ms.
+/// Attend que `condition` devienne vraie, en la vérifiant toutes les 20 ms. 30 s par défaut : le chargement d'une page
+/// (surtout un vrai fichier, `file:`) prend moins d'une seconde seul, mais plus de 10 s quand toute la suite tourne en
+/// parallèle (vues web et fil principal partagés) ; une condition vraie n'attend pas plus longtemps pour autant.
 @MainActor
-func waitUntil(timeout: Duration = .seconds(10), line: Int = #line, _ condition: () -> Bool) async throws {
+func waitUntil(timeout: Duration = .seconds(30), line: Int = #line, _ condition: () -> Bool) async throws {
     let clock = ContinuousClock()
     let deadline = clock.now + timeout
     while !condition() {

@@ -36,6 +36,29 @@ struct SidebarIconView: View {
         }
     }
 
+    /// L'icône en un seul `Text` (le symbole y est une image) : passer d'un symbole à un emoji ne change que le texte,
+    /// pas la structure de la vue. Pour le bouton d'un Space : sa bulle ouverte (l'éditeur) est rattachée à son élément
+    /// d'accessibilité, que SwiftUI recrée sans elle quand la structure de son contenu change ; VoiceOver la perdrait
+    /// dès qu'un emoji remplace le symbole.
+    static func text(
+        _ icon: SidebarIcon,
+        defaultSymbol: String,
+        tint: Color? = nil,
+        size: Double = 13,
+        emojiSize: Double? = nil,
+        weight: Font.Weight = .regular,
+    ) -> Text {
+        switch icon.displayed(defaultSymbol: defaultSymbol, symbolExists: symbolExists) {
+        case let .emoji(emoji):
+            return Text(verbatim: emoji).font(.system(size: emojiSize ?? size))
+        case let .symbol(name):
+            let symbol = Text(Image(systemName: name)).font(.system(size: size, weight: weight))
+            return tint.map { symbol.foregroundStyle($0) } ?? symbol
+        case .default:
+            return text(.symbol(defaultSymbol), defaultSymbol: defaultSymbol, tint: tint, size: size, weight: weight)
+        }
+    }
+
     private static func symbolExists(_ name: String) -> Bool {
         NSImage(systemSymbolName: name, accessibilityDescription: nil) != nil
     }

@@ -6,7 +6,6 @@ import SwiftUI
 struct SpaceSwitcher: View {
     let model: WindowModel
 
-    @State private var editedSpace: SpaceSession?
     @State private var renamedSpace: SpaceSession?
     @State private var newName = ""
 
@@ -65,7 +64,7 @@ struct SpaceSwitcher: View {
         let isCurrent = space === model.space
         return Button {
             if isCurrent {
-                editedSpace = space
+                model.editedSpaceID = space.id
             } else {
                 withAnimation(.easeInOut(duration: 0.3)) { model.select(space) }
             }
@@ -82,20 +81,21 @@ struct SpaceSwitcher: View {
         .accessibilityAddTraits(isCurrent ? .isSelected : [])
         .accessibilityIdentifier("spaceButton")
         .contextMenu { menu(for: space) }
-        .popover(isPresented: Binding { editedSpace === space } set: {
-            if !$0 {
-                editedSpace = nil
+        .popover(isPresented: Binding { model.editedSpaceID == space.id } set: {
+            if !$0, model.editedSpaceID == space.id {
+                model.editedSpaceID = nil
             }
         }, arrowEdge: .top) {
-            SpaceEditor(space: space) { editedSpace = nil }
+            SpaceEditor(space: space) { model.editedSpaceID = nil }
         }
     }
 
     /// Symbole gris (plus grand et au premier plan pour le Space affiché), ou emoji, qui garde ses couleurs et
-    /// s'atténue pour un autre Space.
+    /// s'atténue pour un autre Space. Un seul `Text` (`SidebarIconView.text`) : la bulle de l'éditeur reste dans l'arbre
+    /// d'accessibilité quand un emoji remplace le symbole.
     private func icon(of space: SpaceSession, isCurrent: Bool) -> some View {
-        SidebarIconView(
-            icon: space.icon,
+        SidebarIconView.text(
+            space.icon,
             defaultSymbol: SidebarIcon.defaultSpaceSymbol,
             tint: isCurrent ? .primary : .secondary,
             size: isCurrent ? 11 : 9,
@@ -113,19 +113,13 @@ struct SpaceSwitcher: View {
         #endif
     }
 
-    /// Affiche le Space et ouvre son éditeur.
-    private func edit(_ space: SpaceSession) {
-        model.select(space)
-        editedSpace = space
-    }
-
     @ViewBuilder private func menu(for space: SpaceSession) -> some View {
         Button("Rename…") {
             newName = space.record.name
             renamedSpace = space
         }
-        Button("Edit Theme…") { edit(space) }
-        Button("Change Icon…") { edit(space) }
+        Button("Edit Theme…") { model.editSpace(space) }
+        Button("Change Icon…") { model.editSpace(space) }
         Divider()
         Button("Delete Space") {
             withAnimation(.easeInOut(duration: 0.3)) { model.deleteSpace(space) }

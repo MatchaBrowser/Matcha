@@ -27,6 +27,9 @@ final class WindowModel {
     /// Dossier d'épinglés dont le panneau de personnalisation est ouvert, sous sa ligne : un seul par fenêtre. Seul
     /// l'utilisateur l'ouvre et le ferme (menu du dossier, ×, Échap) ; il ne se voit que dans le Space du dossier.
     var customizedFolderID: UUID?
+    /// Space dont l'éditeur (bulle de son icône, au pied de la barre) est ouvert. Tenu ici et non par la vue : changer
+    /// de Space recrée la barre latérale (`.id` du Space), qui perdrait son état avant d'ouvrir la bulle.
+    var editedSpaceID: UUID?
     /// Où retenir le Space affiché d'un lancement à l'autre ; nil pour ne rien retenir (tests).
     @ObservationIgnored private let defaults: UserDefaults?
 
@@ -69,6 +72,8 @@ final class WindowModel {
             target.tabManager.adoptFavorites(from: current.tabManager)
         }
         transitionEdge = targetIndex > spaceIndex ? .trailing : .leading
+        // La bulle d'un Space ne survit pas à un changement de Space (sauf `editSpace`, qui la rouvre).
+        editedSpaceID = nil
         currentSpaceID = target.id
         defaults?.set(target.id.uuidString, forKey: Self.currentSpaceKey)
         target.tabManager.loadSelectedTab()
@@ -79,6 +84,12 @@ final class WindowModel {
             return
         }
         select(session.spaces[index])
+    }
+
+    /// « Changer l'icône… » et « Modifier le thème… » du menu d'un Space : l'affiche et ouvre son éditeur.
+    func editSpace(_ target: SpaceSession) {
+        select(target)
+        editedSpaceID = target.id
     }
 
     /// Space voisin (glissement à deux doigts), sans boucler.

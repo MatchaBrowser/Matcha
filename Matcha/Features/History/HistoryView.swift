@@ -1,3 +1,4 @@
+import AppKit
 import SwiftUI
 
 /// Liste de l'historique, par jour, avec la recherche (dans la barre d'outils), le menu des lignes, la suppression
@@ -9,7 +10,8 @@ struct HistoryView: View {
     let profileName: String?
     let open: ([HistoryRow]) -> Void
 
-    @State private var isConfirmingClear = false
+    /// Fenêtre de l'historique, où s'ouvre la feuille de « Effacer l'historique… ».
+    @State private var window: NSWindow?
 
     var body: some View {
         List(selection: $model.selection) {
@@ -36,26 +38,16 @@ struct HistoryView: View {
         .searchable(text: $model.searchText, placement: .toolbar, prompt: Text("Search History"))
         .toolbar {
             ToolbarItem(placement: .primaryAction) {
-                Button("Clear History…") { isConfirmingClear = true }
-                    .accessibilityIdentifier("historyClearButton")
-                    .disabled(!model.isReady)
+                Button("Clear History…") {
+                    HistoryClearAlert.present(in: window, profileName: profileName) { model.clear($0) }
+                }
+                .accessibilityIdentifier("historyClearButton")
+                .disabled(!model.isReady)
             }
         }
-        .confirmationDialog(Text("Clear History"), isPresented: $isConfirmingClear) {
-            ForEach(HistoryPeriod.allCases) { period in
-                Button(role: .destructive) {
-                    model.clear(period)
-                } label: {
-                    Text(period.title)
-                }
-            }
-        } message: {
-            if let profileName {
-                Text(
-                    "Pages visited during this period are removed from the history of “\(profileName)”. Cookies and website data are kept.",
-                )
-            } else {
-                Text("Pages visited during this period are removed from the history. Cookies and website data are kept.")
+        .background {
+            WindowAccessor { window in
+                Task { self.window = window }
             }
         }
         .task(id: model.refreshKey) {
