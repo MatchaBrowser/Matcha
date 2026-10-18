@@ -59,7 +59,8 @@ struct SidebarIconView: View {
         }
     }
 
-    private static func symbolExists(_ name: String) -> Bool {
+    /// Vrai si ce macOS connaît le symbole SF `name`.
+    static func symbolExists(_ name: String) -> Bool {
         NSImage(systemSymbolName: name, accessibilityDescription: nil) != nil
     }
 }

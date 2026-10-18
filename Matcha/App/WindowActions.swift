@@ -30,4 +30,6 @@ struct WindowActions {
     let showTab: (BrowserTab) -> Void
     /// Fenêtre privée : « Afficher tout l'historique » (⌘Y) y est grisé, elle n'a pas d'historique.
     let isPrivate: Bool
+    /// Fichier > Importer depuis > Arc… (tâche 7.1) ; nil dans une fenêtre privée.
+    let importFromArc: (() -> Void)?
 }

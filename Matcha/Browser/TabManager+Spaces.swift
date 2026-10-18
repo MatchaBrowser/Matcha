@@ -6,7 +6,8 @@ extension TabManager {
 
     /// Remet les onglets enregistrés, sans vue web : chacun la crée à son premier affichage.
     /// L'onglet utilisé le plus récemment est sélectionné, sans charger sa page : elle se charge quand
-    /// le Space s'affiche (`loadSelectedTab`).
+    /// le Space s'affiche (`loadSelectedTab`). Un onglet jamais utilisé (importé, `lastActivity` à `distantPast`)
+    /// ne l'est pas : rien ne se charge de lui-même.
     func restore(tabs stored: [StoredTab], layout restoredLayout: SidebarLayout) {
         var restored: [BrowserTab] = []
         for entry in stored where restoredLayout.place(of: entry.id) != nil {
@@ -20,7 +21,8 @@ extension TabManager {
             known.remove(id)
         }
         updateLayout { $0 = known }
-        restoreSelection(restored.max { $0.lastActivity < $1.lastActivity }?.id)
+        let used = restored.filter { $0.lastActivity > .distantPast }
+        restoreSelection(used.max { $0.lastActivity < $1.lastActivity }?.id)
     }
 
     /// Crée la vue web des onglets affichés (l'onglet sélectionné et son split), pour les afficher (Space
@@ -47,6 +49,16 @@ extension TabManager {
     /// Retient l'état de navigation de chaque onglet chargé (fermeture de l'app).
     func captureInteractionStates() {
         tabs.forEach { $0.captureInteractionState() }
+    }
+
+    /// Ajoute `stored` à la fin des favoris, sans vue web (import, tâche 7.1).
+    func appendFavorites(_ stored: [StoredTab]) {
+        for entry in stored {
+            let configuration = WebConfigurationFactory.makeConfiguration(websiteDataStore: websiteDataStore)
+            let tab = BrowserTab(restoring: entry, configuration: configuration)
+            register(tab)
+            updateLayout { $0.setPlace(tab.id, to: .favorite) }
+        }
     }
 
     // MARK: Entre Spaces

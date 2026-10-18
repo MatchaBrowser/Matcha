@@ -149,6 +149,9 @@ struct BrowserCommands: Commands {
                 .disabled(frontTab?.hasURL != true)
         }
 
+        // Fichier > Importer depuis (tâche 7.1).
+        ImportCommands()
+
         // Fichier > Exporter en PDF…, Imprimer… ; Présentation > zoom (tâche 5.4), après « Recharger la page ».
         PageCommands(miniWindows: miniWindows)
 

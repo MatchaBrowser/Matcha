@@ -168,4 +168,17 @@ struct SpaceStoreTests {
         #expect(manager.tab(withID: ids[0])?.displayTitle == "Onglet 0")
         #expect(manager.tab(withID: ids[1])?.url == URL(string: "about:blank#1"))
     }
+
+    @Test func `tabs never used are not selected on restore`() {
+        // Onglets importés (tâche 7.1) : `distantPast`, jamais sélectionnés d'eux-mêmes.
+        let ids = [UUID(), UUID()]
+        let stored = ids.map { StoredTab(id: $0, url: URL(string: "about:blank"), lastActivity: .distantPast) }
+        var layout = SidebarLayout()
+        ids.forEach { layout.insertToday($0, at: layout.today.count) }
+        layout.setPlace(ids[0], to: .pinned)
+
+        manager.restore(tabs: stored, layout: layout)
+        #expect(manager.tabs.count == 2)
+        #expect(manager.selectedTab == nil)
+    }
 }

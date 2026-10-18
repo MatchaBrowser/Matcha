@@ -31,10 +31,17 @@ extension BrowserSession {
         record.themeData = SpaceTheme.presets[index % SpaceTheme.presets.count].encoded()
         context.insert(record)
         save(context)
+        return openSpace(record)
+    }
+
+    /// Ouvre le Space enregistré `record` (déjà inséré, avec ses onglets et dossiers : import, tâche 7.1) et l'ajoute
+    /// à la fin.
+    @discardableResult
+    func openSpace(_ record: SpaceRecord) -> SpaceSession {
         let space = SpaceSession(
             record: record,
-            context: context,
-            websiteDataStore: dataStore(for: profile),
+            context: container.mainContext,
+            websiteDataStore: dataStore(for: record.profile),
             faviconService: faviconService,
             downloadScope: downloadScope,
             sitePermissions: sitePermissions,

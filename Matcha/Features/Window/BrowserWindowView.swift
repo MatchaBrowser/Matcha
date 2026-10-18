@@ -138,6 +138,7 @@ struct BrowserWindowView: View {
         .task { await session.removeOrphanDataStores() }
         // « Effacer… » des réglages du site (tâche 5.2) : l'alerte appartient à la fenêtre.
         .modifier(SiteDataClearConfirmation(model: model))
+        .modifier(ArcImportPresenter(model: model))
         // Les mini-fenêtres envoient leurs pages dans cette fenêtre (tâche 4.5).
         .linkedToMiniWindows(session: session, model: model, window: window) { [commandBar] in commandBar.dismiss() }
         // Fenêtre et onglets vus par les extensions (tâche 6.3).
@@ -229,6 +230,7 @@ struct BrowserWindowView: View {
             newSpace: { withAnimation(.easeInOut(duration: 0.3)) { model.newSpace() } },
             showTab: showTab,
             isPrivate: session.isPrivate,
+            importFromArc: session.isPrivate ? nil : { model.arcImport.chooseFile(in: window) },
         )
     }
 

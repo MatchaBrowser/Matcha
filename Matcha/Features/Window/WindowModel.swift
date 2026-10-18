@@ -30,6 +30,8 @@ final class WindowModel {
     /// Space dont l'éditeur (bulle de son icône, au pied de la barre) est ouvert. Tenu ici et non par la vue : changer
     /// de Space recrée la barre latérale (`.id` du Space), qui perdrait son état avant d'ouvrir la bulle.
     var editedSpaceID: UUID?
+    /// Import depuis Arc lancé de cette fenêtre (tâche 7.1).
+    let arcImport = ArcImportModel()
     /// Où retenir le Space affiché d'un lancement à l'autre ; nil pour ne rien retenir (tests).
     @ObservationIgnored private let defaults: UserDefaults?
 

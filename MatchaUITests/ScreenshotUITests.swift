@@ -60,7 +60,9 @@ import XCTest
 /// - `MATCHA_SCREENSHOT_FOLDER` : dossier épinglé personnalisé, nommé d'après la valeur (« Projets » pour « 1 »), et son
 ///   sous-dossier « Client » (sans réseau) : panneau « Personnaliser… » ouvert sous le sous-dossier
 ///   (`37-dossier-panneau`), puis les deux lignes, panneau fermé (`38-dossier-personnalise`). En sombre :
-///   `MATCHA_SCREENSHOT_SETTINGS_VALUES=AppleInterfaceStyle=Dark`. Voir `ScreenshotUITests+Folders`.
+///   `MATCHA_SCREENSHOT_SETTINGS_VALUES=AppleInterfaceStyle=Dark`. Voir `ScreenshotUITests+Folders` ;
+/// - `MATCHA_SCREENSHOT_ARC` : import d'une barre d'Arc par le menu Fichier (« 1 » : l'exemple inventé des tests
+///   unitaires) : sélecteur, aperçu, Spaces importés. Voir `ScreenshotUITests+ArcImport`.
 ///
 /// La capture `1-vide` montre la fenêtre sans onglet : la page vide invite à ⌘T, la barre de commande
 /// ne s'ouvre jamais d'elle-même.
@@ -102,6 +104,7 @@ final class ScreenshotUITests: XCTestCase {
         try captureZoom(in: app, window: window)
         try captureHistory(in: app)
         captureFolderCustomization(in: app, window: window)
+        captureArcImport(in: app, window: window)
         if environment["MATCHA_SCREENSHOT_PEEK"] != nil {
             captureHiddenSidebar(in: app, window: window)
         }

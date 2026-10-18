@@ -1,0 +1,522 @@
+{
+ "version": 1,
+ "sidebar": {
+  "containers": [
+   {
+    "global": {}
+   },
+   {
+    "items": [
+     "S1P",
+     {
+      "id": "S1P",
+      "title": null,
+      "childrenIds": [
+       "T1",
+       "F1",
+       "N1"
+      ],
+      "data": {
+       "itemContainer": {
+        "containerType": {
+         "spaceItems": {
+          "_0": "S1"
+         }
+        }
+       }
+      }
+     },
+     "T1",
+     {
+      "id": "T1",
+      "title": null,
+      "childrenIds": [],
+      "isUnread": false,
+      "createdAt": 0,
+      "parentID": null,
+      "data": {
+       "tab": {
+        "savedURL": "https://example.com/a",
+        "savedTitle": "Page A",
+        "timeLastActiveAt": 0,
+        "savedMuteStatus": "allowAudio"
+       }
+      }
+     },
+     "F1",
+     {
+      "id": "F1",
+      "title": "Dossier",
+      "childrenIds": [
+       "T2",
+       "F2"
+      ],
+      "data": {
+       "list": {}
+      }
+     },
+     "T2",
+     {
+      "id": "T2",
+      "title": "Renommé",
+      "childrenIds": [],
+      "isUnread": false,
+      "createdAt": 0,
+      "parentID": null,
+      "data": {
+       "tab": {
+        "savedURL": "https://example.com/b",
+        "savedTitle": "Page B",
+        "timeLastActiveAt": 0,
+        "savedMuteStatus": "allowAudio"
+       }
+      }
+     },
+     "F2",
+     {
+      "id": "F2",
+      "title": "Sous-dossier",
+      "childrenIds": [
+       "T3"
+      ],
+      "data": {
+       "list": {}
+      }
+     },
+     "T3",
+     {
+      "id": "T3",
+      "title": null,
+      "childrenIds": [],
+      "isUnread": false,
+      "createdAt": 0,
+      "parentID": null,
+      "data": {
+       "tab": {
+        "savedURL": "https://example.com/c",
+        "savedTitle": "",
+        "timeLastActiveAt": 0,
+        "savedMuteStatus": "allowAudio"
+       }
+      }
+     },
+     "N1",
+     {
+      "id": "N1",
+      "title": "Note",
+      "childrenIds": [],
+      "data": {
+       "arcDocument": {
+        "arcDocumentID": "doc",
+        "isEditable": true
+       }
+      }
+     },
+     "S1U",
+     {
+      "id": "S1U",
+      "title": null,
+      "childrenIds": [
+       "T4",
+       "SP1"
+      ],
+      "data": {
+       "itemContainer": {
+        "containerType": {
+         "spaceItems": {
+          "_0": "S1"
+         }
+        }
+       }
+      }
+     },
+     "T4",
+     {
+      "id": "T4",
+      "title": null,
+      "childrenIds": [],
+      "isUnread": false,
+      "createdAt": 0,
+      "parentID": null,
+      "data": {
+       "tab": {
+        "savedURL": "https://example.com/open",
+        "savedTitle": "Ouvert",
+        "timeLastActiveAt": 0,
+        "savedMuteStatus": "allowAudio"
+       }
+      }
+     },
+     "SP1",
+     {
+      "id": "SP1",
+      "title": null,
+      "childrenIds": [
+       "T5",
+       "T6"
+      ],
+      "data": {
+       "splitView": {
+        "layout": "horizontal"
+       }
+      }
+     },
+     "T5",
+     {
+      "id": "T5",
+      "title": null,
+      "childrenIds": [],
+      "isUnread": false,
+      "createdAt": 0,
+      "parentID": null,
+      "data": {
+       "tab": {
+        "savedURL": "arc://boosts",
+        "savedTitle": "Boosts",
+        "timeLastActiveAt": 0,
+        "savedMuteStatus": "allowAudio"
+       }
+      }
+     },
+     "T6",
+     {
+      "id": "T6",
+      "title": null,
+      "childrenIds": [],
+      "isUnread": false,
+      "createdAt": 0,
+      "parentID": null,
+      "data": {
+       "tab": {
+        "savedURL": "https://example.com/split",
+        "savedTitle": "Split",
+        "timeLastActiveAt": 0,
+        "savedMuteStatus": "allowAudio"
+       }
+      }
+     },
+     "S2P",
+     {
+      "id": "S2P",
+      "title": null,
+      "childrenIds": [
+       "T7"
+      ],
+      "data": {
+       "itemContainer": {
+        "containerType": {
+         "spaceItems": {
+          "_0": "S2"
+         }
+        }
+       }
+      }
+     },
+     "T7",
+     {
+      "id": "T7",
+      "title": null,
+      "childrenIds": [],
+      "isUnread": false,
+      "createdAt": 0,
+      "parentID": null,
+      "data": {
+       "tab": {
+        "savedURL": "https://work.example.com/",
+        "savedTitle": "Travail",
+        "timeLastActiveAt": 0,
+        "savedMuteStatus": "allowAudio"
+       }
+      }
+     },
+     "S2U",
+     {
+      "id": "S2U",
+      "title": null,
+      "childrenIds": [],
+      "data": {
+       "itemContainer": {
+        "containerType": {
+         "spaceItems": {
+          "_0": "S2"
+         }
+        }
+       }
+      }
+     },
+     "S3P",
+     {
+      "id": "S3P",
+      "title": null,
+      "childrenIds": [],
+      "data": {
+       "itemContainer": {
+        "containerType": {
+         "spaceItems": {
+          "_0": "S3"
+         }
+        }
+       }
+      }
+     },
+     "S3U",
+     {
+      "id": "S3U",
+      "title": null,
+      "childrenIds": [],
+      "data": {
+       "itemContainer": {
+        "containerType": {
+         "spaceItems": {
+          "_0": "S3"
+         }
+        }
+       }
+      }
+     },
+     "TA",
+     {
+      "id": "TA",
+      "title": null,
+      "childrenIds": [
+       "T8",
+       "T9",
+       "T10"
+      ],
+      "data": {
+       "itemContainer": {
+        "containerType": {
+         "topApps": {
+          "_0": {
+           "default": true
+          }
+         }
+        }
+       }
+      }
+     },
+     "T8",
+     {
+      "id": "T8",
+      "title": null,
+      "childrenIds": [],
+      "isUnread": false,
+      "createdAt": 0,
+      "parentID": null,
+      "data": {
+       "tab": {
+        "savedURL": "https://mail.example.com/",
+        "savedTitle": "Mail",
+        "timeLastActiveAt": 0,
+        "savedMuteStatus": "allowAudio"
+       }
+      }
+     },
+     "T9",
+     {
+      "id": "T9",
+      "title": null,
+      "childrenIds": [],
+      "isUnread": false,
+      "createdAt": 0,
+      "parentID": null,
+      "data": {
+       "tab": {
+        "savedURL": "https://mail.example.com/",
+        "savedTitle": "Mail (doublon)",
+        "timeLastActiveAt": 0,
+        "savedMuteStatus": "allowAudio"
+       }
+      }
+     },
+     "T10",
+     {
+      "id": "T10",
+      "title": null,
+      "childrenIds": [],
+      "isUnread": false,
+      "createdAt": 0,
+      "parentID": null,
+      "data": {
+       "tab": {
+        "savedURL": "https://calendar.example.com/",
+        "savedTitle": "Agenda",
+        "timeLastActiveAt": 0,
+        "savedMuteStatus": "allowAudio"
+       }
+      }
+     },
+     "TB",
+     {
+      "id": "TB",
+      "title": null,
+      "childrenIds": [
+       "T11"
+      ],
+      "data": {
+       "itemContainer": {
+        "containerType": {
+         "topApps": {
+          "_0": {
+           "custom": {
+            "_0": {
+             "directoryBasename": "Profile 1"
+            }
+           }
+          }
+         }
+        }
+       }
+      }
+     },
+     "T11",
+     {
+      "id": "T11",
+      "title": null,
+      "childrenIds": [],
+      "isUnread": false,
+      "createdAt": 0,
+      "parentID": null,
+      "data": {
+       "tab": {
+        "savedURL": "https://intranet.example.com/",
+        "savedTitle": "Intranet",
+        "timeLastActiveAt": 0,
+        "savedMuteStatus": "allowAudio"
+       }
+      }
+     }
+    ],
+    "spaces": [
+     "S1",
+     {
+      "id": "S1",
+      "title": "Perso",
+      "containerIDs": [
+       "unpinned",
+       "S1U",
+       "pinned",
+       "S1P"
+      ],
+      "newContainerIDs": [],
+      "customInfo": {
+       "iconType": {
+        "icon": "star"
+       },
+       "windowTheme": {
+        "background": {
+         "single": {
+          "_0": {
+           "isVibrant": true,
+           "contentOverBackgroundAppearance": "dark",
+           "style": {
+            "color": {
+             "_0": {
+              "blendedSingleColor": {
+               "_0": {
+                "color": {
+                 "colorSpace": "extendedSRGB",
+                 "red": 0.4,
+                 "green": 0.5,
+                 "blue": 0.6,
+                 "alpha": 1
+                },
+                "modifiers": {
+                 "overlay": "grain",
+                 "intensityFactor": 0.8,
+                 "noiseFactor": 0
+                },
+                "translucencyStyle": "light"
+               }
+              }
+             }
+            }
+           }
+          }
+         }
+        }
+       }
+      },
+      "profile": {
+       "default": true
+      }
+     },
+     "S2",
+     {
+      "id": "S2",
+      "title": "Travail",
+      "containerIDs": [
+       "unpinned",
+       "S2U",
+       "pinned",
+       "S2P"
+      ],
+      "customInfo": {
+       "iconType": {
+        "emoji_v2": "🍵"
+       },
+       "windowTheme": {
+        "background": {
+         "gradient": {
+          "_0": {
+           "colors": [
+            {
+             "red": 1,
+             "green": 0,
+             "blue": 0,
+             "alpha": 1
+            },
+            {
+             "red": 0,
+             "green": 0,
+             "blue": 1,
+             "alpha": 1
+            }
+           ]
+          }
+         }
+        }
+       }
+      },
+      "profile": {
+       "custom": {
+        "_0": {
+         "directoryBasename": "Profile 1"
+        }
+       }
+      }
+     },
+     "S3",
+     {
+      "id": "S3",
+      "title": "",
+      "containerIDs": [
+       "unpinned",
+       "S3U",
+       "pinned",
+       "S3P"
+      ],
+      "customInfo": {},
+      "profile": {
+       "default": true
+      }
+     }
+    ],
+    "topAppsContainerIDs": [
+     {
+      "default": true
+     },
+     "TA",
+     {
+      "custom": {
+       "_0": {
+        "directoryBasename": "Profile 1"
+       }
+      }
+     },
+     "TB"
+    ]
+   }
+  ]
+ }
+}

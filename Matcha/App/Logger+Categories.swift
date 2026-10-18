@@ -29,4 +29,6 @@ nonisolated extension Logger {
     static let contentBlocker = Logger(subsystem: subsystem, category: "ContentBlocker")
     /// Extensions web : chargement, fenêtres et onglets ouverts pour elles, demandes de permissions ; jamais d'adresse.
     static let extensions = Logger(subsystem: subsystem, category: "Extensions")
+    /// Import depuis d'autres navigateurs : des nombres seulement ; jamais d'adresse, de titre ni de nom.
+    static let imports = Logger(subsystem: subsystem, category: "Import")
 }

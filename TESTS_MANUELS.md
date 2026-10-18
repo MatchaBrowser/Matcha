@@ -496,3 +496,18 @@ Avec au moins une extension installée (Proton Pass, uBlock Origin Lite, Dark Re
 - [ ] Réglages > Extensions, menu (…) > « Afficher le bouton près de l'adresse » : coché par défaut ; décoché, le bouton disparaît ; recoché, il revient. Quitte et relance : le choix est gardé.
 - [ ] Fenêtre privée (⇧⌘N) : seules les extensions autorisées dans les fenêtres privées ont un bouton.
 - [ ] Extension désactivée (interrupteur des réglages) : son bouton disparaît ; réactivée, il revient.
+
+## Phase 7
+
+### 7.1 Import depuis Arc
+
+Arc installé sur le Mac, avec quelques Spaces, dossiers et favoris. L'import ajoute des Spaces : un Space importé se supprime ensuite par son menu.
+
+- [ ] Fichier > Importer depuis > Arc… : le sélecteur s'ouvre dans `~/Library/Application Support/Arc`, `StorableSidebar.json` déjà choisi ; « Ouvrir ». Grisé dans une fenêtre privée et dans les Réglages.
+- [ ] Aperçu : chaque Space d'Arc avec son icône sur ses couleurs, son nom, le nombre d'épinglés et de dossiers (et son profil s'il n'est pas le principal) ; le nombre de favoris ; les éléments laissés de côté (notes, pages `arc://`). « Annuler » : rien n'est ajouté.
+- [ ] Choisir un autre fichier (un `.json` quelconque) : alerte « Ce fichier ne peut pas être importé ».
+- [ ] « Importer » : un nouveau Space par Space d'Arc, à la fin, avec son nom, son icône (symbole proche ou emoji) et ses couleurs ; ses épinglés et dossiers (sous-dossiers compris) dans l'ordre d'Arc ; la fenêtre affiche le premier. Aucune page ne se charge d'elle-même ; un clic sur un épinglé l'ouvre.
+- [ ] Favoris d'Arc ajoutés après ceux du profil, sans doublon d'adresse ; un second import n'en ajoute pas.
+- [ ] « Importer aussi les onglets ouverts » coché : les onglets ouverts d'Arc rejoignent les onglets du jour de leur Space (les split views d'Arc deviennent des onglets séparés).
+- [ ] Avec plusieurs profils dans Matcha : le menu « Profil » de l'aperçu choisit le profil des Spaces du profil principal d'Arc. Un profil ajouté dans Arc devient un profil de Matcha (même nom que son dossier, « Profile 1 »), réutilisé par un nouvel import.
+- [ ] Quitte et relance : les Spaces importés sont là, toujours sans page chargée d'elle-même.
