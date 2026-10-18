@@ -46,6 +46,7 @@ Ou ⌘R dans Xcode.
   - qu'aucun texte n'est coupé ou ne déborde (l'allemand est le plus long).
 - [ ] Réglages > Profils : le nombre de Spaces d'un profil s'accorde (« 1 Space », « 2 Spaces »).
 - [ ] Message caméra et micro dans ta langue : dans le Terminal, lance `tccutil reset Camera com.matchabrowser.matcha` puis `tccutil reset Microphone com.matchabrowser.matcha`, et ouvre un site qui demande la caméra (par exemple webcamtests.com).
+- [ ] Message réseau local dans ta langue : si Matcha n'apparaît pas encore dans Réglages Système > Confidentialité et sécurité > Réseau local, ouvre une page de ton réseau (l'adresse de ta box, par exemple http://192.168.1.1) : la demande de macOS affiche « Un site demande l'accès aux appareils de votre réseau local. » (ou sa traduction). Une fois la demande passée, macOS ne la montre plus.
 - [ ] Remets Matcha en français (ou retire-la de la liste des Applications) quand tu as fini.
 - Réglé depuis (« Icônes des Spaces », plus bas) : le sous-menu Icône d'un Space, qui affichait les noms techniques des symboles (« circle.fill »…), est remplacé par « Changer l'icône… » et une grille aux noms traduits.
 
