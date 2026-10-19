@@ -202,7 +202,7 @@ Toutes sont vérifiées. Les en-têtes du SDK disent ce que fait WebKit quand la
   - La détection de XCTest est éparpillée.
 - **Correction** : `#if DEBUG`, refuser `default`, et un seul `TestEnvironment` injecté.
 
-**R7. Confirmation à la fermeture** (Faible)
+**✅ R7. Confirmation à la fermeture** (Faible) — corrigé : désactivée par défaut, message juste, jamais pendant une déconnexion, un redémarrage ou un arrêt.
 - **Problème** :
   - Elle est activée par défaut et dit que les onglets seront fermés, alors qu'ils sont restaurés.
   - `runModal` dans `applicationShouldTerminate` bloque la déconnexion et le redémarrage.

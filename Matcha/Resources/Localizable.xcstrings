@@ -8888,35 +8888,6 @@
         }
       }
     },
-    "Open tabs will be closed." : {
-      "comment" : "Message of the alert shown before quitting",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Geöffnete Tabs werden geschlossen."
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Las pestañas abiertas se cerrarán."
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Les onglets ouverts seront fermés."
-          }
-        },
-        "it" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "I pannelli aperti verranno chiusi."
-          }
-        }
-      }
-    },
     "Open the Downloads folder in the Finder" : {
       "comment" : "Help tag of the Show Downloads Folder button of the empty downloads panel",
       "localizations" : {
@@ -14308,6 +14279,35 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Non è stato possibile leggere i tuoi pannelli e i tuoi Spaces (%@). Puoi uscire e riprovare più tardi, ricominciare con dati nuovi (i dati illeggibili vengono messi da parte, non cancellati) o navigare senza salvare nulla."
+          }
+        }
+      }
+    },
+    "Your tabs will be there the next time you open Matcha. Private windows and downloads in progress will be closed." : {
+      "comment" : "Alert before quitting, if the user asked for it",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Deine Tabs sind beim nächsten Öffnen von Matcha wieder da. Private Fenster und laufende Downloads werden geschlossen."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tus pestañas estarán ahí la próxima vez que abras Matcha. Las ventanas privadas y las descargas en curso se cerrarán."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vos onglets seront là à la prochaine ouverture de Matcha. Les fenêtres privées et les téléchargements en cours seront fermés."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "I tuoi pannelli saranno lì la prossima volta che apri Matcha. Le finestre private e i download in corso verranno chiusi."
           }
         }
       }

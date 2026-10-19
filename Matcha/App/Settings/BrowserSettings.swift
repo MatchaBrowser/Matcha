@@ -22,8 +22,8 @@ nonisolated enum BrowserSettings {
 
     static let searchEngine = SearchEngine.defaultEngine
     static let appearance = AppearanceMode.system
-    /// As long as tabs are not restored at launch (phase 3), quitting loses them.
-    static let confirmBeforeQuitting = true
+    /// Off: tabs come back at the next launch (audit R7); some want it against a stray ⌘Q.
+    static let confirmBeforeQuitting = false
     /// Homepage as typed; empty until one is chosen.
     static let homePage = ""
     static let newTabPage = NewTabPage.blank

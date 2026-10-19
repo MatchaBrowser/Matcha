@@ -11,14 +11,12 @@ struct BrowserSettingsTests {
         return defaults
     }
 
-    @Test func `quitting asks for confirmation by default`() {
-        #expect(BrowserSettings.confirmsBeforeQuitting(in: emptyDefaults()))
-    }
-
-    @Test func `quitting confirmation can be turned off`() {
+    /// Off by default: tabs come back at the next launch (audit R7).
+    @Test func `quitting confirmation can be turned on`() {
         let defaults = emptyDefaults()
-        defaults.set(false, forKey: BrowserSettings.Key.confirmBeforeQuitting)
         #expect(!BrowserSettings.confirmsBeforeQuitting(in: defaults))
+        defaults.set(true, forKey: BrowserSettings.Key.confirmBeforeQuitting)
+        #expect(BrowserSettings.confirmsBeforeQuitting(in: defaults))
     }
 
     @Test func `pinned links stay in their tab by default`() {
