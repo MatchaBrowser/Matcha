@@ -75,23 +75,26 @@ scripts/strings.sh fr
 
 ```
 Matcha/
-  App/              point d'entrée, commandes de menu, réglages
-  Browser/          BrowserTab, TabManager, configuration WebKit, délégués
+  App/              point d'entrée, commandes de menu, raccourcis, réglages
+  Browser/          navigation : sessions, Spaces, BrowserTab, TabManager, disposition de la barre latérale,
+                    configuration WebKit, délégués, recherche dans la page, aperçu, zoom, thèmes
   Models/           modèles SwiftData (*Record)
-  Features/
+  Services/         sans interface : favicons, téléchargements, historique, autorisations, code source des
+                    pages, cycle de vie des onglets, recherche de texte (Matching/), bloqueur, extensions,
+                    import, synchro (Sync/)
+  Features/         l'interface, une fonction par dossier
     Window/         fenêtre, fond du Space, carte de contenu
     Sidebar/        barre latérale, favoris, épinglés, onglets du jour
-    Spaces/         sélecteur, thèmes, gestes
+    Spaces/         sélecteur, éditeur de thème, gestes
     CommandBar/     barre de commande et ses fournisseurs
     Peek/           aperçu flottant des liens
     MiniWindow/     petite fenêtre flottante (équivalent de Little Arc)
-    Boosts/         CSS et JS par site
-    Downloads/      téléchargements
-    History/        historique
-  Services/         favicons, archivage, cycle de vie des onglets,
-                    bloqueur, extensions, import, synchro (Sync/)
-  Resources/        listes de blocage, ressources diverses
+    PopupWindow/    fenêtres de connexion
+    Downloads/      panneau des téléchargements
+    History/        fenêtre de l'historique
+    FindInPage/ PageZoom/ Permissions/ SiteSecurity/ Dialogs/ Printing/ Extensions/ Import/
+  Resources/        catalogues de textes, listes de blocage
 MatchaTests/
 MatchaUITests/
-scripts/            scripts de génération et de publication
+scripts/            vérifications, génération et publication
 ```
