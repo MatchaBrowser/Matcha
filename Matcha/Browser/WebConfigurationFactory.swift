@@ -22,6 +22,9 @@ enum WebConfigurationFactory {
         let configuration = WKWebViewConfiguration()
         configuration.websiteDataStore = websiteDataStore
         configuration.preferences.isElementFullscreenEnabled = true
+        // Pop-up blocker (as in Safari): a page only opens a window or a tab right after a click or a key press.
+        // WebKit's default on macOS lets scripts open as many as they want.
+        configuration.preferences.javaScriptCanOpenWindowsAutomatically = false
         WebInspection.apply(to: configuration.preferences)
         configuration.applicationNameForUserAgent = applicationNameForUserAgent
         configuration.userContentController = makeUserContentController()

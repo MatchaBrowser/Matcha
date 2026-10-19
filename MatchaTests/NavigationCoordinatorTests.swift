@@ -51,6 +51,18 @@ struct NavigationCoordinatorTests {
         #expect(hasOpener as? Bool == true)
     }
 
+    /// Pop-up blocker (audit W3): without a click, `window.open` returns nothing and no tab opens.
+    @Test func `a page can't open a window without a click`() async throws {
+        let other = manager.newTab()
+        let page = manager.insertTab(configuration: TestPages.configuration(), after: nil, select: true)
+        let open = "window.open('\(TestPages.url("popup").absoluteString)')"
+        page.load(TestPages.url("ouvrant", body: "<script>document.title = \(open) ? 'ouverte' : 'bloquee'</script>"))
+        try await waitUntil { ["ouverte", "bloquee"].contains(page.title) && !page.isLoading }
+
+        #expect(page.title == "bloquee")
+        #expect(manager.tabs.map(\.id) == [page.id, other.id])
+    }
+
     @Test func `window close from the page closes its tab`() async throws {
         let (page, other) = try await openPage(body: "")
 

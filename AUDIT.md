@@ -56,7 +56,7 @@ Date : 2026-10-19, sur le commit `a94cf2e`. Audit en lecture seule : 9 analyses,
   - Fermer l'onglet vide créé pour l'occasion.
   - Refus d'office pour `smb`, `afp`, `nfs`, `vnc`, `ssh`, `telnet` et `ftp`.
 
-**W3. Aucun blocage des pop-ups** (Élevé, actif, vérifié)
+**✅ W3. Aucun blocage des pop-ups** (Élevé, actif, vérifié) — corrigé : `javaScriptCanOpenWindowsAutomatically = false` ; reste à faire : indicateur « Pop-up bloquée ».
 - **Problème** : `javaScriptCanOpenWindowsAutomatically` vaut YES par défaut sur macOS (en-tête `WKPreferences.h`), et Matcha ne le change pas.
   - Une page ouvre autant d'onglets et de fenêtres qu'elle veut, sans clic.
   - Une fenêtre de connexion ouverte par un onglet en arrière-plan prend le focus clavier : la frappe d'un mot de passe peut atterrir dedans.

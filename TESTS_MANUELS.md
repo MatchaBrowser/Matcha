@@ -555,3 +555,4 @@ Après la 8.1 (l'app déclarée comme navigateur).
 ## Corrections de l'audit
 
 - [ ] W1 : « Afficher le code source » marche toujours (page connectée, fichier local, après relancement). Un lien `matcha-source:https://…` cliqué dans une page n'affiche que l'explication « Pour voir le code source de cette page… », sans rien charger.
+- [ ] W3 : une connexion « Se connecter avec Google / Apple » ouvre toujours sa fenêtre ; une page qui ouvre des fenêtres toute seule (pop-under, publicité) n'ouvre plus rien.
