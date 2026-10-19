@@ -29,13 +29,14 @@ nonisolated enum SavedDownloadList {
     /// The oldest ones beyond this are no longer kept.
     static let limit = 100
 
-    /// Saved list; empty if nothing is saved or if the value is unreadable.
+    /// Saved list; empty if nothing is saved or if the value is unreadable. Read entry by entry: an unreadable one is
+    /// dropped alone (audit R4).
     static func load(from defaults: UserDefaults) -> [SavedDownload] {
         guard let data = defaults.data(forKey: defaultsKey) else {
             return []
         }
         do {
-            return try JSONDecoder().decode([SavedDownload].self, from: data)
+            return try JSONDecoder().decode([Lenient<SavedDownload>].self, from: data).compactMap(\.value)
         } catch {
             Logger.downloads.error("Liste des téléchargements illisible : \(error.logSummary, privacy: .public)")
             return []

@@ -181,7 +181,7 @@ Toutes sont vérifiées. Les en-têtes du SDK disent ce que fait WebKit quand la
 - **Problème** : `try? fetch` apparaît à 13 endroits. Au lancement, une erreur de lecture crée un 2e profil « Personnel » et un 2e Space « Perso » (`BrowserSession.swift:78-81, 228-235`). Pour la synchro, voir S6.
 - **Correction** : propager l'erreur ; ne créer les valeurs par défaut qu'après une lecture réussie et vide.
 
-**R4. Décodage `Codable` fragile** (Moyen, actif)
+**✅ R4. Décodage `Codable` fragile** (Moyen, actif) — corrigé : `ExtensionState` tolérant, lecture entrée par entrée (`Lenient`), valeur illisible mise de côté ; `SyncState` et `SyncedExtensions` avec S6.
 - **Problème** : `ExtensionState`, `SavedDownload`, `CompiledBlocklist`, `SyncState` et `SyncedExtensions` utilisent le `Codable` synthétisé.
   - Il ignore les valeurs par défaut : ajouter un champ rend les anciennes données illisibles.
   - Pour `ExtensionState`, une seule erreur efface toutes les décisions et réactive les extensions désactivées (`isEnabled ?? true`).

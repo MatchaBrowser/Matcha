@@ -21,6 +21,24 @@ nonisolated struct ExtensionState: Codable, Equatable, Sendable {
     /// Button next to the address (task 6.5): false if it is hidden; nil (default): shown.
     var showsButton: Bool?
 
+    init() {}
+
+    /// A missing field takes its default value: a field added later doesn't make the saved states unreadable
+    /// (audit R4).
+    init(from decoder: any Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        isEnabled = try container.decodeIfPresent(Bool.self, forKey: .isEnabled) ?? true
+        grantedPermissions = try container.decodeIfPresent([String: Date].self, forKey: .grantedPermissions) ?? [:]
+        grantedMatchPatterns = try container.decodeIfPresent([String: Date].self, forKey: .grantedMatchPatterns) ?? [:]
+        deniedPermissions = try container.decodeIfPresent([String: Date].self, forKey: .deniedPermissions) ?? [:]
+        deniedMatchPatterns = try container.decodeIfPresent([String: Date].self, forKey: .deniedMatchPatterns) ?? [:]
+        hasAccessToPrivateData = try container.decodeIfPresent(Bool.self, forKey: .hasAccessToPrivateData) ?? false
+        hasRequestedOptionalAccessToAllHosts = try container
+            .decodeIfPresent(Bool.self, forKey: .hasRequestedOptionalAccessToAllHosts) ?? false
+        appExtensionPath = try container.decodeIfPresent(String.self, forKey: .appExtensionPath)
+        showsButton = try container.decodeIfPresent(Bool.self, forKey: .showsButton)
+    }
+
     /// Without the decisions expired at `date`.
     func removingExpired(at date: Date) -> ExtensionState {
         var state = self
@@ -33,11 +51,15 @@ nonisolated struct ExtensionState: Codable, Equatable, Sendable {
 }
 
 /// States of the installed extensions, by identifier (task 6.3), saved in the app's settings (`installedExtensions`,
-/// JSON); without `defaults` (tests, test store), everything stays in memory. The extensions themselves are folders
+/// JSON); without `defaults` (tests, test store), everything stays in memory. Read entry by entry: an unreadable one
+/// is dropped alone, and the saved value is first copied to `installedExtensions.unreadable` (audit R4). The extensions themselves are
+/// folders
 /// (`ExtensionInstallDirectory`).
 @MainActor
 final class ExtensionStateStore {
     static let defaultsKey = "installedExtensions"
+    /// Copy of a saved value that couldn't be read entirely, kept before it is written over.
+    static let unreadableKey = "installedExtensions.unreadable"
 
     private let defaults: UserDefaults?
     private var states: [String: ExtensionState]
@@ -96,9 +118,16 @@ final class ExtensionStateStore {
             return [:]
         }
         do {
-            return try JSONDecoder().decode([String: ExtensionState].self, from: data)
+            let entries = try JSONDecoder().decode([String: Lenient<ExtensionState>].self, from: data)
+            let states = entries.compactMapValues(\.value)
+            if states.count < entries.count {
+                defaults?.set(data, forKey: unreadableKey)
+                Logger.extensions.error("\(entries.count - states.count, privacy: .public) état(s) d'extension illisible(s), mis de côté")
+            }
+            return states
         } catch {
-            Logger.extensions.error("États des extensions illisibles, ignorés : \(error.logSummary, privacy: .public)")
+            defaults?.set(data, forKey: unreadableKey)
+            Logger.extensions.error("États des extensions illisibles, mis de côté : \(error.logSummary, privacy: .public)")
             return [:]
         }
     }
