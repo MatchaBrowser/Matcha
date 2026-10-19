@@ -17,6 +17,8 @@ final class SpaceStore {
     /// True if this Space holds its profile's favorites: otherwise they are neither written nor deleted
     /// (`BrowserSession+Favorites`). Always true outside a session (tests).
     var savesFavorites: () -> Bool = { true }
+    /// Navigation state last read or written for each tab: an unchanged one isn't written again (audit R8).
+    private var savedStates: [UUID: Data?] = [:]
 
     init(space: SpaceRecord, context: ModelContext) {
         self.space = space
@@ -50,6 +52,7 @@ final class SpaceStore {
                 appearance: folder.appearance,
             )
         }
+        savedStates = records.reduce(into: [:]) { $0[$1.id] = $1.interactionState }
         let tabs = records.map { record in
             StoredTab(
                 id: record.id,
@@ -111,7 +114,9 @@ final class SpaceStore {
         }
     }
 
-    /// Updates the records: creates what is missing, deletes the closed tabs and folders. Archived tabs are kept.
+    /// Updates the records: creates what is missing, deletes the closed tabs and folders. Archived tabs are kept. Only
+    /// what changed is assigned: an unchanged tab, and above all its navigation state (stored outside the database),
+    /// isn't written again at each save (audit R8).
     func save(tabs: [StoredTab], layout: SidebarLayout) {
         let folders = saveFolders(layout.folderEntries)
         let positions = layout.positions
@@ -123,29 +128,40 @@ final class SpaceStore {
                 continue
             }
             let record = existing.removeValue(forKey: stored.id) ?? insertedTab(id: stored.id)
-            record.url = stored.url
-            record.title = stored.title
-            record.pinnedURL = stored.pinnedURL
-            record.pinnedTitle = stored.pinnedTitle
-            record.lastActivity = stored.lastActivity
-            record.interactionState = stored.interactionState
-            record.place = position.place
-            record.order = position.order
-            record.folder = position.folderID.flatMap { folders[$0] }
+            update(record, \.url, to: stored.url)
+            update(record, \.title, to: stored.title)
+            update(record, \.pinnedURL, to: stored.pinnedURL)
+            update(record, \.pinnedTitle, to: stored.pinnedTitle)
+            update(record, \.lastActivity, to: stored.lastActivity)
+            if savedStates[stored.id] != stored.interactionState {
+                record.interactionState = stored.interactionState
+                savedStates[stored.id] = stored.interactionState
+            }
+            update(record, \.place, to: position.place)
+            update(record, \.order, to: position.order)
+            update(record, \.folder, to: position.folderID.flatMap { folders[$0] })
             // Never a split for a favorite (`positions` does not give one).
-            record.splitGroupID = position.splitGroupID
-            record.splitFraction = position.splitFraction
+            update(record, \.splitGroupID, to: position.splitGroupID)
+            update(record, \.splitFraction, to: position.splitFraction)
             // A favorite belongs to the profile, the other tabs to the Space.
-            record.profile = position.place == .favorite ? space.profile : nil
-            record.space = position.place == .favorite ? nil : space
+            update(record, \.profile, to: position.place == .favorite ? space.profile : nil)
+            update(record, \.space, to: position.place == .favorite ? nil : space)
         }
         for leftover in existing.values where leftover.place != nil {
+            savedStates[leftover.id] = nil
             context.delete(leftover)
         }
         do {
             try context.save()
         } catch {
             Logger.app.error("Enregistrement du Space impossible : \(error.logSummary, privacy: .public)")
+        }
+    }
+
+    /// Assigns `value` only if it differs: an unchanged record stays out of the save.
+    private func update<Record, Value: Equatable>(_ record: Record, _ keyPath: ReferenceWritableKeyPath<Record, Value>, to value: Value) {
+        if record[keyPath: keyPath] != value {
+            record[keyPath: keyPath] = value
         }
     }
 
@@ -159,15 +175,19 @@ final class SpaceStore {
                 context.insert(folder)
                 return folder
             }()
-            record.name = entry.name
-            record.order = entry.order
-            record.isCollapsed = entry.isCollapsed
-            record.appearance = entry.appearance
-            record.space = space
+            update(record, \.name, to: entry.name)
+            update(record, \.order, to: entry.order)
+            update(record, \.isCollapsed, to: entry.isCollapsed)
+            if record.appearance != entry.appearance {
+                record.appearance = entry.appearance
+            }
+            update(record, \.space, to: space)
             saved[entry.id] = record
         }
         for entry in entries {
-            saved[entry.id]?.parent = entry.parentID.flatMap { saved[$0] }
+            if let record = saved[entry.id] {
+                update(record, \.parent, to: entry.parentID.flatMap { saved[$0] })
+            }
         }
         for leftover in existing.values {
             context.delete(leftover)

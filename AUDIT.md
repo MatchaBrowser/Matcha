@@ -208,7 +208,7 @@ Toutes sont vérifiées. Les en-têtes du SDK disent ce que fait WebKit quand la
   - `runModal` dans `applicationShouldTerminate` bloque la déconnexion et le redémarrage.
 - **Correction** : la désactiver par défaut ou la reformuler, et ne jamais l'afficher lors d'une déconnexion.
 
-**R8. Enregistrement** (Faible)
+**✅ R8. Enregistrement** (Faible) — corrigé : seules les valeurs changées sont écrites ; schéma versionné et index reportés (raisons dans `DECISIONS.md`).
 - `SpaceStore.save` réécrit tous les champs de tous les onglets, `interactionState` compris, une seconde après chaque changement.
 - Il n'y a pas de `VersionedSchema` : à ajouter avant le premier renommage de champ.
 - Il n'y a pas d'index sur `HistoryRecord`.

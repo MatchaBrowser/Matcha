@@ -35,6 +35,21 @@ struct SpaceStoreTests {
         return tabs
     }
 
+    /// Audit R8: a save without change writes nothing (navigation states above all).
+    @Test func `saving again without a change updates no record`() async throws {
+        let store = makeStore()
+        let tabs = try await fillManager()
+        store.saveNow(manager)
+
+        let updates = UpdatedRecords(context: container.mainContext)
+        store.saveNow(manager)
+        #expect(updates.identifiers.isEmpty)
+
+        manager.setPlace(tabs[3], to: .pinned)
+        store.saveNow(manager)
+        #expect(updates.identifiers.count == 1)
+    }
+
     @Test func `saved space loads back with the same layout and tabs`() async throws {
         let store = makeStore()
         _ = try await fillManager()
@@ -180,5 +195,26 @@ struct SpaceStoreTests {
         manager.restore(tabs: stored, layout: layout)
         #expect(manager.tabs.count == 2)
         #expect(manager.selectedTab == nil)
+    }
+}
+
+/// Records updated by the saves of `context`.
+@MainActor
+private final class UpdatedRecords {
+    private(set) var identifiers: [PersistentIdentifier] = []
+    private var observer: (any NSObjectProtocol)?
+
+    init(context: ModelContext) {
+        observer = NotificationCenter.default
+            .addObserver(forName: ModelContext.didSave, object: context, queue: .main) { [weak self] note in
+                let updated = note.userInfo?[ModelContext.NotificationKey.updatedIdentifiers.rawValue] as? [PersistentIdentifier] ?? []
+                MainActor.assumeIsolated { self?.identifiers += updated }
+            }
+    }
+
+    isolated deinit {
+        if let observer {
+            NotificationCenter.default.removeObserver(observer)
+        }
     }
 }
