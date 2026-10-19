@@ -97,7 +97,7 @@ Date : 2026-10-19, sur le commit `a94cf2e`. Audit en lecture seule : 9 analyses,
   - Limiter le nombre de téléchargements en parallèle.
   - Purger la liste en mémoire au-delà de ~200 éléments.
 
-**W8. Favicons** (Faible, actif)
+**✅ W8. Favicons** (Faible, actif) — corrigé : sans cookies, 1 Mo et 15 s au plus, `https` seulement pour une page `https`, formats matriciels décodés hors du fil principal, cache disque lu en asynchrone.
 - **Problème** :
   - Le corps est téléchargé en entier avant le contrôle de 1 Mo, et il n'y a pas de délai total.
   - Le décodage `NSImage(data:)` accepte PDF et SVG, dans le processus de l'app.

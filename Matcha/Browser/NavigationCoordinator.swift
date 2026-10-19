@@ -116,7 +116,7 @@ extension NavigationCoordinator: WKNavigationDelegate {
         tab.documentDidChange()
         tab.permissionPrompts.denyAll()
         tab.audio.reset()
-        tab.favicon = webView.url?.host().flatMap(tabHost.faviconService.cachedIcon(forHost:))
+        tabHost.faviconService.showCachedIcon(on: tab, host: webView.url?.host())
         tabHost.siteZooms?.pageDidCommit(tab, url: webView.url)
     }
 

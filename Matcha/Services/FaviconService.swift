@@ -1,13 +1,15 @@
 import AppKit
 import OSLog
 
-/// Website icons: read from the page, downloaded, kept in memory and on disk, per domain.
+/// Website icons: read from the page, downloaded, kept in memory and on disk, per domain. Downloads carry no cookies
+/// and stop at `maximumSize`; files are read and decoded off the main thread, bitmaps only (`FaviconDecoder`,
+/// audit W8).
 @MainActor
 final class FaviconService {
     static let shared = FaviconService(directory: defaultDirectory)
 
     /// Maximum size of a downloaded icon.
-    static let maximumSize = 1_000_000
+    nonisolated static let maximumSize = 1_000_000
 
     /// `Caches/Favicons/` in the app's container.
     nonisolated static var defaultDirectory: URL? {
@@ -26,21 +28,56 @@ final class FaviconService {
     /// `directory`: folder of the disk cache, or nil for an in-memory cache only.
     init(directory: URL?) {
         self.directory = directory
-        let configuration = URLSessionConfiguration.ephemeral
-        configuration.timeoutIntervalForRequest = 10
-        session = URLSession(configuration: configuration)
+        session = URLSession(configuration: Self.makeConfiguration())
     }
 
-    /// Already known icon of the domain: in memory, otherwise on disk.
+    /// No cookies, credentials or cache: an icon request tells a website nothing about the profile.
+    nonisolated static func makeConfiguration() -> URLSessionConfiguration {
+        let configuration = URLSessionConfiguration.ephemeral
+        configuration.httpCookieAcceptPolicy = .never
+        configuration.httpShouldSetCookies = false
+        configuration.httpCookieStorage = nil
+        configuration.urlCredentialStorage = nil
+        configuration.urlCache = nil
+        configuration.timeoutIntervalForRequest = 10
+        configuration.timeoutIntervalForResource = 15
+        return configuration
+    }
+
+    /// Icon of the domain already in memory.
     func cachedIcon(forHost host: String) -> Favicon? {
-        if let favicon = memory.object(forKey: host as NSString) {
+        memory.object(forKey: host as NSString)
+    }
+
+    /// Already known icon of the domain: in memory, otherwise read from disk.
+    func loadCachedIcon(forHost host: String) async -> Favicon? {
+        if let favicon = cachedIcon(forHost: host) {
             return favicon
         }
-        guard let file = fileURL(forHost: host), let data = try? Data(contentsOf: file), let favicon = Favicon(data: data) else {
+        guard let file = fileURL(forHost: host), let data = await Self.read(file), let decoded = await FaviconDecoder.decode(data) else {
             return nil
         }
+        let favicon = Favicon(decoded: decoded)
         memory.setObject(favicon, forKey: host as NSString)
         return favicon
+    }
+
+    /// New document in `tab`: the known icon of its domain, at once from memory, otherwise once read from disk.
+    func showCachedIcon(on tab: BrowserTab, host: String?) {
+        guard let host, !host.isEmpty else {
+            tab.favicon = nil
+            return
+        }
+        tab.favicon = cachedIcon(forHost: host)
+        guard tab.favicon == nil else {
+            return
+        }
+        Task {
+            let favicon = await loadCachedIcon(forHost: host)
+            if let favicon, tab.favicon == nil, tab.url?.host() == host {
+                tab.favicon = favicon
+            }
+        }
     }
 
     /// True while the domain's icon is being looked up (tests: wait for the end of an unsuccessful lookup).
@@ -93,9 +130,10 @@ final class FaviconService {
             return nil
         }
         for url in FaviconSelector.urlsToTry(candidates: candidates, pageURL: pageURL) {
-            guard let data = await download(url), let favicon = Favicon(data: data) else {
+            guard let data = await download(url), let decoded = await FaviconDecoder.decode(data) else {
                 continue
             }
+            let favicon = Favicon(decoded: decoded)
             store(data, favicon: favicon, forHost: host)
             return favicon
         }
@@ -103,14 +141,29 @@ final class FaviconService {
         return nil
     }
 
-    private func download(_ url: URL) async -> Data? {
-        guard let (data, response) = try? await session.data(from: url) else {
+    /// Content of `url`; nil beyond `maximumSize`, without waiting for the end of a larger response.
+    func download(_ url: URL) async -> Data? {
+        guard let (bytes, response) = try? await session.bytes(from: url) else {
             return nil
         }
         if let http = response as? HTTPURLResponse, !(200 ..< 300).contains(http.statusCode) {
             return nil
         }
-        return data.count <= Self.maximumSize ? data : nil
+        guard response.expectedContentLength <= Self.maximumSize else {
+            return nil
+        }
+        var data = Data()
+        do {
+            for try await byte in bytes {
+                guard data.count < Self.maximumSize else {
+                    return nil
+                }
+                data.append(byte)
+            }
+        } catch {
+            return nil
+        }
+        return data
     }
 
     private func store(_ data: Data, favicon: Favicon, forHost host: String) {
@@ -124,6 +177,15 @@ final class FaviconService {
         } catch {
             Logger.favicons.error("Icône non enregistrée sur disque : \(error.logSummary, privacy: .public)")
         }
+    }
+
+    /// Cached file, off the main thread; nil beyond `maximumSize`.
+    @concurrent
+    private static func read(_ file: URL) async -> Data? {
+        guard let size = try? file.resourceValues(forKeys: [.fileSizeKey]).fileSize, size <= maximumSize else {
+            return nil
+        }
+        return try? Data(contentsOf: file)
     }
 
     private func fileURL(forHost host: String) -> URL? {

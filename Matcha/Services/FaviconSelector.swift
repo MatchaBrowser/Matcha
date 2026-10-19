@@ -10,10 +10,11 @@ nonisolated enum FaviconSelector {
     static let unknownSize = 16
 
     /// Addresses to try, from best to worst: the largest first, in page order for equal sizes, then `/favicon.ico` at
-    /// the root of the website. Without duplicates.
+    /// the root of the website. Without duplicates. An encrypted page's icon never comes unencrypted (audit W8).
     static func urlsToTry(candidates: [FaviconCandidate], pageURL: URL) -> [URL] {
+        let schemes: Set<String> = pageURL.scheme?.lowercased() == "https" ? ["https", "data"] : ["http", "https", "data"]
         let ranked = candidates
-            .filter { ["http", "https", "data"].contains($0.url.scheme?.lowercased() ?? "") }
+            .filter { schemes.contains($0.url.scheme?.lowercased() ?? "") }
             .enumerated()
             .sorted { lhs, rhs in
                 let (left, right) = (size(of: lhs.element), size(of: rhs.element))

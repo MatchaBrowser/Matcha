@@ -48,6 +48,16 @@ struct FaviconSelectorTests {
         #expect(urls == [ico.url, data.url])
     }
 
+    /// Audit W8: an encrypted page's icon never comes unencrypted.
+    @Test func `an https page never gets an http icon`() throws {
+        let http = try FaviconCandidate(url: #require(URL(string: "http://cdn.example.com/icon.png")), rel: "icon", sizes: "64x64")
+        let https = try FaviconCandidate(url: #require(URL(string: "https://cdn.example.com/icon.png")), rel: "icon", sizes: "32x32")
+        let secure = try FaviconSelector.urlsToTry(candidates: [http, https], pageURL: #require(URL(string: "https://example.com/")))
+        #expect(secure.map(\.absoluteString) == ["https://cdn.example.com/icon.png", "https://example.com/favicon.ico"])
+        let plain = try FaviconSelector.urlsToTry(candidates: [http, https], pageURL: #require(URL(string: "http://example.com/")))
+        #expect(plain.first?.absoluteString == "http://cdn.example.com/icon.png")
+    }
+
     @Test func `default icon keeps scheme host and port only`() throws {
         let url = try FaviconSelector.defaultIconURL(for: #require(URL(string: "http://moi:secret@localhost:3000/app?q=1")))
         #expect(url?.absoluteString == "http://localhost:3000/favicon.ico")

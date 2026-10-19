@@ -12,7 +12,12 @@ struct CachedSiteIcon: View {
     var body: some View {
         SiteIcon(favicon: favicon, host: host, size: size)
             .task(id: host) {
-                favicon = host.flatMap { $0.isEmpty ? nil : service.cachedIcon(forHost: $0) }
+                guard let host, !host.isEmpty else {
+                    favicon = nil
+                    return
+                }
+                // From disk, off the main thread, for a site seen in an earlier session.
+                favicon = await service.loadCachedIcon(forHost: host)
             }
     }
 }

@@ -24,6 +24,8 @@ struct FaviconServiceTests {
         #expect(service.cachedIcon(forHost: "www.example.test") === image)
 
         let reloaded = FaviconService(directory: directory)
+        #expect(reloaded.cachedIcon(forHost: "www.example.test") == nil)
+        #expect(await reloaded.loadCachedIcon(forHost: "www.example.test") != nil)
         #expect(reloaded.cachedIcon(forHost: "www.example.test") != nil)
         try? FileManager.default.removeItem(at: directory)
     }
@@ -35,8 +37,24 @@ struct FaviconServiceTests {
         #expect(await service.fetchIcon(forPage: page, candidates: [text, png]) != nil)
     }
 
-    @Test func `unknown host has no cached icon`() {
-        #expect(FaviconService(directory: directory).cachedIcon(forHost: "inconnu.test") == nil)
+    @Test func `unknown host has no cached icon`() async {
+        #expect(await FaviconService(directory: directory).loadCachedIcon(forHost: "inconnu.test") == nil)
+    }
+
+    /// Audit W8: a page can't make the app buffer an icon of any size.
+    @Test func `an icon larger than the limit is not kept`() async throws {
+        let service = FaviconService(directory: nil)
+        let small = Data(count: 10).base64EncodedString()
+        let large = Data(count: FaviconService.maximumSize + 1).base64EncodedString()
+        #expect(try await service.download(#require(URL(string: "data:image/png;base64,\(small)")))?.count == 10)
+        #expect(try await service.download(#require(URL(string: "data:image/png;base64,\(large)"))) == nil)
+    }
+
+    @Test func `icon requests carry no cookies`() {
+        let configuration = FaviconService.makeConfiguration()
+        #expect(configuration.httpCookieStorage == nil)
+        #expect(!configuration.httpShouldSetCookies)
+        #expect(configuration.timeoutIntervalForResource == 15)
     }
 
     @Test func `extracts declared icons with absolute addresses`() async throws {

@@ -11,38 +11,16 @@ final class Favicon {
         self.tone = tone
     }
 
-    /// Icon read from the downloaded data; nil if it is not a valid image.
-    convenience init?(data: Data) {
-        guard let image = NSImage(data: data), image.isValid, image.size.width > 0 else {
-            return nil
-        }
-        self.init(image: image, tone: Self.tone(of: image))
+    /// Icon decoded off the main thread (`FaviconDecoder`).
+    convenience init(decoded: DecodedFavicon) {
+        self.init(image: NSImage(cgImage: decoded.image, size: .zero), tone: decoded.tone)
     }
 
-    /// Look of the image, analyzed on a 32 × 32 pixel reduction.
+    /// Look of `image`, analyzed on a 32 × 32 pixel reduction.
     static func tone(of image: NSImage) -> FaviconTone {
-        let side = 32
-        guard let bitmap = NSBitmapImageRep(
-            bitmapDataPlanes: nil,
-            pixelsWide: side,
-            pixelsHigh: side,
-            bitsPerSample: 8,
-            samplesPerPixel: 4,
-            hasAlpha: true,
-            isPlanar: false,
-            colorSpaceName: .deviceRGB,
-            bytesPerRow: side * 4,
-            bitsPerPixel: 32,
-        ), let context = NSGraphicsContext(bitmapImageRep: bitmap) else {
+        guard let cgImage = image.cgImage(forProposedRect: nil, context: nil, hints: nil) else {
             return .neutral
         }
-        NSGraphicsContext.saveGraphicsState()
-        NSGraphicsContext.current = context
-        image.draw(in: NSRect(x: 0, y: 0, width: side, height: side))
-        NSGraphicsContext.restoreGraphicsState()
-        guard let data = bitmap.bitmapData else {
-            return .neutral
-        }
-        return FaviconTone.analyze(rgba: Array(UnsafeBufferPointer(start: data, count: side * side * 4)))
+        return FaviconDecoder.tone(of: cgImage)
     }
 }
