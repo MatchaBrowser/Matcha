@@ -143,19 +143,25 @@ final class FaviconService {
 
     /// Content of `url`; nil beyond `maximumSize`, without waiting for the end of a larger response.
     func download(_ url: URL) async -> Data? {
+        await Self.download(url, session: session)
+    }
+
+    /// Off the main thread: the response is read as it comes.
+    @concurrent
+    private static func download(_ url: URL, session: URLSession) async -> Data? {
         guard let (bytes, response) = try? await session.bytes(from: url) else {
             return nil
         }
         if let http = response as? HTTPURLResponse, !(200 ..< 300).contains(http.statusCode) {
             return nil
         }
-        guard response.expectedContentLength <= Self.maximumSize else {
+        guard response.expectedContentLength <= maximumSize else {
             return nil
         }
         var data = Data()
         do {
             for try await byte in bytes {
-                guard data.count < Self.maximumSize else {
+                guard data.count < maximumSize else {
                     return nil
                 }
                 data.append(byte)
