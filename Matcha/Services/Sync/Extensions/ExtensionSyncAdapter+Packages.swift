@@ -61,6 +61,12 @@ extension ExtensionSyncAdapter {
     /// Package downloaded, decrypted and verified (digest, size), written under its name in a temporary folder.
     func downloadPackage(_ package: SyncedPackage, using transport: any SyncTransport) async throws -> URL {
         let sealed = try await transport.blob(id: package.blobID)
+        return try await Self.openPackage(sealed, package)
+    }
+
+    /// Decrypts and checks `sealed`, then writes it to a temporary folder, off the main thread (up to 20 MiB, audit C4).
+    @concurrent
+    nonisolated static func openPackage(_ sealed: Data, _ package: SyncedPackage) async throws -> URL {
         let data = try SyncCrypto.decryptBlob(sealed, id: package.blobID, key: SymmetricKey(data: package.blobKey))
         guard data.count == package.size, Self.sha256(of: data) == package.sha256.lowercased() else {
             throw SyncCryptoError.unreadable
@@ -117,25 +123,24 @@ extension ExtensionSyncAdapter {
     }
 
     /// Archive of the folder, encrypted with a new key, off the main thread; nil beyond 20 MiB.
+    @concurrent
     nonisolated static func sealPackage(of folder: URL, version: String?, fileName: String) async throws -> (SyncedPackage, Data)? {
-        try await Task.detached(priority: .utility) {
-            let archive = try ZipWriter.archive(folder: folder)
-            guard archive.count <= maximumPackageSize else {
-                return nil
-            }
-            let key = SymmetricKey(size: .bits256)
-            let id = UUID()
-            let sealed = try SyncCrypto.encryptBlob(archive, id: id, key: key)
-            let package = SyncedPackage(
-                version: version,
-                blobID: id,
-                blobKey: key.withUnsafeBytes { Data($0) },
-                sha256: sha256(of: archive),
-                size: archive.count,
-                fileName: fileName,
-            )
-            return (package, sealed)
-        }.value
+        let archive = try ZipWriter.archive(folder: folder)
+        guard archive.count <= maximumPackageSize else {
+            return nil
+        }
+        let key = SymmetricKey(size: .bits256)
+        let id = UUID()
+        let sealed = try SyncCrypto.encryptBlob(archive, id: id, key: key)
+        let package = SyncedPackage(
+            version: version,
+            blobID: id,
+            blobKey: key.withUnsafeBytes { Data($0) },
+            sha256: sha256(of: archive),
+            size: archive.count,
+            fileName: fileName,
+        )
+        return (package, sealed)
     }
 
     nonisolated static func sha256(of data: Data) -> String {

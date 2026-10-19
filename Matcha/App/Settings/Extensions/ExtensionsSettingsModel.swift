@@ -70,7 +70,7 @@ final class ExtensionsSettingsModel {
 
     /// Reads the apps' Safari extensions again (off the main thread: reads `/Applications`).
     func refreshAppExtensions() async {
-        appExtensions = await Task.detached { SafariExtensionFinder.find() }.value
+        appExtensions = await SafariExtensionFinder.findInBackground()
     }
 
     /// Choose a file (`.crx`, `.xpi`, `.zip`) or an unpacked folder, then prepare it.

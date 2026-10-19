@@ -29,6 +29,12 @@ nonisolated enum SafariExtensionFinder {
         [URL(filePath: "/Applications", directoryHint: .isDirectory)]
     }
 
+    /// `find` off the main thread: it reads `/Applications` and checks signatures.
+    @concurrent
+    static func findInBackground() async -> [SafariAppExtension] {
+        find()
+    }
+
     /// Safari extensions found in `folders`, sorted by name, each one once. `checksSignatures`: false for the tests'
     /// unsigned apps only.
     static func find(

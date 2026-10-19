@@ -458,7 +458,7 @@ Rien n'est branché : il n'y a pas de transport, et seuls les tests créent `Syn
   - `BrowserWindowView` joue le rôle de contrôleur.
 - **Correction** : découper `ExtensionManager` en `ExtensionRegistry`, un délégué et un `ExtensionToolbarModel`.
 
-**C4. Fil principal**
+**✅ C4. Fil principal** — corrigé : favicons, installation, paquets de synchro, recherche des extensions Safari et instantanés hors du fil principal.
 - **Problème** : lecture des favicons, installation d'extensions, chiffrement des paquets, encodage JSON de la synchro et instantanés JPEG tournent sur le fil principal.
 - **Correction** : `@concurrent`, comme le projet le fait déjà ailleurs.
 
