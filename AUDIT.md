@@ -66,7 +66,7 @@ Date : 2026-10-19, sur le commit `a94cf2e`. Audit en lecture seule : 9 analyses,
   - Ne pas donner le focus à une fenêtre de connexion si la fenêtre d'origine ne l'a pas.
   - Afficher un indicateur « Pop-up bloquée ».
 
-**W4. L'adresse affichée est celle en cours de chargement** (Moyen, actif, à confirmer)
+**✅ W4. L'adresse affichée est celle en cours de chargement** (Moyen, actif, confirmé par un test) — corrigé : `displayedURL` (document affiché, ou chargement demandé par l'utilisateur).
 - **Problème** : `tab.url` recopie `webView.url`, qui prend l'adresse demandée avant que la page ne change.
   - Une page lance `location = "https://accounts.google.com:81/"`, un port qui ne répond pas (~75 s d'attente).
   - Sa fausse page reste affichée sous l'adresse de Google. Dans une fenêtre de connexion, elle a même le cadenas.

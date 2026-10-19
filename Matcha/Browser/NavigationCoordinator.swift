@@ -113,6 +113,7 @@ extension NavigationCoordinator: WKNavigationDelegate {
         }
         // Blocker (task 6.2): realigned on the displayed document (redirect, back from the cache).
         tabHost.contentBlocking?.prepare(webView, for: webView.url)
+        tab.documentDidChange()
         tab.permissionPrompts.denyAll()
         tab.audio.reset()
         tab.favicon = webView.url?.host().flatMap(tabHost.faviconService.cachedIcon(forHost:))
@@ -127,6 +128,7 @@ extension NavigationCoordinator: WKNavigationDelegate {
         // process stopped (5.7): the tab follows its web view again.
         tab.suspension.endRestoring()
         tab.crash.end()
+        tab.documentDidChange()
         tabHost.faviconService.refreshIcon(of: tab)
         // Recorded at each loaded page: a crash does not lose the history.
         tab.captureInteractionState()

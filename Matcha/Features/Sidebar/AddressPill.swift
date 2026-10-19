@@ -29,13 +29,13 @@ struct AddressPill: View {
         .onHover { isHovered = $0 }
         .help(Text("Edit Address", comment: "Tooltip of the address pill"))
         .accessibilityLabel(Text("Address", comment: "Accessibility label of the address pill"))
-        .accessibilityValue(Text(verbatim: AddressDisplay.short(for: tab?.url)))
+        .accessibilityValue(Text(verbatim: AddressDisplay.short(for: tab?.displayedURL)))
         .accessibilityIdentifier("addressPill")
     }
 
     /// The site's icon, or a magnifying glass without a page.
     @ViewBuilder private var leadingIcon: some View {
-        if let tab, tab.url != nil {
+        if let tab, tab.displayedURL != nil {
             FaviconView(tab: tab)
         } else {
             Image(systemName: "magnifyingglass")
@@ -47,7 +47,7 @@ struct AddressPill: View {
 
     /// Displayed domain, or the input prompt without a page.
     @ViewBuilder private var text: some View {
-        if let url = tab?.url {
+        if let url = tab?.displayedURL {
             Text(verbatim: AddressDisplay.short(for: url))
                 .lineLimit(1)
                 .truncationMode(.middle)

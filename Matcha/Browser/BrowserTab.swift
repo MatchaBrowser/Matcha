@@ -16,7 +16,10 @@ final class BrowserTab: Identifiable {
     /// The tab's web view; nil when it is unloaded.
     private(set) var webView: WKWebView?
     private(set) var title: String?
+    /// The web view's address: that of a load as soon as it starts (saving, history, sync).
     private(set) var url: URL?
+    /// Address to show (address pill, Peek, sign-in windows, security): the displayed document's (audit W4).
+    private(set) var displayedAddress = DisplayedAddress()
     /// `url != nil`, tracked separately: a view that only needs to know whether the tab has an address
     /// (“Copy URL” menu) is not recomputed on every address change.
     private(set) var hasURL = false
@@ -82,6 +85,7 @@ final class BrowserTab: Identifiable {
     convenience init(restoring stored: StoredTab, configuration: WKWebViewConfiguration) {
         self.init(id: stored.id, configuration: configuration)
         setURL(stored.url)
+        displayedAddress.reset(to: stored.url)
         title = stored.title
         pendingURL = stored.url
         pinnedURL = stored.pinnedURL
@@ -127,14 +131,21 @@ final class BrowserTab: Identifiable {
             suspension.didResume(url: url)
             history.pageWillResume(url: url)
         }
+        // Before the observation, whose first notification gives the new view's empty address.
+        let shownURL = displayedURL
         observe(webView)
         if let state = pendingInteractionState {
-            // Restoration: page, history and scrolling, without reloading from the address.
+            // Restoration: page, history and scrolling, without reloading from the address. The tab's own page, shown
+            // while it comes back.
             pendingInteractionState = nil
             pendingURL = nil
             webView.interactionState = state
+            if let shownURL {
+                displayedAddress.userDidRequest(shownURL)
+            }
         } else if let pendingURL {
             self.pendingURL = nil
+            displayedAddress.userDidRequest(pendingURL)
             load(pendingURL, in: webView)
         }
         return webView
@@ -166,6 +177,7 @@ final class BrowserTab: Identifiable {
         pendingInteractionState = nil
         savedInteractionState = nil
         setURL(url)
+        displayedAddress.reset(to: url)
         self.title = title
         canGoBack = false
         canGoForward = false
@@ -199,6 +211,17 @@ final class BrowserTab: Identifiable {
         }
         title = webView.title
         setURL(webView.url)
+        displayedAddress.reset(to: webView.url)
+    }
+
+    /// A new document is displayed, or the load ended: the address shown is the web view's again (audit W4).
+    func documentDidChange() {
+        displayedAddress.documentDidChange(to: webView?.url)
+    }
+
+    /// Address to show: the displayed document's, or the one the user asked for while it loads (audit W4).
+    var displayedURL: URL? {
+        displayedAddress.url
     }
 
     /// Loads `url`; `source`: the page whose link it is, if any (a local file then reads less, `FileReadAccess`).
@@ -207,6 +230,7 @@ final class BrowserTab: Identifiable {
         // A page other than the one put to sleep: no more snapshot on top; a crashed page leaves its message.
         suspension.endRestoring()
         crash.pageWillNavigate()
+        displayedAddress.userDidRequest(url)
         load(url, in: webView, from: source)
     }
 
@@ -275,6 +299,7 @@ final class BrowserTab: Identifiable {
                 }
                 tab.suspension.pageURLDidChange(to: webView.url)
                 tab.setURL(webView.url)
+                tab.displayedAddress.webViewURLDidChange(to: webView.url, isLoading: webView.isLoading)
                 // Loading read from the web view: WebKit changes the address and the loading state together, before
                 // the tab has copied the latter.
                 tab.history.urlDidChange(to: webView.url, isLoading: webView.isLoading)

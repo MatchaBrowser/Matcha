@@ -9,7 +9,7 @@ struct PopupAddressBar: View {
     let page: BrowserTab
 
     var body: some View {
-        let address = PopupAddress(url: page.url)
+        let address = PopupAddress(url: page.displayedURL)
         HStack(spacing: 6) {
             security(address.security)
             Text(verbatim: address.text)
@@ -37,7 +37,7 @@ struct PopupAddressBar: View {
         .background(.bar)
         .overlay(alignment: .bottom) { Divider() }
         // Full address of a site only: that of a `data:` page can contain the whole page.
-        .help(Text(verbatim: address.security == .none ? address.text : page.url?.absoluteString ?? ""))
+        .help(Text(verbatim: address.security == .none ? address.text : page.displayedURL?.absoluteString ?? ""))
         .accessibilityElement(children: .contain)
     }
 

@@ -36,7 +36,7 @@ struct PeekToolbar: View {
     }
 
     private var shortAddress: String {
-        AddressDisplay.short(for: page.url)
+        AddressDisplay.short(for: page.displayedURL)
     }
 
     private var address: some View {
@@ -55,7 +55,7 @@ struct PeekToolbar: View {
         .background(.regularMaterial, in: Capsule())
         .overlay { Capsule().strokeBorder(Color.primary.opacity(0.12), lineWidth: 1) }
         .contentShape(Capsule())
-        .help(Text(verbatim: page.url?.absoluteString ?? ""))
+        .help(Text(verbatim: page.displayedURL?.absoluteString ?? ""))
         // Static text: on macOS, a plain group does not expose its value (the address).
         .accessibilityElement(children: .ignore)
         .accessibilityAddTraits(.isStaticText)

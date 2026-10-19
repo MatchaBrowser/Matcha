@@ -558,3 +558,4 @@ Après la 8.1 (l'app déclarée comme navigateur).
 - [ ] W3 : une connexion « Se connecter avec Google / Apple » ouvre toujours sa fenêtre ; une page qui ouvre des fenêtres toute seule (pop-under, publicité) n'ouvre plus rien.
 - [ ] W6 : dans une documentation locale (`file:///usr/share/doc/postfix/html/index.html`), ⌘-clic et Maj-clic sur un lien ouvrent toujours la page, avec ses styles. Depuis un site, ⌘-clic sur un lien `file:` ou `data:` n'ouvre pas d'onglet.
 - [ ] W11 : ouvre une fenêtre privée (⇧⌘N), quitte Matcha sans la fermer, relance : seule la fenêtre principale revient.
+- [ ] W4 : taper une adresse lente (un site qui met du temps) : la pastille la montre pendant le chargement. Un lien cliqué dans une page : la pastille garde l'adresse de la page jusqu'à l'affichage de la suivante.
