@@ -31,6 +31,8 @@ final class ExtensionManager: NSObject {
     @ObservationIgnored let directory: URL?
     /// Asks the user what an extension requests (replaced in the tests).
     @ObservationIgnored var permissionPrompter: any ExtensionPermissionPrompting = ExtensionPermissionAlert()
+    /// Extensions whose request waits for the user: one at a time each (audit E5).
+    @ObservationIgnored var promptingContexts: Set<ObjectIdentifier> = []
     /// Popovers of the extensions' actions; task 6.5 will anchor them to their button.
     @ObservationIgnored let popups = ExtensionPopupPresenter()
     /// Loaded extensions, by identifier.

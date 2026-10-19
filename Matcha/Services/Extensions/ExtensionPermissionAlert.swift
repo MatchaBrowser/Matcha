@@ -8,13 +8,13 @@ protocol ExtensionPermissionPrompting: AnyObject {
     func ask(_ request: ExtensionPermissionRequest, completion: @escaping @MainActor (Bool) -> Void)
 }
 
-/// Minimal alert, as a sheet on the app's main window: the extension's name, the requested permissions and websites,
-/// “Don't Allow” (default button: Return grants nothing) and “Allow”. The permissions screen of task 6.4 (built-in
-/// panel) will replace it. Without a window, the request is denied.
+/// Alert as a sheet on the app's main window: the extension's name, the requested permissions and websites, “Don't
+/// Allow” (default button: Return grants nothing) and “Allow”. AppKit queues it behind a sheet already open (audit
+/// E5: a request is no longer refused for that). Without a window, the request is denied.
 @MainActor
 final class ExtensionPermissionAlert: ExtensionPermissionPrompting {
     func ask(_ request: ExtensionPermissionRequest, completion: @escaping @MainActor (Bool) -> Void) {
-        guard let window = NSApp.mainWindow ?? NSApp.keyWindow, window.attachedSheet == nil else {
+        guard let window = NSApp.mainWindow ?? NSApp.keyWindow else {
             Logger.extensions.notice("Demande de permissions refusée : aucune fenêtre pour la montrer")
             completion(false)
             return

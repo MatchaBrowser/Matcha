@@ -8339,6 +8339,35 @@
         }
       }
     },
+    "No Website" : {
+      "comment" : "Extension menu: the extension has access to no website",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Keine Website"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ningún sitio web"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aucun site"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nessun sito web"
+          }
+        }
+      }
+    },
     "No website opens apps or downloads files without asking." : {
       "comment" : "Settings > Privacy: no website may open an app or download files without asking",
       "localizations" : {
@@ -10192,7 +10221,7 @@
       }
     },
     "Quit" : {
-      "comment" : "Button of the alert shown before quitting",
+      "comment" : "Button of the alert shown before quitting\nButton of the alert shown when the data can't be read",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -10556,6 +10585,64 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Vuoi rimuovere “%@”?"
+          }
+        }
+      }
+    },
+    "Remove Access to %@" : {
+      "comment" : "Extension menu: takes back the access to a website; %@ is the website",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zugriff auf %@ entfernen"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Quitar el acceso a %@"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Retirer l'accès à %@"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rimuovi l'accesso a %@"
+          }
+        }
+      }
+    },
+    "Remove Access to All Websites" : {
+      "comment" : "Extension menu: takes back the access to every website",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zugriff auf alle Websites entfernen"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Quitar el acceso a todos los sitios web"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Retirer l'accès à tous les sites"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rimuovi l'accesso a tutti i siti web"
           }
         }
       }
@@ -13875,6 +13962,35 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Archivio web"
+          }
+        }
+      }
+    },
+    "Website Access" : {
+      "comment" : "Extension menu: websites the extension can read and change",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zugriff auf Websites"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Acceso a sitios web"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Accès aux sites"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Accesso ai siti web"
           }
         }
       }

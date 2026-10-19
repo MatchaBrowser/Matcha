@@ -33,6 +33,7 @@ struct InstalledExtensionRow: View {
                     } set: {
                         model.setAllowsPrivateWindows($0, for: item.id)
                     })
+                    siteAccess
                     Divider()
                 }
                 Button("Remove…", role: .destructive, action: remove)
@@ -54,6 +55,28 @@ struct InstalledExtensionRow: View {
         }
         .accessibilityElement(children: .contain)
         .accessibilityIdentifier("installedExtensionRow")
+    }
+
+    /// Websites the extension was given, each one can be taken back (audit E5).
+    private var siteAccess: some View {
+        Menu {
+            if item.grantedSites.isEmpty {
+                Text("No Website", comment: "Extension menu: the extension has access to no website")
+            }
+            ForEach(item.grantedSites, id: \.self) { pattern in
+                Button {
+                    model.revokeSite(pattern, for: item.id)
+                } label: {
+                    if let site = ExtensionPromptPolicy.siteName(of: pattern) {
+                        Text("Remove Access to \(site)", comment: "Extension menu: takes back the access to a website; %@ is the website")
+                    } else {
+                        Text("Remove Access to All Websites", comment: "Extension menu: takes back the access to every website")
+                    }
+                }
+            }
+        } label: {
+            Text("Website Access", comment: "Extension menu: websites the extension can read and change")
+        }
     }
 
     @ViewBuilder private var icon: some View {

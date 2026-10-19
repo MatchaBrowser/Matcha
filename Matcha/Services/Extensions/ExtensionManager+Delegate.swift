@@ -99,8 +99,8 @@ extension ExtensionManager: WKWebExtensionControllerDelegate {
 
     // MARK: Permissions
 
-    /// All or nothing: the whole request is granted if the user accepts, otherwise nothing (nothing is remembered as
-    /// denied: the extension can ask again).
+    /// All or nothing: the whole request is granted if the user accepts; otherwise nothing, and the refusal is
+    /// remembered for a day (`ExtensionPromptPolicy`, audit E5): the extension can't ask again and again.
     func webExtensionController(
         _: WKWebExtensionController,
         promptForPermissions permissions: Set<WKWebExtension.Permission>,
@@ -109,7 +109,13 @@ extension ExtensionManager: WKWebExtensionControllerDelegate {
         completionHandler: @escaping @Sendable (Set<WKWebExtension.Permission>, Date?) -> Void,
     ) {
         let request = ExtensionPermissionRequest(extensionName: displayName(of: context), permissions: permissions.map(\.rawValue))
-        ask(request) { completionHandler($0 ? permissions : [], nil) }
+        ask(request, for: context) { allowed in
+            if !allowed {
+                let expiration = ExtensionPromptPolicy.denialExpiration(from: .now)
+                permissions.forEach { context.setPermissionStatus(.deniedExplicitly, for: $0, expirationDate: expiration) }
+            }
+            completionHandler(allowed ? permissions : [], nil)
+        }
     }
 
     func webExtensionController(
@@ -124,7 +130,13 @@ extension ExtensionManager: WKWebExtensionControllerDelegate {
             matchPatterns: matchPatterns.map(\.string),
             includesAllWebsites: matchPatterns.contains(where: \.matchesAllHosts),
         )
-        ask(request) { completionHandler($0 ? matchPatterns : [], nil) }
+        ask(request, for: context) { allowed in
+            if !allowed {
+                let expiration = ExtensionPromptPolicy.denialExpiration(from: .now)
+                matchPatterns.forEach { context.setPermissionStatus(.deniedExplicitly, for: $0, expirationDate: expiration) }
+            }
+            completionHandler(allowed ? matchPatterns : [], nil)
+        }
     }
 
     func webExtensionController(
@@ -135,7 +147,13 @@ extension ExtensionManager: WKWebExtensionControllerDelegate {
         completionHandler: @escaping @Sendable (Set<URL>, Date?) -> Void,
     ) {
         let request = ExtensionPermissionRequest(extensionName: displayName(of: context), urls: urls)
-        ask(request) { completionHandler($0 ? urls : [], nil) }
+        ask(request, for: context) { allowed in
+            if !allowed {
+                let expiration = ExtensionPromptPolicy.denialExpiration(from: .now)
+                urls.forEach { context.setPermissionStatus(.deniedExplicitly, for: $0, expirationDate: expiration) }
+            }
+            completionHandler(allowed ? urls : [], nil)
+        }
     }
 
     // MARK: Native Messages

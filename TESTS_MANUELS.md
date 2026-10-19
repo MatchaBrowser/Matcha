@@ -567,3 +567,4 @@ Après la 8.1 (l'app déclarée comme navigateur).
 - [ ] K2 : un champ d'envoi de fichier ouvre le panneau du système ; les fichiers choisis arrivent dans la page.
 - [ ] K3 : un site protégé par mot de passe affiche la feuille de connexion (champs lisibles) ; un mauvais mot de passe la ramène avec « incorrect » ; Annuler montre la page 401 du serveur.
 - [ ] K5 : serveur qui refuse, site inexistant, hors ligne : page d'erreur avec « Réessayer » ; « Précédent » revient à la page d'avant. Certificat expiré (`https://expired.badssl.com`) : « Afficher le certificat » et, en dessous, le bouton rouge « Ouvrir ce site quand même » ; la page ouverte affiche « Non sécurisé » en rouge.
+- [ ] E5 : refuse une demande de droits d'une extension : elle ne redemande pas avant le lendemain. Réglages > Extensions, menu d'une extension > « Accès aux sites » : la liste des sites accordés, un clic en retire un.

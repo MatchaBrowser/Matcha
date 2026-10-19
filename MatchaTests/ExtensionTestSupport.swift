@@ -101,6 +101,21 @@ final class FakePermissionPrompter: ExtensionPermissionPrompting {
     }
 }
 
+/// Holds each request until the test answers it.
+@MainActor
+final class HeldPermissionPrompter: ExtensionPermissionPrompting {
+    private(set) var pending: [(ExtensionPermissionRequest, @MainActor (Bool) -> Void)] = []
+
+    func ask(_ request: ExtensionPermissionRequest, completion: @escaping @MainActor (Bool) -> Void) {
+        pending.append((request, completion))
+    }
+
+    func answer(_ allowed: Bool) {
+        let first = pending.removeFirst()
+        first.1(allowed)
+    }
+}
+
 /// The test extension (`Fixtures/test-extension-*`, Manifest V3): a content script that marks `obtest:` pages
 /// (`document.body.dataset.matchaExtension = "1"`) and asks the service worker for a tab on a `#matcha-open-tab` page.
 @MainActor
@@ -134,7 +149,7 @@ enum TestExtension {
     /// Test manager: non-persistent controller, nothing saved, given extensions folder (nil: none).
     static func manager(
         directory: URL? = nil,
-        prompter: FakePermissionPrompter = FakePermissionPrompter(answer: false),
+        prompter: any ExtensionPermissionPrompting = FakePermissionPrompter(answer: false),
     ) -> ExtensionManager {
         let manager = ExtensionManager(configuration: .nonPersistent(), store: ExtensionStateStore(defaults: nil), directory: directory)
         manager.permissionPrompter = prompter

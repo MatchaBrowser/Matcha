@@ -24,6 +24,8 @@ final class ExtensionsSettingsModel {
         let allowsPrivateWindows: Bool
         /// Button next to the address shown (task 6.5).
         let showsButton: Bool
+        /// Websites it was given access to (match patterns), which the user can take back (audit E5).
+        let grantedSites: [String]
     }
 
     let manager: ExtensionManager
@@ -178,6 +180,12 @@ final class ExtensionsSettingsModel {
         revision += 1
     }
 
+    /// Takes back an extension's access to a website: it may ask again (audit E5).
+    func revokeSite(_ pattern: String, for identifier: String) {
+        manager.revokeSite(pattern, identifier: identifier)
+        revision += 1
+    }
+
     func setShowsButton(_ shows: Bool, for identifier: String) {
         manager.setShowsButton(shows, identifier: identifier)
         revision += 1
@@ -208,6 +216,8 @@ final class ExtensionsSettingsModel {
             hasOptionsPage: manager.contexts[identifier]?.optionsPageURL != nil,
             allowsPrivateWindows: state?.hasAccessToPrivateData ?? false,
             showsButton: manager.showsButton(identifier),
+            grantedSites: (manager.contexts[identifier].map { Array($0.grantedPermissionMatchPatterns.keys.map(\.string)) }
+                ?? Array((state?.grantedMatchPatterns ?? [:]).keys)).sorted(),
         )
     }
 

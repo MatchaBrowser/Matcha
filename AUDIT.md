@@ -239,7 +239,7 @@ Toutes sont vérifiées. Les en-têtes du SDK disent ce que fait WebKit quand la
 - **Problème** : `tabs.create`, `tabs.update` et `windows.create` arrivent jusqu'à `BrowserTab.load`. Une extension sans aucun droit peut donc ouvrir un `file:`, avec accès au dossier parent.
 - **Correction** : accepter seulement `http`, `https`, `about:blank` et les pages de l'extension.
 
-**E5. Demandes d'autorisation répétables à l'infini** (Faible)
+**✅ E5. Demandes d'autorisation répétables à l'infini** (Faible) — corrigé : refus retenu 24 h, une demande à la fois par extension, menu « Accès aux sites » dans les Réglages.
 - **Problème** :
   - Aucun refus n'est mémorisé.
   - On ne peut pas retirer un site accordé sans supprimer l'extension.

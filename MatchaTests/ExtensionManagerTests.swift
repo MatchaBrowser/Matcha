@@ -183,6 +183,37 @@ struct ExtensionManagerTests {
         #expect(prompter.requests.last?.websites == ["example.com"])
     }
 
+    /// Audit E5: a refusal holds for a day, one request at a time, and a website given can be taken back.
+    @Test func `a refusal is remembered and an extension can't pile up requests`() async throws {
+        let prompter = HeldPermissionPrompter()
+        let manager = TestExtension.manager(prompter: prompter)
+        let (context, folder) = try await TestExtension.load(in: manager)
+        defer { try? FileManager.default.removeItem(at: folder) }
+        let answers = Answers()
+        manager.webExtensionController(manager.controller, promptForPermissions: [.cookies], in: nil, for: context) { allowed, _ in
+            MainActor.assumeIsolated { answers.values.append(allowed) }
+        }
+        // A second request while the first waits: refused without being shown.
+        manager.webExtensionController(manager.controller, promptForPermissions: [.storage], in: nil, for: context) { allowed, _ in
+            MainActor.assumeIsolated { answers.values.append(allowed) }
+        }
+        #expect(prompter.pending.count == 1)
+        #expect(answers.values == [[]])
+
+        prompter.answer(false)
+        #expect(answers.values == [[], []])
+        #expect(context.permissionStatus(for: .cookies) == .deniedExplicitly)
+        let expiration = try #require(context.deniedPermissions[.cookies])
+        #expect(abs(expiration.timeIntervalSinceNow - ExtensionPromptPolicy.denialDuration) < 60)
+
+        // A website given, then taken back in Settings.
+        let pattern = try WKWebExtension.MatchPattern(string: "*://*.example.com/*")
+        context.setPermissionStatus(.grantedExplicitly, for: pattern)
+        manager.revokeSite(pattern.string, identifier: context.uniqueIdentifier)
+        #expect(context.permissionStatus(for: pattern) != .grantedExplicitly)
+        #expect(manager.store.state(for: context.uniqueIdentifier)?.grantedMatchPatterns[pattern.string] == nil)
+    }
+
     @Test func `decisions are restored at the next load`() async throws {
         let manager = TestExtension.manager()
         let (context, folder) = try await TestExtension.load(in: manager)
@@ -219,4 +250,10 @@ struct ExtensionManagerTests {
         #expect(manager.contexts[first] == nil)
         #expect(manager.store.state(for: first)?.isEnabled == false)
     }
+}
+
+/// Answers WebKit received, in order.
+@MainActor
+private final class Answers {
+    var values: [Set<WKWebExtension.Permission>] = []
 }

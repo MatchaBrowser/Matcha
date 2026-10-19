@@ -73,14 +73,28 @@ extension ExtensionManager {
     }
 
     /// Asks the user (`permissionPrompter`); an empty request is denied without showing anything.
-    func ask(_ request: ExtensionPermissionRequest, completion: @escaping @MainActor (Bool) -> Void) {
-        guard !request.isEmpty else {
+    func ask(_ request: ExtensionPermissionRequest, for context: WKWebExtensionContext, completion: @escaping @MainActor (Bool) -> Void) {
+        let key = ObjectIdentifier(context)
+        guard !request.isEmpty, !promptingContexts.contains(key) else {
             completion(false)
             return
         }
-        permissionPrompter.ask(request) { allowed in
+        promptingContexts.insert(key)
+        permissionPrompter.ask(request) { [weak self] allowed in
+            self?.promptingContexts.remove(key)
             Logger.extensions.info("Demande de permissions \(allowed ? "accordée" : "refusée", privacy: .public)")
             completion(allowed)
+        }
+    }
+
+    /// The user removes an extension's access to a website (Settings): it may ask again.
+    func revokeSite(_ pattern: String, identifier: String) {
+        if let context = contexts[identifier], let matchPattern = try? WKWebExtension.MatchPattern(string: pattern) {
+            context.setPermissionStatus(.unknown, for: matchPattern)
+            saveState(of: context, identifier: identifier)
+        } else if var state = store.state(for: identifier) {
+            state.grantedMatchPatterns[pattern] = nil
+            store.setState(state, for: identifier)
         }
     }
 }
