@@ -169,26 +169,30 @@ struct BrowserCommands: Commands {
         // File > Export as PDF…, Print…; View > zoom (task 5.4), after “Reload Page”.
         PageCommands(miniWindows: miniWindows, shortcuts: shortcuts)
 
-        CommandMenu("Spaces") {
-            if let windowActions {
-                ForEach(Array(windowActions.spaceNames.prefix(9).enumerated()), id: \.offset) { index, name in
-                    Button(name) { windowActions.selectSpace(index) }
-                        .keyboardShortcut(KeyEquivalent(Character(String(index + 1))), modifiers: .control)
+        // The menus after View, in one group: a builder of commands takes at most 10 items before Xcode 27's SDK (the
+        // CI's machines).
+        Group {
+            CommandMenu("Spaces") {
+                if let windowActions {
+                    ForEach(Array(windowActions.spaceNames.prefix(9).enumerated()), id: \.offset) { index, name in
+                        Button(name) { windowActions.selectSpace(index) }
+                            .keyboardShortcut(KeyEquivalent(Character(String(index + 1))), modifiers: .control)
+                    }
+                    Divider()
+                    Button("New Space") { windowActions.newSpace() }
+                        .keyboardShortcut(shortcuts.keyboardShortcut(for: .newSpace))
                 }
-                Divider()
-                Button("New Space") { windowActions.newSpace() }
-                    .keyboardShortcut(shortcuts.keyboardShortcut(for: .newSpace))
             }
+
+            // Tabs menu: right after Spaces.
+            TabCommands(miniWindows: miniWindows)
+
+            // History menu: Homepage, Back, Forward, “Show All History” (task 5.5).
+            HistoryCommands(miniWindows: miniWindows, shortcuts: shortcuts)
+
+            // Help menu: Matcha's site and a problem report (audit H1).
+            HelpCommands(miniWindows: miniWindows, settingsSelection: settingsSelection)
         }
-
-        // Tabs menu: right after Spaces.
-        TabCommands(miniWindows: miniWindows)
-
-        // History menu: Homepage, Back, Forward, “Show All History” (task 5.5).
-        HistoryCommands(miniWindows: miniWindows, shortcuts: shortcuts)
-
-        // Help menu: Matcha's site and a problem report (audit H1).
-        HelpCommands(miniWindows: miniWindows, settingsSelection: settingsSelection)
     }
 
     /// ⌘O: the chosen files open in new tabs of the active window, or of the main window from a mini window.
