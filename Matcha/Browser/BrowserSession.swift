@@ -103,6 +103,13 @@ final class BrowserSession {
         }
     }
 
+    /// A private window's session goes away with it: its observer too (audit R5).
+    isolated deinit {
+        if let terminationObserver {
+            NotificationCenter.default.removeObserver(terminationObserver)
+        }
+    }
+
     /// True for an in-memory store (tests): nothing about the user must be remembered.
     var isInMemory: Bool {
         container.configurations.allSatisfy(\.isStoredInMemoryOnly)

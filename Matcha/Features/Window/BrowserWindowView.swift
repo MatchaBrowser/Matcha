@@ -12,8 +12,7 @@ struct BrowserWindowView: View {
     static let revealEdgeWidth = 8.0
 
     let session: BrowserSession
-    @State private var model: WindowModel
-    @State private var commandBar: CommandBarModel
+    @State private var models: WindowModels
     @State private var window: NSWindow?
     @AppStorage("sidebarWidth") private var sidebarWidth = SidebarMetrics.defaultWidth
     @SceneStorage("sidebarVisible") private var isSidebarVisible = true
@@ -28,15 +27,18 @@ struct BrowserWindowView: View {
     /// Hidden sidebar shown over the page because the pointer hovers it.
     @State private var isFloatingSidebarHovered = false
 
-    /// No side effects: no task and no file read.
+    /// No side effects: no task and no file read; the models are made once (`WindowModels`).
     init(session: BrowserSession) {
         self.session = session
-        // The displayed Space is remembered from one launch to the next, except with a test store.
-        let windowModel = WindowModel(session: session, defaults: session.isInMemory ? nil : .standard)
-        _model = State(initialValue: windowModel)
-        // History of the displayed Space's profile, reread on each keystroke; none for a private window.
-        let history = session.history.map { store in ProfileHistory(store: store) { windowModel.space.record.profile?.id } }
-        _commandBar = State(initialValue: CommandBarModel(windowModel: windowModel, history: history))
+        _models = State(initialValue: WindowModels(session: session))
+    }
+
+    private var model: WindowModel {
+        models.window
+    }
+
+    private var commandBar: CommandBarModel {
+        models.commandBar
     }
 
     /// Displayed Space.

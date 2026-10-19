@@ -191,7 +191,7 @@ Toutes sont vérifiées. Les en-têtes du SDK disent ce que fait WebKit quand la
   - Tester le décodage d'un ancien format.
   - Une extension sans état reste désactivée.
 
-**R5. Session privée recréée** (Moyen, vérifié)
+**✅ R5. Session privée recréée** (Moyen, vérifié) — corrigé : porteurs paresseux (`WindowModels`, `PrivateSessionHolder`), observateur retiré à la libération.
 - **Problème** : `@State private var session = BrowserSession.makePrivate()` est réévalué à chaque recréation de la vue. Cela recrée un conteneur SwiftData, un gestionnaire de fenêtres et un observateur jamais retiré. Même chose pour `WindowModel` et `CommandBarModel` dans `BrowserWindowView.init`.
 - **Correction** : créer ces objets une seule fois, dans un porteur lié à la scène ou dans `.task`.
 
