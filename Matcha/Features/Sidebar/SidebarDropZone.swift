@@ -60,12 +60,12 @@ extension View {
                 guard let tab = tabManager.tab(withID: id) else {
                     return false
                 }
-                withAnimation(.easeOut(duration: 0.15)) { tabManager.move(tab, to: target) }
+                withMotion(.easeOut(duration: 0.15)) { tabManager.move(tab, to: target) }
             case let .folder(id):
                 guard case .pinned = target else {
                     return false
                 }
-                withAnimation(.easeOut(duration: 0.15)) { tabManager.moveFolder(id, to: target) }
+                withMotion(.easeOut(duration: 0.15)) { tabManager.moveFolder(id, to: target) }
             case let .split(id):
                 if case .favorites = target {
                     return false
@@ -73,11 +73,11 @@ extension View {
                 guard tabManager.layout.split(withID: id) != nil else {
                     return false
                 }
-                withAnimation(.easeOut(duration: 0.15)) { tabManager.moveSplit(id, to: target) }
+                withMotion(.easeOut(duration: 0.15)) { tabManager.moveSplit(id, to: target) }
             }
             return true
         } isTargeted: { targeted in
-            withAnimation(.easeOut(duration: 0.1)) { isTargeted.wrappedValue = targeted }
+            withMotion(.easeOut(duration: 0.1)) { isTargeted.wrappedValue = targeted }
         }
     }
 

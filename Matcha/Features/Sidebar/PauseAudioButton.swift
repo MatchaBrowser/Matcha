@@ -33,7 +33,7 @@ struct PauseAudioButton: View {
                 .foregroundStyle(.secondary)
                 .frame(width: 16, height: 16)
                 .background(Circle().fill(.background))
-                .overlay(Circle().strokeBorder(Color.primary.opacity(0.12)))
+                .overlay(Circle().strokeBorder(.hairline))
                 .contentShape(Circle())
         }
     }

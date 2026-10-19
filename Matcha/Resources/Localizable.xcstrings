@@ -7879,6 +7879,93 @@
         }
       }
     },
+    "Move Down" : {
+      "comment" : "VoiceOver action of a sidebar row: moves it one step down",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nach unten bewegen"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bajar"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Descendre"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sposta giù"
+          }
+        }
+      }
+    },
+    "Move Left" : {
+      "comment" : "VoiceOver action of a favorite tile: moves it one step left",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nach links bewegen"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mover a la izquierda"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Déplacer vers la gauche"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sposta a sinistra"
+          }
+        }
+      }
+    },
+    "Move Right" : {
+      "comment" : "VoiceOver action of a favorite tile: moves it one step right",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nach rechts bewegen"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mover a la derecha"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Déplacer vers la droite"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sposta a destra"
+          }
+        }
+      }
+    },
     "Move to Space" : {
       "comment" : "Tab context menu: submenu listing the other Spaces",
       "localizations" : {
@@ -7904,6 +7991,35 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Sposta in"
+          }
+        }
+      }
+    },
+    "Move Up" : {
+      "comment" : "VoiceOver action of a sidebar row: moves it one step up",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nach oben bewegen"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Subir"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Monter"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sposta su"
           }
         }
       }
@@ -9986,7 +10102,7 @@
       }
     },
     "Pinned" : {
-      "comment" : "Sidebar section name, read in the label of its empty drop zone",
+      "comment" : "VoiceOver: section of the pinned tabs in the sidebar",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -14172,7 +14288,7 @@
       }
     },
     "Today" : {
-      "comment" : "History section of the pages visited today",
+      "comment" : "History section of the pages visited today\nVoiceOver: section of the Today tabs in the sidebar",
       "localizations" : {
         "de" : {
           "stringUnit" : {

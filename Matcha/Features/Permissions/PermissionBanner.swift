@@ -22,7 +22,7 @@ struct PermissionBanner: View {
             }
         }
         .clipped()
-        .animation(.easeOut(duration: 0.2), value: prompts.current?.id ?? prompts.currentAction?.id)
+        .motionAnimation(.easeOut(duration: 0.2), value: prompts.current?.id ?? prompts.currentAction?.id)
     }
 }
 

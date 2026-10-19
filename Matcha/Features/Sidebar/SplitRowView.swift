@@ -40,7 +40,7 @@ struct SplitRowView: View {
             ForEach(Array(tabs.enumerated()), id: \.element.id) { index, tab in
                 if index > 0 {
                     Rectangle()
-                        .fill(Color.primary.opacity(0.15))
+                        .fill(.separatorLine)
                         .frame(width: 1, height: 16)
                 }
                 SplitSegmentView(
@@ -125,7 +125,7 @@ private struct SplitSegmentView: View {
         .background {
             if isActive {
                 RoundedRectangle(cornerRadius: 6)
-                    .fill(Color.primary.opacity(0.08))
+                    .fill(.subtleFill)
                     .padding(2)
             }
         }

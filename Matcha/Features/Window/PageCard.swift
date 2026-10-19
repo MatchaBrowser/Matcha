@@ -70,7 +70,10 @@ struct PageCard: View {
         .clipShape(.rect(cornerRadius: BrowserWindowView.cardCornerRadius))
         .overlay {
             RoundedRectangle(cornerRadius: BrowserWindowView.cardCornerRadius)
-                .strokeBorder(isMarked ? Color.accentColor.opacity(0.7) : Color.primary.opacity(0.12), lineWidth: isMarked ? 2 : 1)
+                .strokeBorder(
+                    isMarked ? AnyShapeStyle(Color.accentColor.opacity(0.7)) : AnyShapeStyle(.hairline),
+                    lineWidth: isMarked ? 2 : 1,
+                )
                 .allowsHitTesting(false)
         }
         .shadow(color: .black.opacity(0.18), radius: 3, y: 1)
@@ -89,7 +92,7 @@ struct PageCard: View {
     private func toggleSiteSettings() {
         let isPresented = isActive ? !(windowModel?.isSiteSettingsPresented ?? false) : true
         activate()
-        withAnimation(.easeOut(duration: 0.2)) { windowModel?.isSiteSettingsPresented = isPresented }
+        withMotion(.easeOut(duration: 0.2)) { windowModel?.isSiteSettingsPresented = isPresented }
     }
 
     /// “Active Pane” on the active pane of a split.

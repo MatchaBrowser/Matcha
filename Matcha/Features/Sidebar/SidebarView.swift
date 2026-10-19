@@ -50,11 +50,22 @@ struct SidebarView: View {
             } else {
                 SidebarTopBar(tab: tabManager.selectedTab, showsNavigationButtons: false, sidebarToggle: sidebarToggle)
             }
+            // Each section is a group named for VoiceOver (audit H3).
             FavoritesGrid(tabManager: tabManager)
+                .accessibilityElement(children: .contain)
+                .accessibilityLabel(Text("Favorites"))
             ScrollView {
                 VStack(alignment: .leading, spacing: 2) {
-                    PinnedSection(tabManager: tabManager)
-                    TodaySection(tabManager: tabManager, newTab: newTab)
+                    VStack(alignment: .leading, spacing: 2) {
+                        PinnedSection(tabManager: tabManager)
+                    }
+                    .accessibilityElement(children: .contain)
+                    .accessibilityLabel(Text("Pinned", comment: "VoiceOver: section of the pinned tabs in the sidebar"))
+                    VStack(alignment: .leading, spacing: 2) {
+                        TodaySection(tabManager: tabManager, newTab: newTab)
+                    }
+                    .accessibilityElement(children: .contain)
+                    .accessibilityLabel(Text("Today", comment: "VoiceOver: section of the Today tabs in the sidebar"))
                 }
             }
             .scrollIndicators(.never)
@@ -65,7 +76,7 @@ struct SidebarView: View {
             // Opened even when empty: it says so, and leads to the Downloads folder.
             if model.isDownloadsPresented {
                 DownloadsPanel(downloads: downloads, scope: model.session.downloadScope) {
-                    withAnimation(.easeOut(duration: 0.2)) { model.isDownloadsPresented = false }
+                    withMotion(.easeOut(duration: 0.2)) { model.isDownloadsPresented = false }
                 }
                 .transition(.move(edge: .bottom).combined(with: .opacity))
             }
@@ -80,6 +91,6 @@ struct SidebarView: View {
 
     /// The site settings panel slides below the pill and pushes the tabs down.
     private func setSiteSettingsPresented(_ isPresented: Bool) {
-        withAnimation(.easeOut(duration: 0.2)) { model.isSiteSettingsPresented = isPresented }
+        withMotion(.easeOut(duration: 0.2)) { model.isSiteSettingsPresented = isPresented }
     }
 }

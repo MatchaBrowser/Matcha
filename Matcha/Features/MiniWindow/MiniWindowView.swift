@@ -37,7 +37,7 @@ struct MiniWindowView: View {
                 .clipShape(.rect(cornerRadius: Self.cardCornerRadius))
                 .overlay {
                     RoundedRectangle(cornerRadius: Self.cardCornerRadius)
-                        .strokeBorder(Color.primary.opacity(0.12), lineWidth: 1)
+                        .strokeBorder(.hairline, lineWidth: 1)
                         .allowsHitTesting(false)
                 }
                 .overlay(alignment: .bottom) { CopyConfirmationView(model: controller.copyConfirmation) }

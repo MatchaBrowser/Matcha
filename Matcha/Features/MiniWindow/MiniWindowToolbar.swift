@@ -46,11 +46,11 @@ struct MiniWindowToolbar: View {
                     .lineLimit(1)
                     .truncationMode(.tail)
             }
-            .font(.system(size: 12, weight: .medium))
+            .font(.callout.weight(.medium))
             .padding(.horizontal, 10)
             .frame(height: 26)
             .frame(maxWidth: 190)
-            .background(RoundedRectangle(cornerRadius: 6).fill(Color.primary.opacity(0.08)))
+            .background(RoundedRectangle(cornerRadius: 6).fill(.subtleFill))
             .contentShape(.rect)
         }
         .buttonStyle(.plain)

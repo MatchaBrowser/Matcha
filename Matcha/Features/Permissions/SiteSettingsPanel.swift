@@ -79,7 +79,7 @@ struct SiteSettingsPanel: View {
                 .accessibilityIdentifier("siteSettingsTitle")
             Spacer(minLength: 0)
             Button {
-                withAnimation(.easeOut(duration: 0.2)) { model.isSiteSettingsPresented = false }
+                withMotion(.easeOut(duration: 0.2)) { model.isSiteSettingsPresented = false }
             } label: {
                 Label { closeTitle } icon: { Image(systemName: "xmark") }
             }

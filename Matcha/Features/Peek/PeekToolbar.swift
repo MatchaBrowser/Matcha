@@ -44,7 +44,7 @@ struct PeekToolbar: View {
             HStack(spacing: 6) {
                 FaviconView(tab: page, size: 14)
                 Text(verbatim: shortAddress)
-                    .font(.system(size: 12, weight: .medium))
+                    .font(.callout.weight(.medium))
                     .lineLimit(1)
                     .truncationMode(.middle)
             }
@@ -64,7 +64,7 @@ struct PeekToolbar: View {
         .padding(.horizontal, 10)
         .frame(height: PeekLayout.toolbarHeight)
         .background(.regularMaterial, in: Capsule())
-        .overlay { Capsule().strokeBorder(Color.primary.opacity(0.12), lineWidth: 1) }
+        .overlay { Capsule().strokeBorder(.hairline, lineWidth: 1) }
         .contentShape(Capsule())
     }
 }
@@ -91,7 +91,7 @@ private struct PeekRoundButton: View {
                     Circle().fill(Color.primary.opacity(isHovered ? 0.1 : 0))
                 }
             }
-            .overlay { Circle().strokeBorder(Color.primary.opacity(0.12), lineWidth: 1) }
+            .overlay { Circle().strokeBorder(.hairline, lineWidth: 1) }
             .opacity(configuration.isPressed ? 0.6 : 1)
             .contentShape(Circle())
             .onHover { isHovered = $0 }

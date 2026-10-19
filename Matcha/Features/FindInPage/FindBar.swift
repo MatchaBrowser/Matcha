@@ -24,7 +24,7 @@ struct FindBar: View {
             }
         }
         .clipped()
-        .animation(.easeOut(duration: 0.15), value: page.find.isPresented)
+        .motionAnimation(.easeOut(duration: 0.15), value: page.find.isPresented)
     }
 }
 
@@ -113,7 +113,7 @@ private struct FindBarContent: View {
         // In a narrow card, the field takes priority over the free space.
         .layoutPriority(1)
         .background(RoundedRectangle(cornerRadius: 6).fill(Color.primary.opacity(0.05)))
-        .overlay(RoundedRectangle(cornerRadius: 6).strokeBorder(Color.primary.opacity(0.15), lineWidth: 1))
+        .overlay(RoundedRectangle(cornerRadius: 6).strokeBorder(.hairline, lineWidth: 1))
     }
 
     private func perform(_ command: FindKeyCommand) {

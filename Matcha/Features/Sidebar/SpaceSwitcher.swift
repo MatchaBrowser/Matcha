@@ -38,7 +38,7 @@ struct SpaceSwitcher: View {
         }
         .overlay(alignment: .trailing) {
             Button("New Space", systemImage: "plus") {
-                withAnimation(.easeInOut(duration: 0.3)) { model.newSpace() }
+                withMotion(.easeInOut(duration: 0.3)) { model.newSpace() }
             }
             .labelStyle(.iconOnly)
             .buttonStyle(SidebarIconButtonStyle())
@@ -68,7 +68,7 @@ struct SpaceSwitcher: View {
             if isCurrent {
                 model.editedSpaceID = space.id
             } else {
-                withAnimation(.easeInOut(duration: 0.3)) { model.select(space) }
+                withMotion(.easeInOut(duration: 0.3)) { model.select(space) }
             }
         } label: {
             icon(of: space, isCurrent: isCurrent)
@@ -127,7 +127,7 @@ struct SpaceSwitcher: View {
             if SpaceDeletionAlert.closingTabCount(of: space) > 0 {
                 deletedSpace = space
             } else {
-                withAnimation(.easeInOut(duration: 0.3)) { model.deleteSpace(space) }
+                withMotion(.easeInOut(duration: 0.3)) { model.deleteSpace(space) }
             }
         }
         .disabled(model.session.spaces.count <= 1)

@@ -26,7 +26,7 @@ struct PopupAddressBar: View {
                 ProgressView().controlSize(.mini)
             }
         }
-        .font(.system(size: 12, weight: .medium))
+        .font(.callout.weight(.medium))
         .padding(.horizontal, 10)
         .frame(maxWidth: .infinity)
         .frame(height: Self.height)

@@ -14,7 +14,7 @@ struct FloatingSidebar<Content: View>: View {
             .clipShape(.rect(cornerRadius: BrowserWindowView.cardCornerRadius))
             .overlay {
                 RoundedRectangle(cornerRadius: BrowserWindowView.cardCornerRadius)
-                    .strokeBorder(Color.primary.opacity(0.12), lineWidth: 1)
+                    .strokeBorder(.hairline, lineWidth: 1)
             }
             .onHover(perform: onHover)
             .shadow(color: .black.opacity(0.3), radius: 12, x: 2)

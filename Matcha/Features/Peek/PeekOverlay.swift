@@ -87,7 +87,7 @@ struct PeekOverlay: View {
         .clipShape(.rect(cornerRadius: BrowserWindowView.cardCornerRadius))
         .overlay {
             RoundedRectangle(cornerRadius: BrowserWindowView.cardCornerRadius)
-                .strokeBorder(Color.primary.opacity(0.12), lineWidth: 1)
+                .strokeBorder(.hairline, lineWidth: 1)
                 .allowsHitTesting(false)
         }
         .shadow(color: .black.opacity(0.35), radius: 30, y: 12)

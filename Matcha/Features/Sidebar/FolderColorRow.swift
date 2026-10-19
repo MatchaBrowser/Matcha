@@ -59,7 +59,7 @@ struct FolderColorRow: View {
                 if let preset {
                     Circle()
                         .fill(preset.color.color)
-                        .overlay(Circle().strokeBorder(Color.primary.opacity(0.15), lineWidth: 1))
+                        .overlay(Circle().strokeBorder(.hairline, lineWidth: 1))
                 } else {
                     Image(systemName: "circle.slash")
                         .font(.system(size: Self.swatchSize - 1))

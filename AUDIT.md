@@ -411,7 +411,7 @@ Rien n'est branché : il n'y a pas de transport, et seuls les tests créent `Syn
 - Il n'y a ni annulation, ni « Rouvrir l'onglet fermé » (⇧⌘T).
 - Supprimer un Space ou un dossier, et « Effacer » les onglets du jour, se font sans confirmation et sans annulation.
 
-**H3. Accessibilité**
+**✅ H3. Accessibilité** — corrigé : réduction des animations et contraste suivis, barre latérale au clavier et avec VoiceOver, déplacement sans glisser, styles de texte.
 - « Réduire les animations » n'est respecté que par 3 vues.
 - « Augmenter le contraste » n'est jamais lu.
 - La barre latérale n'est pas navigable au clavier, et ses sections n'ont pas de titre pour VoiceOver.

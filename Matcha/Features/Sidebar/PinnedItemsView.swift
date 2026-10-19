@@ -31,7 +31,7 @@ struct PinnedItemsView: View {
                     .padding(.leading, CGFloat(depth) * Self.indent)
                 if let windowModel, windowModel.customizedFolderID == folder.id {
                     FolderCustomizationPanel(folder: folder, tabManager: tabManager) {
-                        withAnimation(.easeOut(duration: 0.2)) { windowModel.customizedFolderID = nil }
+                        withMotion(.easeOut(duration: 0.2)) { windowModel.customizedFolderID = nil }
                     }
                     .transition(.move(edge: .top).combined(with: .opacity))
                 }

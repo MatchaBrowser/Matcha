@@ -8,7 +8,7 @@ struct TodaySection: View {
     var body: some View {
         HStack(spacing: 8) {
             Rectangle()
-                .fill(Color.primary.opacity(0.12))
+                .fill(.separatorLine)
                 .frame(height: 1)
             if !tabManager.todayTabs.isEmpty {
                 Button(action: tabManager.clearToday) {

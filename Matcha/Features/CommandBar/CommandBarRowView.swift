@@ -13,20 +13,21 @@ struct CommandBarRowView: View {
     let action: () -> Void
 
     @State private var isHovered = false
+    @Environment(\.colorSchemeContrast) private var contrast
 
     var body: some View {
         HStack(spacing: 10) {
             icon
                 .frame(width: 16, height: 16)
             Text(verbatim: row.title)
-                .font(.system(size: 13))
+                .font(.body)
                 .foregroundStyle(.primary)
                 .lineLimit(1)
                 .truncationMode(.tail)
                 .layoutPriority(1)
             if let subtitle {
                 Text(verbatim: subtitle)
-                    .font(.system(size: 12))
+                    .font(.callout)
                     .foregroundStyle(.secondary)
                     .lineLimit(1)
                     .truncationMode(.middle)
@@ -104,7 +105,7 @@ struct CommandBarRowView: View {
 
     private func capsule(_ text: Text) -> some View {
         text
-            .font(.system(size: 11))
+            .font(.subheadline)
             .foregroundStyle(.secondary)
             .lineLimit(1)
             .padding(.horizontal, 6)
@@ -117,8 +118,10 @@ struct CommandBarRowView: View {
         if isSelected {
             shape.fill(Color.primary.opacity(0.06))
                 .overlay { shape.fill(tint.opacity(0.30)) }
+                // “Increase contrast” (audit H3): the selected row is outlined, not only tinted.
+                .overlay { shape.strokeBorder(contrast == .increased ? Color.primary.opacity(0.6) : .clear, lineWidth: 1) }
         } else if isHovered {
-            shape.fill(Color.primary.opacity(0.05))
+            shape.fill(.subtleFill)
         }
     }
 }

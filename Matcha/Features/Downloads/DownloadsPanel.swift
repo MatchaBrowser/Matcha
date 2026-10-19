@@ -22,7 +22,7 @@ struct DownloadsPanel: View {
                     .font(.subheadline.weight(.semibold))
                 Spacer(minLength: 0)
                 Button {
-                    withAnimation(.easeOut(duration: 0.2)) { downloads.clear(in: scope) }
+                    withMotion(.easeOut(duration: 0.2)) { downloads.clear(in: scope) }
                 } label: {
                     // Key distinct from the “Clear” of today tabs.
                     Text(String(

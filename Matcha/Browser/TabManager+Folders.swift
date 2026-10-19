@@ -37,6 +37,17 @@ extension TabManager {
         updateLayout { $0.moveFolder(id, to: destination) }
     }
 
+    /// Moves the folder one step up (−1) or down (+1) among its neighbors, without dragging (audit H3); false at the
+    /// edge.
+    @discardableResult
+    func moveFolderStep(_ id: UUID, by offset: Int) -> Bool {
+        guard let destination = layout.stepDestination(of: id, by: offset) else {
+            return false
+        }
+        moveFolder(id, to: destination)
+        return true
+    }
+
     /// Deletes the folder; its tabs and subfolders take its place.
     func deleteFolder(_ id: UUID) {
         updateLayout { $0.removeFolder(id) }

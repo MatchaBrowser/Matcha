@@ -73,7 +73,7 @@ extension MiniWindowManager {
     func reveal(_ tab: BrowserTab, in space: SpaceSession, openMainWindow: () -> Void) {
         if let link = mainWindow, link.isShown, let windowModel = link.windowModel {
             if windowModel.space !== space {
-                withAnimation(.easeInOut(duration: 0.3)) { windowModel.select(space) }
+                withMotion(.easeInOut(duration: 0.3)) { windowModel.select(space) }
             }
             link.bringToFront()
             TabActivation.focusPage(of: tab)

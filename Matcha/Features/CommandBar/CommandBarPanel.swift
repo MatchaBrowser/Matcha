@@ -35,7 +35,7 @@ struct CommandBarPanel: View {
         }
         .overlay {
             RoundedRectangle(cornerRadius: Self.cornerRadius)
-                .strokeBorder(Color.primary.opacity(0.12), lineWidth: 1)
+                .strokeBorder(.hairline, lineWidth: 1)
         }
         .accessibilityElement(children: .contain)
         .accessibilityLabel(Text("Command Bar", comment: "Accessibility label of the command bar panel"))

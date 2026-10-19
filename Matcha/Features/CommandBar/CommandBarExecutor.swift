@@ -16,7 +16,7 @@ struct CommandBarExecutor {
     let openSettings: () -> Void
     var pasteboard: NSPasteboard = .general
     /// Animated Space change (tests apply it as is).
-    var animate: (() -> Void) -> Void = { change in withAnimation(.easeInOut(duration: 0.3), change) }
+    var animate: (() -> Void) -> Void = { change in withMotion(.easeInOut(duration: 0.3), change) }
 
     private var windowModel: WindowModel {
         model.windowModel

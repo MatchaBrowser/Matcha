@@ -55,7 +55,7 @@ struct FolderRowView: View {
             guard !isRenaming else {
                 return
             }
-            withAnimation(.easeOut(duration: 0.15)) { tabManager.toggleFolder(folder.id) }
+            withMotion(.easeOut(duration: 0.15)) { tabManager.toggleFolder(folder.id) }
         }
         .onHover { isHovered = $0 }
         .contextMenu { menu }
@@ -71,6 +71,9 @@ struct FolderRowView: View {
         .accessibilityLabel(folder.name)
         .accessibilityValue(accessibilityValue)
         .accessibilityAddTraits(.isButton)
+        .sidebarRowKeyboard(isEnabled: !isRenaming) {
+            withMotion(.easeOut(duration: 0.15)) { tabManager.toggleFolder(folder.id) }
+        } move: { tabManager.moveFolderStep(folder.id, by: $0) }
         .accessibilityIdentifier("folderRow")
     }
 
@@ -129,7 +132,7 @@ struct FolderRowView: View {
         Button("New Subfolder") { tabManager.newFolder(in: folder.id) }
         Divider()
         Button("Delete Folder") {
-            withAnimation(.easeOut(duration: 0.15)) {
+            withMotion(.easeOut(duration: 0.15)) {
                 if windowModel?.customizedFolderID == folder.id {
                     windowModel?.customizedFolderID = nil
                 }
@@ -139,7 +142,7 @@ struct FolderRowView: View {
     }
 
     private func toggleCustomization(in windowModel: WindowModel) {
-        withAnimation(.easeOut(duration: 0.2)) { windowModel.toggleFolderCustomization(folder.id) }
+        withMotion(.easeOut(duration: 0.2)) { windowModel.toggleFolderCustomization(folder.id) }
     }
 }
 

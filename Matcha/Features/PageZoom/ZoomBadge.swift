@@ -101,7 +101,7 @@ private struct ZoomBadgeCapsule: View {
 
     var body: some View {
         configuration.label
-            .font(.system(size: style == .floating ? 12 : 11, weight: .semibold))
+            .font((style == .floating ? Font.callout : .subheadline).weight(.semibold))
             .monospacedDigit()
             .lineLimit(1)
             .padding(.horizontal, style == .floating ? 10 : 7)
@@ -124,7 +124,7 @@ private struct ZoomBadgeCapsule: View {
                 Capsule().fill(.regularMaterial)
                 Capsule().fill(Color.primary.opacity(isHovered ? 0.1 : 0))
             }
-            .overlay { Capsule().strokeBorder(Color.primary.opacity(0.12), lineWidth: 1) }
+            .overlay { Capsule().strokeBorder(.hairline, lineWidth: 1) }
         }
     }
 }

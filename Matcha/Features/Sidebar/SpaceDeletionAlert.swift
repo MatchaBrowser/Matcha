@@ -23,7 +23,7 @@ struct SpaceDeletionAlert: ViewModifier {
                 presenting: space,
             ) { space in
                 Button("Delete Space", role: .destructive) {
-                    withAnimation(.easeInOut(duration: 0.3)) { model.deleteSpace(space) }
+                    withMotion(.easeInOut(duration: 0.3)) { model.deleteSpace(space) }
                 }
                 Button("Cancel", role: .cancel) {}
             } message: { space in

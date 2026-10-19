@@ -30,7 +30,7 @@ struct CopyConfirmationView: View {
                 .font(.system(size: 12, weight: .semibold))
                 .foregroundStyle(.secondary)
             Text(Self.message)
-                .font(.system(size: 13, weight: .medium))
+                .font(.body.weight(.medium))
         }
         .padding(.horizontal, 14)
         .padding(.vertical, 8)
@@ -43,7 +43,7 @@ struct CopyConfirmationView: View {
         }
         .overlay {
             Capsule()
-                .strokeBorder(Color.primary.opacity(0.12), lineWidth: 1)
+                .strokeBorder(.hairline, lineWidth: 1)
         }
         .accessibilityElement(children: .ignore)
         .accessibilityLabel(Self.message)

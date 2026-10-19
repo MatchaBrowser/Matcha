@@ -29,7 +29,7 @@ struct AddressPill: View {
             .accessibilityIdentifier("addressPill")
             if let tab {
                 PageSecurityIndicator(page: tab)
-                    .font(.system(size: 11))
+                    .font(.subheadline)
             }
         }
         .padding(.trailing, 8)

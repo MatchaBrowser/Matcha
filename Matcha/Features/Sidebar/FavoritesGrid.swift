@@ -76,6 +76,9 @@ private struct FavoriteTile: View {
             .accessibilityLabel(tab.displayTitle)
             .accessibilityAddTraits(isSelected ? [.isButton, .isSelected] : .isButton)
             .accessibilityAction { TabActivation.activate(tab, in: tabManager) }
+            .sidebarRowKeyboard(isHorizontal: true) { TabActivation.activate(tab, in: tabManager) } move: {
+                tabManager.moveStep(tab, by: $0)
+            }
             .accessibilityIdentifier("favoriteTile")
             .tabAudioAccessibility(tab)
     }

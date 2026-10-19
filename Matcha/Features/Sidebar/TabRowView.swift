@@ -58,6 +58,7 @@ struct TabRowView: View {
         .accessibilityAddTraits(isSelected ? [.isButton, .isSelected] : .isButton)
         .accessibilityAction { TabActivation.activate(tab, in: tabManager) }
         .accessibilityAction(named: "Close Tab") { tabManager.close(tab) }
+        .sidebarRowKeyboard { TabActivation.activate(tab, in: tabManager) } move: { tabManager.moveStep(tab, by: $0) }
         .accessibilityIdentifier("tabRow")
         // “Playing Audio”; in Debug, “suspended” for a sleeping tab (UI tests of task 5.6).
         .tabAudioAccessibility(tab)
@@ -78,17 +79,24 @@ struct SidebarRowBackground: View {
     var cornerRadius = 8.0
 
     @Environment(\.colorScheme) private var colorScheme
+    @Environment(\.colorSchemeContrast) private var contrast
 
     var body: some View {
         RoundedRectangle(cornerRadius: cornerRadius)
             .fill(fill)
             .shadow(color: .black.opacity(isSelected && colorScheme == .light ? 0.08 : 0), radius: 1, y: 1)
+            .overlay {
+                // “Increase contrast” (audit H3): the selected row is outlined, not only lighter.
+                if isSelected, contrast == .increased {
+                    RoundedRectangle(cornerRadius: cornerRadius).strokeBorder(Color.primary.opacity(0.6), lineWidth: 1)
+                }
+            }
     }
 
-    private var fill: Color {
+    private var fill: AnyShapeStyle {
         if isSelected {
-            return colorScheme == .dark ? .white.opacity(0.16) : .white.opacity(0.8)
+            return AnyShapeStyle(colorScheme == .dark ? Color.white.opacity(0.16) : Color.white.opacity(0.8))
         }
-        return isHovered ? Color.primary.opacity(0.07) : .clear
+        return isHovered ? AnyShapeStyle(.subtleFill) : AnyShapeStyle(Color.clear)
     }
 }

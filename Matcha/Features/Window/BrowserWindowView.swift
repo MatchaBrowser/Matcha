@@ -176,7 +176,7 @@ struct BrowserWindowView: View {
         .clipped()
         .background {
             SpaceSwipeArea { direction in
-                withAnimation(.easeInOut(duration: 0.3)) { model.selectAdjacentSpace(direction) }
+                withMotion(.easeInOut(duration: 0.3)) { model.selectAdjacentSpace(direction) }
             }
         }
     }
@@ -193,12 +193,12 @@ struct BrowserWindowView: View {
                 .contentShape(Rectangle())
                 .onHover { hovering in
                     if hovering {
-                        withAnimation(.easeOut(duration: 0.15)) { isFloatingSidebarHovered = true }
+                        withMotion(.easeOut(duration: 0.15)) { isFloatingSidebarHovered = true }
                     }
                 }
             if isFloatingSidebarShown {
                 FloatingSidebar(theme: theme, width: width) { hovering in
-                    withAnimation(.easeOut(duration: 0.15)) { isFloatingSidebarHovered = hovering }
+                    withMotion(.easeOut(duration: 0.15)) { isFloatingSidebarHovered = hovering }
                 } content: {
                     sidebar
                 }
@@ -236,8 +236,8 @@ struct BrowserWindowView: View {
             goHome: homeURL.map { url in { goHome(to: url) } },
             spaceNames: session.spaces.map(\.record.name),
             currentSpaceIndex: model.spaceIndex,
-            selectSpace: { index in withAnimation(.easeInOut(duration: 0.3)) { model.selectSpace(at: index) } },
-            newSpace: { withAnimation(.easeInOut(duration: 0.3)) { model.newSpace() } },
+            selectSpace: { index in withMotion(.easeInOut(duration: 0.3)) { model.selectSpace(at: index) } },
+            newSpace: { withMotion(.easeInOut(duration: 0.3)) { model.newSpace() } },
             showTab: showTab,
             isPrivate: session.isPrivate,
             importFromArc: session.isPrivate ? nil : { model.arcImport.chooseFile(in: window) },
@@ -267,7 +267,7 @@ struct BrowserWindowView: View {
     }
 
     private func toggleSidebar() {
-        withAnimation(.easeInOut(duration: 0.2)) {
+        withMotion(.easeInOut(duration: 0.2)) {
             isSidebarVisible.toggle()
             isFloatingSidebarHovered = false
         }
@@ -276,7 +276,7 @@ struct BrowserWindowView: View {
     /// ⌥⌘L: hides the downloads panel if it is visible; otherwise shows the hidden sidebar, then opens it.
     private func toggleDownloads() {
         let show = !isDownloadsPanelShown
-        withAnimation(.easeInOut(duration: 0.2)) {
+        withMotion(.easeInOut(duration: 0.2)) {
             if show, !isSidebarVisible {
                 isSidebarVisible = true
                 isFloatingSidebarHovered = false

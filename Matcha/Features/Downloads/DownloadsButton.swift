@@ -14,7 +14,7 @@ struct DownloadsButton: View {
     var body: some View {
         let active = downloads.items(in: scope).filter(\.isActive)
         Button {
-            withAnimation(.easeOut(duration: 0.2)) { model.isDownloadsPresented.toggle() }
+            withMotion(.easeOut(duration: 0.2)) { model.isDownloadsPresented.toggle() }
         } label: {
             DownloadsIcon(
                 isDownloading: !active.isEmpty,
