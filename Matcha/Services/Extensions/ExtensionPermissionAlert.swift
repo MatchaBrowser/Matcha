@@ -15,7 +15,7 @@ protocol ExtensionPermissionPrompting: AnyObject {
 final class ExtensionPermissionAlert: ExtensionPermissionPrompting {
     func ask(_ request: ExtensionPermissionRequest, completion: @escaping @MainActor (Bool) -> Void) {
         guard let window = NSApp.mainWindow ?? NSApp.keyWindow else {
-            Logger.extensions.notice("Demande de permissions refusée : aucune fenêtre pour la montrer")
+            Logger.extensions.notice("Permission request denied: no window to show it")
             completion(false)
             return
         }

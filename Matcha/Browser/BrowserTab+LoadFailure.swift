@@ -47,7 +47,7 @@ extension BrowserTab {
             return
         }
         loadFailure.certificateExceptions?.accept(trust, host: error.host)
-        Logger.browser.notice("Certificat non valide accepté par l'utilisateur pour la session")
+        Logger.browser.notice("Invalid certificate accepted by the user for the session")
         load(error.url)
     }
 

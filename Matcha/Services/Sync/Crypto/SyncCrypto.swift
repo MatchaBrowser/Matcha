@@ -52,7 +52,7 @@ nonisolated enum SyncCrypto {
         let status = data.withUnsafeMutableBytes { buffer in
             buffer.baseAddress.map { SecRandomCopyBytes(kSecRandomDefault, count, $0) } ?? errSecAllocate
         }
-        precondition(status == errSecSuccess, "Générateur aléatoire indisponible")
+        precondition(status == errSecSuccess, "Random number generator unavailable")
         return data
     }
 

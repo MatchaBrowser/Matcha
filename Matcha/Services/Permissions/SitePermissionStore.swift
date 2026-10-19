@@ -47,7 +47,7 @@ final class SitePermissionStore {
         table.set(decision, for: kind, origin: origin, profileID: profileID, date: date)
         let value = decision?.rawValue ?? "ask"
         Logger.permissions
-            .info("\(kind.rawValue, privacy: .public) : \(value, privacy: .public) pour \(origin.displayHost, privacy: .private)")
+            .info("\(kind.rawValue, privacy: .public): \(value, privacy: .public) for \(origin.displayHost, privacy: .private)")
         guard let context else {
             return
         }
@@ -102,7 +102,7 @@ final class SitePermissionStore {
         do {
             try context.save()
         } catch {
-            Logger.permissions.error("Décision non enregistrée : \(error.logSummary, privacy: .public)")
+            Logger.permissions.error("Decision not saved: \(error.logSummary, privacy: .public)")
         }
     }
 
@@ -117,7 +117,7 @@ final class SitePermissionStore {
                   let kind = SitePermissionKind(rawValue: record.kindValue),
                   let decision = SitePermissionDecision(rawValue: record.decisionValue)
             else {
-                Logger.permissions.notice("Décision enregistrée illisible, ignorée")
+                Logger.permissions.notice("Unreadable saved decision, ignored")
                 return nil
             }
             return SitePermissionEntry(

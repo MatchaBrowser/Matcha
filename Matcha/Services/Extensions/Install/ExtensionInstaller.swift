@@ -105,9 +105,9 @@ final class ExtensionInstaller {
             await manager.uninstall(identifier: replaced)
         }
         let kind = switch candidate.mode {
-        case .new: "installée"
-        case .update: "mise à jour"
-        case .replacement: "remplacée"
+        case .new: "installed"
+        case .update: "updated"
+        case .replacement: "replaced"
         }
         Logger.extensions.info("Extension \(kind, privacy: .public) (\(identifier, privacy: .private))")
     }

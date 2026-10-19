@@ -49,7 +49,7 @@ extension TabManager {
         }
         setSelection(tab.id)
         let count = displayedTabIDs.count
-        Logger.browser.info("Split : \(count, privacy: .public) panneaux")
+        Logger.browser.info("Split: \(count, privacy: .public) panes")
         return true
     }
 
@@ -79,7 +79,7 @@ extension TabManager {
         } else {
             moveSelection(awayFrom: Set(group.tabIDs)) { members.forEach(discard) }
         }
-        Logger.browser.info("Split fermé : \(members.count, privacy: .public) panneaux")
+        Logger.browser.info("Split closed: \(members.count, privacy: .public) panes")
     }
 
     /// Moves the whole split (drag and drop of its row).

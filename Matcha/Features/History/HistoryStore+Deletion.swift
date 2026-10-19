@@ -21,7 +21,7 @@ extension HistoryStore {
         }
         save()
         apply(.remove(ids, profileID: profileID))
-        Logger.history.info("\(ids.count, privacy: .public) visites supprimées")
+        Logger.history.info("\(ids.count, privacy: .public) visits deleted")
     }
 
     /// “Clear History…”: the profile's visits made during `period`.
@@ -35,7 +35,7 @@ extension HistoryStore {
         }
         save()
         apply(.removeSince(start, profileID: profileID))
-        Logger.history.info("Historique effacé (\(period.rawValue, privacy: .public))")
+        Logger.history.info("History cleared (\(period.rawValue, privacy: .public))")
     }
 
     /// Deleted profile: its whole history.

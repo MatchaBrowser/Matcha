@@ -41,7 +41,7 @@ struct BlocklistLoader<Store: ContentRuleListStoring> {
             } catch {
                 let reason = ContentRuleListError.message(of: error)
                 Logger.contentBlocker.error(
-                    "Liste « \(entry.identifier, privacy: .public) » ignorée : \(reason, privacy: .public)",
+                    "List “\(entry.identifier, privacy: .public)” ignored: \(reason, privacy: .public)",
                 )
             }
         }
@@ -54,7 +54,7 @@ struct BlocklistLoader<Store: ContentRuleListStoring> {
         var lists: [Store.RuleList] = []
         for identifier in record.storeIdentifiers {
             guard let list = await store.lookUp(identifier) else {
-                Logger.contentBlocker.notice("Liste « \(entry.identifier, privacy: .public) » absente du magasin : recompilée")
+                Logger.contentBlocker.notice("List “\(entry.identifier, privacy: .public)” missing from the store: compiled again")
                 return nil
             }
             lists.append(list)
@@ -90,7 +90,7 @@ struct BlocklistLoader<Store: ContentRuleListStoring> {
                     throw error
                 }
                 Logger.contentBlocker.notice(
-                    "Liste « \(entry.identifier, privacy: .public) » trop grosse pour WebKit : parts de \(next, privacy: .public) règles",
+                    "List “\(entry.identifier, privacy: .public)” too large for WebKit: parts of \(next, privacy: .public) rules",
                 )
                 size = next
             }
@@ -102,7 +102,7 @@ struct BlocklistLoader<Store: ContentRuleListStoring> {
             do {
                 try await store.remove(identifier)
             } catch {
-                Logger.contentBlocker.notice("Ancienne liste non supprimée du magasin : \(error.logSummary, privacy: .public)")
+                Logger.contentBlocker.notice("Old list not removed from the store: \(error.logSummary, privacy: .public)")
             }
         }
     }

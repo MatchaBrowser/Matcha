@@ -45,7 +45,7 @@ final class SiteActionAllowances {
 
     func allow(_ action: SiteAction, origin: SiteOrigin, profileID: UUID?) {
         entries.insert(Entry(profileID: profileID, origin: origin, action: action))
-        Logger.permissions.info("\(action.key, privacy: .public) toujours permis pour \(origin.displayHost, privacy: .private)")
+        Logger.permissions.info("\(action.key, privacy: .public) always allowed for \(origin.displayHost, privacy: .private)")
         save()
     }
 

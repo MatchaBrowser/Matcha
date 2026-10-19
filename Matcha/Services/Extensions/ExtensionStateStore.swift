@@ -120,7 +120,7 @@ final class ExtensionStateStore {
         do {
             try defaults.set(JSONEncoder().encode(states), forKey: Self.defaultsKey)
         } catch {
-            Logger.extensions.error("États des extensions non enregistrés : \(error.logSummary, privacy: .public)")
+            Logger.extensions.error("Extension states not saved: \(error.logSummary, privacy: .public)")
         }
     }
 
@@ -133,12 +133,12 @@ final class ExtensionStateStore {
             let states = entries.compactMapValues(\.value)
             if states.count < entries.count {
                 defaults?.set(data, forKey: unreadableKey)
-                Logger.extensions.error("\(entries.count - states.count, privacy: .public) état(s) d'extension illisible(s), mis de côté")
+                Logger.extensions.error("\(entries.count - states.count, privacy: .public) unreadable extension state(s), set aside")
             }
             return states
         } catch {
             defaults?.set(data, forKey: unreadableKey)
-            Logger.extensions.error("États des extensions illisibles, mis de côté : \(error.logSummary, privacy: .public)")
+            Logger.extensions.error("Unreadable extension states, set aside: \(error.logSummary, privacy: .public)")
             return [:]
         }
     }

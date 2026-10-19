@@ -88,11 +88,11 @@ private struct DownloadsEmptyState: View {
     /// The user's real Downloads folder, never the UI tests' subfolder.
     private func showDownloadsFolder() {
         guard let folder = DownloadLocation.userDownloadsDirectory() else {
-            Logger.downloads.error("Dossier Téléchargements introuvable")
+            Logger.downloads.error("Downloads folder not found")
             return
         }
         if !NSWorkspace.shared.open(folder) {
-            Logger.downloads.error("Dossier Téléchargements non ouvert dans le Finder")
+            Logger.downloads.error("Downloads folder not opened in the Finder")
         }
     }
 }

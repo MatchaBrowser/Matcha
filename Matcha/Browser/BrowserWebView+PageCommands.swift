@@ -59,7 +59,7 @@ extension BrowserWebView {
         case .saveAs, .print, .viewSource:
             (uiDelegate as? any PageMenuDelegate)?.pageMenu(perform: command, in: self)
         }
-        Logger.browser.info("Menu de la page : \(command.rawValue, privacy: .public)")
+        Logger.browser.info("Page menu: \(command.rawValue, privacy: .public)")
     }
 }
 

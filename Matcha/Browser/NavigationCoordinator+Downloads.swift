@@ -44,10 +44,10 @@ extension NavigationCoordinator {
             decide(allowed)
         }
         guard isFirstWaiting else {
-            Logger.downloads.info("Téléchargement en attente avec les précédents")
+            Logger.downloads.info("Download waiting with the previous ones")
             return
         }
-        Logger.downloads.info("Téléchargement sans clic : en attente dans le bandeau")
+        Logger.downloads.info("Download without a click: waiting in the banner")
         page.permissionPrompts.enqueue(SiteActionRequest(
             action: .downloadFiles,
             origin: origin,

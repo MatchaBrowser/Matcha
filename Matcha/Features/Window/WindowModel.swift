@@ -143,7 +143,7 @@ final class WindowModel {
         TabLinkCopier.copy(url, to: pasteboard)
         copyConfirmation.show()
         // Never the address itself.
-        Logger.browser.info("Adresse copiée")
+        Logger.browser.info("Address copied")
     }
 
     /// ⇧⌘C and the “Copy URL” action of the command bar: the address of the frontmost page (the peek if it is open,

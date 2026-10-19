@@ -47,11 +47,11 @@ extension MiniWindowManager: TabHost {
             let controller = show(BrowserTab(configuration: configuration, openerID: opener?.tab.id), profileID: profileID)
             controller.tab.load(url, from: webView.url)
             controller.showWebView()
-            Logger.miniWindow.info("Mini-fenêtre ouverte (\(Source.link.rawValue, privacy: .public))")
+            Logger.miniWindow.info("Mini window opened (\(Source.link.rawValue, privacy: .public))")
             return
         }
         space.tabManager.newTab(url: url, select: false, from: webView.url)
-        Logger.miniWindow.info("Lien d'une mini-fenêtre ouvert en arrière-plan dans un Space")
+        Logger.miniWindow.info("Mini window link opened in the background in a Space")
     }
 
     /// A new mini window. In the background (context menu, task 5.9): a background tab of the target Space, like
@@ -62,14 +62,14 @@ extension MiniWindowManager: TabHost {
         if inBackground {
             let space = defaultTarget(profileID: profileID)
             if space.record.profile?.id == profileID {
-                Logger.miniWindow.info("Lien d'une mini-fenêtre ouvert en arrière-plan dans un Space")
+                Logger.miniWindow.info("Mini window link opened in the background in a Space")
                 return space.tabManager.insertTab(configuration: configuration, after: nil, select: false).makeWebViewIfNeeded()
             }
         }
         let controller = show(BrowserTab(configuration: configuration, openerID: opener?.tab.id), profileID: profileID)
         let newWebView = controller.tab.makeWebViewIfNeeded()
         controller.showWebView()
-        Logger.miniWindow.info("Mini-fenêtre ouverte (\(Source.page.rawValue, privacy: .public))")
+        Logger.miniWindow.info("Mini window opened (\(Source.page.rawValue, privacy: .public))")
         return newWebView
     }
 

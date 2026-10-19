@@ -22,7 +22,7 @@ final class ContentBlockerExceptions {
         let stored = defaults?.stringArray(forKey: Self.defaultsKey) ?? []
         sites = Set(stored.compactMap(Self.normalized))
         if sites.count != stored.count {
-            Logger.contentBlocker.notice("Exceptions du bloqueur illisibles ou en double : ignorées")
+            Logger.contentBlocker.notice("Unreadable or duplicate blocker exceptions: ignored")
         }
     }
 

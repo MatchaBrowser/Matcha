@@ -66,9 +66,9 @@ scripts/strings.sh fr
 - **API publiques uniquement.** Jamais de sélecteurs privés, de `value(forKey:)` sur des clés non documentées, ni de `perform(_:)` sur des méthodes cachées. Si une fonction n'est possible qu'avec une API privée, on la reporte et on le note dans `DECISIONS.md`.
 - **Dépendances autorisées** : KeyboardShortcuts (sindresorhus) et Sparkle. Toute autre dépendance → me demander avant.
 - **Fichiers courts** : un type principal par fichier, moins de 300 lignes environ.
-- **Code en anglais** : noms et commentaires (commentaires de ligne, de documentation et de bloc, scripts compris). Les documents du projet (`PLAN.md`, `DECISIONS.md`…) restent en français.
+- **Code en anglais** : noms, commentaires (de ligne, de documentation et de bloc, scripts compris) et messages de journal. Les documents du projet (`PLAN.md`, `DECISIONS.md`…) restent en français.
 - **Logique testable** (analyse d'URL, archivage, import, classement de la barre de commande) dans des types purs, sans dépendance à l'interface, couverts par des tests.
-- **Journalisation** avec `Logger` (os.log), une catégorie par module. Pas de `print` laissé dans le code.
+- **Journalisation** avec `Logger` (os.log), une catégorie par module, messages en anglais ; jamais d'adresse complète en clair. Pas de `print` laissé dans le code.
 - **Textes de l'interface en anglais dans le code**, traduits dans la même tâche dans toutes les langues du catalogue (`Matcha/Resources/*.xcstrings`) : français, allemand, espagnol, italien. Après une compilation, `scripts/check-localizations.sh` doit passer.
 
 ## Structure des dossiers

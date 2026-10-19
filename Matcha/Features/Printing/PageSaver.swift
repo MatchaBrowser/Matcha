@@ -56,9 +56,9 @@ enum PageSaver {
                 try await PageSourceSchemeHandler.fetch(url, store: webView.configuration.websiteDataStore).0
             }
             try PDFExportFile.write(data, to: destination)
-            Logger.browser.info("Page enregistrée (\(data.count, privacy: .public) octets)")
+            Logger.browser.info("Page saved (\(data.count, privacy: .public) bytes)")
         } catch {
-            Logger.browser.error("Page non enregistrée : \(error.logSummary, privacy: .public)")
+            Logger.browser.error("Page not saved: \(error.logSummary, privacy: .public)")
             showFailure(error, in: window)
         }
     }

@@ -52,7 +52,7 @@ extension TabManager {
             return peek
         }
         guard canPeek(from: source) else {
-            Logger.peek.notice("Aperçu refusé : l'onglet d'origine n'est pas affiché")
+            Logger.peek.notice("Peek refused: the originating tab is not shown")
             return nil
         }
         closePeek()
@@ -65,7 +65,7 @@ extension TabManager {
         page.load(url, from: source.url)
         let newPeek = Peek(tab: page, sourceTabID: source.id, openingPoint: openingPoint)
         setPeek(newPeek)
-        Logger.peek.info("Aperçu ouvert")
+        Logger.peek.info("Peek opened")
         return newPeek
     }
 
@@ -76,7 +76,7 @@ extension TabManager {
         }
         setPeek(nil)
         peek.tab.unload(resettingTo: nil, title: nil)
-        Logger.peek.debug("Aperçu fermé")
+        Logger.peek.debug("Peek closed")
     }
 
     /// “Open as Tab”: the Peek page becomes a today tab, on its own, after its source tab (and its split) and those
@@ -88,7 +88,7 @@ extension TabManager {
         }
         setPeek(nil)
         insert(peek.tab, after: tab(withID: peek.sourceTabID), select: true)
-        Logger.peek.info("Aperçu ouvert en onglet")
+        Logger.peek.info("Peek opened as a tab")
         return peek.tab
     }
 }

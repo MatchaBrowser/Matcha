@@ -67,7 +67,7 @@ final class SiteZoomStore {
         for page in pages.values where page.site == site {
             page.tab?.setPageZoom(level)
         }
-        Logger.browser.info("Zoom d'un site : \(Int((level * 100).rounded()), privacy: .public) %, \(site, privacy: .private)")
+        Logger.browser.info("Site zoom: \(Int((level * 100).rounded()), privacy: .public) %, \(site, privacy: .private)")
     }
 
     /// Website of the document displayed by `tab`, if it is tracked.
@@ -101,7 +101,7 @@ final class SiteZoomStore {
         var levels: [String: Double] = [:]
         for (site, value) in stored {
             guard !site.isEmpty, let level = (value as? NSNumber)?.doubleValue, level.isFinite else {
-                Logger.browser.notice("Zoom enregistré illisible, ignoré")
+                Logger.browser.notice("Unreadable saved zoom, ignored")
                 continue
             }
             let clamped = ZoomLevels.clamped(level)

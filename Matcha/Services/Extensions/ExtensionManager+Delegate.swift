@@ -170,7 +170,7 @@ extension ExtensionManager: WKWebExtensionControllerDelegate {
     ) {
         let identifier = context.uniqueIdentifier
         if nativeMessageSenders.insert(identifier).inserted {
-            Logger.extensions.notice("Messages natifs refusés (\(identifier, privacy: .private))")
+            Logger.extensions.notice("Native messages refused (\(identifier, privacy: .private))")
         }
         let delay = nativeMessages.delay(for: identifier, at: .now)
         Task {

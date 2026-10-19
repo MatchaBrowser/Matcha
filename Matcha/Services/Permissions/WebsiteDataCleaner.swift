@@ -36,11 +36,11 @@ enum WebsiteDataCleaner {
         let records = await store.dataRecords(ofTypes: types)
         let matching = records.filter { WebsiteDataMatcher.matches(recordName: $0.displayName, host: host) }
         guard !matching.isEmpty else {
-            Logger.permissions.info("Aucune donnée à effacer pour \(host, privacy: .private)")
+            Logger.permissions.info("No data to clear for \(host, privacy: .private)")
             return 0
         }
         await store.removeData(ofTypes: types, for: matching)
-        Logger.permissions.info("Données effacées pour \(host, privacy: .private) (\(matching.count, privacy: .public) enregistrements)")
+        Logger.permissions.info("Data cleared for \(host, privacy: .private) (\(matching.count, privacy: .public) records)")
         return matching.count
     }
 }

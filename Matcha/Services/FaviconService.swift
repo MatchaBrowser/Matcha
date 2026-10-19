@@ -137,7 +137,7 @@ final class FaviconService {
             store(data, favicon: favicon, forHost: host)
             return favicon
         }
-        Logger.favicons.debug("Aucune icône pour \(host, privacy: .private)")
+        Logger.favicons.debug("No icon for \(host, privacy: .private)")
         return nil
     }
 
@@ -181,7 +181,7 @@ final class FaviconService {
             try FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)
             try data.write(to: file, options: .atomic)
         } catch {
-            Logger.favicons.error("Icône non enregistrée sur disque : \(error.logSummary, privacy: .public)")
+            Logger.favicons.error("Icon not saved to disk: \(error.logSummary, privacy: .public)")
         }
     }
 

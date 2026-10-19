@@ -69,7 +69,7 @@ final class FindSession {
     func present() {
         if !isPresented {
             isPresented = true
-            Logger.browser.debug("Recherche dans la page ouverte")
+            Logger.browser.debug("Find in page opened")
         }
         focusRequest += 1
     }
@@ -96,7 +96,7 @@ final class FindSession {
             hasSelectedMatch = false
             performer?.deselectMatch()
         }
-        Logger.browser.debug("Recherche dans la page fermée")
+        Logger.browser.debug("Find in page closed")
     }
 
     /// Page released (tab unloaded, peek or mini window closed): everything is forgotten, without touching the page.

@@ -68,7 +68,7 @@ struct ArcImporter {
         summary.spaces = opened.count
         summary.favorites += importFavorites(sidebar.favorites, profiles: profiles, skipping: created)
         Logger.imports.info(
-            "Import d'Arc : \(summary.spaces, privacy: .public) Spaces, \(summary.tabs, privacy: .public) onglets",
+            "Arc import: \(summary.spaces, privacy: .public) Spaces, \(summary.tabs, privacy: .public) tabs",
         )
         return (summary, opened)
     }

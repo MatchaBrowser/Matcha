@@ -36,7 +36,7 @@ extension SyncEngine {
         } else {
             await chooseFirstSync()
         }
-        Logger.sync.notice("Première synchro : \(String(describing: choice), privacy: .public)")
+        Logger.sync.notice("First sync: \(String(describing: choice), privacy: .public)")
         switch choice {
         case .merge:
             applyRemote(liveIDs)

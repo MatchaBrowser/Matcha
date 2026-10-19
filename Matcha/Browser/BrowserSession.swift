@@ -147,7 +147,7 @@ final class BrowserSession {
         do {
             profiles = try container.mainContext.fetch(descriptor)
         } catch {
-            Logger.app.error("Profils illisibles : \(error.logSummary, privacy: .public)")
+            Logger.app.error("Unreadable profiles: \(error.logSummary, privacy: .public)")
         }
     }
 

@@ -47,8 +47,8 @@ final class ContentBlockerService {
                 return
             }
             defaults?.set(isEnabled, forKey: BrowserSettings.Key.blocksAdsAndTrackers)
-            let state = isEnabled ? "activé" : "désactivé"
-            Logger.contentBlocker.info("Bloqueur \(state, privacy: .public)")
+            let state = isEnabled ? "on" : "off"
+            Logger.contentBlocker.info("Blocker \(state, privacy: .public)")
             applyToPages(reloadingSite: nil)
         }
     }
@@ -107,7 +107,7 @@ final class ContentBlockerService {
         let compiled = loaded.count { $0.wasCompiled }
         let duration = (clock.now - start).formatted(.units(allowed: [.seconds, .milliseconds]))
         Logger.contentBlocker.info(
-            "Listes prêtes : \(loaded.count, privacy: .public) (\(compiled, privacy: .public) compilées), en \(duration, privacy: .public)",
+            "Lists ready: \(loaded.count, privacy: .public) (\(compiled, privacy: .public) compiled), in \(duration, privacy: .public)",
         )
         applyToPages(reloadingSite: nil)
     }
@@ -124,7 +124,7 @@ final class ContentBlockerService {
         guard let site = ContentBlockerExceptions.normalized(site), exceptions.set(isExcepted, forSite: site) else {
             return
         }
-        Logger.contentBlocker.info("Bloqueur \(isExcepted ? "désactivé" : "réactivé", privacy: .public) sur un site")
+        Logger.contentBlocker.info("Blocker \(isExcepted ? "turned off" : "turned on again", privacy: .public) on a site")
         exceptionsDidChange(forSite: site)
     }
 
@@ -160,12 +160,12 @@ final class ContentBlockerService {
         do {
             let lists = try await source.manifest()?.lists ?? []
             if lists.isEmpty {
-                Logger.contentBlocker.info("Aucune liste de blocage livrée : bloqueur inactif")
+                Logger.contentBlocker.info("No blocklist shipped: blocker inactive")
             }
             return lists
         } catch {
             let reason = error.localizedDescription
-            Logger.contentBlocker.error("Manifeste des listes de blocage illisible, bloqueur inactif : \(reason, privacy: .public)")
+            Logger.contentBlocker.error("Unreadable blocklist manifest, blocker inactive: \(reason, privacy: .public)")
             return []
         }
     }

@@ -51,7 +51,7 @@ final class DownloadManager: NSObject {
         self.defaults = defaults
         let saved = SavedDownloadList.load(from: defaults)
         items.append(contentsOf: saved.map(DownloadItem.init(saved:)))
-        Logger.downloads.info("Liste des téléchargements reprise : \(saved.count, privacy: .public)")
+        Logger.downloads.info("Downloads list restored: \(saved.count, privacy: .public)")
     }
 
     /// Saves the downloads of regular windows that are no longer in progress; when the app quits, also those in
@@ -78,7 +78,7 @@ final class DownloadManager: NSObject {
         active[ObjectIdentifier(download)] = item
         item.observe(download.progress)
         insert(item)
-        Logger.downloads.info("Téléchargement commencé (\(Self.origin(of: item), privacy: .private))")
+        Logger.downloads.info("Download started (\(Self.origin(of: item), privacy: .private))")
         return item
     }
 
@@ -102,7 +102,7 @@ final class DownloadManager: NSObject {
         stopTracking(item)
         item.markCancelled()
         saveList()
-        Logger.downloads.info("Téléchargement annulé (\(Self.origin(of: item), privacy: .private))")
+        Logger.downloads.info("Download cancelled (\(Self.origin(of: item), privacy: .private))")
         guard let download else {
             discardPartialFile(of: item)
             return
@@ -179,7 +179,7 @@ final class DownloadManager: NSObject {
             do {
                 try FileManager.default.removeItem(at: destination)
             } catch {
-                Logger.downloads.error("Fichier partiel non effacé : \(error.logSummary, privacy: .public)")
+                Logger.downloads.error("Partial file not deleted: \(error.logSummary, privacy: .public)")
             }
         }
         releaseReservation(of: item)

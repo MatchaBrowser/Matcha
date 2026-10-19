@@ -99,7 +99,7 @@ final class MiniCommandBarModel: CommandBarPanelModel {
         candidates = Array(repeating: [], count: providers.count)
         isPresented = true
         refresh(resetSelection: true)
-        Logger.miniWindow.debug("Barre de la mini-fenêtre ouverte")
+        Logger.miniWindow.debug("Mini window bar opened")
     }
 
     /// Settings changed while the bar is open: engine and suggestions follow immediately.

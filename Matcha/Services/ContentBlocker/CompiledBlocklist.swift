@@ -50,7 +50,7 @@ nonisolated struct CompiledBlocklist: Codable, Equatable, Sendable {
             // Entry by entry: an unreadable one is compiled again alone (audit R4).
             return try JSONDecoder().decode([Lenient<CompiledBlocklist>].self, from: data).compactMap(\.value)
         } catch {
-            Logger.contentBlocker.notice("Listes compilées retenues illisibles : elles seront recompilées")
+            Logger.contentBlocker.notice("Unreadable compiled lists: they will be compiled again")
             return []
         }
     }

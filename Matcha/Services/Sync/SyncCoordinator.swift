@@ -100,7 +100,7 @@ final class SyncCoordinator {
             lastSyncDate = .now
             status = .idle
         } catch {
-            Logger.sync.error("Synchro en échec : \(error.logSummary, privacy: .public)")
+            Logger.sync.error("Sync failed: \(error.logSummary, privacy: .public)")
             status = .failed
         }
         if needsAnotherCycle {

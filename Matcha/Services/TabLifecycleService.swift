@@ -66,7 +66,7 @@ final class TabLifecycleService {
             return
         }
         pressureMonitor = MemoryPressureMonitor { [weak self] level in
-            Logger.tabLifecycle.notice("Alerte mémoire : \(level.rawValue, privacy: .public)")
+            Logger.tabLifecycle.notice("Memory pressure: \(level.rawValue, privacy: .public)")
             self?.schedule(level == .critical ? .memoryCritical : .memoryWarning)
         }
     }
@@ -131,7 +131,7 @@ final class TabLifecycleService {
         }
         trimSnapshots(keeping: reason == .memoryCritical ? 0 : Self.maximumSnapshots)
         if count > 0 {
-            Logger.tabLifecycle.info("\(count, privacy: .public) onglet(s) mis en veille (\(reason.rawValue, privacy: .public))")
+            Logger.tabLifecycle.info("\(count, privacy: .public) tab(s) put to sleep (\(reason.rawValue, privacy: .public))")
         }
         return count
     }

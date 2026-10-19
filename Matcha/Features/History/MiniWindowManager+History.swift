@@ -22,6 +22,6 @@ extension MiniWindowManager {
         }
         space.tabManager.select(first)
         reveal(first, in: space, openMainWindow: openMainWindow)
-        Logger.history.info("\(urls.count, privacy: .public) pages ouvertes depuis l'historique")
+        Logger.history.info("\(urls.count, privacy: .public) pages opened from the history")
     }
 }

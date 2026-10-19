@@ -170,7 +170,7 @@ final class ExtensionManager: NSObject {
         installed[identifier] = webExtension
         store.setState(state(of: context, identifier: identifier, isEnabled: true), for: identifier)
         let errors = webExtension.errors.count
-        Logger.extensions.info("Extension chargée (\(identifier, privacy: .private), \(errors, privacy: .public) erreur(s) du manifeste)")
+        Logger.extensions.info("Extension loaded (\(identifier, privacy: .private), \(errors, privacy: .public) manifest error(s))")
         return context
     }
 
@@ -182,9 +182,9 @@ final class ExtensionManager: NSObject {
         saveState(of: context, identifier: identifier)
         do {
             try controller.unload(context)
-            Logger.extensions.info("Extension déchargée (\(identifier, privacy: .private))")
+            Logger.extensions.info("Extension unloaded (\(identifier, privacy: .private))")
         } catch {
-            Logger.extensions.error("Extension non déchargée : \(error.logSummary, privacy: .public)")
+            Logger.extensions.error("Extension not unloaded: \(error.logSummary, privacy: .public)")
         }
     }
 

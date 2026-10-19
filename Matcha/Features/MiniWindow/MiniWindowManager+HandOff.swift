@@ -65,7 +65,7 @@ extension MiniWindowManager {
         }
         controller.close()
         reveal(tab, in: space, openMainWindow: openMainWindow)
-        Logger.miniWindow.info("Page ouverte dans un Space")
+        Logger.miniWindow.info("Page opened in a Space")
     }
 
     /// The main window displays `space` and comes to the front, the page of `tab` takes the keyboard; if closed, it

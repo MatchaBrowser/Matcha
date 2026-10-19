@@ -8,7 +8,7 @@ import WebKit
 extension NavigationCoordinator {
     func webViewWebContentProcessDidTerminate(_ webView: WKWebView) {
         guard let tabHost, let page = tabHost.page(for: webView) else {
-            Logger.browser.notice("Processus d'une page inconnue arrêté")
+            Logger.browser.notice("Process of an unknown page terminated")
             return
         }
         let terminations = page.crash.processDidTerminate(at: now())
@@ -17,7 +17,7 @@ extension NavigationCoordinator {
         let host = page.url?.host() ?? "?"
         let window = Int(PageCrashCounter.window)
         Logger.browser.error("""
-        Processus de la page arrêté (\(host, privacy: .private)) : \(terminations, privacy: .public) fois en \
+        Page process terminated (\(host, privacy: .private)): \(terminations, privacy: .public) times in \
         \(window, privacy: .public) s, \(action.rawValue, privacy: .public)
         """)
         page.webContentProcessDidTerminate(action)

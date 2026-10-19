@@ -15,7 +15,7 @@ extension BrowserTab {
         guard let webView else {
             return
         }
-        Logger.browser.info("Son de la page mis en pause")
+        Logger.browser.info("Page sound paused")
         webView.pauseAllMediaPlayback { [weak self, weak webView] in
             // View released or replaced in the meantime: its icon has already been turned off.
             guard let self, let webView, self.webView === webView else {

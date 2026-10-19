@@ -8,7 +8,7 @@ extension SyncEngine {
         do {
             try await readChanges(from: state.cursor)
         } catch SyncTransportError.cursorExpired {
-            Logger.sync.notice("Curseur expiré : relecture complète")
+            Logger.sync.notice("Expired cursor: full reread")
             try await rereadEverything()
         }
     }
@@ -46,7 +46,7 @@ extension SyncEngine {
         }
         entry.version = record.version
         guard let content = record.content else {
-            Logger.sync.error("Enregistrement illisible ignoré")
+            Logger.sync.error("Unreadable record ignored")
             state.entries[record.id] = entry
             return false
         }
@@ -101,7 +101,7 @@ extension SyncEngine {
                 changes.append(.upsert(id, fields))
             } else {
                 // Unknown type, format or value: ignored, without overwriting what this Mac has.
-                Logger.sync.notice("Enregistrement d'un format inconnu ignoré")
+                Logger.sync.notice("Record of an unknown format ignored")
             }
         }
         guard !changes.isEmpty else {

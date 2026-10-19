@@ -30,6 +30,6 @@ enum PagePrinter {
             return
         }
         operation(for: webView, title: page.displayTitle).runModal(for: window, delegate: nil, didRun: nil, contextInfo: nil)
-        Logger.browser.info("Impression de la page")
+        Logger.browser.info("Printing the page")
     }
 }

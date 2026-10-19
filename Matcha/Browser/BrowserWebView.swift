@@ -48,7 +48,7 @@ final class BrowserWebView: WKWebView {
 
     @available(*, unavailable)
     required init?(coder _: NSCoder) {
-        fatalError("init(coder:) n'est pas pris en charge")
+        fatalError("init(coder:) is not supported")
     }
 
     @objc private func webInspectionDidChange() {

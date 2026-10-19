@@ -63,9 +63,9 @@ final class ArcImportModel {
             do {
                 let sidebar = try await Self.read(url)
                 request = Request(sidebar: sidebar)
-                Logger.imports.info("Barre d'Arc lue : \(sidebar.spaces.count, privacy: .public) Spaces")
+                Logger.imports.info("Arc sidebar read: \(sidebar.spaces.count, privacy: .public) Spaces")
             } catch {
-                Logger.imports.error("Barre d'Arc illisible : \(error.logSummary, privacy: .public)")
+                Logger.imports.error("Unreadable Arc sidebar: \(error.logSummary, privacy: .public)")
                 isFailurePresented = true
             }
         }

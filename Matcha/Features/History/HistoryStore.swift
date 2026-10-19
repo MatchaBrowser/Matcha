@@ -96,7 +96,7 @@ final class HistoryStore {
             recentRecords.removeFirst()
         }
         apply(.insert(visit, profileID: profileID))
-        Logger.history.debug("Visite retenue")
+        Logger.history.debug("Visit recorded")
         return visit
     }
 
@@ -149,7 +149,7 @@ final class HistoryStore {
         do {
             try context.delete(model: HistoryRecord.self, where: predicate)
         } catch {
-            Logger.history.error("Visites non supprimées : \(error.logSummary, privacy: .public)")
+            Logger.history.error("Visits not deleted: \(error.logSummary, privacy: .public)")
         }
     }
 
@@ -157,7 +157,7 @@ final class HistoryStore {
         do {
             try context.save()
         } catch {
-            Logger.history.error("Historique non enregistré : \(error.logSummary, privacy: .public)")
+            Logger.history.error("History not saved: \(error.logSummary, privacy: .public)")
         }
     }
 

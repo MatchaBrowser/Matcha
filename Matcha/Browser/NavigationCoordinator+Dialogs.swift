@@ -58,7 +58,7 @@ extension NavigationCoordinator {
         let answer = await dialogs.present(dialog, for: webView)
         if answer?.suppressesFurther == true {
             page.pageDialogs.suppress()
-            Logger.browser.info("Dialogues de la page arrêtés par l'utilisateur")
+            Logger.browser.info("Page dialogs stopped by the user")
         }
         return answer
     }

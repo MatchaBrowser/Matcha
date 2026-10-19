@@ -15,7 +15,7 @@ extension DownloadManager: WKDownloadDelegate {
             return
         }
         guard let destination = reserveDestination(for: item, suggestedFilename: suggestedFilename, response: response) else {
-            Logger.downloads.error("Dossier Téléchargements introuvable : téléchargement abandonné")
+            Logger.downloads.error("Downloads folder not found: download dropped")
             stopTracking(item)
             item.markFailed(reason: String(localized: "The Downloads folder is not available."))
             saveList()
@@ -42,7 +42,7 @@ extension DownloadManager: WKDownloadDelegate {
         item.markFinished(size: size.map(Int64.init))
         recordFinish(in: item.scope)
         saveList()
-        Logger.downloads.info("Téléchargement terminé (\(Self.origin(of: item), privacy: .private))")
+        Logger.downloads.info("Download finished (\(Self.origin(of: item), privacy: .private))")
     }
 
     func download(_ download: WKDownload, didFailWithError error: any Error, resumeData _: Data?) {
@@ -52,11 +52,11 @@ extension DownloadManager: WKDownloadDelegate {
         stopTracking(item)
         if (error as? URLError)?.code == .cancelled {
             item.markCancelled()
-            Logger.downloads.info("Téléchargement interrompu (\(Self.origin(of: item), privacy: .private))")
+            Logger.downloads.info("Download interrupted (\(Self.origin(of: item), privacy: .private))")
         } else {
             item.markFailed(reason: error.localizedDescription)
             Logger.downloads.error(
-                "Téléchargement en échec (\(Self.origin(of: item), privacy: .private)) : \(error.logSummary, privacy: .public)",
+                "Download failed (\(Self.origin(of: item), privacy: .private)): \(error.logSummary, privacy: .public)",
             )
         }
         discardPartialFile(of: item)
@@ -75,11 +75,11 @@ extension DownloadManager: WKDownloadDelegate {
         ))
         switch outcome {
         case .alreadyQuarantined:
-            Logger.downloads.debug("Attribut de quarantaine déjà posé")
+            Logger.downloads.debug("Quarantine attribute already set")
         case .added:
-            Logger.downloads.notice("Attribut de quarantaine absent : posé par Matcha")
+            Logger.downloads.notice("Quarantine attribute missing: set by Matcha")
         case .failed:
-            Logger.downloads.fault("Fichier téléchargé sans attribut de quarantaine")
+            Logger.downloads.fault("Downloaded file without a quarantine attribute")
         }
     }
 }

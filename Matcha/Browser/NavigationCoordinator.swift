@@ -59,9 +59,9 @@ final class NavigationCoordinator: NSObject {
     func open(externally url: URL) {
         let scheme = url.scheme ?? "?"
         if openExternally(url) {
-            Logger.browser.info("Lien \(scheme, privacy: .public): confié à une autre app")
+            Logger.browser.info("\(scheme, privacy: .public): link handed to another app")
         } else {
-            Logger.browser.notice("Aucune app ne gère les liens \(scheme, privacy: .public):")
+            Logger.browser.notice("No app handles \(scheme, privacy: .public): links")
         }
     }
 
@@ -221,7 +221,7 @@ extension NavigationCoordinator: WKUIDelegate {
         }
         // Never the address: only the host.
         let host = navigationAction.request.url?.host() ?? "?"
-        Logger.browser.info("Fenêtre de connexion ouverte (\(host, privacy: .private))")
+        Logger.browser.info("Sign-in window opened (\(host, privacy: .private))")
         return popupWindows.open(configuration: configuration, features: features, opener: PopupOpener(host: tabHost, webView: webView))
     }
 

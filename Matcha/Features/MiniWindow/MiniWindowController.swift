@@ -70,7 +70,7 @@ final class MiniWindowController: NSObject, Identifiable {
         panel.makeFirstResponder(nil)
         switch submission {
         case let .load(url):
-            Logger.miniWindow.info("Adresse chargée dans une mini-fenêtre")
+            Logger.miniWindow.info("Address loaded in a mini window")
             tab.load(url)
             showWebView()
         case .copyURL:
@@ -109,7 +109,7 @@ final class MiniWindowController: NSObject, Identifiable {
         TabLinkCopier.copy(url, to: pasteboard)
         copyConfirmation.show()
         // Never the address itself.
-        Logger.miniWindow.info("Adresse copiée depuis une mini-fenêtre")
+        Logger.miniWindow.info("Address copied from a mini window")
     }
 
     // MARK: Closing

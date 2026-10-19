@@ -70,7 +70,7 @@ extension SyncEngine {
             entry.version = current.version
             guard let content = current.content else {
                 // Unreadable: never overwritten; this Mac's change is dropped.
-                Logger.sync.error("Conflit avec un enregistrement illisible : changement abandonné")
+                Logger.sync.error("Conflict with an unreadable record: change dropped")
                 entry.local = pending.local
                 state.entries[change.id] = entry
                 state.pending[change.id] = nil
@@ -86,7 +86,7 @@ extension SyncEngine {
             }
             return .retry
         case let .rejected(code):
-            Logger.sync.error("Changement refusé par le serveur : \(code, privacy: .public)")
+            Logger.sync.error("Change refused by the server: \(code, privacy: .public)")
             state.rejected[change.id] = pending.local ?? .null
             state.pending[change.id] = nil
             return .done

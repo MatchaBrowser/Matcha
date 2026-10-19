@@ -10,7 +10,7 @@ extension BrowserTab {
             return false
         }
         guard let state = webView.interactionState as? Data else {
-            Logger.browser.notice("État de navigation illisible : l'onglet sera restauré depuis son adresse")
+            Logger.browser.notice("Unreadable navigation state: the tab will be restored from its address")
             return false
         }
         savedInteractionState = state

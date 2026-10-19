@@ -44,7 +44,7 @@ extension ExtensionManager {
             tabManager.setPlace(tab, to: .pinned)
         }
         windows.update()
-        Logger.extensions.info("Onglet ouvert pour une extension")
+        Logger.extensions.info("Tab opened for an extension")
         return tab
     }
 
@@ -63,7 +63,7 @@ extension ExtensionManager {
             controller.showCommandBar(.newSearch)
         }
         windows.update()
-        Logger.extensions.info("Mini-fenêtre ouverte pour une extension")
+        Logger.extensions.info("Mini window opened for an extension")
         return controller
     }
 
@@ -82,7 +82,7 @@ extension ExtensionManager {
         promptingContexts.insert(key)
         permissionPrompter.ask(request) { [weak self] allowed in
             self?.promptingContexts.remove(key)
-            Logger.extensions.info("Demande de permissions \(allowed ? "accordée" : "refusée", privacy: .public)")
+            Logger.extensions.info("Permission request \(allowed ? "granted" : "denied", privacy: .public)")
             completion(allowed)
         }
     }

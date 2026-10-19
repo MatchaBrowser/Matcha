@@ -49,7 +49,7 @@ extension NavigationCoordinator {
         response: PermissionResponse,
     ) {
         guard let tabHost, let page = tabHost.page(for: webView) else {
-            Logger.permissions.notice("Demande refusée : page inconnue")
+            Logger.permissions.notice("Request denied: unknown page")
             response.send(false)
             return
         }
@@ -58,13 +58,13 @@ extension NavigationCoordinator {
         let host = origin?.displayHost ?? "?"
         switch SitePermissionPolicy.evaluate(kinds, stored: stored) {
         case .grant:
-            Logger.permissions.info("Demande accordée par une décision retenue (\(host, privacy: .private))")
+            Logger.permissions.info("Request granted by a remembered decision (\(host, privacy: .private))")
             response.send(true)
         case .deny:
-            Logger.permissions.info("Demande refusée par une décision retenue (\(host, privacy: .private))")
+            Logger.permissions.info("Request denied by a remembered decision (\(host, privacy: .private))")
             response.send(false)
         case let .ask(asked):
-            Logger.permissions.info("Demande en attente dans le bandeau (\(host, privacy: .private))")
+            Logger.permissions.info("Request waiting in the banner (\(host, privacy: .private))")
             page.permissionPrompts.enqueue(SitePermissionRequest(
                 origin: origin,
                 frameName: frameOrigin.flatMap { $0 == origin ? nil : $0.displayName },

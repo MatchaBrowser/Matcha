@@ -25,7 +25,7 @@ extension ExtensionSyncAdapter {
             do {
                 let folder = directory.appendingPathComponent(identifier, isDirectory: true)
                 guard let (package, sealed) = try await Self.sealPackage(of: folder, version: version, fileName: "\(identifier).zip") else {
-                    Logger.sync.notice("Paquet d'extension trop gros : il ne voyage pas")
+                    Logger.sync.notice("Extension package too large: not synced")
                     continue
                 }
                 try await transport.putBlob(sealed, id: package.blobID)
@@ -34,7 +34,7 @@ extension ExtensionSyncAdapter {
                 }
                 synced.packages[identifier] = package
             } catch {
-                Logger.sync.error("Paquet d'extension non envoyé : \(error.logSummary, privacy: .public)")
+                Logger.sync.error("Extension package not sent: \(error.logSummary, privacy: .public)")
             }
         }
         await installUpdates(using: transport)
@@ -52,7 +52,7 @@ extension ExtensionSyncAdapter {
                 try await transport.deleteBlob(id: id)
                 synced.obsoleteBlobs.removeAll { $0 == id }
             } catch {
-                Logger.sync.error("Ancien paquet d'extension non supprimé : \(error.logSummary, privacy: .public)")
+                Logger.sync.error("Old extension package not deleted: \(error.logSummary, privacy: .public)")
                 return
             }
         }
@@ -100,7 +100,7 @@ extension ExtensionSyncAdapter {
                 // Not arrived yet: at the next sync.
                 continue
             } catch {
-                Logger.sync.error("Mise à jour d'extension reçue non installée : \(error.logSummary, privacy: .public)")
+                Logger.sync.error("Received extension update not installed: \(error.logSummary, privacy: .public)")
             }
         }
     }

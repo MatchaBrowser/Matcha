@@ -96,7 +96,7 @@ enum PageAudioScript {
 final class PageAudioMessageHandler: NSObject, WKScriptMessageHandler {
     func userContentController(_: WKUserContentController, didReceive message: WKScriptMessage) {
         guard let report = PageAudioReport(messageBody: message.body) else {
-            Logger.browser.notice("Message du script de son mal formé : ignoré")
+            Logger.browser.notice("Malformed sound script message: ignored")
             return
         }
         (message.webView as? BrowserWebView)?.audio?.receive(report)

@@ -104,7 +104,7 @@ enum PageFindResponder {
     private static func useSelection(of page: BrowserTab) {
         page.webView?.evaluateJavaScript("getSelection().toString()") { result, error in
             if let error {
-                Logger.browser.error("Sélection de la page illisible : \(error.logSummary, privacy: .public)")
+                Logger.browser.error("Unreadable page selection: \(error.logSummary, privacy: .public)")
             }
             if let text = result as? String {
                 page.find.useSelection(text)

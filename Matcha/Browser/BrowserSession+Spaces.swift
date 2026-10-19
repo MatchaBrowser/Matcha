@@ -71,7 +71,7 @@ extension BrowserSession {
         container.mainContext.insert(record)
         save(container.mainContext)
         openSpace(record)
-        Logger.app.notice("Plus aucun Space : Space par défaut recréé")
+        Logger.app.notice("No Space left: default Space created again")
     }
 
     /// Deletes the Space, its tabs and its folders. The last Space cannot be deleted.
@@ -91,7 +91,7 @@ extension BrowserSession {
         do {
             try context.save()
         } catch {
-            Logger.app.error("Spaces non enregistrés : \(error.logSummary, privacy: .public)")
+            Logger.app.error("Spaces not saved: \(error.logSummary, privacy: .public)")
         }
     }
 }

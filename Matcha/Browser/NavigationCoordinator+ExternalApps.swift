@@ -10,7 +10,7 @@ extension NavigationCoordinator {
     func requestOpening(_ url: URL, from webView: WKWebView) {
         let scheme = url.scheme?.lowercased() ?? "?"
         guard let appURL = applicationForURL(url) else {
-            Logger.browser.notice("Aucune app ne gère les liens \(scheme, privacy: .public):")
+            Logger.browser.notice("No app handles \(scheme, privacy: .public): links")
             return
         }
         guard let page = tabHost?.page(for: webView) else {
@@ -32,9 +32,9 @@ extension NavigationCoordinator {
             perform: { [weak self] in self?.open(externally: url) },
         )
         if page.permissionPrompts.enqueue(request) {
-            Logger.browser.info("Lien \(scheme, privacy: .public): en attente dans le bandeau")
+            Logger.browser.info("\(scheme, privacy: .public): link waiting in the banner")
         } else {
-            Logger.browser.notice("Lien \(scheme, privacy: .public): ignoré, la même demande attend déjà")
+            Logger.browser.notice("\(scheme, privacy: .public): link ignored, the same request is already waiting")
         }
     }
 }

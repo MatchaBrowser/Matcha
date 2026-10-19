@@ -68,7 +68,7 @@ final class PermissionPromptQueue {
             return
         }
         let request = actions.removeFirst()
-        Logger.permissions.info("Demande \(request.action.key, privacy: .public) : \(String(describing: answer), privacy: .public)")
+        Logger.permissions.info("Request \(request.action.key, privacy: .public): \(String(describing: answer), privacy: .public)")
         if answer == .alwaysAllow, let origin = request.origin, let scope = request.scope {
             scope.allow(request.action, origin: origin)
         }
@@ -92,7 +92,7 @@ final class PermissionPromptQueue {
             }
         }
         let granted = SitePermissionPolicy.grants(answer)
-        Logger.permissions.info("Demande \(granted ? "accordée" : "refusée", privacy: .public) depuis le bandeau")
+        Logger.permissions.info("Request \(granted ? "granted" : "denied", privacy: .public) from the banner")
         request.response.send(granted)
         resolveDecided()
     }
@@ -107,7 +107,7 @@ final class PermissionPromptQueue {
         }
         let pending = requests
         requests = []
-        Logger.permissions.info("\(pending.count, privacy: .public) demande(s) refusée(s) : page quittée")
+        Logger.permissions.info("\(pending.count, privacy: .public) request(s) denied: page left")
         pending.forEach { $0.response.send(false) }
     }
 

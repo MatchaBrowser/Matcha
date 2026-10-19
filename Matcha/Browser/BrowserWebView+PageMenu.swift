@@ -84,10 +84,10 @@ extension BrowserWebView {
         pageMenuIntent.choose(choice.item.destination, openingPoint: choice.openingPoint, at: .now)
         guard NSApp.sendAction(action, to: choice.original.target, from: choice.original) else {
             pageMenuIntent.cancel()
-            Logger.browser.notice("Menu contextuel : l'élément de WebKit n'a pas répondu")
+            Logger.browser.notice("Context menu: the WebKit item did not respond")
             return
         }
-        Logger.browser.info("Menu contextuel : \(choice.item.logName, privacy: .public)")
+        Logger.browser.info("Context menu: \(choice.item.logName, privacy: .public)")
     }
 }
 
@@ -128,11 +128,11 @@ private extension PageMenuItem {
     var logName: String {
         switch self {
         case .openLinkInNewTab:
-            "lien dans un nouvel onglet"
+            "link in a new tab"
         case .openLinkInPeek:
-            "lien dans un aperçu"
+            "link in a peek"
         case .openImageInNewTab:
-            "image dans un nouvel onglet"
+            "image in a new tab"
         }
     }
 }

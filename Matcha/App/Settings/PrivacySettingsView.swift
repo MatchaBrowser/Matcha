@@ -56,7 +56,7 @@ struct PrivacySettingsView: View {
         for store in session.allDataStores() {
             await store.removeData(ofTypes: WKWebsiteDataStore.allWebsiteDataTypes(), modifiedSince: .distantPast)
         }
-        Logger.app.info("Cookies et données des sites effacés")
+        Logger.app.info("Cookies and website data cleared")
         isClearing = false
         lastCleared = .now
     }

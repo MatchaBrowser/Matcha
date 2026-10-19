@@ -26,7 +26,7 @@ extension ExtensionManager {
                         try load(webExtension, identifier: identifier)
                     }
                 } catch {
-                    Logger.extensions.error("Extension non chargée : \(error.logSummary, privacy: .public)")
+                    Logger.extensions.error("Extension not loaded: \(error.logSummary, privacy: .public)")
                 }
             }
         }
@@ -71,13 +71,13 @@ extension ExtensionManager {
                 do {
                     try FileManager.default.removeItem(at: folder)
                 } catch {
-                    Logger.extensions.error("Dossier d'extension non supprimé : \(error.logSummary, privacy: .public)")
+                    Logger.extensions.error("Extension folder not deleted: \(error.logSummary, privacy: .public)")
                 }
             }
         }
         store.removeState(for: identifier)
         forget(identifier)
-        Logger.extensions.info("Extension désinstallée (\(identifier, privacy: .private))")
+        Logger.extensions.info("Extension uninstalled (\(identifier, privacy: .private))")
     }
 
     /// Opens `url` in a new tab of the browser window (never private) and brings it to the front: links from the

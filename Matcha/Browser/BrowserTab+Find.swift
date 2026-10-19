@@ -22,7 +22,7 @@ extension BrowserTab: FindPerformer {
             return try await webView.find(query, configuration: configuration).matchFound
         } catch {
             // Never the searched text.
-            Logger.browser.error("Recherche dans la page impossible : \(String(describing: type(of: error)), privacy: .public)")
+            Logger.browser.error("Find in page failed: \(String(describing: type(of: error)), privacy: .public)")
             return nil
         }
     }

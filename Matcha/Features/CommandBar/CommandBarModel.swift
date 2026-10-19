@@ -108,7 +108,7 @@ final class CommandBarModel {
         candidates = Array(repeating: [], count: providers.count)
         isPresented = true
         refresh(resetSelection: true)
-        Logger.commandBar.debug("Barre ouverte")
+        Logger.commandBar.debug("Command bar opened")
     }
 
     // MARK: Input and selection
@@ -167,7 +167,7 @@ final class CommandBarModel {
         pristineURL = nil
         candidates = Array(repeating: [], count: providers.count)
         mode = .newTab
-        Logger.commandBar.debug("Barre fermée")
+        Logger.commandBar.debug("Command bar closed")
     }
 
     /// Tests: waits for the current search to finish.

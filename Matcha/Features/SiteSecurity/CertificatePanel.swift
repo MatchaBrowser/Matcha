@@ -42,7 +42,7 @@ enum CertificatePanel {
             localized: "Encryption with a digital certificate keeps information private as it's sent to or from this website.",
             comment: "Certificate panel: what the certificate is for",
         ))
-        Logger.browser.info("Certificat affiché")
+        Logger.browser.info("Certificate shown")
         if let window, window.isVisible, window.attachedSheet == nil {
             panel.beginSheet(for: window, modalDelegate: nil, didEnd: nil, contextInfo: nil, trust: trust, message: message)
         } else {

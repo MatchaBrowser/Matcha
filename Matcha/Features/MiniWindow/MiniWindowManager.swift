@@ -69,7 +69,7 @@ final class MiniWindowManager {
                 }
                 // During a modal alert (“Quit Matcha?”), no window would take the keyboard.
                 guard NSApp.modalWindow == nil else {
-                    Logger.miniWindow.notice("Raccourci de la mini-fenêtre ignoré pendant une alerte")
+                    Logger.miniWindow.notice("Mini window shortcut ignored during an alert")
                     continue
                 }
                 openNew(source: .shortcut)
@@ -109,7 +109,7 @@ final class MiniWindowManager {
         } else {
             controller.showCommandBar(.newSearch)
         }
-        Logger.miniWindow.info("Mini-fenêtre ouverte (\(source.rawValue, privacy: .public))")
+        Logger.miniWindow.info("Mini window opened (\(source.rawValue, privacy: .public))")
         return controller
     }
 

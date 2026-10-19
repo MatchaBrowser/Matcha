@@ -33,7 +33,7 @@ extension BrowserSession {
         do {
             return try BrowserSession(container: BrowserSchema.makeContainer(configuration))
         } catch {
-            Logger.app.error("Base illisible : \(error.logSummary, privacy: .public)")
+            Logger.app.error("Unreadable store: \(error.logSummary, privacy: .public)")
             switch onFailure(error) {
             case .quit:
                 return nil
@@ -54,10 +54,10 @@ extension BrowserSession {
     private static func startOver(_ configuration: ModelConfiguration) -> BrowserSession? {
         do {
             let aside = try BrowserSchema.moveAside(storeAt: configuration.url)
-            Logger.app.notice("Base illisible mise de côté : \(aside.lastPathComponent, privacy: .public)")
+            Logger.app.notice("Unreadable store set aside: \(aside.lastPathComponent, privacy: .public)")
             return try BrowserSession(container: BrowserSchema.makeContainer(configuration))
         } catch {
-            Logger.app.error("Nouvelle base impossible : \(error.logSummary, privacy: .public)")
+            Logger.app.error("New store failed: \(error.logSummary, privacy: .public)")
             return nil
         }
     }

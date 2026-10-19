@@ -61,7 +61,7 @@ final class SearchSuggestionsProvider: CommandProvider {
             return
         }
         let reason = reason(for: error)
-        Logger.commandBar.debug("Suggestions indisponibles (\(engine.rawValue, privacy: .public)) : \(reason, privacy: .public)")
+        Logger.commandBar.debug("Suggestions unavailable (\(engine.rawValue, privacy: .public)): \(reason, privacy: .public)")
     }
 
     private static func reason(for error: any Error) -> String {

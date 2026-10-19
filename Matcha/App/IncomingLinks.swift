@@ -29,7 +29,7 @@ final class IncomingLinks {
             return
         }
         // Never the address: only the count.
-        Logger.app.info("Liens d'une autre app : \(accepted.count, privacy: .public)")
+        Logger.app.info("Links from another app: \(accepted.count, privacy: .public)")
         if let handler {
             handler(accepted)
         } else {

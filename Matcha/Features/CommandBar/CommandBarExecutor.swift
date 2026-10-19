@@ -78,7 +78,7 @@ struct CommandBarExecutor {
     /// Selects the tab in its Space, then shows that Space if it is not shown.
     private func switchToTab(_ reference: TabReference) -> BrowserTab? {
         guard let (space, tab) = windowModel.locate(reference) else {
-            Logger.commandBar.notice("Onglet introuvable")
+            Logger.commandBar.notice("Tab not found")
             return windowModel.space.tabManager.selectedTab
         }
         log("switch")
@@ -112,6 +112,6 @@ struct CommandBarExecutor {
 
     /// Kind of the executed row, never its address.
     private func log(_ kind: String) {
-        Logger.commandBar.info("Ligne exécutée : \(kind, privacy: .public)")
+        Logger.commandBar.info("Row run: \(kind, privacy: .public)")
     }
 }

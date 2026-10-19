@@ -22,7 +22,7 @@ enum DefaultBrowser {
             } catch {
                 Logger.app
                     .notice(
-                        "Navigateur par défaut inchangé (\(scheme, privacy: .public)) : \(error.logSummary, privacy: .public)",
+                        "Default browser unchanged (\(scheme, privacy: .public)): \(error.logSummary, privacy: .public)",
                     )
                 return isMatcha
             }

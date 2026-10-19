@@ -67,7 +67,7 @@ final class SyncEngine {
         await store.finish(using: transport)
         let (sent, received, conflicts) = (report.sent, report.received, report.conflicts)
         Logger.sync.info(
-            "Synchro : \(sent, privacy: .public) envoyés, \(received, privacy: .public) reçus, \(conflicts, privacy: .public) conflits",
+            "Sync: \(sent, privacy: .public) sent, \(received, privacy: .public) received, \(conflicts, privacy: .public) conflicts",
         )
         return report
     }
@@ -110,7 +110,7 @@ final class SyncEngine {
         do {
             try file.save(state)
         } catch {
-            Logger.sync.error("État de la synchro non enregistré : \(error.logSummary, privacy: .public)")
+            Logger.sync.error("Sync state not saved: \(error.logSummary, privacy: .public)")
         }
     }
 }
