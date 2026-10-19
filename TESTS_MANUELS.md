@@ -551,3 +551,7 @@ Après la 8.1 (l'app déclarée comme navigateur).
 - [ ] Clic droit sur le fond d'une page : Précédent, Suivant (grisés s'il n'y a pas d'historique), Recharger ; Enregistrer sous…, Imprimer… ; Afficher le code source (puis Inspecter l'élément avec les outils pour développeurs). Sur un lien, une image ou un texte sélectionné, le menu de WebKit ne change pas (sauf « Ouvrir … dans un nouvel onglet » et l'aperçu).
 - [ ] « Enregistrer sous… » : feuille d'enregistrement au titre de la page, « Format » Archive web ou Code source de la page ; l'archive se rouvre dans Safari avec ses images.
 - [ ] « Afficher le code source » : un nouvel onglet « Source de … », lignes numérotées, en clair comme en sombre ; d'une page où l'on est connecté, le code de la page connectée ; quitte et relance : l'onglet relit le code.
+
+## Corrections de l'audit
+
+- [ ] W1 : « Afficher le code source » marche toujours (page connectée, fichier local, après relancement). Un lien `matcha-source:https://…` cliqué dans une page n'affiche que l'explication « Pour voir le code source de cette page… », sans rien charger.

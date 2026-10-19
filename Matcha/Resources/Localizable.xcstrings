@@ -11739,6 +11739,35 @@
         }
       }
     },
+    "The source of this page is too large to be shown." : {
+      "comment" : "Page source viewer, error",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Der Quelltext dieser Seite ist zu groß, um angezeigt zu werden."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "El código fuente de esta página es demasiado grande para mostrarse."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Le code source de cette page est trop volumineux pour être affiché."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Il sorgente di questa pagina è troppo grande per essere mostrato."
+          }
+        }
+      }
+    },
     "Theme" : {
       "comment" : "Space editor: title of the theme section",
       "localizations" : {
@@ -11764,6 +11793,35 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Tema"
+          }
+        }
+      }
+    },
+    "This address isn't a file." : {
+      "comment" : "Page source viewer, error for a local address",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Diese Adresse ist keine Datei."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Esta dirección no es un archivo."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cette adresse n'est pas un fichier."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Questo indirizzo non è un file."
           }
         }
       }
@@ -11992,6 +12050,35 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Questa pagina non ha impostazioni del sito web."
+          }
+        }
+      }
+    },
+    "To see the source of this page, open the page, then choose View Page Source in its menu." : {
+      "comment" : "Page source viewer opened without the page's menu (link, restored history)",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Um den Quelltext dieser Seite anzuzeigen, öffne die Seite und wähle dann „Seitenquelltext anzeigen“ in ihrem Menü."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Para ver el código fuente de esta página, abre la página y elige Ver código fuente en su menú."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pour voir le code source de cette page, ouvrez la page, puis choisissez Afficher le code source dans son menu."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Per vedere il sorgente di questa pagina, apri la pagina e scegli Mostra sorgente pagina nel suo menu."
           }
         }
       }

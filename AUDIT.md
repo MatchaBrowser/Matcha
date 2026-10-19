@@ -32,7 +32,7 @@ Date : 2026-10-19, sur le commit `a94cf2e`. Audit en lecture seule : 9 analyses,
 
 ## 1. Sécurité du contenu web
 
-**W1. Toute page peut utiliser `matcha-source:`** (Critique, actif, vérifié)
+**✅ W1. Toute page peut utiliser `matcha-source:`** (Critique, actif, vérifié) — corrigé : seulement les afficheurs ouverts par l'app, en cadre principal, par profil ; fichiers ordinaires, 32 Mo au plus, hors du fil principal (la relecture du site reste : l'archive web donne le DOM modifié, pas le code reçu).
 - **Problème** : le gestionnaire est enregistré sur toutes les pages et sert n'importe quelle requête. Cela inclut celles d'une page web : `<img src="matcha-source:https://banque/…">`, une iframe, `location=` ou `window.open`.
   - Il refait la requête hors de WebKit avec **tous les cookies du profil**. Les cookies `SameSite=Strict` passent, et la protection contre le pistage est contournée.
   - Il lit les fichiers `file:` sur le fil principal, sans limite. `matcha-source:file:///dev/zero` gèle l'app.
