@@ -59,6 +59,64 @@
         }
       }
     },
+    "%@ wants to download files." : {
+      "comment" : "Banner: a website wants to download files without a click; %@ is the website",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ möchte Dateien laden."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ quiere descargar archivos."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ veut télécharger des fichiers."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ vuole scaricare dei file."
+          }
+        }
+      }
+    },
+    "%@ wants to open %@." : {
+      "comment" : "Banner: a website asks to open another app; the first %@ is the website, the second the app",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@ möchte %2$@ öffnen."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@ quiere abrir %2$@."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@ veut ouvrir %2$@."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@ vuole aprire %2$@."
+          }
+        }
+      }
+    },
     "%@ wants to use your camera and microphone." : {
       "comment" : "Permission banner; %@ is the website",
       "localizations" : {
@@ -1475,7 +1533,7 @@
       }
     },
     "Allow" : {
-      "comment" : "Site settings: the website may use the camera or microphone without asking",
+      "comment" : "Banner where a website wants to download files: allow them for this page\nSite settings: the website may use the camera or microphone without asking",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -1589,6 +1647,35 @@
         }
       }
     },
+    "Allowed Without Asking" : {
+      "comment" : "Settings > Privacy: websites that may open an app or download files without asking",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ohne Nachfrage erlaubt"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Permitido sin preguntar"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Permis sans demander"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Consentito senza chiedere"
+          }
+        }
+      }
+    },
     "Also import open tabs" : {
       "comment" : "Arc import preview: option, off by default",
       "localizations" : {
@@ -1619,7 +1706,7 @@
       }
     },
     "Always Allow" : {
-      "comment" : "Permission banner: allow, and remember it for this website",
+      "comment" : "Banner where a website wants to download files: allow, and from now on without asking\nPermission banner: allow, and remember it for this website",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -1643,6 +1730,35 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Consenti sempre"
+          }
+        }
+      }
+    },
+    "Always Open" : {
+      "comment" : "Banner where a website asks to open another app: open it, and from now on without asking",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Immer öffnen"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Abrir siempre"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Toujours ouvrir"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Apri sempre"
           }
         }
       }
@@ -1759,6 +1875,35 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Chiedi"
+          }
+        }
+      }
+    },
+    "Ask Again" : {
+      "comment" : "Forgets that a website may open an app or download files without asking: it will ask again",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wieder fragen"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Volver a preguntar"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Redemander"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Chiedi di nuovo"
           }
         }
       }
@@ -4140,7 +4285,7 @@
       }
     },
     "Don't Allow" : {
-      "comment" : "Permission banner: refuse, and remember it for this website",
+      "comment" : "Banner where a website wants to download files: refuse\nPermission banner: refuse, and remember it for this website",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -4164,6 +4309,35 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Non consentire"
+          }
+        }
+      }
+    },
+    "Download Request" : {
+      "comment" : "Accessibility label of the banner where a website asks to download files",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Download-Anfrage"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Solicitud de descarga"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Demande de téléchargement"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Richiesta di download"
           }
         }
       }
@@ -4192,6 +4366,35 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Download"
+          }
+        }
+      }
+    },
+    "Downloads files" : {
+      "comment" : "A website may download files without asking",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lädt Dateien"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Descarga archivos"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Télécharge des fichiers"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Scarica file"
           }
         }
       }
@@ -7846,6 +8049,35 @@
         }
       }
     },
+    "No website opens apps or downloads files without asking." : {
+      "comment" : "Settings > Privacy: no website may open an app or download files without asking",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Keine Website öffnet Apps oder lädt Dateien, ohne zu fragen."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ningún sitio web abre apps ni descarga archivos sin preguntar."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aucun site n'ouvre d'app ni ne télécharge de fichiers sans demander."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nessun sito web apre app o scarica file senza chiedere."
+          }
+        }
+      }
+    },
     "Not Found" : {
       "comment" : "Find bar: the last search found nothing in the page",
       "localizations" : {
@@ -7958,6 +8190,35 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Oceano"
+          }
+        }
+      }
+    },
+    "Open" : {
+      "comment" : "Banner where a website asks to open another app: open the link in that app",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Öffnen"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Abrir"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ouvrir"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Apri"
           }
         }
       }
@@ -8390,6 +8651,35 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Apri la pagina delle estensioni di Safari nell'App Store"
+          }
+        }
+      }
+    },
+    "Opens %@" : {
+      "comment" : "A website may open this app without asking; %@ is the app",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Öffnet %@"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Abre %@"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ouvre %@"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Apre %@"
           }
         }
       }
@@ -10181,6 +10471,35 @@
         }
       }
     },
+    "Request to Open an App" : {
+      "comment" : "Accessibility label of the banner where a website asks to open another app",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Anfrage zum Öffnen einer App"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Solicitud para abrir una app"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Demande d'ouverture d'une app"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Richiesta di aprire un'app"
+          }
+        }
+      }
+    },
     "Requested by an embedded frame from %@." : {
       "comment" : "Permission banner: the request comes from a frame of another website inside the page; %@ is that website",
       "localizations" : {
@@ -10408,6 +10727,35 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Salvate con “Consenti sempre” o “Non consentire”, o nelle impostazioni del sito web accanto all'indirizzo. Mai nelle finestre private."
+          }
+        }
+      }
+    },
+    "Saved with “Always Open” or “Always Allow” when a website asks. Never in private windows." : {
+      "comment" : "Settings > Privacy: footer of the list of websites that may open an app or download files without asking",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gespeichert mit „Immer öffnen“ oder „Immer erlauben“, wenn eine Website fragt. Nie in privaten Fenstern."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Se guarda con «Abrir siempre» o «Permitir siempre» cuando un sitio web lo pide. Nunca en ventanas privadas."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Enregistré avec « Toujours ouvrir » ou « Toujours autoriser » quand un site demande. Jamais dans les fenêtres privées."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Salvato con «Apri sempre» o «Consenti sempre» quando un sito web lo chiede. Mai nelle finestre private."
           }
         }
       }

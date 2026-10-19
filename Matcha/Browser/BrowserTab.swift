@@ -50,6 +50,8 @@ final class BrowserTab: Identifiable {
     let crash = PageCrashRecovery()
     /// Sound played by the page: speaker icon in the sidebar (task 5.10).
     let audio = PageAudio()
+    /// Downloads started by the page's document, and those waiting for the user (audit W7).
+    let pageDownloads = PageDownloads()
     /// The page's zoom (`WKWebView.pageZoom`, task 5.4), copied here for the menus: it only changes through
     /// `setPageZoom`. Pinch zoom (`magnification`) is separate.
     private(set) var pageZoom = ZoomLevels.actualSize

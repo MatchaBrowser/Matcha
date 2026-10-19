@@ -10,11 +10,14 @@ import SwiftData
 @Observable
 final class SitePermissionStore {
     private(set) var table: SitePermissionTable
+    /// What websites may do without asking (open another app, audit W2).
+    let actions: SiteActionAllowances
     /// Store in which to remember the decisions; nil for a private window.
     @ObservationIgnored private let context: ModelContext?
 
-    init(context: ModelContext?) {
+    init(context: ModelContext?, actions: SiteActionAllowances = SiteActionAllowances(defaults: nil)) {
         self.context = context
+        self.actions = actions
         table = SitePermissionTable(Self.load(from: context))
     }
 
@@ -70,9 +73,10 @@ final class SitePermissionStore {
         set(nil, for: entry.kind, origin: entry.origin, profileID: entry.profileID)
     }
 
-    /// Forgets the decisions of a deleted profile.
+    /// Forgets the decisions of a deleted profile, and what it allowed websites to do.
     func removeAll(profileID: UUID) {
         table.removeAll(profileID: profileID)
+        actions.removeAll(profileID: profileID)
         guard let context else {
             return
         }
@@ -138,5 +142,18 @@ struct SitePermissionScope {
 
     func set(_ decision: SitePermissionDecision?, for kind: SitePermissionKind, origin: SiteOrigin) {
         store.set(decision, for: kind, origin: origin, profileID: profileID)
+    }
+
+    func isAllowed(_ action: SiteAction, origin: SiteOrigin) -> Bool {
+        store.actions.isAllowed(action, origin: origin, profileID: profileID)
+    }
+
+    func allow(_ action: SiteAction, origin: SiteOrigin) {
+        store.actions.allow(action, origin: origin, profileID: profileID)
+    }
+
+    /// Actions allowed for `origin`, in the site settings.
+    func actions(for origin: SiteOrigin) -> [SiteActionAllowances.Entry] {
+        store.actions.actions(for: origin, profileID: profileID)
     }
 }

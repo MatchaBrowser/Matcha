@@ -4,7 +4,7 @@ import WebKit
 
 /// Navigation and UI delegate of the web views of a `TabHost` (the tabs of a Space and their Peek, the mini windows
 /// or the sign-in windows): new windows, sign-in windows (`PopupWindowManager`), closing by the page, links to other
-/// apps, clicks with modifiers, Peek, downloads, site permissions (`+Permissions`), history (`+History`),
+/// apps (`+ExternalApps`), clicks with modifiers, Peek, downloads, site permissions (`+Permissions`), history (`+History`),
 /// termination of a page's process (`+Crash`), context menu of pages (`+PageMenu`), blocker (task 6.2). The rules
 /// come from `NavigationPolicy`, `PopupWindowFeatures`, `DownloadPolicy`, `SitePermissionPolicy`, `PageCrashPolicy`
 /// and `PendingPageMenuIntent`; the host decides where pages go.
@@ -16,6 +16,8 @@ final class NavigationCoordinator: NSObject {
 
     /// Hands a URL to the app that handles it; replaceable in tests.
     var openExternally: (URL) -> Bool = { NSWorkspace.shared.open($0) }
+    /// App that opens a link (`+ExternalApps`); replaceable in tests.
+    var applicationForURL: (URL) -> URL? = { NSWorkspace.shared.urlForApplication(toOpen: $0) }
     /// “Open links to other websites from Favorites and pinned tabs in Peek” setting, read at each click;
     /// replaceable in tests.
     var opensPinnedLinksInPeek: () -> Bool = { BrowserSettings.pinnedLinksOpenInPeek() }
@@ -115,6 +117,7 @@ extension NavigationCoordinator: WKNavigationDelegate {
         tabHost.contentBlocking?.prepare(webView, for: webView.url)
         tab.documentDidChange()
         tab.permissionPrompts.denyAll()
+        tab.pageDownloads.documentDidChange()
         tab.audio.reset()
         tabHost.faviconService.showCachedIcon(on: tab, host: webView.url?.host())
         tabHost.siteZooms?.pageDidCommit(tab, url: webView.url)
@@ -141,6 +144,7 @@ extension NavigationCoordinator: WKNavigationDelegate {
         decidePolicyFor navigationAction: WKNavigationAction,
         decisionHandler: @escaping @MainActor @Sendable (WKNavigationActionPolicy) -> Void,
     ) {
+        recordClick(navigationAction, in: webView)
         switch NavigationPolicy.decide(request(for: navigationAction, in: webView)) {
         case .allow:
             allow(navigationAction, in: webView, decisionHandler: decisionHandler)
@@ -148,7 +152,7 @@ extension NavigationCoordinator: WKNavigationDelegate {
             decisionHandler(.cancel)
         case let .openExternally(url):
             decisionHandler(.cancel)
-            open(externally: url)
+            requestOpening(url, from: webView)
         case let .openInNewTab(url, inBackground):
             decisionHandler(.cancel)
             // Same configuration as the originating view: same profile.
@@ -160,18 +164,23 @@ extension NavigationCoordinator: WKNavigationDelegate {
                 allow(navigationAction, in: webView, decisionHandler: decisionHandler)
             }
         case .download:
-            decisionHandler(.download)
+            let isSubframe = navigationAction.targetFrame?.isMainFrame == false
+            startDownload(in: webView, isSubframe: isSubframe) { decisionHandler($0 ? .download : .cancel) }
         }
     }
 
-    /// A response WebKit cannot display, or an attachment, becomes a download.
+    /// A response WebKit cannot display, or an attachment, becomes a download (if the page may download it: `+Downloads`).
     func webView(
-        _: WKWebView,
+        _ webView: WKWebView,
         decidePolicyFor navigationResponse: WKNavigationResponse,
         decisionHandler: @escaping @MainActor @Sendable (WKNavigationResponsePolicy) -> Void,
     ) {
         let response = DownloadResponse(navigationResponse.response, canShowMIMEType: navigationResponse.canShowMIMEType)
-        decisionHandler(DownloadPolicy.shouldDownload(response) ? .download : .allow)
+        guard DownloadPolicy.shouldDownload(response) else {
+            decisionHandler(.allow)
+            return
+        }
+        startDownload(in: webView, isSubframe: !navigationResponse.isForMainFrame) { decisionHandler($0 ? .download : .cancel) }
     }
 
     func webView(_ webView: WKWebView, navigationAction _: WKNavigationAction, didBecome download: WKDownload) {

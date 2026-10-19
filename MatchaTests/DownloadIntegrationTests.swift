@@ -84,6 +84,9 @@ struct DownloadIntegrationTests {
         try await click("l", in: page)
         _ = try await waitForDownloads(1)
         try await click("l", in: page)
+        // A second download without a real click (a script's) waits for the banner (audit W7); WebKit waits too.
+        try await waitUntil { page.permissionPrompts.currentAction?.action == .downloadFiles }
+        page.permissionPrompts.answerAction(.allowOnce)
         let items = try await waitForDownloads(2)
 
         #expect(items.map(\.fileName) == ["notes 2.txt", "notes.txt"])

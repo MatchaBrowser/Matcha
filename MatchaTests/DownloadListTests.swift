@@ -39,6 +39,20 @@ struct DownloadListTests {
         return item
     }
 
+    /// Audit W7: a page can't make the list grow without end during a session.
+    @Test func `the list keeps the most recent downloads and those still running`() {
+        let downloads = folder.makeManager()
+        let running = item("en-cours", in: downloads)
+        for index in 0 ..< DownloadManager.maximumItems {
+            let item = DownloadItem(download: nil, scope: .regular, sourceURL: URL(string: "https://example.com/\(index)"), pageURL: nil)
+            item.markCancelled()
+            downloads.insert(item)
+        }
+        #expect(downloads.items.count == DownloadManager.maximumItems)
+        #expect(downloads.items.contains { $0 === running })
+        #expect(downloads.items.first?.sourceURL?.lastPathComponent == "\(DownloadManager.maximumItems - 1)")
+    }
+
     private func saved(_ id: UUID, outcome: SavedDownload.Outcome = .finished) -> SavedDownload {
         SavedDownload(id: id, fileName: "\(id).zip", fileURL: nil, outcome: outcome, byteCount: 1, failureReason: nil)
     }

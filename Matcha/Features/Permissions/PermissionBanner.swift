@@ -1,8 +1,9 @@
 import SwiftUI
 
-/// Banner for a page's permission requests (task 5.2), at the top of its card (or of the peek, or of a mini
-/// window's page): it slides down and pushes the page, without covering it. One request at a time: the site, what
-/// it asks for, and “Don't Allow”, “Allow Once”, “Always Allow”. Nothing answers on the user's behalf.
+/// Banner for a page's requests, at the top of its card (or of the peek, or of a mini window's page): it slides down
+/// and pushes the page, without covering it. One request at a time: permissions first (task 5.2: the site, what it
+/// asks for, and “Don't Allow”, “Allow Once”, “Always Allow”), then opening another app (audit W2). Nothing answers on
+/// the user's behalf.
 struct PermissionBanner: View {
     let prompts: PermissionPromptQueue
 
@@ -13,10 +14,15 @@ struct PermissionBanner: View {
                     .id(request.id)
                     .transition(.move(edge: .top).combined(with: .opacity))
                 Divider()
+            } else if let request = prompts.currentAction {
+                SiteActionBannerContent(request: request) { prompts.answerAction($0) }
+                    .id(request.id)
+                    .transition(.move(edge: .top).combined(with: .opacity))
+                Divider()
             }
         }
         .clipped()
-        .animation(.easeOut(duration: 0.2), value: prompts.current?.id)
+        .animation(.easeOut(duration: 0.2), value: prompts.current?.id ?? prompts.currentAction?.id)
     }
 }
 
@@ -25,40 +31,19 @@ private struct PermissionBannerContent: View {
     let answer: (SitePermissionAnswer) -> Void
 
     var body: some View {
-        // All on one line if the card is wide enough; otherwise the text, then the buttons (in a column if needed).
-        ViewThatFits(in: .horizontal) {
-            HStack(spacing: 12) {
-                icon
-                message.fixedSize()
-                Spacer(minLength: 12)
-                HStack(spacing: 8) { buttons }
-            }
-            VStack(alignment: .leading, spacing: 8) {
-                HStack(alignment: .top, spacing: 12) {
-                    icon
-                    message
-                    Spacer(minLength: 0)
-                }
-                ViewThatFits(in: .horizontal) {
-                    HStack(spacing: 8) {
-                        Spacer(minLength: 0)
-                        buttons
-                    }
-                    VStack(alignment: .trailing, spacing: 6) { buttons }
-                        .frame(maxWidth: .infinity, alignment: .trailing)
-                }
-            }
+        PromptBannerLayout(
+            label: Text(
+                "Permission Request",
+                comment: "Accessibility label of the banner where a website asks to use the camera or microphone",
+            ),
+            identifier: "permissionBanner",
+        ) {
+            icon
+        } message: {
+            message
+        } buttons: {
+            buttons
         }
-        .padding(.horizontal, 12)
-        .padding(.vertical, 8)
-        .frame(maxWidth: .infinity)
-        .background(.bar)
-        .accessibilityElement(children: .contain)
-        .accessibilityLabel(Text(
-            "Permission Request",
-            comment: "Accessibility label of the banner where a website asks to use the camera or microphone",
-        ))
-        .accessibilityIdentifier("permissionBanner")
     }
 
     private var icon: some View {

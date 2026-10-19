@@ -75,20 +75,6 @@ struct NavigationCoordinatorTests {
         #expect(manager.tabs.map(\.id) == [page.id, other.id])
     }
 
-    @Test func `foreign scheme link is handed to another app`() async throws {
-        var opened: [URL] = []
-        manager.coordinator.openExternally = { opened.append($0)
-            return true
-        }
-        let (page, _) = try await openPage(body: "<a id='l' href='mailto:moi@example.com'>courriel</a>")
-
-        _ = try await page.loadedWebView.evaluateJavaScript("document.getElementById('l').click(); true")
-        try await waitUntil { !opened.isEmpty }
-        #expect(try opened == [#require(URL(string: "mailto:moi@example.com"))])
-        #expect(page.url == TestPages.url("ouvrant", body: "<a id='l' href='mailto:moi@example.com'>courriel</a>"))
-        #expect(manager.tabs.count == 2)
-    }
-
     @Test func `command click opens background tabs in click order`() async throws {
         let (page, other) = try await openPage(body: "")
         let first = TestPages.url("un")

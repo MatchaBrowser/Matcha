@@ -197,7 +197,7 @@ final class TabLifecycleService {
             id: tab.id,
             hiddenSince: visible.contains(tab.id) ? nil : tracker.hiddenSince(tab.id) ?? now,
             isLoaded: webView != nil,
-            hasPendingPermissionPrompt: tab.permissionPrompts.current != nil,
+            hasPendingPermissionPrompt: tab.permissionPrompts.hasPending,
             isCapturingMedia: webView.map { $0.cameraCaptureState != .none || $0.microphoneCaptureState != .none } ?? false,
             isPlayingAudio: tab.isPlayingAudio,
             hasOpenPopupWindow: session?.popupWindows.hasOpenWindow(openedBy: tab) ?? false,

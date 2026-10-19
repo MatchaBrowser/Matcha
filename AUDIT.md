@@ -44,7 +44,7 @@ Date : 2026-10-19, sur le commit `a94cf2e`. Audit en lecture seule : 9 analyses,
   - Dans `decidePolicyFor`, annuler toute navigation vers ce schéma lancée par une page.
   - Retirer `file:`.
 
-**W2. Une page lance d'autres apps sans clic ni accord** (Élevé, actif, vérifié)
+**✅ W2. Une page lance d'autres apps sans clic ni accord** (Élevé, actif, vérifié) — corrigé : bandeau Annuler / Ouvrir / Toujours ouvrir pour tout lien vers une app, `mailto:` compris ; « Toujours » retenu par site et listé dans les Réglages.
 - **Problème** : toute navigation du cadre principal vers un schéma inconnu lance l'app associée. Exemples : `zoommtg:`, `smb:` (montage dans le Finder), `vnc:`, `ssh:`, `x-apple.systempreferences:`.
   - Cela vaut aussi pour une redirection JavaScript, un meta refresh ou une réponse 302.
   - Un `window.open` lancé depuis une iframe publicitaire compte comme « cadre principal » (`targetFrame?.isMainFrame ?? true`).
@@ -90,7 +90,7 @@ Date : 2026-10-19, sur le commit `a94cf2e`. Audit en lecture seule : 9 analyses,
   - Nouvel onglet et Peek seulement pour `http(s)`. Un `file:` seulement depuis une page `file:`.
   - Lecture limitée au fichier lui-même, sauf s'il a été ouvert explicitement par l'utilisateur.
 
-**W7. Téléchargements sans clic** (Faible à Moyen, actif)
+**✅ W7. Téléchargements sans clic** (Faible à Moyen, actif) — corrigé : bandeau à partir du 2e téléchargement sans clic ou pour un cadre intégré ; liste limitée à 200.
 - **Problème** : un lien `download` cliqué par script, ou une réponse « pièce jointe » d'une iframe tierce, lance un téléchargement. Il n'y a aucune limite, aucun geste requis et aucun accord. La quarantaine fonctionne et rien ne s'ouvre seul.
 - **Correction** :
   - Demander via le bandeau d'autorisation (comme Safari) à partir du 2e téléchargement automatique d'une page, ou pour une iframe d'un autre site.
@@ -109,7 +109,7 @@ Date : 2026-10-19, sur le commit `a94cf2e`. Audit en lecture seule : 9 analyses,
   - Pas de cookies.
   - Décodage avec `CGImageSource`, limité à PNG, ICO, JPEG, GIF et WebP, hors du fil principal.
 
-**W9. Bandeau d'autorisation cliquable trop tôt** (Faible)
+**✅ W9. Bandeau d'autorisation cliquable trop tôt** (Faible) — corrigé : clics ignorés 0,5 s.
 - **Problème** : « Toujours autoriser » est cliquable dès que le bandeau apparaît sous le pointeur.
 - **Correction** : ignorer les clics pendant ~0,5 s.
 

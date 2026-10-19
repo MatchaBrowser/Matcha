@@ -28,6 +28,7 @@ struct PrivacySettingsView: View {
                     .foregroundStyle(.secondary)
             }
             SitePermissionsSection(store: session.sitePermissions, profiles: session.profiles)
+            SiteActionsSection(store: session.sitePermissions.actions, profiles: session.profiles)
             // Blocker (task 6.2): the app's, with the saved exceptions.
             if ContentBlockerService.isAvailable {
                 let contentBlocker = session.contentBlocking.service

@@ -63,8 +63,11 @@ final class BrowserSession {
         faviconService = isPrivate ? FaviconService(directory: nil) : .shared
         downloadScope = isPrivate ? .privateWindow(UUID()) : .regular
         let context = container.mainContext
-        sitePermissions = SitePermissionStore(context: isPrivate ? nil : context)
         let isInMemory = container.configurations.allSatisfy(\.isStoredInMemoryOnly)
+        sitePermissions = SitePermissionStore(
+            context: isPrivate ? nil : context,
+            actions: SiteActionAllowances(defaults: isPrivate || isInMemory ? nil : .standard),
+        )
         siteZooms = SiteZoomStore(defaults: isPrivate || isInMemory ? nil : .standard)
         history = isPrivate ? nil : HistoryStore(container: container)
         popupWindows = PopupWindowManager(

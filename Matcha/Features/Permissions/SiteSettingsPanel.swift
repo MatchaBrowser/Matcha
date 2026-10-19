@@ -2,7 +2,8 @@ import SwiftUI
 
 /// Site settings panel of the displayed tab (task 5.2): below the address pill of the sidebar, or at the top of the
 /// card below the address bar above the page. Camera and microphone (“Ask”, “Allow”, “Deny”, the profile's
-/// decisions), the site's zoom (task 5.4), the blocker on this site (task 6.2, hidden while it is set aside), then
+/// decisions), the apps it opens without asking (audit W2), the site's zoom (task 5.4), the blocker on this site (task 6.2, hidden while it
+/// is set aside), then
 /// the site's cookies and data, cleared (this site only) after confirmation. It follows the displayed tab and never
 /// opens or closes by itself (button, ×).
 struct SiteSettingsPanel: View {
@@ -24,6 +25,10 @@ struct SiteSettingsPanel: View {
                 VStack(alignment: .leading, spacing: 6) {
                     ForEach(SitePermissionKind.allCases) { kind in
                         permissionRow(kind, origin: origin, scope: scope)
+                    }
+                    // Apps the site opens without asking (audit W2).
+                    ForEach(scope.actions(for: origin)) { entry in
+                        actionRow(entry, scope: scope)
                     }
                     SiteZoomRow(tab: tab, siteZooms: tabManager.siteZooms)
                     if ContentBlockerService.isAvailable, let contentBlocking = tabManager.contentBlocking {
@@ -96,6 +101,23 @@ struct SiteSettingsPanel: View {
 
     private var closeTitle: Text {
         Text("Close Site Settings", comment: "Button that closes the site settings panel")
+    }
+
+    /// An app the site opens without asking, and the button that makes it ask again.
+    private func actionRow(_ entry: SiteActionAllowances.Entry, scope: SitePermissionScope) -> some View {
+        HStack(spacing: 8) {
+            Label(entry.action.title, systemImage: entry.action.symbolName)
+                .lineLimit(1)
+            Spacer(minLength: 8)
+            Button {
+                scope.store.actions.remove(entry)
+            } label: {
+                SiteActionsSection.forgetTitle
+            }
+            .controlSize(.small)
+            .fixedSize()
+            .accessibilityIdentifier("siteSettingsForgetActionButton")
+        }
     }
 
     /// Camera or microphone: “Ask” (no remembered decision), “Allow”, “Deny”.

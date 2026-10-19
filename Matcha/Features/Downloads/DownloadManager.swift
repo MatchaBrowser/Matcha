@@ -82,9 +82,15 @@ final class DownloadManager: NSObject {
         return item
     }
 
+    /// Most downloads kept in the list during a session: beyond, the oldest finished ones leave it (audit W7).
+    static let maximumItems = 200
+
     /// Adds `item` to the top of the list (primitive of `track`, used as is by the tests).
     func insert(_ item: DownloadItem) {
         items.insert(item, at: 0)
+        while items.count > Self.maximumItems, let oldest = items.lastIndex(where: { !$0.isActive }) {
+            items.remove(at: oldest)
+        }
     }
 
     /// “Cancel” button: the partial file is deleted once WebKit has stopped.
