@@ -36,6 +36,34 @@ struct NavigationPolicyTests {
         #expect(NavigationPolicy.decide(request(modifiers: .command)) == .openInNewTab(page, inBackground: true))
     }
 
+    /// Audit W6: the app itself only opens web links, or a link to a page of the same kind as the displayed one.
+    @Test(arguments: [
+        "data:text/html,salut",
+        "blob:https://example.com/1234",
+        "about:blank",
+        "javascript:void(0)",
+        "file:///Users/moi/Downloads/a.html"
+    ])
+    func `command click on a link the app does not open itself stays a plain click`(url: String) {
+        let link = URL(string: url)
+        #expect(link != nil)
+        #expect(NavigationPolicy.decide(request(url: link, modifiers: .command)) == .allow)
+        #expect(NavigationPolicy.decide(request(url: link, button: 4)) == .allow)
+    }
+
+    @Test func `a local file opens in a new tab from another local file only`() throws {
+        let file = try #require(URL(string: "file:///usr/share/doc/postfix/html/index.html"))
+        var fromFile = request(url: file, modifiers: .command)
+        fromFile.pageURL = URL(string: "file:///usr/share/doc/postfix/html/BASIC_CONFIGURATION_README.html")
+        #expect(NavigationPolicy.decide(fromFile) == .openInNewTab(file, inBackground: true))
+        var fromWeb = fromFile
+        fromWeb.pageURL = page
+        #expect(NavigationPolicy.decide(fromWeb) == .allow)
+        var webFromFile = request(modifiers: .command)
+        webFromFile.pageURL = fromFile.pageURL
+        #expect(NavigationPolicy.decide(webFromFile) == .openInNewTab(page, inBackground: true))
+    }
+
     @Test func `middle click opens a background tab`() {
         #expect(NavigationPolicy.decide(request(button: 4)) == .openInNewTab(page, inBackground: true))
     }

@@ -72,13 +72,13 @@ final class TabManager {
         layout.place(of: tab.id)
     }
 
-    /// Opens a tab at the top of the today tabs and loads `url` in it if provided.
+    /// Opens a tab at the top of the today tabs and loads `url` in it if provided; `source`: the page whose link it is.
     @discardableResult
-    func newTab(url: URL? = nil, select: Bool = true) -> BrowserTab {
+    func newTab(url: URL? = nil, select: Bool = true, from source: URL? = nil) -> BrowserTab {
         let configuration = WebConfigurationFactory.makeConfiguration(websiteDataStore: websiteDataStore)
         let tab = insertTab(configuration: configuration, after: nil, select: select)
         if let url {
-            tab.load(url)
+            tab.load(url, from: source)
         }
         return tab
     }

@@ -201,12 +201,13 @@ final class BrowserTab: Identifiable {
         setURL(webView.url)
     }
 
-    func load(_ url: URL) {
+    /// Loads `url`; `source`: the page whose link it is, if any (a local file then reads less, `FileReadAccess`).
+    func load(_ url: URL, from source: URL? = nil) {
         let webView = makeWebViewIfNeeded()
         // A page other than the one put to sleep: no more snapshot on top; a crashed page leaves its message.
         suspension.endRestoring()
         crash.pageWillNavigate()
-        load(url, in: webView)
+        load(url, in: webView, from: source)
     }
 
     /// The page's zoom (100% = 1); kept for the web view recreated after an unload.
@@ -237,9 +238,9 @@ final class BrowserTab: Identifiable {
         crash.end()
     }
 
-    private func load(_ url: URL, in webView: WKWebView) {
+    private func load(_ url: URL, in webView: WKWebView, from source: URL? = nil) {
         if url.isFileURL {
-            webView.loadFileURL(url, allowingReadAccessTo: url.deletingLastPathComponent())
+            webView.loadFileURL(url, allowingReadAccessTo: FileReadAccess.readableURL(for: url, openedFrom: source))
         } else {
             webView.load(URLRequest(url: url))
         }

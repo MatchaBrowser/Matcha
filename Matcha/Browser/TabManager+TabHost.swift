@@ -23,7 +23,7 @@ extension TabManager: TabHost {
 
     /// After the source tab; from the Peek, after its source tab.
     func openLink(_ url: URL, configuration: WKWebViewConfiguration, from webView: WKWebView, inBackground: Bool) {
-        insertTab(configuration: configuration, after: insertionAnchor(for: webView), select: !inBackground).load(url)
+        insertTab(configuration: configuration, after: insertionAnchor(for: webView), select: !inBackground).load(url, from: webView.url)
     }
 
     /// Window without a size opened by the Peek: the Peek first becomes a tab, so that `window.opener` stays valid.

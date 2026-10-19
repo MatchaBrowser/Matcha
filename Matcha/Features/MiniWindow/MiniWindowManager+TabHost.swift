@@ -45,12 +45,12 @@ extension MiniWindowManager: TabHost {
         guard space.record.profile?.id == profileID else {
             // No Space of this profile left: the page opens alongside, in a mini window of the same profile.
             let controller = show(BrowserTab(configuration: configuration, openerID: opener?.tab.id), profileID: profileID)
-            controller.tab.load(url)
+            controller.tab.load(url, from: webView.url)
             controller.showWebView()
             Logger.miniWindow.info("Mini-fenêtre ouverte (\(Source.link.rawValue, privacy: .public))")
             return
         }
-        space.tabManager.newTab(url: url, select: false)
+        space.tabManager.newTab(url: url, select: false, from: webView.url)
         Logger.miniWindow.info("Lien d'une mini-fenêtre ouvert en arrière-plan dans un Space")
     }
 

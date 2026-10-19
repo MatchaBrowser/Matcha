@@ -56,8 +56,9 @@ nonisolated enum NavigationDecision: Equatable, Sendable {
 nonisolated enum NavigationPolicy {
     static let leftMouseButton = 1
     static let middleMouseButton = 4
-    /// Schemes never opened in Peek: their content depends on the page that contains them.
+    /// Schemes never opened by the app in a new tab or in Peek: their content depends on the page that contains them.
     static let schemesKeptInPlace: Set<String> = ["about", "blob", "data", "javascript"]
+    static let webSchemes: Set<String> = ["http", "https"]
     private static let linkModifiers: NSEvent.ModifierFlags = [.shift, .command, .option, .control]
 
     static func decide(_ request: NavigationRequest) -> NavigationDecision {
@@ -72,15 +73,12 @@ nonisolated enum NavigationPolicy {
         if request.shouldPerformDownload {
             return .download
         }
-        guard request.navigationType == .linkActivated else {
+        guard request.navigationType == .linkActivated, opensElsewhere(url, from: request.pageURL) else {
             return .allow
         }
         let modifiers = request.modifierFlags.intersection(linkModifiers)
         if modifiers.contains(.command) || request.buttonNumber == middleMouseButton {
             return .openInNewTab(url, inBackground: !modifiers.contains(.shift))
-        }
-        guard !schemesKeptInPlace.contains(url.scheme?.lowercased() ?? "") else {
-            return .allow
         }
         switch request.source {
         case .peek:
@@ -91,6 +89,18 @@ nonisolated enum NavigationPolicy {
         case .tab:
             return peekDecision(for: request, url: url, modifiers: modifiers)
         }
+    }
+
+    /// True if the app itself may load the link in a new tab or in Peek (audit W6): a web address, or a link to a page
+    /// of the same kind as the displayed one (a local file from a local file). Anything else (`data:`, `blob:`, a local
+    /// file linked from a website…) stays a plain click, which WebKit decides in place: the app's own loads skip
+    /// WebKit's rules, and a local file would read its whole folder.
+    static func opensElsewhere(_ url: URL, from page: URL?) -> Bool {
+        let scheme = url.scheme?.lowercased() ?? ""
+        if webSchemes.contains(scheme) {
+            return true
+        }
+        return !schemesKeptInPlace.contains(scheme) && page?.scheme?.lowercased() == scheme
     }
 
     /// Shift-click (except an anchor of the displayed page), and a link from a favorite or pinned tab to another site

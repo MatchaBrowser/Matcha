@@ -66,7 +66,7 @@ struct MiniWindowLinkTests {
         let tabManager = session.spaces[0].tabManager
         let existing = tabManager.newTab()
         let mini = try await openPage("ouvrant")
-        let url = blankPage("lien")
+        let url = TestPages.url("lien")
 
         #expect(click(url, in: mini, modifiers: .command) == [.cancel])
 
@@ -83,9 +83,9 @@ struct MiniWindowLinkTests {
         let existing = tabManager.newTab()
         let mini = try await openPage("ouvrant")
 
-        #expect(click(blankPage("milieu"), in: mini, modifiers: [], button: 4) == [.cancel])
+        #expect(click(TestPages.url("milieu"), in: mini, modifiers: [], button: 4) == [.cancel])
         // ⇧⌘-click would open the tab in the foreground in the window: from a mini window, it stays behind.
-        #expect(click(blankPage("devant"), in: mini, modifiers: [.command, .shift]) == [.cancel])
+        #expect(click(TestPages.url("devant"), in: mini, modifiers: [.command, .shift]) == [.cancel])
 
         #expect(tabManager.todayTabs.count == 3)
         #expect(tabManager.selectedTab === existing)

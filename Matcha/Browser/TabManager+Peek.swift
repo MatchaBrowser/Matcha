@@ -48,7 +48,7 @@ extension TabManager {
     @discardableResult
     func openPeek(_ url: URL, from source: BrowserTab, openingPoint: CGPoint = PeekLayout.center) -> Peek? {
         if let peek, source === peek.tab {
-            peek.tab.load(url)
+            peek.tab.load(url, from: peek.tab.url)
             return peek
         }
         guard canPeek(from: source) else {
@@ -62,7 +62,7 @@ extension TabManager {
         }
         let page = BrowserTab(configuration: source.configuration, openerID: source.id)
         page.delegate = coordinator
-        page.load(url)
+        page.load(url, from: source.url)
         let newPeek = Peek(tab: page, sourceTabID: source.id, openingPoint: openingPoint)
         setPeek(newPeek)
         Logger.peek.info("Aperçu ouvert")

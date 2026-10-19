@@ -7,8 +7,8 @@ import WebKit
 ///   ⌘-click); from a sign-in window, as from its originating page
 ///   (`TabHost.openWindow(configuration:from:inBackground:)`).
 /// - “Open Link in Peek”: `TabHost.openInPeek` (hence `TabManager.openPeek(_:from:openingPoint:)`) with the requested
-///   address, and WebKit gets no window; if refused (tab no longer displayed, about, blob, data or javascript
-///   scheme), a background tab. The menu's window has no `window.opener` (checked): nothing to keep.
+///   address, and WebKit gets no window; if refused (tab no longer displayed, a link the app doesn't open itself:
+///   `NavigationPolicy.opensElsewhere`), a background tab. The menu's window has no `window.opener` (checked): nothing to keep.
 /// - Link to another app (mailto:…): handed to that app, like ⌘-click.
 extension NavigationCoordinator: PageMenuDelegate {
     func pageMenuOffersPeek(in webView: WKWebView) -> Bool {
@@ -63,15 +63,10 @@ extension NavigationCoordinator: PageMenuDelegate {
             open(externally: url)
             return nil
         }
-        let point = intent.openingPoint
-        if intent.destination == .peek, let url, Self.canOpenInPeek(url), tabHost.openInPeek(url, from: webView, openingPoint: point) {
+        let opensInPeek = intent.destination == .peek && url.map { NavigationPolicy.opensElsewhere($0, from: webView.url) } == true
+        if opensInPeek, let url, tabHost.openInPeek(url, from: webView, openingPoint: intent.openingPoint) {
             return nil
         }
         return tabHost.openWindow(configuration: configuration, from: webView, inBackground: true)
-    }
-
-    /// The schemes that Shift-click never opens in Peek (`NavigationPolicy`) do not go there through the menu either.
-    private static func canOpenInPeek(_ url: URL) -> Bool {
-        !NavigationPolicy.schemesKeptInPlace.contains(url.scheme?.lowercased() ?? "")
     }
 }

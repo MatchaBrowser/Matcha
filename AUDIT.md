@@ -81,7 +81,7 @@ Date : 2026-10-19, sur le commit `a94cf2e`. Audit en lecture seule : 9 analyses,
   - Au clic, montrer le certificat (`SFCertificateTrustPanel`, API publique).
   - Passer automatiquement en HTTPS avec `defaultWebpagePreferences.preferredHTTPSNavigationPolicy = .automaticFallbackToHTTP`. Cette API existe depuis macOS 15.2 (vérifié dans le SDK). L'entrée de `DECISIONS.md` du 2026-10-16 « WebKit n'a pas de repli automatique vers HTTP » est donc périmée.
 
-**W6. Liens vers `file:` ouverts avec accès au dossier entier** (Faible, actif)
+**✅ W6. Liens vers `file:` ouverts avec accès au dossier entier** (Faible, actif) — corrigé : l'app n'ouvre elle-même que les liens `http(s)` ou du même schéma que la page ; un fichier ouvert par un lien ne lit pas plus que le dossier de la page qui le lie (`FileReadAccess`).
 - **Problème** : ⌘-clic, clic milieu et Maj-clic (Peek) font charger le lien par l'app (`BrowserTab.load`).
   - Cela contourne l'interdiction de WebKit d'aller d'une page web vers un `file:`.
   - La page obtient la lecture de **tout le dossier parent** (`allowingReadAccessTo: url.deletingLastPathComponent()`).
