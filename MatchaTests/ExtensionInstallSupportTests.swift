@@ -17,7 +17,7 @@ struct ExtensionInstallSupportTests {
         #expect(long.map { $0.count <= 63 && !$0.hasSuffix("-") } == true)
     }
 
-    @Test func `package identifiers come from the default-locale name, then the Firefox id`() throws {
+    @Test func `names come from the default locale`() throws {
         let folder = FileManager.default.temporaryDirectory.appendingPathComponent("Manifest-\(UUID().uuidString)", isDirectory: true)
         defer { try? FileManager.default.removeItem(at: folder) }
         try FileManager.default.createDirectory(at: folder.appendingPathComponent("_locales/fr"), withIntermediateDirectories: true)
@@ -25,16 +25,33 @@ struct ExtensionInstallSupportTests {
         try Data(manifest.utf8).write(to: folder.appendingPathComponent("manifest.json"))
         let messages = #"{"extName": {"message": "Lecteur Sombre"}}"#
         try Data(messages.utf8).write(to: folder.appendingPathComponent("_locales/fr/messages.json"))
+        #expect(ExtensionManifestFile(folder: folder)?.name == "Lecteur Sombre")
+    }
 
-        let file = try #require(ExtensionManifestFile(folder: folder))
-        #expect(file.name == "Lecteur Sombre")
-        #expect(ExtensionIdentifier.forPackage(file) == "lecteur-sombre")
+    /// Audit E1: never the name, never a Safari extension's prefix, never twice the same.
+    @Test func `package identifiers are random`() {
+        let first = ExtensionIdentifier.random()
+        #expect(ExtensionInstallDirectory.isValidIdentifier(first))
+        #expect(!first.hasPrefix("safari-"))
+        #expect(first != ExtensionIdentifier.random())
+    }
 
-        let gecko = #"{"name": "日本語", "browser_specific_settings": {"gecko": {"id": "addon@darkreader.org"}}}"#
-        try Data(gecko.utf8).write(to: folder.appendingPathComponent("manifest.json"))
-        #expect(ExtensionManifestFile(folder: folder).flatMap(ExtensionIdentifier.forPackage) == "addon-darkreader-org")
-        #expect(ExtensionInstaller.fallbackIdentifier(for: "日本語").hasPrefix("extension-"))
-        #expect(ExtensionInstallDirectory.isValidIdentifier(ExtensionInstaller.fallbackIdentifier(for: "日本語")))
+    /// Audit E2: an update grants what is new, keeps refusals and drops what is no longer asked for.
+    @Test func `an update keeps refusals and drops what is no longer asked for`() {
+        var state = ExtensionState()
+        state.grantedPermissions = ["tabs": .distantFuture, "cookies": .distantFuture, "storage": .distantFuture]
+        state.deniedMatchPatterns = ["<all_urls>": .distantFuture]
+        state.deniedPermissions = ["history": .distantPast]
+        state.applyRequests(
+            permissions: ["tabs", "history", "downloads"],
+            patterns: ["<all_urls>", "*://example.com/*"],
+            optionalPermissions: ["storage"],
+        )
+        #expect(Set(state.grantedPermissions.keys) == ["tabs", "storage", "history", "downloads"])
+        #expect(state.grantedMatchPatterns.keys.sorted() == ["*://example.com/*"])
+        #expect(state.deniedMatchPatterns["<all_urls>"] != nil)
+        // An expired refusal no longer counts.
+        #expect(state.deniedPermissions.isEmpty)
     }
 
     @Test func `app extension identifiers keep the bundle identifier`() {
@@ -56,6 +73,14 @@ struct ExtensionInstallSupportTests {
         #expect(ExtensionPermissionSummary.lines(permissions: [], hosts: ["proton.me", nil]) == [.allWebsites])
         #expect(ExtensionPermissionSummary.lines(permissions: ["storage"], hosts: ["*"]) == [.allWebsites])
         #expect(ExtensionPermissionSummary.lines(permissions: ["storage", "scripting"], hosts: []).isEmpty)
+    }
+
+    /// Audit E7: local files are named, never as an empty website; `webRequest` sees the pages visited.
+    @Test func `local files and web requests are named`() {
+        #expect(ExtensionPermissionSummary.lines(permissions: [], hosts: [""], readsLocalFiles: true) == [.localFiles])
+        #expect(ExtensionPermissionSummary.lines(permissions: ["webRequest"], hosts: [nil], readsLocalFiles: true) == [
+            .browsingHistory, .allWebsites, .localFiles,
+        ])
     }
 
     // MARK: Safari extensions of apps
@@ -98,7 +123,7 @@ struct ExtensionInstallSupportTests {
         let other = folder.appendingPathComponent("Other", isDirectory: true)
         try makeApp(in: other, name: "Zeta", extensionIdentifier: "com.example.zeta.extension")
 
-        let found = SafariExtensionFinder.find(in: [folder, other])
+        let found = SafariExtensionFinder.find(in: [folder, other], checksSignatures: false)
 
         #expect(found.map(\.displayName) == ["Alpha Extension", "Zeta Extension"])
         #expect(found.map(\.appName) == ["Alpha", "Zeta"])

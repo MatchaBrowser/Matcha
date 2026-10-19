@@ -25,7 +25,7 @@ extension ExtensionSyncAdapter {
             }
             let file = try await downloadPackage(package, using: transport)
             defer { try? FileManager.default.removeItem(at: file.deletingLastPathComponent()) }
-            return try await installer.prepare(fileAt: file)
+            return try await installer.prepare(fileAt: file, preferredIdentifier: fields.identifier)
         }
     }
 

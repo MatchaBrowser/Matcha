@@ -215,7 +215,7 @@ Toutes sont vérifiées. Les en-têtes du SDK disent ce que fait WebKit quand la
 
 ## 4. Extensions
 
-**E1. L'identité d'une extension, c'est son nom** (Élevé, actif, vérifié)
+**✅ E1. L'identité d'une extension, c'est son nom** (Élevé, actif, vérifié) — corrigé : identifiant aléatoire, mise à jour seulement pour une signature CRX3 du même éditeur, sinon remplacement qui efface les données.
 - **Problème** : l'identifiant est le nom du manifeste mis en minuscules. Il sert de dossier, de clé du stockage WebKit, de `runtime.id` et d'adresse (`webkit-extension://dark-reader/`).
   - Un faux `.crx` nommé « Bitwarden » est présenté comme une simple « mise à jour ». Il hérite des données de la vraie extension (coffre local), de ses sites autorisés et de son identifiant.
   - Deux extensions de même nom s'écrasent.
@@ -227,11 +227,11 @@ Toutes sont vérifiées. Les en-têtes du SDK disent ce que fait WebKit quand la
   - Interdire `safari-` aux paquets.
   - Montrer l'ancienne version et la différence de droits.
 
-**E2. Une mise à jour annule les refus** (Moyen)
+**✅ E2. Une mise à jour annule les refus** (Moyen) — corrigé : refus gardés, droits non demandés retirés (`applyRequests`).
 - **Problème** : tous les droits demandés sont réaccordés et les refus effacés. Un utilisateur qui avait limité `<all_urls>` à quelques sites retrouve l'accès à tout.
 - **Correction** : n'accorder que les nouveaux droits, après accord, et garder les refus.
 
-**E3. Installation d'un dossier avec liens symboliques** (Moyen, selon WebKit)
+**✅ E3. Installation d'un dossier avec liens symboliques** (Moyen, selon WebKit) — corrigé : copie fichier par fichier, liens et alias refusés, plafonds (`ExtensionUnpacker`).
 - **Problème** : `copyItem` garde les liens. Un dossier peut pointer vers la base SwiftData ou les données WebKit du conteneur, et l'extension pourrait les lire si WebKit suit les liens.
 - **Correction** : copier fichier par fichier, refuser liens et alias, avec un plafond de taille.
 
@@ -248,7 +248,7 @@ Toutes sont vérifiées. Les en-têtes du SDK disent ce que fait WebKit quand la
   - Mémoriser un refus pour un temps, avec une limite et une file d'attente.
   - Gérer les sites un par un dans les Réglages.
 
-**E6. Installation non atomique, sur le fil principal** (Moyen)
+**✅ E6. Installation non atomique, sur le fil principal** (Moyen) — corrigé : étapes pures en `@concurrent`, ancienne version gardée jusqu'au chargement (`FolderSwap`), état enregistré après.
 - **Problème** :
   - L'ancien dossier est supprimé avant le déplacement du nouveau.
   - L'état est enregistré avant le chargement.
@@ -258,7 +258,7 @@ Toutes sont vérifiées. Les en-têtes du SDK disent ce que fait WebKit quand la
   - Enregistrer l'état après un chargement réussi.
   - Faire les étapes pures en `@concurrent`, sur le modèle de `BlocklistBundle`.
 
-**E7. Divers** (Faible)
+**✅ E7. Divers** (Faible) — corrigé, sauf les données d'origine à la désinstallation et les extensions par profil (reportés, voir `DECISIONS.md`).
 - La désinstallation laisse les données d'origine `webkit-extension://`.
 - L'équipe d'une extension Safari n'est pas validée (`SecStaticCodeCheckValidity`).
 - `~/Applications` est illisible dans le bac à sable, donc sa recherche ne sert à rien.

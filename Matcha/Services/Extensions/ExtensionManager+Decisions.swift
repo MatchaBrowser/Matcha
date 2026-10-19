@@ -42,6 +42,9 @@ extension ExtensionManager {
         let stored = store.state(for: identifier)
         state.appExtensionPath = stored?.appExtensionPath
         state.showsButton = stored?.showsButton
+        state.publisher = stored?.publisher
+        state.version = stored?.version
+        state.appExtensionIdentity = stored?.appExtensionIdentity
         return state
     }
 

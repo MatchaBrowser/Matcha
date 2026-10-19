@@ -20,6 +20,14 @@ nonisolated struct ExtensionState: Codable, Equatable, Sendable {
     var appExtensionPath: String?
     /// Button next to the address (task 6.5): false if it is hidden; nil (default): shown.
     var showsButton: Bool?
+    /// Publisher proven by the installed file's signature (Chrome identifier of its developer, audit E1); nil if it
+    /// couldn't be proven: no file can then update this extension and keep its data.
+    var publisher: String?
+    /// Installed version, shown next to the one of an update.
+    var version: String?
+    /// Signed identity of an app's Safari extension at installation (“bundle identifier (team)”, audit E7): a bundle
+    /// found later at the same place with another identity isn't loaded.
+    var appExtensionIdentity: String?
 
     init() {}
 
@@ -37,6 +45,9 @@ nonisolated struct ExtensionState: Codable, Equatable, Sendable {
             .decodeIfPresent(Bool.self, forKey: .hasRequestedOptionalAccessToAllHosts) ?? false
         appExtensionPath = try container.decodeIfPresent(String.self, forKey: .appExtensionPath)
         showsButton = try container.decodeIfPresent(Bool.self, forKey: .showsButton)
+        publisher = try container.decodeIfPresent(String.self, forKey: .publisher)
+        version = try container.decodeIfPresent(String.self, forKey: .version)
+        appExtensionIdentity = try container.decodeIfPresent(String.self, forKey: .appExtensionIdentity)
     }
 
     /// Without the decisions expired at `date`.

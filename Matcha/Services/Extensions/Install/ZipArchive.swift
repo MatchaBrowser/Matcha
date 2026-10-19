@@ -193,15 +193,20 @@ nonisolated struct ZipArchive {
         guard size > 0 else {
             return Data()
         }
+        // A file announced with content but without compressed data: damaged, never a crash (audit E7).
+        guard !compressed.isEmpty else {
+            throw Failure.corrupted
+        }
         var output = Data(count: size)
         let written = output.withUnsafeMutableBytes { destination in
-            compressed.withUnsafeBytes { source in
+            compressed.withUnsafeBytes { source -> Int in
+                guard let target = destination.bindMemory(to: UInt8.self).baseAddress,
+                      let origin = source.bindMemory(to: UInt8.self).baseAddress
+                else {
+                    return 0
+                }
                 // `COMPRESSION_ZLIB` reads the raw “deflate” (RFC 1951) of zip archives.
-                compression_decode_buffer(
-                    destination.bindMemory(to: UInt8.self).baseAddress!, size,
-                    source.bindMemory(to: UInt8.self).baseAddress!, compressed.count,
-                    nil, COMPRESSION_ZLIB,
-                )
+                return compression_decode_buffer(target, size, origin, compressed.count, nil, COMPRESSION_ZLIB)
             }
         }
         guard written == size else {

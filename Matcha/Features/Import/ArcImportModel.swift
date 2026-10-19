@@ -54,15 +54,28 @@ final class ArcImportModel {
         }
     }
 
-    /// Reads `url`: the preview opens, or the alert.
+    /// Largest file read: Arc's sidebar is a few megabytes at most.
+    nonisolated static let maximumFileSize = 64 * 1024 * 1024
+
+    /// Reads `url` off the main thread: the preview opens, or the alert (audit E7).
     func open(_ url: URL) {
-        do {
-            let sidebar = try ArcSidebarParser.parse(Data(contentsOf: url))
-            request = Request(sidebar: sidebar)
-            Logger.imports.info("Barre d'Arc lue : \(sidebar.spaces.count, privacy: .public) Spaces")
-        } catch {
-            Logger.imports.error("Barre d'Arc illisible : \(error.logSummary, privacy: .public)")
-            isFailurePresented = true
+        Task {
+            do {
+                let sidebar = try await Self.read(url)
+                request = Request(sidebar: sidebar)
+                Logger.imports.info("Barre d'Arc lue : \(sidebar.spaces.count, privacy: .public) Spaces")
+            } catch {
+                Logger.imports.error("Barre d'Arc illisible : \(error.logSummary, privacy: .public)")
+                isFailurePresented = true
+            }
         }
+    }
+
+    @concurrent
+    private nonisolated static func read(_ url: URL) async throws -> ArcSidebar {
+        guard try (url.resourceValues(forKeys: [.fileSizeKey]).fileSize ?? 0) <= maximumFileSize else {
+            throw ArcSidebarParser.Failure.unreadable
+        }
+        return try ArcSidebarParser.parse(Data(contentsOf: url))
     }
 }

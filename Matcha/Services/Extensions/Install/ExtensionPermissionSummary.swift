@@ -18,11 +18,13 @@ nonisolated enum ExtensionPermissionSummary {
         case downloads
         case bookmarks
         case location
+        /// `file:` addresses, or every address (`<all_urls>`, audit E7).
+        case localFiles
     }
 
     /// Sensitive permissions, in display order.
     private static let permissionLines: [(Line, Set<String>)] = [
-        (.browsingHistory, ["tabs", "webNavigation", "history", "declarativeNetRequestFeedback", "topSites"]),
+        (.browsingHistory, ["tabs", "webNavigation", "history", "declarativeNetRequestFeedback", "topSites", "webRequest"]),
         (.cookies, ["cookies"]),
         (.clipboardRead, ["clipboardRead"]),
         (.clipboardWrite, ["clipboardWrite"]),
@@ -35,16 +37,20 @@ nonisolated enum ExtensionPermissionSummary {
     ]
 
     /// `permissions`: names of the permissions (“tabs”); `hosts`: host of each address pattern, nil for a pattern that
-    /// targets all websites (`<all_urls>`, `*://*/*`).
-    static func lines(permissions: Set<String>, hosts: [String?]) -> [Line] {
+    /// targets all websites (`<all_urls>`, `*://*/*`); `readsLocalFiles`: a pattern covers `file:` addresses.
+    static func lines(permissions: Set<String>, hosts: [String?], readsLocalFiles: Bool = false) -> [Line] {
         var lines = permissionLines.filter { !$0.1.isDisjoint(with: permissions) }.map(\.0)
         if hosts.contains(where: { $0 == nil || $0 == "*" }) {
             lines.append(.allWebsites)
         } else {
-            let names = Set(hosts.compactMap(\.self).map(displayHost)).sorted()
+            // A `file:` pattern has no host: never an empty website.
+            let names = Set(hosts.compactMap(\.self).filter { !$0.isEmpty }.map(displayHost)).sorted()
             if !names.isEmpty {
                 lines.append(.websites(names))
             }
+        }
+        if readsLocalFiles {
+            lines.append(.localFiles)
         }
         return lines
     }

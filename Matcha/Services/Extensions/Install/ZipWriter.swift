@@ -11,8 +11,10 @@ nonisolated enum ZipWriter {
         case tooLarge
     }
 
-    /// Maximum size of a file (no zip64).
+    /// Maximum size of a file, and of the archive (no zip64).
     static let maximumFileSize = Int(UInt32.max)
+    /// Most entries in an archive without zip64 (a 16-bit count, audit E7).
+    static let maximumEntries = Int(UInt16.max)
 
     /// Archive of the content of `folder`, with paths relative to it.
     static func archive(folder: URL, fileManager: FileManager = .default) throws -> Data {
@@ -34,13 +36,19 @@ nonisolated enum ZipWriter {
 
     /// Archive of `entries` (relative path, content), in the given order.
     static func archive(_ entries: [(path: String, contents: Data)]) throws -> Data {
+        guard entries.count <= maximumEntries else {
+            throw Failure.tooLarge
+        }
         var output = Data()
         var central = Data()
         for entry in entries {
-            guard entry.contents.count < maximumFileSize, output.count < maximumFileSize else {
+            guard entry.contents.count < maximumFileSize, output.count < maximumFileSize - entry.contents.count else {
                 throw Failure.tooLarge
             }
             let name = Data(entry.path.utf8)
+            guard name.count <= Int(UInt16.max) else {
+                throw Failure.tooLarge
+            }
             let crc = CRC32.checksum(entry.contents)
             let deflated = deflate(entry.contents)
             let (method, stored): (UInt16, Data) = if let deflated, deflated.count < entry.contents.count {
@@ -64,6 +72,9 @@ nonisolated enum ZipWriter {
             // External attributes: regular file, read and write (0644).
             central.append(le32(0o100644 << 16) + le32(offset))
             central.append(name)
+        }
+        guard output.count < maximumFileSize, central.count < maximumFileSize - output.count else {
+            throw Failure.tooLarge
         }
         let centralOffset = UInt32(output.count)
         output.append(central)

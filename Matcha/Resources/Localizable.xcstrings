@@ -7363,6 +7363,35 @@
         }
       }
     },
+    "Matcha can't verify that this file comes from the developer of “%@”. Replacing it erases its data." : {
+      "comment" : "Extension install sheet: a file with the name of an installed extension, from an unproven developer",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Matcha kann nicht prüfen, ob diese Datei vom Entwickler von „%@“ stammt. Beim Ersetzen werden ihre Daten gelöscht."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Matcha no puede comprobar que este archivo proceda del desarrollador de “%@”. Al sustituirla se borran sus datos."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Matcha ne peut pas vérifier que ce fichier vient du développeur de « %@ ». La remplacer efface ses données."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Matcha non può verificare che questo file provenga dallo sviluppatore di “%@”. Sostituirla cancella i suoi dati."
+          }
+        }
+      }
+    },
     "Matcha follows the language of macOS. To use another language in Matcha only, choose it in System Settings." : {
       "comment" : "Settings > General: note under the Change Language button",
       "localizations" : {
@@ -10446,6 +10475,34 @@
         }
       }
     },
+    "Read your local files" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Deine lokalen Dateien lesen"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Leer tus archivos locales"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lire vos fichiers locaux"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Leggere i tuoi file locali"
+          }
+        }
+      }
+    },
     "Red" : {
       "comment" : "Folder color swatch",
       "localizations" : {
@@ -10873,6 +10930,64 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Rinomina…"
+          }
+        }
+      }
+    },
+    "Replace “%@”?" : {
+      "comment" : "Extension install sheet: replaces an installed extension with the same name",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "„%@“ ersetzen?"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "¿Sustituir “%@”?"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Remplacer « %@ » ?"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sostituire “%@”?"
+          }
+        }
+      }
+    },
+    "Replace Extension" : {
+      "comment" : "Button of the extension install sheet: replaces the installed extension, erasing its data",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Erweiterung ersetzen"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sustituir extensión"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Remplacer l'extension"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sostituisci estensione"
           }
         }
       }
@@ -13041,6 +13156,35 @@
         }
       }
     },
+    "This extension is too large to be installed." : {
+      "comment" : "Extension install error",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Diese Erweiterung ist zu groß, um installiert zu werden."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Esta extensión es demasiado grande para instalarse."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cette extension est trop volumineuse pour être installée."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Questa estensione è troppo grande per essere installata."
+          }
+        }
+      }
+    },
     "This File Can’t Be Imported" : {
       "comment" : "Alert title when the chosen file isn't Arc's sidebar",
       "localizations" : {
@@ -13094,6 +13238,35 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Questo file non è un'estensione. Scegli un file .crx, .xpi o .zip, oppure una cartella decompressa."
+          }
+        }
+      }
+    },
+    "This folder contains links to other files or folders. Matcha only installs a folder without links." : {
+      "comment" : "Extension install error: an unpacked folder with symbolic links or aliases",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dieser Ordner enthält Verweise auf andere Dateien oder Ordner. Matcha installiert nur Ordner ohne Verweise."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Esta carpeta contiene enlaces a otros archivos o carpetas. Matcha solo instala carpetas sin enlaces."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ce dossier contient des liens vers d'autres fichiers ou dossiers. Matcha n'installe qu'un dossier sans liens."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Questa cartella contiene collegamenti ad altri file o cartelle. Matcha installa solo cartelle senza collegamenti."
           }
         }
       }
@@ -13239,6 +13412,64 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Questa pagina dice"
+          }
+        }
+      }
+    },
+    "This version doesn't ask for any new permission." : {
+      "comment" : "Extension update sheet: no permission added",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Diese Version fordert keine neuen Berechtigungen an."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Esta versión no pide ningún permiso nuevo."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cette version ne demande aucune nouvelle autorisation."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Questa versione non chiede nuovi permessi."
+          }
+        }
+      }
+    },
+    "This version will also be able to:" : {
+      "comment" : "Extension update sheet: title of the permissions the new version adds",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Diese Version kann außerdem:"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Esta versión también podrá:"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cette version pourra aussi :"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Questa versione potrà anche:"
           }
         }
       }
@@ -13846,6 +14077,35 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Versione %1$@ · %2$@"
+          }
+        }
+      }
+    },
+    "Version %@ → %@ · %@" : {
+      "comment" : "Installed and new versions, and origin, of an extension being updated or replaced",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Version %1$@ → %2$@ · %3$@"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Versión %1$@ → %2$@ · %3$@"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Version %1$@ → %2$@ · %3$@"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Versione %1$@ → %2$@ · %3$@"
           }
         }
       }

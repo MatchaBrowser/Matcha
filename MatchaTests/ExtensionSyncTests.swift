@@ -49,7 +49,8 @@ struct ExtensionSyncTests {
     private func macWithExtension() async throws -> Mac {
         let mac = makeMac("A")
         let file = try #require(Bundle(for: TestPages.self).url(forResource: "test-extension-package.zip", withExtension: nil))
-        try await mac.installer.install(mac.installer.prepare(fileAt: file), allowsPrivateWindows: false)
+        // Its identifier on all the Macs, as sync gives it (`preferredIdentifier`).
+        try await mac.installer.install(mac.installer.prepare(fileAt: file, preferredIdentifier: identifier), allowsPrivateWindows: false)
         await mac.adapter.preparePackages(using: transport)
         return mac
     }

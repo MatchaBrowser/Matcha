@@ -9,8 +9,12 @@ import Foundation
 ///   (root of a container), `arcDocument` (Arc note, left out); another kind that has children (split view…) is
 ///   replaced by its children.
 /// - `topAppsContainerIDs` gives, per profile, the container of its favorites.
-/// Only `http`, `https` and `file` addresses are kept. Pure type.
+/// Only `http`, `https` and `file` addresses are kept. A forged file can't exhaust the app (audit E7): folders deeper
+/// than `maximumDepth` and items beyond `maximumItems` are skipped. Pure type.
 nonisolated enum ArcSidebarParser {
+    static let maximumDepth = 32
+    static let maximumItems = 50000
+
     enum Failure: Error, Equatable {
         /// Not a JSON object.
         case unreadable
@@ -47,6 +51,8 @@ nonisolated enum ArcSidebarParser {
         let items: [String: [String: Any]]
         var skipped = 0
         private var visited: Set<String> = []
+        private var depth = 0
+        private var read = 0
 
         init(items: [String: [String: Any]]) {
             self.items = items
@@ -71,12 +77,23 @@ nonisolated enum ArcSidebarParser {
                 return []
             }
             let ids = (item["childrenIds"] as? [Any])?.compactMap { $0 as? String } ?? []
+            guard depth < ArcSidebarParser.maximumDepth else {
+                skipped += ids.count
+                return []
+            }
+            depth += 1
+            defer { depth -= 1 }
             return ids.flatMap { node(for: $0) }
         }
 
         /// Item `id`: a tab, a folder, or its children for an unknown kind.
         private mutating func node(for id: String) -> [ImportNode] {
             guard let item = items[id] else {
+                return []
+            }
+            read += 1
+            guard read <= ArcSidebarParser.maximumItems else {
+                skipped += 1
                 return []
             }
             let data = item["data"] as? [String: Any] ?? [:]

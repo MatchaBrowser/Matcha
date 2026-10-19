@@ -1,13 +1,13 @@
 import Foundation
 
 /// Stable identifier of an installed extension (task 6.4), valid for `ExtensionInstallDirectory`: it sets its address
-/// (`webkit-extension://<identifier>/`) and its storage. Reinstalling the same extension (new version) gives the same
-/// identifier: it replaces the old one and keeps its data. Pure type.
+/// (`webkit-extension://<identifier>/`) and its storage. Pure type.
 nonisolated enum ExtensionIdentifier {
-    /// Extension from a file: its name in the manifest's default language (“Dark Reader” → `dark-reader`), otherwise
-    /// its Firefox identifier; nil if neither gives an ASCII letter or digit.
-    static func forPackage(_ file: ExtensionManifestFile) -> String? {
-        file.name.flatMap(slug) ?? file.geckoIdentifier.flatMap(slug)
+    /// Extension from a file (audit E1): random, kept for its whole life (updates from the same publisher keep it).
+    /// Never derived from its name: another file with the same name would inherit its data, and websites could guess
+    /// its address. 32 hexadecimal characters, which a Safari extension's (`safari-…`) can't be.
+    static func random() -> String {
+        UUID().uuidString.lowercased().replacingOccurrences(of: "-", with: "")
     }
 
     /// Safari extension of an app: prefix `safari-` and its bundle identifier.

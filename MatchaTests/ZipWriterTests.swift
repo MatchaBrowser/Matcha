@@ -33,3 +33,50 @@ struct ZipWriterTests {
         #expect(try Data(contentsOf: extracted.appending(path: "scripts/fond.js")) == files["scripts/fond.js"])
     }
 }
+
+/// Audit E7: limits of an archive without zip64, and damaged entries, give errors, never a crash.
+struct ZipLimitsTests {
+    @Test func `too many entries or a too long name is refused`() {
+        let entries = (0 ... ZipWriter.maximumEntries).map { (path: "f\($0)", contents: Data()) }
+        #expect(throws: ZipWriter.Failure.tooLarge) {
+            try ZipWriter.archive(entries)
+        }
+        #expect(throws: ZipWriter.Failure.tooLarge) {
+            try ZipWriter.archive([(path: String(repeating: "a", count: Int(UInt16.max) + 1), contents: Data())])
+        }
+    }
+
+    @Test func `an entry announced with content but without data is damaged`() throws {
+        // One entry, “deflate”, 5 bytes announced, no compressed data.
+        let name = Data("a.txt".utf8)
+        func le16(_ value: Int) -> Data {
+            withUnsafeBytes(of: UInt16(value).littleEndian) { Data($0) }
+        }
+        func le32(_ value: Int) -> Data {
+            withUnsafeBytes(of: UInt32(value).littleEndian) { Data($0) }
+        }
+        var archive = Data()
+        for field in [le32(0x0403_4B50), le16(20), le16(0), le16(8), le16(0), le16(0), le32(0), le32(0), le32(5)] {
+            archive.append(field)
+        }
+        archive.append(le16(name.count) + le16(0) + name)
+        var central = Data()
+        for field in [le32(0x0201_4B50), le16(20), le16(20), le16(0), le16(8), le16(0), le16(0), le32(0), le32(0), le32(5)] {
+            central.append(field)
+        }
+        for field in [le16(name.count), le16(0), le16(0), le16(0), le16(0), le32(0), le32(0), name] {
+            central.append(field)
+        }
+        let offset = archive.count
+        archive.append(central)
+        for field in [le32(0x0605_4B50), le16(0), le16(0), le16(1), le16(1), le32(central.count), le32(offset), le16(0)] {
+            archive.append(field)
+        }
+
+        let folder = FileManager.default.temporaryDirectory.appending(path: "ZipLimitsTests-\(UUID().uuidString)")
+        defer { try? FileManager.default.removeItem(at: folder) }
+        #expect(throws: ZipArchive.Failure.corrupted) {
+            try ZipArchive(data: archive).extract(to: folder)
+        }
+    }
+}

@@ -19,6 +19,8 @@ nonisolated enum ExtensionError: Error, Equatable, LocalizedError {
     case nativeMessagingUnsupported
     /// An address an extension may not open (`ExtensionURLPolicy`): local file, `data:`, another extension's page…
     case forbiddenURL
+    /// An app's Safari extension whose signed identity changed since its installation (audit E7).
+    case identityChanged(String)
 
     var errorDescription: String? {
         switch self {
@@ -38,6 +40,8 @@ nonisolated enum ExtensionError: Error, Equatable, LocalizedError {
             "Native messaging is not supported in Matcha."
         case .forbiddenURL:
             "Extensions can only open web pages, about:blank and their own pages."
+        case let .identityChanged(identifier):
+            "The Safari extension \(identifier) is no longer signed by the developer it was installed from."
         }
     }
 }

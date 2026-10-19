@@ -120,9 +120,14 @@ final class ExtensionManager: NSObject {
     @discardableResult
     func read(_ identifier: String) async throws -> WKWebExtension {
         let webExtension: WKWebExtension
-        if let path = store.state(for: identifier)?.appExtensionPath {
-            guard let bundle = Bundle(url: URL(filePath: path)) else {
+        if let state = store.state(for: identifier), let path = state.appExtensionPath {
+            let url = URL(filePath: path)
+            guard let bundle = Bundle(url: url) else {
                 throw ExtensionError.notInstalled(identifier)
+            }
+            // Another bundle at the same place (other identifier, other team, altered signature): not loaded.
+            if let identity = state.appExtensionIdentity, SafariExtensionFinder.safariIdentifier(ofAppExtensionAt: url) != identity {
+                throw ExtensionError.identityChanged(identifier)
             }
             webExtension = try await WKWebExtension(appExtensionBundle: bundle)
         } else if let directory {

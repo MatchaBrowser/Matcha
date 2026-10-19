@@ -18,25 +18,28 @@ nonisolated struct SafariAppExtension: Equatable, Identifiable, Sendable {
     }
 }
 
-/// Looks for the Safari extensions of the apps in `/Applications` (and its direct subfolders, like Utilities) and in
-/// `~/Applications`: no public API lists them. Reads `Info.plist` files only. Pure type.
+/// Looks for the Safari extensions of the apps in `/Applications` (and its direct subfolders, like Utilities): no
+/// public API lists them. In the sandbox, `~/Applications` is the app's container, not the user's folder: it isn't
+/// read (audit E7). Reads `Info.plist` files, and keeps only extensions whose code signature is valid. Pure type.
 nonisolated enum SafariExtensionFinder {
     static let extensionPoint = "com.apple.Safari.web-extension"
 
-    /// Usual app folders.
+    /// Where apps are installed.
     static var applicationFolders: [URL] {
-        let home = FileManager.default.homeDirectoryForCurrentUser
-        return [
-            URL(filePath: "/Applications", directoryHint: .isDirectory),
-            home.appending(path: "Applications", directoryHint: .isDirectory),
-        ]
+        [URL(filePath: "/Applications", directoryHint: .isDirectory)]
     }
 
-    /// Safari extensions found in `folders`, sorted by name, each one once.
-    static func find(in folders: [URL] = applicationFolders, fileManager: FileManager = .default) -> [SafariAppExtension] {
+    /// Safari extensions found in `folders`, sorted by name, each one once. `checksSignatures`: false for the tests'
+    /// unsigned apps only.
+    static func find(
+        in folders: [URL] = applicationFolders,
+        fileManager: FileManager = .default,
+        checksSignatures: Bool = true,
+    ) -> [SafariAppExtension] {
         var found: [String: SafariAppExtension] = [:]
         for app in folders.flatMap({ apps(in: $0, fileManager: fileManager) }) {
-            for item in extensions(of: app, fileManager: fileManager) where found[item.bundleIdentifier] == nil {
+            let items = extensions(of: app, fileManager: fileManager, checksSignatures: checksSignatures)
+            for item in items where found[item.bundleIdentifier] == nil {
                 found[item.bundleIdentifier] = item
             }
         }
@@ -44,7 +47,7 @@ nonisolated enum SafariExtensionFinder {
     }
 
     /// Safari extensions of an app.
-    static func extensions(of app: URL, fileManager: FileManager = .default) -> [SafariAppExtension] {
+    static func extensions(of app: URL, fileManager: FileManager = .default, checksSignatures: Bool = true) -> [SafariAppExtension] {
         let plugIns = app.appending(path: "Contents/PlugIns", directoryHint: .isDirectory)
         let appexes = ((try? fileManager.contentsOfDirectory(at: plugIns, includingPropertiesForKeys: nil)) ?? [])
             .filter { $0.pathExtension == "appex" }
@@ -53,7 +56,8 @@ nonisolated enum SafariExtensionFinder {
             guard let info = infoDictionary(ofBundleAt: appex),
                   (info["NSExtension"] as? [String: Any])?["NSExtensionPointIdentifier"] as? String == extensionPoint,
                   let bundleIdentifier = info["CFBundleIdentifier"] as? String,
-                  fileManager.fileExists(atPath: appex.appending(path: "Contents/Resources/manifest.json").path)
+                  fileManager.fileExists(atPath: appex.appending(path: "Contents/Resources/manifest.json").path),
+                  !checksSignatures || hasValidSignature(appex)
             else {
                 return nil
             }
@@ -82,10 +86,23 @@ nonisolated enum SafariExtensionFinder {
         return "\(bundleIdentifier) (\(team))"
     }
 
-    /// Development team that signed bundle `url`, read through the public Security API.
-    static func teamIdentifier(ofBundleAt url: URL) -> String? {
+    /// True if the code signature of bundle `url` is intact (audit E7): an altered extension isn't offered, and its
+    /// team, read from that signature, can be trusted.
+    static func hasValidSignature(_ url: URL) -> Bool {
         var code: SecStaticCode?
         guard SecStaticCodeCreateWithPath(url as CFURL, [], &code) == errSecSuccess, let code else {
+            return false
+        }
+        return SecStaticCodeCheckValidity(code, [], nil) == errSecSuccess
+    }
+
+    /// Development team that signed bundle `url`, read through the public Security API; nil if its signature isn't
+    /// valid.
+    static func teamIdentifier(ofBundleAt url: URL) -> String? {
+        var code: SecStaticCode?
+        guard SecStaticCodeCreateWithPath(url as CFURL, [], &code) == errSecSuccess, let code,
+              SecStaticCodeCheckValidity(code, [], nil) == errSecSuccess
+        else {
             return nil
         }
         var information: CFDictionary?

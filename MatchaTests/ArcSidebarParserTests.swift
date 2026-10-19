@@ -86,6 +86,40 @@ struct ArcSidebarParserTests {
         #expect(sidebar.skippedItems == 1)
     }
 
+    /// Sidebar of one Space whose pinned container holds `items` (identifier, object), the container itself first.
+    private func sidebar(pinned children: [String], items: [(String, [String: Any])]) throws -> ArcSidebar {
+        var pairs: [Any] = ["P", ["childrenIds": children, "data": ["itemContainer": [:]]]]
+        for (id, item) in items {
+            pairs += [id, item]
+        }
+        let root: [String: Any] = ["sidebar": ["containers": [[
+            "items": pairs,
+            "spaces": ["S", ["title": "Seul", "containerIDs": ["pinned", "P"]]],
+        ]]]]
+        return try ArcSidebarParser.parse(JSONSerialization.data(withJSONObject: root))
+    }
+
+    @Test func `a forged file can't nest folders without end`() throws {
+        // 200 folders, each inside the previous one, and a tab at the bottom (audit E7).
+        let items = (0 ..< 200).map { level -> (String, [String: Any]) in
+            let children = level < 199 ? ["F\(level + 1)"] : ["T"]
+            return ("F\(level)", ["title": "Niveau \(level)", "childrenIds": children, "data": ["list": [:]]])
+        } + [("T", ["childrenIds": [], "data": ["tab": ["savedURL": "https://example.com/"]]])]
+        let pinned = try sidebar(pinned: ["F0"], items: items).spaces[0].pinned
+        let folders = ImportNode.folderCount(of: pinned)
+        #expect(folders > 0 && folders <= ArcSidebarParser.maximumDepth)
+        #expect(ImportNode.tabCount(of: pinned) == 0)
+    }
+
+    @Test func `a forged file can't hold more items than the limit`() throws {
+        let count = ArcSidebarParser.maximumItems + 1
+        let ids = (0 ..< count).map { "T\($0)" }
+        let items = ids.map { ($0, ["childrenIds": [], "data": ["tab": ["savedURL": "https://example.com/\($0)"]]] as [String: Any]) }
+        let sidebar = try sidebar(pinned: ids, items: items)
+        #expect(ImportNode.tabCount(of: sidebar.spaces[0].pinned) == ArcSidebarParser.maximumItems)
+        #expect(sidebar.skippedItems == 1)
+    }
+
     @Test func `arc icons and colors become a Matcha icon and theme`() {
         let available: Set = ["star", "star.fill", "server.rack", "bolt"]
         let exists: (String) -> Bool = { available.contains($0) }

@@ -44,40 +44,82 @@ struct ExtensionInstallerTests {
     @Test func `a zip file is installed in the extensions folder, its permissions granted`() async throws {
         defer { cleanUp() }
         let candidate = try await installer.prepare(fileAt: fixture("test-extension-package.zip"))
-        #expect(candidate.identifier == "matcha-test-extension")
-        #expect(!candidate.isUpdate)
+        let identifier = candidate.identifier
+        // Random, never derived from the name (audit E1).
+        #expect(identifier.count == 32 && ExtensionInstallDirectory.isValidIdentifier(identifier))
+        #expect(candidate.mode == .new)
+        #expect(candidate.publisher == nil)
         #expect(candidate.summary == [.browsingHistory, .allWebsites])
 
         try await installer.install(candidate, allowsPrivateWindows: false)
 
-        let folder = directory.appendingPathComponent("matcha-test-extension")
+        let folder = directory.appendingPathComponent(identifier)
         #expect(FileManager.default.fileExists(atPath: folder.appendingPathComponent("manifest.json").path))
-        let context = try #require(manager.contexts["matcha-test-extension"])
+        let context = try #require(manager.contexts[identifier])
         #expect(context.isLoaded)
         #expect(context.permissionStatus(for: .tabs) == .grantedExplicitly)
         #expect(!context.hasAccessToPrivateData)
-        let state = try #require(store.state(for: "matcha-test-extension"))
+        let state = try #require(store.state(for: identifier))
         #expect(state.grantedPermissions["tabs"] != nil)
         #expect(state.grantedMatchPatterns["obtest://*/*"] != nil)
         #expect(state.appExtensionPath == nil)
-        #expect(manager.installedIdentifiers == ["matcha-test-extension"])
+        #expect(state.version == candidate.webExtension.version)
+        #expect(manager.installedIdentifiers == [identifier])
         #expect(stagingIsEmpty())
     }
 
-    @Test func `crx and xpi files give the same extension, installed again as an update`() async throws {
+    /// Audit E1: a file with an installed extension's name, from an unproven developer, never gets its data.
+    @Test func `an unverified file with the name of an installed extension replaces it and erases its data`() async throws {
         defer { cleanUp() }
         let first = try await installer.prepare(fileAt: fixture("test-extension-package.crx"))
         try await installer.install(first, allowsPrivateWindows: true)
         #expect(manager.contexts[first.identifier]?.hasAccessToPrivateData == true)
 
         let second = try await installer.prepare(fileAt: fixture("test-extension-package.xpi"))
-        #expect(second.identifier == first.identifier)
-        #expect(second.isUpdate)
+        #expect(second.identifier != first.identifier)
+        #expect(second.mode == .replacement(identifier: first.identifier, previousVersion: first.webExtension.version))
         try await installer.install(second, allowsPrivateWindows: false)
 
-        #expect(manager.installedIdentifiers == [first.identifier])
-        #expect(manager.contexts[first.identifier]?.isLoaded == true)
-        #expect(manager.contexts[first.identifier]?.hasAccessToPrivateData == false)
+        #expect(manager.installedIdentifiers == [second.identifier])
+        #expect(store.state(for: first.identifier) == nil)
+        #expect(manager.contexts[second.identifier]?.isLoaded == true)
+        #expect(manager.contexts[second.identifier]?.hasAccessToPrivateData == false)
+    }
+
+    /// Audit E1 and E2: the same verified developer updates in place, keeping data and the user's refusals.
+    @Test func `a crx signed by the same developer updates in place and keeps the user's refusals`() async throws {
+        defer { cleanUp() }
+        let archive = try Data(contentsOf: fixture("test-extension-package.zip"))
+        let developer = try CRXBuilder.Developer()
+        let signed = root.appendingPathComponent("signe.crx")
+        try FileManager.default.createDirectory(at: root, withIntermediateDirectories: true)
+        try CRXBuilder.crx(archive: archive, developer: developer).write(to: signed)
+        let first = try await installer.prepare(fileAt: signed)
+        #expect(first.publisher == developer.identifier)
+        try await installer.install(first, allowsPrivateWindows: true)
+        // The user then refuses the tabs permission (WebKit's decision, saved by the manager).
+        let context = try #require(manager.contexts[first.identifier])
+        context.setPermissionStatus(.deniedExplicitly, for: .tabs)
+        try await waitUntil { store.state(for: first.identifier)?.deniedPermissions["tabs"] != nil }
+
+        let update = try await installer.prepare(fileAt: signed)
+        #expect(update.identifier == first.identifier)
+        #expect(update.mode == .update(previousVersion: first.webExtension.version))
+        #expect(update.addedSummary.isEmpty)
+        #expect(update.allowedPrivateWindows)
+        try await installer.install(update, allowsPrivateWindows: true)
+        let updated = try #require(store.state(for: first.identifier))
+        #expect(updated.deniedPermissions["tabs"] != nil)
+        #expect(updated.grantedPermissions["tabs"] == nil)
+        #expect(updated.publisher == developer.identifier)
+
+        // Another developer's file with the same name: a replacement, not an update.
+        let impostor = root.appendingPathComponent("faux.crx")
+        try CRXBuilder.crx(archive: archive, developer: CRXBuilder.Developer()).write(to: impostor)
+        let fake = try await installer.prepare(fileAt: impostor)
+        #expect(fake.identifier != first.identifier)
+        #expect(fake.mode == .replacement(identifier: first.identifier, previousVersion: first.webExtension.version))
+        installer.discard(fake)
     }
 
     @Test func `an unpacked folder is copied, the original stays`() async throws {
@@ -145,7 +187,20 @@ struct ExtensionInstallerTests {
         ]
         try PropertyListSerialization.data(fromPropertyList: info, format: .xml, options: 0)
             .write(to: contents.appendingPathComponent("Info.plist"))
-        return try #require(SafariExtensionFinder.extensions(of: app).first)
+        return try #require(SafariExtensionFinder.extensions(of: app, checksSignatures: false).first)
+    }
+
+    /// Audit E7: a bundle found later at the same place with another signed identity isn't loaded.
+    @Test func `a safari extension whose identity changed isn't loaded`() async throws {
+        defer { cleanUp() }
+        let appExtension = try makeAppExtension()
+        var state = ExtensionState()
+        state.appExtensionPath = appExtension.extensionURL.path
+        state.appExtensionIdentity = "com.example.other.extension (ABCDE12345)"
+        store.setState(state, for: "safari-test")
+        await #expect(throws: ExtensionError.identityChanged("safari-test")) {
+            try await manager.read("safari-test")
+        }
     }
 
     @Test func `an unsigned safari extension is refused by WebKit`() async throws {

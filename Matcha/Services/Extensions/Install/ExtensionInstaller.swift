@@ -1,35 +1,6 @@
-import CryptoKit
 import Foundation
 import OSLog
 import WebKit
-
-/// Extension ready to install, waiting for the user's approval (permissions screen, task 6.4).
-struct ExtensionInstallCandidate: Identifiable {
-    enum Source {
-        /// Chosen file or folder: unpacked into `staging`, manifest in `root`.
-        case package(root: URL, staging: URL, fileName: String)
-        /// Safari extension of an app, loaded in place.
-        case appExtension(SafariAppExtension)
-    }
-
-    let identifier: String
-    let webExtension: WKWebExtension
-    let source: Source
-    /// An extension with the same identifier is already installed: it will be replaced, its data kept.
-    let isUpdate: Bool
-
-    var id: String {
-        identifier
-    }
-
-    /// What the extension will be able to do, for the permissions screen.
-    var summary: [ExtensionPermissionSummary.Line] {
-        ExtensionPermissionSummary.lines(
-            permissions: Set(webExtension.requestedPermissions.map(\.rawValue)),
-            hosts: webExtension.requestedPermissionMatchPatterns.map { $0.matchesAllHosts ? nil : $0.host },
-        )
-    }
-}
 
 /// Installs extensions (task 6.4): a file (`.crx`, `.xpi`, `.zip`) or an unpacked folder is prepared in a temporary
 /// folder, then, once accepted, moved to `Application Support/Extensions/<identifier>/`; an app's Safari extension
@@ -48,36 +19,37 @@ final class ExtensionInstaller {
         )
     }
 
-    /// Prepares the extension of the file or folder `url`.
-    func prepare(fileAt url: URL) async throws -> ExtensionInstallCandidate {
+    /// Prepares the extension of the file or folder `url`. `preferredIdentifier`: the one it has on your other Macs
+    /// (offer received by sync), used if it is new here.
+    func prepare(fileAt url: URL, preferredIdentifier: String? = nil) async throws -> ExtensionInstallCandidate {
         let staging = stagingRoot.appendingPathComponent(UUID().uuidString, isDirectory: true)
         do {
             try FileManager.default.createDirectory(at: stagingRoot, withIntermediateDirectories: true)
-            if (try? url.resourceValues(forKeys: [.isDirectoryKey]).isDirectory) == true {
-                try FileManager.default.copyItem(at: url, to: staging)
-            } else {
-                let data = try Data(contentsOf: url)
-                try ZipArchive(data: ExtensionPackage.zipData(from: data)).extract(to: staging)
-            }
+            // Off the main thread, without links, within size limits (audits E3 and E6).
+            let publisher = try await ExtensionUnpacker.unpack(url, into: staging)
             let root = try Self.manifestFolder(in: staging)
             guard let file = ExtensionManifestFile(folder: root) else {
                 throw ExtensionInstallError.noManifest
             }
-            let identifier = ExtensionIdentifier.forPackage(file) ?? Self.fallbackIdentifier(for: file.name ?? url.lastPathComponent)
             let webExtension = try await WKWebExtension(resourceBaseURL: root)
-            return ExtensionInstallCandidate(
+            let name = webExtension.displayName ?? file.name
+            let (identifier, mode) = placement(name: name, publisher: publisher, preferredIdentifier: preferredIdentifier)
+            var candidate = ExtensionInstallCandidate(
                 identifier: identifier,
                 webExtension: webExtension,
                 source: .package(root: root, staging: staging, fileName: url.lastPathComponent),
-                isUpdate: manager.installedIdentifiers.contains(identifier),
+                mode: mode,
+                publisher: publisher,
             )
+            await describeUpdate(&candidate)
+            return candidate
         } catch {
             try? FileManager.default.removeItem(at: staging)
             throw ExtensionInstallError(error)
         }
     }
 
-    /// Prepares an app's Safari extension.
+    /// Prepares an app's Safari extension: the app vouches for it, so installing it again is an update.
     func prepare(_ appExtension: SafariAppExtension) async throws -> ExtensionInstallCandidate {
         guard let identifier = ExtensionIdentifier.forAppExtension(bundleIdentifier: appExtension.bundleIdentifier),
               let bundle = Bundle(url: appExtension.extensionURL)
@@ -86,53 +58,94 @@ final class ExtensionInstaller {
         }
         do {
             let webExtension = try await WKWebExtension(appExtensionBundle: bundle)
-            return ExtensionInstallCandidate(
+            let isInstalled = manager.installedIdentifiers.contains(identifier)
+            var candidate = ExtensionInstallCandidate(
                 identifier: identifier,
                 webExtension: webExtension,
                 source: .appExtension(appExtension),
-                isUpdate: manager.installedIdentifiers.contains(identifier),
+                mode: isInstalled ? .update(previousVersion: installedVersion(of: identifier)) : .new,
             )
+            await describeUpdate(&candidate)
+            return candidate
         } catch {
             throw ExtensionInstallError(error)
         }
     }
 
-    /// Installs `candidate` (accepted by the user) and loads it; an already installed version is replaced.
+    /// Installs `candidate` (accepted by the user) and loads it. An update replaces the installed version and keeps its
+    /// data and the user's refusals (audit E2); a replacement then uninstalls the extension it replaces, data included
+    /// (audit E1). If the new version can't be loaded, the previous one comes back, folder and decisions (audit E6).
     func install(_ candidate: ExtensionInstallCandidate, allowsPrivateWindows: Bool) async throws {
         let identifier = candidate.identifier
+        let previous = manager.store.state(for: identifier)
+        let wasLoaded = manager.contexts[identifier] != nil
         manager.unload(identifier: identifier)
-        var state = manager.store.state(for: identifier) ?? ExtensionState()
-        switch candidate.source {
-        case let .package(root, staging, _):
-            guard let directory = manager.directory else {
-                throw ExtensionInstallError.unreadable
+        let swap = try placeFiles(of: candidate)
+        do {
+            manager.store.setState(
+                state(for: candidate, previous: candidate.isUpdate ? previous : nil, allowsPrivateWindows: allowsPrivateWindows),
+                for: identifier,
+            )
+            let installed = try await manager.read(identifier)
+            try manager.load(installed, identifier: identifier)
+        } catch {
+            swap?.restore()
+            if let previous {
+                manager.store.setState(previous, for: identifier)
+                if wasLoaded, let restored = try? await manager.read(identifier) {
+                    _ = try? manager.load(restored, identifier: identifier)
+                }
+            } else {
+                manager.store.removeState(for: identifier)
             }
-            try FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)
-            let destination = directory.appendingPathComponent(identifier, isDirectory: true)
-            if FileManager.default.fileExists(atPath: destination.path) {
-                try FileManager.default.removeItem(at: destination)
-            }
-            try FileManager.default.moveItem(at: root, to: destination)
-            try? FileManager.default.removeItem(at: staging)
-            state.appExtensionPath = nil
-        case let .appExtension(appExtension):
+            throw error
+        }
+        swap?.finish()
+        if case let .replacement(replaced, _) = candidate.mode {
+            await manager.uninstall(identifier: replaced)
+        }
+        let kind = switch candidate.mode {
+        case .new: "installée"
+        case .update: "mise à jour"
+        case .replacement: "remplacée"
+        }
+        Logger.extensions.info("Extension \(kind, privacy: .public) (\(identifier, privacy: .private))")
+    }
+
+    /// Decisions of the installed version (audit E2: what it asks for, minus what the user refused).
+    private func state(for candidate: ExtensionInstallCandidate, previous: ExtensionState?, allowsPrivateWindows: Bool) -> ExtensionState {
+        var state = previous ?? ExtensionState()
+        let webExtension = candidate.webExtension
+        state.applyRequests(
+            permissions: Set(webExtension.requestedPermissions.map(\.rawValue)),
+            patterns: Set(webExtension.requestedPermissionMatchPatterns.map(\.string)),
+            optionalPermissions: Set(webExtension.optionalPermissions.map(\.rawValue)),
+            optionalPatterns: Set(webExtension.optionalPermissionMatchPatterns.map(\.string)),
+        )
+        if case let .appExtension(appExtension) = candidate.source {
             state.appExtensionPath = appExtension.extensionURL.path
-        }
-        for permission in candidate.webExtension.requestedPermissions {
-            state.grantedPermissions[permission.rawValue] = .distantFuture
-            state.deniedPermissions[permission.rawValue] = nil
-        }
-        for pattern in candidate.webExtension.requestedPermissionMatchPatterns {
-            state.grantedMatchPatterns[pattern.string] = .distantFuture
-            state.deniedMatchPatterns[pattern.string] = nil
+            state.appExtensionIdentity = SafariExtensionFinder.safariIdentifier(ofAppExtensionAt: appExtension.extensionURL)
+        } else {
+            state.appExtensionPath = nil
+            state.appExtensionIdentity = nil
         }
         state.hasAccessToPrivateData = allowsPrivateWindows
         state.isEnabled = true
-        manager.store.setState(state, for: identifier)
-        let webExtension = try await manager.read(identifier)
-        try manager.load(webExtension, identifier: identifier)
-        let kind = candidate.isUpdate ? "mise à jour" : "installée"
-        Logger.extensions.info("Extension \(kind, privacy: .public) (\(identifier, privacy: .private))")
+        state.publisher = candidate.publisher ?? previous?.publisher
+        state.version = webExtension.version
+        return state
+    }
+
+    /// Puts the unpacked folder in place: the previous version is kept aside until the new one loads (`FolderSwap`).
+    private func placeFiles(of candidate: ExtensionInstallCandidate) throws -> FolderSwap? {
+        guard case let .package(root, staging, _) = candidate.source else {
+            return nil
+        }
+        defer { try? FileManager.default.removeItem(at: staging) }
+        guard let directory = manager.directory else {
+            throw ExtensionInstallError.unreadable
+        }
+        return try FolderSwap(placing: root, at: directory.appendingPathComponent(candidate.identifier, isDirectory: true))
     }
 
     /// Discards `candidate` (refused): its temporary folder is erased.
@@ -160,11 +173,5 @@ final class ExtensionInstaller {
             throw ExtensionInstallError.noManifest
         }
         return folders[0]
-    }
-
-    /// Identifier of an extension whose name has no ASCII letter: `extension-` and the start of its digest.
-    static func fallbackIdentifier(for name: String) -> String {
-        let digest = SHA256.hash(data: Data(name.utf8)).prefix(6).map { String(format: "%02x", $0) }.joined()
-        return "extension-\(digest)"
     }
 }
