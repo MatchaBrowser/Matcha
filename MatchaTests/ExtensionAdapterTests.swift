@@ -8,10 +8,13 @@ import WebKit
 struct ExtensionAdapterTests {
     private let session: BrowserSession
     private let model: WindowModel
-    private let windows = ExtensionWindows(sink: FakeExtensionSink())
+    /// Kept here: the windows only hold it weakly, and follow nothing without a listener (audit C5).
+    private let sink = FakeExtensionSink()
+    private let windows: ExtensionWindows
     private let windowID: UUID
 
     init() throws {
+        windows = ExtensionWindows(sink: sink)
         session = try BrowserSession(container: BrowserSchema.makeContainer(inMemory: true))
         model = WindowModel(session: session, defaults: nil)
         windows.windowDidAppear(model, window: nil)

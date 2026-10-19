@@ -95,16 +95,24 @@ struct ContentBlockerExceptionsTests {
     /// A private window and a test store never save an exception; tabs and sign-in windows go through their
     /// session's blocker.
     @Test func `sessions give their scope to their pages`() throws {
-        let privateSession = BrowserSession.makePrivate()
-        #expect(!privateSession.contentBlocking.savesExceptions)
-        let session = try BrowserSession(container: BrowserSchema.makeContainer(inMemory: true))
-        #expect(!session.contentBlocking.savesExceptions)
-        #expect(session.contentBlocking.service === ContentBlockerService.shared)
+        let privateSession = BrowserSession.makePrivate(contentBlocker: .shared)
+        #expect(privateSession.contentBlocking?.savesExceptions == false)
+        let session = try BrowserSession(container: BrowserSchema.makeContainer(inMemory: true), contentBlocker: .shared)
+        #expect(session.contentBlocking?.savesExceptions == false)
+        #expect(session.contentBlocking?.service === ContentBlockerService.shared)
         #expect(session.spaces.allSatisfy { $0.tabManager.contentBlocking === session.contentBlocking })
         #expect(session.popupWindows.contentBlocking === session.contentBlocking)
         let profile: ProfileRecord = try #require(session.profiles.first)
         let space = session.addSpace(in: profile)
         #expect(space.tabManager.contentBlocking === session.contentBlocking)
+    }
+
+    /// Set aside (audit C5): no blocker for the pages.
+    @Test func `an unavailable blocker leaves pages alone`() throws {
+        let session = try BrowserSession(container: BrowserSchema.makeContainer(inMemory: true), contentBlocker: nil)
+        #expect(session.contentBlocking == nil)
+        #expect(session.spaces.allSatisfy { $0.tabManager.contentBlocking == nil })
+        #expect(BrowserSession.defaultContentBlocker == nil || ContentBlockerService.isAvailable)
     }
 
     @Test func `the global switch is saved and on by default`() {

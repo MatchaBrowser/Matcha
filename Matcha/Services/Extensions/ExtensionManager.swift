@@ -164,7 +164,7 @@ final class ExtensionManager: NSObject {
         context.isInspectable = WebInspection.isEnabled()
         (store.state(for: identifier) ?? ExtensionState()).apply(to: context)
         // WebKit asks for the open windows during loading: they must be up to date.
-        windows.update()
+        windows.update(beforeLoading: true)
         try controller.load(context)
         contexts[identifier] = context
         installed[identifier] = webExtension

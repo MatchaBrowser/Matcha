@@ -462,7 +462,7 @@ Rien n'est branché : il n'y a pas de transport, et seuls les tests créent `Syn
 - **Problème** : lecture des favicons, installation d'extensions, chiffrement des paquets, encodage JSON de la synchro et instantanés JPEG tournent sur le fil principal.
 - **Correction** : `@concurrent`, comme le projet le fait déjà ailleurs.
 
-**C5. Code dormant qui travaille**
+**✅ C5. Code dormant qui travaille** — corrigé : pas de bloqueur pour les pages tant qu'il est mis de côté, fenêtres suivies seulement quand une extension écoute.
 - **Problème** :
   - Le bloqueur (6.2 : ~1 050 lignes, plus 860 lignes de tests) tourne à chaque navigation pour rien, et ses tests compilent de vraies listes WebKit.
   - `ExtensionWindows` calcule des différences même sans extension.

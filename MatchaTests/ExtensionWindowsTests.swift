@@ -209,13 +209,24 @@ struct ExtensionWindowsTests {
         #expect(windows.adapter(for: model)?.isPrivate == false)
     }
 
-    @Test func `without a loaded extension nothing is sent, but the state follows`() {
+    /// Audit C5: nothing is followed without a loaded extension; the next one to load reads the windows afresh, without
+    /// receiving the changes made before it.
+    @Test func `without a loaded extension nothing is followed`() {
         _ = sink.take()
         sink.isListening = false
+        windows.update()
         let tab = tabManager.newTab()
         windows.update()
         #expect(sink.take().isEmpty)
+        #expect(windows.location(ofTab: tab.id) == nil)
+
+        windows.update(beforeLoading: true)
         #expect(windows.location(ofTab: tab.id)?.windowID == windowID)
+        #expect(sink.take().isEmpty)
+        sink.isListening = true
+        let next = tabManager.newTab()
+        windows.update()
+        #expect(sink.take().contains(.openTab(next.id)))
     }
 
     @Test func `changes are seen without an explicit update`() async throws {

@@ -30,8 +30,7 @@ struct PrivacySettingsView: View {
             SitePermissionsSection(store: session.sitePermissions, profiles: session.profiles)
             SiteActionsSection(store: session.sitePermissions.actions, profiles: session.profiles)
             // Blocker (task 6.2): the app's, with the saved exceptions.
-            if ContentBlockerService.isAvailable {
-                let contentBlocker = session.contentBlocking.service
+            if let contentBlocker = session.contentBlocking?.service {
                 ContentBlockerSettingsSection(service: contentBlocker)
                 ContentBlockerExceptionsSection(service: contentBlocker)
                 BlocklistCreditsSection(service: contentBlocker)

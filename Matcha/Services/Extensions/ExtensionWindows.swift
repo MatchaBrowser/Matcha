@@ -53,6 +53,8 @@ final class ExtensionWindows {
     private var tabAdapters: [UUID: ExtensionTab] = [:]
     private var windowAdapters: [UUID: ExtensionWindow] = [:]
     private var isUpdateScheduled = false
+    /// The state follows the windows (an extension listens, audit C5): without any, nothing is read nor compared.
+    private var isTracking = false
     private var isApplying = false
     private var observers: [any NSObjectProtocol] = []
 
@@ -158,7 +160,7 @@ final class ExtensionWindows {
 
     /// Reads the state again on the next turn of the main run loop (the changes of a single turn are grouped).
     func setNeedsUpdate() {
-        guard !isUpdateScheduled else {
+        guard !isUpdateScheduled, isTracking || sink?.isListening == true else {
             return
         }
         isUpdateScheduled = true
@@ -167,14 +169,24 @@ final class ExtensionWindows {
         }
     }
 
-    /// Reads the state again right away and gives the events to the controller; then tracks what was read.
-    func update() {
+    /// Reads the state again right away and gives the events to the controller; then tracks what was read. Without a
+    /// listening extension, it stops following the windows. `beforeLoading`: an extension is about to load and WebKit
+    /// will ask for the open windows; read without sending anything if nothing was followed.
+    func update(beforeLoading: Bool = false) {
         isUpdateScheduled = false
+        let isListening = sink?.isListening == true
+        guard isListening || beforeLoading else {
+            isTracking = false
+            return
+        }
         guard !isApplying else {
             setNeedsUpdate()
             return
         }
         startObservingWindows()
+        // Before a first loading, the windows are read without events: the extension asks WebKit for them.
+        let sendsEvents = isListening && (isTracking || !beforeLoading)
+        isTracking = true
         let snapshot = withObservationTracking {
             makeSnapshot()
         } onChange: { [weak self] in
@@ -182,10 +194,10 @@ final class ExtensionWindows {
                 self?.setNeedsUpdate()
             }
         }
-        apply(snapshot)
+        apply(snapshot, sendsEvents: sendsEvents)
     }
 
-    private func apply(_ snapshot: Snapshot) {
+    private func apply(_ snapshot: Snapshot, sendsEvents: Bool) {
         let events = ExtensionEventPlanner.events(from: state, to: snapshot.state)
         state = snapshot.state
         locations = state.locations()
@@ -199,7 +211,7 @@ final class ExtensionWindows {
         guard !events.isEmpty else {
             return
         }
-        if let sink, sink.isListening {
+        if sendsEvents, let sink {
             isApplying = true
             events.forEach { send($0, to: sink) }
             isApplying = false
