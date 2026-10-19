@@ -52,6 +52,12 @@ final class BrowserTab: Identifiable {
     let audio = PageAudio()
     /// Downloads started by the page's document, and those waiting for the user (audit W7).
     let pageDownloads = PageDownloads()
+    /// Load that failed, shown in place of the page (`+LoadFailure`, audit K5).
+    let loadFailure = PageLoadFailure()
+    /// JavaScript dialogs of the page's document (audit K1).
+    let pageDialogs = PageDialogState()
+    /// Websites whose invalid certificate the user accepted, loaded in this tab (“Not Secure”, audit K5).
+    var acceptedCertificateHosts: Set<String> = []
     /// The page's zoom (`WKWebView.pageZoom`, task 5.4), copied here for the menus: it only changes through
     /// `setPageZoom`. Pinch zoom (`magnification`) is separate.
     private(set) var pageZoom = ZoomLevels.actualSize
@@ -155,20 +161,6 @@ final class BrowserTab: Identifiable {
         return webView
     }
 
-    /// Keeps the web view's navigation state, to restore it later; false if it could not be read.
-    @discardableResult
-    func captureInteractionState() -> Bool {
-        guard let webView else {
-            return false
-        }
-        guard let state = webView.interactionState as? Data else {
-            Logger.browser.notice("État de navigation illisible : l'onglet sera restauré depuis son adresse")
-            return false
-        }
-        savedInteractionState = state
-        return true
-    }
-
     /// Releases the web view (memory, sound, process), denies pending permission requests, forgets find in page and
     /// goes back to 100% (the site's zoom will come back with the page). The tab now displays `url` and `title`, and
     /// will load `url` when it is reopened.
@@ -221,6 +213,24 @@ final class BrowserTab: Identifiable {
     /// A new document is displayed, or the load ended: the address shown is the web view's again (audit W4).
     func documentDidChange() {
         displayedAddress.documentDidChange(to: webView?.url)
+        loadFailure.clear()
+        updateCanGoBack()
+    }
+
+    /// A first load that failed leaves the web view without an address: the tab keeps the one it couldn't open, to show
+    /// it, save it and try again (audit K5).
+    func keepFailedAddress(_ url: URL) {
+        if webView?.url == nil {
+            setURL(url)
+        }
+    }
+
+    /// “Back” also leaves a failed load shown over the page it was leaving (audit K5).
+    func updateCanGoBack() {
+        let canGoBack = webView?.canGoBack == true || (loadFailure.error != nil && webView?.url != nil)
+        if self.canGoBack != canGoBack {
+            self.canGoBack = canGoBack
+        }
     }
 
     /// Loads `url`; `source`: the page whose link it is, if any (a local file then reads less, `FileReadAccess`).
@@ -230,6 +240,7 @@ final class BrowserTab: Identifiable {
         suspension.endRestoring()
         crash.pageWillNavigate()
         displayedAddress.userDidRequest(url)
+        loadFailure.clear()
         load(url, in: webView, from: source)
     }
 
@@ -305,7 +316,7 @@ final class BrowserTab: Identifiable {
             }),
             webView.observe(\.isLoading, options: .initial, changeHandler: sync { $0.isLoading = $1.isLoading }),
             webView.observe(\.estimatedProgress, options: .initial, changeHandler: sync { $0.progress = $1.estimatedProgress }),
-            webView.observe(\.canGoBack, options: .initial, changeHandler: sync { $0.canGoBack = $1.canGoBack }),
+            webView.observe(\.canGoBack, options: .initial, changeHandler: sync { tab, _ in tab.updateCanGoBack() }),
             webView.observe(\.canGoForward, options: .initial, changeHandler: sync { $0.canGoForward = $1.canGoForward }),
             webView.observe(\.hasOnlySecureContent, options: .initial, changeHandler: sync { tab, webView in
                 tab.hasOnlySecureContent = webView.hasOnlySecureContent

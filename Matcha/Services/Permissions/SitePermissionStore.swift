@@ -12,6 +12,8 @@ final class SitePermissionStore {
     private(set) var table: SitePermissionTable
     /// What websites may do without asking (open another app, audit W2).
     let actions: SiteActionAllowances
+    /// Invalid certificates the user chose to accept, until the app quits (audit K5).
+    let certificateExceptions = CertificateExceptions()
     /// Store in which to remember the decisions; nil for a private window.
     @ObservationIgnored private let context: ModelContext?
 

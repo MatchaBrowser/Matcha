@@ -18,6 +18,8 @@ final class NavigationCoordinator: NSObject {
     var openExternally: (URL) -> Bool = { NSWorkspace.shared.open($0) }
     /// App that opens a link (`+ExternalApps`); replaceable in tests.
     var applicationForURL: (URL) -> URL? = { NSWorkspace.shared.urlForApplication(toOpen: $0) }
+    /// JavaScript dialogs, files to send, logins (`+Dialogs`, `+Authentication`); replaced in tests.
+    var dialogs: any PageDialogPresenting = SystemPageDialogs()
     /// “Open links to other websites from Favorites and pinned tabs in Peek” setting, read at each click;
     /// replaceable in tests.
     var opensPinnedLinksInPeek: () -> Bool = { BrowserSettings.pinnedLinksOpenInPeek() }
@@ -118,6 +120,7 @@ extension NavigationCoordinator: WKNavigationDelegate {
         tab.documentDidChange()
         tab.permissionPrompts.denyAll()
         tab.pageDownloads.documentDidChange()
+        tab.pageDialogs.documentDidChange()
         tab.audio.reset()
         tabHost.faviconService.showCachedIcon(on: tab, host: webView.url?.host())
         tabHost.siteZooms?.pageDidCommit(tab, url: webView.url)

@@ -84,6 +84,8 @@ struct MiniWindowView: View {
                     .background(.background)
                 } else if tab.crash.isShowingProblem {
                     PageProblemView(page: tab)
+                } else if let error = tab.loadFailure.error {
+                    PageLoadErrorView(page: tab, error: error)
                 }
             }
         }

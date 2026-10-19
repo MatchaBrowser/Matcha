@@ -563,3 +563,7 @@ Après la 8.1 (l'app déclarée comme navigateur).
 - [ ] W2 : un lien `mailto:` ou vers une autre app affiche le bandeau (Annuler, Ouvrir, Toujours ouvrir) ; « Toujours ouvrir » ne redemande plus pour ce site et cette sorte de lien ; Réglages > Confidentialité > « Permis sans demander » et le panneau du site le listent, « Redemander » le retire.
 - [ ] W7 : une page qui lance plusieurs téléchargements sans clic : le premier passe, puis le bandeau « … veut télécharger des fichiers. » ; Autoriser laisse passer les suivants ; un vrai clic sur un lien de téléchargement ne demande jamais.
 - [ ] K4 : un site uniquement en `http` (`http://httpforever.com`) s'ouvre, avec « Non sécurisé ».
+- [ ] K1 : `alert`, `confirm`, `prompt` s'ouvrent en feuille titrée « ‹site› indique » ; dès le 2e dialogue, la case « Empêcher cette page… » arrête les suivants jusqu'au rechargement.
+- [ ] K2 : un champ d'envoi de fichier ouvre le panneau du système ; les fichiers choisis arrivent dans la page.
+- [ ] K3 : un site protégé par mot de passe affiche la feuille de connexion (champs lisibles) ; un mauvais mot de passe la ramène avec « incorrect » ; Annuler montre la page 401 du serveur.
+- [ ] K5 : serveur qui refuse, site inexistant, hors ligne : page d'erreur avec « Réessayer » ; « Précédent » revient à la page d'avant. Certificat expiré (`https://expired.badssl.com`) : « Afficher le certificat » et, en dessous, le bouton rouge « Ouvrir ce site quand même » ; la page ouverte affiche « Non sécurisé » en rouge.

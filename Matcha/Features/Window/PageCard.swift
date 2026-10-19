@@ -117,6 +117,12 @@ struct PageCard: View {
                         PageProblemView(page: tab, activate: activate)
                     }
                 }
+                // Load that failed (audit K5): why, until another load.
+                .overlay {
+                    if let error = tab.loadFailure.error {
+                        PageLoadErrorView(page: tab, error: error, activate: activate)
+                    }
+                }
         } else {
             ContentUnavailableView(emptyPageTitle, systemImage: "globe", description: Text(emptyPageDescription))
                 // Takes the full height, like the web view: otherwise the whole column is centered vertically.

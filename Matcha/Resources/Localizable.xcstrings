@@ -1,6 +1,35 @@
 {
   "sourceLanguage" : "en",
   "strings" : {
+    "“%@” needs a user name and password." : {
+      "comment" : "Page shown when a website's login was cancelled; %@ is the website",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "„%@“ benötigt einen Benutzernamen und ein Passwort."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "“%@” necesita un nombre de usuario y una contraseña."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "« %@ » demande un nom d'utilisateur et un mot de passe."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "“%@” richiede un nome utente e una password."
+          }
+        }
+      }
+    },
     "“%@” Requests Additional Access" : {
       "comment" : "Alert shown when a browser extension asks for more permissions; %@ is the extension name",
       "localizations" : {
@@ -55,6 +84,35 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "%1$@ di %2$@"
+          }
+        }
+      }
+    },
+    "%@ says" : {
+      "comment" : "Title of a website's JavaScript dialog; %@ is the website",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ meldet"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ dice"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ indique"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ dice"
           }
         }
       }
@@ -2579,7 +2637,7 @@
       }
     },
     "Choose" : {
-      "comment" : "Button of the panel that picks an extension file or folder",
+      "comment" : "Button of the panel that picks an extension file or folder\nButton of the panel where the user picks files to send to a website",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -4309,6 +4367,35 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Non consentire"
+          }
+        }
+      }
+    },
+    "Don't allow this page to show more dialogs" : {
+      "comment" : "Checkbox of a website's JavaScript dialog, from its second dialog on",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dieser Seite keine weiteren Dialoge erlauben"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No permitir que esta página muestre más diálogos"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Empêcher cette page d'afficher d'autres dialogues"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Non consentire a questa pagina di mostrare altre finestre di dialogo"
           }
         }
       }
@@ -6959,6 +7046,64 @@
         }
       }
     },
+    "Log In" : {
+      "comment" : "Button of the sheet where a website asks for a user name and password",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Anmelden"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Iniciar sesión"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Se connecter"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Accedi"
+          }
+        }
+      }
+    },
+    "Log in to %@" : {
+      "comment" : "Title of the sheet where a website asks for a user name and password; %@ is the website",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bei %@ anmelden"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Iniciar sesión en %@"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Se connecter à %@"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Accedi a %@"
+          }
+        }
+      }
+    },
     "macOS asks you to confirm" : {
       "comment" : "Settings > General: help of the Make Default button",
       "localizations" : {
@@ -7069,6 +7214,93 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Gestire i tuoi download"
+          }
+        }
+      }
+    },
+    "Matcha can't connect to the server “%@”." : {
+      "comment" : "Page shown when a server refuses the connection; %@ is the website",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Matcha kann keine Verbindung zum Server „%@“ herstellen."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Matcha no puede conectarse al servidor “%@”."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Matcha ne peut pas se connecter au serveur « %@ »."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Matcha non riesce a connettersi al server “%@”."
+          }
+        }
+      }
+    },
+    "Matcha can't find the server “%@”." : {
+      "comment" : "Page shown when a website's name leads nowhere; %@ is the website",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Matcha kann den Server „%@“ nicht finden."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Matcha no encuentra el servidor “%@”."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Matcha ne trouve pas le serveur « %@ »."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Matcha non trova il server “%@”."
+          }
+        }
+      }
+    },
+    "Matcha Can't Open This Page" : {
+      "comment" : "Title of the page shown after a page couldn't load",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Matcha kann diese Seite nicht öffnen"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Matcha no puede abrir esta página"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Matcha ne peut pas ouvrir cette page"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Matcha non può aprire questa pagina"
           }
         }
       }
@@ -8194,6 +8426,35 @@
         }
       }
     },
+    "OK" : {
+      "comment" : "Button of a website's JavaScript dialog",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "OK"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aceptar"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "OK"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "OK"
+          }
+        }
+      }
+    },
     "Open" : {
       "comment" : "Banner where a website asks to open another app: open the link in that app",
       "localizations" : {
@@ -9027,6 +9288,35 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Parti di questa pagina non sono crittografate — Mostra certificato"
+          }
+        }
+      }
+    },
+    "Password" : {
+      "comment" : "Field of the sheet where a website asks for a user name and password",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Passwort"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Contraseña"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mot de passe"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Password"
           }
         }
       }
@@ -11134,6 +11424,35 @@
         }
       }
     },
+    "Show Certificate" : {
+      "comment" : "Button of the page shown after a certificate error: shows the website's certificate",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zertifikat anzeigen"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mostrar certificado"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Afficher le certificat"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mostra certificato"
+          }
+        }
+      }
+    },
     "Show Downloads" : {
       "comment" : "View menu item (⌥⌘L) that opens the downloads panel at the bottom of the sidebar",
       "localizations" : {
@@ -12030,6 +12349,64 @@
         }
       }
     },
+    "The certificate of “%@” isn't valid." : {
+      "comment" : "Certificate panel of a website whose certificate isn't valid; %@ is the website",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Das Zertifikat von „%@“ ist ungültig."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "El certificado de “%@” no es válido."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Le certificat de « %@ » n'est pas valide."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Il certificato di “%@” non è valido."
+          }
+        }
+      }
+    },
+    "The certificate of “%@” isn't valid. Someone may be impersonating this website to steal your information." : {
+      "comment" : "Page shown after a certificate error; %@ is the website",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Das Zertifikat von „%@“ ist ungültig. Möglicherweise gibt sich jemand als diese Website aus, um deine Daten zu stehlen."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "El certificado de “%@” no es válido. Puede que alguien se esté haciendo pasar por este sitio web para robar tu información."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Le certificat de « %@ » n'est pas valide. Quelqu'un se fait peut-être passer pour ce site pour voler vos informations."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Il certificato di “%@” non è valido. Qualcuno potrebbe fingersi questo sito web per rubare le tue informazioni."
+          }
+        }
+      }
+    },
     "The connection to “%@” is encrypted, but parts of this page were loaded without encryption." : {
       "comment" : "Certificate panel of a page whose images or media are not encrypted; %@ is the website",
       "localizations" : {
@@ -12203,6 +12580,35 @@
         }
       }
     },
+    "The server “%@” took too long to respond." : {
+      "comment" : "Page shown after a timeout; %@ is the website",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Der Server „%@“ hat zu lange nicht geantwortet."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "El servidor “%@” tardó demasiado en responder."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Le serveur « %@ » a mis trop de temps à répondre."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Il server “%@” ha impiegato troppo tempo a rispondere."
+          }
+        }
+      }
+    },
     "The source of this page couldn't be loaded." : {
       "comment" : "Page source viewer, after an error",
       "localizations" : {
@@ -12261,6 +12667,64 @@
         }
       }
     },
+    "The user name or password isn't correct." : {
+      "comment" : "Login sheet, after a refused attempt",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Der Benutzername oder das Passwort ist falsch."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "El nombre de usuario o la contraseña no son correctos."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Le nom d'utilisateur ou le mot de passe est incorrect."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Il nome utente o la password non sono corretti."
+          }
+        }
+      }
+    },
+    "The website says: “%@”" : {
+      "comment" : "Login sheet: the name the server gives to its protected area; %@ is that name",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Die Website meldet: „%@“"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "El sitio web dice: “%@”"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Le site indique : « %@ »"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Il sito web dice: “%@”"
+          }
+        }
+      }
+    },
     "Theme" : {
       "comment" : "Space editor: title of the theme section",
       "localizations" : {
@@ -12315,6 +12779,35 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Questo indirizzo non è un file."
+          }
+        }
+      }
+    },
+    "This Connection Isn't Private" : {
+      "comment" : "Title of the page shown when a website's certificate isn't valid",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Diese Verbindung ist nicht privat"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Esta conexión no es privada"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cette connexion n'est pas privée"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Questa connessione non è privata"
           }
         }
       }
@@ -12489,6 +12982,35 @@
         }
       }
     },
+    "This page can't be shown until your Mac is connected to the internet." : {
+      "comment" : "Page shown when the Mac is offline",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Diese Seite kann erst angezeigt werden, wenn dein Mac mit dem Internet verbunden ist."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Esta página no se puede mostrar hasta que tu Mac esté conectado a Internet."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cette page ne peut pas s'afficher tant que votre Mac n'est pas connecté à Internet."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Questa pagina non può essere mostrata finché il Mac non è connesso a Internet."
+          }
+        }
+      }
+    },
     "This page had a problem" : {
       "comment" : "Title of the message shown in place of a page whose content stopped working several times in a row",
       "localizations" : {
@@ -12543,6 +13065,64 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Questa pagina non ha impostazioni del sito web."
+          }
+        }
+      }
+    },
+    "This page says" : {
+      "comment" : "Title of a JavaScript dialog of a page without a website (local file)",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Diese Seite meldet"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Esta página dice"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cette page indique"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Questa pagina dice"
+          }
+        }
+      }
+    },
+    "This Website's Certificate Isn't Valid — Show Certificate" : {
+      "comment" : "Help tag of “Not Secure” for a website visited despite its invalid certificate",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Das Zertifikat dieser Website ist ungültig – Zertifikat anzeigen"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "El certificado de este sitio web no es válido — Mostrar certificado"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Le certificat de ce site n'est pas valide — Afficher le certificat"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Il certificato di questo sito web non è valido — Mostra certificato"
           }
         }
       }
@@ -12717,6 +13297,35 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Albero"
+          }
+        }
+      }
+    },
+    "Try Again" : {
+      "comment" : "Button of the page shown after a page couldn't load: loads it again",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Erneut versuchen"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Reintentar"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Réessayer"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Riprova"
           }
         }
       }
@@ -13038,6 +13647,35 @@
         }
       }
     },
+    "User Name" : {
+      "comment" : "Field of the sheet where a website asks for a user name and password",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Benutzername"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nombre de usuario"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nom d'utilisateur"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nome utente"
+          }
+        }
+      }
+    },
     "Version %@ · %@" : {
       "comment" : "Version and origin of an installed extension",
       "localizations" : {
@@ -13121,6 +13759,35 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Mostra sorgente pagina"
+          }
+        }
+      }
+    },
+    "Visit This Website Anyway" : {
+      "comment" : "Red button of the page shown after a certificate error: opens the website despite the risk",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Website trotzdem öffnen"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Abrir este sitio web de todos modos"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ouvrir ce site quand même"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Apri comunque questo sito web"
           }
         }
       }
@@ -13385,6 +14052,35 @@
         }
       }
     },
+    "You Aren't Connected to the Internet" : {
+      "comment" : "Title of the page shown when the Mac is offline",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Du bist nicht mit dem Internet verbunden"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No estás conectado a Internet"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vous n'êtes pas connecté à Internet"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Non sei connesso a Internet"
+          }
+        }
+      }
+    },
     "You will be signed out of all websites. This action cannot be undone." : {
       "localizations" : {
         "de" : {
@@ -13467,6 +14163,35 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Pagina iniziale"
+          }
+        }
+      }
+    },
+    "Your password will be sent unencrypted." : {
+      "comment" : "Login sheet of a website without encryption",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dein Passwort wird unverschlüsselt gesendet."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tu contraseña se enviará sin cifrar."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Votre mot de passe sera envoyé sans chiffrement."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "La password verrà inviata senza crittografia."
           }
         }
       }

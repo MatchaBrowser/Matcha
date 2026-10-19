@@ -126,7 +126,7 @@ Date : 2026-10-19, sur le commit `a94cf2e`. Audit en lecture seule : 9 analyses,
 
 Toutes sont vérifiées. Les en-têtes du SDK disent ce que fait WebKit quand la méthode manque.
 
-**K1. Dialogues JavaScript** (Élevé)
+**✅ K1. Dialogues JavaScript** (Élevé) — corrigé : feuilles système titrées du site, arrêt possible dès le 2e dialogue.
 - **Problème** : `runJavaScriptAlert`, `Confirm` et `TextInputPanel` ne sont pas implémentés.
   - `alert()` n'affiche rien.
   - `confirm()` répond **toujours non** : « Supprimer ce message ? » ne fait plus rien.
@@ -135,11 +135,11 @@ Toutes sont vérifiées. Les en-têtes du SDK disent ce que fait WebKit quand la
   - Des feuilles `NSAlert` attachées à l'onglet, qui affichent l'origine du cadre (`securityOrigin`).
   - Une file d'attente par onglet, vidée à la navigation, avec une limite de fréquence.
 
-**K2. Envoi de fichiers** (Élevé)
+**✅ K2. Envoi de fichiers** (Élevé) — corrigé : panneau d'ouverture du système.
 - **Problème** : sans `runOpenPanelWith`, WebKit fait « Annuler » sur macOS. Tout `<input type=file>` est donc inerte : pièces jointes, photo de profil, formulaires.
 - **Correction** : un `NSOpenPanel` en feuille, avec sélection multiple et dossiers. Les droits du bac à sable sont déjà là.
 
-**K3. Sites protégés par mot de passe** (Élevé)
+**✅ K3. Sites protégés par mot de passe** (Élevé) — corrigé : feuille d'identification, identifiants pour la session.
 - **Problème** : sans `webView(_:respondTo:)`, WebKit refuse la demande d'identification. Box, intranets, préproduction (Basic, Digest, NTLM) et certificats client sont inaccessibles.
 - **Correction** :
   - Une feuille identifiant et mot de passe, qui montre l'hôte et le realm.
@@ -149,7 +149,7 @@ Toutes sont vérifiées. Les en-têtes du SDK disent ce que fait WebKit quand la
 - **Problème** : sans `NSAppTransportSecurity`, App Transport Security s'applique aux `WKWebView`. `http://neverssl.com` échoue avec l'erreur `NSURLErrorDomain -1022`. Seuls les adresses IP, `.local` et localhost passent.
 - **Correction** : `NSAllowsArbitraryLoadsInWebContent = YES` dans un vrai Info.plist (voir A5). Les requêtes `URLSession` (synchro, suggestions) restent sous ATS.
 
-**K5. Échec de chargement invisible** (Élevé)
+**✅ K5. Échec de chargement invisible** (Élevé) — corrigé : page d'erreur avec « Réessayer » ; certificat : « Afficher le certificat » et bouton rouge « Ouvrir ce site quand même » (exception de session).
 - **Problème** : hors ligne, sur une erreur DNS, un délai dépassé ou un certificat invalide, rien ne s'affiche. Seul le plantage d'un processus a sa page (`PageProblemView`). Avec K4, un site `http` donne une page blanche.
 - **Correction** : une page d'erreur traduite avec « Réessayer ». Les certificats ont leur propre cas, avec « Afficher le certificat ».
 

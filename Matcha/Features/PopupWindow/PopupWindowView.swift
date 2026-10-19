@@ -19,6 +19,8 @@ struct PopupWindowView: View {
                 MiniWebViewContainerView(container: controller.container)
                 if tab.crash.isShowingProblem {
                     PageProblemView(page: tab)
+                } else if let error = tab.loadFailure.error {
+                    PageLoadErrorView(page: tab, error: error)
                 }
             }
         }

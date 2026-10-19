@@ -9,6 +9,9 @@ extension NavigationCoordinator {
     func webView(_ webView: WKWebView, didFailProvisionalNavigation _: WKNavigation!, withError error: any Error) {
         navigationDidFail(in: webView)
         provisionalNavigationDidFail(in: webView, error: error)
+        // Why, in place of the page (audit K5).
+        let exceptions = tabHost?.sitePermissions(for: webView)?.store.certificateExceptions
+        tabHost?.page(for: webView)?.provisionalLoadDidFail(error, certificateExceptions: exceptions)
     }
 
     func webView(_ webView: WKWebView, didFail _: WKNavigation!, withError _: any Error) {

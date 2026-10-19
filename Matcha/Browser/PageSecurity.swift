@@ -9,6 +9,8 @@ nonisolated enum PageSecurity: Equatable, Sendable {
     case partlySecure
     /// http.
     case notSecure
+    /// https with a certificate that isn't valid, which the user chose to accept (`CertificateExceptions`).
+    case invalidCertificate
     /// Not a website (local file, `about:`, `data:`, extension page…): nothing to show.
     case none
 
@@ -25,6 +27,6 @@ nonisolated enum PageSecurity: Equatable, Sendable {
 
     /// True if the connection is encrypted: its certificate can be shown.
     var hasCertificate: Bool {
-        self == .secure || self == .partlySecure
+        [.secure, .partlySecure, .invalidCertificate].contains(self)
     }
 }

@@ -78,6 +78,8 @@ struct PeekOverlay: View {
                 .overlay {
                     if peek.tab.crash.isShowingProblem {
                         PageProblemView(page: peek.tab)
+                    } else if let error = peek.tab.loadFailure.error {
+                        PageLoadErrorView(page: peek.tab, error: error)
                     }
                 }
         }

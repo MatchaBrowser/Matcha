@@ -1,7 +1,8 @@
 import SwiftUI
 
 /// Security of a page next to its address (audit W5): a padlock button that shows the certificate of an encrypted
-/// page; “Not Secure” for an unencrypted one; nothing for a page that isn't a website. `prominent`: in red, where a
+/// page; “Not Secure” for an unencrypted one, in red (and showing the certificate) for a website visited despite its
+/// invalid certificate (audit K5); nothing for a page that isn't a website. `prominent`: in red, where a
 /// password may be typed (sign-in windows).
 struct PageSecurityIndicator: View {
     let page: BrowserTab
@@ -41,9 +42,36 @@ struct PageSecurityIndicator: View {
             .accessibilityElement(children: .ignore)
             .accessibilityLabel(Text("Not Secure", comment: "Address bar: the page is not encrypted (http)"))
             .accessibilityIdentifier("notSecureLabel")
+        case .invalidCertificate:
+            // Visited despite its invalid certificate, at the user's request: “Not Secure” in red, which shows it.
+            Button {
+                CertificatePanel.show(for: page, in: NSApp.keyWindow)
+            } label: {
+                HStack(spacing: 4) {
+                    Image(systemName: "exclamationmark.triangle.fill")
+                        .font(.system(size: 11, weight: .medium))
+                    if showsNotSecureText {
+                        Text("Not Secure", comment: "Address bar: the page is not encrypted (http)")
+                            .lineLimit(1)
+                    }
+                }
+                .foregroundStyle(.red)
+                .contentShape(.rect)
+            }
+            .buttonStyle(.plain)
+            .help(invalidCertificateHelp)
+            .accessibilityLabel(invalidCertificateHelp)
+            .accessibilityIdentifier("invalidCertificateButton")
         case .none:
             EmptyView()
         }
+    }
+
+    private var invalidCertificateHelp: Text {
+        Text(
+            "This Website's Certificate Isn't Valid — Show Certificate",
+            comment: "Help tag of “Not Secure” for a website visited despite its invalid certificate",
+        )
     }
 
     private var helpText: Text {

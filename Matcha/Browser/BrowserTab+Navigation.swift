@@ -15,14 +15,18 @@ extension BrowserTab {
     }
 
     /// Navigation commands lead away from the page woken from sleep: no more snapshot on top of it; a crashed page
-    /// (task 5.7) leaves its message.
+    /// (task 5.7) leaves its message; a failed load (audit K5) goes away, and “Back” returns to the page under it.
     func goBack() {
+        if leaveLoadFailure() {
+            return
+        }
         suspension.endRestoring()
         crash.pageWillNavigate()
         webView?.goBack()
     }
 
     func goForward() {
+        loadFailure.clear()
         suspension.endRestoring()
         crash.pageWillNavigate()
         webView?.goForward()
@@ -32,6 +36,9 @@ extension BrowserTab {
     /// history visit, like waking from sleep; a page terminated before it displayed anything (nothing to reload) loads
     /// its address.
     func reload() {
+        if retryFailedLoad() {
+            return
+        }
         suspension.endRestoring()
         guard crash.isRecovering else {
             webView?.reload()

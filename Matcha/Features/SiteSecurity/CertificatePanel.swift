@@ -11,7 +11,10 @@ enum CertificatePanel {
             NSSound.beep()
             return
         }
-        let panel = SFCertificateTrustPanel()
+        if page.security == .invalidCertificate {
+            showInvalid(trust, host: host, in: window)
+            return
+        }
         let message = page.security == .partlySecure
             ? String(
                 localized: "The connection to “\(host)” is encrypted, but parts of this page were loaded without encryption.",
@@ -21,6 +24,20 @@ enum CertificatePanel {
                 localized: "Matcha is using an encrypted connection to “\(host)”.",
                 comment: "Certificate panel of an encrypted page; %@ is the website",
             )
+        show(trust, message: message, in: window)
+    }
+
+    /// Certificate of a website whose certificate isn't valid (page shown after the failed load, audit K5).
+    static func showInvalid(_ trust: SecTrust, host: String, in window: NSWindow?) {
+        let message = String(
+            localized: "The certificate of “\(host)” isn't valid.",
+            comment: "Certificate panel of a website whose certificate isn't valid; %@ is the website",
+        )
+        show(trust, message: message, in: window)
+    }
+
+    private static func show(_ trust: SecTrust, message: String, in window: NSWindow?) {
+        let panel = SFCertificateTrustPanel()
         panel.setInformativeText(String(
             localized: "Encryption with a digital certificate keeps information private as it's sent to or from this website.",
             comment: "Certificate panel: what the certificate is for",
