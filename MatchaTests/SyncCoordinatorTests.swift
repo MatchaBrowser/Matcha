@@ -44,6 +44,7 @@ struct SyncCoordinatorTests {
 
         defaults.set("bing", forKey: BrowserSettings.Key.searchEngine)
         #expect(try await eventually { await server.content(of: SyncIdentifier.setting("searchEngine")) != nil })
-        #expect(coordinator.status == .idle)
+        // A cycle may still be running (the setting's own save triggers one): it ends idle.
+        #expect(try await eventually { coordinator.status == .idle })
     }
 }
