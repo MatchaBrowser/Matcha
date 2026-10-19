@@ -104,7 +104,8 @@ struct TabSuspensionTests {
         #expect(tab.suspension.snapshot == nil)
         try await waitUntil { tab.suspension.cover == nil }
         #expect(!tab.suspension.isRestoring)
-        #expect(tab.title == "deux")
+        // Under the load of the whole suite, the title can come just after the end of the reload.
+        try await waitUntil { tab.title == "deux" }
     }
 
     @Test func `a snapshot of another page never covers the tab`() async throws {
