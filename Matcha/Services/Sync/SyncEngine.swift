@@ -110,7 +110,7 @@ final class SyncEngine {
         do {
             try file.save(state)
         } catch {
-            Logger.sync.error("État de la synchro non enregistré : \(error.localizedDescription, privacy: .public)")
+            Logger.sync.error("État de la synchro non enregistré : \(error.logSummary, privacy: .public)")
         }
     }
 }

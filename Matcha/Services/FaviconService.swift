@@ -122,7 +122,7 @@ final class FaviconService {
             try FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)
             try data.write(to: file, options: .atomic)
         } catch {
-            Logger.favicons.error("Icône non enregistrée sur disque : \(error.localizedDescription, privacy: .public)")
+            Logger.favicons.error("Icône non enregistrée sur disque : \(error.logSummary, privacy: .public)")
         }
     }
 

@@ -145,7 +145,7 @@ final class SpaceStore {
         do {
             try context.save()
         } catch {
-            Logger.app.error("Enregistrement du Space impossible : \(error.localizedDescription, privacy: .public)")
+            Logger.app.error("Enregistrement du Space impossible : \(error.logSummary, privacy: .public)")
         }
     }
 

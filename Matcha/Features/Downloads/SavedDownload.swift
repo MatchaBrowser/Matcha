@@ -37,7 +37,7 @@ nonisolated enum SavedDownloadList {
         do {
             return try JSONDecoder().decode([SavedDownload].self, from: data)
         } catch {
-            Logger.downloads.error("Liste des téléchargements illisible : \(error.localizedDescription, privacy: .public)")
+            Logger.downloads.error("Liste des téléchargements illisible : \(error.logSummary, privacy: .public)")
             return []
         }
     }
@@ -51,7 +51,7 @@ nonisolated enum SavedDownloadList {
         do {
             try defaults.set(JSONEncoder().encode(Array(downloads.prefix(limit))), forKey: defaultsKey)
         } catch {
-            Logger.downloads.error("Liste des téléchargements non enregistrée : \(error.localizedDescription, privacy: .public)")
+            Logger.downloads.error("Liste des téléchargements non enregistrée : \(error.logSummary, privacy: .public)")
         }
     }
 }

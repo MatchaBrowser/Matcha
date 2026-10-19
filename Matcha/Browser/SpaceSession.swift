@@ -57,7 +57,7 @@ final class SpaceSession: Identifiable {
         do {
             try context.save()
         } catch {
-            Logger.app.error("Thème non enregistré : \(error.localizedDescription, privacy: .public)")
+            Logger.app.error("Thème non enregistré : \(error.logSummary, privacy: .public)")
         }
     }
 
@@ -86,7 +86,7 @@ final class SpaceSession: Identifiable {
         do {
             try context.save()
         } catch {
-            Logger.app.error("Icône du Space non enregistrée : \(error.localizedDescription, privacy: .public)")
+            Logger.app.error("Icône du Space non enregistrée : \(error.logSummary, privacy: .public)")
         }
     }
 

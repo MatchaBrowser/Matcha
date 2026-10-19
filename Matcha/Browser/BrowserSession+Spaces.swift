@@ -79,7 +79,7 @@ extension BrowserSession {
         do {
             try context.save()
         } catch {
-            Logger.app.error("Spaces non enregistrés : \(error.localizedDescription, privacy: .public)")
+            Logger.app.error("Spaces non enregistrés : \(error.logSummary, privacy: .public)")
         }
     }
 }

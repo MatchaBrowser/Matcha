@@ -54,7 +54,7 @@ nonisolated enum DownloadLocation {
             try FileManager.default.removeItem(at: folder)
             Logger.downloads.info("Dossier des téléchargements de test effacé")
         } catch {
-            Logger.downloads.error("Dossier des téléchargements de test non effacé : \(error.localizedDescription, privacy: .public)")
+            Logger.downloads.error("Dossier des téléchargements de test non effacé : \(error.logSummary, privacy: .public)")
         }
     }
 }

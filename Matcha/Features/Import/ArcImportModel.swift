@@ -61,7 +61,7 @@ final class ArcImportModel {
             request = Request(sidebar: sidebar)
             Logger.imports.info("Barre d'Arc lue : \(sidebar.spaces.count, privacy: .public) Spaces")
         } catch {
-            Logger.imports.error("Barre d'Arc illisible : \(String(describing: error), privacy: .public)")
+            Logger.imports.error("Barre d'Arc illisible : \(error.logSummary, privacy: .public)")
             isFailurePresented = true
         }
     }

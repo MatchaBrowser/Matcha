@@ -58,7 +58,7 @@ enum PageSaver {
             try PDFExportFile.write(data, to: destination)
             Logger.browser.info("Page enregistrée (\(data.count, privacy: .public) octets)")
         } catch {
-            Logger.browser.error("Page non enregistrée : \(error.localizedDescription, privacy: .public)")
+            Logger.browser.error("Page non enregistrée : \(error.logSummary, privacy: .public)")
             showFailure(error, in: window)
         }
     }

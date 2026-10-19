@@ -78,7 +78,7 @@ final class DownloadManager: NSObject {
         active[ObjectIdentifier(download)] = item
         item.observe(download.progress)
         insert(item)
-        Logger.downloads.info("Téléchargement commencé (\(Self.origin(of: item), privacy: .public))")
+        Logger.downloads.info("Téléchargement commencé (\(Self.origin(of: item), privacy: .private))")
         return item
     }
 
@@ -96,7 +96,7 @@ final class DownloadManager: NSObject {
         stopTracking(item)
         item.markCancelled()
         saveList()
-        Logger.downloads.info("Téléchargement annulé (\(Self.origin(of: item), privacy: .public))")
+        Logger.downloads.info("Téléchargement annulé (\(Self.origin(of: item), privacy: .private))")
         guard let download else {
             discardPartialFile(of: item)
             return
@@ -173,7 +173,7 @@ final class DownloadManager: NSObject {
             do {
                 try FileManager.default.removeItem(at: destination)
             } catch {
-                Logger.downloads.error("Fichier partiel non effacé : \(error.localizedDescription, privacy: .public)")
+                Logger.downloads.error("Fichier partiel non effacé : \(error.logSummary, privacy: .public)")
             }
         }
         releaseReservation(of: item)

@@ -42,7 +42,7 @@ extension DownloadManager: WKDownloadDelegate {
         item.markFinished(size: size.map(Int64.init))
         recordFinish(in: item.scope)
         saveList()
-        Logger.downloads.info("Téléchargement terminé (\(Self.origin(of: item), privacy: .public))")
+        Logger.downloads.info("Téléchargement terminé (\(Self.origin(of: item), privacy: .private))")
     }
 
     func download(_ download: WKDownload, didFailWithError error: any Error, resumeData _: Data?) {
@@ -52,11 +52,11 @@ extension DownloadManager: WKDownloadDelegate {
         stopTracking(item)
         if (error as? URLError)?.code == .cancelled {
             item.markCancelled()
-            Logger.downloads.info("Téléchargement interrompu (\(Self.origin(of: item), privacy: .public))")
+            Logger.downloads.info("Téléchargement interrompu (\(Self.origin(of: item), privacy: .private))")
         } else {
             item.markFailed(reason: error.localizedDescription)
             Logger.downloads.error(
-                "Téléchargement en échec (\(Self.origin(of: item), privacy: .public)) : \(error.localizedDescription, privacy: .public)",
+                "Téléchargement en échec (\(Self.origin(of: item), privacy: .private)) : \(error.logSummary, privacy: .public)",
             )
         }
         discardPartialFile(of: item)

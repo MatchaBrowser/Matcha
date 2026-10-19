@@ -96,7 +96,7 @@ final class SitePermissionStore {
         do {
             try context.save()
         } catch {
-            Logger.permissions.error("Décision non enregistrée : \(error.localizedDescription, privacy: .public)")
+            Logger.permissions.error("Décision non enregistrée : \(error.logSummary, privacy: .public)")
         }
     }
 

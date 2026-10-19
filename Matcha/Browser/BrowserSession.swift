@@ -118,7 +118,7 @@ final class BrowserSession {
         do {
             return try BrowserSession(container: BrowserSchema.makeContainer(inMemory: inMemory, name: name))
         } catch {
-            Logger.app.error("Base indisponible, onglets non enregistrés : \(error.localizedDescription, privacy: .public)")
+            Logger.app.error("Base indisponible, onglets non enregistrés : \(error.logSummary, privacy: .public)")
             // An in-memory store at least allows browsing.
             // swiftlint:disable:next force_try
             return BrowserSession(container: try! BrowserSchema.makeContainer(inMemory: true))

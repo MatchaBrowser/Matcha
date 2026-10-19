@@ -132,7 +132,7 @@ final class ExtensionInstaller {
         let webExtension = try await manager.read(identifier)
         try manager.load(webExtension, identifier: identifier)
         let kind = candidate.isUpdate ? "mise à jour" : "installée"
-        Logger.extensions.info("Extension \(kind, privacy: .public) (\(identifier, privacy: .public))")
+        Logger.extensions.info("Extension \(kind, privacy: .public) (\(identifier, privacy: .private))")
     }
 
     /// Discards `candidate` (refused): its temporary folder is erased.

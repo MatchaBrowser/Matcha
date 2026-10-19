@@ -63,7 +63,7 @@ final class PageSourceSchemeHandler: NSObject, WKURLSchemeHandler {
             do {
                 result = try await .success(Self.fetch(page, store: store))
             } catch {
-                Logger.browser.notice("Code source illisible : \((error as NSError).code, privacy: .public)")
+                Logger.browser.notice("Code source illisible : \(error.logSummary, privacy: .public)")
                 result = .failure(error)
             }
             let html = await PageSourceLoader.viewerHTML(for: result, title: title)

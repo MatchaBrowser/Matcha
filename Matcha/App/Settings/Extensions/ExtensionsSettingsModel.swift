@@ -134,7 +134,7 @@ final class ExtensionsSettingsModel {
             installingOffer = nil
         } catch {
             installer.discard(candidate)
-            Logger.extensions.error("Extension non installée : \(error.localizedDescription, privacy: .public)")
+            Logger.extensions.error("Extension non installée : \(error.logSummary, privacy: .public)")
             errorMessage = ExtensionInstallError(error).localizedDescription
         }
     }
@@ -155,7 +155,7 @@ final class ExtensionsSettingsModel {
         do {
             candidate = try await make(installer)
         } catch {
-            Logger.extensions.error("Extension non préparée : \(error.localizedDescription, privacy: .public)")
+            Logger.extensions.error("Extension non préparée : \(error.logSummary, privacy: .public)")
             errorMessage = ExtensionInstallError(error).localizedDescription
         }
     }

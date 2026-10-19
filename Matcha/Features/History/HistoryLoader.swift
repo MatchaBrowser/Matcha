@@ -14,13 +14,13 @@ nonisolated enum HistoryLoader {
             try context.delete(model: HistoryRecord.self, where: #Predicate { $0.visitDate < cutoff })
             try context.save()
         } catch {
-            Logger.history.error("Visites anciennes non effacées : \(error.localizedDescription, privacy: .public)")
+            Logger.history.error("Visites anciennes non effacées : \(error.logSummary, privacy: .public)")
         }
         let records: [HistoryRecord]
         do {
             records = try context.fetch(FetchDescriptor<HistoryRecord>())
         } catch {
-            Logger.history.error("Historique illisible : \(error.localizedDescription, privacy: .public)")
+            Logger.history.error("Historique illisible : \(error.logSummary, privacy: .public)")
             return [:]
         }
         var visits: [UUID?: [HistoryVisit]] = [:]

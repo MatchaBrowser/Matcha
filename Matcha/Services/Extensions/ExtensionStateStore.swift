@@ -87,7 +87,7 @@ final class ExtensionStateStore {
         do {
             try defaults.set(JSONEncoder().encode(states), forKey: Self.defaultsKey)
         } catch {
-            Logger.extensions.error("États des extensions non enregistrés : \(error.localizedDescription, privacy: .public)")
+            Logger.extensions.error("États des extensions non enregistrés : \(error.logSummary, privacy: .public)")
         }
     }
 
@@ -98,7 +98,7 @@ final class ExtensionStateStore {
         do {
             return try JSONDecoder().decode([String: ExtensionState].self, from: data)
         } catch {
-            Logger.extensions.error("États des extensions illisibles, ignorés : \(error.localizedDescription, privacy: .public)")
+            Logger.extensions.error("États des extensions illisibles, ignorés : \(error.logSummary, privacy: .public)")
             return [:]
         }
     }

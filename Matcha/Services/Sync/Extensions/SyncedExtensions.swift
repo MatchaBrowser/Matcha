@@ -107,7 +107,7 @@ final class SyncedExtensions {
             try FileManager.default.createDirectory(at: url.deletingLastPathComponent(), withIntermediateDirectories: true)
             try SyncCoding.encoder().encode(saved).write(to: url, options: .atomic)
         } catch {
-            Logger.sync.error("Extensions synchronisées non enregistrées : \(error.localizedDescription, privacy: .public)")
+            Logger.sync.error("Extensions synchronisées non enregistrées : \(error.logSummary, privacy: .public)")
         }
     }
 }

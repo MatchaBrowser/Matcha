@@ -80,7 +80,7 @@ extension BrowserSession {
         } catch {
             // A web view was still using it: it will be deleted at the next launch.
             Logger.app
-                .notice("Données du profil supprimé gardées jusqu'au prochain lancement : \(error.localizedDescription, privacy: .public)")
+                .notice("Données du profil supprimé gardées jusqu'au prochain lancement : \(error.logSummary, privacy: .public)")
         }
     }
 }

@@ -113,7 +113,7 @@ Date : 2026-10-19, sur le commit `a94cf2e`. Audit en lecture seule : 9 analyses,
 - **Problème** : « Toujours autoriser » est cliquable dès que le bandeau apparaît sous le pointeur.
 - **Correction** : ignorer les clics pendant ~0,5 s.
 
-**W10. Journaux trop bavards** (Faible, actif)
+**✅ W10. Journaux trop bavards** (Faible, actif) — corrigé : erreurs par domaine et code (`logSummary`), hôtes des téléchargements et identifiants d'extensions en privé.
 - **Problème** :
   - Les hôtes des téléchargements sont en `.public`, fenêtres privées comprises.
   - `error.localizedDescription` est en `.public` et peut contenir un chemin, donc le nom d'utilisateur : `DownloadManager`, `PageSaver`, `PageSourceSchemeHandler`, `ArcImportModel:64`.

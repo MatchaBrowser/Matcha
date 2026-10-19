@@ -34,7 +34,7 @@ extension ExtensionSyncAdapter {
                 }
                 synced.packages[identifier] = package
             } catch {
-                Logger.sync.error("Paquet d'extension non envoyé : \(error.localizedDescription, privacy: .public)")
+                Logger.sync.error("Paquet d'extension non envoyé : \(error.logSummary, privacy: .public)")
             }
         }
         await installUpdates(using: transport)
@@ -52,7 +52,7 @@ extension ExtensionSyncAdapter {
                 try await transport.deleteBlob(id: id)
                 synced.obsoleteBlobs.removeAll { $0 == id }
             } catch {
-                Logger.sync.error("Ancien paquet d'extension non supprimé : \(error.localizedDescription, privacy: .public)")
+                Logger.sync.error("Ancien paquet d'extension non supprimé : \(error.logSummary, privacy: .public)")
                 return
             }
         }
@@ -100,7 +100,7 @@ extension ExtensionSyncAdapter {
                 // Not arrived yet: at the next sync.
                 continue
             } catch {
-                Logger.sync.error("Mise à jour d'extension reçue non installée : \(error.localizedDescription, privacy: .public)")
+                Logger.sync.error("Mise à jour d'extension reçue non installée : \(error.logSummary, privacy: .public)")
             }
         }
     }

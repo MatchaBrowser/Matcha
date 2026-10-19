@@ -111,7 +111,7 @@ final class ExtensionSyncAdapter {
                 do {
                     try await manager.setEnabled(fields.isEnabled, identifier: identifier)
                 } catch {
-                    Logger.sync.error("Extension reçue non chargée : \(error.localizedDescription, privacy: .public)")
+                    Logger.sync.error("Extension reçue non chargée : \(error.logSummary, privacy: .public)")
                 }
             }
         }

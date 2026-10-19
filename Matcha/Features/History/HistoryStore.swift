@@ -149,7 +149,7 @@ final class HistoryStore {
         do {
             try context.delete(model: HistoryRecord.self, where: predicate)
         } catch {
-            Logger.history.error("Visites non supprimées : \(error.localizedDescription, privacy: .public)")
+            Logger.history.error("Visites non supprimées : \(error.logSummary, privacy: .public)")
         }
     }
 
@@ -157,7 +157,7 @@ final class HistoryStore {
         do {
             try context.save()
         } catch {
-            Logger.history.error("Historique non enregistré : \(error.localizedDescription, privacy: .public)")
+            Logger.history.error("Historique non enregistré : \(error.logSummary, privacy: .public)")
         }
     }
 

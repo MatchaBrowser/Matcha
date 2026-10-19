@@ -102,7 +102,7 @@ struct BlocklistLoader<Store: ContentRuleListStoring> {
             do {
                 try await store.remove(identifier)
             } catch {
-                Logger.contentBlocker.notice("Ancienne liste non supprimée du magasin : \(error.localizedDescription, privacy: .public)")
+                Logger.contentBlocker.notice("Ancienne liste non supprimée du magasin : \(error.logSummary, privacy: .public)")
             }
         }
     }
