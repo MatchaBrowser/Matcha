@@ -31,7 +31,7 @@ nonisolated enum DownloadLocation {
 
     /// Test subfolder requested at launch, if valid: a single component, prefix `testSubfolderPrefix`.
     static func testSubfolderName(defaults: UserDefaults) -> String? {
-        guard let name = defaults.string(forKey: testSubfolderKey), name.hasPrefix(testSubfolderPrefix),
+        guard let name = TestEnvironment.arguments(defaults)?.string(forKey: testSubfolderKey), name.hasPrefix(testSubfolderPrefix),
               DownloadFileName.sanitized(name) == name
         else {
             return nil
@@ -41,7 +41,8 @@ nonisolated enum DownloadLocation {
 
     /// At app launch: deletes the test subfolder if `resetDownloadsSubfolder` asks for it.
     static func resetTestSubfolderIfRequested(defaults: UserDefaults = .standard) {
-        guard defaults.bool(forKey: resetTestSubfolderKey), let name = testSubfolderName(defaults: defaults),
+        guard TestEnvironment.arguments(defaults)?.bool(forKey: resetTestSubfolderKey) == true,
+              let name = testSubfolderName(defaults: defaults),
               let downloads = userDownloadsDirectory()
         else {
             return

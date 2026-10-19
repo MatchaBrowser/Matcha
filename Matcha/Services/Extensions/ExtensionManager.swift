@@ -85,8 +85,7 @@ final class ExtensionManager: NSObject {
     private static func makeShared() -> ExtensionManager {
         // Host app of the unit tests, and test store (UI tests): nothing of the user's is read or written (same
         // settings and same container as the app).
-        let isUnitTesting = ProcessInfo.processInfo.environment["XCTestConfigurationFilePath"] != nil
-        guard !isUnitTesting, !UserDefaults.standard.bool(forKey: BrowserSession.inMemoryStoreKey) else {
+        guard !TestEnvironment.usesInMemoryStore() else {
             return ExtensionManager(configuration: .nonPersistent(), store: ExtensionStateStore(defaults: nil), directory: nil)
         }
         let applicationSupport = FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask).first

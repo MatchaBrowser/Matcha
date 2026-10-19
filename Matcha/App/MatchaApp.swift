@@ -36,7 +36,7 @@ struct MatchaApp: App {
         // Global mini window shortcut, except in the unit tests' host app: it would be taken from the user, and its
         // first access would write ⌥⌘N into their settings (same app identifier). Blocker (task 6.2, set aside):
         // lists read again or compiled in the background, except there too (the tests have their own store).
-        if ProcessInfo.processInfo.environment["XCTestConfigurationFilePath"] == nil {
+        if !TestEnvironment.isUnitTestHost() {
             miniWindows.start()
             if ContentBlockerService.isAvailable {
                 ContentBlockerService.shared.start()

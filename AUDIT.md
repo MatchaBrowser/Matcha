@@ -195,7 +195,7 @@ Toutes sont vérifiées. Les en-têtes du SDK disent ce que fait WebKit quand la
 - **Problème** : `@State private var session = BrowserSession.makePrivate()` est réévalué à chaque recréation de la vue. Cela recrée un conteneur SwiftData, un gestionnaire de fenêtres et un observateur jamais retiré. Même chose pour `WindowModel` et `CommandBarModel` dans `BrowserWindowView.init`.
 - **Correction** : créer ces objets une seule fois, dans un porteur lié à la scène ou dans `.task`.
 
-**R6. Crochets de test actifs en Release** (Faible)
+**✅ R6. Crochets de test actifs en Release** (Faible) — corrigé : arguments lus en Debug seulement, base par défaut jamais effacée, `TestEnvironment` unique.
 - **Problème** :
   - `storeName`, `resetStore`, `inMemoryStore` et `downloadsSubfolder` sont lus en Release.
   - `storeName=default` avec `resetStore` effacerait la vraie base, puisque `default` est le nom par défaut de SwiftData.

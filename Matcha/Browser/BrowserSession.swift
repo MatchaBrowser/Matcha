@@ -20,11 +20,12 @@ final class BrowserSession {
     }
 
     /// Launch argument for an in-memory store (UI tests): nothing is written to disk.
-    static let inMemoryStoreKey = "inMemoryStore"
+    nonisolated static let inMemoryStoreKey = "inMemoryStore"
     /// Launch argument for a separately named store (UI tests of saving).
-    static let storeNameKey = "storeName"
-    /// Launch argument that empties the named store before opening it; never the default store.
-    static let resetStoreKey = "resetStore"
+    nonisolated static let storeNameKey = "storeName"
+    /// Launch argument that empties the named store before opening it; never the default store (Debug builds only,
+    /// `TestEnvironment`).
+    nonisolated static let resetStoreKey = "resetStore"
 
     @ObservationIgnored let container: ModelContainer
     /// Session of a private window: nothing is kept (no tabs, cookies, icons or history: `history` is nil).

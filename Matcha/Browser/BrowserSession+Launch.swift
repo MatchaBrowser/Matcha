@@ -22,10 +22,11 @@ extension BrowserSession {
         storeURL: URL? = nil,
         onFailure: @MainActor (any Error) -> StoreFailureChoice = StoreFailureAlert.ask,
     ) -> BrowserSession? {
-        let isUnitTesting = environment["XCTestConfigurationFilePath"] != nil
-        let inMemory = isUnitTesting || defaults.bool(forKey: inMemoryStoreKey)
-        let name = defaults.string(forKey: storeNameKey)
-        if let name, defaults.bool(forKey: resetStoreKey) {
+        let inMemory = TestEnvironment.usesInMemoryStore(defaults: defaults, environment: environment)
+        // UI tests' arguments: Debug builds only, never the default store (`TestEnvironment`, audit R6).
+        let arguments = TestEnvironment.arguments(defaults)
+        let name = arguments?.string(forKey: storeNameKey)
+        if let name, arguments?.bool(forKey: resetStoreKey) == true, TestEnvironment.isResettableStore(named: name) {
             deleteStore(named: name)
         }
         let configuration = BrowserSchema.configuration(inMemory: inMemory, name: name, url: storeURL)

@@ -165,9 +165,10 @@ extension ExtensionSyncAdapter {
     /// Sync of the app's extensions, with its settings in `Application Support/Sync/extensions.json`. During tests
     /// (unit tests and test store), everything stays in memory.
     static let shared: ExtensionSyncAdapter = {
-        let isTesting = ProcessInfo.processInfo.environment["XCTestConfigurationFilePath"] != nil
-            || UserDefaults.standard.bool(forKey: BrowserSession.inMemoryStoreKey)
-        let url = isTesting ? nil : FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask).first?
+        let url = TestEnvironment.usesInMemoryStore() ? nil : FileManager.default.urls(
+            for: .applicationSupportDirectory,
+            in: .userDomainMask,
+        ).first?
             .appendingPathComponent("Sync/extensions.json")
         return ExtensionSyncAdapter(manager: .shared, synced: SyncedExtensions(url: url))
     }()
