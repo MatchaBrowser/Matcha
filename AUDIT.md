@@ -235,7 +235,7 @@ Toutes sont vérifiées. Les en-têtes du SDK disent ce que fait WebKit quand la
 - **Problème** : `copyItem` garde les liens. Un dossier peut pointer vers la base SwiftData ou les données WebKit du conteneur, et l'extension pourrait les lire si WebKit suit les liens.
 - **Correction** : copier fichier par fichier, refuser liens et alias, avec un plafond de taille.
 
-**E4. Adresses demandées par une extension non filtrées** (Moyen, selon WebKit)
+**✅ E4. Adresses demandées par une extension non filtrées** (Moyen, selon WebKit) — corrigé : `http(s)`, `about:blank` et ses propres pages seulement (`ExtensionURLPolicy`).
 - **Problème** : `tabs.create`, `tabs.update` et `windows.create` arrivent jusqu'à `BrowserTab.load`. Une extension sans aucun droit peut donc ouvrir un `file:`, avec accès au dossier parent.
 - **Correction** : accepter seulement `http`, `https`, `about:blank` et les pages de l'extension.
 

@@ -17,6 +17,8 @@ nonisolated enum ExtensionError: Error, Equatable, LocalizedError {
     case notInstalled(String)
     /// Messages to an extension's app (`runtime.sendNativeMessage`, `connectNative`).
     case nativeMessagingUnsupported
+    /// An address an extension may not open (`ExtensionURLPolicy`): local file, `data:`, another extension's page…
+    case forbiddenURL
 
     var errorDescription: String? {
         switch self {
@@ -34,6 +36,8 @@ nonisolated enum ExtensionError: Error, Equatable, LocalizedError {
             "No extension is installed with identifier \(identifier)."
         case .nativeMessagingUnsupported:
             "Native messaging is not supported in Matcha."
+        case .forbiddenURL:
+            "Extensions can only open web pages, about:blank and their own pages."
         }
     }
 }

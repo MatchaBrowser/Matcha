@@ -9,9 +9,13 @@ extension ExtensionTab {
 
     /// A web page, or a page of the same extension: WebKit refuses to switch from one to the other in the same web view
     /// (`WKWebExtensionContext.webViewConfiguration`); these pages open in a new tab (`FEATURES.md`).
-    func loadURL(_ url: URL, for _: WKWebExtensionContext, completionHandler: @escaping Completion) {
+    func loadURL(_ url: URL, for context: WKWebExtensionContext, completionHandler: @escaping Completion) {
         guard let page, let owner else {
             completionHandler(ExtensionError.notFound)
+            return
+        }
+        guard ExtensionURLPolicy.allows(url, from: context.baseURL) else {
+            completionHandler(ExtensionError.forbiddenURL)
             return
         }
         guard ExtensionManager.isExtensionURL(url) == ExtensionManager.isExtensionURL(page.url) else {

@@ -26,6 +26,10 @@ extension ExtensionManager: WKWebExtensionControllerDelegate {
         for context: WKWebExtensionContext,
         completionHandler: @escaping @Sendable ((any WKWebExtensionTab)?, (any Error)?) -> Void,
     ) {
+        guard configuration.url.map({ ExtensionURLPolicy.allows($0, from: context.baseURL) }) ?? true else {
+            completionHandler(nil, ExtensionError.forbiddenURL)
+            return
+        }
         guard let model = browserWindow(for: configuration.window, context: context) else {
             completionHandler(nil, ExtensionError.noBrowserWindow)
             return
@@ -48,6 +52,10 @@ extension ExtensionManager: WKWebExtensionControllerDelegate {
     ) {
         guard !configuration.shouldBePrivate else {
             completionHandler(nil, ExtensionError.unsupported("Private windows cannot be opened by extensions."))
+            return
+        }
+        guard configuration.tabURLs.allSatisfy({ ExtensionURLPolicy.allows($0, from: context.baseURL) }) else {
+            completionHandler(nil, ExtensionError.forbiddenURL)
             return
         }
         if configuration.windowType == .popup, let miniWindows = windows.miniWindows {
