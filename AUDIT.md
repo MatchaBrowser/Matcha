@@ -119,7 +119,7 @@ Date : 2026-10-19, sur le commit `a94cf2e`. Audit en lecture seule : 9 analyses,
   - `error.localizedDescription` est en `.public` et peut contenir un chemin, donc le nom d'utilisateur : `DownloadManager`, `PageSaver`, `PageSourceSchemeHandler`, `ArcImportModel:64`.
 - **Correction** : hôtes en `.private` ; domaine et code d'erreur en public, description en `.private`.
 
-**W11. Fenêtres privées rouvertes au lancement** (Faible, actif, vérifié)
+**✅ W11. Fenêtres privées rouvertes au lancement** (Faible, actif, vérifié) — corrigé : `restorationBehavior(.disabled)`.
 - **Problème** : le `WindowGroup` privé n'a pas `.restorationBehavior(.disabled)`. Des fenêtres privées vides réapparaissent au lancement, sans contenu sensible.
 
 ## 2. Fonctions WebKit manquantes (sites courants cassés)

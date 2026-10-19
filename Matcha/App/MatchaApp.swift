@@ -68,12 +68,14 @@ struct MatchaApp: App {
         }
         .onChange(of: appearance, initial: true) { appearance.apply() }
 
-        // Private windows: each one has its own in-memory session, nothing is saved.
+        // Private windows: each one has its own in-memory session, nothing is saved; never reopened at launch, like
+        // in Safari.
         WindowGroup("Private Browsing", id: Self.privateWindowID) {
             PrivateWindowView()
                 .environment(DownloadManager.shared)
         }
         .windowStyle(.hiddenTitleBar)
+        .restorationBehavior(.disabled)
         .handlesExternalEvents(matching: [])
         // Without its default commands (“Close”, “Close All”), which would override ⌘W and ⇧⌘W.
         .commandsRemoved()
