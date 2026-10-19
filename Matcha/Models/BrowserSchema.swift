@@ -9,7 +9,7 @@ enum BrowserSchema {
         ProfileRecord.self, SpaceRecord.self, FolderRecord.self, TabRecord.self, SitePermissionRecord.self, HistoryRecord.self,
     ]
 
-    /// Local container (iCloud sync will come in phase 7); in memory for tests.
+    /// Local container (sync goes through a server, `SYNC.md`, not CloudKit's mirroring); in memory for tests.
     /// `name` picks the store (`<name>.store` in Application Support), nil for the default store.
     static func makeContainer(inMemory: Bool = false, name: String? = nil) throws -> ModelContainer {
         try makeContainer(configuration(inMemory: inMemory, name: name))

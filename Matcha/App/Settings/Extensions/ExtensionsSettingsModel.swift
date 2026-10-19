@@ -41,8 +41,6 @@ final class ExtensionsSettingsModel {
     /// Last failure (preparation, installation), in the user's language.
     var errorMessage: String?
     private(set) var isWorking = false
-    /// Changes on every action, to read again what is not tracked (enabled, private windows).
-    private(set) var revision = 0
 
     init(manager: ExtensionManager, syncAdapter: ExtensionSyncAdapter) {
         self.manager = manager
@@ -52,14 +50,12 @@ final class ExtensionsSettingsModel {
 
     /// Installed extensions, by name.
     var installed: [Installed] {
-        _ = revision
         let identifiers = Set(manager.installedIdentifiers).union(manager.installed.keys)
         return identifiers.map(entry(for:)).sorted { $0.name.localizedStandardCompare($1.name) == .orderedAscending }
     }
 
     /// True if the Safari extension `appExtension` is already installed.
     func isInstalled(_ appExtension: SafariAppExtension) -> Bool {
-        _ = revision
         guard let identifier = ExtensionIdentifier.forAppExtension(bundleIdentifier: appExtension.bundleIdentifier) else {
             return false
         }
@@ -126,7 +122,6 @@ final class ExtensionsSettingsModel {
         isWorking = true
         defer {
             isWorking = false
-            revision += 1
         }
         do {
             try await installer.install(candidate, allowsPrivateWindows: allowsPrivateWindows)
@@ -171,24 +166,20 @@ final class ExtensionsSettingsModel {
             } catch {
                 errorMessage = ExtensionInstallError(error).localizedDescription
             }
-            revision += 1
         }
     }
 
     func setAllowsPrivateWindows(_ isAllowed: Bool, for identifier: String) {
         manager.setAccessToPrivateData(isAllowed, identifier: identifier)
-        revision += 1
     }
 
     /// Takes back an extension's access to a website: it may ask again (audit E5).
     func revokeSite(_ pattern: String, for identifier: String) {
         manager.revokeSite(pattern, identifier: identifier)
-        revision += 1
     }
 
     func setShowsButton(_ shows: Bool, for identifier: String) {
         manager.setShowsButton(shows, identifier: identifier)
-        revision += 1
     }
 
     func openOptions(of identifier: String) {
@@ -198,7 +189,6 @@ final class ExtensionsSettingsModel {
     func remove(_ identifier: String) {
         Task {
             await manager.uninstall(identifier: identifier)
-            revision += 1
         }
     }
 
@@ -216,8 +206,8 @@ final class ExtensionsSettingsModel {
             hasOptionsPage: manager.contexts[identifier]?.optionsPageURL != nil,
             allowsPrivateWindows: state?.hasAccessToPrivateData ?? false,
             showsButton: manager.showsButton(identifier),
-            grantedSites: (manager.contexts[identifier].map { Array($0.grantedPermissionMatchPatterns.keys.map(\.string)) }
-                ?? Array((state?.grantedMatchPatterns ?? [:]).keys)).sorted(),
+            // The saved decisions follow the extension's (`saveState`): observed, unlike its context.
+            grantedSites: Array((state?.grantedMatchPatterns ?? [:]).keys).sorted(),
         )
     }
 

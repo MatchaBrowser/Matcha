@@ -6,7 +6,7 @@ import WebKit
 @MainActor
 @Observable
 final class TabManager {
-    /// Place and order of the tabs in the sidebar (in memory until phase 3).
+    /// Place and order of the tabs in the sidebar, saved by the Space (`SpaceStore`).
     private(set) var layout = SidebarLayout()
     private(set) var selectedTabID: BrowserTab.ID?
     /// Folder whose name is being edited in the sidebar (UI state).

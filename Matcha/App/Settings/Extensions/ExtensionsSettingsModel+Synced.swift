@@ -20,8 +20,7 @@ extension ExtensionsSettingsModel {
 
     /// Already installed here: an update that asks for one more permission or site.
     func isUpdate(_ offer: SyncExtensionFields) -> Bool {
-        _ = revision
-        return manager.installedIdentifiers.contains(offer.identifier)
+        manager.installedIdentifiers.contains(offer.identifier)
     }
 
     func availability(of offer: SyncExtensionFields) -> OfferAvailability {

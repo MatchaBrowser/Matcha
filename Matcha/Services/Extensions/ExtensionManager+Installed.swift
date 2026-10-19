@@ -7,8 +7,7 @@ import WebKit
 extension ExtensionManager {
     /// Identifiers of the installed extensions: folders of `directory`, then the remembered Safari extensions of apps.
     var installedIdentifiers: [String] {
-        let folders = directory.map { ExtensionInstallDirectory.installedExtensions(in: $0).map(\.identifier) } ?? []
-        return folders + store.appExtensions.map(\.identifier).filter { !folders.contains($0) }
+        installedFolders + store.appExtensions.map(\.identifier).filter { !installedFolders.contains($0) }
     }
 
     /// Reads the installed extensions in the background and loads the enabled ones. No effect on a second call.
@@ -17,6 +16,7 @@ extension ExtensionManager {
             return
         }
         isStarted = true
+        refreshInstalledFolders()
         let identifiers = installedIdentifiers
         Task {
             for identifier in identifiers {
@@ -76,6 +76,7 @@ extension ExtensionManager {
             }
         }
         store.removeState(for: identifier)
+        refreshInstalledFolders()
         forget(identifier)
         Logger.extensions.info("Extension uninstalled (\(identifier, privacy: .private))")
     }

@@ -44,19 +44,6 @@ nonisolated struct AddressResolver: Sendable {
     }
 }
 
-/// What a typed text designates: an address to open or a search to run.
-nonisolated enum AddressInterpretation: Equatable, Sendable {
-    case address(URL)
-    /// Search for the text on the chosen engine; the URL is that of the results page.
-    case search(URL)
-
-    var url: URL {
-        switch self {
-        case let .address(url), let .search(url): url
-        }
-    }
-}
-
 /// Nature of the “host[:port]” part of an address typed without a scheme.
 private nonisolated enum HostKind {
     /// Public domain name, served over HTTPS.

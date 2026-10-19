@@ -62,6 +62,11 @@ final class ExtensionWindows {
         self.sink = sink
     }
 
+    /// Windows that go away (tests) take their observers with them (audit C7).
+    isolated deinit {
+        observers.forEach(NotificationCenter.default.removeObserver)
+    }
+
     // MARK: Browser Windows
 
     /// A browser window is displayed, or its `NSWindow` changes.

@@ -33,12 +33,14 @@ final class ExtensionManager: NSObject {
     @ObservationIgnored var permissionPrompter: any ExtensionPermissionPrompting = ExtensionPermissionAlert()
     /// Extensions whose request waits for the user: one at a time each (audit E5).
     @ObservationIgnored var promptingContexts: Set<ObjectIdentifier> = []
-    /// Popovers of the extensions' actions; task 6.5 will anchor them to their button.
+    /// Popovers of the extensions' actions, anchored to their button (`popups.anchor`).
     @ObservationIgnored let popups = ExtensionPopupPresenter()
     /// Loaded extensions, by identifier.
     private(set) var contexts: [String: WKWebExtensionContext] = [:]
     /// Installed extensions, loaded or not, by identifier (task 6.4): what is needed to show them in the settings.
     private(set) var installed: [String: WKWebExtension] = [:]
+    /// Folders of `directory`, read at creation and after each installation or removal: never from a view (audit C7).
+    private(set) var installedFolders: [String] = []
     /// Changes at each update of an action (icon, title, badge): the buttons follow it (task 6.5).
     private(set) var actionRevision = 0
     /// Changes when the buttons to show change (button hidden or shown, private windows; task 6.5).
@@ -62,6 +64,7 @@ final class ExtensionManager: NSObject {
         self.store = store
         self.directory = directory
         super.init()
+        refreshInstalledFolders()
         controller.delegate = self
         windows.sink = controller
         observeContexts()
@@ -82,6 +85,11 @@ final class ExtensionManager: NSObject {
             }
             return (view, view.bounds)
         }
+    }
+
+    /// A manager that goes away (tests) takes its observers with it (audit C7).
+    isolated deinit {
+        observers.forEach(NotificationCenter.default.removeObserver)
     }
 
     private static func makeShared() -> ExtensionManager {
@@ -145,6 +153,11 @@ final class ExtensionManager: NSObject {
     func load(resourceBaseURL url: URL, identifier: String) async throws -> WKWebExtensionContext {
         let webExtension = try await WKWebExtension(resourceBaseURL: url)
         return try load(webExtension, identifier: identifier)
+    }
+
+    /// Reads the extensions folder again: at launch, after an installation or a removal.
+    func refreshInstalledFolders() {
+        installedFolders = directory.map { ExtensionInstallDirectory.installedExtensions(in: $0).map(\.identifier) } ?? []
     }
 
     /// Loads `webExtension` under identifier `identifier`, with the decisions remembered for it; it is now enabled.

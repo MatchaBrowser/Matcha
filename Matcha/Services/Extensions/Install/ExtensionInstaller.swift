@@ -90,6 +90,7 @@ final class ExtensionInstaller {
             try manager.load(installed, identifier: identifier)
         } catch {
             swap?.restore()
+            manager.refreshInstalledFolders()
             if let previous {
                 manager.store.setState(previous, for: identifier)
                 if wasLoaded, let restored = try? await manager.read(identifier) {
@@ -101,6 +102,7 @@ final class ExtensionInstaller {
             throw error
         }
         swap?.finish()
+        manager.refreshInstalledFolders()
         if case let .replacement(replaced, _) = candidate.mode {
             await manager.uninstall(identifier: replaced)
         }

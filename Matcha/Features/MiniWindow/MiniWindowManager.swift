@@ -54,6 +54,12 @@ final class MiniWindowManager {
         coordinator.tabHost = self
     }
 
+    /// A manager that goes away (tests) stops listening (audit C7).
+    isolated deinit {
+        shortcutTask?.cancel()
+        observers.forEach(NotificationCenter.default.removeObserver)
+    }
+
     /// Listens to the global shortcut (even when Matcha is not in the foreground) and to the app's activation.
     /// No effect on a second call; never called in the unit tests' host app.
     func start() {

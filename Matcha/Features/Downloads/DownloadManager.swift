@@ -45,6 +45,13 @@ final class DownloadManager: NSObject {
         }
     }
 
+    /// A manager that goes away (tests) takes its observer with it (audit C7).
+    isolated deinit {
+        if let terminationObserver {
+            NotificationCenter.default.removeObserver(terminationObserver)
+        }
+    }
+
     /// Restores the list saved at the previous launch, then saves it at each download end and at each “Clear”.
     /// Once, at launch.
     func restoreList(from defaults: UserDefaults) {
