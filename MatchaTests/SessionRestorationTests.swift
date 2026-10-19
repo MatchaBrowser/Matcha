@@ -52,7 +52,7 @@ struct SessionRestorationTests {
 
     @Test func `back button works on tabs restored after relaunch`() async throws {
         let container = try BrowserSchema.makeContainer(inMemory: true)
-        let first = BrowserSession(container: container)
+        let first = try BrowserSession(container: container)
         let manager = try #require(first.spaces.first?.tabManager)
         let tab = manager.newTab(url: URL(string: "about:blank#a"))
         try await waitUntil { tab.url != nil && !tab.isLoading }
@@ -61,7 +61,7 @@ struct SessionRestorationTests {
         let firstURL = try #require(tab.webView?.backForwardList.backItem?.url)
         first.saveAll()
 
-        let second = BrowserSession(container: container)
+        let second = try BrowserSession(container: container)
         let restoredManager = try #require(second.spaces.first?.tabManager)
         restoredManager.loadSelectedTab()
         let restored = try #require(restoredManager.selectedTab)

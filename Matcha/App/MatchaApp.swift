@@ -18,7 +18,10 @@ struct MatchaApp: App {
         NSWindow.allowsAutomaticWindowTabbing = false
         // UI tests: their downloads folder starts out empty again (no effect otherwise).
         DownloadLocation.resetTestSubfolderIfRequested()
-        let session = BrowserSession.launch()
+        // Store unreadable and the user chose to quit (audit R2): nothing was opened, nothing to save.
+        guard let session = BrowserSession.launch() else {
+            exit(EXIT_SUCCESS)
+        }
         // History read at launch, off the main thread, after deleting visits older than a year: the command bar
         // finds it ready.
         if let history = session.history {

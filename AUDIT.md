@@ -167,7 +167,7 @@ Toutes sont vérifiées. Les en-têtes du SDK disent ce que fait WebKit quand la
   - Plus aucun accès à l'indice 0.
   - Ajouter un test.
 
-**R2. Base illisible = mode test silencieux** (Élevé, actif, vérifié)
+**✅ R2. Base illisible = mode test silencieux** (Élevé, actif, vérifié) — corrigé : alerte (Quitter, Repartir de zéro avec la base mise de côté, Continuer sans enregistrer).
 - **Problème** : si la base SwiftData ne s'ouvre pas, `BrowserSession.launch` repasse en mémoire sans prévenir.
   - Plus rien n'est enregistré.
   - `isInMemory` sert aussi de « mode test » : les cookies ne sont plus gardés, les extensions ne démarrent pas, les téléchargements ne sont pas restaurés.
@@ -177,7 +177,7 @@ Toutes sont vérifiées. Les en-têtes du SDK disent ce que fait WebKit quand la
   - Une copie de sauvegarde de la base avant tout repli.
   - Séparer « base en mémoire » et « mode test ».
 
-**R3. Lecture de la base en échec traitée comme « vide »** (Moyen, actif)
+**✅ R3. Lecture de la base en échec traitée comme « vide »** (Moyen, actif) — corrigé au lancement : l'erreur remonte à l'alerte de R2 (la synchro reste en S6).
 - **Problème** : `try? fetch` apparaît à 13 endroits. Au lancement, une erreur de lecture crée un 2e profil « Personnel » et un 2e Space « Perso » (`BrowserSession.swift:78-81, 228-235`). Pour la synchro, voir S6.
 - **Correction** : propager l'erreur ; ne créer les valeurs par défaut qu'après une lecture réussie et vide.
 

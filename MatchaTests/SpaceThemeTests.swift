@@ -60,11 +60,11 @@ struct SpaceThemeTests {
     @MainActor
     @Test func `a space keeps its theme across launches`() throws {
         let container = try BrowserSchema.makeContainer(inMemory: true)
-        let first = BrowserSession(container: container)
+        let first = try BrowserSession(container: container)
         #expect(first.spaces.first?.theme == .default)
         first.spaces.first?.setTheme(.forest)
 
-        let second = BrowserSession(container: container)
+        let second = try BrowserSession(container: container)
         #expect(second.spaces.first?.theme == .forest)
     }
 }

@@ -15,7 +15,7 @@ struct SpaceIconTests {
 
     @Test func `symbol and emoji are saved in the record`() throws {
         let container = try BrowserSchema.makeContainer(inMemory: true)
-        let space = BrowserSession(container: container).spaces[0]
+        let space = try BrowserSession(container: container).spaces[0]
 
         space.setIcon(.emoji("🌿"))
         #expect(space.icon == .emoji("🌿"))

@@ -56,8 +56,8 @@ final class BrowserSession {
     @ObservationIgnored private var terminationObserver: (any NSObjectProtocol)?
 
     /// Opens the saved Spaces; at first launch, creates the “Personal” profile and the “Home” Space (“Personnel” and
-    /// “Perso” in French).
-    init(container: ModelContainer, isPrivate: Bool = false, contentBlocker: ContentBlockerService = .shared) {
+    /// “Perso” in French). A store that can't be read throws, rather than looking empty (audit R3).
+    init(container: ModelContainer, isPrivate: Bool = false, contentBlocker: ContentBlockerService = .shared) throws {
         self.container = container
         self.isPrivate = isPrivate
         faviconService = isPrivate ? FaviconService(directory: nil) : .shared
@@ -78,10 +78,7 @@ final class BrowserSession {
         )
         contentBlocking = ContentBlockerScope(service: contentBlocker, savesExceptions: !isPrivate && !isInMemory)
         popupWindows.contentBlocking = contentBlocking
-        var records = (try? context.fetch(FetchDescriptor<SpaceRecord>(sortBy: [SortDescriptor(\.order)]))) ?? []
-        if records.isEmpty {
-            records = [Self.createDefaultSpace(in: context)]
-        }
+        let records = try Self.spaceRecords(in: context)
         refreshProfiles()
         spaces = records.map { record in
             SpaceSession(
@@ -103,28 +100,6 @@ final class BrowserSession {
             queue: .main,
         ) { [weak self] _ in
             MainActor.assumeIsolated { self?.saveAll() }
-        }
-    }
-
-    /// The app's session. During tests, the store stays in memory: the user's tabs are neither read nor
-    /// modified.
-    static func launch(
-        defaults: UserDefaults = .standard,
-        environment: [String: String] = ProcessInfo.processInfo.environment,
-    ) -> BrowserSession {
-        let isUnitTesting = environment["XCTestConfigurationFilePath"] != nil
-        let inMemory = isUnitTesting || defaults.bool(forKey: inMemoryStoreKey)
-        let name = defaults.string(forKey: storeNameKey)
-        if let name, defaults.bool(forKey: resetStoreKey) {
-            deleteStore(named: name)
-        }
-        do {
-            return try BrowserSession(container: BrowserSchema.makeContainer(inMemory: inMemory, name: name))
-        } catch {
-            Logger.app.error("Base indisponible, onglets non enregistrés : \(error.logSummary, privacy: .public)")
-            // An in-memory store at least allows browsing.
-            // swiftlint:disable:next force_try
-            return BrowserSession(container: try! BrowserSchema.makeContainer(inMemory: true))
         }
     }
 
@@ -158,9 +133,14 @@ final class BrowserSession {
     }
 
     /// Reloads the list of profiles, in their order.
+    /// A failed read keeps the known profiles (audit R3).
     func refreshProfiles() {
         let descriptor = FetchDescriptor<ProfileRecord>(sortBy: [SortDescriptor(\.order)])
-        profiles = (try? container.mainContext.fetch(descriptor)) ?? []
+        do {
+            profiles = try container.mainContext.fetch(descriptor)
+        } catch {
+            Logger.app.error("Profils illisibles : \(error.logSummary, privacy: .public)")
+        }
     }
 
     /// Deletes the data stores that no longer belong to any profile (profile deleted while a web view was
@@ -177,8 +157,9 @@ final class BrowserSession {
 
     /// Session of a private window: in-memory store, non-persistent data stores.
     static func makePrivate() -> BrowserSession {
+        // An empty in-memory store: nothing to read that could fail.
         // swiftlint:disable:next force_try
-        BrowserSession(container: try! BrowserSchema.makeContainer(inMemory: true), isPrivate: true)
+        try! BrowserSession(container: BrowserSchema.makeContainer(inMemory: true), isPrivate: true)
     }
 
     /// Saves each Space right away (app quitting).
@@ -212,30 +193,5 @@ final class BrowserSession {
     /// Sorts the Spaces in the order of their records (equal ranks: the identifier breaks the tie).
     func sortSpaces() {
         spaces.sort { ($0.record.order, $0.id.uuidString) < ($1.record.order, $1.id.uuidString) }
-    }
-
-    /// Deletes the files of store `name` (`<name>.store`, `-shm`, `-wal`) in Application Support.
-    private static func deleteStore(named name: String) {
-        let manager = FileManager.default
-        guard let directory = manager.urls(for: .applicationSupportDirectory, in: .userDomainMask).first,
-              let files = try? manager.contentsOfDirectory(atPath: directory.path)
-        else {
-            return
-        }
-        for file in files where file.hasPrefix("\(name).store") {
-            try? manager.removeItem(at: directory.appendingPathComponent(file))
-        }
-    }
-
-    private static func createDefaultSpace(in context: ModelContext) -> SpaceRecord {
-        let profile = (try? context.fetch(FetchDescriptor<ProfileRecord>()))?.first ?? {
-            let profile = ProfileRecord(name: defaultProfileName)
-            context.insert(profile)
-            return profile
-        }()
-        let space = SpaceRecord(name: defaultSpaceName, profile: profile)
-        context.insert(space)
-        try? context.save()
-        return space
     }
 }

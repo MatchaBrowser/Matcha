@@ -12,8 +12,35 @@ enum BrowserSchema {
     /// Local container (iCloud sync will come in phase 7); in memory for tests.
     /// `name` picks the store (`<name>.store` in Application Support), nil for the default store.
     static func makeContainer(inMemory: Bool = false, name: String? = nil) throws -> ModelContainer {
+        try makeContainer(configuration(inMemory: inMemory, name: name))
+    }
+
+    /// Store at `url` (tests), or named `name` in Application Support, or in memory.
+    static func configuration(inMemory: Bool = false, name: String? = nil, url: URL? = nil) -> ModelConfiguration {
         let schema = Schema(models)
-        let configuration = ModelConfiguration(name, schema: schema, isStoredInMemoryOnly: inMemory, cloudKitDatabase: .none)
-        return try ModelContainer(for: schema, configurations: configuration)
+        if let url, !inMemory {
+            return ModelConfiguration(name, schema: schema, url: url, cloudKitDatabase: .none)
+        }
+        return ModelConfiguration(name, schema: schema, isStoredInMemoryOnly: inMemory, cloudKitDatabase: .none)
+    }
+
+    static func makeContainer(_ configuration: ModelConfiguration) throws -> ModelContainer {
+        try ModelContainer(for: Schema(models), configurations: configuration)
+    }
+
+    /// Puts the files of the store at `url` (`.store`, `-shm`, `-wal`) aside, renamed with the date: an unreadable
+    /// store is never deleted (audit R2). Returns the new name of the main file.
+    @discardableResult
+    static func moveAside(storeAt url: URL, date: Date = .now) throws -> URL {
+        let manager = FileManager.default
+        let stamp = Int(date.timeIntervalSince1970)
+        let aside = url.deletingLastPathComponent().appendingPathComponent("\(url.lastPathComponent).unreadable-\(stamp)")
+        for suffix in ["", "-shm", "-wal"] {
+            let file = URL(filePath: url.path + suffix)
+            if manager.fileExists(atPath: file.path) {
+                try manager.moveItem(at: file, to: URL(filePath: aside.path + suffix))
+            }
+        }
+        return aside
     }
 }

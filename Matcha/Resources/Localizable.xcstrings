@@ -3620,6 +3620,35 @@
         }
       }
     },
+    "Continue Without Saving" : {
+      "comment" : "Button of the alert shown when the data can't be read: browse in memory",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ohne Speichern fortfahren"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Continuar sin guardar"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Continuer sans enregistrer"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Continua senza salvare"
+          }
+        }
+      }
+    },
     "Conversation" : {
       "comment" : "Icon choice (SF Symbol): two speech bubbles",
       "localizations" : {
@@ -7272,6 +7301,35 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Matcha non trova il server “%@”."
+          }
+        }
+      }
+    },
+    "Matcha can't open its data." : {
+      "comment" : "Alert at launch when the tabs and Spaces can't be read",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Matcha kann seine Daten nicht öffnen."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Matcha no puede abrir sus datos."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Matcha ne peut pas ouvrir ses données."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Matcha non riesce ad aprire i suoi dati."
           }
         }
       }
@@ -12030,6 +12088,35 @@
         }
       }
     },
+    "Start Over" : {
+      "comment" : "Button of the alert shown when the data can't be read: new data, the old kept aside",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Neu beginnen"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Empezar de nuevo"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Repartir de zéro"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ricomincia"
+          }
+        }
+      }
+    },
     "Stop" : {
       "comment" : "Toolbar button: stop loading the page",
       "localizations" : {
@@ -14192,6 +14279,35 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "La password verrà inviata senza crittografia."
+          }
+        }
+      }
+    },
+    "Your tabs and Spaces couldn't be read (%@). You can quit and try again later, start over with new data (the unreadable data is kept aside, not deleted), or browse without saving anything." : {
+      "comment" : "Alert at launch when the tabs and Spaces can't be read; %@ is the error code",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Deine Tabs und Spaces konnten nicht gelesen werden (%@). Du kannst Matcha beenden und es später erneut versuchen, mit neuen Daten neu beginnen (die unlesbaren Daten werden beiseitegelegt, nicht gelöscht) oder surfen, ohne etwas zu speichern."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No se han podido leer tus pestañas y Spaces (%@). Puedes salir e intentarlo más tarde, empezar de nuevo con datos nuevos (los datos ilegibles se guardan aparte, no se borran) o navegar sin guardar nada."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vos onglets et vos Spaces n'ont pas pu être lus (%@). Vous pouvez quitter et réessayer plus tard, repartir de zéro avec de nouvelles données (les données illisibles sont mises de côté, pas effacées) ou naviguer sans rien enregistrer."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Non è stato possibile leggere i tuoi pannelli e i tuoi Spaces (%@). Puoi uscire e riprovare più tardi, ricominciare con dati nuovi (i dati illeggibili vengono messi da parte, non cancellati) o navigare senza salvare nulla."
           }
         }
       }
