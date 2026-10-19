@@ -63,6 +63,7 @@ scripts/strings.sh fr
 - **État observable** avec `@Observable` (framework Observation), pas `ObservableObject`.
 - **Deux mondes séparés** : les modèles persistés SwiftData (suffixe `Record`) et les objets d'exécution (`BrowserTab`, qui possède le `WKWebView`). Jamais de `WKWebView` dans un modèle SwiftData.
 - **SwiftData compatible CloudKit dès le départ** : pas de `@Attribute(.unique)`, chaque propriété a une valeur par défaut ou est optionnelle, chaque relation est optionnelle avec son inverse.
+- **Couches** : `Browser/`, `Services/` et `Models/` n'utilisent rien de `Features/` ni d'`App/` ; ce qu'il leur faut de l'interface passe par un protocole (`PageDialogPresenting`, `PopupWindowHosting`, `ExtensionHost`). Aucun `static let shared` : les services partagés sont créés une fois dans `AppEnvironment` (racine de composition, `MatchaApp.init`) et donnés par les initialiseurs (`SessionServices` pour les sessions) ou par `.environment`.
 - **API publiques uniquement.** Jamais de sélecteurs privés, de `value(forKey:)` sur des clés non documentées, ni de `perform(_:)` sur des méthodes cachées. Si une fonction n'est possible qu'avec une API privée, on la reporte et on le note dans `DECISIONS.md`.
 - **Dépendances autorisées** : KeyboardShortcuts (sindresorhus) et Sparkle. Toute autre dépendance → me demander avant.
 - **Fichiers courts** : un type principal par fichier, moins de 300 lignes environ.

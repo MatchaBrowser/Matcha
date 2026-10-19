@@ -7,7 +7,7 @@ extension ExtensionManager {
     /// Opens (or closes) private windows to extension `identifier`: the user's choice only (task 6.4); remembered, and
     /// applied right away if it is loaded.
     func setAccessToPrivateData(_ isAllowed: Bool, identifier: String) {
-        defer { buttonsDidChange() }
+        defer { toolbar.buttonsDidChange() }
         if let context = contexts[identifier] {
             context.hasAccessToPrivateData = isAllowed
             saveState(of: context, identifier: identifier)

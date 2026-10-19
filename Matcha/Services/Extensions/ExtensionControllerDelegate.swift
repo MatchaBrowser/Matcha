@@ -1,23 +1,27 @@
-import AppKit
+import Foundation
 import OSLog
 import WebKit
 
-/// Delegate of the extension controller (task 6.3): windows, new tabs and windows, options page, permission requests
-/// and an action's popover. Matcha has only one main browser window (`DECISIONS.md`):
-/// - a new tab goes to the top of the Today tabs of the displayed Space (after its parent tab if it belongs to this
-///   Space), in the requested window, otherwise the active window, otherwise the main window; never in a private window
-///   for an extension that has no access to it; the requested index is ignored;
-/// - a new “popup” window is a mini window (its first address); a “normal” window gives tabs in the browser window; a
-///   private window is refused; the tabs to move are ignored;
-/// - an extension page (options, `webkit-extension:`) opens in a tab created with its extension's configuration, as
-///   WebKit requires.
-extension ExtensionManager: WKWebExtensionControllerDelegate {
+/// Delegate of the extension controller (task 6.3, audit C3): windows and new pages go to the manager's host
+/// (`ExtensionHost`, the interface), permission requests to its prompter; options page, native messages, an action's
+/// popover. Rules:
+/// - only web pages, `about:blank` and the extension's own pages can be opened (`ExtensionURLPolicy`, audit E4);
+/// - a private window is never opened for an extension;
+/// - without a host (no interface), nothing opens.
+@MainActor
+final class ExtensionControllerDelegate: NSObject, WKWebExtensionControllerDelegate {
+    private unowned let manager: ExtensionManager
+
+    init(manager: ExtensionManager) {
+        self.manager = manager
+    }
+
     func webExtensionController(_: WKWebExtensionController, openWindowsFor _: WKWebExtensionContext) -> [any WKWebExtensionWindow] {
-        windows.orderedWindows
+        manager.host?.windowsForExtensions ?? []
     }
 
     func webExtensionController(_: WKWebExtensionController, focusedWindowFor _: WKWebExtensionContext) -> (any WKWebExtensionWindow)? {
-        windows.focusedWindow
+        manager.host?.focusedWindowForExtensions
     }
 
     func webExtensionController(
@@ -30,18 +34,15 @@ extension ExtensionManager: WKWebExtensionControllerDelegate {
             completionHandler(nil, ExtensionError.forbiddenURL)
             return
         }
-        guard let model = browserWindow(for: configuration.window, context: context) else {
+        guard let host = manager.host else {
             completionHandler(nil, ExtensionError.noBrowserWindow)
             return
         }
-        let tab = openTab(
-            configuration.url,
-            in: model,
-            after: (configuration.parentTab as? ExtensionTab)?.page,
-            isActive: configuration.shouldBeActive,
-            isPinned: configuration.shouldBePinned,
-        )
-        completionHandler(windows.adapter(for: tab), nil)
+        do {
+            try completionHandler(host.openTab(using: configuration, for: context), nil)
+        } catch {
+            completionHandler(nil, error)
+        }
     }
 
     func webExtensionController(
@@ -58,26 +59,15 @@ extension ExtensionManager: WKWebExtensionControllerDelegate {
             completionHandler(nil, ExtensionError.forbiddenURL)
             return
         }
-        if configuration.windowType == .popup, let miniWindows = windows.miniWindows {
-            let controller = openMiniWindow(configuration.tabURLs.first, in: miniWindows)
-            completionHandler(windows.windowAdapter(controller.id), nil)
-            return
-        }
-        guard let model = browserWindow(for: nil, context: context) else {
+        guard let host = manager.host else {
             completionHandler(nil, ExtensionError.noBrowserWindow)
             return
         }
-        // At the top of the Today tabs, in the requested order (opened from last to first); the first one is active.
-        let urls: [URL?] = configuration.tabURLs.isEmpty ? [nil] : configuration.tabURLs
-        let first = urls.reversed().map { openTab($0, in: model, after: nil, isActive: false, isPinned: false) }.last
-        if let first {
-            model.space.tabManager.select(first)
-            windows.update()
+        do {
+            try completionHandler(host.openWindow(using: configuration, for: context), nil)
+        } catch {
+            completionHandler(nil, error)
         }
-        if configuration.shouldBeFocused {
-            windows.adapter(for: model)?.owner?.nsWindow?.makeKeyAndOrderFront(nil)
-        }
-        completionHandler(windows.adapter(for: model), nil)
     }
 
     func webExtensionController(
@@ -89,12 +79,7 @@ extension ExtensionManager: WKWebExtensionControllerDelegate {
             completionHandler(ExtensionError.unsupported("The extension has no options page."))
             return
         }
-        guard let model = browserWindow(for: nil, context: context) else {
-            completionHandler(ExtensionError.noBrowserWindow)
-            return
-        }
-        openTab(url, in: model, after: nil, isActive: true, isPinned: false)
-        completionHandler(nil)
+        completionHandler(manager.host?.openPage(url, for: context) == true ? nil : ExtensionError.noBrowserWindow)
     }
 
     // MARK: Permissions
@@ -108,8 +93,8 @@ extension ExtensionManager: WKWebExtensionControllerDelegate {
         for context: WKWebExtensionContext,
         completionHandler: @escaping @Sendable (Set<WKWebExtension.Permission>, Date?) -> Void,
     ) {
-        let request = ExtensionPermissionRequest(extensionName: displayName(of: context), permissions: permissions.map(\.rawValue))
-        ask(request, for: context) { allowed in
+        let request = ExtensionPermissionRequest(extensionName: manager.displayName(of: context), permissions: permissions.map(\.rawValue))
+        manager.ask(request, for: context) { allowed in
             if !allowed {
                 let expiration = ExtensionPromptPolicy.denialExpiration(from: .now)
                 permissions.forEach { context.setPermissionStatus(.deniedExplicitly, for: $0, expirationDate: expiration) }
@@ -126,11 +111,11 @@ extension ExtensionManager: WKWebExtensionControllerDelegate {
         completionHandler: @escaping @Sendable (Set<WKWebExtension.MatchPattern>, Date?) -> Void,
     ) {
         let request = ExtensionPermissionRequest(
-            extensionName: displayName(of: context),
+            extensionName: manager.displayName(of: context),
             matchPatterns: matchPatterns.map(\.string),
             includesAllWebsites: matchPatterns.contains(where: \.matchesAllHosts),
         )
-        ask(request, for: context) { allowed in
+        manager.ask(request, for: context) { allowed in
             if !allowed {
                 let expiration = ExtensionPromptPolicy.denialExpiration(from: .now)
                 matchPatterns.forEach { context.setPermissionStatus(.deniedExplicitly, for: $0, expirationDate: expiration) }
@@ -146,8 +131,8 @@ extension ExtensionManager: WKWebExtensionControllerDelegate {
         for context: WKWebExtensionContext,
         completionHandler: @escaping @Sendable (Set<URL>, Date?) -> Void,
     ) {
-        let request = ExtensionPermissionRequest(extensionName: displayName(of: context), urls: urls)
-        ask(request, for: context) { allowed in
+        let request = ExtensionPermissionRequest(extensionName: manager.displayName(of: context), urls: urls)
+        manager.ask(request, for: context) { allowed in
             if !allowed {
                 let expiration = ExtensionPromptPolicy.denialExpiration(from: .now)
                 urls.forEach { context.setPermissionStatus(.deniedExplicitly, for: $0, expirationDate: expiration) }
@@ -169,10 +154,10 @@ extension ExtensionManager: WKWebExtensionControllerDelegate {
         replyHandler: @escaping @Sendable (Any?, (any Error)?) -> Void,
     ) {
         let identifier = context.uniqueIdentifier
-        if nativeMessageSenders.insert(identifier).inserted {
+        if manager.nativeMessageSenders.insert(identifier).inserted {
             Logger.extensions.notice("Native messages refused (\(identifier, privacy: .private))")
         }
-        let delay = nativeMessages.delay(for: identifier, at: .now)
+        let delay = manager.nativeMessages.delay(for: identifier, at: .now)
         Task {
             try? await Task.sleep(for: delay)
             replyHandler(nil, ExtensionError.nativeMessagingUnsupported)
@@ -191,16 +176,14 @@ extension ExtensionManager: WKWebExtensionControllerDelegate {
 
     // MARK: Actions
 
-    /// The action's popover, in the window of its tab, otherwise the active window.
+    /// The action's popover, below its button (`ExtensionHost.presentPopup`).
     func webExtensionController(
         _: WKWebExtensionController,
         presentActionPopup action: WKWebExtension.Action,
         for _: WKWebExtensionContext,
         completionHandler: @escaping @Sendable ((any Error)?) -> Void,
     ) {
-        let tabWindow = (action.associatedTab as? ExtensionTab)?.windowID.flatMap { windows.owner(ofWindow: $0)?.nsWindow }
-        let window = tabWindow ?? windows.focusedWindow?.owner?.nsWindow ?? NSApp.keyWindow
-        guard popups.present(action, in: window) else {
+        guard manager.host?.presentPopup(of: action) == true else {
             completionHandler(ExtensionError.unsupported("The popup cannot be shown."))
             return
         }
@@ -212,6 +195,6 @@ extension ExtensionManager: WKWebExtensionControllerDelegate {
         didUpdate _: WKWebExtension.Action,
         forExtensionContext _: WKWebExtensionContext,
     ) {
-        actionDidUpdate()
+        manager.toolbar.actionDidUpdate()
     }
 }

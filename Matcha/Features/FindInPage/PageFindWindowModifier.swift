@@ -7,19 +7,20 @@ struct PageFindWindowModifier: ViewModifier {
     let model: WindowModel
     let window: NSWindow?
     let closeCommandBar: () -> Void
+    @Environment(\.pageFind) private var pageFind
 
     func body(content: Content) -> some View {
         content
             .onAppear(perform: register)
             .onChange(of: window) { old, _ in
-                PageFindResponder.unregister(old)
+                pageFind?.unregister(old)
                 register()
             }
-            .onDisappear { PageFindResponder.unregister(window) }
+            .onDisappear { pageFind?.unregister(window) }
     }
 
     private func register() {
-        PageFindResponder.register(PageFindResponder.Window(
+        pageFind?.register(PageFindResponder.Window(
             window: window,
             page: { [weak model] in model.flatMap { FrontPage.page(miniWindowTab: nil, tabManager: $0.space.tabManager) } },
             closeCommandBar: closeCommandBar,

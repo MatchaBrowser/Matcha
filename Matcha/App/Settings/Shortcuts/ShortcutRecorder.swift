@@ -8,8 +8,6 @@ import Observation
 @MainActor
 @Observable
 final class ShortcutRecorder {
-    static let shared = ShortcutRecorder()
-
     /// Command being recorded.
     private(set) var command: MenuShortcut?
     /// Last refusal, shown under its command until the next recording.

@@ -40,6 +40,12 @@ final class ExtensionWindows {
 
     /// Receives the events: the extension controller (a fake version in the tests).
     weak var sink: (any ExtensionEventSink)?
+    /// The extensions this host serves (`ExtensionWindows+Host`).
+    weak var manager: ExtensionManager?
+    /// Popovers of the extensions' actions, below their button (task 6.5).
+    let popups = ExtensionPopupPresenter()
+    /// Displayed extension buttons, to anchor their popover to them (task 6.5).
+    let buttonAnchors = ExtensionButtonAnchors()
     /// The app's mini windows (task 4.5).
     weak var miniWindows: MiniWindowManager? {
         didSet { setNeedsUpdate() }
@@ -60,6 +66,16 @@ final class ExtensionWindows {
 
     init(sink: (any ExtensionEventSink)? = nil) {
         self.sink = sink
+        // An action's popover below its extension's button (in the window and, if there are several, the card of the
+        // targeted tab), otherwise at the top right corner of the window.
+        popups.anchor = { [weak self] action, window in
+            guard let self, let context = action.webExtensionContext, let identifier = manager?.identifier(of: context),
+                  let view = buttonAnchors.view(for: identifier, tabID: (action.associatedTab as? ExtensionTab)?.tabID, in: window)
+            else {
+                return ExtensionPopupPresenter.topTrailingAnchor(in: window)
+            }
+            return (view, view.bounds)
+        }
     }
 
     /// Windows that go away (tests) take their observers with them (audit C7).

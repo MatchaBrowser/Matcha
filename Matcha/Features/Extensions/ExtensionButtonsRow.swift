@@ -7,14 +7,15 @@ import WebKit
 struct ExtensionButtonsRow: View {
     let tab: BrowserTab?
     let isPrivate: Bool
-    var manager = ExtensionManager.shared
+    @Environment(ExtensionManager.self) private var manager
+    @Environment(\.extensionWindows) private var windows
 
     var body: some View {
-        let extensions = manager.buttonExtensions(isPrivate: isPrivate)
-        if !extensions.isEmpty {
+        let extensions = manager.toolbar.buttonExtensions(isPrivate: isPrivate)
+        if !extensions.isEmpty, let windows {
             HStack(spacing: 2) {
                 ForEach(extensions, id: \.identifier) { item in
-                    ExtensionActionButton(identifier: item.identifier, tab: tab, manager: manager)
+                    ExtensionActionButton(identifier: item.identifier, tab: tab, manager: manager, windows: windows)
                 }
             }
             .labelStyle(.iconOnly)
@@ -33,15 +34,17 @@ struct ExtensionActionButton: View {
     let identifier: String
     let tab: BrowserTab?
     let manager: ExtensionManager
+    let windows: ExtensionWindows
 
     @Environment(\.openSettings) private var openSettings
+    @Environment(SettingsSelection.self) private var settingsSelection
 
     var body: some View {
-        let action = manager.action(of: identifier, for: tab)
+        let action = manager.toolbar.action(of: identifier, for: tab)
         let context = manager.contexts[identifier]
-        let name = context.map(ExtensionManager.name(of:)) ?? identifier
+        let name = context.map(ExtensionToolbar.name(of:)) ?? identifier
         Button {
-            manager.performAction(of: identifier, for: tab)
+            manager.toolbar.performAction(of: identifier, for: tab)
         } label: {
             Label {
                 Text(verbatim: name)
@@ -52,15 +55,15 @@ struct ExtensionActionButton: View {
         .overlay(alignment: .topTrailing) { badge(action) }
         .disabled(action.map { !$0.isEnabled } ?? false)
         .help(action.flatMap { $0.label.isEmpty ? nil : $0.label } ?? name)
-        .background(ExtensionButtonAnchor(identifier: identifier, tabID: tabID, anchors: manager.buttonAnchors))
+        .background(ExtensionButtonAnchor(identifier: identifier, tabID: tabID, anchors: windows.buttonAnchors))
         .contextMenu {
             if context?.optionsPageURL != nil {
                 Button("Options…") { manager.openOptionsPage(identifier: identifier) }
             }
-            Button("Hide Button") { manager.setShowsButton(false, identifier: identifier) }
+            Button("Hide Button") { manager.toolbar.setShowsButton(false, identifier: identifier) }
             Divider()
             Button("Manage Extensions…") {
-                SettingsSelection.shared.tab = .extensions
+                settingsSelection.tab = .extensions
                 openSettings()
             }
         }
@@ -71,7 +74,7 @@ struct ExtensionActionButton: View {
 
     /// Target tab, as WebKit knows it (to anchor the popover under this very button).
     private var tabID: UUID? {
-        tab.flatMap { manager.windows.adapter(for: $0)?.tabID }
+        tab.flatMap { windows.adapter(for: $0)?.tabID }
     }
 
     @ViewBuilder private func icon(_ image: NSImage?) -> some View {
@@ -107,6 +110,10 @@ private struct ExtensionButtonAnchor: NSViewRepresentable {
     let tabID: UUID?
     let anchors: ExtensionButtonAnchors
 
+    func makeCoordinator() -> ExtensionButtonAnchors {
+        anchors
+    }
+
     func makeNSView(context _: Context) -> NSView {
         let view = NSView()
         anchors.register(view, identifier: identifier, tabID: tabID)
@@ -117,7 +124,7 @@ private struct ExtensionButtonAnchor: NSViewRepresentable {
         anchors.register(view, identifier: identifier, tabID: tabID)
     }
 
-    static func dismantleNSView(_ view: NSView, coordinator _: ()) {
-        ExtensionManager.shared.buttonAnchors.unregister(view)
+    static func dismantleNSView(_ view: NSView, coordinator anchors: ExtensionButtonAnchors) {
+        anchors.unregister(view)
     }
 }

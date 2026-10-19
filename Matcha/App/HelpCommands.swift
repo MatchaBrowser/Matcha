@@ -11,6 +11,7 @@ struct HelpCommands: Commands {
     }
 
     let miniWindows: MiniWindowManager
+    let settingsSelection: SettingsSelection
     @FocusedValue(\.tabManager) private var tabManager
     @FocusedValue(\.windowActions) private var windowActions
     @Environment(\.openSettings) private var openSettings
@@ -20,7 +21,7 @@ struct HelpCommands: Commands {
             Button("Matcha Help") { open(.website) }
                 .keyboardShortcut("?")
             Button("Keyboard Shortcuts") {
-                SettingsSelection.shared.tab = .shortcuts
+                settingsSelection.tab = .shortcuts
                 openSettings()
             }
             Divider()

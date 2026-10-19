@@ -6,7 +6,9 @@ import SwiftUI
 struct BrowserCommands: Commands {
     let miniWindows: MiniWindowManager
     /// Shortcuts chosen in Settings > Shortcuts.
-    private let shortcuts = MenuShortcutStore.shared
+    let shortcuts: MenuShortcutStore
+    /// Tab shown by the Settings window (Help > Keyboard Shortcuts).
+    let settingsSelection: SettingsSelection
     @FocusedValue(\.tabManager) private var tabManager
     @FocusedValue(\.windowActions) private var windowActions
     @Environment(\.openWindow) private var openWindow
@@ -165,7 +167,7 @@ struct BrowserCommands: Commands {
         ImportCommands()
 
         // File > Export as PDF…, Print…; View > zoom (task 5.4), after “Reload Page”.
-        PageCommands(miniWindows: miniWindows)
+        PageCommands(miniWindows: miniWindows, shortcuts: shortcuts)
 
         CommandMenu("Spaces") {
             if let windowActions {
@@ -183,10 +185,10 @@ struct BrowserCommands: Commands {
         TabCommands(miniWindows: miniWindows)
 
         // History menu: Homepage, Back, Forward, “Show All History” (task 5.5).
-        HistoryCommands(miniWindows: miniWindows)
+        HistoryCommands(miniWindows: miniWindows, shortcuts: shortcuts)
 
         // Help menu: Matcha's site and a problem report (audit H1).
-        HelpCommands(miniWindows: miniWindows)
+        HelpCommands(miniWindows: miniWindows, settingsSelection: settingsSelection)
     }
 
     /// ⌘O: the chosen files open in new tabs of the active window, or of the main window from a mini window.

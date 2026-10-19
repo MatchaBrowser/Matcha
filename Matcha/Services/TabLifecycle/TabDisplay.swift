@@ -3,9 +3,3 @@
 protocol TabDisplay: AnyObject {
     var displayedTabManager: TabManager { get }
 }
-
-extension WindowModel: TabDisplay {
-    var displayedTabManager: TabManager {
-        space.tabManager
-    }
-}

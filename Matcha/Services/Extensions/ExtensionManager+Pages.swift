@@ -1,8 +1,8 @@
-import AppKit
+import Foundation
 import OSLog
 import WebKit
 
-/// Tabs and mini windows opened for extensions, and requests to the user (task 6.3).
+/// Pages of the extensions and requests to the user (task 6.3).
 extension ExtensionManager {
     /// Configuration of an extension page (`webkit-extension:`) opened in a tab or a mini window: that of its extension
     /// (otherwise WebKit refuses the navigation), with a per-page content controller (task 6.2); nil for another
@@ -13,58 +13,6 @@ extension ExtensionManager {
         }
         configuration.userContentController = WebConfigurationFactory.makeUserContentController()
         return configuration
-    }
-
-    /// Browser window in which to open tabs: `requested` if it is one, otherwise the active window, otherwise the main
-    /// window; a private window only for an extension that has access to it.
-    func browserWindow(for requested: (any WKWebExtensionWindow)?, context: WKWebExtensionContext) -> WindowModel? {
-        let allowsPrivate = context.hasAccessToPrivateData
-        for candidate in [requested as? ExtensionWindow, windows.focusedWindow] {
-            if case let .browser(model, _)? = candidate?.owner, allowsPrivate || !model.session.isPrivate {
-                return model
-            }
-        }
-        let models = windows.browserWindows.compactMap(\.model)
-        return models.first { !$0.session.isPrivate } ?? (allowsPrivate ? models.first : nil)
-    }
-
-    /// Opens `url` (none: an empty tab) in the Space displayed by `model`, at the top of the Today tabs, or after
-    /// `parent` if it belongs to this Space; active (selected) and pinned on request.
-    @discardableResult
-    func openTab(_ url: URL?, in model: WindowModel, after parent: BrowserTab?, isActive: Bool, isPinned: Bool) -> BrowserTab {
-        let tabManager = model.space.tabManager
-        let configuration = url.flatMap(pageConfiguration(for:))
-            ?? tabManager.pages.makeConfiguration(websiteDataStore: tabManager.websiteDataStore)
-        let anchor = parent.flatMap { tabManager.tab(withID: $0.id) === $0 ? $0 : nil }
-        let tab = tabManager.insertTab(configuration: configuration, after: anchor, select: isActive)
-        if let url {
-            tab.load(url)
-        }
-        if isPinned {
-            tabManager.setPlace(tab, to: .pinned)
-        }
-        windows.update()
-        Logger.extensions.info("Tab opened for an extension")
-        return tab
-    }
-
-    /// Mini window (an extension's “popup” window) on `url`, in the profile of the displayed Space; without an address,
-    /// its input bar opens.
-    @discardableResult
-    func openMiniWindow(_ url: URL?, in miniWindows: MiniWindowManager) -> MiniWindowController {
-        let profile = miniWindows.displayedSpace.record.profile
-        let configuration = url.flatMap(pageConfiguration(for:))
-            ?? miniWindows.makeConfiguration(miniWindows.session.dataStore(for: profile))
-        let controller = miniWindows.show(BrowserTab(configuration: configuration), profileID: profile?.id)
-        if let url {
-            controller.tab.load(url)
-            controller.showWebView()
-        } else {
-            controller.showCommandBar(.newSearch)
-        }
-        windows.update()
-        Logger.extensions.info("Mini window opened for an extension")
-        return controller
     }
 
     /// Name of the extension for the user.

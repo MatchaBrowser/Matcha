@@ -79,7 +79,7 @@ struct ExtensionAdapterTests {
             "webExtensionController:connectUsingMessagePort:forExtensionContext:completionHandler:",
         ]
         for selector in delegateSelectors {
-            #expect(manager.responds(to: NSSelectorFromString(selector)), "\(selector)")
+            #expect(manager.controllerDelegate.responds(to: NSSelectorFromString(selector)), "\(selector)")
         }
     }
 

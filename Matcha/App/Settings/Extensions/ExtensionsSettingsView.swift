@@ -5,8 +5,12 @@ import SwiftUI
 /// `.crx`, Firefox `.xpi`, `.zip`) or an unpacked folder (and the link to Firefox add-ons). Each addition goes
 /// through the permissions screen.
 struct ExtensionsSettingsView: View {
-    @State private var model = ExtensionsSettingsModel(manager: .shared, syncAdapter: .shared)
+    @State private var model: ExtensionsSettingsModel
     @State private var pendingRemoval: ExtensionsSettingsModel.Installed?
+
+    init(manager: ExtensionManager, syncAdapter: ExtensionSyncAdapter) {
+        _model = State(initialValue: ExtensionsSettingsModel(manager: manager, syncAdapter: syncAdapter))
+    }
 
     var body: some View {
         Form {

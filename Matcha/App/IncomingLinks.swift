@@ -5,7 +5,6 @@ import OSLog
 /// Finder. Received by the app delegate, they wait until the app is ready (`handler`), at launch.
 @MainActor
 final class IncomingLinks {
-    static let shared = IncomingLinks()
     /// Accepted schemes; the others are ignored.
     static let schemes: Set<String> = ["http", "https", "file"]
 

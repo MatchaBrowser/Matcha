@@ -22,7 +22,6 @@ nonisolated enum ShortcutProblem: Equatable, Sendable {
 @MainActor
 @Observable
 final class MenuShortcutStore {
-    static let shared = MenuShortcutStore(defaults: .standard)
     nonisolated static let defaultsKey = "menuShortcuts"
 
     /// Changed commands: their shortcut, or nil for none.

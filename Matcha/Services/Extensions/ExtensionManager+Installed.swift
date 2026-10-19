@@ -85,25 +85,16 @@ extension ExtensionManager {
     /// settings to the extension stores. False with no browser window open.
     @discardableResult
     func openInBrowser(_ url: URL) -> Bool {
-        guard let model = windows.browserWindows.compactMap(\.model).first(where: { !$0.session.isPrivate }) else {
-            return false
-        }
-        openTab(url, in: model, after: nil, isActive: true, isPinned: false)
-        windows.adapter(for: model)?.owner?.nsWindow?.makeKeyAndOrderFront(nil)
-        return true
+        host?.openPage(url, for: nil) ?? false
     }
 
     /// Opens the options page of the loaded extension `identifier` in a new tab; false without an options page or
     /// without a browser window.
     @discardableResult
     func openOptionsPage(identifier: String) -> Bool {
-        guard let context = contexts[identifier], let url = context.optionsPageURL,
-              let model = browserWindow(for: nil, context: context)
-        else {
+        guard let context = contexts[identifier], let url = context.optionsPageURL else {
             return false
         }
-        openTab(url, in: model, after: nil, isActive: true, isPinned: false)
-        windows.adapter(for: model)?.owner?.nsWindow?.makeKeyAndOrderFront(nil)
-        return true
+        return host?.openPage(url, for: context) ?? false
     }
 }

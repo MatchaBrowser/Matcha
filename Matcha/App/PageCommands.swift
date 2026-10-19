@@ -9,7 +9,8 @@ import SwiftUI
 struct PageCommands: Commands {
     let miniWindows: MiniWindowManager
     @FocusedValue(\.tabManager) private var tabManager
-    private let shortcuts = MenuShortcutStore.shared
+    /// Shortcuts chosen in Settings > Shortcuts.
+    let shortcuts: MenuShortcutStore
 
     /// Active mini window: `keyWindowID` is read so the menu follows along, the window is read again on each action.
     private var miniWindow: MiniWindowController? {

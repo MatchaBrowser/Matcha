@@ -12,20 +12,20 @@ struct BrowserWindowView: View {
     static let revealEdgeWidth = 8.0
 
     let session: BrowserSession
-    @State private var models: WindowModels
-    @State private var window: NSWindow?
+    @State var models: WindowModels
+    @State var window: NSWindow?
     @AppStorage("sidebarWidth") private var sidebarWidth = SidebarMetrics.defaultWidth
-    @SceneStorage("sidebarVisible") private var isSidebarVisible = true
-    @AppStorage(BrowserSettings.Key.homePage) private var homePage = BrowserSettings.homePage
-    @AppStorage(BrowserSettings.Key.newTabPage) private var newTabPage = BrowserSettings.newTabPage
-    @AppStorage(BrowserSettings.Key.showsHomeButton) private var showsHomeButton = BrowserSettings.showsHomeButton
-    @AppStorage(BrowserSettings.Key.searchEngine) private var searchEngine = BrowserSettings.searchEngine
+    @SceneStorage("sidebarVisible") var isSidebarVisible = true
+    @AppStorage(BrowserSettings.Key.homePage) var homePage = BrowserSettings.homePage
+    @AppStorage(BrowserSettings.Key.newTabPage) var newTabPage = BrowserSettings.newTabPage
+    @AppStorage(BrowserSettings.Key.showsHomeButton) var showsHomeButton = BrowserSettings.showsHomeButton
+    @AppStorage(BrowserSettings.Key.searchEngine) var searchEngine = BrowserSettings.searchEngine
     @AppStorage(BrowserSettings.Key.addressBarPosition) private var addressBarPosition = BrowserSettings.addressBarPosition
     @AppStorage(BrowserSettings.Key.showsNavigationButtons) private var showsNavigationButtons = BrowserSettings.showsNavigationButtons
-    @AppStorage(BrowserSettings.Key.showsSearchSuggestions) private var showsSearchSuggestions = BrowserSettings.showsSearchSuggestions
-    @Environment(\.openSettings) private var openSettings
+    @AppStorage(BrowserSettings.Key.showsSearchSuggestions) var showsSearchSuggestions = BrowserSettings.showsSearchSuggestions
+    @Environment(\.openSettings) var openSettings
     /// Hidden sidebar shown over the page because the pointer hovers it.
-    @State private var isFloatingSidebarHovered = false
+    @State var isFloatingSidebarHovered = false
 
     /// No side effects: no task and no file read; the models are made once (`WindowModels`).
     init(session: BrowserSession) {
@@ -33,11 +33,11 @@ struct BrowserWindowView: View {
         _models = State(initialValue: WindowModels(session: session))
     }
 
-    private var model: WindowModel {
+    var model: WindowModel {
         models.window
     }
 
-    private var commandBar: CommandBarModel {
+    var commandBar: CommandBarModel {
         models.commandBar
     }
 
@@ -47,7 +47,7 @@ struct BrowserWindowView: View {
     }
 
     /// Tabs of the displayed Space.
-    private var tabManager: TabManager {
+    var tabManager: TabManager {
         space.tabManager
     }
 
@@ -66,7 +66,7 @@ struct BrowserWindowView: View {
     }
 
     /// Downloads panel visible: open, in the fixed or floating sidebar.
-    private var isDownloadsPanelShown: Bool {
+    var isDownloadsPanelShown: Bool {
         model.isDownloadsPresented && (isSidebarVisible || isFloatingSidebarShown)
     }
 
@@ -206,103 +206,6 @@ struct BrowserWindowView: View {
                 }
                 .transition(.move(edge: .leading).combined(with: .opacity))
             }
-        }
-    }
-
-    /// Settings read each time the command bar opens, and followed while it is open.
-    private var commandBarSettings: CommandBarSettings {
-        CommandBarSettings(
-            searchEngine: searchEngine,
-            newTabPage: newTabPage,
-            homePage: homePage,
-            showsSearchSuggestions: showsSearchSuggestions,
-        )
-    }
-
-    private var commandBarExecutor: CommandBarExecutor {
-        CommandBarExecutor(model: commandBar, window: window, openSettings: { openSettings() })
-    }
-
-    private var windowActions: WindowActions {
-        WindowActions(
-            newTab: openCommandBarForNewTab,
-            editAddress: editAddress,
-            isCommandBarPresented: commandBar.isPresented,
-            closeCommandBar: commandBarExecutor.cancel,
-            toggleSidebar: toggleSidebar,
-            isSidebarVisible: isSidebarVisible,
-            toggleDownloads: toggleDownloads,
-            isDownloadsPanelShown: isDownloadsPanelShown,
-            // `hasURL` and not `url`: the window is not recomputed on each address change.
-            copyURL: tabManager.frontTab?.hasURL == true ? { model.copySelectedTabURL() } : nil,
-            goHome: homeURL.map { url in { goHome(to: url) } },
-            spaceNames: session.spaces.map(\.record.name),
-            currentSpaceIndex: model.spaceIndex,
-            selectSpace: { index in withMotion(.easeInOut(duration: 0.3)) { model.selectSpace(at: index) } },
-            newSpace: { withMotion(.easeInOut(duration: 0.3)) { model.newSpace() } },
-            showTab: showTab,
-            isPrivate: session.isPrivate,
-            importFromArc: session.isPrivate ? nil : { model.arcImport.chooseFile(in: window) },
-        )
-    }
-
-    /// ⌘1 to ⌘9, ⌃⇥ and ⌃⇧⇥: like a click in the sidebar, which closes the command bar and the peek (even on the
-    /// tab already displayed).
-    private func showTab(_ tab: BrowserTab) {
-        commandBar.dismiss()
-        tabManager.closePeek()
-        TabActivation.activate(tab, in: tabManager)
-    }
-
-    /// ⌘T and “New Tab”: the command bar, or a tab on the home page.
-    private func openCommandBarForNewTab() {
-        // A single floating layer: the command bar closes the peek.
-        tabManager.closePeek()
-        commandBar.newTab(commandBarSettings)
-    }
-
-    /// ⌘L and the address pill: the command bar on the address of the displayed tab.
-    private func editAddress() {
-        // A single floating layer: the command bar closes the peek.
-        tabManager.closePeek()
-        commandBar.editCurrentTab(commandBarSettings)
-    }
-
-    private func toggleSidebar() {
-        withMotion(.easeInOut(duration: 0.2)) {
-            isSidebarVisible.toggle()
-            isFloatingSidebarHovered = false
-        }
-    }
-
-    /// ⌥⌘L: hides the downloads panel if it is visible; otherwise shows the hidden sidebar, then opens it.
-    private func toggleDownloads() {
-        let show = !isDownloadsPanelShown
-        withMotion(.easeInOut(duration: 0.2)) {
-            if show, !isSidebarVisible {
-                isSidebarVisible = true
-                isFloatingSidebarHovered = false
-            }
-            model.isDownloadsPresented = show
-        }
-    }
-
-    /// Action of the Home button, if it is displayed and a home page is set.
-    private var homeButtonAction: (() -> Void)? {
-        showsHomeButton ? windowActions.goHome : nil
-    }
-
-    private var homeURL: URL? {
-        BrowserSettings.homeURL(from: homePage, searchEngine: searchEngine)
-    }
-
-    /// Loads the home page in the selected tab, or in a new tab if there is none.
-    private func goHome(to url: URL) {
-        tabManager.closePeek()
-        if let tab = tabManager.selectedTab {
-            tab.load(url)
-        } else {
-            tabManager.newTab(url: url)
         }
     }
 }

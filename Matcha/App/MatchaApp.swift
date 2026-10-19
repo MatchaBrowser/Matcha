@@ -1,4 +1,5 @@
 import AppKit
+import KeyboardShortcuts
 import SwiftUI
 
 @main
@@ -22,7 +23,7 @@ struct MatchaApp: App {
         DownloadLocation.resetTestSubfolderIfRequested()
         let environment = AppEnvironment()
         // Store unreadable and the user chose to quit (audit R2): nothing was opened, nothing to save.
-        guard let session = BrowserSession.launch(services: environment.sessionServices) else {
+        guard let session = BrowserSession.launch(onFailure: StoreFailureAlert.ask, services: environment.sessionServices) else {
             exit(EXIT_SUCCESS)
         }
         // History read at launch, off the main thread, after deleting visits older than a year: the command bar
@@ -41,21 +42,26 @@ struct MatchaApp: App {
         // lists read again or compiled in the background, except there too (the tests have their own store).
         if !TestEnvironment.isUnitTestHost() {
             miniWindows.start()
+            let global = KeyboardShortcuts.getShortcut(for: .openMiniWindow)
+            environment.menuShortcuts.setGlobalMiniWindowKey(MiniWindowShortcut.menuKey(of: global))
             environment.contentBlocker?.start()
         }
         // Extensions (task 6.3): mini windows are windows to them; installed extensions load in the background,
         // except with a test store (UI tests): never the user's.
-        ExtensionManager.shared.windows.miniWindows = miniWindows
+        environment.extensionWindows.miniWindows = miniWindows
         if !session.isInMemory {
-            ExtensionManager.shared.start()
+            environment.extensions.start()
         }
-        // Links from other apps (task 8.2), including the one that launched the app.
-        IncomingLinks.shared.handler = { [miniWindows] urls in
-            miniWindows.openFromOtherApp(urls, destination: ExternalLinkDestination.current())
-        }
+        // Edit > Find: the active mini window's page first.
+        environment.pageFind.miniWindows = miniWindows
         _environment = State(initialValue: environment)
         _session = State(initialValue: session)
         _miniWindows = State(initialValue: miniWindows)
+        appDelegate.pageFind = environment.pageFind
+        // Links from other apps (task 8.2), including the one that launched the app.
+        appDelegate.incomingLinks.handler = { [miniWindows] urls in
+            miniWindows.openFromOtherApp(urls, destination: ExternalLinkDestination.current())
+        }
     }
 
     var body: some Scene {
@@ -63,7 +69,7 @@ struct MatchaApp: App {
         Window(Text(verbatim: "Matcha"), id: Self.browserWindowID) {
             BrowserWindowView(session: session)
                 .environment(miniWindows)
-                .environment(environment.downloads)
+                .appServices(environment)
         }
         .windowStyle(.hiddenTitleBar)
         // First opening: most of the screen, up to a comfortable size (audit H5); then the size the user chose.
@@ -73,7 +79,11 @@ struct MatchaApp: App {
         // Links from other apps go through the delegate (`IncomingLinks`): no window is created for them.
         .handlesExternalEvents(matching: [])
         .commands {
-            BrowserCommands(miniWindows: miniWindows)
+            BrowserCommands(
+                miniWindows: miniWindows,
+                shortcuts: environment.menuShortcuts,
+                settingsSelection: environment.settingsSelection,
+            )
         }
         .onChange(of: appearance, initial: true) { appearance.apply() }
 
@@ -81,7 +91,7 @@ struct MatchaApp: App {
         // in Safari.
         WindowGroup("Private Browsing", id: Self.privateWindowID) {
             PrivateWindowView(services: environment.sessionServices)
-                .environment(environment.downloads)
+                .appServices(environment)
         }
         .windowStyle(.hiddenTitleBar)
         .defaultWindowPlacement { _, context in
@@ -105,9 +115,15 @@ struct MatchaApp: App {
         .commandsRemoved()
 
         Settings {
-            SettingsView()
-                .environment(session)
-                .environment(miniWindows)
+            SettingsView(
+                selection: environment.settingsSelection,
+                extensions: environment.extensions,
+                extensionSync: environment.extensionSync,
+                menuShortcuts: environment.menuShortcuts,
+                shortcutRecorder: environment.shortcutRecorder,
+            )
+            .environment(session)
+            .environment(miniWindows)
         }
     }
 }

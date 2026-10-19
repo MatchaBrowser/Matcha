@@ -32,7 +32,10 @@ struct BrowserSessionTests {
 
     @Test func `unit tests never open the real store`() throws {
         let defaults = try #require(UserDefaults(suiteName: "BrowserSessionTests-\(UUID().uuidString)"))
-        let session = try #require(BrowserSession.launch(defaults: defaults, environment: ["XCTestConfigurationFilePath": "/tmp/x"]))
+        let session = try #require(BrowserSession.launch(
+            defaults: defaults,
+            environment: ["XCTestConfigurationFilePath": "/tmp/x"],
+        ) { _ in .quit })
         let inMemory = session.container.configurations.allSatisfy(\.isStoredInMemoryOnly)
         #expect(inMemory)
     }

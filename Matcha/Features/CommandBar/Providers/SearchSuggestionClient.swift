@@ -14,7 +14,6 @@ nonisolated enum SearchSuggestionError: Error, Equatable {
 nonisolated struct SearchSuggestionClient: Sendable {
     typealias Load = @Sendable (URLRequest) async throws -> (Data, URLResponse)
 
-    static let shared = SearchSuggestionClient()
     /// Maximum accepted size of a response, in bytes.
     static let maximumSize = 65536
 

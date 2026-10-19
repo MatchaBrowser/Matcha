@@ -20,7 +20,7 @@ extension BrowserSession {
         defaults: UserDefaults = .standard,
         environment: [String: String] = ProcessInfo.processInfo.environment,
         storeURL: URL? = nil,
-        onFailure: @MainActor (any Error) -> StoreFailureChoice = StoreFailureAlert.ask,
+        onFailure: @MainActor (any Error) -> StoreFailureChoice,
         services: SessionServices = SessionServices(),
     ) -> BrowserSession? {
         let inMemory = TestEnvironment.usesInMemoryStore(defaults: defaults, environment: environment)

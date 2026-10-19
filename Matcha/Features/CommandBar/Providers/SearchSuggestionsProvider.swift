@@ -17,12 +17,17 @@ final class SearchSuggestionsProvider: CommandProvider {
     private let fetch: Fetch
     private let sleep: Sleep
 
-    /// `fetch` and `sleep` are replaced in tests.
+    /// `fetch` and `sleep` are replaced in tests; by default, a client of its own (a bar's: no shared state).
     init(
-        fetch: @escaping Fetch = { try await SearchSuggestionClient.shared.suggestions(for: $0, engine: $1) },
+        fetch: Fetch? = nil,
         sleep: @escaping Sleep = { try await Task.sleep(for: $0) },
     ) {
-        self.fetch = fetch
+        if let fetch {
+            self.fetch = fetch
+        } else {
+            let client = SearchSuggestionClient()
+            self.fetch = { try await client.suggestions(for: $0, engine: $1) }
+        }
         self.sleep = sleep
     }
 

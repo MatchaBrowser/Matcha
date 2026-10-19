@@ -13,40 +13,34 @@ import WebKit
 ///   (persistent controller, `.default()`).
 /// - User decisions (permissions, websites, private windows): remembered by `ExtensionStateStore`, restored at each
 ///   load; nothing is ever granted without the user.
-/// - Windows and tabs: `ExtensionWindows`; controller delegate: `+Delegate`.
+/// - Windows, tabs and the pages opened for extensions: `host` (`ExtensionHost`, interface given by the app); answers
+///   to WebKit: `ExtensionControllerDelegate`; buttons: `toolbar` (audit C3). One for the app (`AppEnvironment`).
 @MainActor
 @Observable
 final class ExtensionManager: NSObject {
     /// Scheme of the extension pages (options, popup, background).
     nonisolated static let scheme = "webkit-extension"
 
-    /// The app's instance; in the unit tests' host app and with a test store (UI tests), a non-persistent controller,
-    /// with nothing saved or loaded.
-    static let shared = ExtensionManager.makeShared()
-
     @ObservationIgnored let controller: WKWebExtensionController
-    @ObservationIgnored let windows = ExtensionWindows()
+    /// The app's windows as extensions see them, owned by the manager; nil (no interface): nothing opens.
+    @ObservationIgnored var host: (any ExtensionHost)?
     @ObservationIgnored let store: ExtensionStateStore
     /// Folder of the installed extensions; nil (tests): nothing loaded at launch.
     @ObservationIgnored let directory: URL?
-    /// Asks the user what an extension requests (replaced in the tests).
-    @ObservationIgnored var permissionPrompter: any ExtensionPermissionPrompting = ExtensionPermissionAlert()
+    /// Asks the user what an extension requests: the app's alert; without it, every request is denied.
+    @ObservationIgnored var permissionPrompter: any ExtensionPermissionPrompting = RefusingPermissionPrompter()
     /// Extensions whose request waits for the user: one at a time each (audit E5).
     @ObservationIgnored var promptingContexts: Set<ObjectIdentifier> = []
-    /// Popovers of the extensions' actions, anchored to their button (`popups.anchor`).
-    @ObservationIgnored let popups = ExtensionPopupPresenter()
     /// Loaded extensions, by identifier.
     private(set) var contexts: [String: WKWebExtensionContext] = [:]
     /// Installed extensions, loaded or not, by identifier (task 6.4): what is needed to show them in the settings.
     private(set) var installed: [String: WKWebExtension] = [:]
     /// Folders of `directory`, read at creation and after each installation or removal: never from a view (audit C7).
     private(set) var installedFolders: [String] = []
-    /// Changes at each update of an action (icon, title, badge): the buttons follow it (task 6.5).
-    private(set) var actionRevision = 0
-    /// Changes when the buttons to show change (button hidden or shown, private windows; task 6.5).
-    private(set) var buttonsRevision = 0
-    /// Displayed extension buttons, to anchor their popover to them (task 6.5).
-    @ObservationIgnored let buttonAnchors = ExtensionButtonAnchors()
+    /// Extension buttons next to the address (task 6.5).
+    @ObservationIgnored private(set) lazy var toolbar = ExtensionToolbar(manager: self)
+    /// Answers to WebKit (the controller holds it weakly).
+    @ObservationIgnored private(set) lazy var controllerDelegate = ExtensionControllerDelegate(manager: self)
     /// Answers to native messages (refused), spaced out per extension.
     @ObservationIgnored var nativeMessages = NativeMessageThrottle()
     /// Extensions that already had a native message refused (one log line each).
@@ -65,8 +59,7 @@ final class ExtensionManager: NSObject {
         self.directory = directory
         super.init()
         refreshInstalledFolders()
-        controller.delegate = self
-        windows.sink = controller
+        controller.delegate = controllerDelegate
         observeContexts()
         // Developer tools: extension pages inspectable (Safari > Develop) depending on the setting.
         observers
@@ -75,35 +68,11 @@ final class ExtensionManager: NSObject {
                     self?.contexts.values.forEach { $0.isInspectable = WebInspection.isEnabled() }
                 }
             })
-        // An action's popover below its extension's button (in the window and, if there are several, the card of the
-        // targeted tab), otherwise at the top right corner of the window.
-        popups.anchor = { [weak self] action, window in
-            guard let self, let context = action.webExtensionContext, let identifier = identifier(of: context),
-                  let view = buttonAnchors.view(for: identifier, tabID: (action.associatedTab as? ExtensionTab)?.tabID, in: window)
-            else {
-                return ExtensionPopupPresenter.topTrailingAnchor(in: window)
-            }
-            return (view, view.bounds)
-        }
     }
 
     /// A manager that goes away (tests) takes its observers with it (audit C7).
     isolated deinit {
         observers.forEach(NotificationCenter.default.removeObserver)
-    }
-
-    private static func makeShared() -> ExtensionManager {
-        // Host app of the unit tests, and test store (UI tests): nothing of the user's is read or written (same
-        // settings and same container as the app).
-        guard !TestEnvironment.usesInMemoryStore() else {
-            return ExtensionManager(configuration: .nonPersistent(), store: ExtensionStateStore(defaults: nil), directory: nil)
-        }
-        let applicationSupport = FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask).first
-        return ExtensionManager(
-            configuration: .default(),
-            store: ExtensionStateStore(defaults: .standard),
-            directory: applicationSupport.map(ExtensionInstallDirectory.directory(in:)),
-        )
     }
 
     /// True for the address of an extension page.
@@ -177,7 +146,7 @@ final class ExtensionManager: NSObject {
         context.isInspectable = WebInspection.isEnabled()
         (store.state(for: identifier) ?? ExtensionState()).apply(to: context)
         // WebKit asks for the open windows during loading: they must be up to date.
-        windows.update(beforeLoading: true)
+        host?.update(beforeLoading: true)
         try controller.load(context)
         contexts[identifier] = context
         installed[identifier] = webExtension
@@ -206,13 +175,8 @@ final class ExtensionManager: NSObject {
         installed[identifier] = nil
     }
 
-    /// An action changed (task 6.5: extension buttons).
-    func actionDidUpdate() {
-        actionRevision &+= 1
-    }
-
-    /// The buttons to show have changed (task 6.5).
-    func buttonsDidChange() {
-        buttonsRevision &+= 1
+    /// Matcha's identifier for `context` (settings, folder), if it is loaded.
+    func identifier(of context: WKWebExtensionContext) -> String? {
+        contexts.first { $0.value === context }?.key
     }
 }

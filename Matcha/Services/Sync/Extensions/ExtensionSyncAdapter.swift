@@ -105,7 +105,7 @@ final class ExtensionSyncAdapter {
         if hadPrivateAccess != fields.allowsPrivateWindows {
             manager.setAccessToPrivateData(fields.allowsPrivateWindows, identifier: identifier)
         }
-        manager.buttonsDidChange()
+        manager.toolbar.buttonsDidChange()
         if wasEnabled != fields.isEnabled {
             Task { [manager] in
                 do {
@@ -159,17 +159,4 @@ final class ExtensionSyncAdapter {
     static func dates(_ expirations: [String: Date?]) -> [String: Date] {
         expirations.mapValues { $0 ?? .distantFuture }
     }
-}
-
-extension ExtensionSyncAdapter {
-    /// Sync of the app's extensions, with its settings in `Application Support/Sync/extensions.json`. During tests
-    /// (unit tests and test store), everything stays in memory.
-    static let shared: ExtensionSyncAdapter = {
-        let url = TestEnvironment.usesInMemoryStore() ? nil : FileManager.default.urls(
-            for: .applicationSupportDirectory,
-            in: .userDomainMask,
-        ).first?
-            .appendingPathComponent("Sync/extensions.json")
-        return ExtensionSyncAdapter(manager: .shared, synced: SyncedExtensions(url: url))
-    }()
 }

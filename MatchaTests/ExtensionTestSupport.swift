@@ -153,6 +153,10 @@ enum TestExtension {
     ) -> ExtensionManager {
         let manager = ExtensionManager(configuration: .nonPersistent(), store: ExtensionStateStore(defaults: nil), directory: directory)
         manager.permissionPrompter = prompter
+        // Its windows, as the app gives them (`AppEnvironment`).
+        let windows = ExtensionWindows(sink: manager.controller)
+        windows.manager = manager
+        manager.host = windows
         return manager
     }
 
@@ -201,5 +205,15 @@ enum TestExtension {
     /// Mark set by the content script in the page of `webView`: “1”, otherwise “none”.
     static func marker(in webView: WKWebView) async -> String? {
         try? await webView.evaluateJavaScript("document.body ? (document.body.dataset.matchaExtension || 'none') : 'none'") as? String
+    }
+}
+
+extension ExtensionManager {
+    /// The windows of a test manager (`TestExtension.manager`).
+    var testWindows: ExtensionWindows {
+        guard let windows = host as? ExtensionWindows else {
+            preconditionFailure("Manager made without its windows")
+        }
+        return windows
     }
 }

@@ -439,7 +439,7 @@ Rien n'est branché : il n'y a pas de transport, et seuls les tests créent `Syn
 - un `Logger` par module ;
 - les règles SwiftData pour CloudKit respectées et testées.
 
-**C1. Couches**
+**✅ C1. Couches** — corrigé : couches basses sans interface, protocoles `PageDialogPresenting`, `PopupWindowHosting`, `ExtensionHost` ; dossiers de `CLAUDE.md` à jour.
 - **Problème** :
   - `Services/` dépend de `Features/` : `ExtensionOwners` utilise `WindowModel` et `MiniWindowManager`, `ExtensionTab` utilise `PeekActions`.
   - De l'interface vit dans `Services/Extensions` : `NSAlert`, `NSPopover`, registre de vues.
@@ -447,11 +447,11 @@ Rien n'est branché : il n'y a pas de transport, et seuls les tests créent `Syn
   - La liste des dossiers de `CLAUDE.md` est périmée.
 - **Correction** : déplacer l'interface dans `Features/Extensions`, et injecter un protocole `ExtensionHost`.
 
-**C2. Singletons**
+**✅ C2. Singletons** — corrigé : aucun `static let shared`, racine de composition `AppEnvironment`, services donnés par `SessionServices` et `.environment`.
 - **Problème** : 9 `static let shared`, et `WebConfigurationFactory` est statique : il attache `ExtensionManager.shared` à toutes les pages.
 - **Correction** : une racine de composition dans `MatchaApp.init`, avec injection par `.environment` et par les initialiseurs.
 
-**C3. Types trop gros**
+**✅ C3. Types trop gros** — corrigé : `ExtensionManager` découpé (registre, `ExtensionControllerDelegate`, `ExtensionToolbar`, hôte `ExtensionWindows`) ; actions de `BrowserWindowView` à part.
 - **Problème** :
   - `TabManager` fait 872 lignes sur 9 fichiers.
   - `ExtensionManager` fait 722 lignes sur 6 fichiers et a une dizaine de rôles.

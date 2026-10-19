@@ -4,8 +4,8 @@ import SwiftUI
 /// brings back the default one. A refused shortcut is explained underneath.
 struct ShortcutRecorderField: View {
     let command: MenuShortcut
-    private let store = MenuShortcutStore.shared
-    private let recorder = ShortcutRecorder.shared
+    let store: MenuShortcutStore
+    let recorder: ShortcutRecorder
 
     private var isRecording: Bool {
         recorder.command == command

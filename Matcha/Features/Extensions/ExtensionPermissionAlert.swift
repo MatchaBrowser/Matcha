@@ -1,13 +1,6 @@
 import AppKit
 import OSLog
 
-/// Asks the user what an extension requests while running (task 6.3). A single answer, and true only if the user
-/// accepts: nothing is ever granted automatically. Replaced in the tests.
-@MainActor
-protocol ExtensionPermissionPrompting: AnyObject {
-    func ask(_ request: ExtensionPermissionRequest, completion: @escaping @MainActor (Bool) -> Void)
-}
-
 /// Alert as a sheet on the app's main window: the extension's name, the requested permissions and websites, “Don't
 /// Allow” (default button: Return grants nothing) and “Allow”. AppKit queues it behind a sheet already open (audit
 /// E5: a request is no longer refused for that). Without a window, the request is denied.

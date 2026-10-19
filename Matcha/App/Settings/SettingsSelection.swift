@@ -15,7 +15,5 @@ final class SettingsSelection {
         case advanced
     }
 
-    static let shared = SettingsSelection()
-
     var tab = Tab.general
 }

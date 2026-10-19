@@ -121,8 +121,13 @@ struct MenuShortcutTests {
         ))
     }
 
-    @Test func `edit find reaches the app when no view takes it`() {
+    @Test func `edit find reaches the app when no view takes it`() throws {
         let find = #selector(AppDelegate.performFindPanelAction(_:))
-        #expect(NSApp.target(forAction: find, to: nil, from: nil) != nil)
+        // SwiftUI's app delegate, which forwards to Matcha's.
+        let target = try #require(NSApp.target(forAction: find, to: nil, from: nil) as? NSObject)
+        let delegate = try #require((target as? AppDelegate) ?? target.forwardingTarget(for: find) as? AppDelegate)
+        // Given by `MatchaApp.init` (audit C2), like the handler of the links from other apps.
+        #expect(delegate.pageFind != nil)
+        #expect(delegate.incomingLinks.handler != nil)
     }
 }

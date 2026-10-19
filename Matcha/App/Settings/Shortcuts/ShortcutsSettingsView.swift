@@ -5,7 +5,8 @@ import SwiftUI
 /// and the mini window's global shortcut (none by default, audit H5). macOS's standard commands (Edit, Find, Window)
 /// are changed in System Settings, like in any app.
 struct ShortcutsSettingsView: View {
-    private let store = MenuShortcutStore.shared
+    let store: MenuShortcutStore
+    let recorder: ShortcutRecorder
 
     var body: some View {
         Form {
@@ -13,7 +14,7 @@ struct ShortcutsSettingsView: View {
                 Section(menu.title) {
                     ForEach(MenuShortcut.allCases.filter { $0.menu == menu }, id: \.self) { command in
                         LabeledContent(command.title) {
-                            ShortcutRecorderField(command: command)
+                            ShortcutRecorderField(command: command, store: store, recorder: recorder)
                         }
                     }
                 }
@@ -43,7 +44,7 @@ struct ShortcutsSettingsView: View {
                 HStack {
                     Spacer()
                     Button("Restore Defaults") {
-                        ShortcutRecorder.shared.stop()
+                        recorder.stop()
                         store.resetAll()
                     }
                     .disabled(!store.hasCustomizations)
@@ -59,7 +60,7 @@ struct ShortcutsSettingsView: View {
         }
         .formStyle(.grouped)
         .frame(height: 560)
-        .onDisappear { ShortcutRecorder.shared.stop() }
+        .onDisappear { recorder.stop() }
     }
 
     /// The global shortcut can't be one of the menus' (except “New Mini Window”).

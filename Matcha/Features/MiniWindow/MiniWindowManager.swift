@@ -68,7 +68,6 @@ final class MiniWindowManager {
             return
         }
         MiniWindowShortcut.removeFormerDefault()
-        MenuShortcutStore.shared.setGlobalMiniWindowKey(MiniWindowShortcut.menuKey(of: KeyboardShortcuts.getShortcut(for: .openMiniWindow)))
         shortcutTask = Task { [weak self] in
             for await _ in KeyboardShortcuts.events(.keyDown, for: .openMiniWindow) {
                 guard let self else {

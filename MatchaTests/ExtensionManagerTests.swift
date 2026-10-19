@@ -122,8 +122,8 @@ struct ExtensionManagerTests {
         let session = try BrowserSession(container: BrowserSchema.makeContainer(inMemory: true))
         let model = WindowModel(session: session, defaults: nil)
         let manager = TestExtension.manager()
-        manager.windows.windowDidAppear(model, window: nil)
-        manager.windows.update()
+        manager.testWindows.windowDidAppear(model, window: nil)
+        manager.testWindows.update()
         let (context, folder) = try await TestExtension.load(in: manager)
         defer { try? FileManager.default.removeItem(at: folder) }
         try await TestExtension.waitForBackground(of: context)
@@ -134,7 +134,7 @@ struct ExtensionManagerTests {
             manager.attach(to: configuration)
             let tabManager = model.space.tabManager
             let opener = tabManager.insertTab(configuration: configuration, after: nil, select: true)
-            manager.windows.update()
+            manager.testWindows.update()
             var components = try #require(URLComponents(url: TestPages.url("opener"), resolvingAgainstBaseURL: false))
             components.fragment = "matcha-open-tab"
             try opener.load(#require(components.url))
@@ -153,7 +153,7 @@ struct ExtensionManagerTests {
             try await waitUntil { created.url != nil }
             #expect(created.url == URL(string: "about:blank"))
             #expect(tabManager.selectedTab === opener)
-            #expect(manager.windows.adapter(for: created) != nil)
+            #expect(manager.testWindows.adapter(for: created) != nil)
             opener.unload(resettingTo: nil, title: nil)
         }
     }
@@ -167,9 +167,10 @@ struct ExtensionManagerTests {
         defer { try? FileManager.default.removeItem(at: folder) }
         let requested: Set<WKWebExtension.Permission> = [.cookies, .storage]
         let refused = await withCheckedContinuation { continuation in
-            manager.webExtensionController(manager.controller, promptForPermissions: requested, in: nil, for: context) { allowed, _ in
-                continuation.resume(returning: allowed)
-            }
+            manager.controllerDelegate
+                .webExtensionController(manager.controller, promptForPermissions: requested, in: nil, for: context) { allowed, _ in
+                    continuation.resume(returning: allowed)
+                }
         }
         #expect(refused.isEmpty)
         #expect(prompter.requests.last?.permissions == ["cookies", "storage"])
@@ -178,9 +179,10 @@ struct ExtensionManagerTests {
         prompter.answer = true
         let urls: Set<URL> = try [#require(URL(string: "https://example.com/a"))]
         let allowed = await withCheckedContinuation { continuation in
-            manager.webExtensionController(manager.controller, promptForPermissionToAccess: urls, in: nil, for: context) { allowed, _ in
-                continuation.resume(returning: allowed)
-            }
+            manager.controllerDelegate
+                .webExtensionController(manager.controller, promptForPermissionToAccess: urls, in: nil, for: context) { allowed, _ in
+                    continuation.resume(returning: allowed)
+                }
         }
         #expect(allowed == urls)
         #expect(prompter.requests.last?.websites == ["example.com"])
@@ -193,13 +195,15 @@ struct ExtensionManagerTests {
         let (context, folder) = try await TestExtension.load(in: manager)
         defer { try? FileManager.default.removeItem(at: folder) }
         let answers = Answers()
-        manager.webExtensionController(manager.controller, promptForPermissions: [.cookies], in: nil, for: context) { allowed, _ in
-            MainActor.assumeIsolated { answers.values.append(allowed) }
-        }
+        manager.controllerDelegate
+            .webExtensionController(manager.controller, promptForPermissions: [.cookies], in: nil, for: context) { allowed, _ in
+                MainActor.assumeIsolated { answers.values.append(allowed) }
+            }
         // A second request while the first waits: refused without being shown.
-        manager.webExtensionController(manager.controller, promptForPermissions: [.storage], in: nil, for: context) { allowed, _ in
-            MainActor.assumeIsolated { answers.values.append(allowed) }
-        }
+        manager.controllerDelegate
+            .webExtensionController(manager.controller, promptForPermissions: [.storage], in: nil, for: context) { allowed, _ in
+                MainActor.assumeIsolated { answers.values.append(allowed) }
+            }
         #expect(prompter.pending.count == 1)
         #expect(answers.values == [[]])
 

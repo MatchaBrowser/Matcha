@@ -7,7 +7,8 @@ struct HistoryCommands: Commands {
     @FocusedValue(\.tabManager) private var tabManager
     @FocusedValue(\.windowActions) private var windowActions
     @Environment(\.openWindow) private var openWindow
-    private let shortcuts = MenuShortcutStore.shared
+    /// Shortcuts chosen in Settings > Shortcuts.
+    let shortcuts: MenuShortcutStore
 
     /// Front page: the active mini window's, the peek if it is open, otherwise the selected tab.
     private var frontTab: BrowserTab? {

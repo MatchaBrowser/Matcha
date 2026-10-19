@@ -179,7 +179,7 @@ final class ExtensionsSettingsModel {
     }
 
     func setShowsButton(_ shows: Bool, for identifier: String) {
-        manager.setShowsButton(shows, identifier: identifier)
+        manager.toolbar.setShowsButton(shows, identifier: identifier)
     }
 
     func openOptions(of identifier: String) {
@@ -205,7 +205,7 @@ final class ExtensionsSettingsModel {
             isEnabled: manager.isEnabled(identifier),
             hasOptionsPage: manager.contexts[identifier]?.optionsPageURL != nil,
             allowsPrivateWindows: state?.hasAccessToPrivateData ?? false,
-            showsButton: manager.showsButton(identifier),
+            showsButton: manager.toolbar.showsButton(identifier),
             // The saved decisions follow the extension's (`saveState`): observed, unlike its context.
             grantedSites: Array((state?.grantedMatchPatterns ?? [:]).keys).sorted(),
         )

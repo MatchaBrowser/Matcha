@@ -6,12 +6,13 @@ import SwiftUI
 struct ExtensionWindowModifier: ViewModifier {
     let model: WindowModel
     let window: NSWindow?
+    @Environment(\.extensionWindows) private var windows
 
     func body(content: Content) -> some View {
         content
-            .onAppear { ExtensionManager.shared.windows.windowDidAppear(model, window: window) }
-            .onChange(of: window) { ExtensionManager.shared.windows.windowDidAppear(model, window: window) }
-            .onDisappear { ExtensionManager.shared.windows.windowDidDisappear(model) }
+            .onAppear { windows?.windowDidAppear(model, window: window) }
+            .onChange(of: window) { windows?.windowDidAppear(model, window: window) }
+            .onDisappear { windows?.windowDidDisappear(model) }
     }
 }
 

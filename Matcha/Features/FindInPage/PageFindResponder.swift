@@ -6,8 +6,9 @@ import WebKit
 /// Find Next (⌘G), Find Previous (⇧⌘G), Use Selection for Find (⌘E), Jump to Selection (⌘J). The app delegate receives
 /// them when no view before it does: a page doesn't, nor a text field (its editor only searches with a find bar of
 /// its own), so they work from the command bar and from the find field too. “Find and Replace…” stays disabled.
+/// One for the app (`AppEnvironment`); the browser windows register with it (`PageFindWindowModifier`).
 @MainActor
-enum PageFindResponder {
+final class PageFindResponder {
     /// A browser window: its front page, and the closing of its command bar (one text entry at a time).
     struct Window {
         weak var window: NSWindow?
@@ -15,22 +16,24 @@ enum PageFindResponder {
         let closeCommandBar: () -> Void
     }
 
-    private static var windows: [ObjectIdentifier: Window] = [:]
+    private var windows: [ObjectIdentifier: Window] = [:]
+    /// The app's mini windows: the active one's page comes first.
+    weak var miniWindows: MiniWindowManager?
 
-    static func register(_ window: Window) {
+    func register(_ window: Window) {
         windows = windows.filter { $0.value.window != nil }
         if let nsWindow = window.window {
             windows[ObjectIdentifier(nsWindow)] = window
         }
     }
 
-    static func unregister(_ window: NSWindow?) {
+    func unregister(_ window: NSWindow?) {
         windows = windows.filter { $0.value.window != nil && $0.value.window !== window }
     }
 
     // MARK: Commands
 
-    static func canPerform(tag: Int) -> Bool {
+    func canPerform(tag: Int) -> Bool {
         guard let target = target() else {
             return false
         }
@@ -44,7 +47,7 @@ enum PageFindResponder {
         }
     }
 
-    static func perform(tag: Int) {
+    func perform(tag: Int) {
         guard let target = target() else {
             return
         }
@@ -65,12 +68,12 @@ enum PageFindResponder {
         }
     }
 
-    static var hasPage: Bool {
+    var hasPage: Bool {
         target() != nil
     }
 
     /// ⌘J: the page scrolls to its selected text.
-    static func jumpToSelection() {
+    func jumpToSelection() {
         let script = """
         (() => {
             const selection = getSelection();
@@ -83,8 +86,8 @@ enum PageFindResponder {
     // MARK: Target
 
     /// The active mini window's page, otherwise the front page of the active browser window.
-    private static func target() -> (page: BrowserTab, closeCommandBar: () -> Void)? {
-        if let mini = ExtensionManager.shared.windows.miniWindows?.keyWindow {
+    private func target() -> (page: BrowserTab, closeCommandBar: () -> Void)? {
+        if let mini = miniWindows?.keyWindow {
             guard let page = FrontPage.page(miniWindowTab: mini.tab, tabManager: nil) else {
                 return nil
             }
@@ -101,7 +104,7 @@ enum PageFindResponder {
     }
 
     /// ⌘E: the selected text of the page becomes the searched text (never logged).
-    private static func useSelection(of page: BrowserTab) {
+    private func useSelection(of page: BrowserTab) {
         page.webView?.evaluateJavaScript("getSelection().toString()") { result, error in
             if let error {
                 Logger.browser.error("Unreadable page selection: \(error.logSummary, privacy: .public)")

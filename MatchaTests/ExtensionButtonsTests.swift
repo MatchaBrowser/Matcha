@@ -30,26 +30,26 @@ struct ExtensionButtonsTests {
         defer { try? FileManager.default.removeItem(at: folder) }
         let identifier = try #require(manager.identifier(of: context))
 
-        #expect(manager.buttonExtensions(isPrivate: false).map(\.identifier) == [identifier])
-        #expect(manager.buttonExtensions(isPrivate: true).isEmpty)
+        #expect(manager.toolbar.buttonExtensions(isPrivate: false).map(\.identifier) == [identifier])
+        #expect(manager.toolbar.buttonExtensions(isPrivate: true).isEmpty)
         manager.setAccessToPrivateData(true, identifier: identifier)
-        #expect(manager.buttonExtensions(isPrivate: true).map(\.identifier) == [identifier])
+        #expect(manager.toolbar.buttonExtensions(isPrivate: true).map(\.identifier) == [identifier])
 
-        let revision = manager.buttonsRevision
-        manager.setShowsButton(false, identifier: identifier)
-        #expect(manager.buttonsRevision != revision)
-        #expect(!manager.showsButton(identifier))
-        #expect(manager.buttonExtensions(isPrivate: false).isEmpty)
+        let revision = manager.toolbar.buttonsRevision
+        manager.toolbar.setShowsButton(false, identifier: identifier)
+        #expect(manager.toolbar.buttonsRevision != revision)
+        #expect(!manager.toolbar.showsButton(identifier))
+        #expect(manager.toolbar.buttonExtensions(isPrivate: false).isEmpty)
         // Remembered, even when WebKit changes the decisions or on reload.
         manager.saveAllStates()
         manager.unload(identifier: identifier)
         #expect(manager.store.state(for: identifier)?.showsButton == false)
         try await manager.load(resourceBaseURL: folder, identifier: identifier)
-        #expect(manager.buttonExtensions(isPrivate: false).isEmpty)
+        #expect(manager.toolbar.buttonExtensions(isPrivate: false).isEmpty)
 
-        manager.setShowsButton(true, identifier: identifier)
+        manager.toolbar.setShowsButton(true, identifier: identifier)
         #expect(manager.store.state(for: identifier)?.showsButton == nil)
-        #expect(manager.buttonExtensions(isPrivate: false).map(\.identifier) == [identifier])
+        #expect(manager.toolbar.buttonExtensions(isPrivate: false).map(\.identifier) == [identifier])
         manager.unload(identifier: identifier)
     }
 
@@ -57,15 +57,15 @@ struct ExtensionButtonsTests {
         let manager = TestExtension.manager()
         let (identifier, folder) = try await loadExtensionWithAction(in: manager)
         defer { try? FileManager.default.removeItem(at: folder) }
-        let action = try #require(manager.action(of: identifier, for: nil))
+        let action = try #require(manager.toolbar.action(of: identifier, for: nil))
         #expect(action.label == "Matcha Test Action")
         #expect(action.presentsPopup)
 
-        let revision = manager.actionRevision
+        let revision = manager.toolbar.actionRevision
         try await TestExtension.waitForBackground(of: #require(manager.contexts[identifier]))
-        try await waitUntil { manager.action(of: identifier, for: nil)?.badgeText == "7" }
+        try await waitUntil { manager.toolbar.action(of: identifier, for: nil)?.badgeText == "7" }
         // WebKit reports the update a little after the badge changes.
-        try await waitUntil { manager.actionRevision != revision }
+        try await waitUntil { manager.toolbar.actionRevision != revision }
         manager.unload(identifier: identifier)
     }
 
@@ -81,16 +81,16 @@ struct ExtensionButtonsTests {
         )
         let button = NSView(frame: CGRect(x: 10, y: 10, width: 26, height: 26))
         window.contentView?.addSubview(button)
-        manager.buttonAnchors.register(button, identifier: identifier, tabID: nil)
-        let action = try #require(manager.action(of: identifier, for: nil))
+        manager.testWindows.buttonAnchors.register(button, identifier: identifier, tabID: nil)
+        let action = try #require(manager.toolbar.action(of: identifier, for: nil))
 
-        let anchor = try #require(manager.popups.anchor(action, window))
+        let anchor = try #require(manager.testWindows.popups.anchor(action, window))
         #expect(anchor.view === button)
         #expect(anchor.rect == button.bounds)
 
         // Without a button (hidden): top right corner of the window.
-        manager.buttonAnchors.unregister(button)
-        #expect(manager.popups.anchor(action, window)?.view === window.contentView)
+        manager.testWindows.buttonAnchors.unregister(button)
+        #expect(manager.testWindows.popups.anchor(action, window)?.view === window.contentView)
         manager.unload(identifier: identifier)
     }
 
@@ -150,7 +150,7 @@ struct ExtensionButtonsTests {
         let context = try await manager.load(resourceBaseURL: folder, identifier: identifier)
         context.setPermissionStatus(.grantedExplicitly, for: .nativeMessaging)
         try await TestExtension.waitForBackground(of: context)
-        try await waitUntil { manager.action(of: identifier, for: nil)?.badgeText == "err" }
+        try await waitUntil { manager.toolbar.action(of: identifier, for: nil)?.badgeText == "err" }
         manager.unload(identifier: identifier)
     }
 }

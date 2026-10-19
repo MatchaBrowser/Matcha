@@ -63,8 +63,8 @@ struct ExtensionPageFramesTests {
         let session = try BrowserSession(container: BrowserSchema.makeContainer(inMemory: true))
         let model = WindowModel(session: session, defaults: nil)
         let manager = TestExtension.manager()
-        manager.windows.windowDidAppear(model, window: nil)
-        manager.windows.update()
+        manager.testWindows.windowDidAppear(model, window: nil)
+        manager.testWindows.update()
         let identifier = TestExtension.uniqueIdentifier("frames")
         let context = try await manager.load(resourceBaseURL: folder, identifier: identifier)
         for pattern in context.webExtension.allRequestedMatchPatterns {
@@ -77,7 +77,7 @@ struct ExtensionPageFramesTests {
         configuration.websiteDataStore = WKWebsiteDataStore(forIdentifier: storeID)
         manager.attach(to: configuration)
         let tab = model.space.tabManager.insertTab(configuration: configuration, after: nil, select: true)
-        manager.windows.update()
+        manager.testWindows.update()
         tab.load(TestPages.url("frames"))
         var reply = ""
         for _ in 0 ..< 300 where reply.isEmpty {
