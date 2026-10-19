@@ -16,7 +16,8 @@ struct ExtensionButtonsTests {
         manifest["action"] = ["default_title": "Matcha Test Action", "default_popup": "popup.html"]
         try JSONSerialization.data(withJSONObject: manifest).write(to: manifestURL)
         try Data("<p>Popup</p>".utf8).write(to: folder.appendingPathComponent("popup.html"))
-        try Data(#"browser.action.setBadgeText({ text: "7" });"#.utf8)
+        // A second later: once the test holds the action and its revision, so that the update comes after them.
+        try Data(#"setTimeout(() => browser.action.setBadgeText({ text: "7" }), 1000);"#.utf8)
             .write(to: folder.appendingPathComponent("test-extension-background.js"))
         let identifier = TestExtension.uniqueIdentifier("buttons")
         try await manager.load(resourceBaseURL: folder, identifier: identifier)
@@ -63,7 +64,8 @@ struct ExtensionButtonsTests {
         let revision = manager.actionRevision
         try await TestExtension.waitForBackground(of: #require(manager.contexts[identifier]))
         try await waitUntil { manager.action(of: identifier, for: nil)?.badgeText == "7" }
-        #expect(manager.actionRevision != revision)
+        // WebKit reports the update a little after the badge changes.
+        try await waitUntil { manager.actionRevision != revision }
         manager.unload(identifier: identifier)
     }
 
