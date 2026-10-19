@@ -6,7 +6,7 @@ import WebKit
 @MainActor
 struct MiniCommandBarModelTests {
     private let engine = FakeSuggestionEngine()
-    private let tab = BrowserTab(configuration: WebConfigurationFactory.makeConfiguration(websiteDataStore: .nonPersistent()))
+    private let tab = BrowserTab(configuration: WebConfigurationFactory().makeConfiguration(websiteDataStore: .nonPersistent()))
     private let settings = CommandBarSettings(searchEngine: .google, newTabPage: .blank, homePage: "", showsSearchSuggestions: true)
 
     private func makeModel() -> MiniCommandBarModel {

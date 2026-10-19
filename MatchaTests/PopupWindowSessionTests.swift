@@ -13,17 +13,17 @@ final class PopupWindowSessionTests {
     private let model: WindowModel
 
     init() throws {
-        session = try BrowserSession(container: BrowserSchema.makeContainer(inMemory: true))
+        session = try BrowserSession(container: BrowserSchema.makeContainer(inMemory: true), services: .withPopupWindows())
         model = WindowModel(session: session, defaults: nil)
-        session.popupWindows.prepareForTests()
+        session.popupManager.prepareForTests()
     }
 
     isolated deinit {
-        session.popupWindows.closeAll()
+        session.popupManager.closeAll()
     }
 
     private var popups: PopupWindowManager {
-        session.popupWindows
+        session.popupManager
     }
 
     /// Selected tab of the Space `space` on the local page `name`, once loaded.
@@ -32,7 +32,7 @@ final class PopupWindowSessionTests {
         in space: SpaceSession,
         dataStore: WKWebsiteDataStore = .nonPersistent(),
     ) async throws -> BrowserTab {
-        let configuration = WebConfigurationFactory.makeConfiguration(websiteDataStore: dataStore)
+        let configuration = WebConfigurationFactory().makeConfiguration(websiteDataStore: dataStore)
         configuration.setURLSchemeHandler(TestPages(), forURLScheme: TestPages.scheme)
         let tab = space.tabManager.insertTab(configuration: configuration, after: nil, select: true)
         tab.load(TestPages.url(name))
@@ -74,24 +74,24 @@ final class PopupWindowSessionTests {
     }
 
     @Test func `sign-in windows of a private window are private, dark, and close with it`() async throws {
-        let privateSession = BrowserSession.makePrivate()
-        privateSession.popupWindows.prepareForTests()
+        let privateSession = BrowserSession.makePrivate(services: .withPopupWindows())
+        privateSession.popupManager.prepareForTests()
         let space = privateSession.spaces[0]
         let tab = try await openTab("ouvrant", in: space)
 
         try await tab.loadedWebView.openWindow(TestPages.url("connexion"), features: "width=500,height=600")
-        try await waitUntil { privateSession.popupWindows.windows.count == 1 }
-        let popup = privateSession.popupWindows.windows[0]
+        try await waitUntil { privateSession.popupManager.windows.count == 1 }
+        let popup = privateSession.popupManager.windows[0]
         let webView = try #require(popup.tab.webView)
 
         #expect(popup.window.appearance?.name == .darkAqua)
-        #expect(privateSession.popupWindows.historyScope(for: webView) == nil)
-        #expect(privateSession.popupWindows.downloadScope == privateSession.downloadScope)
+        #expect(privateSession.popupManager.historyScope(for: webView) == nil)
+        #expect(privateSession.popupManager.downloadScope == privateSession.downloadScope)
         #expect(popup.tab.configuration.websiteDataStore === tab.configuration.websiteDataStore)
         #expect(popups.windows.isEmpty)
 
-        privateSession.popupWindows.closeAll()
-        #expect(privateSession.popupWindows.windows.isEmpty)
+        privateSession.popupManager.closeAll()
+        #expect(privateSession.popupManager.windows.isEmpty)
         #expect(!popup.tab.isLoaded)
     }
 

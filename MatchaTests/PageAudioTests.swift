@@ -7,7 +7,7 @@ import WebKit
 /// right away when the web view is released (suspension, unloading) or the page's process terminates.
 @MainActor
 struct PageAudioTests {
-    private let tab = BrowserTab(configuration: WebConfigurationFactory.makeConfiguration(websiteDataStore: .nonPersistent()))
+    private let tab = BrowserTab(configuration: WebConfigurationFactory().makeConfiguration(websiteDataStore: .nonPersistent()))
     private let playing = PageAudioReport(frame: "main", isAudible: true)
     private let silent = PageAudioReport(frame: "main", isAudible: false)
 

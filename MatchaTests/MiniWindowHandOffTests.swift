@@ -43,7 +43,7 @@ struct MiniWindowHandOffTests {
     @Test func `another profile reloads the address there and frees the mini page`() async throws {
         let space = session.spaces[0]
         let other = session.addProfile(named: "Travail")
-        let tab = BrowserTab(configuration: WebConfigurationFactory
+        let tab = BrowserTab(configuration: session.services.pages
             .makeConfiguration(websiteDataStore: session.dataStore(for: space.record.profile)))
         // Address that the web view of the new profile can load (not the test scheme).
         let url = blankPage("travail")
@@ -60,7 +60,7 @@ struct MiniWindowHandOffTests {
 
     @Test func `a mini window without a page moves nothing`() {
         let space = session.spaces[0]
-        let tab = BrowserTab(configuration: WebConfigurationFactory.makeConfiguration(websiteDataStore: .nonPersistent()))
+        let tab = BrowserTab(configuration: WebConfigurationFactory().makeConfiguration(websiteDataStore: .nonPersistent()))
         #expect(MiniWindowHandOff.move(tab, profileID: space.record.profile?.id, to: space) == nil)
         #expect(space.tabManager.tabs.isEmpty)
     }

@@ -81,7 +81,7 @@ struct HistoryCommandBarTests {
         let history = try #require(session.history)
         let space = session.spaces[0]
         try record("https://example.com/docs", title: "Exemple docs", in: space)
-        let tab = BrowserTab(configuration: WebConfigurationFactory.makeConfiguration(websiteDataStore: .nonPersistent()))
+        let tab = BrowserTab(configuration: WebConfigurationFactory().makeConfiguration(websiteDataStore: .nonPersistent()))
         let model = MiniCommandBarModel(
             tab: tab,
             faviconService: FaviconService(directory: nil),

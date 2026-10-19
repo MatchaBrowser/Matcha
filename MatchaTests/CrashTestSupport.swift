@@ -12,7 +12,7 @@ final class CountingTestPages: NSObject, WKURLSchemeHandler {
 
     /// App configuration, with these pages under the `obtest:` scheme.
     func configuration() -> WKWebViewConfiguration {
-        let configuration = WebConfigurationFactory.makeConfiguration(websiteDataStore: .nonPersistent())
+        let configuration = WebConfigurationFactory().makeConfiguration(websiteDataStore: .nonPersistent())
         configuration.setURLSchemeHandler(self, forURLScheme: TestPages.scheme)
         return configuration
     }

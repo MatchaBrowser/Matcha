@@ -52,7 +52,7 @@ struct PageSecurityTests {
     }
 
     @Test func `http addresses are tried in https first`() {
-        let configuration = WebConfigurationFactory.makeConfiguration(websiteDataStore: .nonPersistent())
+        let configuration = WebConfigurationFactory().makeConfiguration(websiteDataStore: .nonPersistent())
         #expect(configuration.defaultWebpagePreferences.preferredHTTPSNavigationPolicy == .automaticFallbackToHTTP)
     }
 }

@@ -81,7 +81,7 @@ extension PopupWindowManager: TabHost {
     }
 
     /// A sign-in window that opens another one giving its size: one more, above it.
-    var popupWindows: PopupWindowManager? {
+    var popupWindows: (any PopupWindowHosting)? {
         self
     }
 }

@@ -136,6 +136,10 @@ final class FakePageDialogs: PageDialogPresenting {
         logins.append(login)
         return credential
     }
+
+    func save(_: BrowserTab) {}
+
+    func print(_: BrowserTab) {}
 }
 
 /// Sender of a challenge built by hand: the answer goes through the delegate's return value.

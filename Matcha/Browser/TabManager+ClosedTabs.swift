@@ -33,7 +33,7 @@ extension TabManager {
         // Today tabs by increasing rank: each one finds its neighbors already back.
         let ordered = group.sorted { ($0.todayIndex ?? .max) < ($1.todayIndex ?? .max) }
         let reopened = ordered.map { closed -> BrowserTab in
-            let configuration = WebConfigurationFactory.makeConfiguration(websiteDataStore: websiteDataStore)
+            let configuration = pages.makeConfiguration(websiteDataStore: websiteDataStore)
             let tab = BrowserTab(restoring: closed.stored, configuration: configuration)
             register(tab)
             updateLayout { $0.insertToday(tab.id, at: min(closed.todayIndex ?? 0, $0.today.count)) }

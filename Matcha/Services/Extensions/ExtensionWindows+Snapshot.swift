@@ -63,8 +63,10 @@ extension ExtensionWindows {
             sessions.append(miniWindows.session)
         }
         var seen = Set<ObjectIdentifier>()
-        for session in sessions where seen.insert(ObjectIdentifier(session.popupWindows)).inserted {
-            let manager = session.popupWindows
+        for session in sessions {
+            guard let manager = session.popupWindows as? PopupWindowManager, seen.insert(ObjectIdentifier(manager)).inserted else {
+                continue
+            }
             for controller in manager.windows {
                 var tabIDs: [UUID] = []
                 snapshot.add(controller.tab, owner: .popupWindow(controller, manager), isPinned: false, to: &tabIDs)

@@ -9,7 +9,7 @@ import WebKit
 /// private and close with it. The pages of sign-in windows have their own navigation delegate (host: this
 /// manager, `+TabHost`); never saved nor restored.
 @MainActor
-final class PopupWindowManager {
+final class PopupWindowManager: PopupWindowHosting {
     let faviconService: FaviconService
     /// Window their downloads go back to: the session's.
     let downloadScope: DownloadScope
@@ -20,7 +20,7 @@ final class PopupWindowManager {
     /// Blocker of the session (task 6.2), given by the session; nil (tests): pages are not tracked.
     var contentBlocking: ContentBlockerScope?
     /// Navigation delegate of the sign-in windows' pages.
-    let coordinator = NavigationCoordinator()
+    let coordinator: NavigationCoordinator
     /// Open windows, from oldest to newest.
     private(set) var windows: [PopupWindowController] = []
 
@@ -29,11 +29,12 @@ final class PopupWindowManager {
     /// Usable area of the screen of the originating window, or of the pointer's screen without it (replaced in tests).
     var visibleScreenFrame: @MainActor (NSWindow?) -> CGRect? = PopupWindowManager.visibleFrame(around:)
 
-    init(faviconService: FaviconService, downloadScope: DownloadScope, siteZooms: SiteZoomStore?, isPrivate: Bool) {
-        self.faviconService = faviconService
-        self.downloadScope = downloadScope
-        self.siteZooms = siteZooms
-        self.isPrivate = isPrivate
+    init(settings: PopupWindowSettings) {
+        faviconService = settings.services.favicons
+        downloadScope = settings.downloadScope
+        siteZooms = settings.siteZooms
+        isPrivate = settings.isPrivate
+        coordinator = settings.services.makeCoordinator()
         coordinator.tabHost = self
     }
 

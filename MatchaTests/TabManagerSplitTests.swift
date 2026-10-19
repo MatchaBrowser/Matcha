@@ -225,7 +225,7 @@ struct TabManagerSplitTests {
     @Test func `links from a pane open after the split`() async throws {
         let tabs = try await openTabs(["t0", "t1", "t2"])
         manager.openInSplit(tabs[1])
-        let configuration = WebConfigurationFactory.makeConfiguration(websiteDataStore: manager.websiteDataStore)
+        let configuration = WebConfigurationFactory().makeConfiguration(websiteDataStore: manager.websiteDataStore)
         let background = manager.insertTab(configuration: configuration, after: tabs[2], select: false)
         #expect(ids(manager.todayTabs) == ids([tabs[2], tabs[1], background, tabs[0]]))
         #expect(manager.split(containing: background) == nil)

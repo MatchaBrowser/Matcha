@@ -23,12 +23,12 @@ extension NavigationCoordinator: PageMenuDelegate {
         }
         switch command {
         case .saveAs:
-            PageSaver.start(for: page)
+            dialogs.save(page)
         case .print:
-            PagePrinter.print(page)
+            dialogs.print(page)
         case .viewSource:
             if let viewer = PageSource.viewerURL(for: page.url) {
-                PageSourceSchemeHandler.shared.authorize(viewer, in: webView.configuration.websiteDataStore)
+                PageSourceSchemeHandler.of(webView.configuration)?.authorize(viewer, in: webView.configuration.websiteDataStore)
                 tabHost.openLink(viewer, configuration: webView.configuration, from: webView, inBackground: false)
             }
         case .goBack, .goForward:

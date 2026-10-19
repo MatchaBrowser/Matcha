@@ -12,7 +12,9 @@ struct PrivateSessionTests {
         let space = try #require(session.spaces.first)
         #expect(!space.tabManager.websiteDataStore.isPersistent)
         // Icons in memory only: no trace of the visited sites in the disk cache.
-        #expect(space.tabManager.faviconService !== FaviconService.shared)
+        let services = SessionServices()
+        let other = BrowserSession.makePrivate(services: services)
+        #expect(other.faviconService !== services.favicons)
         #expect(session.faviconService === space.tabManager.faviconService)
     }
 
@@ -23,8 +25,9 @@ struct PrivateSessionTests {
     }
 
     @Test func `regular sessions are not private`() throws {
-        let session = try BrowserSession(container: BrowserSchema.makeContainer(inMemory: true))
+        let services = SessionServices()
+        let session = try BrowserSession(container: BrowserSchema.makeContainer(inMemory: true), services: services)
         #expect(!session.isPrivate)
-        #expect(session.faviconService === FaviconService.shared)
+        #expect(session.faviconService === services.favicons)
     }
 }

@@ -21,7 +21,7 @@ extension TabManager {
             if let tab = tab(withID: entry.id) {
                 update(tab, from: entry, isDisplayed: displayed.contains(entry.id))
             } else {
-                let configuration = WebConfigurationFactory.makeConfiguration(websiteDataStore: websiteDataStore)
+                let configuration = pages.makeConfiguration(websiteDataStore: websiteDataStore)
                 register(BrowserTab(restoring: entry, configuration: configuration))
             }
         }

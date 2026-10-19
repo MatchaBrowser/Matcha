@@ -56,7 +56,7 @@ struct TabManagerTests {
 
     @Test func `inserted tab goes after its opener and its previous children`() {
         let tabs = openTabs(3) // today: 2, 1, 0
-        let configuration = WebConfigurationFactory.makeConfiguration(websiteDataStore: manager.websiteDataStore)
+        let configuration = WebConfigurationFactory().makeConfiguration(websiteDataStore: manager.websiteDataStore)
         let child1 = manager.insertTab(configuration: configuration, after: tabs[1], select: false)
         let child2 = manager.insertTab(configuration: configuration, after: tabs[1], select: false)
         #expect(ids(manager.todayTabs) == [tabs[2].id, tabs[1].id, child1.id, child2.id, tabs[0].id])
@@ -67,7 +67,7 @@ struct TabManagerTests {
     @Test func `tab opened from a pinned tab goes on top of today's tabs`() {
         let tabs = openTabs(2)
         manager.setPlace(tabs[0], to: .pinned)
-        let configuration = WebConfigurationFactory.makeConfiguration(websiteDataStore: manager.websiteDataStore)
+        let configuration = WebConfigurationFactory().makeConfiguration(websiteDataStore: manager.websiteDataStore)
         let child = manager.insertTab(configuration: configuration, after: tabs[0], select: true)
         #expect(manager.todayTabs.first === child)
         #expect(manager.selectedTab === child)

@@ -13,13 +13,13 @@ final class PageMenuHostsTests {
     private let model: WindowModel
 
     init() throws {
-        session = try BrowserSession(container: BrowserSchema.makeContainer(inMemory: true))
+        session = try BrowserSession(container: BrowserSchema.makeContainer(inMemory: true), services: .withPopupWindows())
         model = WindowModel(session: session, defaults: nil)
-        session.popupWindows.prepareForTests()
+        session.popupManager.prepareForTests()
     }
 
     isolated deinit {
-        session.popupWindows.closeAll()
+        session.popupManager.closeAll()
     }
 
     /// Records the “new tab” choice in `webView`, then makes it request a window for `url`.
@@ -35,7 +35,7 @@ final class PageMenuHostsTests {
     }
 
     @Test func `a private window opens a private background tab`() throws {
-        let privateSession = BrowserSession.makePrivate()
+        let privateSession = BrowserSession.makePrivate(services: .withPopupWindows())
         let tabManager = privateSession.spaces[0].tabManager
         let page = tabManager.newTab()
         // The app's configuration, without the test pages' scheme: a web link (never loaded here).
@@ -77,17 +77,17 @@ final class PageMenuHostsTests {
         opener.load(TestPages.url("ouvrant"))
         try await waitUntil { opener.title == "ouvrant" && !opener.isLoading }
         try await opener.loadedWebView.openWindow(TestPages.url("connexion"), features: "width=500,height=600")
-        try await waitUntil { session.popupWindows.windows.count == 1 }
-        let popup = session.popupWindows.windows[0]
+        try await waitUntil { session.popupManager.windows.count == 1 }
+        let popup = session.popupManager.windows[0]
         let popupWebView = try #require(popup.tab.webView)
-        #expect(!session.popupWindows.coordinator.pageMenuOffersPeek(in: popupWebView))
+        #expect(!session.popupManager.coordinator.pageMenuOffersPeek(in: popupWebView))
 
-        let created = try openInNewTab(TestPages.url("cible"), from: popupWebView, coordinator: session.popupWindows.coordinator)
+        let created = try openInNewTab(TestPages.url("cible"), from: popupWebView, coordinator: session.popupManager.coordinator)
 
         #expect(tabManager.tabs.count == 3)
         #expect(tabManager.tabs[0] === opener && tabManager.tabs[2] === other)
         #expect(tabManager.tabs[1].webView === created)
         #expect(tabManager.selectedTab === opener)
-        #expect(session.popupWindows.windows.count == 1)
+        #expect(session.popupManager.windows.count == 1)
     }
 }

@@ -30,7 +30,7 @@ final class SpaceSession: Identifiable {
         record: SpaceRecord,
         context: ModelContext,
         websiteDataStore: WKWebsiteDataStore,
-        faviconService: FaviconService = .shared,
+        services: SessionServices = SessionServices(),
         downloadScope: DownloadScope = .regular,
         sitePermissions: SitePermissionStore? = nil,
         siteZooms: SiteZoomStore? = nil,
@@ -40,7 +40,7 @@ final class SpaceSession: Identifiable {
         self.context = context
         openedProfileID = record.profile?.id
         theme = SpaceTheme.decoded(from: record.themeData) ?? .default
-        tabManager = TabManager(websiteDataStore: websiteDataStore, faviconService: faviconService, downloadScope: downloadScope)
+        tabManager = TabManager(websiteDataStore: websiteDataStore, services: services, downloadScope: downloadScope)
         tabManager.sitePermissions = sitePermissions.map { SitePermissionScope(store: $0, profileID: record.profile?.id) }
         tabManager.siteZooms = siteZooms
         tabManager.history = history.map { HistoryScope(store: $0, profileID: record.profile?.id, spaceID: record.id) }

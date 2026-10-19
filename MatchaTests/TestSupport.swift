@@ -74,7 +74,7 @@ final class TestPages: NSObject, WKURLSchemeHandler {
 
     /// The app's configuration, with the `obtest:` scheme added.
     static func configuration() -> WKWebViewConfiguration {
-        let configuration = WebConfigurationFactory.makeConfiguration(websiteDataStore: .nonPersistent())
+        let configuration = WebConfigurationFactory().makeConfiguration(websiteDataStore: .nonPersistent())
         configuration.setURLSchemeHandler(TestPages(), forURLScheme: scheme)
         return configuration
     }

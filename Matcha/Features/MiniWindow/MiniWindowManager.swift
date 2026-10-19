@@ -19,7 +19,7 @@ final class MiniWindowManager {
     /// Where to remember the size chosen with the mouse; nil with a test database (nothing is remembered).
     @ObservationIgnored let defaults: UserDefaults?
     /// Navigation delegate of the mini windows' pages (host: this manager).
-    @ObservationIgnored let coordinator = NavigationCoordinator()
+    @ObservationIgnored let coordinator: NavigationCoordinator
     /// Open mini windows, from the oldest to the most recent.
     @ObservationIgnored private(set) var windows: [MiniWindowController] = []
     /// Active mini window, tracked so the menus update; the action reads `keyWindow` again.
@@ -34,8 +34,7 @@ final class MiniWindowManager {
     @ObservationIgnored var openMainWindow: (@MainActor () -> Void)?
 
     /// WebKit configuration of a new page, for its profile's store (replaced in tests).
-    @ObservationIgnored var makeConfiguration: @MainActor (WKWebsiteDataStore) -> WKWebViewConfiguration =
-        WebConfigurationFactory.makeConfiguration(websiteDataStore:)
+    @ObservationIgnored var makeConfiguration: @MainActor (WKWebsiteDataStore) -> WKWebViewConfiguration
     /// Shows a panel and activates the app (replaced in tests: no panel on screen).
     @ObservationIgnored var present: @MainActor (MiniWindowPanel) -> Void = MiniWindowManager.presentOnScreen
     /// Usable area of the screen where to open a mini window: that of the pointer.
@@ -49,6 +48,8 @@ final class MiniWindowManager {
     /// Free of side effects: `start()` hooks up the global shortcut and the app's activation.
     init(session: BrowserSession, defaults: UserDefaults?) {
         self.session = session
+        coordinator = session.services.makeCoordinator()
+        makeConfiguration = { [pages = session.services.pages] in pages.makeConfiguration(websiteDataStore: $0) }
         self.defaults = defaults
         lastMainSpaceID = defaults?.string(forKey: WindowModel.currentSpaceKey).flatMap(UUID.init(uuidString:))
         coordinator.tabHost = self

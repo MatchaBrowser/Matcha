@@ -15,7 +15,7 @@ struct WindowModelsTests {
     }
 
     @Test func `a private session is made once, when first read`() {
-        let holder = PrivateSessionHolder()
+        let holder = PrivateSessionHolder(services: SessionServices())
         let session = holder.session
         #expect(holder.session === session)
         #expect(session.isPrivate)
@@ -24,7 +24,7 @@ struct WindowModelsTests {
     @Test func `a private session goes away with its window`() {
         weak var released: BrowserSession?
         do {
-            let holder = PrivateSessionHolder()
+            let holder = PrivateSessionHolder(services: SessionServices())
             released = holder.session
             #expect(released != nil)
         }

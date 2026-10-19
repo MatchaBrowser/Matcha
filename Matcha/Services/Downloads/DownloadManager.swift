@@ -12,8 +12,6 @@ import WebKit
 @MainActor
 @Observable
 final class DownloadManager: NSObject {
-    static let shared = DownloadManager()
-
     /// Downloads of this app session and those restored from the saved list, from newest to oldest.
     private(set) var items: [DownloadItem] = []
     /// Downloads finished since launch, per window: the sidebar button bounces for each one.

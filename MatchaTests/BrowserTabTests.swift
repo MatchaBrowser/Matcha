@@ -5,7 +5,7 @@ import WebKit
 @MainActor
 struct BrowserTabTests {
     private func makeTab() -> BrowserTab {
-        BrowserTab(configuration: WebConfigurationFactory.makeConfiguration(websiteDataStore: .nonPersistent()))
+        BrowserTab(configuration: WebConfigurationFactory().makeConfiguration(websiteDataStore: .nonPersistent()))
     }
 
     @Test func `configures web view`() {

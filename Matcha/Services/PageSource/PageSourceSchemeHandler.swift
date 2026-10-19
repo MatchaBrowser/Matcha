@@ -8,10 +8,14 @@ import WebKit
 /// Only viewers opened by the app are served: “View Page Source” and the restoration of a viewer tab authorize their
 /// address for the profile's data store (`authorize`). A page can't use the scheme to send requests with the user's
 /// cookies or to read files: an address it builds itself only gets an explanation, without network or disk, and the
-/// viewer is never served inside another page (frame, image).
+/// viewer is never served inside another page (frame, image). One for the app, held by `WebConfigurationFactory`; a page
+/// finds it in its configuration (`of(_:)`).
 @MainActor
 final class PageSourceSchemeHandler: NSObject, WKURLSchemeHandler {
-    static let shared = PageSourceSchemeHandler()
+    /// The handler of `configuration`, if it has one.
+    static func of(_ configuration: WKWebViewConfiguration) -> PageSourceSchemeHandler? {
+        configuration.urlSchemeHandler(forURLScheme: PageSource.scheme) as? PageSourceSchemeHandler
+    }
 
     /// The viewer's response headers: no script, no request, no sniffing, an origin of its own.
     static let headers = [

@@ -18,7 +18,7 @@ struct PeekWebContainerTests {
     }
 
     private func makeWebView() -> WKWebView {
-        WKWebView(frame: .zero, configuration: WebConfigurationFactory.makeConfiguration(websiteDataStore: .nonPersistent()))
+        WKWebView(frame: .zero, configuration: WebConfigurationFactory().makeConfiguration(websiteDataStore: .nonPersistent()))
     }
 
     @Test func `the peek page takes the keyboard from the page`() {

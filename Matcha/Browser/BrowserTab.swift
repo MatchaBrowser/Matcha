@@ -105,7 +105,7 @@ final class BrowserTab: Identifiable {
         pendingInteractionState = stored.interactionState
         // A source viewer the user had opened stays readable after a relaunch.
         if let url = stored.url {
-            PageSourceSchemeHandler.shared.authorize(url, in: configuration.websiteDataStore)
+            PageSourceSchemeHandler.of(configuration)?.authorize(url, in: configuration.websiteDataStore)
         }
     }
 

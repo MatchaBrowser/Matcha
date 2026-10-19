@@ -30,12 +30,12 @@ extension PopupWindowManager {
 
     /// Test manager: nothing remembered, no window on screen.
     static func forTests(isPrivate: Bool = false) -> PopupWindowManager {
-        let manager = PopupWindowManager(
-            faviconService: FaviconService(directory: nil),
+        let manager = PopupWindowManager(settings: PopupWindowSettings(
+            services: SessionServices(),
             downloadScope: .regular,
             siteZooms: nil,
             isPrivate: isPrivate,
-        )
+        ))
         manager.prepareForTests()
         return manager
     }
@@ -44,6 +44,23 @@ extension PopupWindowManager {
     func prepareForTests() {
         present = { _ in }
         visibleScreenFrame = { _ in Self.testScreen }
+    }
+}
+
+extension SessionServices {
+    /// A session's services with its own sign-in windows (task 5.8), as the app makes them.
+    static func withPopupWindows() -> SessionServices {
+        SessionServices(makePopupWindows: { PopupWindowManager(settings: $0) })
+    }
+}
+
+extension BrowserSession {
+    /// The sign-in windows of a session made with `SessionServices.withPopupWindows()`.
+    var popupManager: PopupWindowManager {
+        guard let manager = popupWindows as? PopupWindowManager else {
+            preconditionFailure("Session made without sign-in windows")
+        }
+        return manager
     }
 }
 

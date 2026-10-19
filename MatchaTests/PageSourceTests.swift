@@ -37,9 +37,12 @@ struct PageSourceTests {
     @Test func `a viewer tab shows the source of a local page`() async throws {
         let file = try Self.temporaryPage("<p>Bonjour</p>\n<b>gras</b>")
         defer { try? FileManager.default.removeItem(at: file) }
-        let webView = WKWebView(frame: .zero, configuration: WebConfigurationFactory.makeConfiguration(websiteDataStore: .nonPersistent()))
+        let webView = WKWebView(
+            frame: .zero,
+            configuration: WebConfigurationFactory().makeConfiguration(websiteDataStore: .nonPersistent()),
+        )
         let viewer = try #require(PageSource.viewerURL(for: file))
-        PageSourceSchemeHandler.shared.authorize(viewer, in: webView.configuration.websiteDataStore)
+        try #require(PageSourceSchemeHandler.of(webView.configuration)).authorize(viewer, in: webView.configuration.websiteDataStore)
         webView.load(URLRequest(url: viewer))
         try await waitUntil { webView.title?.hasPrefix("Source") == true && !webView.isLoading }
         let text = try await Self.text(of: webView)
@@ -51,7 +54,10 @@ struct PageSourceTests {
         let secret = "secret-\(UUID().uuidString)"
         let file = try Self.temporaryPage(secret)
         defer { try? FileManager.default.removeItem(at: file) }
-        let webView = WKWebView(frame: .zero, configuration: WebConfigurationFactory.makeConfiguration(websiteDataStore: .nonPersistent()))
+        let webView = WKWebView(
+            frame: .zero,
+            configuration: WebConfigurationFactory().makeConfiguration(websiteDataStore: .nonPersistent()),
+        )
         let viewer = try #require(PageSource.viewerURL(for: file))
         webView.load(URLRequest(url: viewer))
         try await waitUntil { webView.title?.hasPrefix("Source") == true && !webView.isLoading }
@@ -63,10 +69,11 @@ struct PageSourceTests {
     @Test func `an authorized viewer is only served to the profile that opened it`() throws {
         let viewer = try #require(URL(string: "matcha-source:https://example.com/compte"))
         let store = WKWebsiteDataStore.nonPersistent()
-        PageSourceSchemeHandler.shared.authorize(viewer, in: store)
-        #expect(PageSourceSchemeHandler.shared.isAuthorized(viewer, in: store))
-        #expect(!PageSourceSchemeHandler.shared.isAuthorized(viewer, in: .nonPersistent()))
-        #expect(try !PageSourceSchemeHandler.shared.isAuthorized(
+        let handler = PageSourceSchemeHandler()
+        handler.authorize(viewer, in: store)
+        #expect(handler.isAuthorized(viewer, in: store))
+        #expect(!handler.isAuthorized(viewer, in: .nonPersistent()))
+        #expect(try !handler.isAuthorized(
             #require(URL(string: "matcha-source:https://example.com/autre")),
             in: store,
         ))
@@ -79,7 +86,7 @@ struct PageSourceTests {
         let configuration = TestPages.configuration()
         let webView = WKWebView(frame: .zero, configuration: configuration)
         let viewer = try #require(PageSource.viewerURL(for: file))
-        PageSourceSchemeHandler.shared.authorize(viewer, in: webView.configuration.websiteDataStore)
+        try #require(PageSourceSchemeHandler.of(webView.configuration)).authorize(viewer, in: webView.configuration.websiteDataStore)
         webView.load(URLRequest(url: TestPages.url("cadre", body: "<iframe src=\"\(viewer.absoluteString)\"></iframe>")))
         try await waitUntil { webView.title == "cadre" && !webView.isLoading }
         let archive = try await Self.archive(of: webView)
@@ -88,9 +95,9 @@ struct PageSourceTests {
 
     @Test func `a restored viewer tab stays readable`() throws {
         let viewer = try #require(URL(string: "matcha-source:https://example.com/restaure-\(UUID().uuidString)"))
-        let configuration = WebConfigurationFactory.makeConfiguration(websiteDataStore: .nonPersistent())
+        let configuration = WebConfigurationFactory().makeConfiguration(websiteDataStore: .nonPersistent())
         let tab = BrowserTab(restoring: StoredTab(id: UUID(), url: viewer, lastActivity: .now), configuration: configuration)
-        #expect(PageSourceSchemeHandler.shared.isAuthorized(viewer, in: tab.configuration.websiteDataStore))
+        #expect(try #require(PageSourceSchemeHandler.of(tab.configuration)).isAuthorized(viewer, in: tab.configuration.websiteDataStore))
     }
 
     @Test func `only regular files of a reasonable size are read`() throws {

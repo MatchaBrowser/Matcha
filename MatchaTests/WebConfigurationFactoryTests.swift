@@ -6,18 +6,18 @@ import WebKit
 struct WebConfigurationFactoryTests {
     @Test func `uses given website data store`() {
         let store = WKWebsiteDataStore.nonPersistent()
-        let configuration = WebConfigurationFactory.makeConfiguration(websiteDataStore: store)
+        let configuration = WebConfigurationFactory().makeConfiguration(websiteDataStore: store)
         #expect(configuration.websiteDataStore === store)
     }
 
     @Test func `enables element fullscreen`() {
-        let configuration = WebConfigurationFactory.makeConfiguration(websiteDataStore: .nonPersistent())
+        let configuration = WebConfigurationFactory().makeConfiguration(websiteDataStore: .nonPersistent())
         #expect(configuration.preferences.isElementFullscreenEnabled)
     }
 
     /// Task 5.10: the sound script, at the start of each document, iframes included.
     @Test func `installs the audio script in every frame`() throws {
-        let configuration = WebConfigurationFactory.makeConfiguration(websiteDataStore: .nonPersistent())
+        let configuration = WebConfigurationFactory().makeConfiguration(websiteDataStore: .nonPersistent())
         let scripts = configuration.userContentController.userScripts.filter { $0.source == PageAudioScript.source }
         let script = try #require(scripts.first)
         #expect(scripts.count == 1)
@@ -27,7 +27,7 @@ struct WebConfigurationFactoryTests {
 
     /// Task 6.2: each page has its own content controller, which the blocker configures without touching the others.
     @Test func `a new page keeps a configuration whose controller is free`() {
-        let configuration = WebConfigurationFactory.makeConfiguration(websiteDataStore: .nonPersistent())
+        let configuration = WebConfigurationFactory().makeConfiguration(websiteDataStore: .nonPersistent())
         let controller = configuration.userContentController
         let tab = BrowserTab(configuration: configuration)
         #expect(tab.configuration === configuration)
@@ -52,7 +52,7 @@ struct WebConfigurationFactoryTests {
 
     /// Window requested by WebKit: the provided configuration itself gets a fresh controller.
     @Test func `a window requested by webkit gets its own controller in place`() {
-        let configuration = WebConfigurationFactory.makeConfiguration(websiteDataStore: .nonPersistent())
+        let configuration = WebConfigurationFactory().makeConfiguration(websiteDataStore: .nonPersistent())
         let shared = configuration.userContentController
         WebConfigurationFactory.giveOwnContentController(to: configuration)
         #expect(configuration.userContentController !== shared)

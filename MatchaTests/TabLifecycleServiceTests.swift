@@ -20,7 +20,7 @@ struct TabLifecycleServiceTests {
     }
 
     init() throws {
-        session = try BrowserSession(container: BrowserSchema.makeContainer(inMemory: true))
+        session = try BrowserSession(container: BrowserSchema.makeContainer(inMemory: true), services: .withPopupWindows())
         model = WindowModel(session: session, defaults: nil)
         service = session.tabLifecycle
         service.settings = { [settings] in TabSuspensionSettings(delay: settings.delay, checkInterval: .seconds(3600)) }
@@ -205,7 +205,7 @@ struct TabLifecycleServiceTests {
     /// Task 5.8: as long as the sign-in window opened by a tab is still open, the tab keeps its page, otherwise
     /// `window.opener` would no longer find it.
     @Test func `a tab with an open sign-in window is never suspended`() async throws {
-        session.popupWindows.prepareForTests()
+        session.popupManager.prepareForTests()
         let tabs = openTabs(2)
         let opener = tabs[0]
         let popupWebView = try #require(manager.coordinator.webView(
@@ -214,7 +214,7 @@ struct TabLifecycleServiceTests {
             for: FakeNavigationAction(url: TestPages.url("connexion"), modifierFlags: []),
             windowFeatures: FakeWindowFeatures(width: 500, height: 600),
         ))
-        let popup = try #require(session.popupWindows.window(for: popupWebView))
+        let popup = try #require(session.popupManager.window(for: popupWebView))
         clock.advance(3600)
 
         #expect(await service.check(.memoryCritical) == 0)

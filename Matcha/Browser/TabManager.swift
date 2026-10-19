@@ -20,8 +20,10 @@ final class TabManager {
     /// Data store (cookies, storage) of this window's tabs.
     @ObservationIgnored let websiteDataStore: WKWebsiteDataStore
     /// Delegate of all web views of this window (the views do not retain it).
-    @ObservationIgnored let coordinator = NavigationCoordinator()
+    @ObservationIgnored let coordinator: NavigationCoordinator
     @ObservationIgnored let faviconService: FaviconService
+    /// Configuration of new pages (source viewer, extensions).
+    @ObservationIgnored let pages: WebConfigurationFactory
     /// Window these tabs' downloads belong to: a private window's scope forgets them.
     @ObservationIgnored let downloadScope: DownloadScope
     /// Permission decisions of these tabs' profile (task 5.2), given by the Space; nil: nothing is remembered.
@@ -33,13 +35,16 @@ final class TabManager {
     /// What is displayed in the session's windows (tasks 5.6 and 5.7), given by the session.
     @ObservationIgnored weak var lifecycle: TabLifecycleService?
     /// The session's sign-in windows (task 5.8), given by the session; nil (tests): tabs instead.
-    @ObservationIgnored weak var popupWindows: PopupWindowManager?
+    @ObservationIgnored weak var popupWindows: (any PopupWindowHosting)?
     /// The session's blocker (task 6.2), given by the session; nil (tests): pages are not tracked.
     @ObservationIgnored var contentBlocking: ContentBlockerScope?
 
-    init(websiteDataStore: WKWebsiteDataStore, faviconService: FaviconService = .shared, downloadScope: DownloadScope = .regular) {
+    /// `services`: the session's (audit C2); the tests' own by default, without extensions, downloads or windows.
+    init(websiteDataStore: WKWebsiteDataStore, services: SessionServices = SessionServices(), downloadScope: DownloadScope = .regular) {
         self.websiteDataStore = websiteDataStore
-        self.faviconService = faviconService
+        faviconService = services.favicons
+        pages = services.pages
+        coordinator = services.makeCoordinator()
         self.downloadScope = downloadScope
         coordinator.tabHost = self
     }
@@ -77,7 +82,7 @@ final class TabManager {
     /// Opens a tab at the top of the today tabs and loads `url` in it if provided; `source`: the page whose link it is.
     @discardableResult
     func newTab(url: URL? = nil, select: Bool = true, from source: URL? = nil) -> BrowserTab {
-        let configuration = WebConfigurationFactory.makeConfiguration(websiteDataStore: websiteDataStore)
+        let configuration = pages.makeConfiguration(websiteDataStore: websiteDataStore)
         let tab = insertTab(configuration: configuration, after: nil, select: select)
         if let url {
             tab.load(url, from: source)

@@ -2,8 +2,9 @@ import Foundation
 import WebKit
 
 /// What a page asks the user directly (audits K1 to K3): a JavaScript dialog (`alert`, `confirm`, `prompt`), files to
-/// send, a user name and password. WebKit answers “Cancel” to all of them when the app doesn't show them. Shown by
-/// `SystemPageDialogs`, as sheets on the page's window; replaced in tests.
+/// send, a user name and password; and the panels of its menu, saving and printing. WebKit answers “Cancel” to all of
+/// them when the app doesn't show them. Shown by `SystemPageDialogs` (interface, given by the app: audit C1), as
+/// sheets on the page's window; replaced in tests.
 @MainActor
 protocol PageDialogPresenting: AnyObject {
     /// nil if it couldn't be shown (page in no visible window): the page gets “Cancel”.
@@ -12,6 +13,30 @@ protocol PageDialogPresenting: AnyObject {
     func chooseFiles(allowsMultipleSelection: Bool, allowsDirectories: Bool, for webView: WKWebView) async -> [URL]?
     /// User name and password typed for a website that asks for them; nil: cancelled.
     func credential(for login: LoginRequest, for webView: WKWebView) async -> URLCredential?
+    /// “Save As…” for `page`.
+    func save(_ page: BrowserTab)
+    /// “Print…” for `page`.
+    func print(_ page: BrowserTab)
+}
+
+/// No dialog can be shown (tests, a session made without interface): the page always gets “Cancel”.
+@MainActor
+final class UnavailablePageDialogs: PageDialogPresenting {
+    func present(_: PageDialog, for _: WKWebView) async -> PageDialogAnswer? {
+        nil
+    }
+
+    func chooseFiles(allowsMultipleSelection _: Bool, allowsDirectories _: Bool, for _: WKWebView) async -> [URL]? {
+        nil
+    }
+
+    func credential(for _: LoginRequest, for _: WKWebView) async -> URLCredential? {
+        nil
+    }
+
+    func save(_: BrowserTab) {}
+
+    func print(_: BrowserTab) {}
 }
 
 /// A JavaScript dialog, as shown: never longer than `maximumLength`, with the website of the frame that opens it.

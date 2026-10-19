@@ -34,7 +34,7 @@ extension ExtensionManager {
     func openTab(_ url: URL?, in model: WindowModel, after parent: BrowserTab?, isActive: Bool, isPinned: Bool) -> BrowserTab {
         let tabManager = model.space.tabManager
         let configuration = url.flatMap(pageConfiguration(for:))
-            ?? WebConfigurationFactory.makeConfiguration(websiteDataStore: tabManager.websiteDataStore)
+            ?? tabManager.pages.makeConfiguration(websiteDataStore: tabManager.websiteDataStore)
         let anchor = parent.flatMap { tabManager.tab(withID: $0.id) === $0 ? $0 : nil }
         let tab = tabManager.insertTab(configuration: configuration, after: anchor, select: isActive)
         if let url {

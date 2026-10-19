@@ -53,7 +53,7 @@ extension BrowserSession {
             return nil
         }
         // Its sign-in windows (task 5.8) close first, so their pages stop using its data.
-        popupWindows.closeWindows(using: dataStore(for: profile))
+        popupWindows?.closeWindows(using: dataStore(for: profile))
         for space in spaces(of: profile) {
             space.close()
             removeSpace(space)

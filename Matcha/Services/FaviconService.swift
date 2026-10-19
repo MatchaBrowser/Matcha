@@ -6,8 +6,6 @@ import OSLog
 /// audit W8).
 @MainActor
 final class FaviconService {
-    static let shared = FaviconService(directory: defaultDirectory)
-
     /// Maximum size of a downloaded icon.
     nonisolated static let maximumSize = 1_000_000
 

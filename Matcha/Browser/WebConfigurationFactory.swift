@@ -1,11 +1,12 @@
 import WebKit
 
-/// Builds the WebKit configuration shared by all web views, with the sound script (task 5.10) and the extension
-/// controller (task 6.3, private windows included: extensions only have access to them if the user allows it).
-/// Each page has its own content controller (`pageConfiguration`): the blocker (task 6.2) sets or removes its lists
-/// there page by page; WebKit injects the extensions' scripts into it.
+/// Builds the WebKit configuration shared by all web views, with the sound script (task 5.10), the source viewer and
+/// the extension controller (task 6.3, private windows included: extensions only have access to them if the user
+/// allows it). Each page has its own content controller (`pageConfiguration`): the blocker (task 6.2) sets or removes
+/// its lists there page by page; WebKit injects the extensions' scripts into it. One for the app (`AppEnvironment`);
+/// the tests make theirs, without extensions.
 @MainActor
-enum WebConfigurationFactory {
+final class WebConfigurationFactory {
     /// Safari version announced to sites, so that they treat the app as Safari: the installed Safari's (audit H5).
     static let safariVersion = SafariVersion.announced(
         installed: SafariVersion.installed(),
@@ -15,12 +16,25 @@ enum WebConfigurationFactory {
     /// Content controllers already given to a page (`BrowserTab`).
     private static let pageControllers = NSHashTable<WKUserContentController>.weakObjects()
 
+    /// Source viewer of the pages (`matcha-source:`).
+    let pageSources: PageSourceSchemeHandler
+    /// Hands each configuration to the extension controller; nil: no extensions.
+    private let attachExtensions: (@MainActor (WKWebViewConfiguration) -> Void)?
+
+    init(
+        pageSources: PageSourceSchemeHandler = PageSourceSchemeHandler(),
+        attachExtensions: (@MainActor (WKWebViewConfiguration) -> Void)? = nil,
+    ) {
+        self.pageSources = pageSources
+        self.attachExtensions = attachExtensions
+    }
+
     /// Suffix added by WebKit to its user agent.
     static var applicationNameForUserAgent: String {
         "Version/\(safariVersion) Safari/605.1.15"
     }
 
-    static func makeConfiguration(websiteDataStore: WKWebsiteDataStore) -> WKWebViewConfiguration {
+    func makeConfiguration(websiteDataStore: WKWebsiteDataStore) -> WKWebViewConfiguration {
         let configuration = WKWebViewConfiguration()
         configuration.websiteDataStore = websiteDataStore
         configuration.preferences.isElementFullscreenEnabled = true
@@ -33,11 +47,11 @@ enum WebConfigurationFactory {
         // Media with sound waits for a click, as with Safari's “Stop Media with Sound” (audit H5); silent media plays.
         configuration.mediaTypesRequiringUserActionForPlayback = .audio
         WebInspection.apply(to: configuration.preferences)
-        configuration.applicationNameForUserAgent = applicationNameForUserAgent
-        configuration.userContentController = makeUserContentController()
+        configuration.applicationNameForUserAgent = Self.applicationNameForUserAgent
+        configuration.userContentController = Self.makeUserContentController()
         // “View Page Source” (menu of a page).
-        configuration.setURLSchemeHandler(PageSourceSchemeHandler.shared, forURLScheme: PageSource.scheme)
-        ExtensionManager.shared.attach(to: configuration)
+        configuration.setURLSchemeHandler(pageSources, forURLScheme: PageSource.scheme)
+        attachExtensions?(configuration)
         return configuration
     }
 

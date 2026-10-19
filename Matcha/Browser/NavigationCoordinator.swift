@@ -11,15 +11,16 @@ import WebKit
 @MainActor
 final class NavigationCoordinator: NSObject {
     weak var tabHost: (any TabHost)?
-    /// Receives the downloads; replaced in tests (temporary folder).
-    var downloadManager = DownloadManager.shared
+    /// Receives the downloads (the app's, given by its host); nil: pages can't download.
+    var downloadManager: DownloadManager?
 
     /// Hands a URL to the app that handles it; replaceable in tests.
     var openExternally: (URL) -> Bool = { NSWorkspace.shared.open($0) }
     /// App that opens a link (`+ExternalApps`); replaceable in tests.
     var applicationForURL: (URL) -> URL? = { NSWorkspace.shared.urlForApplication(toOpen: $0) }
-    /// JavaScript dialogs, files to send, logins (`+Dialogs`, `+Authentication`); replaced in tests.
-    var dialogs: any PageDialogPresenting = SystemPageDialogs()
+    /// JavaScript dialogs, files to send, logins, saving and printing (`+Dialogs`, `+Authentication`, `+PageMenu`): the
+    /// app's, given by its host; replaced in tests.
+    var dialogs: any PageDialogPresenting = UnavailablePageDialogs()
     /// “Open links to other websites from Favorites and pinned tabs in Peek” setting, read at each click;
     /// replaceable in tests.
     var opensPinnedLinksInPeek: () -> Bool = { BrowserSettings.pinnedLinksOpenInPeek() }
@@ -68,6 +69,10 @@ final class NavigationCoordinator: NSObject {
     /// Hands to `downloadManager` a download WebKit has just created. The originating page is the request's referrer,
     /// otherwise the displayed page (never the address being loaded, which is the file's).
     private func track(_ download: WKDownload, from webView: WKWebView) {
+        guard let downloadManager else {
+            download.cancel(nil)
+            return
+        }
         let referrer = download.originalRequest?.value(forHTTPHeaderField: "Referer").flatMap(URL.init(string:))
         downloadManager.track(
             download,

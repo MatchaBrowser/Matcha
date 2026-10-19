@@ -42,7 +42,7 @@ extension BrowserSession {
             record: record,
             context: container.mainContext,
             websiteDataStore: dataStore(for: record.profile),
-            faviconService: faviconService,
+            services: services,
             downloadScope: downloadScope,
             sitePermissions: sitePermissions,
             siteZooms: siteZooms,

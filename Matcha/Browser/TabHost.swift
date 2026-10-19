@@ -24,7 +24,7 @@ protocol TabHost: AnyObject {
     func openWindow(configuration: WKWebViewConfiguration, from webView: WKWebView, inBackground: Bool) -> WKWebView?
     /// Sign-in windows of the session (task 5.8): a page that opens a window giving its size gets it in its own small
     /// window; nil (tests): a tab, as without a size.
-    var popupWindows: PopupWindowManager? { get }
+    var popupWindows: (any PopupWindowHosting)? { get }
     /// Shift-click: `url` in Peek; false if it is refused (the link then proceeds as usual).
     func openInPeek(_ url: URL, from webView: WKWebView, openingPoint: CGPoint) -> Bool
     /// The page called `window.close()`.

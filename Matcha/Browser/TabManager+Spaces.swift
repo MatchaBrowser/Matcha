@@ -11,7 +11,7 @@ extension TabManager {
     func restore(tabs stored: [StoredTab], layout restoredLayout: SidebarLayout) {
         var restored: [BrowserTab] = []
         for entry in stored where restoredLayout.place(of: entry.id) != nil {
-            let configuration = WebConfigurationFactory.makeConfiguration(websiteDataStore: websiteDataStore)
+            let configuration = pages.makeConfiguration(websiteDataStore: websiteDataStore)
             let tab = BrowserTab(restoring: entry, configuration: configuration)
             register(tab)
             restored.append(tab)
@@ -54,7 +54,7 @@ extension TabManager {
     /// Appends `stored` at the end of the favorites, without a web view (import, task 7.1).
     func appendFavorites(_ stored: [StoredTab]) {
         for entry in stored {
-            let configuration = WebConfigurationFactory.makeConfiguration(websiteDataStore: websiteDataStore)
+            let configuration = pages.makeConfiguration(websiteDataStore: websiteDataStore)
             let tab = BrowserTab(restoring: entry, configuration: configuration)
             register(tab)
             updateLayout { $0.setPlace(tab.id, to: .favorite) }

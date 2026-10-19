@@ -23,7 +23,7 @@ struct SafariVersionTests {
 
     @MainActor
     @Test func `the user agent names this safari, and sound waits for a click`() {
-        let configuration = WebConfigurationFactory.makeConfiguration(websiteDataStore: .nonPersistent())
+        let configuration = WebConfigurationFactory().makeConfiguration(websiteDataStore: .nonPersistent())
         #expect(configuration.applicationNameForUserAgent == "Version/\(WebConfigurationFactory.safariVersion) Safari/605.1.15")
         #expect(WebConfigurationFactory.safariVersion == SafariVersion.installed() || SafariVersion.installed() == nil)
         #expect(configuration.mediaTypesRequiringUserActionForPlayback == .audio)

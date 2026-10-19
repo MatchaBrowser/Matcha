@@ -21,6 +21,7 @@ extension BrowserSession {
         environment: [String: String] = ProcessInfo.processInfo.environment,
         storeURL: URL? = nil,
         onFailure: @MainActor (any Error) -> StoreFailureChoice = StoreFailureAlert.ask,
+        services: SessionServices = SessionServices(),
     ) -> BrowserSession? {
         let inMemory = TestEnvironment.usesInMemoryStore(defaults: defaults, environment: environment)
         // UI tests' arguments: Debug builds only, never the default store (`TestEnvironment`, audit R6).
@@ -31,14 +32,14 @@ extension BrowserSession {
         }
         let configuration = BrowserSchema.configuration(inMemory: inMemory, name: name, url: storeURL)
         do {
-            return try BrowserSession(container: BrowserSchema.makeContainer(configuration))
+            return try BrowserSession(container: BrowserSchema.makeContainer(configuration), services: services)
         } catch {
             Logger.app.error("Unreadable store: \(error.logSummary, privacy: .public)")
             switch onFailure(error) {
             case .quit:
                 return nil
             case .startOver:
-                if let session = startOver(configuration) {
+                if let session = startOver(configuration, services: services) {
                     return session
                 }
             case .continueWithoutSaving:
@@ -46,16 +47,16 @@ extension BrowserSession {
             }
             // An empty in-memory store: nothing to read that could fail.
             // swiftlint:disable:next force_try
-            return try! BrowserSession(container: BrowserSchema.makeContainer(inMemory: true))
+            return try! BrowserSession(container: BrowserSchema.makeContainer(inMemory: true), services: services)
         }
     }
 
     /// The unreadable store put aside, a new one in its place; nil if that fails too.
-    private static func startOver(_ configuration: ModelConfiguration) -> BrowserSession? {
+    private static func startOver(_ configuration: ModelConfiguration, services: SessionServices) -> BrowserSession? {
         do {
             let aside = try BrowserSchema.moveAside(storeAt: configuration.url)
             Logger.app.notice("Unreadable store set aside: \(aside.lastPathComponent, privacy: .public)")
-            return try BrowserSession(container: BrowserSchema.makeContainer(configuration))
+            return try BrowserSession(container: BrowserSchema.makeContainer(configuration), services: services)
         } catch {
             Logger.app.error("New store failed: \(error.logSummary, privacy: .public)")
             return nil

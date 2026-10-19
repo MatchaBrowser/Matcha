@@ -93,7 +93,7 @@ extension MiniWindowManager: TabHost {
     }
 
     /// Sign-in windows of the main session (task 5.8).
-    var popupWindows: PopupWindowManager? {
+    var popupWindows: (any PopupWindowHosting)? {
         session.popupWindows
     }
 

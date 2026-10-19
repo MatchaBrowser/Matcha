@@ -9,6 +9,8 @@ struct MatchaApp: App {
 
     @NSApplicationDelegateAdaptor(AppDelegate.self) private var appDelegate
     @AppStorage(BrowserSettings.Key.appearance) private var appearance = BrowserSettings.appearance
+    /// Shared services, made once (audit C2).
+    @State private var environment: AppEnvironment
     @State private var session: BrowserSession
     /// Mini windows of the whole app (task 4.5).
     @State private var miniWindows: MiniWindowManager
@@ -18,8 +20,9 @@ struct MatchaApp: App {
         NSWindow.allowsAutomaticWindowTabbing = false
         // UI tests: their downloads folder starts out empty again (no effect otherwise).
         DownloadLocation.resetTestSubfolderIfRequested()
+        let environment = AppEnvironment()
         // Store unreadable and the user chose to quit (audit R2): nothing was opened, nothing to save.
-        guard let session = BrowserSession.launch() else {
+        guard let session = BrowserSession.launch(services: environment.sessionServices) else {
             exit(EXIT_SUCCESS)
         }
         // History read at launch, off the main thread, after deleting visits older than a year: the command bar
@@ -31,16 +34,14 @@ struct MatchaApp: App {
         let miniWindows = MiniWindowManager(session: session, defaults: session.isInMemory ? nil : .standard)
         // Downloads list kept from one launch to the next, except there too.
         if !session.isInMemory {
-            DownloadManager.shared.restoreList(from: .standard)
+            environment.downloads.restoreList(from: .standard)
         }
         // Global mini window shortcut, except in the unit tests' host app: it would be taken from the user, and its
         // first access would write ⌥⌘N into their settings (same app identifier). Blocker (task 6.2, set aside):
         // lists read again or compiled in the background, except there too (the tests have their own store).
         if !TestEnvironment.isUnitTestHost() {
             miniWindows.start()
-            if ContentBlockerService.isAvailable {
-                ContentBlockerService.shared.start()
-            }
+            environment.contentBlocker?.start()
         }
         // Extensions (task 6.3): mini windows are windows to them; installed extensions load in the background,
         // except with a test store (UI tests): never the user's.
@@ -52,6 +53,7 @@ struct MatchaApp: App {
         IncomingLinks.shared.handler = { [miniWindows] urls in
             miniWindows.openFromOtherApp(urls, destination: ExternalLinkDestination.current())
         }
+        _environment = State(initialValue: environment)
         _session = State(initialValue: session)
         _miniWindows = State(initialValue: miniWindows)
     }
@@ -61,7 +63,7 @@ struct MatchaApp: App {
         Window(Text(verbatim: "Matcha"), id: Self.browserWindowID) {
             BrowserWindowView(session: session)
                 .environment(miniWindows)
-                .environment(DownloadManager.shared)
+                .environment(environment.downloads)
         }
         .windowStyle(.hiddenTitleBar)
         // First opening: most of the screen, up to a comfortable size (audit H5); then the size the user chose.
@@ -78,8 +80,8 @@ struct MatchaApp: App {
         // Private windows: each one has its own in-memory session, nothing is saved; never reopened at launch, like
         // in Safari.
         WindowGroup("Private Browsing", id: Self.privateWindowID) {
-            PrivateWindowView()
-                .environment(DownloadManager.shared)
+            PrivateWindowView(services: environment.sessionServices)
+                .environment(environment.downloads)
         }
         .windowStyle(.hiddenTitleBar)
         .defaultWindowPlacement { _, context in

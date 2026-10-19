@@ -73,7 +73,7 @@ struct FaviconServiceTests {
     }
 
     @Test func `tab gets its icon after loading`() async throws {
-        let manager = TabManager(websiteDataStore: .nonPersistent(), faviconService: FaviconService(directory: nil))
+        let manager = TabManager(websiteDataStore: .nonPersistent(), services: SessionServices(favicons: FaviconService(directory: nil)))
         let tab = manager.insertTab(configuration: TestPages.configuration(), after: nil, select: true)
         tab.load(TestPages.url("avec-icone", body: "<link rel='icon' href='\(Self.pngURL.absoluteString)'>"))
         // Loading, reading the icons in the page, then downloading: 0.2 s alone, but nearly 10 s when the whole
@@ -82,7 +82,7 @@ struct FaviconServiceTests {
     }
 
     @Test func `an icon that could not be found is retried on the next load`() async throws {
-        let manager = TabManager(websiteDataStore: .nonPersistent(), faviconService: FaviconService(directory: nil))
+        let manager = TabManager(websiteDataStore: .nonPersistent(), services: SessionServices(favicons: FaviconService(directory: nil)))
         let tab = manager.insertTab(configuration: TestPages.configuration(), after: nil, select: true)
         tab.load(TestPages.url("sans-icone"))
         try await waitUntil { tab.title == "sans-icone" && !tab.isLoading }

@@ -22,9 +22,12 @@ struct NavigationCoordinatorDownloadTests {
         #expect(manager.tabs.count == 1)
     }
 
-    @Test func `downloads go to the shared list by default`() {
-        #expect(manager.coordinator.downloadManager === DownloadManager.shared)
+    @Test func `downloads go to the session's list`() {
+        let downloads = DownloadManager()
+        let manager = TabManager(websiteDataStore: .nonPersistent(), services: SessionServices(downloads: downloads))
+        #expect(manager.coordinator.downloadManager === downloads)
         #expect(manager.downloadScope == .regular)
+        #expect(TabManager(websiteDataStore: .nonPersistent()).coordinator.downloadManager == nil)
     }
 
     @Test func `private sessions have their own scope, for every Space`() {

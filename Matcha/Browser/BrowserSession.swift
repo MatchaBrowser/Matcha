@@ -28,6 +28,8 @@ final class BrowserSession {
     nonisolated static let resetStoreKey = "resetStore"
 
     @ObservationIgnored let container: ModelContainer
+    /// What the app gives the session (audit C2): for a private window, its own icons in memory.
+    @ObservationIgnored let services: SessionServices
     /// Session of a private window: nothing is kept (no tabs, cookies, icons or history: `history` is nil).
     @ObservationIgnored let isPrivate: Bool
     /// Site icons: shared disk cache, or in memory only for a private window.
@@ -43,8 +45,9 @@ final class BrowserSession {
     @ObservationIgnored let history: HistoryStore?
     /// Sleeping of hidden tabs (task 5.6), started when the window opens; same rules in a private window.
     @ObservationIgnored let tabLifecycle = TabLifecycleService()
-    /// Sign-in windows opened by the session's pages (task 5.8): private, and closed with it, for a private window.
-    @ObservationIgnored let popupWindows: PopupWindowManager
+    /// Sign-in windows opened by the session's pages (task 5.8): private, and closed with it, for a private window; nil
+    /// without interface (tests).
+    @ObservationIgnored let popupWindows: (any PopupWindowHosting)?
     /// Blocker (task 6.2): the app's, with the saved exceptions; those changed in a private window or a test store
     /// stay in memory. Nil while the blocker is set aside (`ContentBlockerService.isAvailable`, audit C5): pages don't
     /// go through it.
@@ -59,10 +62,15 @@ final class BrowserSession {
 
     /// Opens the saved Spaces; at first launch, creates the “Personal” profile and the “Home” Space (“Personnel” and
     /// “Perso” in French). A store that can't be read throws, rather than looking empty (audit R3).
-    init(container: ModelContainer, isPrivate: Bool = false, contentBlocker: ContentBlockerService? = defaultContentBlocker) throws {
+    init(container: ModelContainer, isPrivate: Bool = false, services appServices: SessionServices = SessionServices()) throws {
         self.container = container
         self.isPrivate = isPrivate
-        faviconService = isPrivate ? FaviconService(directory: nil) : .shared
+        var services = appServices
+        if isPrivate {
+            services.favicons = FaviconService(directory: nil)
+        }
+        self.services = services
+        faviconService = services.favicons
         downloadScope = isPrivate ? .privateWindow(UUID()) : .regular
         let context = container.mainContext
         let isInMemory = container.configurations.allSatisfy(\.isStoredInMemoryOnly)
@@ -72,14 +80,14 @@ final class BrowserSession {
         )
         siteZooms = SiteZoomStore(defaults: isPrivate || isInMemory ? nil : .standard)
         history = isPrivate ? nil : HistoryStore(container: container)
-        popupWindows = PopupWindowManager(
-            faviconService: faviconService,
+        popupWindows = services.makePopupWindows(PopupWindowSettings(
+            services: services,
             downloadScope: downloadScope,
             siteZooms: siteZooms,
             isPrivate: isPrivate,
-        )
-        contentBlocking = contentBlocker.map { ContentBlockerScope(service: $0, savesExceptions: !isPrivate && !isInMemory) }
-        popupWindows.contentBlocking = contentBlocking
+        ))
+        contentBlocking = services.contentBlocker.map { ContentBlockerScope(service: $0, savesExceptions: !isPrivate && !isInMemory) }
+        popupWindows?.contentBlocking = contentBlocking
         let records = try Self.spaceRecords(in: context)
         refreshProfiles()
         spaces = records.map { record in
@@ -87,7 +95,7 @@ final class BrowserSession {
                 record: record,
                 context: context,
                 websiteDataStore: dataStore(for: record.profile),
-                faviconService: faviconService,
+                services: services,
                 downloadScope: downloadScope,
                 sitePermissions: sitePermissions,
                 siteZooms: siteZooms,
@@ -165,15 +173,10 @@ final class BrowserSession {
     }
 
     /// Session of a private window: in-memory store, non-persistent data stores.
-    static func makePrivate(contentBlocker: ContentBlockerService? = defaultContentBlocker) -> BrowserSession {
+    static func makePrivate(services: SessionServices = SessionServices()) -> BrowserSession {
         // An empty in-memory store: nothing to read that could fail.
         // swiftlint:disable:next force_try
-        try! BrowserSession(container: BrowserSchema.makeContainer(inMemory: true), isPrivate: true, contentBlocker: contentBlocker)
-    }
-
-    /// The app's blocker, if it is available.
-    static var defaultContentBlocker: ContentBlockerService? {
-        ContentBlockerService.isAvailable ? .shared : nil
+        try! BrowserSession(container: BrowserSchema.makeContainer(inMemory: true), isPrivate: true, services: services)
     }
 
     /// Saves each Space right away (app quitting).

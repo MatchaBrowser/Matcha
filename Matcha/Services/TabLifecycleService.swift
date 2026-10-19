@@ -200,7 +200,7 @@ final class TabLifecycleService {
             hasPendingPermissionPrompt: tab.permissionPrompts.hasPending,
             isCapturingMedia: webView.map { $0.cameraCaptureState != .none || $0.microphoneCaptureState != .none } ?? false,
             isPlayingAudio: tab.isPlayingAudio,
-            hasOpenPopupWindow: session?.popupWindows.hasOpenWindow(openedBy: tab) ?? false,
+            hasOpenPopupWindow: session?.popupWindows?.hasOpenWindow(openedBy: tab) ?? false,
         )
     }
 

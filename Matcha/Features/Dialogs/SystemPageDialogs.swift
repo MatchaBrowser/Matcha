@@ -1,9 +1,9 @@
 import AppKit
 import WebKit
 
-/// The system's dialogs for a page (audits K1 to K3), as sheets on its window: AppKit queues them if one is already
-/// open. The website asking is the title, never the page's text. A page in no visible window (tab in the background)
-/// gets “Cancel”.
+/// The system's dialogs and panels for a page (audits K1 to K3; “Save As…”, “Print…”), as sheets on its window:
+/// AppKit queues them if one is already open. The website asking is the title, never the page's text. A page in no
+/// visible window (tab in the background) gets “Cancel”.
 @MainActor
 final class SystemPageDialogs: PageDialogPresenting {
     func present(_ dialog: PageDialog, for webView: WKWebView) async -> PageDialogAnswer? {
@@ -114,5 +114,13 @@ final class SystemPageDialogs: PageDialogPresenting {
             ))
         }
         return lines.joined(separator: "\n\n")
+    }
+
+    func save(_ page: BrowserTab) {
+        PageSaver.start(for: page)
+    }
+
+    func print(_ page: BrowserTab) {
+        PagePrinter.print(page)
     }
 }

@@ -29,11 +29,14 @@ struct ExtensionManagerTests {
         #expect(manager.contexts.isEmpty)
     }
 
-    @Test func `every page configuration gets the shared controller`() {
-        let configuration = WebConfigurationFactory.makeConfiguration(websiteDataStore: .nonPersistent())
-        #expect(configuration.webExtensionController === ExtensionManager.shared.controller)
+    @Test func `every page configuration of the app gets its controller`() {
+        let environment = AppEnvironment()
+        let configuration = environment.pages.makeConfiguration(websiteDataStore: .nonPersistent())
+        #expect(configuration.webExtensionController === environment.extensions.controller)
         let page = WebConfigurationFactory.pageConfiguration(from: WebConfigurationFactory.pageConfiguration(from: configuration))
-        #expect(page.webExtensionController === ExtensionManager.shared.controller)
+        #expect(page.webExtensionController === environment.extensions.controller)
+        // A factory made without extensions (tests) attaches none.
+        #expect(WebConfigurationFactory().makeConfiguration(websiteDataStore: .nonPersistent()).webExtensionController == nil)
     }
 
     @Test func `extension pages are never handed to another app`() throws {
