@@ -272,6 +272,8 @@ Toutes sont vérifiées. Les en-têtes du SDK disent ce que fait WebKit quand la
 
 Rien n'est branché : il n'y a pas de transport, et seuls les tests créent `SyncEngine`. Les cinq premiers points demandent de **modifier `SYNC.md`**.
 
+**2026-10-19 :** `SYNC.md` est révisé (S1 à S5, plus une relecture complète, voir `DECISIONS.md`). Reste le code : S1 à S6, et les écarts listés en S7.
+
 **S1. Mises à jour d'extensions silencieuses** (Élevé, contredit `SYNC.md` § 2.5)
 - **Problème** :
   - `installUpdates` installe sans accord tout paquet reçu qui ne demande pas plus de droits.
@@ -342,6 +344,18 @@ Rien n'est branché : il n'y a pas de transport, et seuls les tests créent `Syn
   - Les fichiers d'état sont en clair et ne sont pas supprimés à la déconnexion.
   - `user:password@` reste dans les adresses synchronisées.
   - Une date dans le futur fausse l'horloge hybride.
+
+**S7. Écarts du code avec `SYNC.md` révisé le 2026-10-19**
+- **Formats** : identifiants calculés par HMAC (`idKey`, UUID version 8) au lieu de l'UUID v5, vérifiés à la réception ; `order` décimal (`Double`) dans les champs synchronisés, déplacement par valeur intermédiaire ; `lastActivity` seul ne déclenche pas d'envoi ; `user:password@` retiré des adresses.
+- **Clés** : `SyncKDF` borné à 10 000 000 itérations et à un sel de 16 octets exactement.
+- **Horloge** : modification datée après la version remplacée ; dates reçues à plus de 24 h dans le futur sans effet sur l'horloge ; en-tête `Date` du serveur (7.7).
+- **Moteur** : anti-rejeu par enregistrement ; parent supprimé (remonter ou supprimer), cycles de dossiers, `folderId` d'un autre Space ; invariants (profil et Space recréés, Space affiché supprimé) ; enregistrements ignorés (type inconnu, `schema` plus récent, illisibles) tenus à l'écart de « Remplacer les données synchronisées » ; objet d'un `schema` plus récent en lecture seule ; champs bloquants ou à valeur par défaut du § 2.9 ; garde-fou des suppressions en masse.
+- **Sites et extensions** : seuls les refus de site s'appliquent ; adresses d'onglets `http(s)` seulement, `homePage` filtrée ; profil supprimé reçu : données de ses sites effacées, confirmation locale « sur tous vos Mac » ; mises à jour de paquets sur clic, droits reçus qui ne font que réduire, droits non appliqués gardés dans l'enregistrement envoyé.
+- **État et trousseau** : `SyncState` par serveur et par compte, gardé après `device_revoked`, effacé après `account_deleted` ou une déconnexion voulue ; trousseau rangé par serveur et par compte ; marque de la machine (Mac cloné).
+- **Tests** : vecteurs `masterKey`, `idKey` et identifiants calculés du § 3.10.
+- **Seconde relecture** : suppression d'un enregistrement à identifiant calculé appliquée sans vérification ; valeurs reçues non appliquées gardées (changements calculés champ par champ, `SyncState` garde contenu accepté et état appliqué) ; favoris et épinglés à adresse non web locaux ; `extension-app:<bundleIdentifier>` ; `default-profile` et `default-space` ; garde-fou des recréations après un curseur expiré, et renvoi de ce qu'un serveur restauré a perdu ; conflit au même couple (`modifiedAt`, `modifiedBy`) pris pour déjà appliqué ; `SyncState` inutilisé effacé après 60 jours.
+- **Extensions (modifie E1)** : bouton « Mettre à jour » d'une extension installée ; un fichier non vérifiable choisi par ce bouton garde l'`identifier` et les données (écran « Ce fichier ne peut pas être vérifié ») ; ouvert ou déposé autrement, c'est une nouvelle installation : revoir le flux actuel « Remplacer X (version) ».
+- **Transport (7.7) et réglages (7.9)** : lot et `Idempotency-Key` gardés jusqu'à la réponse, conflit `current: null` renvoyé comme une création, certificats reconnus par macOS seulement, changement d'adresse e-mail, un seul renouvellement de jeton à la fois, `event: expired`, `account_deleted`, `logout` authentifié, quota plein (suppressions d'abord), réessais d'un paquet introuvable et paquets orphelins, adresse du serveur normalisée.
 
 ## 6. App Store et distribution
 
@@ -525,7 +539,7 @@ Rien n'est branché : il n'y a pas de transport, et seuls les tests créent `Syn
 | 2. Plantage et données | R1, R2, R3, R4, R5, R6 | Plantage et pertes de données |
 | 3. WebKit de base | K1, K2, K3, K5, W5 avec HTTPS automatique, W4 ; K4 avec la 8.1 | Sites courants cassés |
 | 4. Extensions | E1, E2, E3, E4, E6, E5 | Usurpation et données d'extensions |
-| 5. Synchro | Révision de `SYNC.md` (S1 à S5), puis S6 et T2 | Avant la 7.7, tant qu'aucun serveur n'a de données |
+| 5. Synchro | Révision de `SYNC.md` (S1 à S5, faite le 2026-10-19), puis le code de S1 à S7 et T2 | Avant la 7.7, tant qu'aucun serveur n'a de données |
 | 6. Distribution | A5, A6, A3, A4 ; puis A1 et A2 si le Mac App Store est visé | Avant la première version publique |
 | 7. HIG et accessibilité | H1 à H5 | Finition |
 | 8. Architecture et tests | C1 à C7, T1, T3 à T5 | Au fil de l'eau |
