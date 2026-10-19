@@ -4600,6 +4600,35 @@
         }
       }
     },
+    "Encryption with a digital certificate keeps information private as it's sent to or from this website." : {
+      "comment" : "Certificate panel: what the certificate is for",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Die Verschlüsselung mit einem digitalen Zertifikat schützt Informationen, die an diese Website gesendet oder von ihr empfangen werden."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "El cifrado con un certificado digital protege la información que se envía a este sitio web o se recibe de él."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Le chiffrement par certificat numérique protège les informations envoyées à ce site ou reçues de lui."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "La crittografia con un certificato digitale protegge le informazioni inviate a questo sito web o ricevute da esso."
+          }
+        }
+      }
+    },
     "Export as PDF…" : {
       "comment" : "File menu: saves the whole page as a PDF file",
       "localizations" : {
@@ -6870,6 +6899,35 @@
         }
       }
     },
+    "Matcha is using an encrypted connection to “%@”." : {
+      "comment" : "Certificate panel of an encrypted page; %@ is the website",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Matcha verwendet eine verschlüsselte Verbindung zu „%@“."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Matcha está usando una conexión cifrada con “%@”."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Matcha utilise une connexion chiffrée avec « %@ »."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Matcha sta usando una connessione crittografata con “%@”."
+          }
+        }
+      }
+    },
     "Matcha is your default browser." : {
       "comment" : "Settings > General: Matcha is already the default browser",
       "localizations" : {
@@ -7847,7 +7905,7 @@
       }
     },
     "Not Secure" : {
-      "comment" : "Sign-in window address bar: the page is not encrypted (http)",
+      "comment" : "Address bar: the page is not encrypted (http)",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -8650,6 +8708,35 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Divisore dei riquadri"
+          }
+        }
+      }
+    },
+    "Parts of This Page Aren't Encrypted — Show Certificate" : {
+      "comment" : "Help tag of the padlock in the address bar, when images or media came without encryption",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Teile dieser Seite sind nicht verschlüsselt – Zertifikat anzeigen"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Partes de esta página no están cifradas — Mostrar certificado"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Des parties de cette page ne sont pas chiffrées — Afficher le certificat"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Parti di questa pagina non sono crittografate — Mostra certificato"
           }
         }
       }
@@ -10440,31 +10527,31 @@
         }
       }
     },
-    "Secure Connection" : {
-      "comment" : "Sign-in window address bar: lock icon of an encrypted (https) page",
+    "Secure Connection — Show Certificate" : {
+      "comment" : "Help tag of the padlock in the address bar",
       "localizations" : {
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Sichere Verbindung"
+            "value" : "Sichere Verbindung – Zertifikat anzeigen"
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Conexión segura"
+            "value" : "Conexión segura — Mostrar certificado"
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Connexion sécurisée"
+            "value" : "Connexion sécurisée — Afficher le certificat"
           }
         },
         "it" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Connessione sicura"
+            "value" : "Connessione sicura — Mostra certificato"
           }
         }
       }
@@ -11591,6 +11678,64 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Qui compariranno gli autori e le licenze delle liste di blocco."
+          }
+        }
+      }
+    },
+    "The connection to “%@” is encrypted, but parts of this page were loaded without encryption." : {
+      "comment" : "Certificate panel of a page whose images or media are not encrypted; %@ is the website",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Die Verbindung zu „%@“ ist verschlüsselt, aber Teile dieser Seite wurden ohne Verschlüsselung geladen."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "La conexión con “%@” está cifrada, pero partes de esta página se cargaron sin cifrado."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "La connexion avec « %@ » est chiffrée, mais des parties de cette page ont été chargées sans chiffrement."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "La connessione con “%@” è crittografata, ma parti di questa pagina sono state caricate senza crittografia."
+          }
+        }
+      }
+    },
+    "The connection to this site isn't encrypted. Don't enter passwords or payment details." : {
+      "comment" : "Help tag of “Not Secure” in the address bar",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Die Verbindung zu dieser Website ist nicht verschlüsselt. Gib keine Passwörter oder Zahlungsdaten ein."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "La conexión con este sitio no está cifrada. No introduzcas contraseñas ni datos de pago."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "La connexion à ce site n'est pas chiffrée. N'y saisissez ni mot de passe ni informations de paiement."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "La connessione a questo sito non è crittografata. Non inserire password o dati di pagamento."
           }
         }
       }

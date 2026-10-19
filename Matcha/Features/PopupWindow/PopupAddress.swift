@@ -3,14 +3,9 @@ import Foundation
 /// Address shown by the bar of a sign-in window (task 5.8): you must see which site asks for the password,
 /// whatever title the page gives itself. The window title comes from the page, this bar never does.
 nonisolated struct PopupAddress: Equatable, Sendable {
-    enum Security: Equatable, Sendable {
-        /// https: encrypted connection (padlock).
-        case secure
-        /// http: “Not Secure”.
-        case notSecure
-        /// Not a site (local file, `about:`, `data:`): nothing.
-        case none
-    }
+    /// From the address alone: https, http, or not a site (local file, `about:`, `data:`). The bar shows the page's
+    /// (`BrowserTab.security`), which also knows about unencrypted parts.
+    typealias Security = PageSecurity
 
     /// The host (without “www.”, with the port if it is not the default one) for a site; the file name for a local
     /// file; `about:blank`; otherwise only the scheme (`data:`), never the content of a `data:` address.
@@ -25,12 +20,11 @@ nonisolated extension PopupAddress {
             security = .none
             return
         }
+        security = PageSecurity.of(url, hasOnlySecureContent: true)
         if let origin = SiteOrigin.web(of: url) {
             text = origin.displayHost
-            security = origin.scheme == "https" ? .secure : .notSecure
             return
         }
-        security = .none
         let scheme = url.scheme?.lowercased() ?? ""
         if url.isFileURL {
             text = url.lastPathComponent

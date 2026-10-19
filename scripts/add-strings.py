@@ -3,6 +3,7 @@ sorted by `localizedStandardCompare`, “ : ” separators), so that diffs stay 
 
     python3 -I scripts/add-strings.py new.json
     python3 -I scripts/add-strings.py --check     # is the catalog in Xcode's order?
+    python3 -I scripts/add-strings.py --remove "Old key" …   # removes keys no longer used by the code
 
 `new.json`: {"English key": {"comment": "…", "fr": "…", "de": "…", "es": "…", "it": "…"}}; for a plural,
 each language (English included) is {"one": "…", "other": "…"}. A key that is already present is rejected.
@@ -77,6 +78,13 @@ def main(argv):
     catalog = json.loads(text)
     if argv == ["--check"]:
         print("ordre de Xcode" if dump(catalog) == text else "ordre différent")
+        return
+    if argv[:1] == ["--remove"]:
+        for key in argv[1:]:
+            if catalog["strings"].pop(key, None) is None:
+                sys.exit(f"Absent du catalogue : {key}")
+        with open(CATALOG, "w", encoding="utf-8") as file:
+            file.write(dump(catalog))
         return
     with open(argv[0], encoding="utf-8") as file:
         entries = json.load(file)

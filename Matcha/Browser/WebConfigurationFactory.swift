@@ -25,6 +25,9 @@ enum WebConfigurationFactory {
         // Pop-up blocker (as in Safari): a page only opens a window or a tab right after a click or a key press.
         // WebKit's default on macOS lets scripts open as many as they want.
         configuration.preferences.javaScriptCanOpenWindowsAutomatically = false
+        // An http address is tried in https first, then in http if that fails (audit W5; WebKit keeps the address as
+        // requested by default).
+        configuration.defaultWebpagePreferences.preferredHTTPSNavigationPolicy = .automaticFallbackToHTTP
         WebInspection.apply(to: configuration.preferences)
         configuration.applicationNameForUserAgent = applicationNameForUserAgent
         configuration.userContentController = makeUserContentController()

@@ -20,6 +20,8 @@ final class BrowserTab: Identifiable {
     private(set) var url: URL?
     /// Address to show (address pill, Peek, sign-in windows, security): the displayed document's (audit W4).
     private(set) var displayedAddress = DisplayedAddress()
+    /// True if everything the displayed page loaded came encrypted (`+Address`, audit W5).
+    private(set) var hasOnlySecureContent = false
     /// `url != nil`, tracked separately: a view that only needs to know whether the tab has an address
     /// (“Copy URL” menu) is not recomputed on every address change.
     private(set) var hasURL = false
@@ -219,11 +221,6 @@ final class BrowserTab: Identifiable {
         displayedAddress.documentDidChange(to: webView?.url)
     }
 
-    /// Address to show: the displayed document's, or the one the user asked for while it loads (audit W4).
-    var displayedURL: URL? {
-        displayedAddress.url
-    }
-
     /// Loads `url`; `source`: the page whose link it is, if any (a local file then reads less, `FileReadAccess`).
     func load(_ url: URL, from source: URL? = nil) {
         let webView = makeWebViewIfNeeded()
@@ -308,6 +305,9 @@ final class BrowserTab: Identifiable {
             webView.observe(\.estimatedProgress, options: .initial, changeHandler: sync { $0.progress = $1.estimatedProgress }),
             webView.observe(\.canGoBack, options: .initial, changeHandler: sync { $0.canGoBack = $1.canGoBack }),
             webView.observe(\.canGoForward, options: .initial, changeHandler: sync { $0.canGoForward = $1.canGoForward }),
+            webView.observe(\.hasOnlySecureContent, options: .initial, changeHandler: sync { tab, webView in
+                tab.hasOnlySecureContent = webView.hasOnlySecureContent
+            }),
         ]
     }
 

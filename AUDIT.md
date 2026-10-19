@@ -74,7 +74,7 @@ Date : 2026-10-19, sur le commit `a94cf2e`. Audit en lecture seule : 9 analyses,
   - Ajouter une `committedURL`, mise à jour dans `didCommit` et lors des changements dans le même document, puis rétablie après un échec.
   - Afficher l'adresse en attente seulement pour les chargements lancés par l'utilisateur.
 
-**W5. Pas d'indicateur HTTP/HTTPS** (Moyen, actif)
+**✅ W5. Pas d'indicateur HTTP/HTTPS** (Moyen, actif) — corrigé : cadenas qui ouvre le certificat, « Non sécurisé » pour `http`, passage automatique en `https`.
 - **Problème** : la pastille montre l'hôte seul, donc `http://banque.fr` et `https://banque.fr` sont identiques. Le cadenas des fenêtres de connexion ne regarde que le schéma.
 - **Correction** :
   - Afficher « Non sécurisé » pour `http`, et pour `https` quand `hasOnlySecureContent` est faux.

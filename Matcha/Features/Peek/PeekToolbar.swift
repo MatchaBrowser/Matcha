@@ -41,11 +41,22 @@ struct PeekToolbar: View {
 
     private var address: some View {
         HStack(spacing: 6) {
-            FaviconView(tab: page, size: 14)
-            Text(verbatim: shortAddress)
-                .font(.system(size: 12, weight: .medium))
-                .lineLimit(1)
-                .truncationMode(.middle)
+            HStack(spacing: 6) {
+                FaviconView(tab: page, size: 14)
+                Text(verbatim: shortAddress)
+                    .font(.system(size: 12, weight: .medium))
+                    .lineLimit(1)
+                    .truncationMode(.middle)
+            }
+            .help(Text(verbatim: page.displayedURL?.absoluteString ?? ""))
+            // Static text: on macOS, a plain group does not expose its value (the address).
+            .accessibilityElement(children: .ignore)
+            .accessibilityAddTraits(.isStaticText)
+            .accessibilityLabel(Text("Address", comment: "Accessibility label of the address pill"))
+            .accessibilityValue(Text(verbatim: shortAddress))
+            .accessibilityIdentifier("peekAddress")
+            // Security of the page (audit W5): an icon only, the bar is small.
+            PageSecurityIndicator(page: page, showsNotSecureText: false)
             if page.isLoading {
                 ProgressView().controlSize(.mini)
             }
@@ -55,13 +66,6 @@ struct PeekToolbar: View {
         .background(.regularMaterial, in: Capsule())
         .overlay { Capsule().strokeBorder(Color.primary.opacity(0.12), lineWidth: 1) }
         .contentShape(Capsule())
-        .help(Text(verbatim: page.displayedURL?.absoluteString ?? ""))
-        // Static text: on macOS, a plain group does not expose its value (the address).
-        .accessibilityElement(children: .ignore)
-        .accessibilityAddTraits(.isStaticText)
-        .accessibilityLabel(Text("Address", comment: "Accessibility label of the address pill"))
-        .accessibilityValue(Text(verbatim: shortAddress))
-        .accessibilityIdentifier("peekAddress")
     }
 }
 
