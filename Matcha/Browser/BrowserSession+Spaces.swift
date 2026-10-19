@@ -62,6 +62,18 @@ extension BrowserSession {
         save(container.mainContext)
     }
 
+    /// The window always shows a Space: without any left, the first profile gets its default one (audit R1).
+    func ensureOneSpace() {
+        guard spaces.isEmpty else {
+            return
+        }
+        let record = SpaceRecord(name: Self.defaultSpaceName, profile: profiles.first)
+        container.mainContext.insert(record)
+        save(container.mainContext)
+        openSpace(record)
+        Logger.app.notice("Plus aucun Space : Space par défaut recréé")
+    }
+
     /// Deletes the Space, its tabs and its folders. The last Space cannot be deleted.
     func deleteSpace(_ space: SpaceSession) {
         guard spaces.count > 1, spaces.contains(where: { $0 === space }) else {

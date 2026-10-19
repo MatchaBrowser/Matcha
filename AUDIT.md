@@ -155,7 +155,7 @@ Toutes sont vérifiées. Les en-têtes du SDK disent ce que fait WebKit quand la
 
 ## 3. Robustesse et données
 
-**R1. Plantage quand il ne reste aucun Space** (Critique, actif, vérifié)
+**✅ R1. Plantage quand il ne reste aucun Space** (Critique, actif, vérifié) — corrigé : un Space par défaut est recréé pour le profil restant (test qui reproduisait le plantage).
 - **Scénario** :
   1. Le profil B a un Space.
   2. On supprime ce Space : c'est permis, car il en reste un, celui du profil A.

@@ -63,6 +63,8 @@ extension BrowserSession {
         container.mainContext.delete(profile)
         save(container.mainContext)
         refreshProfiles()
+        // Its Spaces were the last ones (the others' Spaces were deleted before): the window needs one (audit R1).
+        ensureOneSpace()
         forgetDataStore(of: identifier)
         favoritesHolders[identifier] = nil
         sitePermissions.removeAll(profileID: identifier)

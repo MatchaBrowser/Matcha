@@ -61,6 +61,25 @@ struct ProfilesTests {
         #expect(session.profiles.count == 1)
     }
 
+    /// Audit R1: the second profile's Space deleted, then the first profile, which held the last Space: the window
+    /// used to crash on `spaces[0]`.
+    @Test func `deleting the profile of the last space leaves a space to show`() async throws {
+        let workSpace = session.addProfile(named: "Travail")
+        let work = session.profiles[1]
+        session.deleteSpace(workSpace)
+        #expect(session.spaces(of: work).isEmpty)
+        #expect(session.spaces.count == 1)
+
+        await session.deleteProfile(firstProfile)
+        #expect(session.profiles.map(\.id) == [work.id])
+        #expect(session.spaces.count == 1)
+        #expect(session.spaces.first?.record.profile?.id == work.id)
+        #expect(session.spaces.first?.record.name == BrowserSession.defaultSpaceName)
+        #expect(model.space === session.spaces.first)
+        let context = session.container.mainContext
+        #expect(try context.fetchCount(FetchDescriptor<SpaceRecord>()) == 1)
+    }
+
     @Test func `profiles can be renamed`() {
         session.renameProfile(firstProfile, to: " Maison ")
         session.renameProfile(firstProfile, to: "")
