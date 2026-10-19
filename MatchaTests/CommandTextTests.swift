@@ -19,7 +19,7 @@ struct CommandTextTests {
 
     @Test func `fold collapses and trims whitespace`() {
         #expect(CommandText.fold("  pain \t au\n\nlevain  ") == "pain au levain")
-        #expect(CommandText.fold("   ") == "")
+        #expect(CommandText.fold("   ").isEmpty)
     }
 
     @Test func `words split on anything but letters and digits`() {
@@ -68,6 +68,6 @@ struct CommandTextTests {
         #expect(CommandText.stripURLPrefixes("http://example.com") == "example.com")
         #expect(CommandText.stripURLPrefixes("www.apple.com") == "apple.com")
         #expect(CommandText.stripURLPrefixes("swift") == "swift")
-        #expect(CommandText.stripURLPrefixes("https://") == "")
+        #expect(CommandText.stripURLPrefixes("https://").isEmpty)
     }
 }

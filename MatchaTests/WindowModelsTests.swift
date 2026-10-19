@@ -9,8 +9,10 @@ struct WindowModelsTests {
     @Test func `a window's models are made once and share the window model`() throws {
         let session = try BrowserSession(container: BrowserSchema.makeContainer(inMemory: true))
         let models = WindowModels(session: session)
-        #expect(models.window === models.window)
-        #expect(models.commandBar === models.commandBar)
+        let window = models.window
+        let commandBar = models.commandBar
+        #expect(models.window === window)
+        #expect(models.commandBar === commandBar)
         #expect(models.commandBar.windowModel === models.window)
     }
 

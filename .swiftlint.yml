@@ -11,8 +11,24 @@ excluded:
 disabled_rules:
   - trailing_comma
 
+# Règles ajoutées (audit C7). Écartées : legacy_objc_type (NSNumber, NSMutableData imposés par les API du système),
+# implicitly_unwrapped_optional (signatures de WebKit), discouraged_optional_boolean (booléens à trois états).
 opt_in_rules:
   - indentation_width
+  - force_unwrapping
+  - empty_count
+  - empty_string
+  - first_where
+  - last_where
+  - contains_over_filter_count
+  - contains_over_first_not_nil
+  - sorted_first_last
+  - redundant_nil_coalescing
+  - toggle_bool
+  - fatal_error_message
+  - unneeded_parentheses_in_closure_argument
+  - yoda_condition
+  - identical_operands
 
 indentation_width:
   indentation_width: 4
@@ -20,3 +36,23 @@ indentation_width:
 line_length:
   warning: 140
   ignores_comments: true
+
+# « Fichiers courts » de CLAUDE.md : environ 300 lignes, sans compter les commentaires.
+file_length:
+  warning: 300
+  ignore_comment_only_lines: true
+
+custom_rules:
+  no_print:
+    regex: '(?<![\w.])(?<!func )print\('
+    excluded_match_kinds:
+      - comment
+      - doccomment
+      - string
+    message: "Logger (os.log), jamais print (CLAUDE.md)"
+  no_shared_singleton:
+    regex: 'static (let|var) shared\b'
+    excluded_match_kinds:
+      - comment
+      - doccomment
+    message: "Pas de singleton : les services partagés viennent d'AppEnvironment (CLAUDE.md)"

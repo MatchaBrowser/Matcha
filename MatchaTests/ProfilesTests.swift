@@ -21,7 +21,8 @@ struct ProfilesTests {
     @Test func `each profile has its own data store`() {
         let otherSpace = session.addProfile(named: "Travail")
         let other = session.profiles[1]
-        #expect(session.dataStore(for: firstProfile) === session.dataStore(for: firstProfile))
+        let store = session.dataStore(for: firstProfile)
+        #expect(session.dataStore(for: firstProfile) === store)
         #expect(session.dataStore(for: firstProfile) !== session.dataStore(for: other))
         #expect(otherSpace.record.profile?.id == other.id)
         // The tests write nothing: non-persistent stores.

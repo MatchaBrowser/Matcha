@@ -37,6 +37,10 @@ scripts/check-localizations.sh
 
 # Relire les textes d'une langue (anglais → traduction) ; --missing, --comments
 scripts/strings.sh fr
+
+# Tout vérifier d'un coup, comme la CI (GitHub Actions) : format, style, compilation sans avertissement,
+# traductions, tests unitaires ; --fix formate d'abord
+scripts/check.sh
 ```
 
 `xcbeautify` s'installe avec `brew install xcbeautify`. S'il manque, retire `| xcbeautify` et `set -o pipefail &&`.
@@ -46,9 +50,7 @@ scripts/strings.sh fr
 1. Au début de chaque session, lis `PLAN.md` et repère la première tâche non cochée.
 2. Une tâche à la fois. Avant de coder, résume en 2 ou 3 lignes ce que tu vas faire et quels fichiers tu touches.
 3. Après chaque tâche :
-   - la compilation passe **sans erreur ni avertissement** ;
-   - les tests passent ;
-   - `scripts/check-localizations.sh` passe (aucune clé absente, périmée ou non traduite) ;
+   - `scripts/check.sh` passe : format, style, compilation **sans erreur ni avertissement**, traductions (aucune clé absente, périmée ou non traduite) et tests unitaires ;
    - tu coches la tâche dans `PLAN.md` ;
    - tu fais un commit au format `1.4 — Résolution URL ou recherche`.
 4. **[MANUEL]** = action à faire par moi dans Xcode ou sur le portail Apple. Donne-moi les étapes exactes, clic par clic, puis attends ma confirmation.

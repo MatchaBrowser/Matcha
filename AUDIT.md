@@ -472,7 +472,7 @@ Rien n'est branché : il n'y a pas de transport, et seuls les tests créent `Syn
 - `MiniCommandBarModel` et `CommandBarModel`.
 - Les conversions entre modèle et champs de synchro, écrites dans les deux sens.
 
-**C7. Petits points**
+**✅ C7. Petits points** — corrigé : observateurs retirés, états observés, un type par fichier, commentaires à jour, journaux en anglais, SwiftLint durci, `scripts/check.sh` et GitHub Actions.
 - Les observateurs de `NotificationCenter` ne sont jamais retirés.
 - Des compteurs de révision sont tenus à la main, et `installedIdentifiers` lit le disque, même depuis des `body`.
 - 7 fichiers contiennent plusieurs types principaux.

@@ -17,7 +17,7 @@ struct BrowserTabTests {
 
     @Test func `starts empty`() {
         let tab = makeTab()
-        #expect(tab.title == nil || tab.title == "")
+        #expect((tab.title ?? "").isEmpty)
         #expect(tab.url == nil)
         #expect(!tab.isLoading)
         #expect(!tab.canGoBack)

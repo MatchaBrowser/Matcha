@@ -15,7 +15,7 @@ struct SidebarDisplayTests {
     }
 
     @Test func `no address shows nothing`() {
-        #expect(AddressDisplay.short(for: nil) == "")
+        #expect(AddressDisplay.short(for: nil).isEmpty)
     }
 
     @Test(arguments: [("www.apple.com", "A"), ("github.com", "G"), ("éditions.fr", "É"), ("", "?")])

@@ -1,0 +1,3 @@
+# Tests : un dépaquetage forcé fait échouer le test aussitôt, à sa ligne.
+disabled_rules:
+  - force_unwrapping
