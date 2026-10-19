@@ -2,11 +2,11 @@ import AppKit
 @testable import Matcha
 import Testing
 
-/// Menus de la tâche 5.4, relevés dans l'app hôte des tests : « Imprimer… » (⌘P) et les commandes de zoom (⌘0, ⌘+,
-/// ⌘-) n'existent qu'une fois, et « Exporter en PDF… » se trouve juste avant « Imprimer… », sans raccourci.
+/// Menus of task 5.4, read in the tests' host app: “Print…” (⌘P) and the zoom commands (⌘0, ⌘+, ⌘-) exist only once,
+/// and “Export as PDF…” sits right before “Print…”, without a shortcut.
 @MainActor
 struct PageMenuTests {
-    /// Éléments de tous les menus de l'app, sous-menus compris.
+    /// Items of all the app's menus, submenus included.
     private func allItems(of menu: NSMenu?) -> [NSMenuItem] {
         (menu?.items ?? []).flatMap { [$0] + allItems(of: $0.submenu) }
     }
@@ -28,7 +28,7 @@ struct PageMenuTests {
         #expect(index > 0)
         #expect(fileMenu.items[index - 1].keyEquivalent.isEmpty)
         #expect(!fileMenu.items[index - 1].isSeparatorItem)
-        // Les trois commandes de zoom sont voisines, dans le même menu que « Recharger la page » (⌘R).
+        // The three zoom commands are next to each other, in the same menu as “Reload Page” (⌘R).
         let zoomMenu = try #require(items("+", in: menu).first?.menu)
         #expect(items("0", in: menu).first?.menu === zoomMenu)
         #expect(items("-", in: menu).first?.menu === zoomMenu)

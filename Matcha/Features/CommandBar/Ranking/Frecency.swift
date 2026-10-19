@@ -1,12 +1,12 @@
 import Foundation
 
-/// Fréquence et récence d'une adresse de l'historique, en entiers, à la manière de Firefox.
+/// Frequency and recency of a history address, as integers, in the manner of Firefox.
 nonisolated enum Frecency {
-    /// Au-delà, les visites ne comptent plus.
+    /// Beyond this, visits no longer count.
     static let maximumVisits = 30
 
-    /// Poids de la dernière visite selon son âge (bornes incluses) : 100 jusqu'à 4 jours, 70 jusqu'à
-    /// 14, 50 jusqu'à 31, 30 jusqu'à 90, puis 10. Un âge négatif compte comme nul.
+    /// Weight of the last visit according to its age (bounds included): 100 up to 4 days, 70 up to 14, 50 up to
+    /// 31, 30 up to 90, then 10. A negative age counts as zero.
     static func recencyWeight(age: TimeInterval) -> Int {
         let day: TimeInterval = 86400
         switch max(0, age) {
@@ -18,7 +18,7 @@ nonisolated enum Frecency {
         }
     }
 
-    /// Poids de récence multiplié par le nombre de visites (au moins 1, au plus 30).
+    /// Recency weight multiplied by the number of visits (at least 1, at most 30).
     static func score(visitCount: Int, lastVisit: Date, now: Date) -> Int {
         recencyWeight(age: now.timeIntervalSince(lastVisit)) * min(max(visitCount, 1), maximumVisits)
     }

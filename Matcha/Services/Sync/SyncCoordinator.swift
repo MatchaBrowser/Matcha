@@ -4,17 +4,17 @@ import Observation
 import OSLog
 import SwiftData
 
-/// Déclenche la synchro (tâche 7.4, `SYNC.md` § 5) : au démarrage, 2 secondes après un changement de ce Mac
-/// (enregistrement de la base ou des réglages), au retour au premier plan, toutes les 15 minutes, et quand une page
-/// d'onglet du jour en attente devient stable. Une seule synchro à la fois : une demande pendant un cycle en relance un
-/// autre ensuite. Rien ne tourne avant `start` (synchro configurée, tâche 7.9).
+/// Triggers sync (task 7.4, `SYNC.md` § 5): at startup, 2 seconds after a change on this Mac (store or settings
+/// saved), when returning to the foreground, every 15 minutes, and when a waiting today tab page becomes stable. Only
+/// one sync at a time: a request during a cycle starts another one afterwards. Nothing runs before `start` (sync
+/// configured, task 7.9).
 @MainActor
 @Observable
 final class SyncCoordinator {
     enum Status: Equatable {
         case idle
         case syncing
-        /// Dernier cycle en échec (message journalisé ; l'interface affichera le sien, tâche 7.9).
+        /// Last cycle failed (message logged; the interface will show its own, task 7.9).
         case failed
     }
 
@@ -34,7 +34,7 @@ final class SyncCoordinator {
         self.interval = interval
     }
 
-    /// Suit les enregistrements de `context` et les réglages de `defaults`, et lance un premier cycle.
+    /// Observes the saves of `context` and the settings of `defaults`, and starts a first cycle.
     func start(observing context: ModelContext, defaults: UserDefaults) {
         stop()
         let center = NotificationCenter.default
@@ -58,7 +58,7 @@ final class SyncCoordinator {
         syncSoon(after: .zero)
     }
 
-    /// Plus aucun déclencheur ; un cycle en cours se termine.
+    /// No more triggers; a cycle in progress finishes.
     func stop() {
         observers.forEach(NotificationCenter.default.removeObserver)
         observers = []
@@ -68,7 +68,7 @@ final class SyncCoordinator {
         periodic = nil
     }
 
-    /// Changement de ce Mac : regroupé avec ceux qui suivent. Ceux qu'écrit la synchro elle-même sont ignorés.
+    /// Change on this Mac: grouped with the ones that follow. Those written by sync itself are ignored.
     private func localChange() {
         guard !engine.isSyncing else {
             return
@@ -76,7 +76,7 @@ final class SyncCoordinator {
         syncSoon(after: debounce)
     }
 
-    /// Un cycle après `delay` (remplace celui déjà prévu).
+    /// A cycle after `delay` (replaces the one already scheduled).
     func syncSoon(after delay: Duration) {
         scheduled?.cancel()
         scheduled = Task { [weak self] in
@@ -88,7 +88,7 @@ final class SyncCoordinator {
         }
     }
 
-    /// Un cycle tout de suite (« Synchroniser maintenant ») ; pendant un cycle, un autre suivra.
+    /// A cycle right away (“Sync Now”); during a cycle, another one will follow.
     func syncNow() async {
         guard !engine.isSyncing else {
             needsAnotherCycle = true

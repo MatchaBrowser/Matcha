@@ -3,7 +3,7 @@ import Foundation
 @testable import Matcha
 import Testing
 
-/// Effets des lignes de la barre de commande sur les onglets et les Spaces.
+/// Effects of the command bar rows on tabs and Spaces.
 @MainActor
 struct CommandBarExecutorTests {
     private let session: BrowserSession
@@ -134,7 +134,7 @@ struct CommandBarExecutorTests {
         let focused = executor().perform(.run(.perform(.copyURL), mode: .currentTab(tab.id)))
         #expect(focused === tab)
         #expect(pasteboard.string(forType: .string) == "about:blank?one")
-        // Même confirmation que ⇧⌘C.
+        // Same confirmation as ⇧⌘C.
         #expect(windowModel.copyConfirmation.isVisible)
         #expect(windowModel.copyConfirmation.presentationCount == 1)
     }
@@ -157,7 +157,7 @@ struct CommandBarExecutorTests {
         #expect(presentedDuringAction == [false])
         #expect(!model.isPresented)
 
-        // Rien à exécuter : la barre reste ouverte.
+        // Nothing to run: the bar stays open.
         tabManager.newTab()
         model.editCurrentTab(settings)
         executor.submit(nil)

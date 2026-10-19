@@ -2,7 +2,7 @@
 import Testing
 
 struct SpaceSwipeTrackerTests {
-    /// Joue un geste : un début puis des mouvements (doigts, vertical) ; renvoie les sens déclenchés.
+    /// Plays a gesture: a start then movements (fingers, vertical); returns the triggered directions.
     private func play(_ moves: [(Double, Double)]) -> [SpaceSwipeTracker.Direction] {
         var tracker = SpaceSwipeTracker()
         var directions: [SpaceSwipeTracker.Direction] = []

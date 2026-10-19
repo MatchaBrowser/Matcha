@@ -3,7 +3,7 @@ import Foundation
 import SwiftData
 import Testing
 
-/// Données de Matcha vues par la synchro (tâche 7.4) : instantané, et changements reçus appliqués à la session.
+/// Matcha data as seen by sync (task 7.4): snapshot, and received changes applied to the session.
 @MainActor
 struct MatchaSyncStoreTests {
     private let session: BrowserSession
@@ -84,10 +84,10 @@ struct MatchaSyncStoreTests {
         #expect(opened.tabManager.layout.folderEntries.map(\.name) == ["Projets"])
         #expect(opened.tabManager.layout.positions[inFolder]?.folderID == folder)
         #expect(opened.tabManager.todayTabs.map(\.id) == [today])
-        // Rien de chargé ni de sélectionné.
+        // Nothing loaded or selected.
         #expect(opened.tabManager.selectedTab == nil)
         #expect(opened.tabManager.tabs.allSatisfy { !$0.isLoaded })
-        // L'instantané rend ce qui a été reçu : rien ne repartira.
+        // The snapshot gives back what was received: nothing will be sent again.
         let snapshot = store.snapshot()
         for change in changes {
             if case let .upsert(id, fields) = change {
@@ -126,7 +126,7 @@ struct MatchaSyncStoreTests {
         #expect(home.tabManager.tab(withID: tab.id) == nil)
         #expect(session.spaces.map(\.id) == [home.id])
 
-        // L'onglet affiché, fermé ailleurs, reste là jusqu'à ce que l'utilisateur le ferme.
+        // The displayed tab, closed elsewhere, stays there until the user closes it.
         _ = store.apply([.delete(shown.id, .tab), .delete(home.id, .space)])
         #expect(home.tabManager.selectedTab === shown)
         #expect(session.spaces.map(\.id) == [home.id])

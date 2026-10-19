@@ -1,7 +1,7 @@
 import SwiftUI
 
-/// Bouton des réglages du site (tâche 5.2), à droite de la pastille d'adresse : visible quand la page affichée est
-/// un site web (http ou https). Il ouvre et ferme le panneau ; surligné tant que le panneau est ouvert.
+/// Site settings button (task 5.2), to the right of the address pill: visible when the displayed page is a website
+/// (http or https). It opens and closes the panel; highlighted while the panel is open.
 struct SiteSettingsButton: View {
     let tab: BrowserTab?
     let isPresented: Bool

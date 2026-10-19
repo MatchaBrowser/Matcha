@@ -1,11 +1,11 @@
 import AppKit
 import WebKit
 
-/// Page qui a ouvert une fenêtre de connexion (tâche 5.8), relevée à l'ouverture : son hôte et sa vue web (où vont les
-/// liens ⌘-clic et les fenêtres sans taille de la fenêtre de connexion), sa page (jamais mise en veille tant que la
-/// fenêtre est ouverte, sans quoi `window.opener` la perdrait : tâche 5.6), sa fenêtre (au-dessus de laquelle la
-/// fenêtre de connexion reste), et ce qui suit son profil : décisions de permission et historique. Les références
-/// sont faibles : la page d'origine peut se fermer avant la fenêtre de connexion, qui reste alors ouverte.
+/// Page that opened a sign-in window (task 5.8), recorded at opening: its host and its web view (where the sign-in
+/// window's ⌘-click links and size-less windows go), its page (never suspended while the window is open, otherwise
+/// `window.opener` would lose it: task 5.6), its window (above which the sign-in window stays), and what follows
+/// its profile: permission decisions and history. The references are weak: the originating page can close before
+/// the sign-in window, which then stays open.
 @MainActor
 struct PopupOpener {
     private(set) weak var host: (any TabHost)?
@@ -24,7 +24,7 @@ struct PopupOpener {
         history = host.historyScope(for: webView)
     }
 
-    /// Hôte et vue web de la page d'origine, s'il l'affiche encore (onglet ouvert, aperçu ou mini-fenêtre pas fermés).
+    /// Host and web view of the originating page, if it still shows it (tab open, peek or mini window not closed).
     var liveSource: (host: any TabHost, webView: WKWebView)? {
         guard let host, let webView, host.page(for: webView) != nil else {
             return nil

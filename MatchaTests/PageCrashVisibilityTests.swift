@@ -3,9 +3,9 @@ import Foundation
 import Testing
 import WebKit
 
-/// Arrêt du processus d'une page (tâche 5.7) dans une session, avec le suivi des fenêtres de la mise en veille (tâche
-/// 5.6) : seul ce qui est affiché dans une fenêtre ouverte, dans le Space affiché, se recharge tout de suite ; les pages
-/// des mini-fenêtres aussi. Vraies vues web, arrêts annoncés au délégué comme le fait WebKit.
+/// Termination of a page's process (task 5.7) in a session, with the window tracking of suspension (task 5.6): only
+/// what is shown in an open window, in the displayed Space, reloads right away; so do the pages of mini windows. Real
+/// web views, terminations reported to the delegate as WebKit does.
 @MainActor
 struct PageCrashVisibilityTests {
     private let session: BrowserSession
@@ -16,13 +16,13 @@ struct PageCrashVisibilityTests {
         session = try BrowserSession(container: BrowserSchema.makeContainer(inMemory: true))
         model = WindowModel(session: session, defaults: nil)
         let service = session.tabLifecycle
-        // Aucune mise en veille pendant ces tests : seul l'arrêt du processus libère une vue.
+        // No suspension during these tests: only the process termination releases a view.
         service.settings = { TabSuspensionSettings(delay: nil, checkInterval: .seconds(3600)) }
         service.listensToMemoryPressure = false
         service.windowDidAppear(model)
     }
 
-    /// Onglet sélectionné du Space affiché, sur la page locale `name`, une fois chargée.
+    /// Selected tab of the displayed Space, on the local page `name`, once loaded.
     private func openTab(_ name: String) async throws -> BrowserTab {
         let tab = model.space.tabManager.insertTab(configuration: pages.configuration(), after: nil, select: true)
         tab.load(TestPages.url(name))
@@ -51,7 +51,7 @@ struct PageCrashVisibilityTests {
         let first = model.space
         let tab = try await openTab("premier")
         model.newSpace()
-        // Toujours l'onglet affiché par son Space, mais ce Space n'est plus à l'écran.
+        // Still the tab shown by its Space, but this Space is no longer on screen.
         #expect(first.tabManager.displayedTabIDs == [tab.id])
         try terminate(tab, in: first)
         #expect(tab.webView == nil)
@@ -67,7 +67,7 @@ struct PageCrashVisibilityTests {
         try terminate(tab, in: model.space)
         #expect(tab.webView == nil)
 
-        // Ce que fait la fenêtre à son ouverture (`BrowserWindowView`).
+        // What the window does when it opens (`BrowserWindowView`).
         session.tabLifecycle.windowDidAppear(model)
         model.space.tabManager.loadSelectedTab()
         try await waitUntil { pages.count("fenetre") == 2 && tab.webView?.title == "fenetre" && !tab.isLoading }
@@ -78,7 +78,7 @@ struct PageCrashVisibilityTests {
         minis.makeConfiguration = { [pages] _ in pages.configuration() }
         let mini = minis.openNew(loading: TestPages.url("mini"), source: .link)
         try await waitUntil { mini.tab.title == "mini" && !mini.tab.isLoading }
-        // Fenêtre principale fermée : la mini-fenêtre, elle, est ouverte.
+        // Main window closed: the mini window, however, is open.
         session.tabLifecycle.windowDidDisappear(model)
 
         let webView = try #require(mini.tab.webView)

@@ -1,24 +1,23 @@
 import Foundation
 import OSLog
 
-/// Suggestions du moteur de recherche, demandées 150 ms après la dernière frappe : une frappe plus
-/// récente annule la tâche, donc l'attente, et rien n'est envoyé. Seulement pour un texte lu comme
-/// une recherche (et qui n'a pas l'air d'une adresse), réglage activé, hors fenêtre privée. Le texte
-/// tapé n'est jamais journalisé.
+/// Search engine suggestions, requested 150 ms after the last keystroke: a more recent keystroke cancels the task,
+/// hence the wait, and nothing is sent. Only for a text read as a search (and that does not look like an address),
+/// setting enabled, outside a private window. The typed text is never logged.
 @MainActor
 final class SearchSuggestionsProvider: CommandProvider {
     typealias Fetch = @MainActor (String, SearchEngine) async throws -> [String]
     typealias Sleep = @MainActor (Duration) async throws -> Void
 
-    /// Attente avant la demande.
+    /// Wait before the request.
     nonisolated static let delay = Duration.milliseconds(150)
-    /// Au-delà, le texte n'est pas envoyé.
+    /// Beyond this, the text is not sent.
     nonisolated static let maximumLength = 120
 
     private let fetch: Fetch
     private let sleep: Sleep
 
-    /// `fetch` et `sleep` sont remplacés dans les tests.
+    /// `fetch` and `sleep` are replaced in tests.
     init(
         fetch: @escaping Fetch = { try await SearchSuggestionClient.shared.suggestions(for: $0, engine: $1) },
         sleep: @escaping Sleep = { try await Task.sleep(for: $0) },
@@ -27,16 +26,16 @@ final class SearchSuggestionsProvider: CommandProvider {
         self.sleep = sleep
     }
 
-    /// Vrai seulement si : suggestions permises (réglage et fenêtre non privée), texte lu comme une
-    /// recherche qui ne ressemble pas à une adresse, 1 à 120 caractères.
+    /// True only if: suggestions allowed (setting and non-private window), text read as a search that does not
+    /// look like an address, 1 to 120 characters.
     nonisolated static func allowsRequest(for query: CommandQuery, context: CommandContext) -> Bool {
         context.allowsSuggestions && query.isSearch && !looksLikeAddress(query)
             && (1 ... maximumLength).contains(query.trimmed.count)
     }
 
-    /// Un seul mot avec « : », « / » ou « @ » : sans doute une adresse que `AddressResolver` lit comme
-    /// une recherche (« intranet:8080 », « wiki/rh/salaires », une adresse e-mail). Elle ne part pas
-    /// chez le moteur, même si Entrée la cherche.
+    /// A single word with “:”, “/” or “@”: probably an address that `AddressResolver` reads as a search
+    /// (“intranet:8080”, “wiki/hr/salaries”, an email address). It is not sent to the engine, even if Return
+    /// searches it.
     private nonisolated static func looksLikeAddress(_ query: CommandQuery) -> Bool {
         query.tokens.count == 1 && query.trimmed.contains { ":/@".contains($0) }
     }
@@ -56,8 +55,7 @@ final class SearchSuggestionsProvider: CommandProvider {
         }
     }
 
-    /// Annulation (frappe suivante, barre fermée) : silencieuse. Le reste : la raison, jamais le texte
-    /// ni l'adresse.
+    /// Cancellation (next keystroke, bar closed): silent. Anything else: the reason, never the text or the address.
     private static func log(_ error: any Error, engine: SearchEngine) {
         if error is CancellationError || (error as? URLError)?.code == .cancelled {
             return

@@ -3,8 +3,8 @@ import Foundation
 import SwiftData
 import Testing
 
-/// Liens ouverts par d'autres apps (tâche 8.2) : ils attendent que l'app soit prête, puis s'ouvrent dans une
-/// mini-fenêtre ou dans un nouvel onglet du Space affiché, selon le réglage.
+/// Links opened by other apps (task 8.2): they wait until the app is ready, then open in a mini window or in a new
+/// tab of the displayed Space, depending on the setting.
 @MainActor
 struct IncomingLinksTests {
     private let session: BrowserSession

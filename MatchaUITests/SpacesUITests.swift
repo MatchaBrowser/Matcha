@@ -1,6 +1,6 @@
 import XCTest
 
-/// Spaces : création, passage de l'un à l'autre, favoris partagés, renommage, suppression.
+/// Spaces: creation, switching from one to another, shared Favorites, renaming, deletion.
 final class SpacesUITests: XCTestCase {
     override func setUpWithError() throws {
         continueAfterFailure = false
@@ -56,7 +56,7 @@ final class SpacesUITests: XCTestCase {
         let nameField = app.dialogs.textFields.firstMatch.exists ? app.dialogs.textFields.firstMatch : app.sheets.textFields.firstMatch
         XCTAssertTrue(nameField.waitForExistence(timeout: 3))
         nameField.typeKey("a", modifierFlags: .command)
-        // Entrée valide l'alerte (son bouton par défaut est « Renommer »).
+        // Return confirms the alert (its default button is “Rename”).
         nameField.typeText("Travail\n")
         XCTAssertTrue(app.descendants(matching: .any)["Space Travail"].waitForExistence(timeout: 3))
 

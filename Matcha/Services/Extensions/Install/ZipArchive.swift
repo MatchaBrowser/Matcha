@@ -1,10 +1,10 @@
 import Compression
 import Foundation
 
-/// Lecture d'une archive zip (tâche 6.4) : `.zip`, `.xpi` de Firefox, ou contenu d'un `.crx` de Chrome
-/// (`ExtensionPackage`). Seuls les fichiers rangés tels quels ou compressés en « deflate » sont pris ; une archive
-/// chiffrée ou au format zip64 est refusée, comme toute entrée qui sortirait du dossier (chemin absolu, `..`) ; les
-/// liens symboliques sont ignorés. Tailles bornées contre les archives démesurées. Type pur.
+/// Reading of a zip archive (task 6.4): `.zip`, Firefox `.xpi`, or the content of a Chrome `.crx` (`ExtensionPackage`).
+/// Only files stored as is or compressed with “deflate” are accepted; an encrypted or zip64 archive is refused, as is
+/// any entry that would leave the folder (absolute path, `..`); symbolic links are ignored. Sizes are bounded against
+/// oversized archives. Pure type.
 nonisolated struct ZipArchive {
     enum Failure: Error, Equatable {
         case notAnArchive
@@ -15,7 +15,7 @@ nonisolated struct ZipArchive {
     }
 
     struct Entry: Equatable {
-        /// Chemin relatif, composants séparés par « / » ; finit par « / » pour un dossier.
+        /// Relative path, components separated by “/”; ends with “/” for a folder.
         let path: String
         let method: UInt16
         let crc32: UInt32
@@ -29,9 +29,9 @@ nonisolated struct ZipArchive {
         }
     }
 
-    /// Taille totale décompressée au plus.
+    /// Maximum total uncompressed size.
     static let maximumTotalSize = 512 * 1024 * 1024
-    /// Nombre d'entrées au plus.
+    /// Maximum number of entries.
     static let maximumEntryCount = 20000
 
     let entries: [Entry]
@@ -50,7 +50,7 @@ nonisolated struct ZipArchive {
         }
     }
 
-    /// Contenu décompressé de `entry`, vérifié (taille, CRC-32).
+    /// Uncompressed content of `entry`, checked (size, CRC-32).
     func contents(of entry: Entry) throws -> Data {
         let start = entry.localHeaderOffset
         guard try Self.uint32(data, at: start) == 0x0403_4B50 else {
@@ -78,7 +78,7 @@ nonisolated struct ZipArchive {
         return contents
     }
 
-    /// Écrit les fichiers et dossiers de l'archive dans `directory` (créé au besoin).
+    /// Writes the files and folders of the archive into `directory` (created if needed).
     func extract(to directory: URL, fileManager: FileManager = .default) throws {
         try fileManager.createDirectory(at: directory, withIntermediateDirectories: true)
         for entry in entries where !entry.isSymbolicLink {
@@ -96,8 +96,7 @@ nonisolated struct ZipArchive {
         }
     }
 
-    /// Composants d'un chemin d'entrée ; refusé s'il est absolu, contient `..`, une barre oblique inverse ou un
-    /// caractère nul.
+    /// Components of an entry path; refused if it is absolute, or contains `..`, a backslash or a null character.
     static func safeComponents(of path: String) throws -> [String] {
         guard !path.hasPrefix("/"), !path.contains("\\"), !path.contains("\0") else {
             throw Failure.unsafePath(path)
@@ -109,7 +108,7 @@ nonisolated struct ZipArchive {
         return components
     }
 
-    // MARK: Lecture
+    // MARK: Reading
 
     private static func readCentralDirectory(of data: Data) throws -> [Entry] {
         let end = try endOfCentralDirectory(in: data)
@@ -132,7 +131,7 @@ nonisolated struct ZipArchive {
         return entries
     }
 
-    /// Entrée du répertoire central qui commence à `position`, et la position de la suivante.
+    /// Central directory entry that starts at `position`, and the position of the next one.
     private static func readEntry(in data: Data, at position: Int) throws -> (Entry, next: Int) {
         guard try uint32(data, at: position) == 0x0201_4B50 else {
             throw Failure.corrupted
@@ -156,11 +155,11 @@ nonisolated struct ZipArchive {
             throw Failure.corrupted
         }
         let nameData = data.subdata(in: data.startIndex + nameStart ..< data.startIndex + nameStart + nameLength)
-        // Bit 11 : nom en UTF-8 ; sinon, en pratique aussi de l'UTF-8 ou de l'ASCII.
+        // Bit 11: name in UTF-8; otherwise, in practice also UTF-8 or ASCII.
         guard let path = String(data: nameData, encoding: .utf8) ?? String(data: nameData, encoding: .isoLatin1) else {
             throw Failure.corrupted
         }
-        // Créée sous Unix (octet haut de « made by » = 3) : type de fichier dans les attributs externes.
+        // Created on Unix (high byte of “made by” = 3): file type in the external attributes.
         let mode = try uint32(data, at: position + 38) >> 16
         let entry = try Entry(
             path: path,
@@ -174,7 +173,7 @@ nonisolated struct ZipArchive {
         return (entry, nameStart + nameLength + extraLength + commentLength)
     }
 
-    /// Position de la fin du répertoire central, cherchée depuis la fin (après un commentaire éventuel).
+    /// Position of the end of the central directory, searched from the end (after a possible comment).
     private static func endOfCentralDirectory(in data: Data) throws -> Int {
         guard data.count >= 22 else {
             throw Failure.notAnArchive
@@ -197,7 +196,7 @@ nonisolated struct ZipArchive {
         var output = Data(count: size)
         let written = output.withUnsafeMutableBytes { destination in
             compressed.withUnsafeBytes { source in
-                // `COMPRESSION_ZLIB` lit le « deflate » brut (RFC 1951) des archives zip.
+                // `COMPRESSION_ZLIB` reads the raw “deflate” (RFC 1951) of zip archives.
                 compression_decode_buffer(
                     destination.bindMemory(to: UInt8.self).baseAddress!, size,
                     source.bindMemory(to: UInt8.self).baseAddress!, compressed.count,
@@ -228,7 +227,7 @@ nonisolated struct ZipArchive {
     }
 }
 
-/// Somme de contrôle CRC-32 des archives zip (polynôme 0xEDB88320). Type pur.
+/// CRC-32 checksum of zip archives (polynomial 0xEDB88320). Pure type.
 nonisolated enum CRC32 {
     private static let table: [UInt32] = (0 ..< 256).map { index in
         (0 ..< 8).reduce(UInt32(index)) { crc, _ in crc & 1 == 1 ? 0xEDB8_8320 ^ (crc >> 1) : crc >> 1 }

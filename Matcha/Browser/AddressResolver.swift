@@ -1,20 +1,20 @@
 import Foundation
 
-/// Transforme le texte tapé dans le champ d'adresse en URL :
-/// adresse complète telle quelle, hôte auquel on ajoute un schéma, ou recherche.
+/// Turns the text typed in the address field into a URL:
+/// a full address as is, a host to which a scheme is added, or a search.
 nonisolated struct AddressResolver: Sendable {
     var searchEngine = SearchEngine.defaultEngine
 
-    /// Schémas acceptés tels quels.
+    /// Schemes accepted as is.
     static let directSchemes: Set<String> = ["http", "https", "file", "about"]
 
-    /// URL à ouvrir pour `input`, ou nil si le texte est vide.
+    /// URL to open for `input`, or nil if the text is empty.
     func resolve(_ input: String) -> URL? {
         interpret(input)?.url
     }
 
-    /// Lecture de `input` : adresse (schéma accepté tel quel, ou hôte auquel on ajoute un schéma)
-    /// ou recherche ; nil si le texte est vide.
+    /// Reading of `input`: an address (accepted scheme as is, or a host to which a scheme is added)
+    /// or a search; nil if the text is empty.
     func interpret(_ input: String) -> AddressInterpretation? {
         let text = input.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !text.isEmpty else {
@@ -29,8 +29,8 @@ nonisolated struct AddressResolver: Sendable {
         return searchEngine.searchURL(for: text).map(AddressInterpretation.search)
     }
 
-    /// URL complète si `text` ressemble à « hôte[:port][/chemin] », sans espace.
-    /// Les hôtes locaux (localhost, adresses IP, `.local`) reçoivent `http://`, les autres `https://`.
+    /// Full URL if `text` looks like “host[:port][/path]”, with no space.
+    /// Local hosts (localhost, IP addresses, `.local`) get `http://`, the others `https://`.
     private func hostURL(for text: String) -> URL? {
         guard !text.contains(where: \.isWhitespace) else {
             return nil
@@ -44,10 +44,10 @@ nonisolated struct AddressResolver: Sendable {
     }
 }
 
-/// Ce que désigne un texte tapé : une adresse à ouvrir ou une recherche à lancer.
+/// What a typed text designates: an address to open or a search to run.
 nonisolated enum AddressInterpretation: Equatable, Sendable {
     case address(URL)
-    /// Recherche du texte sur le moteur choisi ; l'URL est celle de la page de résultats.
+    /// Search for the text on the chosen engine; the URL is that of the results page.
     case search(URL)
 
     var url: URL {
@@ -57,16 +57,16 @@ nonisolated enum AddressInterpretation: Equatable, Sendable {
     }
 }
 
-/// Nature de la partie « hôte[:port] » d'une adresse tapée sans schéma.
+/// Nature of the “host[:port]” part of an address typed without a scheme.
 private nonisolated enum HostKind {
-    /// Nom de domaine public, servi en HTTPS.
+    /// Public domain name, served over HTTPS.
     case domain
-    /// localhost, adresse IP ou nom `.local` : serveurs de développement, box, imprimantes.
+    /// localhost, IP address or `.local` name: development servers, routers, printers.
     case local
 
-    /// Nil si `authority` ne ressemble pas à un hôte.
+    /// Nil if `authority` does not look like a host.
     init?(authority: Substring) {
-        // Un « @ » signale plutôt une adresse e-mail, qu'on cherche.
+        // An “@” rather signals an e-mail address, which we search for.
         guard !authority.isEmpty, !authority.contains("@") else {
             return nil
         }
@@ -94,7 +94,7 @@ private nonisolated enum HostKind {
         }
     }
 
-    /// « [::1] » ou « [::1]:8080 ».
+    /// “[::1]” or “[::1]:8080”.
     private static func isBracketedIPv6(_ authority: Substring) -> Bool {
         guard let close = authority.firstIndex(of: "]") else {
             return false
@@ -120,8 +120,8 @@ private nonisolated enum HostKind {
         }
     }
 
-    /// Au moins deux étiquettes séparées par des points, la dernière contenant une lettre :
-    /// « apple.com » oui, « 6.4 » non. Un point final est toléré.
+    /// At least two labels separated by dots, the last one containing a letter:
+    /// “apple.com” yes, “6.4” no. A trailing dot is tolerated.
     private static func isDomainName(_ text: String) -> Bool {
         var labels = text.split(separator: ".", omittingEmptySubsequences: false)
         if labels.count > 2, labels.last?.isEmpty == true {

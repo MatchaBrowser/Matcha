@@ -1,9 +1,9 @@
 import XCTest
 
-/// Réglages du site (tâche 5.2) : bouton à côté de l'adresse, panneau sous la pastille ou en haut de la carte, caméra
-/// et micro, effacement des données avec confirmation, liste des Réglages > Confidentialité. Le bandeau des demandes de
-/// permission n'a pas de déclencheur sans réseau, et une vraie demande `getUserMedia` passe aussi par la demande d'accès
-/// de macOS : il est couvert par les tests unitaires (`NavigationCoordinatorPermissionTests`) et à la main.
+/// Site settings (task 5.2): button next to the address, panel below the pill or at the top of the card, camera
+/// and microphone, data clearing with confirmation, list in Settings > Privacy. The permission request banner
+/// has no trigger without network, and a real `getUserMedia` request also goes through the macOS access request:
+/// it is covered by the unit tests (`NavigationCoordinatorPermissionTests`) and by hand.
 final class SiteSettingsUITests: XCTestCase {
     override func setUpWithError() throws {
         continueAfterFailure = false
@@ -24,7 +24,7 @@ final class SiteSettingsUITests: XCTestCase {
         let app = launchApp()
         checkSiteSettingsPanel(in: app)
 
-        // La décision choisie figure dans Réglages > Confidentialité, d'où on peut l'oublier.
+        // The chosen decision appears in Settings > Privacy, where it can be forgotten.
         app.typeKey(",", modifierFlags: .command)
         let privacy = app.toolbars.buttons["Confidentialité"]
         XCTAssertTrue(privacy.waitForExistence(timeout: 5))
@@ -44,9 +44,9 @@ final class SiteSettingsUITests: XCTestCase {
         checkSiteSettingsPanel(in: app)
     }
 
-    /// Sur example.com : rien ne s'ouvre de soi-même ; le bouton ouvre le panneau (site, caméra et micro sur
-    /// « Demander ») ; « Autoriser » est retenu ; « Effacer… » demande confirmation et « Annuler » n'efface rien ; la croix
-    /// ferme le panneau et le bouton le rouvre puis le referme.
+    /// On example.com: nothing opens by itself; the button opens the panel (site, camera and microphone on
+    /// “Ask”); “Allow” is remembered; “Clear…” asks for confirmation and “Cancel” clears nothing; the cross
+    /// closes the panel and the button reopens it then closes it again.
     @MainActor
     private func checkSiteSettingsPanel(in app: XCUIApplication) {
         XCTAssertTrue(waitForBrowserWindow(of: app))
@@ -58,7 +58,7 @@ final class SiteSettingsUITests: XCTestCase {
 
         button.click()
         XCTAssertTrue(panel.waitForExistence(timeout: 3))
-        // Un texte statique expose son texte dans sa valeur ; son libellé reste vide.
+        // A static text exposes its text in its value; its label stays empty.
         XCTAssertEqual(panel.staticTexts["siteSettingsTitle"].value as? String, "example.com")
         let camera = permissionPicker(.camera, in: app)
         XCTAssertTrue(camera.exists)

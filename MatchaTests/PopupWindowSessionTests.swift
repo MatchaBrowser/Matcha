@@ -4,8 +4,8 @@ import Foundation
 import Testing
 import WebKit
 
-/// Fenêtres de connexion (tâche 5.8) dans une session : Spaces, mini-fenêtres, fenêtre privée, profils. Vraies vues
-/// web, pages de `TestPages`, fenêtres jamais affichées, fermées à la fin de chaque test (`PopupWindowTests`).
+/// Sign-in windows (task 5.8) in a session: Spaces, mini windows, private window, profiles. Real web views, pages from
+/// `TestPages`, windows never shown, closed at the end of each test (`PopupWindowTests`).
 @MainActor
 @Suite(.serialized)
 final class PopupWindowSessionTests {
@@ -26,7 +26,7 @@ final class PopupWindowSessionTests {
         session.popupWindows
     }
 
-    /// Onglet sélectionné du Space `space` sur la page locale `name`, une fois chargée.
+    /// Selected tab of the Space `space` on the local page `name`, once loaded.
     private func openTab(
         _ name: String,
         in space: SpaceSession,
@@ -40,7 +40,7 @@ final class PopupWindowSessionTests {
         return tab
     }
 
-    /// Fenêtre de connexion ouverte par `tab` du Space `space`, par le délégué comme le fait WebKit.
+    /// Sign-in window opened by `tab` of the Space `space`, through the delegate as WebKit does.
     @discardableResult
     private func openPopup(from tab: BrowserTab, in space: SpaceSession) throws -> PopupWindowController {
         let webView = try #require(space.tabManager.coordinator.webView(
@@ -60,7 +60,7 @@ final class PopupWindowSessionTests {
         #expect(popups.downloadScope == .regular)
     }
 
-    /// Permissions et historique : ceux du profil et du Space de la page d'origine.
+    /// Permissions and history: those of the profile and the Space of the originating page.
     @Test func `a sign-in window uses the profile of its opener`() async throws {
         let space = model.space
         let tab = try await openTab("ouvrant", in: space)
@@ -109,8 +109,8 @@ final class PopupWindowSessionTests {
         #expect(popups.windows.map(\.id) == [keptPopup.id])
     }
 
-    /// Depuis une mini-fenêtre : pas de nouvelle mini-fenêtre, et ⌘-clic dans la fenêtre de connexion ajoute un
-    /// onglet en arrière-plan au Space visé, comme depuis la mini-fenêtre.
+    /// From a mini window: no new mini window, and ⌘-click in the sign-in window adds a background tab to the target
+    /// Space, as from the mini window.
     @Test func `a sign-in window from a mini window`() async throws {
         let miniWindows = MiniWindowManager.forTests(session: session)
         let mini = miniWindows.openNew(loading: TestPages.url("ouvrant"), source: .link)

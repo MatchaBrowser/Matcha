@@ -3,9 +3,9 @@ import OSLog
 import UniformTypeIdentifiers
 import WebKit
 
-/// « Enregistrer sous… » du menu d'une page : la zone d'enregistrement s'ouvre en feuille sur sa fenêtre, au titre de
-/// la page, avec le choix du format comme dans Safari : archive web (la page et ses ressources, `createWebArchiveData`)
-/// ou code source (relu comme pour « Afficher le code source »). Une erreur est montrée dans une alerte.
+/// “Save As…” in a page's menu: the save panel opens as a sheet on its window, titled after the page, with the choice
+/// of format as in Safari: web archive (the page and its resources, `createWebArchiveData`) or source code (reloaded
+/// as for “View Page Source”). An error is shown in an alert.
 @MainActor
 enum PageSaver {
     enum Format: Int, CaseIterable {
@@ -75,7 +75,7 @@ enum PageSaver {
         }
     }
 
-    /// Choix du format sous la zone d'enregistrement ; l'extension du nom suit.
+    /// Format choice under the save panel; the name's extension follows.
     private final class FormatAccessory: NSObject {
         let view: NSView
         private let popUp = NSPopUpButton()

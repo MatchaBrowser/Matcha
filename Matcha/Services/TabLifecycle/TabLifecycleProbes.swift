@@ -1,24 +1,24 @@
 import AppKit
 import WebKit
 
-/// Ce que la mise en veille demande à WebKit (tâche 5.6), remplaçable dans les tests : le son, et la capture de la
-/// page. Les deux sont asynchrones ; sans réponse à temps, la page est tenue pour occupée (pas de veille) ou sans
-/// capture.
+/// What tab sleeping asks WebKit (task 5.6), replaceable in the tests: the sound, and the page snapshot. Both are
+/// asynchronous; without an answer in time, the page is considered busy (no sleep) or without a snapshot.
 @MainActor
 struct TabLifecycleProbes {
-    /// Délai de réponse de WebKit : une page qui ne répond pas joue peut-être du son.
+    /// WebKit's answer deadline: a page that does not answer may be playing sound.
     static let timeout = Duration.seconds(2)
 
-    /// Vrai si la page joue un média, ou si WebKit n'a pas répondu à temps.
+    /// True if the page is playing media, or if WebKit did not answer in time.
     var isPlayingMedia: @MainActor (WKWebView) async -> Bool
-    /// Capture de la page affichée par la vue (son adresse est donnée à part), ou nil.
+    /// Snapshot of the page displayed by the view (its address is given separately), or nil.
     var snapshot: @MainActor (WKWebView, URL?) async -> TabSnapshot?
 
     static let webKit = TabLifecycleProbes(isPlayingMedia: isPlayingMedia(in:), snapshot: snapshot(of:url:))
 
-    /// `requestMediaPlaybackState` : seul « en lecture » compte (une vidéo en pause peut se décharger). Prudent :
-    /// vérifié (tâche 5.10), WebKit répond « en lecture » dès qu'un média de la page n'est pas en pause, même chargé
-    /// mais jamais lancé ou coupé (Web Audio et `new Audio()` compris), et « en pause » dès qu'un seul l'est.
+    /// `requestMediaPlaybackState`: only “playing” counts (a paused video can be unloaded). Conservative: as
+    /// checked (task 5.10), WebKit answers “playing” as soon as a media element of the page is not paused, even
+    /// loaded but never started, or muted (Web Audio and `new Audio()` included), and “paused” when none plays but
+    /// one is paused.
     static func isPlayingMedia(in webView: WKWebView) async -> Bool {
         await CallbackTimeout.value(timeout: timeout, fallback: true) { done in
             webView.requestMediaPlaybackState { state in
@@ -27,9 +27,9 @@ struct TabLifecycleProbes {
         }
     }
 
-    /// `takeSnapshot` de la partie visible de la page, sans attendre une mise à jour de l'écran : la vue d'un onglet
-    /// caché n'est dans aucune fenêtre (WebKit dessine quand même la page). Rien pour une vue sans taille (onglet
-    /// ouvert en arrière-plan, jamais affiché).
+    /// `takeSnapshot` of the visible part of the page, without waiting for a screen update: the view of a hidden tab is
+    /// in no window (WebKit draws the page anyway). Nothing for a view without a size (tab opened in the background,
+    /// never displayed).
     static func snapshot(of webView: WKWebView, url: URL?) async -> TabSnapshot? {
         let width = webView.bounds.width
         guard width >= 1, webView.bounds.height >= 1 else {

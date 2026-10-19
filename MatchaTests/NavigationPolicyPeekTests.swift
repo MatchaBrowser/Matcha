@@ -3,7 +3,7 @@ import AppKit
 import Testing
 import WebKit
 
-/// Règles de l'aperçu (Peek, tâche 4.4) : Maj+clic, liens dans l'aperçu, liens d'un favori ou d'un épinglé.
+/// Peek rules (task 4.4): Shift-click, links inside Peek, links from a favorite or a pinned tab.
 struct NavigationPolicyPeekTests {
     private static let link = "https://example.org/target"
     private static let start = "https://example.com/start"
@@ -40,9 +40,9 @@ struct NavigationPolicyPeekTests {
         .openInPeek(URL(string: text)!)
     }
 
-    // MARK: Maj+clic
+    // MARK: Shift-click
 
-    /// Bouton gauche, ou Maj+Entrée sur un lien ; un clic simulé n'emporte jamais Maj, mais la règle n'en dépend pas.
+    /// Left button, or Shift-Return on a link; a simulated click never carries Shift, but the rule does not rely on it.
     @Test(arguments: [1, 0])
     func `shift click opens the link in Peek`(button: Int) {
         #expect(NavigationPolicy.decide(request(button: button)) == peek())
@@ -80,7 +80,7 @@ struct NavigationPolicyPeekTests {
         #expect(NavigationPolicy.decide(request(modifiers: [], button: 4)) == .openInNewTab(url, inBackground: true))
     }
 
-    /// Un lien `download` se télécharge (tâche 5.1) : l'aperçu resterait vide.
+    /// A `download` link is downloaded (task 5.1): Peek would stay empty.
     @Test func `shift click on a download link downloads`() {
         #expect(NavigationPolicy.decide(request(download: true)) == .download)
     }
@@ -119,7 +119,7 @@ struct NavigationPolicyPeekTests {
         #expect(NavigationPolicy.decide(request(url: file, pageURL: "file:///usr/share/doc/postfix/html/index.html")) == peek(file))
     }
 
-    // MARK: Dans l'aperçu
+    // MARK: Inside Peek
 
     @Test func `links inside Peek stay in Peek`() {
         #expect(NavigationPolicy.decide(request(modifiers: [], source: .peek)) == .allow)
@@ -144,9 +144,9 @@ struct NavigationPolicyPeekTests {
         #expect(NavigationPolicy.decide(request(modifiers: [], source: .other, otherSites: true)) == .allow)
     }
 
-    // MARK: Favoris et épinglés (réglage)
+    // MARK: Favorites and pinned tabs (setting)
 
-    /// Clic gauche sans touche depuis un favori ou un épinglé, réglage activé.
+    /// Left click with no modifier from a favorite or a pinned tab, setting enabled.
     private func pinned(
         url: String = link,
         modifiers: NSEvent.ModifierFlags = [],

@@ -4,9 +4,9 @@ import SwiftData
 import Testing
 import WebKit
 
-/// Page qui plante en boucle (tâche 5.7) : au second arrêt en moins de 30 s, plus de rechargement automatique, un
-/// message attend l'utilisateur ; le rechargement après un arrêt n'est pas une visite de l'historique. Vraies vues web,
-/// arrêts annoncés au délégué comme le fait WebKit, horloge de test.
+/// Page that crashes in a loop (task 5.7): on the second termination within 30 s, no more automatic reload, a message
+/// waits for the user; the reload after a termination is not a history visit. Real web views, terminations reported
+/// to the delegate as WebKit does, test clock.
 @MainActor
 struct PageCrashLoopTests {
     private let manager = TabManager(websiteDataStore: .nonPersistent())
@@ -17,7 +17,7 @@ struct PageCrashLoopTests {
         manager.coordinator.now = { [clock] in clock.now }
     }
 
-    /// Onglet sélectionné sur la page locale « page », une fois chargée.
+    /// Selected tab on the local page “page”, once loaded.
     private func openTab() async throws -> BrowserTab {
         let tab = manager.insertTab(configuration: pages.configuration(), after: nil, select: true)
         tab.load(TestPages.url("page"))
@@ -29,7 +29,7 @@ struct PageCrashLoopTests {
         try manager.coordinator.webViewWebContentProcessDidTerminate(#require(tab.webView))
     }
 
-    /// Rechargement terminé : `count` requêtes en tout pour la page, reprise finie.
+    /// Reload finished: `count` requests in all for the page, resumption done.
     private func waitForReload(of tab: BrowserTab, requests count: Int) async throws {
         try await waitUntil { pages.count("page") == count && !tab.crash.isRecovering && !tab.isLoading }
     }
@@ -49,12 +49,12 @@ struct PageCrashLoopTests {
         try await Task.sleep(for: .milliseconds(200))
         #expect(pages.count("page") == 2)
 
-        // Bouton « Recharger » du message, comme ⌘R : le message part tout de suite.
+        // The message's “Reload” button, like ⌘R: the message goes away right away.
         tab.reload()
         #expect(!tab.crash.isShowingProblem)
         try await waitForReload(of: tab, requests: 3)
 
-        // Encore dans les 30 s : de nouveau le message.
+        // Still within the 30 s: the message again.
         clock.advance(5)
         try terminate(tab)
         #expect(tab.crash.isShowingProblem)
@@ -82,7 +82,7 @@ struct PageCrashLoopTests {
         try await waitUntil { tab.title == "ailleurs" && !tab.crash.isRecovering && !tab.isLoading }
     }
 
-    /// Un onglet quitté pendant la boucle garde sa vue et son message : il ne se recharge pas non plus quand on l'affiche.
+    /// A tab left during the loop keeps its view and its message: it does not reload when shown either.
     @Test func `a hidden page that crashed twice shows the message when shown`() async throws {
         let tab = try await openTab()
         try terminate(tab)
@@ -100,11 +100,11 @@ struct PageCrashLoopTests {
         try await waitForReload(of: tab, requests: 3)
     }
 
-    /// Documentation livrée avec macOS : page locale (`file:`), retenue dans l'historique, sans réseau.
+    /// Documentation shipped with macOS: a local page (`file:`), kept in the history, without network.
     nonisolated static let localDocs = "/usr/share/doc/postfix/html/index.html"
 
-    /// Comme la sortie de veille (tâche 5.6) : ni le rechargement automatique ni celui du message ne sont des visites,
-    /// même plus d'une minute après la visite (un rechargement ordinaire en serait une nouvelle).
+    /// Like waking from suspension (task 5.6): neither the automatic reload nor the one from the message is a visit,
+    /// even more than a minute after the visit (an ordinary reload would be a new one).
     @Test(.enabled(if: FileManager.default.isReadableFile(atPath: localDocs)))
     func `a reload after a crash is not a new visit`() async throws {
         let container = try BrowserSchema.makeContainer(inMemory: true)
@@ -129,7 +129,7 @@ struct PageCrashLoopTests {
         #expect(visits() == 1)
         #expect(tab.title == "Postfix Documentation")
 
-        // Témoin : un rechargement ordinaire, plus d'une minute après, est une visite.
+        // Control: an ordinary reload, more than a minute later, is a visit.
         clock.advance(120)
         tab.reload()
         try await waitUntil { visits() == 2 }

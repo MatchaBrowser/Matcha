@@ -1,16 +1,16 @@
 import AppKit
 import OSLog
 
-/// Demande à l'utilisateur ce qu'une extension réclame en cours d'exécution (tâche 6.3). Une seule réponse, et vrai
-/// seulement s'il accepte : rien n'est jamais accordé d'office. Remplacé dans les tests.
+/// Asks the user what an extension requests while running (task 6.3). A single answer, and true only if the user
+/// accepts: nothing is ever granted automatically. Replaced in the tests.
 @MainActor
 protocol ExtensionPermissionPrompting: AnyObject {
     func ask(_ request: ExtensionPermissionRequest, completion: @escaping @MainActor (Bool) -> Void)
 }
 
-/// Alerte minimale, en feuille sur la fenêtre principale de l'app : le nom de l'extension, les permissions et les sites
-/// demandés, « Refuser » (bouton par défaut : Entrée n'accorde rien) et « Autoriser ». L'écran des permissions de la tâche 6.4
-/// (panneau intégré) la remplacera. Sans fenêtre, la demande est refusée.
+/// Minimal alert, as a sheet on the app's main window: the extension's name, the requested permissions and websites,
+/// “Don't Allow” (default button: Return grants nothing) and “Allow”. The permissions screen of task 6.4 (built-in
+/// panel) will replace it. Without a window, the request is denied.
 @MainActor
 final class ExtensionPermissionAlert: ExtensionPermissionPrompting {
     func ask(_ request: ExtensionPermissionRequest, completion: @escaping @MainActor (Bool) -> Void) {
@@ -25,7 +25,7 @@ final class ExtensionPermissionAlert: ExtensionPermissionPrompting {
             comment: "Alert shown when a browser extension asks for more permissions; %@ is the extension name",
         )
         alert.informativeText = Self.details(of: request)
-        // Refuser d'abord : c'est le bouton par défaut.
+        // “Don't Allow” first: it is the default button.
         alert.addButton(withTitle: String(
             localized: "Extension Prompt Deny",
             defaultValue: "Don't Allow",
@@ -43,7 +43,7 @@ final class ExtensionPermissionAlert: ExtensionPermissionPrompting {
         }
     }
 
-    /// Lignes de l'alerte : permissions, puis sites (ou « Tous les sites »), listes au format de la langue.
+    /// Lines of the alert: permissions, then websites (or “all websites”), lists in the language's format.
     static func details(of request: ExtensionPermissionRequest) -> String {
         var lines: [String] = []
         if !request.permissions.isEmpty {

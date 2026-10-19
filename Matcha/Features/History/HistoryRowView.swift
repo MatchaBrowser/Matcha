@@ -1,7 +1,7 @@
 import SwiftUI
 
-/// Ligne de l'historique : icône du site (celle en cache, sinon l'initiale), titre, domaine et heure de la dernière
-/// visite du jour.
+/// History row: site icon (the cached one, otherwise the initial), title, domain and time of the day's last
+/// visit.
 struct HistoryRowView: View {
     let row: HistoryRow
     let faviconService: FaviconService
@@ -24,7 +24,7 @@ struct HistoryRowView: View {
                 .monospacedDigit()
         }
         .help(Text(verbatim: row.url.absoluteString))
-        // Texte statique : sous macOS, un simple groupe n'expose pas sa valeur (le domaine).
+        // Static text: on macOS, a plain group does not expose its value (the domain).
         .accessibilityElement(children: .ignore)
         .accessibilityAddTraits(.isStaticText)
         .accessibilityLabel(Text(verbatim: row.title))

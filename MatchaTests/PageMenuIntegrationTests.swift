@@ -3,19 +3,19 @@ import AppKit
 import Testing
 import WebKit
 
-/// Relève le prochain menu contextuel dès qu'il s'ouvre, tel qu'il s'affiche (après la réécriture de Matcha), y
-/// choisit un élément de Matcha comme l'utilisateur (`performActionForItem`), puis le ferme. Tout se passe pendant le
-/// suivi du menu, alors que WebKit l'affiche encore. Tout autre menu qui s'ouvrirait ensuite est fermé aussitôt.
+/// Captures the next context menu as soon as it opens, as displayed (after Matcha's rewrite), chooses a Matcha item in
+/// it as the user would (`performActionForItem`), then closes it. Everything happens during menu tracking, while
+/// WebKit is still showing it. Any other menu that opens afterwards is closed at once.
 @MainActor
 final class ContextMenuDriver: NSObject {
     private let choice: PageMenuItem?
     private var menu: NSMenu?
     private var observers: [any NSObjectProtocol] = []
-    /// Identifiants des éléments du menu (nil : séparateur).
+    /// Identifiers of the menu items (nil: separator).
     private(set) var identifiers: [String?] = []
-    /// Éléments de Matcha, à leur place (nil : élément de WebKit).
+    /// Matcha's items, in their places (nil: WebKit item).
     private(set) var choices: [PageMenuItem?] = []
-    /// Le menu a été relevé, puis s'est fermé.
+    /// The menu was captured, then closed.
     private(set) var didClose = false
 
     var didOpen: Bool {
@@ -39,7 +39,7 @@ final class ContextMenuDriver: NSObject {
 
     private func observe(_ name: Notification.Name, _ handle: @escaping @MainActor (ContextMenuDriver, NSMenu) -> Void) {
         observers.append(NotificationCenter.default.addObserver(forName: name, object: nil, queue: .main) { [weak self] notification in
-            // Avis donné sur la file principale (`queue: .main`) : le menu n'en sort pas.
+            // Notification delivered on the main queue (`queue: .main`): the menu never leaves it.
             nonisolated(unsafe) let menu = notification.object as? NSMenu
             MainActor.assumeIsolated {
                 if let self, let menu {
@@ -55,8 +55,8 @@ final class ContextMenuDriver: NSObject {
             return
         }
         self.menu = menu
-        // L'avis précède `willOpenMenu` (constaté) : le menu est relevé au tour suivant, pendant son suivi, où la
-        // boucle principale tourne dans ce mode.
+        // The notification comes before `willOpenMenu` (observed): the menu is captured on the next turn, during its
+        // tracking, when the main run loop runs in this mode.
         perform(#selector(chooseAndClose), with: nil, afterDelay: 0, inModes: [.eventTracking, .default])
     }
 
@@ -73,9 +73,9 @@ final class ContextMenuDriver: NSObject {
     }
 }
 
-/// Menu contextuel des pages (tâche 5.9) sur un vrai menu de WebKit, ouvert par un clic droit simulé dans une vraie
-/// vue web : identifiants relevés, élément de WebKit déclenché, fenêtre rangée. WebKit n'ouvre son menu que pour une
-/// vue web dans une fenêtre affichée : la fenêtre est placée hors de tout écran ; le menu apparaît un instant.
+/// Page context menu (task 5.9) on a real WebKit menu, opened by a simulated right-click in a real web view:
+/// identifiers captured, WebKit item triggered, window put away. WebKit only opens its menu for a web view in a shown
+/// window: the window is placed off every screen; the menu appears for a moment.
 @MainActor
 @Suite(.serialized)
 final class PageMenuIntegrationTests {
@@ -97,8 +97,8 @@ final class PageMenuIntegrationTests {
         window.orderOut(nil)
     }
 
-    /// Onglet sélectionné qui affiche `body` (sans marge), seul dans la fenêtre, une fois la page visible et mise en
-    /// page à la taille de la fenêtre, avec `element` au milieu.
+    /// Selected tab showing `body` (no margin), alone in the window, once the page is visible and laid out at the
+    /// window's size, with `element` in the middle.
     private func showPage(_ body: String, element: String) async throws -> BrowserTab {
         let page = manager.insertTab(configuration: TestPages.configuration(), after: nil, select: true)
         let webView = page.loadedWebView
@@ -115,8 +115,8 @@ final class PageMenuIntegrationTests {
         return page
     }
 
-    /// Clic droit au milieu de la page ; le menu est relevé, `choice` y est choisi, puis il se ferme. Juste après un
-    /// autre menu, WebKit peut ne pas ouvrir le sien (constaté) : le clic est refait, trois fois au plus.
+    /// Right-click in the middle of the page; the menu is captured, `choice` is chosen in it, then it closes. Right
+    /// after another menu, WebKit may not open its own (observed): the click is retried, three times at most.
     private func rightClick(choosing choice: PageMenuItem?) async throws -> ContextMenuDriver {
         let driver = ContextMenuDriver(choosing: choice)
         for _ in 1 ... 3 {
@@ -126,7 +126,7 @@ final class PageMenuIntegrationTests {
             }
         }
         try await waitUntil { driver.didClose }
-        // Le temps que WebKit et AppKit en finissent avec ce menu avant le suivant.
+        // Time for WebKit and AppKit to be done with this menu before the next one.
         try await Task.sleep(for: .milliseconds(300))
         return driver
     }

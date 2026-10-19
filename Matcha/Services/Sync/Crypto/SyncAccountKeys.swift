@@ -1,17 +1,17 @@
 import CryptoKit
 import Foundation
 
-/// Paramètres de dérivation du mot de passe maître (`kdf`, `SYNC.md` § 3.1) : PBKDF2-SHA256, sel de 16 octets.
+/// Derivation parameters of the master password (`kdf`, `SYNC.md` § 3.1): PBKDF2-SHA256, 16-byte salt.
 nonisolated struct SyncKDF: Codable, Equatable, Sendable {
     static let algorithmName = "pbkdf2-sha256"
-    /// Minimum de ce Matcha : un serveur ne peut pas l'abaisser pour deviner plus vite le mot de passe.
+    /// This Matcha's minimum: a server cannot lower it to guess the password faster.
     static let minimumIterations = 600_000
 
     var algorithm: String
     var iterations: Int
     var salt: Data
 
-    /// Nouveau sel aléatoire.
+    /// New random salt.
     static func random(iterations: Int = minimumIterations) -> SyncKDF {
         SyncKDF(algorithm: algorithmName, iterations: iterations, salt: SyncCrypto.randomBytes(16))
     }
@@ -21,7 +21,7 @@ nonisolated struct SyncKDF: Codable, Equatable, Sendable {
     }
 }
 
-/// Mot de passe maître (`SYNC.md` § 3.1) : normalisé en Unicode NFKD, puis encodé en UTF-8 ; 12 caractères au moins.
+/// Master password (`SYNC.md` § 3.1): normalized to Unicode NFKD, then encoded as UTF-8; at least 12 characters.
 nonisolated enum SyncPassword {
     static let minimumLength = 12
 
@@ -34,19 +34,19 @@ nonisolated enum SyncPassword {
     }
 }
 
-/// Clés d'un compte de synchro (`SYNC.md` § 3.2). Ni le mot de passe, ni la clé maître, ni la clé de secours ne sont
-/// jamais enregistrés ; seule la clé de compte reste dans le trousseau de ce Mac.
+/// Keys of a sync account (`SYNC.md` § 3.2). Neither the password, nor the master key, nor the recovery key is ever
+/// saved; only the account key stays in this Mac's keychain.
 nonisolated enum SyncAccountKeys {
     static let accountKeyAAD = Data("matcha.account-key.v1".utf8)
 
-    /// Clés tirées du mot de passe : `authKey` prouve qu'on le connaît, `wrapKey` enveloppe la clé de compte.
+    /// Keys derived from the password: `authKey` proves knowledge of it, `wrapKey` wraps the account key.
     struct PasswordKeys {
         let authKey: SymmetricKey
         let wrapKey: SymmetricKey
     }
 
-    /// Calcule la clé maître (lent : PBKDF2) et ses sous-clés ; refuse un mot de passe trop court ou des paramètres
-    /// trop faibles.
+    /// Computes the master key (slow: PBKDF2) and its subkeys; rejects a password that is too short or parameters
+    /// that are too weak.
     static func passwordKeys(password: String, kdf: SyncKDF) throws -> PasswordKeys {
         guard SyncPassword.isLongEnough(password) else {
             throw SyncCryptoError.passwordTooShort
@@ -65,7 +65,7 @@ nonisolated enum SyncAccountKeys {
         )
     }
 
-    /// Clés tirées de la clé de secours.
+    /// Keys derived from the recovery key.
     static func recoveryKeys(_ recoveryKey: SyncRecoveryKey) -> PasswordKeys {
         let key = SymmetricKey(data: recoveryKey.bytes)
         return PasswordKeys(
@@ -74,7 +74,7 @@ nonisolated enum SyncAccountKeys {
         )
     }
 
-    /// Clé des enregistrements.
+    /// Key for the records.
     static func dataKey(accountKey: SymmetricKey) -> SymmetricKey {
         SyncCrypto.subkey(of: accountKey, info: "matcha.data.v1")
     }
@@ -83,7 +83,7 @@ nonisolated enum SyncAccountKeys {
         try SyncCrypto.seal(accountKey.withUnsafeBytes { Data($0) }, key: wrapKey, aad: accountKeyAAD)
     }
 
-    /// Clé de compte ouverte ; un échec veut dire une enveloppe altérée ou une mauvaise clé.
+    /// Unwrapped account key; a failure means a tampered envelope or a wrong key.
     static func unwrap(_ wrapped: Data, with wrapKey: SymmetricKey) throws -> SymmetricKey {
         let bytes = try SyncCrypto.open(wrapped, key: wrapKey, aad: accountKeyAAD)
         guard bytes.count == 32 else {
@@ -92,7 +92,7 @@ nonisolated enum SyncAccountKeys {
         return SymmetricKey(data: bytes)
     }
 
-    /// Données de la création d'un compte (`SYNC.md` § 3.3) : sel, clé de compte et clé de secours tirés au hasard.
+    /// Data for creating an account (`SYNC.md` § 3.3): salt, account key and recovery key drawn at random.
     struct Creation {
         let kdf: SyncKDF
         let authKey: Data

@@ -34,7 +34,7 @@ struct BrowserSettingsTests {
         #expect(!BrowserSettings.pinnedLinksOpenInPeek(in: defaults))
     }
 
-    /// Les arguments de lancement (« -opensPinnedLinksInPeek YES ») arrivent sous forme de texte.
+    /// Launch arguments (“-opensPinnedLinksInPeek YES”) arrive as text.
     @Test(arguments: [("YES", true), ("NO", false)])
     func `pinned links in Peek read launch arguments`(text: String, expected: Bool) {
         let defaults = emptyDefaults()

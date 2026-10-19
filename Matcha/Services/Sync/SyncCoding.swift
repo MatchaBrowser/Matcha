@@ -1,7 +1,7 @@
 import Foundation
 
-/// Conventions JSON de la synchro (tâche 7.4, `SYNC.md` § 2.2 et § 4.1) : dates ISO 8601 en UTC à la milliseconde
-/// (« 2026-10-17T08:30:12.345Z »), clés triées pour un contenu stable. Type pur.
+/// JSON conventions of sync (task 7.4, `SYNC.md` § 2.2 and § 4.1): ISO 8601 dates in UTC to the millisecond
+/// (“2026-10-17T08:30:12.345Z”), sorted keys for stable content. Pure type.
 nonisolated enum SyncCoding {
     static func encoder() -> JSONEncoder {
         let encoder = JSONEncoder()
@@ -26,17 +26,17 @@ nonisolated enum SyncCoding {
         return decoder
     }
 
-    /// Nombre de millisecondes depuis 1970 (arrondi).
+    /// Number of milliseconds since 1970 (rounded).
     static func milliseconds(of date: Date) -> Int64 {
         Int64((date.timeIntervalSince1970 * 1000).rounded())
     }
 
-    /// Date exacte de `milliseconds`.
+    /// Exact date of `milliseconds`.
     static func date(milliseconds: Int64) -> Date {
         Date(timeIntervalSince1970: Double(milliseconds) / 1000)
     }
 
-    /// Date arrondie à la milliseconde : celle qui revient d'un aller et retour en JSON.
+    /// Date rounded to the millisecond: the one that comes back from a JSON round trip.
     static func rounded(_ date: Date) -> Date {
         self.date(milliseconds: milliseconds(of: date))
     }
@@ -57,7 +57,8 @@ nonisolated enum SyncCoding {
         )
     }
 
-    /// Date lue dans « 2026-10-17T08:30:12.345Z » (fraction facultative, au plus la milliseconde comptée) ; nil sinon.
+    /// Date read from “2026-10-17T08:30:12.345Z” (optional fraction, counted to the millisecond at most); nil
+    /// otherwise.
     static func date(from text: String) -> Date? {
         guard text.hasSuffix("Z") else {
             return try? Date(text, strategy: .iso8601)

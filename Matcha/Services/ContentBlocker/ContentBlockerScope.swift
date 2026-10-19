@@ -2,17 +2,17 @@ import Foundation
 import Observation
 import WebKit
 
-/// Le bloqueur vu d'une session (tâche 6.2) : ses pages lui disent quel document elles vont charger, et ses réglages du
-/// site lisent ou changent l'exception d'un site. La session principale lit et écrit les exceptions enregistrées ; une
-/// fenêtre privée (ou une base de test) les lit, mais ses changements restent en mémoire et partent avec elle : rien
-/// de ce qu'on y visite n'est écrit.
+/// The blocker as seen from a session (task 6.2): its pages tell it which document they are about to load, and its
+/// site settings read or change a website's exception. The main session reads and writes the saved exceptions; a
+/// private window (or a test store) reads them, but its changes stay in memory and go away with it: nothing visited
+/// there is written.
 @MainActor
 @Observable
 final class ContentBlockerScope {
     @ObservationIgnored let service: ContentBlockerService
-    /// Faux : les changements d'exception restent dans cette session (`overrides`).
+    /// False: exception changes stay in this session (`overrides`).
     @ObservationIgnored let savesExceptions: Bool
-    /// Exceptions changées dans cette session sans être enregistrées : site → exception (vrai) ou blocage (faux).
+    /// Exceptions changed in this session without being saved: website → exception (true) or blocking (false).
     private var overrides: [String: Bool] = [:]
 
     init(service: ContentBlockerService, savesExceptions: Bool) {
@@ -20,12 +20,12 @@ final class ContentBlockerScope {
         self.savesExceptions = savesExceptions
     }
 
-    /// Vrai si le bloqueur est désactivé sur `site` pour les pages de cette session.
+    /// True if the blocker is turned off on `site` for the pages of this session.
     func isExcepted(site: String) -> Bool {
         overrides[site] ?? service.exceptions.contains(site)
     }
 
-    /// Bloque (ou non) sur `site` ; les pages ouvertes de ce site dans les sessions concernées se rechargent.
+    /// Blocks (or not) on `site`; the open pages of that website in the affected sessions reload.
     func setBlocks(_ blocks: Bool, onSite site: String) {
         guard let site = ContentBlockerExceptions.normalized(site), isExcepted(site: site) == blocks else {
             return
@@ -38,8 +38,8 @@ final class ContentBlockerScope {
         }
     }
 
-    /// Le document principal de `webView` va être `url` (navigation autorisée, avant son chargement ; ou document
-    /// affiché) : les listes y sont posées ou retirées selon son site.
+    /// The main document of `webView` is about to be `url` (navigation allowed, before it loads; or document shown):
+    /// the lists are added to it or removed from it according to its website.
     func prepare(_ webView: WKWebView, for url: URL?) {
         service.prepare(webView, for: url, scope: self)
     }

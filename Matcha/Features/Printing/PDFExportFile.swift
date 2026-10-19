@@ -1,21 +1,21 @@
 import Foundation
 
-/// Fichier de « Exporter en PDF… » (tâche 5.4), sans dépendance à l'interface : nom proposé et écriture.
+/// File of “Export as PDF…” (task 5.4), with no dependency on the UI: proposed name and writing.
 nonisolated enum PDFExportFile {
-    /// Nom de repli quand la page n'a ni titre ni hôte, jamais traduit : c'est un nom de fichier.
+    /// Fallback name when the page has neither title nor host, never localized: it is a file name.
     static let fallbackName = "page"
 
-    /// Nom proposé : le titre de la page rendu sûr (« / » devient « - », comme « : »), sinon l'hôte, sinon le nom du
-    /// fichier local, sinon `fallbackName` ; « .pdf » (ou `fileExtension`) ajouté, 255 octets au plus.
+    /// Proposed name: the page title made safe (“/” becomes “-”, like “:”), otherwise the host, otherwise the name of
+    /// the local file, otherwise `fallbackName`; “.pdf” (or `fileExtension`) appended, 255 bytes at most.
     static func name(title: String?, url: URL?, fileExtension: String = "pdf") -> String {
         let candidates = [title, url?.host(percentEncoded: false), url.flatMap { $0.isFileURL ? $0.lastPathComponent : nil }]
         let base = candidates.lazy.compactMap { $0.map(baseName) }.first { !$0.isEmpty } ?? fallbackName
         return DownloadFileName.sanitized(base + "." + fileExtension)
     }
 
-    /// Écrit `data` d'un seul coup : dans un fichier temporaire du même volume, qui prend ensuite la place de
-    /// `destination` (un fichier à moitié écrit ne remplace jamais l'ancien). Le dossier temporaire est celui que le
-    /// système prévoit pour ces remplacements, permis dans la sandbox ; à défaut, celui de l'app.
+    /// Writes `data` in one go: into a temporary file on the same volume, which then takes the place of
+    /// `destination` (a half-written file never replaces the old one). The temporary folder is the one the system
+    /// provides for these replacements, allowed in the sandbox; failing that, the app's.
     static func write(_ data: Data, to destination: URL, fileManager: FileManager = .default) throws {
         let replacementDirectory = try? fileManager.url(
             for: .itemReplacementDirectory,
@@ -26,7 +26,7 @@ nonisolated enum PDFExportFile {
         let temporary = (replacementDirectory ?? fileManager.temporaryDirectory)
             .appendingPathComponent(UUID().uuidString)
             .appendingPathExtension("pdf")
-        // Le dossier de remplacement est propre à cette écriture : il part avec le fichier temporaire.
+        // The replacement folder is specific to this write: it goes away with the temporary file.
         defer {
             try? fileManager.removeItem(at: replacementDirectory ?? temporary)
         }
@@ -38,7 +38,7 @@ nonisolated enum PDFExportFile {
         }
     }
 
-    /// Titre sans « / » ni « \ » (ils couperaient le nom), sans « .pdf » final ni espaces et points autour.
+    /// Title without “/” or “\” (they would cut the name), without trailing “.pdf” or surrounding spaces and dots.
     private static func baseName(_ text: String) -> String {
         var name = DownloadFileName.sanitized(text.replacingOccurrences(of: "/", with: "-").replacingOccurrences(of: "\\", with: "-"))
         if name.lowercased().hasSuffix(".pdf") {

@@ -1,16 +1,16 @@
 import AppKit
 
-/// Réglages AppKit de la fenêtre que SwiftUI n'expose pas.
+/// AppKit settings of the window that SwiftUI does not expose.
 @MainActor
 enum WindowChrome {
-    /// Barre de titre transparente. `isMovableByWindowBackground` reste désactivé : il transformerait
-    /// tout glissement sur une zone transparente (poignée, glisser-déposer) en déplacement de la fenêtre.
+    /// Transparent title bar. `isMovableByWindowBackground` stays disabled: it would turn any drag on a transparent
+    /// area (handle, drag and drop) into a window move.
     static func configure(_ window: NSWindow) {
         window.titlebarAppearsTransparent = true
         window.isMovableByWindowBackground = false
     }
 
-    /// Masque ou montre les boutons rouge, orange et vert.
+    /// Hides or shows the red, yellow and green buttons.
     static func setButtonsHidden(_ hidden: Bool, in window: NSWindow?) {
         for kind in [NSWindow.ButtonType.closeButton, .miniaturizeButton, .zoomButton] {
             window?.standardWindowButton(kind)?.isHidden = hidden

@@ -1,36 +1,36 @@
 import Foundation
 
-/// Règles de l'historique (tâche 5.5), pures : ce qui est retenu, sous quelle forme, et quand une visite en
-/// prolonge une autre plutôt que d'en créer une. Voir `DECISIONS.md`.
+/// History rules (task 5.5), pure: what is kept, in what form, and when a visit extends another rather than
+/// creating a new one. See `DECISIONS.md`.
 nonisolated enum HistoryRecordingPolicy {
-    /// Ce que fait une page qui vient de s'afficher à une adresse, d'après la dernière visite qu'elle a retenue.
+    /// What a page that has just been displayed at an address does, based on the last visit it kept.
     enum Decision: Equatable, Sendable {
-        /// Nouvelle visite.
+        /// New visit.
         case record
-        /// Même page, même adresse, peu après : la visite précédente prend la nouvelle date et le nouveau titre
-        /// (rechargements en rafale, redirection qui revient).
+        /// Same page, same address, shortly after: the previous visit takes the new date and the new title
+        /// (bursts of reloads, a redirect that comes back).
         case refresh
     }
 
-    /// Dernière visite retenue par une page.
+    /// Last visit kept by a page.
     struct PageVisit: Equatable, Sendable {
         let id: UUID
         let urlKey: String
         let date: Date
     }
 
-    /// Une même adresse rechargée par la même page dans ce délai ne compte qu'une fois.
+    /// The same address reloaded by the same page within this delay counts only once.
     static let mergeInterval: TimeInterval = 60
-    /// Un titre qui change dans ce délai après la visite la renomme (titre posé par le script de la page) ; ensuite,
-    /// seul un titre qui manquait encore est pris.
+    /// A title that changes within this delay after the visit renames it (title set by the page's script); after
+    /// that, only a title that was still missing is taken.
     static let titleUpdateInterval: TimeInterval = 5
-    /// Adresse changée par la page sans nouveau document (History API) : retenue si elle tient ce délai, pour ne
-    /// garder que la dernière d'une rafale de `replaceState`.
+    /// Address changed by the page without a new document (History API): kept if it lasts this delay, so as to keep
+    /// only the last of a burst of `replaceState` calls.
     static let sameDocumentDelay: Duration = .seconds(1)
 
-    /// Adresse retenue, ou nil si l'adresse ne va pas dans l'historique : seulement les pages web (`http`,
-    /// `https`, avec un hôte) et les fichiers locaux ; jamais `about:`, `data:`, `blob:`, `javascript:` ni les
-    /// schémas d'autres apps ou de tests. Le fragment et les identifiants (`user:password@`) sont retirés.
+    /// The kept address, or nil if the address does not go into the history: only web pages (`http`, `https`, with
+    /// a host) and local files; never `about:`, `data:`, `blob:`, `javascript:`, nor the schemes of other apps or
+    /// of tests. The fragment and the credentials (`user:password@`) are removed.
     static func storedURL(for url: URL?) -> URL? {
         guard let url, var components = URLComponents(url: url, resolvingAgainstBaseURL: false) else {
             return nil
@@ -51,7 +51,7 @@ nonisolated enum HistoryRecordingPolicy {
         return components.url
     }
 
-    /// Titre retenu : sans espaces aux bords, nil s'il est vide.
+    /// Kept title: without surrounding whitespace, nil if it is empty.
     static func normalizedTitle(_ title: String?) -> String? {
         guard let trimmed = title?.trimmingCharacters(in: .whitespacesAndNewlines), !trimmed.isEmpty else {
             return nil
@@ -59,7 +59,7 @@ nonisolated enum HistoryRecordingPolicy {
         return trimmed
     }
 
-    /// Nouvelle visite, ou rafraîchissement de `previous` si c'est la même adresse dans le délai de fusion.
+    /// New visit, or a refresh of `previous` if it is the same address within the merge delay.
     static func decision(previous: PageVisit?, urlKey: String, now: Date) -> Decision {
         guard let previous, previous.urlKey == urlKey else {
             return .record
@@ -67,8 +67,8 @@ nonisolated enum HistoryRecordingPolicy {
         return abs(now.timeIntervalSince(previous.date)) <= mergeInterval ? .refresh : .record
     }
 
-    /// Vrai si un nouveau titre de la page renomme `visit` : même adresse, et titre arrivé dans le délai ou visite
-    /// encore sans titre.
+    /// True if a new title of the page renames `visit`: same address, and the title arrived within the delay or the
+    /// visit still has no title.
     static func acceptsTitle(for visit: PageVisit, visitHasTitle: Bool, pageURLKey: String?, now: Date) -> Bool {
         guard pageURLKey == visit.urlKey else {
             return false
@@ -76,8 +76,8 @@ nonisolated enum HistoryRecordingPolicy {
         return !visitHasTitle || abs(now.timeIntervalSince(visit.date)) <= titleUpdateInterval
     }
 
-    /// Une adresse changée par la page compte si elle reste sur l'origine du dernier document chargé (l'History
-    /// API ne peut pas en changer) : un échec de chargement vers un autre site ne devient pas une visite.
+    /// An address changed by the page counts if it stays on the origin of the last loaded document (the History
+    /// API cannot change it): a failed load to another site does not become a visit.
     static func isSameDocumentChange(from loaded: URL?, to url: URL) -> Bool {
         guard let loaded else {
             return false
@@ -85,7 +85,7 @@ nonisolated enum HistoryRecordingPolicy {
         return origin(of: loaded) == origin(of: url)
     }
 
-    /// Visites gardées : un an (réglage par défaut de Safari) ; les plus anciennes sont effacées au lancement.
+    /// Visits kept: one year (Safari's default setting); the oldest are erased at launch.
     static func retentionCutoff(now: Date, calendar: Calendar) -> Date {
         calendar.date(byAdding: .year, value: -1, to: now) ?? now.addingTimeInterval(-365 * 86400)
     }

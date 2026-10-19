@@ -1,11 +1,11 @@
 import SwiftUI
 
-/// Capture d'un onglet sorti de veille (tâche 5.6), posée sur sa page le temps du rechargement : à la largeur de la
-/// page, calée en haut. Rien si la page n'a plus la largeur de la capture (fenêtre redimensionnée, panneau d'un split) :
-/// sa mise en page a changé, la capture ne lui ressemblerait plus. Elle ne prend ni clic ni clavier : la page dessous
-/// reste utilisable.
+/// Snapshot of a tab woken from sleep (task 5.6), placed over its page while it reloads: at the page's width, pinned to
+/// the top. Nothing if the page no longer has the snapshot's width (window resized, pane of a split): its layout has
+/// changed, the snapshot would no longer look like it. It takes neither clicks nor keyboard: the page underneath stays
+/// usable.
 struct SuspendedPageCover: View {
-    /// Écart de largeur toléré, en fraction de la largeur de la page.
+    /// Tolerated width difference, as a fraction of the page's width.
     nonisolated static let widthTolerance = 0.1
 
     let cover: TabCover
@@ -27,7 +27,7 @@ struct SuspendedPageCover: View {
         .accessibilityHidden(true)
     }
 
-    /// Vrai si une capture d'une page large de `pageWidth` points ressemble à la page affichée sur `width` points.
+    /// True if a snapshot of a page `pageWidth` points wide looks like the page displayed on `width` points.
     nonisolated static func fits(pageWidth: Double, in width: Double) -> Bool {
         width > 0 && abs(pageWidth - width) <= width * widthTolerance
     }

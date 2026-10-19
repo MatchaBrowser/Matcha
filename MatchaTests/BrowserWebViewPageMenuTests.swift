@@ -3,7 +3,7 @@ import AppKit
 import Testing
 import WebKit
 
-/// Cible des éléments d'un faux menu de WebKit : garde les éléments qui l'ont déclenchée.
+/// Target of the items of a fake WebKit menu: keeps the items that triggered it.
 @MainActor
 final class FakeWebKitMenuTarget: NSObject {
     private(set) var senders: [NSMenuItem] = []
@@ -13,7 +13,7 @@ final class FakeWebKitMenuTarget: NSObject {
     }
 }
 
-/// Délégué d'interface d'une vue web, qui dit si « Ouvrir dans un aperçu » a un sens.
+/// UI delegate of a web view, which says whether “Open Link in Peek” makes sense.
 @MainActor
 final class FakePageMenuDelegate: NSObject, WKUIDelegate, PageMenuDelegate {
     var offersPeek: Bool
@@ -26,7 +26,7 @@ final class FakePageMenuDelegate: NSObject, WKUIDelegate, PageMenuDelegate {
         offersPeek
     }
 
-    /// Commandes de la page demandées (enregistrer, imprimer, code source).
+    /// Page commands requested (save, print, page source).
     private(set) var performed: [PageCommand] = []
 
     func pageMenu(perform command: PageCommand, in _: WKWebView) {
@@ -34,8 +34,8 @@ final class FakePageMenuDelegate: NSObject, WKUIDelegate, PageMenuDelegate {
     }
 }
 
-/// Menu contextuel des pages (tâche 5.9) sur un faux menu qui reprend les identifiants, l'action et l'état des
-/// éléments de WebKit (relevés sur un vrai menu, `PageMenuIntegrationTests`).
+/// Page context menu (task 5.9) on a fake menu that reproduces the identifiers, action and state of WebKit's
+/// items (taken from a real menu, `PageMenuIntegrationTests`).
 @MainActor
 struct BrowserWebViewPageMenuTests {
     private let webView = BrowserWebView(frame: .zero, configuration: WKWebViewConfiguration())
@@ -46,7 +46,7 @@ struct BrowserWebViewPageMenuTests {
         webView.uiDelegate = delegate
     }
 
-    /// Menu de WebKit : un élément par identifiant (nil : séparateur), avec icône comme sur macOS 26 et plus.
+    /// WebKit menu: one item per identifier (nil: separator), with an icon as on macOS 26 and later.
     private func webKitMenu(_ identifiers: [String?], target: AnyObject? = nil, withImages: Bool = true) -> NSMenu {
         let menu = NSMenu()
         menu.autoenablesItems = false
@@ -102,7 +102,7 @@ struct BrowserWebViewPageMenuTests {
         webView.rewritePageMenu(menu)
         #expect(choices(in: menu) == [nil, .openLinkInNewTab, nil, nil, nil, nil])
 
-        // Sans délégué d'interface : pas d'aperçu non plus.
+        // Without a UI delegate: no Peek either.
         let lonely = BrowserWebView(frame: .zero, configuration: WKWebViewConfiguration())
         let other = webKitMenu(PageMenuPlanTests.linkMenu)
         lonely.rewritePageMenu(other)
@@ -141,8 +141,8 @@ struct BrowserWebViewPageMenuTests {
         #expect(menu.items[0].image == nil)
     }
 
-    /// Choisir l'élément de Matcha déclenche celui de WebKit (son action, sa cible, lui-même comme expéditeur), après
-    /// avoir retenu le choix.
+    /// Choosing the Matcha item triggers the WebKit one (its action, its target, itself as sender), after
+    /// remembering the choice.
     @Test(arguments: [(1, PageMenuDestination.backgroundTab), (2, .peek)])
     func `choosing an item triggers the WebKit item with the choice pending`(index: Int, destination: PageMenuDestination) {
         let menu = webKitMenu(PageMenuPlanTests.linkMenu)
@@ -172,7 +172,7 @@ struct BrowserWebViewPageMenuTests {
         #expect(webView.pageMenuIntent.intent == nil)
     }
 
-    // MARK: Menu d'une page
+    // MARK: Page menu
 
     @Test func `the page menu gets back, forward, save, print and source`() {
         let menu = webKitMenu(["WKMenuItemIdentifierReload"])
@@ -182,7 +182,7 @@ struct BrowserWebViewPageMenuTests {
             "MatchaMenuItemIdentifierGoBack", "MatchaMenuItemIdentifierGoForward", "WKMenuItemIdentifierReload", nil,
             "MatchaMenuItemIdentifierSaveAs", "MatchaMenuItemIdentifierPrint", nil, "MatchaMenuItemIdentifierViewSource",
         ])
-        // Page sans historique ni adresse : rien n'est possible.
+        // Page without history or address: nothing is possible.
         #expect(menu.items.filter { $0.identifier?.rawValue.hasPrefix("MatchaMenuItemIdentifier") == true }.allSatisfy { !$0.isEnabled })
         #expect(menu.items[0].image != nil)
     }
@@ -191,7 +191,7 @@ struct BrowserWebViewPageMenuTests {
         let menu = webKitMenu(["WKMenuItemIdentifierReload"])
         webView.rewritePageMenu(menu)
         for identifier in ["MatchaMenuItemIdentifierSaveAs", "MatchaMenuItemIdentifierPrint", "MatchaMenuItemIdentifierViewSource"] {
-            // Désactivés sur cette page sans adresse : leur action est envoyée directement.
+            // Disabled on this page without an address: their action is sent directly.
             let item = try #require(menu.items.first { $0.identifier?.rawValue == identifier })
             try NSApp.sendAction(#require(item.action), to: item.target, from: item)
         }

@@ -3,9 +3,9 @@ import Foundation
 import Testing
 import WebKit
 
-/// Zoom des pages avec de vraies vues web (tâche 5.4) : zoom du site appliqué à chaque nouveau document (onglet,
-/// aperçu, mini-fenêtre), gagné par les autres pages ouvertes du site, oublié à 100 %. Pages web simulées
-/// (`loadSimulatedRequest`), sans réseau.
+/// Page zoom with real web views (task 5.4): the site's zoom applied to each new document (tab, Peek, mini window),
+/// spread to the site's other open pages, forgotten at 100%. Simulated web pages (`loadSimulatedRequest`), without
+/// network.
 @MainActor
 struct PageZoomIntegrationTests {
     private let store = SiteZoomStore(defaults: nil)
@@ -15,14 +15,14 @@ struct PageZoomIntegrationTests {
         manager.siteZooms = store
     }
 
-    /// Onglet sélectionné, en tête des onglets du jour, sur la page web simulée `address`.
+    /// Selected tab, at the top of today tabs, on the simulated web page `address`.
     private func open(_ address: String) async throws -> BrowserTab {
         let tab = manager.insertTab(configuration: TestPages.configuration(), after: nil, select: true)
         try await load(address, in: tab)
         return tab
     }
 
-    /// Charge dans `tab` une page simulée à `address`, dont le titre est son chemin.
+    /// Loads into `tab` a simulated page at `address`, whose title is its path.
     private func load(_ address: String, in tab: BrowserTab) async throws {
         let url = try #require(URL(string: address))
         let title = url.lastPathComponent
@@ -40,7 +40,7 @@ struct PageZoomIntegrationTests {
         #expect(tab.pageZoom == 1.25)
         #expect(zoom(of: tab) == 1.25)
 
-        // Autre site : 100 % ; retour sur le site : son zoom.
+        // Another site: 100%; back on the site: its zoom.
         try await load("https://apple.com/autre", in: tab)
         #expect(zoom(of: tab) == 1)
         try await load("https://example.com/retour", in: tab)
@@ -62,7 +62,7 @@ struct PageZoomIntegrationTests {
         #expect(PageZoom.apply(.zoomOut, to: other, siteZooms: store) == 0.85)
         #expect(zoom(of: first) == 1.25)
 
-        // Taille réelle : le site est oublié, toutes ses pages reviennent à 100 %.
+        // Actual size: the site is forgotten, all its pages go back to 100%.
         #expect(PageZoom.apply(.actualSize, to: second, siteZooms: store) == 1)
         #expect(zoom(of: first) == 1)
         #expect(zoom(of: second) == 1)
@@ -71,7 +71,7 @@ struct PageZoomIntegrationTests {
         #expect(PageZoom.apply(.actualSize, to: first, siteZooms: store) == nil)
     }
 
-    /// Clic sur le badge du zoom : comme ⌘0, le site est oublié et toutes ses pages ouvertes reviennent à 100 %.
+    /// Click on the zoom badge: like ⌘0, the site is forgotten and all its open pages go back to 100%.
     @Test func `the zoom badge brings the site back to 100 percent`() async throws {
         let first = try await open("https://example.com/badge")
         let second = try await open("https://docs.example.com/badge")
@@ -121,7 +121,7 @@ struct PageZoomIntegrationTests {
 
         try await load("https://example.com/apercu", in: peek.tab)
         #expect(zoom(of: peek.tab) == 1.5)
-        // Un changement du site gagne l'aperçu.
+        // A change to the site reaches Peek.
         store.setLevel(2, forSite: "example.com")
         #expect(zoom(of: peek.tab) == 2)
         manager.closePeek()

@@ -1,8 +1,8 @@
 import SwiftUI
 import WebKit
 
-/// Écran des permissions avant d'installer une extension (tâche 6.4) : ce qu'elle pourra faire, ses sites, et le choix
-/// des fenêtres privées (non par défaut). Rien n'est installé sans « Ajouter ».
+/// Permissions screen before installing an extension (task 6.4): what it will be able to do, its sites, and the
+/// private windows choice (off by default). Nothing is installed without “Add Extension”.
 struct ExtensionReviewSheet: View {
     let candidate: ExtensionInstallCandidate
     let install: (_ allowsPrivateWindows: Bool) -> Void
@@ -65,7 +65,7 @@ struct ExtensionReviewSheet: View {
         candidate.webExtension.displayName ?? candidate.identifier
     }
 
-    /// « Version 1.2 · Dans Proton Pass for Safari » ou « Version 1.2 · darkreader.crx ».
+    /// “Version 1.2 · In Proton Pass for Safari” or “Version 1.2 · darkreader.crx”.
     private var details: String {
         let origin = switch candidate.source {
         case let .appExtension(appExtension):
@@ -98,7 +98,7 @@ struct ExtensionReviewSheet: View {
     }
 }
 
-/// Une ligne de l'écran des permissions : symbole et phrase (et la liste des sites).
+/// One line of the permissions screen: symbol and sentence (and the list of sites).
 struct ExtensionPermissionLineView: View {
     let line: ExtensionPermissionSummary.Line
 

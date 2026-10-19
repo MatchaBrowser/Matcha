@@ -57,7 +57,7 @@ struct FolderAppearanceTests {
         #expect(FolderAppearance(icon: .emoji("🌿"), textColor: indigo).summary == "emoji:🌿 text:#5856D6 background:none")
     }
 
-    /// Une base modifiée à la main, une synchro ou une version future : ce qui est illisible redevient la valeur par défaut.
+    /// A store edited by hand, a sync or a future version: whatever is unreadable goes back to the default value.
     @Test(arguments: [nil, "", "star", "symbol:", "symbol:Star", "symbol:star fill", "emoji:", "emoji:ab", "emoji:😀😀", "other:x"])
     func `unreadable stored icons fall back to the default`(stored: String?) {
         #expect(SidebarIcon(storedValue: stored) == .default)

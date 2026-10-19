@@ -1,20 +1,20 @@
 import Foundation
 import OSLog
 
-/// Envoi des changements en attente (`SYNC.md` § 5, étape 1).
+/// Sending the pending changes (`SYNC.md` § 5, step 1).
 extension SyncEngine {
-    /// Tours d'envoi au plus dans un cycle : un conflit gagné par ce Mac repart au tour suivant.
+    /// Maximum number of sending rounds in a cycle: a conflict won by this Mac is sent again in the next round.
     static let pushRounds = 4
 
     private enum Outcome {
         case done
-        /// Le serveur a plus récent : son contenu s'applique ici.
+        /// The server has something newer: its content is applied here.
         case remoteWins
-        /// Ce Mac a plus récent : le changement repart sur la version du serveur.
+        /// This Mac has something newer: the change is sent again on top of the server's version.
         case retry
     }
 
-    /// Envoie les changements en attente, par lots, parents d'abord.
+    /// Sends the pending changes, in batches, parents first.
     func push() async throws {
         for _ in 0 ..< Self.pushRounds {
             let ids = pendingIDs()
@@ -46,7 +46,7 @@ extension SyncEngine {
         }
     }
 
-    /// En attente, dans l'ordre d'application (parents d'abord), puis par identifiant.
+    /// Pending, in application order (parents first), then by identifier.
     private func pendingIDs() -> [UUID] {
         func rank(_ id: UUID) -> Int {
             state.pending[id]?.content.recordType?.applyRank ?? Int.max
@@ -69,7 +69,7 @@ extension SyncEngine {
             var entry = state.entries[change.id] ?? SyncEntry(type: change.content.type)
             entry.version = current.version
             guard let content = current.content else {
-                // Illisible : jamais écrasé ; le changement de ce Mac est abandonné.
+                // Unreadable: never overwritten; this Mac's change is dropped.
                 Logger.sync.error("Conflit avec un enregistrement illisible : changement abandonné")
                 entry.local = pending.local
                 state.entries[change.id] = entry

@@ -2,8 +2,7 @@ import Foundation
 @testable import Matcha
 import Testing
 
-/// Champs des enregistrements synchronisés (tâche 7.4, `SYNC.md` § 2.1, § 2.5 et § 2.6) : aller et retour en JSON,
-/// valeurs inconnues ignorées.
+/// Fields of synced records (task 7.4, `SYNC.md` § 2.1, § 2.5 and § 2.6): JSON round trip, unknown values ignored.
 struct SyncFieldsTests {
     private let profile = UUID()
     private let space = UUID()

@@ -3,9 +3,9 @@ import Foundation
 import Testing
 import WebKit
 
-/// Le coordinateur et les téléchargements (tâche 5.1) : liens `download`, rattachement des téléchargements à leur
-/// fenêtre. Les réponses se testent par `DownloadPolicyTests` (un `WKNavigationResponse` créé à la main fait planter
-/// WebKit à sa libération) et de bout en bout par `DownloadIntegrationTests`.
+/// The coordinator and downloads (task 5.1): `download` links, attaching downloads to their window. Responses are
+/// tested by `DownloadPolicyTests` (a `WKNavigationResponse` created by hand makes WebKit crash when it is
+/// released) and end to end by `DownloadIntegrationTests`.
 @MainActor
 struct NavigationCoordinatorDownloadTests {
     private let manager = TabManager(websiteDataStore: .nonPersistent())

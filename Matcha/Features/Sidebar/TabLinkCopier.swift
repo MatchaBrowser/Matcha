@@ -1,13 +1,13 @@
 import AppKit
 
-/// Copie l'adresse d'une page dans le presse-papiers, en URL et en texte.
+/// Copies a page's address to the pasteboard, as a URL and as text.
 @MainActor
 enum TabLinkCopier {
     static func copy(_ url: URL, to pasteboard: NSPasteboard = .general) {
         copy([url], to: pasteboard)
     }
 
-    /// Plusieurs adresses (lignes de l'historique) : une URL par adresse, et le texte avec une adresse par ligne.
+    /// Several addresses (history rows): one URL per address, and the text with one address per line.
     static func copy(_ urls: [URL], to pasteboard: NSPasteboard = .general) {
         guard !urls.isEmpty else {
             return

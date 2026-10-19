@@ -24,7 +24,7 @@ struct ProfilesTests {
         #expect(session.dataStore(for: firstProfile) === session.dataStore(for: firstProfile))
         #expect(session.dataStore(for: firstProfile) !== session.dataStore(for: other))
         #expect(otherSpace.record.profile?.id == other.id)
-        // Les tests n'écrivent rien : magasins non persistants.
+        // The tests write nothing: non-persistent stores.
         #expect(!session.dataStore(for: other).isPersistent)
         #expect(session.allDataStores().count == 2)
     }
@@ -92,7 +92,7 @@ struct ProfilesTests {
         let moved = try #require(target.tabManager.todayTabs.first)
         #expect(moved !== tab)
         #expect(moved.makeWebViewIfNeeded().configuration.websiteDataStore === session.dataStore(for: target.record.profile))
-        // Recréé à partir de l'adresse d'origine (WebKit l'écrit « about:blank%23profil »).
+        // Recreated from the original address (WebKit writes it “about:blank%23profil”).
         try await waitUntil { moved.url == original && !moved.isLoading }
     }
 }

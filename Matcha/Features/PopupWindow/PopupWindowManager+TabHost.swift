@@ -1,16 +1,16 @@
 import Foundation
 import WebKit
 
-/// Les pages des fenêtres de connexion vues par le délégué de navigation (`NavigationCoordinator`) :
-/// - permissions des sites et historique : ceux de la page d'origine (son profil ; rien en fenêtre privée) ;
-/// - téléchargements : dans la liste de la session ; une fenêtre qui n'a rien affiché avant de télécharger se ferme ;
-/// - ⌘-clic, clic du milieu, `target=_blank`, `window.open` sans taille, « … dans un nouvel onglet » du menu
-///   contextuel (tâche 5.9) : comme depuis la page d'origine (onglet de sa fenêtre, ou mini-fenêtre), tant qu'elle
-///   est ouverte ; sinon une autre fenêtre de connexion, du même profil ;
-/// - `window.open` avec une taille : une autre fenêtre de connexion, au-dessus de celle-ci (`NavigationCoordinator`) ;
-/// - pas d'aperçu : un Maj+clic reste un clic (`NavigationSource.other`), pas de « Ouvrir dans un aperçu » ;
-/// - `window.close()` : la fenêtre se ferme ;
-/// - processus de la page arrêté (tâche 5.7) : la page est visible tant que sa fenêtre est ouverte, elle se recharge.
+/// Sign-in window pages as seen by the navigation delegate (`NavigationCoordinator`):
+/// - site permissions and history: those of the originating page (its profile; nothing in a private window);
+/// - downloads: in the session's list; a window that displayed nothing before downloading closes;
+/// - ⌘-click, middle click, `target=_blank`, `window.open` without size, “… in New Tab” from the context menu
+///   (task 5.9): as from the originating page (a tab of its window, or a mini window), as long as it is open;
+///   otherwise another sign-in window, from the same profile;
+/// - `window.open` with a size: another sign-in window, above this one (`NavigationCoordinator`);
+/// - no peek: a Shift-click stays a click (`NavigationSource.other`), no “Open Link in Peek”;
+/// - `window.close()`: the window closes;
+/// - page process stopped (task 5.7): the page is visible as long as its window is open, it reloads.
 extension PopupWindowManager: TabHost {
     func page(for webView: WKWebView) -> BrowserTab? {
         window(for: webView)?.tab
@@ -46,7 +46,7 @@ extension PopupWindowManager: TabHost {
         return open(configuration: configuration, features: PopupWindowFeatures(), opener: PopupOpener(host: self, webView: webView))
     }
 
-    /// Pas d'aperçu dans une fenêtre de connexion : refusé, le lien suit son cours sur place.
+    /// No peek in a sign-in window: refused, the link proceeds in place.
     func openInPeek(_: URL, from _: WKWebView, openingPoint _: CGPoint) -> Bool {
         false
     }
@@ -55,9 +55,9 @@ extension PopupWindowManager: TabHost {
         window(for: webView)?.close()
     }
 
-    /// Une fenêtre qui ne fait que télécharger (aucune page affichée avant) resterait vide : elle se ferme, comme dans
-    /// Safari, au tour suivant de la boucle principale (WebKit finit d'abord de prévenir le délégué). Le téléchargement
-    /// continue : il survit à la vue web qui l'a lancé (vérifié en 5.6, et par les tests).
+    /// A window that only downloads (no page displayed before) would stay empty: it closes, as in Safari, on the
+    /// next turn of the main run loop (WebKit first finishes notifying the delegate). The download continues: it
+    /// outlives the web view that started it (verified in 5.6, and by the tests).
     func downloadDidStart(in webView: WKWebView) {
         guard let controller = window(for: webView), webView.backForwardList.currentItem == nil else {
             return
@@ -75,12 +75,12 @@ extension PopupWindowManager: TabHost {
         window(for: webView)?.opener.history
     }
 
-    /// Fenêtre ouverte, même au second plan (comme une mini-fenêtre).
+    /// Window open, even in the background (like a mini window).
     func isVisible(_ page: BrowserTab) -> Bool {
         window(for: page) != nil
     }
 
-    /// Une fenêtre de connexion qui en ouvre une autre en donnant sa taille : une de plus, au-dessus d'elle.
+    /// A sign-in window that opens another one giving its size: one more, above it.
     var popupWindows: PopupWindowManager? {
         self
     }

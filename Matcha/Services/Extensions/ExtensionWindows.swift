@@ -3,29 +3,29 @@ import Observation
 import OSLog
 import WebKit
 
-/// Fenêtres et onglets vus par les extensions (tâche 6.3), et leurs changements donnés au contrôleur des extensions.
+/// Windows and tabs seen by extensions (task 6.3), and their changes given to the extension controller.
 ///
-/// Correspondance (`DECISIONS.md`) :
-/// - une fenêtre de navigation (principale ou privée) est une fenêtre « normal » ; ses onglets sont ceux de **tous** ses
-///   Spaces, Space après Space, chacun dans l'ordre de la barre (favoris, épinglés, onglets du jour), comme des groupes
-///   d'onglets ; les favoris d'un profil n'y sont qu'une fois. L'onglet actif est le panneau actif du Space affiché, les
-///   onglets sélectionnés les panneaux de son split. Changer de Space change donc l'onglet actif, sans fermer d'onglet ;
-/// - l'aperçu (Peek) ouvert est un onglet, juste après son onglet d'origine, et l'onglet actif : WebKit refuse les
-///   messages des scripts de contenu d'une page qui n'est pas un onglet connu ;
-/// - une mini-fenêtre ou une fenêtre de connexion est une fenêtre « popup » d'une seule page.
+/// Mapping (`DECISIONS.md`):
+/// - a browser window (main or private) is a “normal” window; its tabs are those of **all** its Spaces, Space after
+///   Space, each in the sidebar's order (favorites, pinned, Today tabs), like tab groups; a profile's favorites appear
+///   in it only once. The active tab is the active pane of the displayed Space, the selected tabs are the panes of its
+///   split. Switching Spaces therefore changes the active tab, without closing any tab;
+/// - the open Peek is a tab, right after its originating tab, and the active tab: WebKit rejects the messages of the
+///   content scripts of a page that is not a known tab;
+/// - a mini window or a sign-in window is a single-page “popup” window.
 ///
-/// Tout passe par un état pur (`ExtensionBrowserState`) relu à chaque changement — framework Observation (Spaces,
-/// rangement, sélection, titres, adresses…), notifications des fenêtres (fenêtre clé, fermeture) — et comparé au
-/// précédent par `ExtensionEventPlanner`. Aucun appel à semer dans le reste du code.
+/// Everything goes through a pure state (`ExtensionBrowserState`) read again at each change — Observation framework
+/// (Spaces, arrangement, selection, titles, addresses…), window notifications (key window, closing) — and compared with
+/// the previous one by `ExtensionEventPlanner`. No calls to scatter through the rest of the code.
 @MainActor
 final class ExtensionWindows {
-    /// Un onglet vivant et ce qui le possède.
+    /// A live tab and what owns it.
     struct LiveTab {
         let tab: BrowserTab
         let owner: ExtensionTabOwner
     }
 
-    /// Une fenêtre de navigation suivie, avec le Space qui tient les favoris de chaque profil (le dernier affiché).
+    /// A tracked browser window, with the Space that holds each profile's favorites (the last displayed one).
     final class BrowserWindowEntry {
         let id = UUID()
         weak var model: WindowModel?
@@ -38,9 +38,9 @@ final class ExtensionWindows {
         }
     }
 
-    /// Reçoit les événements : le contrôleur des extensions (une fausse version dans les tests).
+    /// Receives the events: the extension controller (a fake version in the tests).
     weak var sink: (any ExtensionEventSink)?
-    /// Mini-fenêtres de l'app (tâche 4.5).
+    /// The app's mini windows (task 4.5).
     weak var miniWindows: MiniWindowManager? {
         didSet { setNeedsUpdate() }
     }
@@ -60,9 +60,9 @@ final class ExtensionWindows {
         self.sink = sink
     }
 
-    // MARK: Fenêtres de navigation
+    // MARK: Browser Windows
 
-    /// Une fenêtre de navigation s'affiche, ou sa `NSWindow` change.
+    /// A browser window is displayed, or its `NSWindow` changes.
     func windowDidAppear(_ model: WindowModel, window: NSWindow?) {
         if let entry = browserWindows.first(where: { $0.model === model }) {
             entry.window = window
@@ -72,13 +72,13 @@ final class ExtensionWindows {
         setNeedsUpdate()
     }
 
-    /// La fenêtre se ferme : elle et ses onglets disparaissent pour les extensions.
+    /// The window closes: it and its tabs disappear for extensions.
     func windowDidDisappear(_ model: WindowModel) {
         browserWindows.removeAll { $0.model === model || $0.model == nil }
         setNeedsUpdate()
     }
 
-    // MARK: Lecture
+    // MARK: Reading
 
     func liveTab(_ id: UUID) -> LiveTab? {
         liveTabs[id]
@@ -92,7 +92,7 @@ final class ExtensionWindows {
         locations[id]
     }
 
-    /// Fenêtres, la fenêtre active d'abord (exigé par `openWindowsFor`).
+    /// Windows, the active window first (required by `openWindowsFor`).
     var orderedWindows: [ExtensionWindow] {
         let ids = state.windows.map(\.id)
         let focused = state.focusedWindowID.map { [$0] } ?? []
@@ -118,7 +118,7 @@ final class ExtensionWindows {
         return state.window(withID: windowID)?.selectedTabIDs.contains(tabID) ?? false
     }
 
-    /// L'onglet `tab` s'il est vu par les extensions (rangé dans une fenêtre ouverte).
+    /// Tab `tab` if it is seen by extensions (in the sidebar of an open window).
     func adapter(for tab: BrowserTab) -> ExtensionTab? {
         guard liveTabs[tab.id]?.tab === tab else {
             return nil
@@ -126,13 +126,13 @@ final class ExtensionWindows {
         return tabAdapter(tab.id)
     }
 
-    /// Fenêtre de navigation de `model`, si elle est suivie.
+    /// Browser window of `model`, if it is tracked.
     func adapter(for model: WindowModel) -> ExtensionWindow? {
         browserWindows.first { $0.model === model }.flatMap { state.window(withID: $0.id) != nil ? windowAdapter($0.id) : nil }
     }
 
-    /// Fenêtre d'extension `id` (créée à la première demande, puis toujours la même : WebKit reconnaît les fenêtres à
-    /// leur objet).
+    /// Extension window `id` (created on the first request, then always the same: WebKit recognizes windows by their
+    /// object).
     func windowAdapter(_ id: UUID) -> ExtensionWindow {
         if let adapter = windowAdapters[id] {
             return adapter
@@ -143,7 +143,7 @@ final class ExtensionWindows {
         return adapter
     }
 
-    /// Onglet d'extension `id` (même règle que les fenêtres).
+    /// Extension tab `id` (same rule as the windows).
     func tabAdapter(_ id: UUID) -> ExtensionTab {
         if let adapter = tabAdapters[id] {
             return adapter
@@ -154,9 +154,9 @@ final class ExtensionWindows {
         return adapter
     }
 
-    // MARK: Mise à jour
+    // MARK: Update
 
-    /// Relit l'état au prochain tour de la boucle principale (les changements d'un même tour sont regroupés).
+    /// Reads the state again on the next turn of the main run loop (the changes of a single turn are grouped).
     func setNeedsUpdate() {
         guard !isUpdateScheduled else {
             return
@@ -167,7 +167,7 @@ final class ExtensionWindows {
         }
     }
 
-    /// Relit l'état tout de suite et donne les événements au contrôleur ; suit ensuite ce qui a été lu.
+    /// Reads the state again right away and gives the events to the controller; then tracks what was read.
     func update() {
         isUpdateScheduled = false
         guard !isApplying else {
@@ -204,7 +204,7 @@ final class ExtensionWindows {
             events.forEach { send($0, to: sink) }
             isApplying = false
         }
-        // Les objets des onglets et fenêtres fermés sont oubliés après leurs événements.
+        // The objects of closed tabs and windows are forgotten after their events.
         tabAdapters = tabAdapters.filter { locations[$0.key] != nil }
         windowAdapters = windowAdapters.filter { snapshot.windows[$0.key] != nil }
     }
@@ -234,8 +234,8 @@ final class ExtensionWindows {
         }
     }
 
-    /// Fenêtre clé, ouverture et fermeture des fenêtres (mini-fenêtres et fenêtres de connexion comprises) : AppKit
-    /// le dit par notifications, que le framework Observation ne voit pas.
+    /// Key window, opening and closing of windows (mini windows and sign-in windows included): AppKit reports them
+    /// through notifications, which the Observation framework does not see.
     private func startObservingWindows() {
         guard observers.isEmpty else {
             return

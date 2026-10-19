@@ -1,15 +1,15 @@
 import AppKit
 import OSLog
 
-/// Icônes des sites : lues dans la page, téléchargées, gardées en mémoire et sur disque, par domaine.
+/// Website icons: read from the page, downloaded, kept in memory and on disk, per domain.
 @MainActor
 final class FaviconService {
     static let shared = FaviconService(directory: defaultDirectory)
 
-    /// Taille maximale d'une icône téléchargée.
+    /// Maximum size of a downloaded icon.
     static let maximumSize = 1_000_000
 
-    /// `Caches/Favicons/` dans le conteneur de l'app.
+    /// `Caches/Favicons/` in the app's container.
     nonisolated static var defaultDirectory: URL? {
         FileManager.default.urls(for: .cachesDirectory, in: .userDomainMask).first?
             .appendingPathComponent("Favicons", isDirectory: true)
@@ -18,12 +18,12 @@ final class FaviconService {
     private let directory: URL?
     private let memory = NSCache<NSString, Favicon>()
     private let session: URLSession
-    /// Téléchargement en cours par domaine, partagé par les onglets du même site.
+    /// Download in progress per domain, shared by the tabs of the same website.
     private var downloads: [String: Task<Favicon?, Never>] = [:]
-    /// Domaines dont l'icône a été rafraîchie avec succès depuis le lancement.
+    /// Domains whose icon has been successfully refreshed since launch.
     private var refreshedHosts: Set<String> = []
 
-    /// `directory` : dossier du cache disque, ou nil pour un cache en mémoire seulement.
+    /// `directory`: folder of the disk cache, or nil for an in-memory cache only.
     init(directory: URL?) {
         self.directory = directory
         let configuration = URLSessionConfiguration.ephemeral
@@ -31,7 +31,7 @@ final class FaviconService {
         session = URLSession(configuration: configuration)
     }
 
-    /// Icône déjà connue du domaine : en mémoire, sinon sur disque.
+    /// Already known icon of the domain: in memory, otherwise on disk.
     func cachedIcon(forHost host: String) -> Favicon? {
         if let favicon = memory.object(forKey: host as NSString) {
             return favicon
@@ -43,13 +43,13 @@ final class FaviconService {
         return favicon
     }
 
-    /// Vrai pendant la recherche de l'icône du domaine (tests : attendre la fin d'une recherche infructueuse).
+    /// True while the domain's icon is being looked up (tests: wait for the end of an unsuccessful lookup).
     func isRefreshingIcon(forHost host: String) -> Bool {
         downloads[host] != nil
     }
 
-    /// Après le chargement d'une page : affiche tout de suite l'icône connue du domaine, puis va chercher
-    /// celle que déclare la page, une fois par domaine et par lancement.
+    /// After a page loads: shows the domain's known icon right away, then fetches the one the page declares, once per
+    /// domain and per launch.
     func refreshIcon(of tab: BrowserTab) {
         guard let pageURL = tab.url, let host = pageURL.host(), !host.isEmpty else {
             return
@@ -77,7 +77,7 @@ final class FaviconService {
             let favicon = await download.value
             downloads[host] = nil
             guard let favicon else {
-                // Échec (réseau, page sans icône lisible) : nouvel essai au prochain chargement du site.
+                // Failure (network, page without a readable icon): new attempt at the next load of the website.
                 refreshedHosts.remove(host)
                 return
             }
@@ -87,7 +87,7 @@ final class FaviconService {
         }
     }
 
-    /// Télécharge la meilleure icône disponible pour `pageURL` et la met en cache.
+    /// Downloads the best available icon for `pageURL` and caches it.
     func fetchIcon(forPage pageURL: URL, candidates: [FaviconCandidate]) async -> Favicon? {
         guard let host = pageURL.host(), !host.isEmpty else {
             return nil

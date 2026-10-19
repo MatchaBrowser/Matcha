@@ -1,10 +1,10 @@
 import Foundation
 
-/// Formes de texte comparées par la barre de commande : texte replié (sans casse, accents ni
-/// largeur), mots, et adresses lisibles.
+/// Text forms compared by the command bar: folded text (without case, accents or width), words, and readable
+/// addresses.
 nonisolated enum CommandText {
-    /// Texte sans casse, accents ni pleine largeur, espaces regroupés et retirés aux bords :
-    /// « CAFÉ  Crème » → « cafe creme ».
+    /// Text without case, accents or full width, spaces collapsed and trimmed at the edges:
+    /// “CAFÉ  Crème” → “cafe creme”.
     static func fold(_ text: String) -> String {
         text.folding(options: [.caseInsensitive, .diacriticInsensitive, .widthInsensitive], locale: nil)
             .lowercased()
@@ -12,14 +12,14 @@ nonisolated enum CommandText {
             .joined(separator: " ")
     }
 
-    /// Mots d'un texte replié : tout ce qui n'est ni une lettre ni un chiffre les sépare.
+    /// Words of a folded text: anything that is neither a letter nor a digit separates them.
     static func words(_ folded: String) -> [Substring] {
         folded.split { !$0.isLetter && !$0.isNumber }
     }
 
-    /// Adresse lisible : pour une page web, l'hôte sans « www. », le port s'il n'est pas celui du
-    /// schéma, le chemin sans « / » final et la requête, sans fragment ; le chemin d'un fichier ;
-    /// sinon l'adresse entière sans fragment (`about:blank?one`).
+    /// Readable address: for a web page, the host without “www.”, the port if it is not the scheme's, the path
+    /// without trailing “/” and the query, without fragment; the path of a file; otherwise the whole address without
+    /// fragment (`about:blank?one`).
     static func displayURL(_ url: URL) -> String {
         switch url.scheme?.lowercased() {
         case "http", "https":
@@ -31,8 +31,8 @@ nonisolated enum CommandText {
         }
     }
 
-    /// Clé d'une adresse pour repérer les doublons : `http` et `https`, « www. » et la casse de
-    /// l'hôte n'y comptent pas ; les autres schémas gardent leur nom (`about:blank?one`).
+    /// Key of an address for spotting duplicates: `http` and `https`, “www.” and the host's case do not count; other
+    /// schemes keep their name (`about:blank?one`).
     static func urlKey(_ url: URL) -> String {
         let scheme = url.scheme?.lowercased()
         if scheme == "http" || scheme == "https", let display = webDisplay(url, lowercasingHost: true) {
@@ -47,8 +47,8 @@ nonisolated enum CommandText {
         return prefix + rest
     }
 
-    /// Texte replié sans « https:// » ou « http:// » initial, puis sans « www. » :
-    /// « https://www.git » → « git ».
+    /// Folded text without a leading “https://” or “http://”, then without “www.”:
+    /// “https://www.git” → “git”.
     static func stripURLPrefixes(_ folded: String) -> String {
         var text = Substring(folded)
         if let scheme = ["https://", "http://"].first(where: { text.hasPrefix($0) }) {
@@ -60,7 +60,7 @@ nonisolated enum CommandText {
         return String(text)
     }
 
-    /// « hôte[:port]/chemin?requête » d'une adresse web, nil si elle n'a pas d'hôte.
+    /// “host[:port]/path?query” of a web address, nil if it has no host.
     private static func webDisplay(_ url: URL, lowercasingHost: Bool) -> String? {
         guard var host = url.host(), !host.isEmpty else {
             return nil

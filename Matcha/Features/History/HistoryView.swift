@@ -1,16 +1,16 @@
 import AppKit
 import SwiftUI
 
-/// Liste de l'historique, par jour, avec la recherche (dans la barre d'outils), le menu des lignes, la suppression
-/// (touche ⌫, menu Édition > Supprimer) et « Effacer l'historique… ».
+/// History list, by day, with the search (in the toolbar), the rows' menu, deletion (⌫ key, Edit > Delete menu)
+/// and “Clear History…”.
 struct HistoryView: View {
     @Bindable var model: HistoryWindowModel
     let faviconService: FaviconService
-    /// Nom du profil montré, s'il y en a plusieurs (message de l'effacement).
+    /// Name of the profile shown, if there are several (message of the clearing dialog).
     let profileName: String?
     let open: ([HistoryRow]) -> Void
 
-    /// Fenêtre de l'historique, où s'ouvre la feuille de « Effacer l'historique… ».
+    /// History window, where the “Clear History…” sheet opens.
     @State private var window: NSWindow?
 
     var body: some View {
@@ -51,7 +51,7 @@ struct HistoryView: View {
             }
         }
         .task(id: model.refreshKey) {
-            // Une rafale de frappes ou de visites ne recalcule qu'une fois.
+            // A burst of keystrokes or visits recomputes only once.
             if model.isReady {
                 try? await Task.sleep(for: .milliseconds(100))
             }
@@ -89,7 +89,7 @@ struct HistoryView: View {
     }
 }
 
-/// En-tête d'un jour : « Aujourd'hui », « Hier », sinon la date complète.
+/// Header of a day: “Today”, “Yesterday”, otherwise the full date.
 private struct HistoryDayHeader: View {
     let day: HistoryDay
 

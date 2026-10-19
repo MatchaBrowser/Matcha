@@ -1,8 +1,8 @@
 import Foundation
 
 nonisolated extension SymbolChoice {
-    /// Icônes proposées pour un Space, pleines pour rester lisibles en petit dans la barre. En premier, les symboles
-    /// donnés tour à tour aux nouveaux Spaces (`BrowserSession.spaceSymbols`), dans le même ordre.
+    /// Icons offered for a Space, filled to stay readable at small size in the sidebar. First, the symbols given in
+    /// turn to new Spaces (`BrowserSession.spaceSymbols`), in the same order.
     static let spaceIcons = [
         SymbolChoice(name: "circle.fill", title: LocalizedStringResource("Circle", comment: "Icon choice (SF Symbol)")),
         SymbolChoice(name: "star.fill", title: LocalizedStringResource("Star", comment: "Icon choice (SF Symbol)")),

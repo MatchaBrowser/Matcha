@@ -12,7 +12,7 @@ struct MiniWindowHandOffTests {
         session = try BrowserSession(container: BrowserSchema.makeContainer(inMemory: true))
     }
 
-    /// Page d'une mini-fenêtre sur le profil de `space`, chargée sur `pages`, l'une après l'autre.
+    /// Page of a mini window on the profile of `space`, loaded on `pages`, one after the other.
     private func miniTab(in space: SpaceSession, pages: [String]) async throws -> BrowserTab {
         let configuration = TestPages.configuration()
         configuration.websiteDataStore = session.dataStore(for: space.record.profile)
@@ -45,7 +45,7 @@ struct MiniWindowHandOffTests {
         let other = session.addProfile(named: "Travail")
         let tab = BrowserTab(configuration: WebConfigurationFactory
             .makeConfiguration(websiteDataStore: session.dataStore(for: space.record.profile)))
-        // Adresse que la vue web du nouveau profil sait charger (pas le schéma de test).
+        // Address that the web view of the new profile can load (not the test scheme).
         let url = blankPage("travail")
         tab.load(url)
         try await waitUntil { tab.url == url && !tab.isLoading }

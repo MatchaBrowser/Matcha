@@ -1,16 +1,15 @@
 import SwiftUI
 
-/// Commandes de la page au premier plan (`FrontPage`, tâche 5.4) : Fichier > « Exporter en PDF… » et « Imprimer… »
-/// (⌘P), à la place des commandes d'impression standard (absentes jusqu'ici : rien n'est doublé) ; Présentation >
-/// « Taille réelle » (⌘0), « Zoom avant » (⌘+, et ⌘= par `BrowserWebView`), « Zoom arrière » (⌘-), après « Recharger la
-/// page ». Le zoom est retenu pour le site de la page, montré à côté de sa pastille d'adresse (`ZoomBadge`) et annoncé
-/// à VoiceOver. Une page qui garde ces raccourcis pour elle passe avant, comme dans Safari : WebKit lui envoie les
-/// raccourcis d'abord.
+/// Commands of the front page (`FrontPage`, task 5.4): File > “Export as PDF…” and “Print…” (⌘P), in place of the
+/// standard print commands (absent until now: nothing is duplicated); View > “Actual Size” (⌘0), “Zoom In” (⌘+, and
+/// ⌘= through `BrowserWebView`), “Zoom Out” (⌘-), after “Reload Page”. The zoom is remembered for the page's site,
+/// shown next to its address pill (`ZoomBadge`) and announced to VoiceOver. A page that keeps these shortcuts for
+/// itself comes first, as in Safari: WebKit sends it the shortcuts first.
 struct PageCommands: Commands {
     let miniWindows: MiniWindowManager
     @FocusedValue(\.tabManager) private var tabManager
 
-    /// Mini-fenêtre active : `keyWindowID` est lu pour que le menu suive, la fenêtre est relue à chaque action.
+    /// Active mini window: `keyWindowID` is read so the menu follows along, the window is read again on each action.
     private var miniWindow: MiniWindowController? {
         _ = miniWindows.keyWindowID
         return miniWindows.keyWindow
@@ -20,7 +19,7 @@ struct PageCommands: Commands {
         FrontPage.page(miniWindowTab: miniWindow?.tab, tabManager: tabManager)
     }
 
-    /// Zoom par site des pages de la fenêtre active : celui de la session principale pour une mini-fenêtre.
+    /// Per-site zoom of the active window's pages: the main session's for a mini window.
     private var siteZooms: SiteZoomStore? {
         miniWindow == nil ? tabManager?.siteZooms : miniWindows.siteZooms
     }
@@ -28,7 +27,7 @@ struct PageCommands: Commands {
     var body: some Commands {
         CommandGroup(replacing: .printItem) {
             let page = page
-            // Sans raccourci, comme dans Safari ; ⇧⌘P sert à certaines pages (palette de commandes).
+            // No shortcut, as in Safari; ⇧⌘P is used by some pages (command palette).
             Button("Export as PDF…") { self.page.map(PDFExport.start(for:)) }
                 .disabled(page == nil)
             Button("Print…") { self.page.map(PagePrinter.print) }
@@ -51,7 +50,7 @@ struct PageCommands: Commands {
         }
     }
 
-    /// Zoome la page ; son badge suit de lui-même, VoiceOver annonce le nouveau zoom.
+    /// Zooms the page; its badge follows on its own, VoiceOver announces the new zoom.
     private func zoom(_ change: ZoomLevels.Change) {
         guard let page, let level = PageZoom.apply(change, to: page, siteZooms: siteZooms) else {
             return

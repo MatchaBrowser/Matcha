@@ -1,10 +1,10 @@
 import Foundation
 
-/// Ce qu'affiche un nouvel onglet.
+/// What a new tab shows.
 nonisolated enum NewTabPage: String, CaseIterable, Identifiable, Sendable {
-    /// Onglet vide, curseur dans la barre d'adresse.
+    /// Empty tab, cursor in the address bar.
     case blank
-    /// Page d'accueil des réglages.
+    /// Homepage from the settings.
     case homePage
 
     var id: Self {

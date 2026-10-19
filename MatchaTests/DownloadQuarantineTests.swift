@@ -3,8 +3,8 @@ import Foundation
 @testable import Matcha
 import Testing
 
-/// Propriétés de quarantaine des fichiers téléchargés (tâche 5.1). Le comportement réel (attribut posé par la
-/// sandbox sur le fichier écrit par WebKit) est vérifié par `DownloadIntegrationTests` et le test d'interface.
+/// Quarantine properties of downloaded files (task 5.1). The real behavior (attribute set by the sandbox on the
+/// file written by WebKit) is checked by `DownloadIntegrationTests` and the UI test.
 struct DownloadQuarantineTests {
     private static let agent = kLSQuarantineAgentNameKey as String
     private static let type = kLSQuarantineTypeKey as String
@@ -36,7 +36,7 @@ struct DownloadQuarantineTests {
         #expect(DownloadQuarantine.recordedURL(nil) == nil)
     }
 
-    /// Fichier créé par l'app (sandboxée) : la sandbox le met en quarantaine d'elle-même, rien n'est réécrit.
+    /// File created by the (sandboxed) app: the sandbox quarantines it by itself, nothing is rewritten.
     @Test func `a file created in the sandbox is already quarantined`() throws {
         let folder = FileManager.default.temporaryDirectory.appendingPathComponent("Quarantine-\(UUID().uuidString)")
         try FileManager.default.createDirectory(at: folder, withIntermediateDirectories: true)

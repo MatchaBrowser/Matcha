@@ -1,6 +1,6 @@
 import SwiftUI
 
-/// Menu contextuel d'un onglet de la barre latérale (ou d'un morceau de la ligne d'un split).
+/// Context menu of a tab in the sidebar (or of a segment of a split's row).
 struct TabContextMenu: View {
     let tab: BrowserTab
     let tabManager: TabManager
@@ -16,7 +16,7 @@ struct TabContextMenu: View {
             Button("Add to Favorites") { tabManager.setPlace(tab, to: .favorite) }
         }
         if let group {
-            // Épingler un membre épingle tout le split.
+            // Pinning a member pins the whole split.
             if place == .pinned {
                 Button("Unpin Split View") { tabManager.setSplitPlace(group.id, to: .today) }
                 Button("New Folder") { tabManager.newFolder() }
@@ -47,14 +47,14 @@ struct TabContextMenu: View {
         .disabled(tab.url == nil)
         Divider()
         closeItems(place: place, group: group)
-        // Le split de l'onglet reste entier.
+        // The tab's split stays whole.
         let kept = Set(group?.tabIDs ?? [tab.id])
         Button("Close Other Tabs") { tabManager.closeOtherTabs(than: tab) }
             .disabled(!tabManager.todayTabs.contains { !kept.contains($0.id) })
     }
 
-    /// Fermer : un onglet du jour disparaît ; un épinglé ou un favori se décharge, « Supprimer » le retire de
-    /// la barre ; un split épinglé se ferme en entier.
+    /// Close: a today tab disappears; a pinned tab or a favorite is unloaded, “Delete Tab” removes it from
+    /// the sidebar; a pinned split closes entirely.
     @ViewBuilder
     private func closeItems(place: TabPlace?, group: SplitGroup?) -> some View {
         if place == .today {
@@ -73,7 +73,7 @@ struct TabContextMenu: View {
         }
     }
 
-    /// Avec la confirmation « URL copiée » de la fenêtre, comme ⇧⌘C.
+    /// With the window's “URL Copied” confirmation, like ⇧⌘C.
     private func copyLink(_ url: URL) {
         if let windowModel {
             windowModel.copyLink(url)

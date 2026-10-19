@@ -1,16 +1,16 @@
 import AppKit
 import SwiftUI
 
-/// Ligne d'un dossier d'épinglés : un clic le replie ou le déplie ; menu pour le renommer, le personnaliser (icône,
-/// couleurs du texte et du fond, `FolderCustomizationPanel`), y créer un sous-dossier ou le supprimer. Un élément
-/// déposé sur la ligne entre dans le dossier, ou se place avant lui s'il est lâché sur le haut de la ligne.
+/// Row of a pinned folder: a click collapses or expands it; a menu to rename it, customize it (icon, text and
+/// background colors, `FolderCustomizationPanel`), create a subfolder in it or delete it. An item dropped on the
+/// row goes into the folder, or is placed before it if it is released on the top of the row.
 struct FolderRowView: View {
-    /// Hauteur du haut de la ligne où un dépôt place l'élément avant le dossier.
+    /// Height of the top of the row where a drop places the item before the folder.
     static let beforeZoneHeight = 8.0
 
     let folder: PinnedFolder
     let tabManager: TabManager
-    /// Place du dossier dans son parent.
+    /// Position of the folder in its parent.
     let dropDestination: SidebarDestination
 
     @Environment(WindowModel.self) private var windowModel: WindowModel?
@@ -23,7 +23,7 @@ struct FolderRowView: View {
         tabManager.renamingFolderID == folder.id
     }
 
-    /// Couleur du nom et du symbole : choisie, ou lisible sur le fond choisi ; nil : celle du système.
+    /// Color of the name and the symbol: chosen, or readable on the chosen background; nil: the system's color.
     private var textColor: Color? {
         folder.appearance.displayedTextColor?.color
     }
@@ -74,7 +74,7 @@ struct FolderRowView: View {
         .accessibilityIdentifier("folderRow")
     }
 
-    /// Gris du système ; sur un fond choisi, où ce gris peut disparaître, la couleur du texte atténuée.
+    /// System gray; on a chosen background, where this gray may vanish, the dimmed text color.
     private var chevronStyle: AnyShapeStyle {
         guard folder.appearance.backgroundColor != nil else {
             return AnyShapeStyle(.secondary)
@@ -82,7 +82,7 @@ struct FolderRowView: View {
         return AnyShapeStyle((textColor ?? .primary).opacity(0.7))
     }
 
-    /// En Debug, l'apparence choisie (« symbol:star text:#FF3B30 background:none »), pour les tests d'interface.
+    /// In Debug, the chosen appearance (“symbol:star text:#FF3B30 background:none”), for the UI tests.
     private var accessibilityValue: Text {
         #if DEBUG
             return Text(verbatim: folder.appearance.summary)
@@ -99,15 +99,15 @@ struct FolderRowView: View {
             .onSubmit { tabManager.renameFolder(folder.id, to: draftName) }
             .onExitCommand { tabManager.renameFolder(folder.id, to: folder.name) }
             .onChange(of: isNameFocused) { _, focused in
-                // Cliquer ailleurs valide le nom saisi.
+                // Clicking elsewhere confirms the typed name.
                 if !focused, isRenaming {
                     tabManager.renameFolder(folder.id, to: draftName)
                 }
             }
             .onAppear { draftName = folder.name }
             .task {
-                // Le champ apparaît souvent pendant la fermeture d'un menu contextuel : on attend
-                // qu'elle soit finie pour prendre le clavier, puis on sélectionne le nom.
+                // The field often appears while a context menu is closing: wait for it
+                // to finish before taking the keyboard, then select the name.
                 try? await Task.sleep(for: .milliseconds(80))
                 isNameFocused = true
                 try? await Task.sleep(for: .milliseconds(20))
@@ -119,7 +119,7 @@ struct FolderRowView: View {
     @ViewBuilder private var menu: some View {
         Button("Rename") { tabManager.renamingFolderID = folder.id }
         if let windowModel {
-            // Le même élément ferme le panneau ouvert sous ce dossier.
+            // The same item closes the panel open below this folder.
             if windowModel.customizedFolderID == folder.id {
                 Button("Close Customization") { toggleCustomization(in: windowModel) }
             } else {
@@ -143,8 +143,8 @@ struct FolderRowView: View {
     }
 }
 
-/// Fond de la ligne d'un dossier : la couleur choisie, pleine, éclaircie ou assombrie au survol (dans la couleur du
-/// texte lisible sur elle) ; sans couleur, celui des autres lignes.
+/// Background of a folder's row: the chosen color, solid, lightened or darkened on hover (towards the text color
+/// readable on it); without a color, that of the other rows.
 private struct FolderRowBackground: View {
     let appearance: FolderAppearance
     let isHovered: Bool

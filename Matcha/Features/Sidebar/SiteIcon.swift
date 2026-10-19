@@ -1,8 +1,8 @@
 import SwiftUI
 
-/// Icône d'un site : la sienne, sinon une pastille avec l'initiale du domaine, sinon un globe.
-/// Une icône sombre et sans couleur sur fond sombre (ou claire sur fond clair) est posée sur une
-/// plaque contrastée pour rester visible.
+/// Icon of a site: its own, otherwise a pill with the domain's initial, otherwise a globe.
+/// A dark, colorless icon on a dark background (or a light one on a light background) is placed on a
+/// contrasting plate to stay visible.
 struct SiteIcon: View {
     let favicon: Favicon?
     let host: String?
@@ -47,7 +47,7 @@ struct SiteIcon: View {
         }
     }
 
-    /// Plaque claire sous une icône sombre en mode sombre, sombre sous une icône claire en mode clair.
+    /// Light plate under a dark icon in dark mode, dark plate under a light icon in light mode.
     private func plateColor(for tone: FaviconTone) -> Color? {
         switch (tone, colorScheme) {
         case (.dark, .dark): .white.opacity(0.9)

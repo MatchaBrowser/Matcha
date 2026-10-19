@@ -2,31 +2,31 @@ import AppKit
 import OSLog
 import WebKit
 
-/// Fenêtres de connexion d'une session (tâche 5.8) : une page qui ouvre une fenêtre en donnant sa taille
-/// (`window.open(url, nom, "width=500,height=600")` : connexion Google ou Apple, banque, paiement) l'obtient dans sa
-/// propre petite fenêtre, au-dessus de sa fenêtre d'origine, au lieu d'un onglet ; depuis un aperçu, l'aperçu reste un
-/// aperçu ; depuis une mini-fenêtre, de même. Une instance par session (`BrowserSession.popupWindows`) : celles d'une
-/// fenêtre privée sont privées et se ferment avec elle. Les pages des fenêtres de connexion ont leur propre délégué de
-/// navigation (hôte : ce gestionnaire, `+TabHost`) ; jamais enregistrées ni restaurées.
+/// Sign-in windows of a session (task 5.8): a page that opens a window giving its size
+/// (`window.open(url, name, "width=500,height=600")`: Google or Apple sign-in, bank, payment) gets it in its own
+/// small window, above its originating window, instead of a tab; from a peek, the peek stays a peek; from a mini
+/// window, likewise. One instance per session (`BrowserSession.popupWindows`): those of a private window are
+/// private and close with it. The pages of sign-in windows have their own navigation delegate (host: this
+/// manager, `+TabHost`); never saved nor restored.
 @MainActor
 final class PopupWindowManager {
     let faviconService: FaviconService
-    /// Fenêtre à laquelle reviennent leurs téléchargements : celle de la session.
+    /// Window their downloads go back to: the session's.
     let downloadScope: DownloadScope
-    /// Zoom des pages par site de la session (tâche 5.4).
+    /// Per-site page zoom of the session (task 5.4).
     let siteZooms: SiteZoomStore?
-    /// Fenêtre privée : fenêtres de connexion sombres, comme elle.
+    /// Private window: dark sign-in windows, like it.
     let isPrivate: Bool
-    /// Bloqueur de la session (tâche 6.2), donné par la session ; nil (tests) : les pages ne sont pas suivies.
+    /// Blocker of the session (task 6.2), given by the session; nil (tests): pages are not tracked.
     var contentBlocking: ContentBlockerScope?
-    /// Délégué de navigation des pages des fenêtres de connexion.
+    /// Navigation delegate of the sign-in windows' pages.
     let coordinator = NavigationCoordinator()
-    /// Fenêtres ouvertes, de la plus ancienne à la plus récente.
+    /// Open windows, from oldest to newest.
     private(set) var windows: [PopupWindowController] = []
 
-    /// Montre la fenêtre au-dessus de sa fenêtre d'origine (remplacé dans les tests : aucune fenêtre à l'écran).
+    /// Shows the window above its originating window (replaced in tests: no window on screen).
     var present: @MainActor (PopupWindowController) -> Void = PopupWindowManager.presentOnScreen
-    /// Zone utile de l'écran de la fenêtre d'origine, ou de celui du pointeur sans elle (remplacée dans les tests).
+    /// Usable area of the screen of the originating window, or of the pointer's screen without it (replaced in tests).
     var visibleScreenFrame: @MainActor (NSWindow?) -> CGRect? = PopupWindowManager.visibleFrame(around:)
 
     init(faviconService: FaviconService, downloadScope: DownloadScope, siteZooms: SiteZoomStore?, isPrivate: Bool) {
@@ -45,26 +45,26 @@ final class PopupWindowManager {
         windows.first { $0.tab === page }
     }
 
-    /// Vrai si une fenêtre ouverte par `page` l'est encore : `page` ne doit pas être mise en veille (tâche 5.6), sans
-    /// quoi `window.opener` ne la retrouverait plus.
+    /// True if a window opened by `page` is still open: `page` must not be suspended (task 5.6), otherwise
+    /// `window.opener` would no longer find it.
     func hasOpenWindow(openedBy page: BrowserTab) -> Bool {
         windows.contains { $0.opener.page === page }
     }
 
-    // MARK: Ouverture
+    // MARK: Opening
 
-    /// Ouvre une fenêtre de connexion et renvoie sa vue web, créée avec `configuration` telle quelle (sans quoi
-    /// `window.opener` ne fonctionne pas) ; WebKit y charge ensuite la page demandée.
+    /// Opens a sign-in window and returns its web view, created with `configuration` as is (otherwise
+    /// `window.opener` does not work); WebKit then loads the requested page in it.
     func open(configuration: WKWebViewConfiguration, features: PopupWindowFeatures, opener: PopupOpener) -> WKWebView {
         let tab = BrowserTab(configuration: configuration, openerID: opener.page?.id)
         return show(tab, features: features, opener: opener).tab.makeWebViewIfNeeded()
     }
 
-    /// Crée la fenêtre de `tab`, à la taille demandée, centrée sur la fenêtre d'origine, et la montre.
+    /// Creates the window of `tab`, at the requested size, centered on the originating window, and shows it.
     @discardableResult
     func show(_ tab: BrowserTab, features: PopupWindowFeatures, opener: PopupOpener) -> PopupWindowController {
         tab.delegate = coordinator
-        // Vue web créée avant la fenêtre, avec son délégué : le conteneur la montre dès l'ouverture.
+        // Web view created before the window, with its delegate: the container shows it from the opening.
         tab.makeWebViewIfNeeded()
         let controller = PopupWindowController(
             tab: tab,
@@ -78,29 +78,29 @@ final class PopupWindowManager {
         return controller
     }
 
-    // MARK: Fermeture
+    // MARK: Closing
 
     func didClose(_ controller: PopupWindowController) {
         windows.removeAll { $0 === controller }
     }
 
-    /// Fenêtre privée fermée : ses fenêtres de connexion aussi (sa session est oubliée).
+    /// Private window closed: its sign-in windows too (its session is forgotten).
     func closeAll() {
         for controller in windows {
             controller.close()
         }
     }
 
-    /// Profil supprimé : les fenêtres qui utilisent ses données se ferment avant qu'elles ne soient effacées.
+    /// Profile deleted: the windows that use its data close before the data is erased.
     func closeWindows(using dataStore: WKWebsiteDataStore) {
         for controller in windows where controller.tab.configuration.websiteDataStore === dataStore {
             controller.close()
         }
     }
 
-    // MARK: Écran
+    // MARK: Screen
 
-    /// Page à la taille demandée, plus la barre d'adresse et la barre de titre, dans la zone utile de l'écran.
+    /// Page at the requested size, plus the address bar and the title bar, within the usable area of the screen.
     private func frame(for features: PopupWindowFeatures, opener: NSWindow?) -> CGRect {
         let page = PopupWindowPlacement.pageSize(for: features)
         let content = CGRect(x: 0, y: 0, width: page.width, height: page.height + PopupAddressBar.height)
@@ -109,7 +109,7 @@ final class PopupWindowManager {
         return PopupWindowPlacement.frame(size: size, opener: opener?.frame, in: visible)
     }
 
-    /// Au-dessus de la fenêtre d'origine si elle est à l'écran, au premier plan ; la page prend le clavier.
+    /// Above the originating window if it is on screen, in front; the page takes keyboard focus.
     static func presentOnScreen(_ controller: PopupWindowController) {
         if let parent = controller.opener.window, parent.isVisible, !parent.isMiniaturized {
             controller.attach(to: parent)

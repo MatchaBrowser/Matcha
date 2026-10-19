@@ -2,7 +2,7 @@ import Foundation
 @testable import Matcha
 import Testing
 
-/// Barre d'adresse d'une fenêtre de connexion (tâche 5.8) : le site qui demande, et si la connexion est chiffrée.
+/// Address bar of a sign-in window (task 5.8): the requesting site, and whether the connection is encrypted.
 struct PopupAddressTests {
     private func address(_ text: String) -> PopupAddress {
         PopupAddress(url: URL(string: text))
@@ -20,7 +20,7 @@ struct PopupAddressTests {
         #expect(address("http://[::1]:3000/") == PopupAddress(text: "[::1]:3000", security: .notSecure))
     }
 
-    /// Ni cadenas ni avertissement hors d'un site ; jamais le contenu d'une adresse `data:`.
+    /// Neither padlock nor warning outside a site; never the content of a `data:` address.
     @Test func `other pages show what they are, without a security state`() {
         #expect(address("about:blank") == PopupAddress(text: "about:blank", security: .none))
         #expect(address("data:text/html,<h1>Connexion</h1>") == PopupAddress(text: "data:", security: .none))

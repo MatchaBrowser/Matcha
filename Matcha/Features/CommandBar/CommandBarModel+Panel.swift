@@ -1,8 +1,8 @@
 import Foundation
 
-/// La barre d'une fenêtre de navigation vue par son panneau.
+/// The bar of a browser window as seen by its panel.
 extension CommandBarModel: CommandBarPanelModel {
-    /// Onglet visé en mode « onglet affiché ».
+    /// Target tab in “displayed tab” mode.
     var editedTab: BrowserTab? {
         guard case let .currentTab(id) = mode else {
             return nil

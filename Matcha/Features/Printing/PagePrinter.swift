@@ -2,15 +2,15 @@ import AppKit
 import OSLog
 import WebKit
 
-/// « Imprimer… » (⌘P, tâche 5.4) : la page au premier plan, par la zone d'impression de macOS en feuille sur sa
-/// fenêtre (aperçu, imprimante, « PDF » pour l'enregistrer en pages). Le titre du travail est celui de la page.
+/// “Print…” (⌘P, task 5.4): the frontmost page, through the macOS print panel as a sheet on its window (preview,
+/// printer, “PDF” to save it as pages). The job title is the page's.
 @MainActor
 enum PagePrinter {
-    /// Taille donnée à la vue d'impression quand la vue web n'en a pas (jamais affichée).
+    /// Size given to the print view when the web view has none (never displayed).
     static let fallbackViewSize = CGSize(width: 800, height: 600)
 
-    /// Opération d'impression de `webView`, intitulée `title`. Sa vue reçoit un cadre : celle que donne WebKit n'en a
-    /// pas, et l'impression ne produit alors que des pages blanches (problème connu de `printOperation(with:)`).
+    /// Print operation of `webView`, titled `title`. Its view is given a frame: the one WebKit provides has none, and
+    /// printing then produces only blank pages (known issue of `printOperation(with:)`).
     static func operation(for webView: WKWebView, title: String, printInfo: NSPrintInfo = .shared) -> NSPrintOperation {
         let operation = webView.printOperation(with: printInfo)
         operation.jobTitle = title
@@ -22,8 +22,8 @@ enum PagePrinter {
         return operation
     }
 
-    /// Ouvre la zone d'impression sur la fenêtre de `page` ; rien si la page n'a pas de vue web affichée ou si une
-    /// autre feuille est déjà ouverte sur la fenêtre.
+    /// Opens the print panel on the window of `page`; nothing if the page has no displayed web view or if another
+    /// sheet is already open on the window.
     static func print(_ page: BrowserTab) {
         guard let webView = page.webView, let window = webView.window, window.attachedSheet == nil else {
             NSSound.beep()

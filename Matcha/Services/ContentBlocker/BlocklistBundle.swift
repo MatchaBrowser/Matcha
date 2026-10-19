@@ -1,11 +1,11 @@
 import Foundation
 
-/// Listes de blocage livrées dans les ressources d'un paquet (tâche 6.2) : l'app, ou le paquet des tests pour leurs
-/// listes d'essai. Xcode copie à plat les ressources du dossier synchronisé (`Resources/Blocklists/x.json` arrive dans
-/// `Contents/Resources/x.json`) ; un sous-dossier `Blocklists` est aussi cherché, au cas où il serait gardé.
+/// Blocklists shipped in a bundle's resources (task 6.2): the app, or the test bundle for its sample lists. Xcode
+/// copies the resources of the synchronized folder flat (`Resources/Blocklists/x.json` ends up in
+/// `Contents/Resources/x.json`); a `Blocklists` subfolder is also searched, in case it is kept.
 nonisolated struct BlocklistBundle: Sendable {
     enum Error: Swift.Error, Equatable {
-        /// Le fichier d'une liste du manifeste manque dans les ressources.
+        /// The file of a list in the manifest is missing from the resources.
         case missingFile(String)
     }
 
@@ -14,7 +14,7 @@ nonisolated struct BlocklistBundle: Sendable {
     let bundle: Bundle
     var manifestName = BlocklistManifest.resourceName
 
-    /// Manifeste des listes ; nil s'il n'y en a pas (aucune liste livrée : le bloqueur reste inactif).
+    /// Manifest of the lists; nil if there is none (no list shipped: the blocker stays inactive).
     func manifest() async throws -> BlocklistManifest? {
         guard let url = url(of: manifestName) else {
             return nil
@@ -22,7 +22,7 @@ nonisolated struct BlocklistBundle: Sendable {
         return try await BlocklistManifest(data: Self.read(url))
     }
 
-    /// Règles de `entry` (JSON au format de WebKit), lues hors du fil principal.
+    /// Rules of `entry` (JSON in WebKit's format), read off the main thread.
     func rules(of entry: BlocklistEntry) async throws -> Data {
         guard let url = url(of: entry.file) else {
             throw Error.missingFile(entry.file)

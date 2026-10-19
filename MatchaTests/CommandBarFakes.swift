@@ -1,14 +1,14 @@
 import Foundation
 @testable import Matcha
 
-// Sources factices de la barre de commande.
+// Fake sources for the command bar.
 
-/// Adresse `about:blank?<name>` : WebKit la garde telle quelle, sans réseau.
+/// Address `about:blank?<name>`: WebKit keeps it as is, without any network access.
 func blankPage(_ name: String) -> URL {
     URL(string: "about:blank?\(name)")!
 }
 
-/// Historique factice : renvoie `entries` et note chaque lecture.
+/// Fake history: returns `entries` and records each read.
 @MainActor
 final class FakeHistory: HistorySource {
     var entries: [HistoryEntry]
@@ -24,8 +24,8 @@ final class FakeHistory: HistorySource {
     }
 }
 
-/// Moteur de suggestions factice : note chaque texte demandé et répond `responses[texte]` (sinon
-/// rien), ou lève `error`. Un texte de `suspended` attend `resume(_:with:)`.
+/// Fake suggestion engine: records each requested text and answers `responses[text]` (otherwise
+/// nothing), or throws `error`. A text in `suspended` waits for `resume(_:with:)`.
 @MainActor
 final class FakeSuggestionEngine {
     private(set) var requests: [String] = []
@@ -53,14 +53,14 @@ final class FakeSuggestionEngine {
         waiting.removeValue(forKey: text)?.resume(returning: suggestions)
     }
 
-    /// Libère les demandes encore en attente (fin de test).
+    /// Releases the requests still pending (end of test).
     func resumeAll() {
         for text in waiting.keys {
             resume(text, with: [])
         }
     }
 
-    /// Source branchée sur ce moteur ; `sleep` nil : la vraie attente de 150 ms.
+    /// Source plugged into this engine; `sleep` nil: the real 150 ms wait.
     func provider(sleep: SearchSuggestionsProvider.Sleep? = { _ in }) -> SearchSuggestionsProvider {
         let fetch: SearchSuggestionsProvider.Fetch = { [self] text, engine in try await self.fetch(text, engine) }
         guard let sleep else {
@@ -70,7 +70,7 @@ final class FakeSuggestionEngine {
     }
 }
 
-/// Attente factice : note chaque durée demandée, puis rend la main aussitôt ou lève `error`.
+/// Fake sleep: records each requested duration, then returns immediately or throws `error`.
 @MainActor
 final class FakeSleep {
     private(set) var durations: [Duration] = []
@@ -84,7 +84,7 @@ final class FakeSleep {
     }
 }
 
-/// Attente factice qui dure jusqu'à `open()` ; une tâche annulée entre-temps lève alors `CancellationError`.
+/// Fake sleep that lasts until `open()`; a task cancelled in the meantime then throws `CancellationError`.
 @MainActor
 final class GatedSleep {
     private var waiting: [CheckedContinuation<Void, Never>] = []

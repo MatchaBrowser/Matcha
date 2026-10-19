@@ -1,21 +1,20 @@
 import AppKit
 import Foundation
 
-/// Lecture de l'état des fenêtres et des onglets (tâche 6.3), sous le suivi du framework Observation.
+/// Reading of the state of the windows and tabs (task 6.3), under tracking by the Observation framework.
 extension ExtensionWindows {
-    /// État pur, et les objets vivants qu'il désigne.
+    /// Pure state, and the live objects it designates.
     struct Snapshot {
         var state = ExtensionBrowserState()
         var tabs: [UUID: LiveTab] = [:]
         var windows: [UUID: ExtensionWindowOwner] = [:]
-        /// Fenêtre clé de l'app, puis celle qui la porte : une feuille (alerte) ou une bulle (popup d'une extension)
-        /// laissent active la fenêtre sur laquelle elles s'ouvrent ; une fenêtre de connexion, fenêtre enfant, l'est
-        /// elle-même.
+        /// The app's key window, then the window that carries it: a sheet (alert) or a popover (an extension's popup)
+        /// leaves the window it opens on active; a sign-in window, a child window, is itself active.
         let keyWindows: [NSWindow] = [NSApp.keyWindow, NSApp.keyWindow?.sheetParent, NSApp.keyWindow?.parent].compactMap(\.self)
-        /// Rang dans `keyWindows` de la fenêtre active retenue.
+        /// Index in `keyWindows` of the active window found so far.
         private var focusRank = Int.max
 
-        /// Ajoute `tab` à la fenêtre en cours de lecture ; un onglet déjà vu ailleurs est ignoré.
+        /// Adds `tab` to the window being read; a tab already seen elsewhere is ignored.
         mutating func add(_ tab: BrowserTab, owner: ExtensionTabOwner, isPinned: Bool, to tabIDs: inout [UUID]) {
             guard tabs[tab.id] == nil else {
                 return
@@ -32,7 +31,7 @@ extension ExtensionWindows {
             )
         }
 
-        /// Ajoute une fenêtre ; elle est la fenêtre active si sa `NSWindow` est la fenêtre clé, ou porte celle-ci.
+        /// Adds a window; it is the active window if its `NSWindow` is the key window, or carries it.
         mutating func addWindow(_ window: ExtensionBrowserState.Window, owner: ExtensionWindowOwner) {
             state.windows.append(window)
             windows[window.id] = owner
@@ -54,7 +53,7 @@ extension ExtensionWindows {
             sessions.append(model.session)
         }
         if let miniWindows {
-            // Lu pour être prévenu quand la mini-fenêtre active change.
+            // Read to be notified when the active mini window changes.
             _ = miniWindows.keyWindowID
             for controller in miniWindows.windows {
                 var tabIDs: [UUID] = []
@@ -75,10 +74,10 @@ extension ExtensionWindows {
         return snapshot
     }
 
-    /// Fenêtre de navigation : les onglets de chaque Space, dans l'ordre des Spaces puis de la barre. Les favoris d'un
-    /// profil, communs à ses Spaces, n'apparaissent qu'une fois, au début du premier Space de ce profil, pris dans le
-    /// Space qui les tient (le dernier affiché de ce profil : les autres n'en ont qu'une copie jusqu'à leur affichage).
-    /// L'aperçu ouvert suit son onglet d'origine.
+    /// Browser window: the tabs of each Space, in the order of the Spaces, then of the sidebar. A profile's favorites,
+    /// shared by its Spaces, appear only once, at the start of the first Space of that profile, taken from the Space
+    /// that holds them (the last displayed one of that profile: the others only have a copy of them until they are
+    /// displayed). The open Peek follows its originating tab.
     private func addBrowserWindow(_ entry: BrowserWindowEntry, model: WindowModel, to snapshot: inout Snapshot) {
         let session = model.session
         let displayed = model.space
@@ -104,8 +103,8 @@ extension ExtensionWindows {
         let manager = displayed.tabManager
         var selected = Set(manager.displayedTabIDs).intersection(tabIDs)
         var active = manager.selectedTabID.flatMap { selected.contains($0) ? $0 : nil }
-        // L'aperçu est la page au premier plan : un onglet juste après son onglet d'origine, actif tant qu'il est ouvert
-        // (sans quoi ses scripts de contenu ne pourraient pas parler à leur extension : « Tab not found »).
+        // Peek is the page in front: a tab right after its originating tab, active while it is open (otherwise its
+        // content scripts could not talk to their extension: “Tab not found”).
         if let peek = manager.peek {
             var peekIDs: [UUID] = []
             snapshot.add(peek.tab, owner: .peek(displayed, model), isPinned: false, to: &peekIDs)
@@ -117,7 +116,7 @@ extension ExtensionWindows {
         snapshot.addWindow(window, owner: .browser(model, entry.window))
     }
 
-    /// Mini-fenêtre ou fenêtre de connexion : sa page est l'onglet actif et sélectionné.
+    /// Mini window or sign-in window: its page is the active and selected tab.
     private func addSinglePageWindow(id: UUID, tabIDs: [UUID], owner: ExtensionWindowOwner, to snapshot: inout Snapshot) {
         let window = ExtensionBrowserState.Window(id: id, tabIDs: tabIDs, activeTabID: tabIDs.first, selectedTabIDs: Set(tabIDs))
         snapshot.addWindow(window, owner: owner)

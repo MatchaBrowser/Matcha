@@ -2,8 +2,8 @@ import Foundation
 import OSLog
 import WebKit
 
-/// Sert les pages `matcha-source:` (`PageSource`) : relit la page avec les cookies de son profil (une page connectée
-/// montre son vrai code), puis la montre comme du texte. Une page locale est lue sur le disque.
+/// Serves `matcha-source:` pages (`PageSource`): reloads the page with the cookies of its profile (a signed-in page
+/// shows its real code), then shows it as text. A local page is read from disk.
 @MainActor
 final class PageSourceSchemeHandler: NSObject, WKURLSchemeHandler {
     static let shared = PageSourceSchemeHandler()
@@ -50,8 +50,8 @@ final class PageSourceSchemeHandler: NSObject, WKURLSchemeHandler {
         loads.removeValue(forKey: ObjectIdentifier(urlSchemeTask))?.cancel()
     }
 
-    /// Contenu de `page` et son encodage : lu sur le disque pour un fichier, sinon demandé au site avec les cookies de
-    /// `store` (session éphémère, présentée comme Safari).
+    /// Content of `page` and its encoding: read from disk for a file, otherwise requested from the site with the
+    /// cookies of `store` (ephemeral session, presented as Safari).
     static func fetch(_ page: URL, store: WKWebsiteDataStore) async throws -> (Data, String?) {
         if page.isFileURL {
             return try (Data(contentsOf: page), nil)

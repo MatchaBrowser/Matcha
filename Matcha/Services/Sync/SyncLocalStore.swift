@@ -1,24 +1,24 @@
 import Foundation
 
-/// Données de ce Mac vues par le moteur de synchro (tâche 7.4) : leur état actuel, enregistrement par enregistrement, et
-/// l'application de ce qui est reçu. Implémenté pour Matcha par `MatchaSyncStore`, et en mémoire dans les tests.
+/// This Mac's data as seen by the sync engine (task 7.4): its current state, record by record, and the applying of
+/// what is received. Implemented for Matcha by `MatchaSyncStore`, and in memory in tests.
 @MainActor
 protocol SyncLocalStore: AnyObject {
-    /// État actuel de chaque enregistrement synchronisé de ce Mac.
+    /// Current state of each synced record on this Mac.
     func snapshot() -> [UUID: SyncFields]
 
-    /// Applique `changes`, dans l'ordre donné (parents d'abord) ; renvoie les enregistrements mis en attente faute de
-    /// leur parent (`SYNC.md` § 2.3 : masqués jusqu'à la lecture suivante).
+    /// Applies `changes`, in the given order (parents first); returns the records put on hold because their parent is
+    /// missing (`SYNC.md` § 2.3: hidden until the next read).
     func apply(_ changes: [SyncLocalChange]) -> Set<UUID>
 
-    /// Vrai si ce Mac n'a que les données de son premier lancement (`SYNC.md` § 5) : à la première synchro, il prend
-    /// alors les données synchronisées et retire les siennes.
+    /// True if this Mac only has its first-launch data (`SYNC.md` § 5): at the first sync, it then takes the synced
+    /// data and removes its own.
     var hasOnlyFirstLaunchData: Bool { get }
 
-    /// Avant un cycle : ce qui doit partir avant les enregistrements qui le citent (paquets d'extension).
+    /// Before a cycle: what must be sent before the records that reference it (extension packages).
     func prepare(using transport: any SyncTransport) async
 
-    /// Après un cycle réussi : ménage sur le serveur (anciens paquets).
+    /// After a successful cycle: cleanup on the server (old packages).
     func finish(using transport: any SyncTransport) async
 }
 
@@ -28,7 +28,7 @@ extension SyncLocalStore {
     func finish(using _: any SyncTransport) async {}
 }
 
-/// Changement reçu, à appliquer sur ce Mac.
+/// Received change, to apply on this Mac.
 nonisolated enum SyncLocalChange: Equatable, Sendable {
     case upsert(UUID, SyncFields)
     case delete(UUID, SyncRecordType)
@@ -39,8 +39,8 @@ nonisolated enum SyncLocalChange: Equatable, Sendable {
         }
     }
 
-    /// Ordre d'application d'un lot : créations et modifications des parents d'abord (profils, Spaces, dossiers,
-    /// onglets…), puis les suppressions, du contenu vers les parents.
+    /// Application order of a batch: creations and modifications of parents first (profiles, Spaces, folders,
+    /// tabs…), then deletions, from the content up to the parents.
     static func ordered(_ changes: [SyncLocalChange]) -> [SyncLocalChange] {
         changes.sorted { first, second in
             switch (first, second) {

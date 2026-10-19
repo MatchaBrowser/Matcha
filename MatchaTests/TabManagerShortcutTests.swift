@@ -3,12 +3,12 @@ import Foundation
 import Testing
 import WebKit
 
-/// ⌘1 à ⌘9, ⌃⇥ et ⌃⇧⇥ sur les onglets d'une fenêtre (tâche 4.8).
+/// ⌘1 to ⌘9, ⌃⇥ and ⌃⇧⇥ on the tabs of a window (task 4.8).
 @MainActor
 struct TabManagerShortcutTests {
     private let manager = TabManager(websiteDataStore: .nonPersistent())
 
-    /// Onglets du jour `count`, dans l'ordre de la barre ; le premier est sélectionné.
+    /// `count` today tabs, in sidebar order; the first one is selected.
     private func openTabs(_ count: Int) -> [BrowserTab] {
         let tabs = Array((0 ..< count).map { _ in manager.newTab() }.reversed())
         manager.select(tabs[0])
@@ -46,7 +46,7 @@ struct TabManagerShortcutTests {
         try #require(manager.openInSplit(tabs[1]))
         let group = try #require(manager.split(containing: tabs[0]))
         #expect(group.tabIDs == [tabs[0].id, tabs[1].id])
-        // Le panneau ajouté est sélectionné ; le split revient sur lui.
+        // The added pane is selected; the split comes back to it.
         #expect(manager.target(of: group.tabIDs) === tabs[1])
         tabs[0].lastActivity = .now.addingTimeInterval(60)
         #expect(manager.target(of: group.tabIDs) === tabs[0])

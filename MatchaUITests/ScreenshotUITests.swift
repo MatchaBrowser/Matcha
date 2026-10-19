@@ -1,71 +1,72 @@
 import XCTest
 
-/// Captures de la fenêtre pour le contrôle visuel, jointes au résultat des tests.
-/// Ignoré sauf si `MATCHA_SCREENSHOT` est défini :
+/// Screenshots of the window for visual checks, attached to the test results.
+/// Skipped unless `MATCHA_SCREENSHOT` is set:
 ///
 ///     TEST_RUNNER_MATCHA_SCREENSHOT=1 xcodebuild … test -only-testing:MatchaUITests/ScreenshotUITests
-///     xcrun xcresulttool export attachments --path <résultat>.xcresult --output-path <dossier>
+///     xcrun xcresulttool export attachments --path <result>.xcresult --output-path <folder>
 ///
-/// Variables facultatives :
-/// - `MATCHA_SCREENSHOT_URLS` : adresses séparées par des virgules, ouvertes chacune dans un onglet ;
-/// - `MATCHA_SCREENSHOT_MENU` : actions du menu contextuel, « Élément@titre d'onglet » séparées par des `;`
-///   (ex. « Ajouter aux favoris@Apple;Épingler@GitHub ») ;
-/// - `MATCHA_SCREENSHOT_PEEK` : capture aussi la barre masquée (⌘S), puis apparue au survol du bord gauche
-///   (barre latérale masquée, rien à voir avec l'aperçu des liens) ;
-/// - `MATCHA_SCREENSHOT_PEEK_LINK` : texte d'un lien de la dernière page de `MATCHA_SCREENSHOT_URLS`, ouvert par
-///   Maj+clic dans l'aperçu (`18-apercu`), puis « Ouvrir en onglet » (`19-apercu-onglet`). Pages locales sans
-///   réseau : `MATCHA_SCREENSHOT_URLS=file:///usr/share/doc/postfix/html/index.html` et
-///   `MATCHA_SCREENSHOT_PEEK_LINK="Basic configuration"` ;
-/// - `MATCHA_SCREENSHOT_SETTINGS` : capture aussi chaque onglet des réglages (⌘,) ;
-/// - `MATCHA_SCREENSHOT_SETTINGS_VALUES` : réglages imposés au lancement (« addressBarPosition=top,… ») ;
-/// - `MATCHA_SCREENSHOT_THEME` : ouvre l'éditeur de thème et choisit ce thème prédéfini (« Océan »…) ;
-/// - `MATCHA_SCREENSHOT_SPACES` : crée ce nombre de Spaces avec le bouton + ;
-/// - `MATCHA_SCREENSHOT_COMMAND_BAR` : texte tapé dans la barre de commande (⌘T), capturée avec ses
-///   résultats, puis la sélection descendue, puis la barre d'édition (⌘L). Pour voir les suggestions du
-///   moteur : `MATCHA_SCREENSHOT_SETTINGS_VALUES=showsSearchSuggestions=YES` ; en sombre :
-///   `MATCHA_SCREENSHOT_SETTINGS_VALUES=AppleInterfaceStyle=Dark` ; en clair sur un Mac réglé en
-///   sombre : `NSRequiresAquaSystemAppearance=YES` (`AppleInterfaceStyle=Light` reste sombre) ;
-/// - `MATCHA_SCREENSHOT_PRIVATE` : capture aussi la barre de commande (⌘T) d'une nouvelle fenêtre privée
-///   (⇧⌘N), avec le texte de `MATCHA_SCREENSHOT_COMMAND_BAR` s'il est défini ;
-/// - `MATCHA_SCREENSHOT_COPY_URL` : capture aussi la confirmation « URL copiée » après ⇧⌘C, sur l'onglet
-///   affiché (sans `MATCHA_SCREENSHOT_URLS`, un onglet `about:blank?copy` est ouvert d'abord) ;
-/// - `MATCHA_SCREENSHOT_SPLIT` : nombre de panneaux (2 à 4). Sans `MATCHA_SCREENSHOT_URLS`, ouvre d'abord
-///   `about:blank?split1`… ; puis « Ouvrir en split » sur la première ligne d'onglet non sélectionnée jusqu'à ce
-///   nombre ; capture `15-split`, clique le panneau de gauche (`16-split-panneau-actif`), survole le premier
-///   séparateur (`17-split-separateur`). Avec `…_SETTINGS_VALUES=addressBarPosition=top` : une barre par panneau ;
-/// - `MATCHA_SCREENSHOT_MINI` : texte tapé dans une mini-fenêtre ouverte par le menu Fichier, après les autres
-///   captures : `20-mini-vide` (barre ouverte), `21-mini-page` (après Entrée), `22-mini-flottante` (écran entier,
-///   fenêtre du navigateur active : la mini-fenêtre reste devant), `23-mini-remise` (⌘O, la page dans le Space).
-///   Sans réseau : `MATCHA_SCREENSHOT_MINI=about:blank?mini` ;
-/// - `MATCHA_SCREENSHOT_DOWNLOADS` : chemin d'un fichier local que WebKit n'affiche pas (« 1 » : celui des tests
-///   des téléchargements), téléchargé dans ~/Downloads/MatchaUITests, effacé à la fin : `36-telechargements-vide`
-///   (panneau vide, avant le téléchargement), `24-telechargement-bouton` (bouton du pied de la barre),
-///   `25-telechargements-liste` (liste ouverte) ;
-/// - `MATCHA_SCREENSHOT_SITE_SETTINGS` : panneau des réglages du site de l'onglet affiché (`26-reglages-site`), puis la
-///   confirmation de l'effacement de ses données (`27-reglages-site-effacer`) ; sans `MATCHA_SCREENSHOT_URLS`, ouvre
-///   https://example.com (réseau). Avec `…_SETTINGS_VALUES=addressBarPosition=top` : en haut de la carte ;
-/// - `MATCHA_SCREENSHOT_PERMISSION_URL` : page qui demande la caméra ou le micro, et `MATCHA_SCREENSHOT_PERMISSION_BUTTON`
-///   (facultatif) : texte du bouton de la page à cliquer pour lancer la demande ; capture le bandeau
-///   (`28-permission-bandeau`). Réseau nécessaire ; la demande d'accès de macOS peut apparaître la première fois ;
-/// - `MATCHA_SCREENSHOT_FIND` : texte cherché (⌘F) dans l'onglet affiché : `29-recherche-trouvee`, puis « zzqqxx » :
-///   `30-recherche-introuvable`. Sans `MATCHA_SCREENSHOT_URLS`, ouvre la documentation de Postfix (sans réseau) :
-///   `MATCHA_SCREENSHOT_FIND=postfix` ;
-/// - `MATCHA_SCREENSHOT_ZOOM` : badge du zoom à côté de la pastille d'adresse après ⌘+ (`31-zoom-badge`) ; avec
-///   `=site`, la ligne « Zoom » des réglages du site d'example.com (`32-zoom-reglages-site`, réseau). Voir
-///   `ScreenshotUITests+Zoom` ;
-/// - `MATCHA_SCREENSHOT_HISTORY` : fenêtre de l'historique (⌘Y) après la visite de deux pages de la documentation de
-///   Postfix (sans réseau ; celles de `MATCHA_SCREENSHOT_URLS` si défini) : `33-historique` ; avec un texte (pas « 1 »),
-///   ce texte cherché : `34-historique-recherche` ; puis le dialogue « Effacer l'historique… » : `35-historique-effacer`.
-///   Ex. `MATCHA_SCREENSHOT_HISTORY=basic`. Voir `ScreenshotUITests+History` ;
-/// - `MATCHA_SCREENSHOT_FOLDER` : dossier épinglé personnalisé, nommé d'après la valeur (« Projets » pour « 1 »), et son
-///   sous-dossier « Client » (sans réseau) : panneau « Personnaliser… » ouvert sous le sous-dossier
-///   (`37-dossier-panneau`), puis les deux lignes, panneau fermé (`38-dossier-personnalise`). En sombre :
-///   `MATCHA_SCREENSHOT_SETTINGS_VALUES=AppleInterfaceStyle=Dark`. Voir `ScreenshotUITests+Folders` ;
-/// - `MATCHA_SCREENSHOT_ARC` : import d'une barre d'Arc par le menu Fichier (« 1 » : l'exemple inventé des tests
-///   unitaires) : sélecteur, aperçu, Spaces importés. Voir `ScreenshotUITests+ArcImport`.
+/// Optional variables:
+/// - `MATCHA_SCREENSHOT_URLS`: comma-separated addresses, each opened in a tab;
+/// - `MATCHA_SCREENSHOT_MENU`: context menu actions, “Item@tab title” separated by `;`
+///   (e.g. “Ajouter aux favoris@Apple;Épingler@GitHub”);
+/// - `MATCHA_SCREENSHOT_PEEK`: also captures the hidden sidebar (⌘S), then revealed by hovering the left edge
+///   (hidden sidebar, nothing to do with link Peek);
+/// - `MATCHA_SCREENSHOT_PEEK_LINK`: text of a link of the last page of `MATCHA_SCREENSHOT_URLS`, opened with
+///   Shift-click in Peek (`18-apercu`), then “Open as Tab” (`19-apercu-onglet`). Local pages without
+///   network: `MATCHA_SCREENSHOT_URLS=file:///usr/share/doc/postfix/html/index.html` and
+///   `MATCHA_SCREENSHOT_PEEK_LINK="Basic configuration"`;
+/// - `MATCHA_SCREENSHOT_SETTINGS`: also captures each tab of the settings (⌘,);
+/// - `MATCHA_SCREENSHOT_SETTINGS_VALUES`: settings forced at launch (“addressBarPosition=top,…”);
+/// - `MATCHA_SCREENSHOT_THEME`: opens the theme editor and picks this preset theme (“Océan”…);
+/// - `MATCHA_SCREENSHOT_SPACES`: creates this number of Spaces with the + button;
+/// - `MATCHA_SCREENSHOT_COMMAND_BAR`: text typed in the command bar (⌘T), captured with its
+///   results, then with the selection moved down, then the edit bar (⌘L). To see the search engine
+///   suggestions: `MATCHA_SCREENSHOT_SETTINGS_VALUES=showsSearchSuggestions=YES`; in dark mode:
+///   `MATCHA_SCREENSHOT_SETTINGS_VALUES=AppleInterfaceStyle=Dark`; in light mode on a Mac set to
+///   dark: `NSRequiresAquaSystemAppearance=YES` (`AppleInterfaceStyle=Light` stays dark);
+/// - `MATCHA_SCREENSHOT_PRIVATE`: also captures the command bar (⌘T) of a new private window
+///   (⇧⌘N), with the text of `MATCHA_SCREENSHOT_COMMAND_BAR` if it is set;
+/// - `MATCHA_SCREENSHOT_COPY_URL`: also captures the “URL Copied” confirmation after ⇧⌘C, on the displayed
+///   tab (without `MATCHA_SCREENSHOT_URLS`, an `about:blank?copy` tab is opened first);
+/// - `MATCHA_SCREENSHOT_SPLIT`: number of panes (2 to 4). Without `MATCHA_SCREENSHOT_URLS`, first opens
+///   `about:blank?split1`…; then “Open in Split View” on the first unselected tab row until this
+///   number; captures `15-split`, clicks the left pane (`16-split-panneau-actif`), hovers the first
+///   divider (`17-split-separateur`). With `…_SETTINGS_VALUES=addressBarPosition=top`: one bar per pane;
+/// - `MATCHA_SCREENSHOT_MINI`: text typed in a mini window opened from the File menu, after the other
+///   screenshots: `20-mini-vide` (bar open), `21-mini-page` (after Return), `22-mini-flottante` (whole screen,
+///   browser window active: the mini window stays in front), `23-mini-remise` (⌘O, the page in the Space).
+///   Without network: `MATCHA_SCREENSHOT_MINI=about:blank?mini`;
+/// - `MATCHA_SCREENSHOT_DOWNLOADS`: path of a local file that WebKit doesn't display (“1”: the one of the
+///   downloads tests), downloaded to ~/Downloads/MatchaUITests, deleted at the end: `36-telechargements-vide`
+///   (empty panel, before the download), `24-telechargement-bouton` (button in the sidebar footer),
+///   `25-telechargements-liste` (open list);
+/// - `MATCHA_SCREENSHOT_SITE_SETTINGS`: site settings panel of the displayed tab (`26-reglages-site`), then the
+///   confirmation of clearing its data (`27-reglages-site-effacer`); without `MATCHA_SCREENSHOT_URLS`, opens
+///   https://example.com (network). With `…_SETTINGS_VALUES=addressBarPosition=top`: at the top of the card;
+/// - `MATCHA_SCREENSHOT_PERMISSION_URL`: page that requests the camera or the microphone, and
+///   `MATCHA_SCREENSHOT_PERMISSION_BUTTON` (optional): text of the page button to click to start the request;
+///   captures the banner (`28-permission-bandeau`). Network needed; the macOS access request may appear the
+///   first time;
+/// - `MATCHA_SCREENSHOT_FIND`: text searched (⌘F) in the displayed tab: `29-recherche-trouvee`, then “zzqqxx”:
+///   `30-recherche-introuvable`. Without `MATCHA_SCREENSHOT_URLS`, opens the Postfix documentation (no network):
+///   `MATCHA_SCREENSHOT_FIND=postfix`;
+/// - `MATCHA_SCREENSHOT_ZOOM`: zoom badge next to the address pill after ⌘+ (`31-zoom-badge`); with
+///   `=site`, the “Zoom” row of the site settings of example.com (`32-zoom-reglages-site`, network). See
+///   `ScreenshotUITests+Zoom`;
+/// - `MATCHA_SCREENSHOT_HISTORY`: history window (⌘Y) after visiting two pages of the Postfix documentation
+///   (no network; those of `MATCHA_SCREENSHOT_URLS` if set): `33-historique`; with a text (not “1”), this text
+///   searched: `34-historique-recherche`; then the “Clear History…” dialog: `35-historique-effacer`.
+///   E.g. `MATCHA_SCREENSHOT_HISTORY=basic`. See `ScreenshotUITests+History`;
+/// - `MATCHA_SCREENSHOT_FOLDER`: customized pinned folder, named after the value (“Projets” for “1”), and its
+///   subfolder “Client” (no network): “Customize…” panel open below the subfolder
+///   (`37-dossier-panneau`), then both rows, panel closed (`38-dossier-personnalise`). In dark mode:
+///   `MATCHA_SCREENSHOT_SETTINGS_VALUES=AppleInterfaceStyle=Dark`. See `ScreenshotUITests+Folders`;
+/// - `MATCHA_SCREENSHOT_ARC`: import of an Arc sidebar from the File menu (“1”: the made-up example of the unit
+///   tests): picker, preview, imported Spaces. See `ScreenshotUITests+ArcImport`.
 ///
-/// La capture `1-vide` montre la fenêtre sans onglet : la page vide invite à ⌘T, la barre de commande
-/// ne s'ouvre jamais d'elle-même.
+/// The `1-vide` screenshot shows the window without a tab: the empty page suggests ⌘T, the command bar
+/// never opens by itself.
 final class ScreenshotUITests: XCTestCase {
     private let environment = ProcessInfo.processInfo.environment
 
@@ -96,7 +97,7 @@ final class ScreenshotUITests: XCTestCase {
         if let text = environment["MATCHA_SCREENSHOT_PEEK_LINK"] {
             capturePeek(link: text, in: app, window: window)
         }
-        // Après l'aperçu (sa page doit rester affichée), avant la barre masquée (le bouton doit être visible).
+        // After Peek (its page must stay displayed), before the hidden sidebar (the button must be visible).
         try captureDownloads(in: app, window: window)
         captureSiteSettings(in: app, window: window)
         capturePermissionBanner(in: app, window: window)
@@ -120,7 +121,7 @@ final class ScreenshotUITests: XCTestCase {
         }
     }
 
-    /// `MATCHA_SCREENSHOT_SPACES` Spaces créés avec le bouton +.
+    /// `MATCHA_SCREENSHOT_SPACES` Spaces created with the + button.
     @MainActor
     private func captureSpaces(in app: XCUIApplication, window: XCUIElement) {
         guard let count = environment["MATCHA_SCREENSHOT_SPACES"].flatMap(Int.init), count > 0 else {
@@ -144,8 +145,8 @@ final class ScreenshotUITests: XCTestCase {
         attach(window.screenshot(), as: "8-theme-\(preset)")
     }
 
-    /// Réglages imposés pour la capture : `MATCHA_SCREENSHOT_SETTINGS_VALUES`, « clé=valeur » séparés par des virgules ;
-    /// avec `MATCHA_SCREENSHOT_DOWNLOADS`, le dossier des téléchargements de test.
+    /// Settings forced for the screenshot: `MATCHA_SCREENSHOT_SETTINGS_VALUES`, comma-separated “key=value” pairs;
+    /// with `MATCHA_SCREENSHOT_DOWNLOADS`, the test downloads folder.
     private var settingsOverrides: [String: String] {
         let pairs = environment["MATCHA_SCREENSHOT_SETTINGS_VALUES"]?.split(separator: ",") ?? []
         let settings = Dictionary(pairs.compactMap { pair in
@@ -192,8 +193,8 @@ final class ScreenshotUITests: XCTestCase {
         attach(window.screenshot(), as: "3-rangement")
     }
 
-    /// Split de `count` panneaux formé par le menu, puis le panneau de gauche rendu actif, puis la poignée
-    /// survolée.
+    /// Split of `count` panes formed from the menu, then the left pane made active, then the handle
+    /// hovered.
     @MainActor
     private func captureSplit(panes count: Int, in app: XCUIApplication, window: XCUIElement) {
         if environment["MATCHA_SCREENSHOT_URLS"] == nil {
@@ -201,7 +202,7 @@ final class ScreenshotUITests: XCTestCase {
                 openAddress("about:blank?split\(index)", in: app)
             }
         }
-        // Un essai par panneau au plus : un menu qui n'ajoute rien ne bloque pas la capture.
+        // At most one try per pane: a menu that adds nothing doesn't block the screenshot.
         for _ in 0 ..< count where pagePanes(in: app).count < count {
             guard let row = tabRows(in: app).allElementsBoundByIndex.first(where: { !$0.isSelected }) else {
                 break
@@ -220,7 +221,7 @@ final class ScreenshotUITests: XCTestCase {
         attach(window.screenshot(), as: "17-split-separateur")
     }
 
-    /// Barre de commande avec ses résultats, puis la 2e ligne sélectionnée, puis l'édition de l'onglet affiché.
+    /// Command bar with its results, then the 2nd row selected, then editing of the displayed tab.
     @MainActor
     private func captureCommandBar(typing query: String, in app: XCUIApplication, window: XCUIElement) {
         openCommandBar(in: app)
@@ -240,7 +241,7 @@ final class ScreenshotUITests: XCTestCase {
         app.typeKey(.escape, modifierFlags: [])
     }
 
-    /// Barre de commande (⌘T) d'une nouvelle fenêtre privée, toujours sombre.
+    /// Command bar (⌘T) of a new private window, always dark.
     @MainActor
     private func capturePrivateCommandBar(typing query: String?, in app: XCUIApplication) {
         let privateWindow = openPrivateWindow(in: app)
@@ -254,7 +255,7 @@ final class ScreenshotUITests: XCTestCase {
         XCTAssertTrue(privateWindow.waitForNonExistence(timeout: 5))
     }
 
-    /// Aperçu ouvert par Maj+clic sur le lien `text`, puis passé en onglet.
+    /// Peek opened by Shift-click on the link `text`, then turned into a tab.
     @MainActor
     private func capturePeek(link text: String, in app: XCUIApplication, window: XCUIElement) {
         let source = link(containing: text, in: app)

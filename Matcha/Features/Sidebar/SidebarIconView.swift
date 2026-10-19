@@ -1,16 +1,16 @@
 import AppKit
 import SwiftUI
 
-/// Icône d'un dossier d'épinglés ou d'un Space (`SidebarIcon`) : son emoji, qui garde ses couleurs ; son symbole SF,
-/// teinté de `tint` ou du style en cours ; sinon `defaultSymbol` (aussi pour un symbole que ce macOS ne connaît pas,
-/// reçu d'un Mac plus récent).
+/// Icon of a pinned folder or of a Space (`SidebarIcon`): its emoji, which keeps its colors; its SF Symbol, tinted
+/// with `tint` or the current style; otherwise `defaultSymbol` (also for a symbol this macOS does not know,
+/// received from a more recent Mac).
 struct SidebarIconView: View {
     let icon: SidebarIcon
     let defaultSymbol: String
-    /// Couleur du symbole ; nil : le style de premier plan en cours.
+    /// Color of the symbol; nil: the current foreground style.
     var tint: Color?
     var size = 13.0
-    /// Taille d'un emoji ; nil : `size`.
+    /// Size of an emoji; nil: `size`.
     var emojiSize: Double?
     var weight = Font.Weight.regular
 
@@ -36,10 +36,10 @@ struct SidebarIconView: View {
         }
     }
 
-    /// L'icône en un seul `Text` (le symbole y est une image) : passer d'un symbole à un emoji ne change que le texte,
-    /// pas la structure de la vue. Pour le bouton d'un Space : sa bulle ouverte (l'éditeur) est rattachée à son élément
-    /// d'accessibilité, que SwiftUI recrée sans elle quand la structure de son contenu change ; VoiceOver la perdrait
-    /// dès qu'un emoji remplace le symbole.
+    /// The icon as a single `Text` (the symbol is an image inside it): switching from a symbol to an emoji only
+    /// changes the text, not the view's structure. For a Space's button: its open popover (the editor) is attached to
+    /// its accessibility element, which SwiftUI recreates without it when the structure of its content changes;
+    /// VoiceOver would lose it as soon as an emoji replaces the symbol.
     static func text(
         _ icon: SidebarIcon,
         defaultSymbol: String,
@@ -59,7 +59,7 @@ struct SidebarIconView: View {
         }
     }
 
-    /// Vrai si ce macOS connaît le symbole SF `name`.
+    /// True if this macOS knows the SF Symbol `name`.
     static func symbolExists(_ name: String) -> Bool {
         NSImage(systemSymbolName: name, accessibilityDescription: nil) != nil
     }

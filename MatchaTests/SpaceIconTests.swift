@@ -3,7 +3,7 @@ import Foundation
 import SwiftData
 import Testing
 
-/// Icône d'un Space changée par la session : écrite dans `SpaceRecord.symbol`, relue au lancement suivant.
+/// Icon of a Space changed by the session: written to `SpaceRecord.symbol`, read back at the next launch.
 @MainActor
 struct SpaceIconTests {
     @Test func `new spaces still get the default symbols in turn`() throws {
@@ -24,7 +24,7 @@ struct SpaceIconTests {
 
         space.setIcon(.symbol("graduationcap.fill"))
         #expect(space.icon == .symbol("graduationcap.fill"))
-        // Un symbole s'écrit sans préfixe, comme avant les emoji.
+        // A symbol is written without a prefix, as before emoji.
         #expect(try savedSymbol(of: space, in: container) == "graduationcap.fill")
     }
 
@@ -38,7 +38,7 @@ struct SpaceIconTests {
         space.setIcon(.symbol("Not A Symbol"))
         #expect(space.icon == .symbol(SidebarIcon.defaultSpaceSymbol))
         space.setIcon(.emoji("🔥"))
-        // Champ emoji vidé : l'icône par défaut, le cercle.
+        // Emoji field cleared: the default icon, the circle.
         space.setIcon(.default)
         #expect(space.record.symbol == SidebarIcon.defaultSpaceSymbol)
     }
@@ -49,7 +49,7 @@ struct SpaceIconTests {
         #expect(space.icon == .symbol("moon.fill"))
     }
 
-    /// Base sur disque : l'icône choisie revient au lancement suivant, par un autre conteneur.
+    /// Store on disk: the chosen icon comes back at the next launch, through another container.
     @Test func `the icon is back after a relaunch`() throws {
         let directory = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString, isDirectory: true)
         try FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)
@@ -71,7 +71,7 @@ struct SpaceIconTests {
         return try ModelContainer(for: schema, configurations: ModelConfiguration(schema: schema, url: url, cloudKitDatabase: .none))
     }
 
-    /// `symbol` du Space tel qu'enregistré, lu par un autre contexte.
+    /// The Space's `symbol` as stored, read by another context.
     private func savedSymbol(of space: SpaceSession, in container: ModelContainer) throws -> String? {
         let id = space.id
         return try ModelContext(container).fetch(FetchDescriptor<SpaceRecord>(predicate: #Predicate { $0.id == id })).first?.symbol

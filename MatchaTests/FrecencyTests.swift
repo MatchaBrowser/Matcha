@@ -4,7 +4,7 @@ import Testing
 
 private let day: TimeInterval = 86400
 
-/// Âge de la dernière visite et poids attendu.
+/// Age of the last visit and expected weight.
 private let recencyCases: [(TimeInterval, Int)] = [
     (0, 100),
     (4 * day, 100),

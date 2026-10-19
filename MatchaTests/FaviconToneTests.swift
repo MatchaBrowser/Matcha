@@ -3,7 +3,7 @@ import AppKit
 import Testing
 
 struct FaviconToneTests {
-    /// Image de 10 × 10 pixels RGBA prémultipliés : `drawn` pixels de la couleur donnée, le reste transparent.
+    /// 10 × 10 pixel image in premultiplied RGBA: `drawn` pixels of the given color, the rest transparent.
     private func pixels(red: UInt8, green: UInt8, blue: UInt8, drawn: Int, total: Int = 100) -> [UInt8] {
         (0 ..< total).flatMap { index in index < drawn ? [red, green, blue, 255] : [0, 0, 0, 0] }
     }

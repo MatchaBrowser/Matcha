@@ -1,10 +1,10 @@
 import Foundation
 
-/// Où s'ouvrent les liens cliqués dans d'autres apps (tâche 8.2).
+/// Where links clicked in other apps open (task 8.2).
 nonisolated enum ExternalLinkDestination: String, CaseIterable, Identifiable, Sendable {
-    /// Une mini-fenêtre par lien, comme Little Arc : on lit, puis on garde la page (⌘O) ou on la ferme.
+    /// One mini window per link, like Little Arc: you read, then keep the page (⌘O) or close it.
     case miniWindow
-    /// Un nouvel onglet du Space affiché par la fenêtre principale.
+    /// A new tab in the Space shown by the main window.
     case space
 
     var id: Self {
@@ -18,7 +18,7 @@ nonisolated enum ExternalLinkDestination: String, CaseIterable, Identifiable, Se
         }
     }
 
-    /// Valeur du réglage dans `defaults`, ou sa valeur par défaut.
+    /// Value of the setting in `defaults`, or its default value.
     static func current(in defaults: UserDefaults = .standard) -> ExternalLinkDestination {
         defaults.string(forKey: BrowserSettings.Key.externalLinkDestination).flatMap(Self.init(rawValue:))
             ?? BrowserSettings.externalLinkDestination

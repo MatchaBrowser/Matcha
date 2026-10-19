@@ -1,7 +1,6 @@
 import SwiftUI
 
-/// Réglages > Avancé : outils pour développeurs web (`WebInspection`), comme « Afficher les fonctions pour les
-/// développeurs web » de Safari.
+/// Settings > Advanced: web developer tools (`WebInspection`), like Safari's “Show features for web developers”.
 struct AdvancedSettingsView: View {
     @AppStorage(BrowserSettings.Key.showsDeveloperTools) private var showsDeveloperTools = BrowserSettings.showsDeveloperTools
 

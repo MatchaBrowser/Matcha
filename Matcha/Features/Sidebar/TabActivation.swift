@@ -1,15 +1,15 @@
 import AppKit
 
-/// Choisir un onglet depuis la barre latérale ou la barre de commande : il est sélectionné et sa page
-/// reçoit le clavier.
+/// Choosing a tab from the sidebar or the command bar: it is selected and its page
+/// receives the keyboard.
 @MainActor
 enum TabActivation {
     static func activate(_ tab: BrowserTab, in tabManager: TabManager) {
         let window = NSApp.keyWindow
         tabManager.select(tab)
-        // Quitte le champ en cours d'édition (barre de commande, nom de dossier).
+        // Leaves the field being edited (command bar, folder name).
         window?.makeFirstResponder(nil)
-        // La vue web de l'onglet n'est insérée dans la fenêtre qu'au prochain rendu.
+        // The tab's web view is only inserted into the window at the next render.
         Task { @MainActor in
             if let webView = tab.webView {
                 webView.window?.makeFirstResponder(webView)
@@ -17,8 +17,8 @@ enum TabActivation {
         }
     }
 
-    /// Donne le clavier à la page de `tab` dès que sa vue web est dans une fenêtre (rendu suivant), sauf
-    /// si quelqu'un l'a pris entre-temps (barre rouverte, champ de dossier…).
+    /// Gives the keyboard to the page of `tab` as soon as its web view is in a window (next render), unless
+    /// someone took it in the meantime (bar reopened, folder field…).
     static func focusPage(of tab: BrowserTab) {
         Task { @MainActor in
             for _ in 0 ..< 10 {

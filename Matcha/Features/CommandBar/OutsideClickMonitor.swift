@@ -1,8 +1,8 @@
 import AppKit
 import SwiftUI
 
-/// Posée derrière le panneau de la barre de commande ou de l'aperçu : un clic de la même fenêtre hors du
-/// panneau appelle `onOutsideClick`, puis atteint sa cible (le clic n'est jamais retenu).
+/// Placed behind the panel of the command bar or of the peek: a click in the same window outside the panel calls
+/// `onOutsideClick`, then reaches its target (the click is never held back).
 struct OutsideClickMonitor: NSViewRepresentable {
     let onOutsideClick: () -> Void
 
@@ -16,12 +16,12 @@ struct OutsideClickMonitor: NSViewRepresentable {
         view.onOutsideClick = onOutsideClick
     }
 
-    /// Lit les clics de la fenêtre avant leur cible, sans en recevoir aucun.
+    /// Reads the window's clicks before their target, without receiving any.
     final class MonitorView: NSView {
         var onOutsideClick: (() -> Void)?
         private var monitor: Any?
 
-        /// Transparente aux clics : seul le panneau, au-dessus, les reçoit.
+        /// Transparent to clicks: only the panel, above, receives them.
         override func hitTest(_: NSPoint) -> NSView? {
             nil
         }

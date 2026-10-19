@@ -1,12 +1,12 @@
 import Foundation
 
-/// Champs d'un profil (`SYNC.md` § 2.1).
+/// Fields of a profile (`SYNC.md` § 2.1).
 nonisolated struct SyncProfileFields: Codable, Equatable, Sendable {
     var name: String
     var order: Int
 }
 
-/// Champs d'un Space : `symbol` comme `SpaceRecord.symbol`, `theme` comme `SpaceTheme` (nil : thème par défaut).
+/// Fields of a Space: `symbol` as in `SpaceRecord.symbol`, `theme` as in `SpaceTheme` (nil: default theme).
 nonisolated struct SyncSpaceFields: Codable, Equatable, Sendable {
     var name: String
     var symbol: String
@@ -15,7 +15,7 @@ nonisolated struct SyncSpaceFields: Codable, Equatable, Sendable {
     var profileId: UUID?
 }
 
-/// Champs d'un dossier d'épinglés : `icon` comme `FolderRecord.iconValue`, couleurs en « #RRGGBB ».
+/// Fields of a folder of pinned tabs: `icon` as in `FolderRecord.iconValue`, colors as “#RRGGBB”.
 nonisolated struct SyncFolderFields: Codable, Equatable, Sendable {
     var name: String
     var order: Int
@@ -27,15 +27,15 @@ nonisolated struct SyncFolderFields: Codable, Equatable, Sendable {
     var backgroundColor: String?
 }
 
-/// Place d'un onglet synchronisé ; une autre valeur fait ignorer l'enregistrement.
+/// Placement of a synced tab; any other value makes the record ignored.
 nonisolated enum SyncTabPlace: String, Codable, Sendable {
     case favorite
     case pinned
     case today
 }
 
-/// Champs d'un onglet (`SYNC.md` § 2.1 et § 2.4) : adresse et titre d'origine d'un favori ou d'un épinglé, adresse et
-/// titre courants d'un onglet du jour ; `profileId` pour un favori, `spaceId` pour les autres.
+/// Fields of a tab (`SYNC.md` § 2.1 and § 2.4): original address and title of a favorite or a pinned tab, current
+/// address and title of a today tab; `profileId` for a favorite, `spaceId` for the others.
 nonisolated struct SyncTabFields: Codable, Equatable, Sendable {
     var place: SyncTabPlace
     var url: URL?
@@ -44,11 +44,11 @@ nonisolated struct SyncTabFields: Codable, Equatable, Sendable {
     var profileId: UUID?
     var spaceId: UUID?
     var folderId: UUID?
-    /// Dernière utilisation d'un onglet du jour ; nil pour les autres.
+    /// Last use of a today tab; nil for the others.
     var lastActivity: Date?
 
-    /// Vrai si `other` ne diffère que par l'adresse, le titre ou la dernière utilisation d'un onglet du jour : un
-    /// changement qui attend que la page soit stable avant de partir (`SYNC.md` § 2.4).
+    /// True if `other` only differs by the address, the title or the last use of a today tab: a change that waits
+    /// for the page to be stable before being sent (`SYNC.md` § 2.4).
     func differsOnlyByPage(from other: SyncTabFields) -> Bool {
         guard place == .today, other.place == .today else {
             return false

@@ -1,19 +1,19 @@
 import Foundation
 
-/// Changements de ce Mac (tâche 7.4, `SYNC.md` § 5) : l'état actuel comparé, enregistrement par enregistrement, à ce que
-/// ce Mac avait à sa dernière synchro (ou à ce qu'il s'apprête à envoyer). Un onglet du jour qui n'a changé que de page
-/// attend d'être stable depuis 5 secondes, 30 au plus s'il change sans cesse (§ 2.4). Type pur.
+/// This Mac's changes (task 7.4, `SYNC.md` § 5): the current state compared, record by record, with what this Mac
+/// had at its last sync (or with what it is about to send). A today tab that only changed page waits until it has
+/// been stable for 5 seconds, 30 at most if it keeps changing (§ 2.4). Pure type.
 nonisolated struct SyncChangeDetector: Sendable {
     static let stability: TimeInterval = 5
     static let maximumWait: TimeInterval = 30
 
-    /// Changement trouvé : les nouveaux champs, nil pour une suppression.
+    /// Change found: the new fields, nil for a deletion.
     struct Change: Equatable, Sendable {
         let id: UUID
         let fields: SyncFields?
     }
 
-    /// Page d'un onglet du jour qui attend d'être stable.
+    /// Page of a today tab waiting to be stable.
     private struct Held: Sendable {
         var fields: SyncJSON
         var firstSeen: Date
@@ -22,8 +22,8 @@ nonisolated struct SyncChangeDetector: Sendable {
 
     private var held: [UUID: Held] = [:]
 
-    /// Changements de `snapshot` par rapport à `state`, triés par type puis par identifiant, et la date à laquelle
-    /// regarder de nouveau une page en attente (nil s'il n'y en a pas).
+    /// Changes in `snapshot` compared with `state`, sorted by type then by identifier, and the date at which to look
+    /// at a waiting page again (nil if there is none).
     mutating func changes(in snapshot: [UUID: SyncFields], state: SyncState, now: Date) -> (changes: [Change], nextCheck: Date?) {
         var ids = Set(snapshot.keys)
         ids.formUnion(state.entries.compactMap { $0.value.local == nil ? nil : $0.key })
@@ -31,7 +31,7 @@ nonisolated struct SyncChangeDetector: Sendable {
         var changes: [Change] = []
         var nextCheck: Date?
         for id in ids {
-            // Écrit par une version plus récente de Matcha : jamais modifié ici.
+            // Written by a newer version of Matcha: never modified here.
             if state.entries[id]?.remote?.isFromNewerVersion == true {
                 continue
             }
@@ -64,7 +64,7 @@ nonisolated struct SyncChangeDetector: Sendable {
         case wait(until: Date)
     }
 
-    /// Onglet du jour dont seules l'adresse, le titre ou la dernière utilisation ont changé.
+    /// Today tab where only the address, the title or the last use changed.
     private func isPageChange(_ current: SyncFields?, from baseline: SyncJSON?) -> Bool {
         guard case let .tab(now) = current, let baseline, case let .tab(before) = SyncFields(json: baseline, type: .tab) else {
             return false

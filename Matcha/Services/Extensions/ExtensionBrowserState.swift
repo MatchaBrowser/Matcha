@@ -1,11 +1,11 @@
 import Foundation
 
-/// Ce que les extensions voient des fenêtres et des onglets à un instant donné (tâche 6.3). Type pur : deux états
-/// successifs sont comparés par `ExtensionEventPlanner`, qui en tire les événements à donner au contrôleur des
-/// extensions. Fenêtres et onglets sont désignés par leur identifiant.
+/// What extensions see of the windows and tabs at a given moment (task 6.3). Pure type: two successive states are
+/// compared by `ExtensionEventPlanner`, which derives from them the events to give to the extension controller. Windows
+/// and tabs are designated by their identifier.
 nonisolated struct ExtensionBrowserState: Equatable, Sendable {
-    /// Une fenêtre : ses onglets dans l'ordre, l'onglet actif (celui au premier plan) et les onglets sélectionnés (les
-    /// panneaux du split affiché, l'onglet actif compris).
+    /// A window: its tabs in order, the active tab (the one in front) and the selected tabs (the panes of the displayed
+    /// split, the active tab included).
     struct Window: Equatable, Sendable {
         var id: UUID
         var tabIDs: [UUID]
@@ -13,7 +13,7 @@ nonisolated struct ExtensionBrowserState: Equatable, Sendable {
         var selectedTabIDs: Set<UUID> = []
     }
 
-    /// Propriétés d'un onglet suivies par les extensions (`tabs.onUpdated`).
+    /// Properties of a tab tracked by extensions (`tabs.onUpdated`).
     struct Tab: Equatable, Sendable {
         var title: String?
         var url: URL?
@@ -23,23 +23,23 @@ nonisolated struct ExtensionBrowserState: Equatable, Sendable {
         var zoomFactor = 1.0
     }
 
-    /// Place d'un onglet : sa fenêtre et son rang dans celle-ci.
+    /// Location of a tab: its window and its index in it.
     struct Location: Equatable, Sendable {
         var windowID: UUID
         var index: Int
     }
 
-    /// Fenêtres, dans l'ordre où elles ont été vues.
+    /// Windows, in the order in which they were seen.
     var windows: [Window] = []
     var tabs: [UUID: Tab] = [:]
-    /// Fenêtre active (fenêtre clé de l'app) ; nil si aucune fenêtre vue par les extensions ne l'est.
+    /// Active window (the app's key window); nil if no window seen by extensions is.
     var focusedWindowID: UUID?
 
     func window(withID id: UUID) -> Window? {
         windows.first { $0.id == id }
     }
 
-    /// Place de chaque onglet ; un onglet présent deux fois garde la première.
+    /// Location of each tab; a tab present twice keeps the first one.
     func locations() -> [UUID: Location] {
         var result: [UUID: Location] = [:]
         for window in windows {
@@ -51,7 +51,7 @@ nonisolated struct ExtensionBrowserState: Equatable, Sendable {
     }
 }
 
-/// Propriétés d'un onglet qui ont changé (équivalent pur de `WKWebExtension.TabChangedProperties`).
+/// Properties of a tab that changed (pure equivalent of `WKWebExtension.TabChangedProperties`).
 nonisolated struct ExtensionTabChanges: OptionSet, Hashable, Sendable {
     let rawValue: Int
 
@@ -66,7 +66,7 @@ nonisolated struct ExtensionTabChanges: OptionSet, Hashable, Sendable {
         self.rawValue = rawValue
     }
 
-    /// Ce qui diffère de `old` à `new`.
+    /// What differs from `old` to `new`.
     init(from old: ExtensionBrowserState.Tab, to new: ExtensionBrowserState.Tab) {
         var changes: ExtensionTabChanges = []
         if old.isLoading != new.isLoading {
@@ -91,15 +91,15 @@ nonisolated struct ExtensionTabChanges: OptionSet, Hashable, Sendable {
     }
 }
 
-/// Un événement à donner au contrôleur des extensions (`WKWebExtensionController.didOpenTab…`).
+/// An event to give to the extension controller (`WKWebExtensionController.didOpenTab…`).
 nonisolated enum ExtensionEvent: Equatable, Sendable {
-    /// Fenêtre ouverte ; WebKit ouvre lui-même ses onglets (`didOpenWindow`).
+    /// Window opened; WebKit opens its tabs itself (`didOpenWindow`).
     case openWindow(UUID)
     case openTab(UUID)
-    /// Onglet déplacé : depuis le rang `fromIndex` de la fenêtre `oldWindowID` (la même ou une autre).
+    /// Tab moved: from index `fromIndex` of window `oldWindowID` (the same one or another).
     case moveTab(UUID, fromIndex: Int, oldWindowID: UUID)
     case changeTab(UUID, ExtensionTabChanges)
-    /// Nouvel onglet actif de sa fenêtre ; WebKit relit alors les onglets sélectionnés de la fenêtre.
+    /// New active tab of its window; WebKit then reads the window's selected tabs again.
     case activateTab(UUID, previousTabID: UUID?)
     case selectTabs([UUID])
     case deselectTabs([UUID])

@@ -2,8 +2,8 @@ import AppKit
 import KeyboardShortcuts
 import SwiftUI
 
-/// Réglages généraux : navigateur par défaut et liens d'autres apps, page d'accueil, nouveaux onglets, recherche et
-/// suggestions, aperçu des liens, mémoire des onglets inactifs, raccourci de la mini-fenêtre, fermeture de l'app, langue.
+/// General settings: default browser and links from other apps, homepage, new tabs, search and suggestions, link
+/// peek, memory of inactive tabs, mini window shortcut, quitting the app, language.
 struct GeneralSettingsView: View {
     @AppStorage(BrowserSettings.Key.homePage) private var homePage = BrowserSettings.homePage
     @AppStorage(BrowserSettings.Key.newTabPage) private var newTabPage = BrowserSettings.newTabPage
@@ -69,7 +69,7 @@ struct GeneralSettingsView: View {
             }
             Section {
                 LabeledContent("Mini Window Shortcut") {
-                    // Ses propres textes (effacer, raccourci refusé) sont traduits par KeyboardShortcuts.
+                    // Its own texts (clear, rejected shortcut) are translated by KeyboardShortcuts.
                     KeyboardShortcuts.Recorder(for: .openMiniWindow)
                         .accessibilityIdentifier("miniWindowShortcutRecorder")
                 }
@@ -96,12 +96,12 @@ struct GeneralSettingsView: View {
             }
         }
         .formStyle(.grouped)
-        // La fenêtre prend la hauteur du contenu : pas de barre de défilement.
+        // The window takes the height of its content: no scroll bar.
         .scrollDisabled(true)
         .fixedSize(horizontal: false, vertical: true)
     }
 
-    /// Réglages Système > Général > Langue et région, où l'on choisit la langue de chaque app.
+    /// System Settings > General > Language & Region, where you choose the language of each app.
     private func openLanguageSettings() {
         if let url = URL(string: "x-apple.systempreferences:com.apple.Localization-Settings.extension") {
             NSWorkspace.shared.open(url)

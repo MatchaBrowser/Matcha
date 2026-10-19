@@ -3,7 +3,7 @@ import Foundation
 import Testing
 import WebKit
 
-/// Contrôleur d'extensions factice : il note les événements reçus, avec les identifiants des onglets et des fenêtres.
+/// Fake extension controller: it records the events received, with the identifiers of the tabs and windows.
 @MainActor
 final class FakeExtensionSink: ExtensionEventSink {
     enum Event: Equatable {
@@ -22,7 +22,7 @@ final class FakeExtensionSink: ExtensionEventSink {
     var isListening = true
     private(set) var events: [Event] = []
 
-    /// Événements reçus depuis le dernier appel.
+    /// Events received since the last call.
     func take() -> [Event] {
         defer { events = [] }
         return events
@@ -85,7 +85,7 @@ final class FakeExtensionSink: ExtensionEventSink {
     }
 }
 
-/// Réponses données d'avance aux demandes de permissions ; note les demandes.
+/// Answers given in advance to permission requests; records the requests.
 @MainActor
 final class FakePermissionPrompter: ExtensionPermissionPrompting {
     var answer: Bool
@@ -101,13 +101,13 @@ final class FakePermissionPrompter: ExtensionPermissionPrompting {
     }
 }
 
-/// L'extension d'essai (`Fixtures/test-extension-*`, Manifest V3) : un script de contenu qui marque les pages `obtest:`
-/// (`document.body.dataset.matchaExtension = "1"`) et demande un onglet au service worker sur une page `#matcha-open-tab`.
+/// The test extension (`Fixtures/test-extension-*`, Manifest V3): a content script that marks `obtest:` pages
+/// (`document.body.dataset.matchaExtension = "1"`) and asks the service worker for a tab on a `#matcha-open-tab` page.
 @MainActor
 enum TestExtension {
-    /// Copie de l'extension dans un dossier temporaire neuf (à effacer après le test), sous ses noms de fichiers réels.
+    /// Copy of the extension in a new temporary folder (to delete after the test), under its real file names.
     static func makeFolder(in parent: URL? = nil, named name: String = "TestExtension-\(UUID().uuidString)") throws -> URL {
-        // Les motifs `obtest://*/*` du manifeste ne se lisent qu'une fois le schéma déclaré.
+        // The `obtest://*/*` patterns of the manifest can only be read once the scheme is declared.
         WKWebExtension.MatchPattern.registerCustomURLScheme(TestPages.scheme)
         let bundle = Bundle(for: TestPages.self)
         let folder = (parent ?? FileManager.default.temporaryDirectory).appendingPathComponent(name, isDirectory: true)
@@ -124,14 +124,14 @@ enum TestExtension {
         return folder
     }
 
-    /// Identifiant neuf : deux contrôleurs (tests en parallèle) qui chargent le même identifiant partagent le monde
-    /// JavaScript des scripts de contenu (`WebExtension-<identifiant>`), et les messages d'une page peuvent partir vers
-    /// l'extension de l'autre test.
+    /// New identifier: two controllers (tests in parallel) that load the same identifier share the JavaScript world
+    /// of the content scripts (`WebExtension-<identifier>`), and the messages of a page can go to the other test's
+    /// extension.
     static func uniqueIdentifier(_ prefix: String = "matcha-test") -> String {
         "\(prefix)-\(UUID().uuidString.lowercased())"
     }
 
-    /// Gestionnaire de test : contrôleur non persistant, rien d'enregistré, dossier d'extensions donné (nil : aucun).
+    /// Test manager: non-persistent controller, nothing saved, given extensions folder (nil: none).
     static func manager(
         directory: URL? = nil,
         prompter: FakePermissionPrompter = FakePermissionPrompter(answer: false),
@@ -141,7 +141,7 @@ enum TestExtension {
         return manager
     }
 
-    /// Extension d'essai chargée dans `manager`, avec ses sites accordés (`obtest://*/*`).
+    /// Test extension loaded in `manager`, with its granted sites (`obtest://*/*`).
     static func load(
         in manager: ExtensionManager,
         identifier: String = TestExtension.uniqueIdentifier(),
@@ -154,8 +154,8 @@ enum TestExtension {
         return (context, folder)
     }
 
-    /// Attend que l'arrière-plan de l'extension soit chargé : ses scripts de contenu sont alors posés sur les pages.
-    /// Borné par `waitUntil` : une réponse qui ne vient jamais fait échouer le test au lieu de bloquer la suite.
+    /// Waits until the extension's background has loaded: its content scripts are then injected into the pages.
+    /// Bounded by `waitUntil`: a reply that never comes makes the test fail instead of blocking the rest of the suite.
     static func waitForBackground(of context: WKWebExtensionContext) async throws {
         let load = BackgroundLoad()
         Task {
@@ -172,7 +172,7 @@ enum TestExtension {
         }
     }
 
-    /// Réponse de `loadBackgroundContent`.
+    /// Reply from `loadBackgroundContent`.
     private final class BackgroundLoad {
         private(set) var isFinished = false
         private(set) var error: (any Error)?
@@ -183,7 +183,7 @@ enum TestExtension {
         }
     }
 
-    /// Marque posée par le script de contenu dans la page de `webView` : « 1 », sinon « none ».
+    /// Mark set by the content script in the page of `webView`: “1”, otherwise “none”.
     static func marker(in webView: WKWebView) async -> String? {
         try? await webView.evaluateJavaScript("document.body ? (document.body.dataset.matchaExtension || 'none') : 'none'") as? String
     }

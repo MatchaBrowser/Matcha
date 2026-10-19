@@ -3,14 +3,14 @@ import Observation
 import OSLog
 import SwiftData
 
-/// Décisions de permission d'une session (tâche 5.2) : la table en mémoire, observée par le panneau des réglages du
-/// site et par les Réglages, et ses enregistrements `SitePermissionRecord`. Une fenêtre privée n'a pas de contexte :
-/// ses décisions vivent en mémoire, le temps de la fenêtre, et rien n'est écrit.
+/// Permission decisions of a session (task 5.2): the in-memory table, observed by the site settings panel and by
+/// Settings, and its `SitePermissionRecord` records. A private window has no context: its decisions live in memory for
+/// the lifetime of the window, and nothing is written.
 @MainActor
 @Observable
 final class SitePermissionStore {
     private(set) var table: SitePermissionTable
-    /// Base où retenir les décisions ; nil pour une fenêtre privée.
+    /// Store in which to remember the decisions; nil for a private window.
     @ObservationIgnored private let context: ModelContext?
 
     init(context: ModelContext?) {
@@ -18,12 +18,12 @@ final class SitePermissionStore {
         table = SitePermissionTable(Self.load(from: context))
     }
 
-    /// Vrai si les décisions sont enregistrées (faux pour une fenêtre privée).
+    /// True if the decisions are saved (false for a private window).
     var isPersistent: Bool {
         context != nil
     }
 
-    /// Décisions retenues, dans l'ordre des Réglages.
+    /// Remembered decisions, in the order of Settings.
     var entries: [SitePermissionEntry] {
         table.sortedEntries
     }
@@ -36,7 +36,7 @@ final class SitePermissionStore {
         decisions(for: origin, profileID: profileID)[kind]
     }
 
-    /// Retient `decision` (nil : l'oublie, « Demander »).
+    /// Remembers `decision` (nil: forgets it, “Ask”).
     func set(_ decision: SitePermissionDecision?, for kind: SitePermissionKind, origin: SiteOrigin, profileID: UUID?) {
         let date = Date.now
         table.set(decision, for: kind, origin: origin, profileID: profileID, date: date)
@@ -70,7 +70,7 @@ final class SitePermissionStore {
         set(nil, for: entry.kind, origin: entry.origin, profileID: entry.profileID)
     }
 
-    /// Oublie les décisions d'un profil supprimé.
+    /// Forgets the decisions of a deleted profile.
     func removeAll(profileID: UUID) {
         table.removeAll(profileID: profileID)
         guard let context else {
@@ -87,7 +87,7 @@ final class SitePermissionStore {
         kind: SitePermissionKind,
         in context: ModelContext,
     ) -> [SitePermissionRecord] {
-        // Peu de décisions : un filtre en mémoire suffit et évite un prédicat sur un identifiant optionnel.
+        // Few decisions: an in-memory filter is enough and avoids a predicate on an optional identifier.
         let records = (try? context.fetch(FetchDescriptor<SitePermissionRecord>(sortBy: [SortDescriptor(\.date, order: .reverse)]))) ?? []
         return records.filter { $0.profileID == profileID && $0.originKey == origin.key && $0.kindValue == kind.rawValue }
     }
@@ -100,7 +100,7 @@ final class SitePermissionStore {
         }
     }
 
-    /// Enregistrements lisibles ; une origine, une permission ou une décision inconnue est ignorée.
+    /// Readable records; an unknown origin, permission or decision is ignored.
     private static func load(from context: ModelContext?) -> [SitePermissionEntry] {
         guard let context else {
             return []
@@ -123,7 +123,7 @@ final class SitePermissionStore {
     }
 }
 
-/// Décisions vues par les pages d'un profil : celles d'un Space, de son aperçu ou d'une mini-fenêtre.
+/// Decisions seen by the pages of a profile: those of a Space, of its Peek or of a mini window.
 struct SitePermissionScope {
     let store: SitePermissionStore
     let profileID: UUID?

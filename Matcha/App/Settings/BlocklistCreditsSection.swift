@@ -1,7 +1,7 @@
 import SwiftUI
 
-/// Réglages > Confidentialité : crédits des listes de blocage livrées (tâche 6.2), lus dans leur manifeste : nom,
-/// licence et site de chaque liste. La tâche 6.1 donne ces informations avec les listes.
+/// Settings > Privacy: credits of the bundled blocklists (task 6.2), read from their manifest: name, license and
+/// site of each list. Task 6.1 provides this information with the lists.
 struct BlocklistCreditsSection: View {
     let service: ContentBlockerService
 

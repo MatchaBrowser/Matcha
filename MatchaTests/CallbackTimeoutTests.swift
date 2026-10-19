@@ -3,7 +3,7 @@ import Foundation
 import Testing
 import WebKit
 
-/// Réponses de WebKit attendues avec un délai (tâche 5.6) : son des pages, captures.
+/// WebKit replies awaited with a timeout (task 5.6): page audio, snapshots.
 @MainActor
 struct CallbackTimeoutTests {
     @Test func `an answer in time is returned`() async {
@@ -23,7 +23,7 @@ struct CallbackTimeoutTests {
         #expect(value == 42)
     }
 
-    /// Une page qui ne répond pas est tenue pour occupée : elle ne se met pas en veille.
+    /// A page that does not reply is considered busy: it does not go to sleep.
     @Test func `no answer gives the fallback after the timeout`() async {
         let start = ContinuousClock.now
         let value = await CallbackTimeout.value(timeout: .milliseconds(50), fallback: true) { _ in }
@@ -37,7 +37,7 @@ struct CallbackTimeoutTests {
             late = done
         }
         #expect(value)
-        // Ni plantage (continuation reprise deux fois) ni effet.
+        // Neither a crash (continuation resumed twice) nor any effect.
         late?(false)
         late?(false)
     }

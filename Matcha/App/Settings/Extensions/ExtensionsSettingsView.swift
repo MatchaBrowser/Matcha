@@ -1,9 +1,9 @@
 import SwiftUI
 
-/// Réglages > Extensions (tâche 6.4) : les extensions installées (activer, options, fenêtres privées, supprimer), puis
-/// « Ajouter » : les extensions Safari des apps installées (et l'App Store, « Plus d'extensions… »), et un fichier
-/// (`.crx` de Chrome, `.xpi` de Firefox, `.zip`) ou un dossier décompressé (et le lien vers les modules de Firefox).
-/// Chaque ajout passe par l'écran des permissions.
+/// Settings > Extensions (task 6.4): the installed extensions (enable, options, private windows, remove), then
+/// “Add”: the Safari extensions of the installed apps (and the App Store, “More Extensions…”), and a file (Chrome
+/// `.crx`, Firefox `.xpi`, `.zip`) or an unpacked folder (and the link to Firefox add-ons). Each addition goes
+/// through the permissions screen.
 struct ExtensionsSettingsView: View {
     @State private var model = ExtensionsSettingsModel(manager: .shared, syncAdapter: .shared)
     @State private var pendingRemoval: ExtensionsSettingsModel.Installed?
@@ -80,7 +80,7 @@ struct ExtensionsSettingsView: View {
             }
         }
         .formStyle(.grouped)
-        // La fenêtre prend la hauteur du contenu : pas de barre de défilement.
+        // The window takes the height of its content: no scroll bar.
         .scrollDisabled(true)
         .fixedSize(horizontal: false, vertical: true)
         .task { await model.refreshAppExtensions() }
@@ -110,7 +110,7 @@ struct ExtensionsSettingsView: View {
     }
 }
 
-/// Extension Safari d'une app : icône de l'app, nom, app, et « Ajouter… » (ou « Installée »).
+/// Safari extension of an app: app icon, name, app, and “Add…” (or “Installed”).
 private struct SafariExtensionRow: View {
     let appExtension: SafariAppExtension
     let isInstalled: Bool

@@ -1,8 +1,9 @@
 import Foundation
 
-/// Emoji d'une icône de dossier ou de Space (`SidebarIcon`) : un seul caractère (graphème), qui s'affiche en emoji.
+/// Emoji of a folder or Space icon (`SidebarIcon`): a single character (grapheme), displayed as an emoji.
 nonisolated enum IconEmoji {
-    /// `text` sans les espaces autour, s'il est exactement un emoji ; sinon nil (vide, plusieurs caractères, lettre…).
+    /// `text` without surrounding whitespace, if it is exactly one emoji; otherwise nil (empty, several characters,
+    /// letter…).
     static func validated(_ text: String) -> String? {
         let trimmed = text.trimmingCharacters(in: .whitespacesAndNewlines)
         guard trimmed.count == 1, let character = trimmed.first, isEmoji(character) else {
@@ -11,8 +12,8 @@ nonisolated enum IconEmoji {
         return trimmed
     }
 
-    /// Dernier caractère de `text` s'il est un emoji : le champ garde l'emoji tapé ou choisi en dernier (le
-    /// visualiseur de caractères l'ajoute après l'ancien) ; nil sinon.
+    /// Last character of `text` if it is an emoji: the field keeps the emoji typed or chosen last (the Character
+    /// Viewer appends it after the old one); nil otherwise.
     static func latest(in text: String) -> String? {
         guard let last = text.trimmingCharacters(in: .whitespacesAndNewlines).last, isEmoji(last) else {
             return nil
@@ -20,9 +21,9 @@ nonisolated enum IconEmoji {
         return String(last)
     }
 
-    /// Vrai si le caractère s'affiche en emoji : l'un de ses scalaires a la présentation emoji par défaut (😀, 🇫🇷,
-    /// 👩🏽‍💻), ou il commence par un emoji suivi du sélecteur de variante 16, U+FE0F (❤️, 1️⃣). Un chiffre, « © »
-    /// ou « ❤ » seuls n'en sont pas.
+    /// True if the character displays as an emoji: one of its scalars has emoji presentation by default (😀, 🇫🇷,
+    /// 👩🏽‍💻), or it starts with an emoji followed by variation selector 16, U+FE0F (❤️, 1️⃣). A digit, “©”
+    /// or “❤” on their own are not.
     static func isEmoji(_ character: Character) -> Bool {
         let scalars = character.unicodeScalars
         if scalars.contains(where: \.properties.isEmojiPresentation) {

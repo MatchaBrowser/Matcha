@@ -5,13 +5,13 @@ import SwiftData
 import Testing
 import WebKit
 
-/// Mise en veille d'un onglet (tâche 5.6) avec de vraies vues web : la vue est libérée, l'onglet garde sa page, son
-/// titre et son historique, et se recrée à la même page.
+/// Suspension of a tab (task 5.6) with real web views: the view is released, the tab keeps its page, its title and its
+/// history, and is recreated at the same page.
 @MainActor
 struct TabSuspensionTests {
     private let manager = TabManager(websiteDataStore: .nonPersistent())
 
-    /// Onglet passé par les pages locales « un » puis « deux » (précédent disponible), puis caché derrière un autre.
+    /// Tab that went through the local pages “un” then “deux” (back available), then hidden behind another one.
     private func hiddenTabWithHistory() async throws -> BrowserTab {
         let tab = manager.insertTab(configuration: TestPages.configuration(), after: nil, select: true)
         tab.load(TestPages.url("un"))
@@ -22,7 +22,7 @@ struct TabSuspensionTests {
         return tab
     }
 
-    /// Petite capture JPEG de la page `url`.
+    /// Small JPEG snapshot of the page `url`.
     private func snapshot(of url: URL?) throws -> TabSnapshot {
         let image = try #require(NSImage(size: NSSize(width: 4, height: 3), flipped: false) { rect in
             NSColor.red.setFill()
@@ -48,7 +48,7 @@ struct TabSuspensionTests {
         #expect(tab.displayTitle == "deux")
         #expect(tab.favicon === favicon)
         #expect(tab.savedInteractionState != nil)
-        // Toujours rangé : la barre et la barre de commande le montrent.
+        // Still placed: the sidebar and the command bar show it.
         #expect(manager.tabs.contains { $0 === tab })
     }
 
@@ -59,7 +59,7 @@ struct TabSuspensionTests {
         manager.select(tab)
         #expect(tab.isLoaded)
         #expect(!tab.suspension.isSuspended)
-        // Pendant le rechargement, la barre garde le titre et l'adresse.
+        // During the reload, the sidebar keeps the title and the address.
         #expect(tab.title == "deux")
         #expect(tab.url == TestPages.url("deux"))
         try await waitUntil { tab.webView?.title == "deux" && tab.canGoBack && !tab.isLoading }
@@ -69,7 +69,7 @@ struct TabSuspensionTests {
         try await waitUntil { tab.title == "un" && tab.canGoForward }
     }
 
-    /// Un épinglé en veille garde la page où il était, pas son adresse d'origine (comme dans Arc).
+    /// A suspended pinned tab keeps the page it was on, not its original address (as in Arc).
     @Test func `a pinned tab keeps its current page, not its pinned address`() async throws {
         let tab = manager.insertTab(configuration: TestPages.configuration(), after: nil, select: true)
         tab.load(TestPages.url("origine"))
@@ -86,7 +86,7 @@ struct TabSuspensionTests {
         #expect(tab.url == TestPages.url("ailleurs"))
         #expect(tab.pinnedURL == TestPages.url("origine"))
 
-        // Fermer reste le retour à l'origine, sans historique.
+        // Closing still takes it back to its origin, without history.
         manager.close(tab)
         #expect(!tab.suspension.isSuspended)
         #expect(tab.url == TestPages.url("origine"))
@@ -141,11 +141,11 @@ struct TabSuspensionTests {
         #expect(tab.suspension.isSuspended)
     }
 
-    /// Documentation livrée avec macOS : page locale (`file:`), retenue dans l'historique, sans réseau.
+    /// Documentation shipped with macOS: a local page (`file:`), kept in the history, without network.
     nonisolated static let localDocs = "/usr/share/doc/postfix/html/index.html"
 
-    /// Le rechargement d'une page sortie de veille n'est pas une nouvelle visite (tâche 5.5) ; une page locale revient
-    /// avec son historique.
+    /// Reloading a page woken from suspension is not a new visit (task 5.5); a local page comes back with its
+    /// history.
     @Test(.enabled(if: FileManager.default.isReadableFile(atPath: localDocs)))
     func `a local page comes back without a new visit`() async throws {
         let container = try BrowserSchema.makeContainer(inMemory: true)
@@ -167,7 +167,7 @@ struct TabSuspensionTests {
 
         tab.goBack()
         try await waitUntil { tab.title == "Postfix Documentation" && !tab.isLoading }
-        // Une page où l'on revient est une visite, comme avant la veille.
+        // A page you come back to is a visit, as before the suspension.
         try await waitUntil { visits() == 3 }
     }
 }

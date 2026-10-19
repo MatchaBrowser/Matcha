@@ -2,37 +2,37 @@ import Foundation
 import Observation
 import WebKit
 
-/// Onglets d'une fenêtre, leur rangement dans la barre latérale et l'onglet sélectionné.
+/// A window's tabs, their arrangement in the sidebar and the selected tab.
 @MainActor
 @Observable
 final class TabManager {
-    /// Place et ordre des onglets dans la barre latérale (en mémoire jusqu'à la phase 3).
+    /// Place and order of the tabs in the sidebar (in memory until phase 3).
     private(set) var layout = SidebarLayout()
     private(set) var selectedTabID: BrowserTab.ID?
-    /// Dossier dont le nom est en cours de saisie dans la barre (état d'interface).
+    /// Folder whose name is being edited in the sidebar (UI state).
     var renamingFolderID: UUID?
-    /// Aperçu ouvert par-dessus les pages affichées (Maj+clic, tâche 4.4) : une page hors de la barre latérale.
+    /// Peek opened on top of the displayed pages (Shift-click, task 4.4): a page outside the sidebar.
     private(set) var peek: Peek?
     private var tabsByID: [BrowserTab.ID: BrowserTab] = [:]
 
-    /// Magasin de données (cookies, stockage) des onglets de cette fenêtre.
+    /// Data store (cookies, storage) of this window's tabs.
     @ObservationIgnored let websiteDataStore: WKWebsiteDataStore
-    /// Délégué de toutes les vues web de cette fenêtre (les vues ne le retiennent pas).
+    /// Delegate of all web views of this window (the views do not retain it).
     @ObservationIgnored let coordinator = NavigationCoordinator()
     @ObservationIgnored let faviconService: FaviconService
-    /// Fenêtre à laquelle reviennent les téléchargements de ces onglets : celle d'une fenêtre privée les oublie.
+    /// Window these tabs' downloads belong to: a private window's scope forgets them.
     @ObservationIgnored let downloadScope: DownloadScope
-    /// Décisions de permission du profil de ces onglets (tâche 5.2), données par le Space ; nil : rien n'est retenu.
+    /// Permission decisions of these tabs' profile (task 5.2), given by the Space; nil: nothing is remembered.
     @ObservationIgnored var sitePermissions: SitePermissionScope?
-    /// Zoom des pages par site (tâche 5.4), donné par le Space : celui de la session ; nil : rien n'est retenu.
+    /// Page zoom per site (task 5.4), given by the Space: the session's; nil: nothing is remembered.
     @ObservationIgnored var siteZooms: SiteZoomStore?
-    /// Historique des pages de ce Space (tâche 5.5), donné par le Space ; nil : rien n'est retenu (fenêtre privée).
+    /// History of this Space's pages (task 5.5), given by the Space; nil: nothing is remembered (private window).
     @ObservationIgnored var history: HistoryScope?
-    /// Ce qui est affiché dans les fenêtres de la session (tâches 5.6 et 5.7), donné par la session.
+    /// What is displayed in the session's windows (tasks 5.6 and 5.7), given by the session.
     @ObservationIgnored weak var lifecycle: TabLifecycleService?
-    /// Fenêtres de connexion de la session (tâche 5.8), données par la session ; nil (tests) : des onglets.
+    /// The session's sign-in windows (task 5.8), given by the session; nil (tests): tabs instead.
     @ObservationIgnored weak var popupWindows: PopupWindowManager?
-    /// Bloqueur de la session (tâche 6.2), donné par la session ; nil (tests) : les pages ne sont pas suivies.
+    /// The session's blocker (task 6.2), given by the session; nil (tests): pages are not tracked.
     @ObservationIgnored var contentBlocking: ContentBlockerScope?
 
     init(websiteDataStore: WKWebsiteDataStore, faviconService: FaviconService = .shared, downloadScope: DownloadScope = .regular) {
@@ -42,7 +42,7 @@ final class TabManager {
         coordinator.tabHost = self
     }
 
-    /// Tous les onglets, dans l'ordre de la barre latérale.
+    /// All tabs, in sidebar order.
     var tabs: [BrowserTab] {
         layout.orderedTabIDs.compactMap { tabsByID[$0] }
     }
@@ -63,7 +63,7 @@ final class TabManager {
         tabsByID[id]
     }
 
-    /// Onglet qui possède `webView`.
+    /// Tab that owns `webView`.
     func tab(for webView: WKWebView) -> BrowserTab? {
         tabsByID.values.first { $0.webView === webView }
     }
@@ -72,7 +72,7 @@ final class TabManager {
         layout.place(of: tab.id)
     }
 
-    /// Ouvre un onglet en tête des onglets du jour et y charge `url` si elle est fournie.
+    /// Opens a tab at the top of the today tabs and loads `url` in it if provided.
     @discardableResult
     func newTab(url: URL? = nil, select: Bool = true) -> BrowserTab {
         let configuration = WebConfigurationFactory.makeConfiguration(websiteDataStore: websiteDataStore)
@@ -83,11 +83,11 @@ final class TabManager {
         return tab
     }
 
-    /// Insère parmi les onglets du jour un onglet dont la vue web est créée avec `configuration`, telle
-    /// quelle : c'est ce qu'exige WebKit pour les fenêtres ouvertes par une page.
-    /// Si `anchor` est un onglet du jour, le nouveau va après lui et après les onglets déjà ouverts
-    /// depuis lui, pour garder l'ordre des clics ; sinon, en tête.
-    /// Il est sélectionné si `select` est vrai ou si aucun onglet ne l'est.
+    /// Inserts among the today tabs a tab whose web view is created with `configuration`, as is:
+    /// WebKit requires this for windows opened by a page.
+    /// If `anchor` is a today tab, the new one goes after it and after the tabs already opened
+    /// from it, to keep the order of clicks; otherwise, at the top.
+    /// It is selected if `select` is true or if no tab is selected.
     @discardableResult
     func insertTab(configuration: WKWebViewConfiguration, after anchor: BrowserTab?, select: Bool) -> BrowserTab {
         let tab = BrowserTab(configuration: configuration, openerID: anchor?.id)
@@ -95,8 +95,8 @@ final class TabManager {
         return tab
     }
 
-    /// Range parmi les onglets du jour un onglet déjà créé (aperçu ouvert en onglet ; tâche 4.5 : « Ouvrir dans
-    /// le Space »), comme `insertTab`.
+    /// Places among the today tabs an already created tab (Peek opened as a tab; task 4.5: “Open in Space”), like
+    /// `insertTab`.
     func insert(_ tab: BrowserTab, after anchor: BrowserTab?, select: Bool) {
         tab.delegate = coordinator
         tab.makeWebViewIfNeeded()
@@ -107,10 +107,10 @@ final class TabManager {
         }
     }
 
-    /// Ferme `tab` (⌘W, ×). Un onglet du jour disparaît. Un épinglé ou un favori reste dans la barre,
-    /// comme dans Arc : il revient à son adresse d'origine et se décharge ; un split épinglé se ferme en entier.
-    /// S'il était sélectionné, son voisin dans le split prend la sélection, sinon son voisin suivant dans la
-    /// barre, ou le précédent.
+    /// Closes `tab` (⌘W, ×). A today tab goes away. A pinned tab or a favorite stays in the sidebar,
+    /// as in Arc: it goes back to its original address and unloads; a pinned split closes as a whole.
+    /// If it was selected, its neighbor in the split takes the selection, otherwise its next neighbor in the
+    /// sidebar, or the previous one.
     func close(_ tab: BrowserTab) {
         guard let place = layout.place(of: tab.id) else {
             return
@@ -118,7 +118,7 @@ final class TabManager {
         if place == .today {
             delete(tab)
         } else if place == .pinned, let group = layout.split(containing: tab.id) {
-            // Un split épinglé se ferme en entier, comme un épinglé : il se décharge et reste dans la barre.
+            // A pinned split closes as a whole, like a pinned tab: it unloads and stays in the sidebar.
             closeSplit(group.id)
         } else {
             moveSelection(awayFrom: tab) {
@@ -127,7 +127,7 @@ final class TabManager {
         }
     }
 
-    /// Retire l'onglet de la barre, où qu'il soit, et libère sa vue web.
+    /// Removes the tab from the sidebar, wherever it is, and releases its web view.
     func delete(_ tab: BrowserTab) {
         guard tabsByID[tab.id] != nil else {
             return
@@ -135,7 +135,7 @@ final class TabManager {
         moveSelection(awayFrom: tab) { discard(tab) }
     }
 
-    /// Sélectionne l'onglet ; un onglet déchargé recharge alors sa page.
+    /// Selects the tab; an unloaded tab then reloads its page.
     func select(_ tab: BrowserTab) {
         guard tabsByID[tab.id] != nil else {
             return
@@ -143,8 +143,8 @@ final class TabManager {
         setSelection(tab.id)
     }
 
-    /// Range l'onglet dans les favoris, les épinglés (à la fin) ou les onglets du jour (en tête) ; il quitte
-    /// son split, dont le reste reste affiché.
+    /// Places the tab in the favorites, the pinned tabs (at the end) or the today tabs (at the top); it leaves
+    /// its split, the rest of which stays displayed.
     func setPlace(_ tab: BrowserTab, to place: TabPlace) {
         guard tabsByID[tab.id] != nil else {
             return
@@ -156,7 +156,7 @@ final class TabManager {
         }
     }
 
-    /// Déplace l'onglet dans la barre (glisser-déposer) ; il quitte son split, dont le reste reste affiché.
+    /// Moves the tab in the sidebar (drag and drop); it leaves its split, the rest of which stays displayed.
     func move(_ tab: BrowserTab, to destination: SidebarDestination) {
         guard tabsByID[tab.id] != nil else {
             return
@@ -168,36 +168,36 @@ final class TabManager {
         }
     }
 
-    // MARK: Primitives des extensions
+    // MARK: Primitives for extensions
 
-    /// Ajoute un onglet existant (restauré ou venu d'un autre Space), branché sur le délégué de ce Space.
+    /// Adds an existing tab (restored or coming from another Space), attached to this Space's delegate.
     func register(_ tab: BrowserTab) {
         tab.delegate = coordinator
         tabsByID[tab.id] = tab
     }
 
-    /// Oublie un onglet sans le fermer (il continue d'exister ailleurs).
+    /// Forgets a tab without closing it (it keeps existing elsewhere).
     func unregister(_ id: BrowserTab.ID) {
         tabsByID[id] = nil
     }
 
-    /// Sélectionne `id` sans charger sa page (restauration).
+    /// Selects `id` without loading its page (restoration).
     func restoreSelection(_ id: BrowserTab.ID?) {
         selectedTabID = id
     }
 
-    /// Primitive de `TabManager+Peek` : remplace l'aperçu, sans rien libérer.
+    /// Primitive of `TabManager+Peek`: replaces the Peek, without releasing anything.
     func setPeek(_ newPeek: Peek?) {
         peek = newPeek
     }
 
-    /// Seul point d'entrée des extensions pour modifier le rangement.
+    /// The extensions' only entry point to modify the layout.
     func updateLayout(_ change: (inout SidebarLayout) -> Void) {
         change(&layout)
     }
 
-    /// Un onglet qui devient épinglé ou favori retient son adresse et son titre actuels comme origine ;
-    /// redevenu onglet du jour, il les oublie.
+    /// A tab that becomes pinned or a favorite keeps its current address and title as its origin;
+    /// once a today tab again, it forgets them.
     func updatePinnedOrigin(of tab: BrowserTab, previousPlace: TabPlace?) {
         if layout.place(of: tab.id) == .today {
             tab.pinnedURL = nil
@@ -208,14 +208,14 @@ final class TabManager {
         }
     }
 
-    /// Sélectionne `id`, note son activité et s'assure que la vue web de chaque onglet affiché existe
-    /// (tout son split).
+    /// Selects `id`, records its activity and makes sure the web view of each displayed tab exists
+    /// (its whole split).
     func setSelection(_ id: BrowserTab.ID?) {
-        // L'aperçu appartient à l'onglet affiché : en afficher un autre le ferme (tâche 4.4).
+        // The Peek belongs to the displayed tab: displaying another one closes it (task 4.4).
         if let peek, peek.sourceTabID != id {
             closePeek()
         }
-        // Les onglets qui quittent l'écran retiennent leur état de navigation.
+        // Tabs that leave the screen keep their navigation state.
         let leaving = displayedTabs
         selectedTabID = id
         let shown = displayedTabs
@@ -228,14 +228,15 @@ final class TabManager {
         shown.forEach { $0.makeWebViewIfNeeded() }
     }
 
-    /// Applique `change` à `tab` ; s'il était sélectionné, la sélection passe à son voisin dans le split,
-    /// sinon à son voisin suivant dans la barre, ou au précédent s'il était le dernier.
+    /// Applies `change` to `tab`; if it was selected, the selection moves to its neighbor in the split,
+    /// otherwise to its next neighbor in the sidebar, or to the previous one if it was the last.
     func moveSelection(awayFrom tab: BrowserTab, during change: () -> Void) {
         moveSelection(awayFrom: [tab.id], preferring: layout.split(containing: tab.id)?.neighbor(of: tab.id), during: change)
     }
 
-    /// Applique `change` ; si l'onglet sélectionné fait partie de `ids`, la sélection passe à `preferred` s'il est
-    /// encore rangé, sinon au premier onglet hors de `ids` qui le suivait dans la barre, sinon au dernier qui le précédait.
+    /// Applies `change`; if the selected tab is part of `ids`, the selection moves to `preferred` if it is still
+    /// placed, otherwise to the first tab outside `ids` that followed it in the sidebar, otherwise to the last one
+    /// that preceded it.
     func moveSelection(awayFrom ids: Set<BrowserTab.ID>, preferring preferred: BrowserTab.ID? = nil, during change: () -> Void) {
         let ordered = layout.orderedTabIDs
         let index = selectedTabID.flatMap { ordered.firstIndex(of: $0) }
@@ -261,8 +262,8 @@ final class TabManager {
         tab.stop()
     }
 
-    /// Après l'ancre (après son split s'il en a un) et les onglets déjà ouverts depuis elle ; en tête sans ancre
-    /// du jour.
+    /// After the anchor (after its split if it has one) and the tabs already opened from it; at the top without a
+    /// today anchor.
     private func todayInsertionIndex(after anchor: BrowserTab?) -> Int {
         guard let anchor, var index = layout.today.firstIndex(of: layout.split(containing: anchor.id)?.tabIDs.last ?? anchor.id) else {
             return 0

@@ -1,12 +1,12 @@
 import XCTest
 
-/// Son (tâche 5.10) : un onglet en arrière-plan qui joue du son montre un haut-parleur ; un clic dessus met sa page en
-/// pause sans sélectionner l'onglet ni le fermer. Page sans réseau : une musique des Souvenirs de Photos livrée avec
-/// macOS, ouverte comme fichier (WebKit en fait une page qui la joue d'elle-même) ; test ignoré s'il n'y en a pas.
-/// **Ce test joue quelques secondes de musique** (baisse le son) et déplace la vraie souris.
+/// Sound (task 5.10): a background tab that plays sound shows a speaker; clicking it pauses its page without
+/// selecting or closing the tab. Page without network: a Photos Memories track shipped with macOS, opened as a file
+/// (WebKit turns it into a page that plays it by itself); test skipped if there is none.
+/// **This test plays a few seconds of music** (turn the volume down) and moves the real mouse.
 final class AudioUITests: XCTestCase {
     private static let musicDirectory = "/System/Library/Photos/Resources/FlexAudio"
-    /// Valeur d'accessibilité d'un onglet qui joue du son, en français.
+    /// Accessibility value of a tab that plays sound, in French.
     private static let playing = "Lecture audio en cours"
 
     override func setUpWithError() throws {
@@ -22,22 +22,22 @@ final class AudioUITests: XCTestCase {
         let row = tabRow(titled: (music as NSString).lastPathComponent, in: app)
         XCTAssertTrue(waitForValue(of: row, timeout: 10) { $0 == Self.playing })
 
-        // Un onglet vide passe devant : la musique continue, le haut-parleur reste.
+        // An empty tab comes to the front: the music keeps playing, the speaker stays.
         openEmptyTab(in: app)
         XCTAssertTrue(waitForCount(tabRows(in: app), 2))
         XCTAssertFalse(row.isSelected)
         Thread.sleep(forTimeInterval: 1)
         XCTAssertEqual(row.value as? String, Self.playing)
 
-        // Le haut-parleur, juste avant la place du × (marge de 3 pt, × et haut-parleur de 26 pt) : il ne bouge pas
-        // quand le × apparaît au survol.
+        // The speaker, just before the spot of the × (3 pt margin, 26 pt × and speaker): it doesn't move when the ×
+        // appears on hover.
         row.coordinate(withNormalizedOffset: CGVector(dx: 1, dy: 0.5)).withOffset(CGVector(dx: -42, dy: 0)).click()
         XCTAssertTrue(waitUntilSilent(row, timeout: 3))
         XCTAssertFalse(row.isSelected)
         XCTAssertEqual(tabRows(in: app).count, 2)
 
-        // En pause, pas terminée : le haut-parleur ne revient pas, ni quand on affiche l'onglet. Lecture directe : une
-        // attente par prédicat ne le vérifie qu'au bout d'une seconde environ, jamais avec un délai d'une seconde.
+        // Paused, not finished: the speaker doesn't come back, not even when the tab is shown. Direct read: a predicate
+        // wait only checks after about one second, never with a one-second delay.
         Thread.sleep(forTimeInterval: 3)
         XCTAssertNotEqual(row.value as? String, Self.playing)
         row.click()
@@ -46,7 +46,7 @@ final class AudioUITests: XCTestCase {
         XCTAssertNotEqual(row.value as? String, Self.playing)
     }
 
-    /// Premier morceau trouvé ; le test est ignoré sans lui.
+    /// First track found; the test is skipped without it.
     private func musicFile() throws -> String {
         let bundles = (try? FileManager.default.contentsOfDirectory(atPath: Self.musicDirectory)) ?? []
         for bundle in bundles.sorted() where bundle.hasSuffix(".smsbundle") {
@@ -59,7 +59,7 @@ final class AudioUITests: XCTestCase {
         throw XCTSkip("Aucune musique de Photos dans \(Self.musicDirectory)")
     }
 
-    /// Attend que la ligne ne dise plus « Lecture audio en cours » (sans valeur, ou vide).
+    /// Waits until the row no longer says “Playing Audio” (no value, or empty).
     @MainActor
     private func waitUntilSilent(_ row: XCUIElement, timeout: TimeInterval) -> Bool {
         let predicate = NSPredicate { object, _ in

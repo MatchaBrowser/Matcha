@@ -2,8 +2,8 @@ import Foundation
 @testable import Matcha
 import Testing
 
-/// Recherche factice : les textes présents dans la page, les recherches demandées, les désélections. Avec `gate`,
-/// chaque recherche attend `gate.open()`.
+/// Fake search: the texts present in the page, the searches requested, the deselections. With `gate`, each search
+/// waits for `gate.open()`.
 @MainActor
 final class FakeFindPerformer: FindPerformer {
     struct Search: Equatable {
@@ -12,7 +12,7 @@ final class FakeFindPerformer: FindPerformer {
     }
 
     var matches: Set<String> = []
-    /// Faux : la page ne peut pas chercher (pas de vue web).
+    /// Fake: the page cannot search (no web view).
     var canSearch = true
     var gate: GatedSleep?
     private(set) var searches: [Search] = []
@@ -29,14 +29,14 @@ final class FakeFindPerformer: FindPerformer {
     }
 }
 
-/// Recherche dans la page (tâche 5.3) : ouverture et clavier, frappe différée et annulée, suivant et précédent,
-/// fermeture, page déchargée ou changée.
+/// Find in page (task 5.3): opening and keyboard focus, deferred and cancelled typing, next and previous, closing,
+/// page unloaded or changed.
 @MainActor
 struct FindSessionTests {
     private let page = FakeFindPerformer()
     private let sleeper = FakeSleep()
 
-    /// Recherche sur `page`, attente immédiate (ou `gate`).
+    /// Search on `page`, immediate wait (or `gate`).
     private func makeSession(gate: GatedSleep? = nil) -> FindSession {
         let session = if let gate {
             FindSession { try await gate.sleep($0) }
@@ -51,7 +51,7 @@ struct FindSessionTests {
         FakeFindPerformer.Search(query: query, direction: direction)
     }
 
-    /// Barre ouverte, `text` tapé et cherché.
+    /// Bar open, `text` typed and searched.
     private func type(_ text: String, in session: FindSession) async {
         session.present()
         session.updateQuery(text)
@@ -66,10 +66,10 @@ struct FindSessionTests {
         session.present()
         #expect(session.isPresented)
         #expect(session.takeFocusRequest())
-        // Un champ recréé plus tard (retour sur l'onglet) ne reprend pas le clavier.
+        // A field recreated later (back on the tab) does not take the keyboard focus back.
         #expect(!session.takeFocusRequest())
 
-        // Déjà ouverte : elle reste, et le champ reprend le clavier.
+        // Already open: it stays, and the field takes the keyboard focus back.
         session.present()
         #expect(session.isPresented)
         #expect(session.takeFocusRequest())
@@ -130,7 +130,7 @@ struct FindSessionTests {
         await session.waitForPendingSearch()
         #expect(page.searches == [search("postfix"), search("postfix"), search("postfix", .backward)])
 
-        // Entrée avant la fin de l'attente : la frappe en attente est cherchée tout de suite, une seule fois.
+        // Return before the end of the wait: the pending input is searched right away, only once.
         let gate = GatedSleep()
         let typing = makeSession(gate: gate)
         typing.present()
@@ -178,7 +178,7 @@ struct FindSessionTests {
         #expect(session.status == .idle)
         #expect(page.deselections == 1)
 
-        // Rien de trouvé : la sélection de la page n'est pas la nôtre, elle reste.
+        // Nothing found: the page's selection is not ours, it stays.
         await type("zzqqxx", in: session)
         session.close()
         #expect(page.deselections == 1)
@@ -194,7 +194,7 @@ struct FindSessionTests {
         try await waitUntil { gate.waitingCount == 1 }
         session.close()
         gate.open()
-        // La recherche annulée reprend et finit : son résultat ne doit rien changer.
+        // The cancelled search resumes and finishes: its result must not change anything.
         try await Task.sleep(for: .milliseconds(50))
         #expect(session.status == .idle)
         session.close()
@@ -239,7 +239,7 @@ struct FindSessionTests {
         #expect(FindKeyCommand(selectorName: "insertLineBreak:", isShiftDown: true) == .previous)
         #expect(FindKeyCommand(selectorName: "cancelOperation:", isShiftDown: false) == .close)
         #expect(FindKeyCommand(selectorName: "complete:", isShiftDown: false) == .close)
-        // ⇥, ↑ et ↓ restent à l'éditeur (champ suivant, curseur).
+        // ⇥, ↑ and ↓ stay with the editor (next field, cursor).
         for selector in ["insertTab:", "insertBacktab:", "moveUp:", "moveDown:", "deleteBackward:"] {
             #expect(FindKeyCommand(selectorName: selector, isShiftDown: false) == nil)
         }

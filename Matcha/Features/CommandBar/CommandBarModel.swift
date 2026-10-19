@@ -2,12 +2,11 @@ import Foundation
 import Observation
 import OSLog
 
-/// État de la barre de commande d'une fenêtre : ouverture, mode, texte, lignes et sélection.
+/// State of a window's command bar: opening, mode, text, rows and selection.
 ///
-/// Chaque frappe reconstruit les lignes tout de suite (lignes du texte, puis résultats déjà reçus,
-/// reclassés), puis une seule tâche interroge les sources dans l'ordre : onglets, actions,
-/// historique, suggestions. Les lignes sont republiées après chaque source ; une frappe plus récente
-/// annule la tâche en cours.
+/// Each keystroke rebuilds the rows right away (rows from the text, then results already received, re-ranked),
+/// then a single task queries the sources in order: tabs, actions, history, suggestions. The rows are republished
+/// after each source; a more recent keystroke cancels the current task.
 @MainActor
 @Observable
 final class CommandBarModel {
@@ -16,25 +15,25 @@ final class CommandBarModel {
     private(set) var text = ""
     private(set) var rows: [CommandRow] = []
     private(set) var selectedRowID: CommandRow.ID?
-    /// Incrémenté à chaque demande d'ouverture : le champ reprend le clavier et sélectionne tout.
+    /// Incremented on each open request: the field takes the keyboard back and selects all.
     private(set) var focusRequest = 0
-    /// Moteur de l'ouverture en cours (sous-titres « Rechercher sur … »).
+    /// Engine of the current opening (“Search …” subtitles).
     private(set) var searchEngine = SearchEngine.defaultEngine
 
     @ObservationIgnored let windowModel: WindowModel
     @ObservationIgnored private let actions: ActionsProvider
-    /// Onglets, actions, historique, suggestions (toujours en dernier).
+    /// Tabs, actions, history, suggestions (always last).
     @ObservationIgnored private let providers: [any CommandProvider]
     @ObservationIgnored private let ranker: CommandRanker
     @ObservationIgnored private let now: () -> Date
     @ObservationIgnored private var context = CommandContext()
-    /// Résultats reçus, un tableau par source.
+    /// Results received, one array per source.
     @ObservationIgnored private var candidates: [[CommandCandidate]]
-    /// Adresse de ⌘L tant que le texte n'a pas été modifié.
+    /// ⌘L address as long as the text has not been modified.
     @ObservationIgnored private var pristineURL: URL?
     @ObservationIgnored private var queryTask: Task<Void, Never>?
 
-    /// Sans effet de bord : rien n'est lancé avant la première ouverture.
+    /// No side effects: nothing starts before the first opening.
     init(
         windowModel: WindowModel,
         history: (any HistorySource)? = nil,
@@ -54,10 +53,10 @@ final class CommandBarModel {
         rows.first { $0.id == selectedRowID }
     }
 
-    // MARK: Ouverture
+    // MARK: Opening
 
-    /// ⌘T et « Nouvel onglet » : la barre en mode nouvel onglet. Avec une page d'accueil pour les
-    /// nouveaux onglets, l'onglet est créé tout de suite et la barre s'ouvre sur son adresse.
+    /// ⌘T and “New Tab”: the bar in new tab mode. With a home page for new tabs, the tab is created right away and
+    /// the bar opens on its address.
     func newTab(_ settings: CommandBarSettings) {
         if let home = settings.newTabHomeURL {
             let tab = windowModel.space.tabManager.newTab(url: home)
@@ -67,7 +66,7 @@ final class CommandBarModel {
         }
     }
 
-    /// ⌘L et la pastille d'adresse : édition de l'onglet affiché, ou nouvel onglet s'il n'y en a pas.
+    /// ⌘L and the address pill: editing of the displayed tab, or a new tab if there is none.
     func editCurrentTab(_ settings: CommandBarSettings) {
         if let tab = windowModel.space.tabManager.selectedTab {
             present(.currentTab(tab.id), text: tab.url?.absoluteString ?? "", pristineURL: tab.url, settings: settings)
@@ -76,9 +75,8 @@ final class CommandBarModel {
         }
     }
 
-    /// Réglages modifiés pendant que la barre est ouverte (fenêtre Réglages, barre restée ouverte) :
-    /// le moteur et les suggestions suivent aussitôt. Les suggestions déjà reçues sont oubliées et
-    /// les sources interrogées de nouveau.
+    /// Settings changed while the bar is open (Settings window, bar left open): the engine and suggestions follow
+    /// immediately. Suggestions already received are forgotten and the sources queried again.
     func apply(_ settings: CommandBarSettings) {
         let newContext = makeContext(settings)
         guard isPresented, settings.searchEngine != searchEngine || newContext != context else {
@@ -94,7 +92,7 @@ final class CommandBarModel {
         startQuery(CommandQuery(text: text, searchEngine: searchEngine))
     }
 
-    /// Déjà ouverte dans le même mode : le texte reste, le champ reprend seulement le clavier.
+    /// Already open in the same mode: the text stays, the field only takes the keyboard back.
     private func present(_ newMode: CommandBarMode, text newText: String, pristineURL newPristineURL: URL?, settings: CommandBarSettings) {
         focusRequest += 1
         if isPresented, newMode == mode {
@@ -113,16 +111,15 @@ final class CommandBarModel {
         Logger.commandBar.debug("Barre ouverte")
     }
 
-    // MARK: Saisie et sélection
+    // MARK: Input and selection
 
-    /// Nouveau texte du champ : lignes reconstruites tout de suite, première ligne sélectionnée, puis
-    /// sources interrogées dans une tâche.
+    /// New field text: rows rebuilt right away, first row selected, then sources queried in a task.
     func updateText(_ newText: String) {
         guard isPresented, newText != text else {
             return
         }
         text = newText
-        // La première modification met fin pour de bon à l'adresse de ⌘L.
+        // The first modification ends the ⌘L address for good.
         pristineURL = nil
         cancelQuery()
         let query = CommandQuery(text: newText, searchEngine: searchEngine)
@@ -133,7 +130,7 @@ final class CommandBarModel {
         startQuery(query)
     }
 
-    /// Déplace la sélection, bornée aux lignes, sans boucler.
+    /// Moves the selection, bounded by the rows, without wrapping.
     func moveSelection(by delta: Int) {
         guard !rows.isEmpty else {
             return
@@ -142,7 +139,7 @@ final class CommandBarModel {
         selectedRowID = rows[min(max(current + delta, 0), rows.count - 1)].id
     }
 
-    /// Suite à donner à Entrée (`rowID` nil : la ligne sélectionnée) ou à un clic sur une ligne.
+    /// What follows Return (`rowID` nil: the selected row) or a click on a row.
     func submission(for rowID: CommandRow.ID?) -> CommandBarSubmission {
         guard isPresented else {
             return .ignore
@@ -157,7 +154,7 @@ final class CommandBarModel {
         return .run(row.target, mode: mode)
     }
 
-    /// Ferme la barre et oublie tout, sauf `focusRequest`.
+    /// Closes the bar and forgets everything except `focusRequest`.
     func dismiss() {
         guard isPresented else {
             return
@@ -173,18 +170,18 @@ final class CommandBarModel {
         Logger.commandBar.debug("Barre fermée")
     }
 
-    /// Tests : attend la fin de la recherche en cours.
+    /// Tests: waits for the current search to finish.
     func waitForPendingResults() async {
         await queryTask?.value
     }
 
-    // MARK: Résultats
+    // MARK: Results
 
     private func makeContext(_ settings: CommandBarSettings) -> CommandContext {
         CommandContext(isPrivate: windowModel.session.isPrivate, showsSearchSuggestions: settings.showsSearchSuggestions)
     }
 
-    /// Interroge les sources dans une tâche, sauf pour un texte vide ou l'adresse de ⌘L non modifiée.
+    /// Queries the sources in a task, except for an empty text or the unmodified ⌘L address.
     private func startQuery(_ query: CommandQuery) {
         guard pristineURL == nil, !query.isEmpty else {
             return
@@ -206,8 +203,8 @@ final class CommandBarModel {
         }
     }
 
-    /// Recalcule les lignes ; la sélection revient à la première ligne si demandé ou si la ligne
-    /// sélectionnée a disparu.
+    /// Recomputes the rows; the selection returns to the first row if requested or if the selected row has
+    /// disappeared.
     private func refresh(resetSelection: Bool) {
         let query = CommandQuery(text: text, searchEngine: searchEngine)
         let newRows = if let pristineURL {

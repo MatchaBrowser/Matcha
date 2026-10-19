@@ -5,61 +5,58 @@ import OSLog
 import SwiftData
 import WebKit
 
-/// Données du navigateur pour toute l'app : profils et Spaces avec leurs onglets, enregistrés dans SwiftData.
+/// Browser data for the whole app: profiles and Spaces with their tabs, saved in SwiftData.
 @MainActor
 @Observable
 final class BrowserSession {
-    /// Noms créés au premier lancement, dans la langue de l'utilisateur ; ce sont ensuite ses données.
+    /// Names created at first launch, in the user's language; after that they are the user's data.
     static var defaultProfileName: String {
         String(localized: "Personal", comment: "Name of the profile created at first launch")
     }
 
-    /// La clé diffère du texte anglais pour ne pas se confondre avec le bouton « Home » (page d'accueil).
+    /// The key differs from the English text so it is not confused with the “Home” button (home page).
     static var defaultSpaceName: String {
         String(localized: "Home Space", defaultValue: "Home", comment: "Name of the Space created at first launch")
     }
 
-    /// Argument de lancement pour une base en mémoire (tests d'interface) : rien n'est écrit sur disque.
+    /// Launch argument for an in-memory store (UI tests): nothing is written to disk.
     static let inMemoryStoreKey = "inMemoryStore"
-    /// Argument de lancement pour une base nommée à part (tests d'interface de l'enregistrement).
+    /// Launch argument for a separately named store (UI tests of saving).
     static let storeNameKey = "storeName"
-    /// Argument de lancement qui vide la base nommée avant de l'ouvrir ; jamais la base par défaut.
+    /// Launch argument that empties the named store before opening it; never the default store.
     static let resetStoreKey = "resetStore"
 
     @ObservationIgnored let container: ModelContainer
-    /// Session d'une fenêtre privée : rien n'est gardé (ni onglets, ni cookies, ni icônes, ni historique : `history`
-    /// est nil).
+    /// Session of a private window: nothing is kept (no tabs, cookies, icons or history: `history` is nil).
     @ObservationIgnored let isPrivate: Bool
-    /// Icônes de sites : cache disque partagé, ou en mémoire seulement pour une fenêtre privée.
+    /// Site icons: shared disk cache, or in memory only for a private window.
     @ObservationIgnored let faviconService: FaviconService
-    /// Téléchargements de cette session : ceux d'une fenêtre privée quittent la liste à sa fermeture (tâche 5.1).
+    /// Downloads of this session: those of a private window leave the list when it closes (task 5.1).
     @ObservationIgnored let downloadScope: DownloadScope
-    /// Décisions de permission des sites (tâche 5.2) : enregistrées, ou en mémoire seulement pour une fenêtre privée.
+    /// Site permission decisions (task 5.2): saved, or in memory only for a private window.
     @ObservationIgnored let sitePermissions: SitePermissionStore
-    /// Zoom des pages par site (tâche 5.4) : enregistré dans les réglages, ou en mémoire seulement pour une fenêtre
-    /// privée ou une base de test.
+    /// Page zoom per site (task 5.4): saved in the settings, or in memory only for a private window or a test
+    /// store.
     @ObservationIgnored let siteZooms: SiteZoomStore
-    /// Historique de navigation (tâche 5.5) ; nil pour une fenêtre privée : rien n'est retenu.
+    /// Browsing history (task 5.5); nil for a private window: nothing is remembered.
     @ObservationIgnored let history: HistoryStore?
-    /// Mise en veille des onglets cachés (tâche 5.6), lancée par l'ouverture de la fenêtre ; mêmes règles en fenêtre
-    /// privée.
+    /// Sleeping of hidden tabs (task 5.6), started when the window opens; same rules in a private window.
     @ObservationIgnored let tabLifecycle = TabLifecycleService()
-    /// Fenêtres de connexion ouvertes par les pages de la session (tâche 5.8) : privées et fermées avec elle pour une
-    /// fenêtre privée.
+    /// Sign-in windows opened by the session's pages (task 5.8): private, and closed with it, for a private window.
     @ObservationIgnored let popupWindows: PopupWindowManager
-    /// Bloqueur (tâche 6.2) : celui de l'app, avec les exceptions enregistrées ; celles changées dans une fenêtre privée
-    /// ou une base de test restent en mémoire.
+    /// Blocker (task 6.2): the app's, with the saved exceptions; those changed in a private window or a test store
+    /// stay in memory.
     @ObservationIgnored let contentBlocking: ContentBlockerScope
     private(set) var spaces: [SpaceSession] = []
     private(set) var profiles: [ProfileRecord] = []
-    /// Magasin de données (cookies, stockage) de chaque profil, par identifiant de profil.
+    /// Data store (cookies, storage) of each profile, by profile identifier.
     @ObservationIgnored private var dataStores: [UUID: WKWebsiteDataStore] = [:]
-    /// Space qui tient les favoris de chaque profil (`BrowserSession+Favorites`).
+    /// Space that holds the favorites of each profile (`BrowserSession+Favorites`).
     @ObservationIgnored var favoritesHolders: [UUID: WeakTabManager] = [:]
     @ObservationIgnored private var terminationObserver: (any NSObjectProtocol)?
 
-    /// Ouvre les Spaces enregistrés ; au premier lancement, crée le profil « Personnel » et le Space « Perso »
-    /// (« Personal » et « Home » en anglais).
+    /// Opens the saved Spaces; at first launch, creates the “Personal” profile and the “Home” Space (“Personnel” and
+    /// “Perso” in French).
     init(container: ModelContainer, isPrivate: Bool = false, contentBlocker: ContentBlockerService = .shared) {
         self.container = container
         self.isPrivate = isPrivate
@@ -106,8 +103,8 @@ final class BrowserSession {
         }
     }
 
-    /// Session de l'app. Pendant les tests, la base reste en mémoire : les onglets de l'utilisateur
-    /// ne sont ni lus ni modifiés.
+    /// The app's session. During tests, the store stays in memory: the user's tabs are neither read nor
+    /// modified.
     static func launch(
         defaults: UserDefaults = .standard,
         environment: [String: String] = ProcessInfo.processInfo.environment,
@@ -122,19 +119,19 @@ final class BrowserSession {
             return try BrowserSession(container: BrowserSchema.makeContainer(inMemory: inMemory, name: name))
         } catch {
             Logger.app.error("Base indisponible, onglets non enregistrés : \(error.localizedDescription, privacy: .public)")
-            // Une base en mémoire permet au moins de naviguer.
+            // An in-memory store at least allows browsing.
             // swiftlint:disable:next force_try
             return BrowserSession(container: try! BrowserSchema.makeContainer(inMemory: true))
         }
     }
 
-    /// Vrai pour une base en mémoire (tests) : rien de ce qui concerne l'utilisateur ne doit être retenu.
+    /// True for an in-memory store (tests): nothing about the user must be remembered.
     var isInMemory: Bool {
         container.configurations.allSatisfy(\.isStoredInMemoryOnly)
     }
 
-    /// Magasin de données du profil : un par profil, pour que cookies et connexions ne se mélangent pas.
-    /// Avec une base de test, il n'écrit rien sur disque.
+    /// The profile's data store: one per profile, so that cookies and sign-ins do not mix.
+    /// With a test store, it writes nothing to disk.
     func dataStore(for profile: ProfileRecord?) -> WKWebsiteDataStore {
         guard let id = profile?.id else {
             return isInMemory ? .nonPersistent() : .default()
@@ -147,24 +144,24 @@ final class BrowserSession {
         return store
     }
 
-    /// Oublie le magasin d'un profil supprimé.
+    /// Forgets the store of a deleted profile.
     func forgetDataStore(of profileID: UUID) {
         dataStores[profileID] = nil
     }
 
-    /// Magasins de tous les profils (effacement des cookies).
+    /// Stores of all profiles (clearing cookies).
     func allDataStores() -> [WKWebsiteDataStore] {
         profiles.map(dataStore(for:))
     }
 
-    /// Recharge la liste des profils, dans leur ordre.
+    /// Reloads the list of profiles, in their order.
     func refreshProfiles() {
         let descriptor = FetchDescriptor<ProfileRecord>(sortBy: [SortDescriptor(\.order)])
         profiles = (try? container.mainContext.fetch(descriptor)) ?? []
     }
 
-    /// Supprime les magasins de données qui n'appartiennent plus à aucun profil (profil supprimé alors
-    /// qu'une vue web l'utilisait encore).
+    /// Deletes the data stores that no longer belong to any profile (profile deleted while a web view was
+    /// still using it).
     func removeOrphanDataStores() async {
         guard !isInMemory else {
             return
@@ -175,13 +172,13 @@ final class BrowserSession {
         }
     }
 
-    /// Session d'une fenêtre privée : base en mémoire, magasins de données non persistants.
+    /// Session of a private window: in-memory store, non-persistent data stores.
     static func makePrivate() -> BrowserSession {
         // swiftlint:disable:next force_try
         BrowserSession(container: try! BrowserSchema.makeContainer(inMemory: true), isPrivate: true)
     }
 
-    /// Enregistre tout de suite chaque Space (fermeture de l'app).
+    /// Saves each Space right away (app quitting).
     func saveAll() {
         spaces.forEach { $0.saveNow() }
     }
@@ -191,13 +188,12 @@ final class BrowserSession {
         spaces.append(space)
     }
 
-    /// Les onglets du Space suivent la mise en veille et le bloqueur de la session, et y ouvrent leurs fenêtres de
-    /// connexion.
+    /// The Space's tabs follow the session's tab sleeping and blocker, and open their sign-in windows in it.
     private func connect(_ space: SpaceSession) {
         space.tabManager.lifecycle = tabLifecycle
         space.tabManager.popupWindows = popupWindows
         space.tabManager.contentBlocking = contentBlocking
-        // Seul le Space qui tient les favoris du profil les enregistre.
+        // Only the Space that holds the profile's favorites saves them.
         space.store.savesFavorites = { [weak self, weak space] in
             guard let self, let space else {
                 return false
@@ -210,12 +206,12 @@ final class BrowserSession {
         spaces.removeAll { $0 === space }
     }
 
-    /// Range les Spaces dans l'ordre de leurs enregistrements (rangs égaux : l'identifiant départage).
+    /// Sorts the Spaces in the order of their records (equal ranks: the identifier breaks the tie).
     func sortSpaces() {
         spaces.sort { ($0.record.order, $0.id.uuidString) < ($1.record.order, $1.id.uuidString) }
     }
 
-    /// Supprime les fichiers de la base `name` (`<name>.store`, `-shm`, `-wal`) dans Application Support.
+    /// Deletes the files of store `name` (`<name>.store`, `-shm`, `-wal`) in Application Support.
     private static func deleteStore(named name: String) {
         let manager = FileManager.default
         guard let directory = manager.urls(for: .applicationSupportDirectory, in: .userDomainMask).first,

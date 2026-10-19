@@ -2,36 +2,36 @@ import Foundation
 import Observation
 import OSLog
 
-/// Demande de permission qui attend la réponse de l'utilisateur dans le bandeau de la page qui l'a faite.
+/// Permission request waiting for the user's answer in the banner of the page that made it.
 struct SitePermissionRequest: Identifiable {
     let id = UUID()
-    /// Origine de la page principale ; nil si elle ne peut pas être retenue (page sans hôte : fichier local…).
+    /// Origin of the main page; nil if it cannot be remembered (page without a host: local file…).
     let origin: SiteOrigin?
-    /// Site du cadre qui demande, s'il n'est pas celui de la page (cadre intégré).
+    /// Website of the requesting frame, if it is not the page's (embedded frame).
     let frameName: String?
-    /// Permissions demandées par la page.
+    /// Permissions requested by the page.
     let requested: Set<SitePermissionKind>
-    /// Celles que le bandeau demande : sans décision retenue.
+    /// Those that the banner asks for: without a remembered decision.
     let asked: Set<SitePermissionKind>
-    /// Où retenir la réponse ; nil : nulle part.
+    /// Where to remember the answer; nil: nowhere.
     let scope: SitePermissionScope?
     let response: PermissionResponse
 
-    /// « Toujours autoriser » n'est proposé que si la décision peut être retenue.
+    /// “Always Allow” is offered only if the decision can be remembered.
     var canRemember: Bool {
         origin != nil && scope != nil
     }
 }
 
-/// Demandes en attente d'une page (onglet, aperçu ou mini-fenêtre), montrées une à une dans son bandeau, dans
-/// l'ordre d'arrivée. Sans réponse, la page attend : rien n'est accordé ni refusé de soi-même. Un nouveau document
-/// dans la page, ou la page fermée, refuse ce qui attend (`denyAll`).
+/// Pending requests of a page (tab, Peek or mini window), shown one at a time in its banner, in order of arrival.
+/// Without an answer, the page waits: nothing is granted or denied on its own. A new document in the page, or the page
+/// closed, denies what is pending (`denyAll`).
 @MainActor
 @Observable
 final class PermissionPromptQueue {
     private(set) var requests: [SitePermissionRequest] = []
 
-    /// Demande affichée.
+    /// Displayed request.
     var current: SitePermissionRequest? {
         requests.first
     }
@@ -40,8 +40,8 @@ final class PermissionPromptQueue {
         requests.append(request)
     }
 
-    /// Réponse au bandeau : la demande affichée la reçoit et la décision est retenue s'il y a lieu ; les suivantes que
-    /// cette décision tranche partent aussi.
+    /// Answer from the banner: the displayed request receives it and the decision is remembered if appropriate; the
+    /// following ones that this decision settles leave too.
     func answer(_ answer: SitePermissionAnswer) {
         guard !requests.isEmpty else {
             return
@@ -58,7 +58,7 @@ final class PermissionPromptQueue {
         resolveDecided()
     }
 
-    /// Refuse tout ce qui attend : la page a changé de document ou se ferme.
+    /// Denies everything that is pending: the page changed document or is closing.
     func denyAll() {
         guard !requests.isEmpty else {
             return
@@ -69,7 +69,7 @@ final class PermissionPromptQueue {
         pending.forEach { $0.response.send(false) }
     }
 
-    /// Répond aux demandes en attente qu'une décision retenue tranche désormais.
+    /// Answers the pending requests that a remembered decision now settles.
     private func resolveDecided() {
         var remaining: [SitePermissionRequest] = []
         for request in requests {

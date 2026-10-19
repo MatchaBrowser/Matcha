@@ -3,55 +3,55 @@ import Observation
 import OSLog
 import WebKit
 
-/// Extensions web de l'app (tâche 6.3) : un seul `WKWebExtensionController`, branché sur la configuration de toutes les
-/// pages (`WebConfigurationFactory`), fenêtres privées comprises ; les extensions n'y voient et n'y injectent rien tant
-/// qu'elles n'ont pas l'accès aux données privées (`hasAccessToPrivateData`, refusé par défaut, comme dans Safari).
+/// The app's web extensions (task 6.3): a single `WKWebExtensionController`, plugged into the configuration of all
+/// pages (`WebConfigurationFactory`), private windows included; extensions see and inject nothing there as long as they
+/// do not have access to private data (`hasAccessToPrivateData`, denied by default, as in Safari).
 ///
-/// - Chargement : `load(resourceBaseURL:identifier:)` (dossier décompressé) ; au lancement (`start`), les extensions
-///   actives de `Application Support/Extensions/<identifiant>/` (`ExtensionInstallDirectory`). L'identifiant fixe
-///   l'adresse des pages de l'extension (`webkit-extension://<identifiant>/`) et son stockage, gardés d'un lancement à
-///   l'autre (contrôleur persistant, `.default()`).
-/// - Décisions de l'utilisateur (permissions, sites, fenêtres privées) : retenues par `ExtensionStateStore`, remises à
-///   chaque chargement ; jamais rien d'accordé sans lui.
-/// - Fenêtres et onglets : `ExtensionWindows` ; délégué du contrôleur : `+Delegate`.
+/// - Loading: `load(resourceBaseURL:identifier:)` (unpacked folder); at launch (`start`), the enabled extensions of
+///   `Application Support/Extensions/<identifier>/` (`ExtensionInstallDirectory`). The identifier sets the address of
+///   the extension's pages (`webkit-extension://<identifier>/`) and its storage, kept from one launch to the next
+///   (persistent controller, `.default()`).
+/// - User decisions (permissions, websites, private windows): remembered by `ExtensionStateStore`, restored at each
+///   load; nothing is ever granted without the user.
+/// - Windows and tabs: `ExtensionWindows`; controller delegate: `+Delegate`.
 @MainActor
 @Observable
 final class ExtensionManager: NSObject {
-    /// Schéma des pages des extensions (options, popup, arrière-plan).
+    /// Scheme of the extension pages (options, popup, background).
     nonisolated static let scheme = "webkit-extension"
 
-    /// Instance de l'app ; dans l'app hôte des tests unitaires et avec une base de test (tests d'interface), un
-    /// contrôleur non persistant, sans rien d'enregistré ni de chargé.
+    /// The app's instance; in the unit tests' host app and with a test store (UI tests), a non-persistent controller,
+    /// with nothing saved or loaded.
     static let shared = ExtensionManager.makeShared()
 
     @ObservationIgnored let controller: WKWebExtensionController
     @ObservationIgnored let windows = ExtensionWindows()
     @ObservationIgnored let store: ExtensionStateStore
-    /// Dossier des extensions installées ; nil (tests) : aucun chargement au lancement.
+    /// Folder of the installed extensions; nil (tests): nothing loaded at launch.
     @ObservationIgnored let directory: URL?
-    /// Demande à l'utilisateur ce qu'une extension réclame (remplacé dans les tests).
+    /// Asks the user what an extension requests (replaced in the tests).
     @ObservationIgnored var permissionPrompter: any ExtensionPermissionPrompting = ExtensionPermissionAlert()
-    /// Bulles des actions des extensions ; la tâche 6.5 les ancrera à leur bouton.
+    /// Popovers of the extensions' actions; task 6.5 will anchor them to their button.
     @ObservationIgnored let popups = ExtensionPopupPresenter()
-    /// Extensions chargées, par identifiant.
+    /// Loaded extensions, by identifier.
     private(set) var contexts: [String: WKWebExtensionContext] = [:]
-    /// Extensions installées, chargées ou non, par identifiant (tâche 6.4) : de quoi les montrer dans les réglages.
+    /// Installed extensions, loaded or not, by identifier (task 6.4): what is needed to show them in the settings.
     private(set) var installed: [String: WKWebExtension] = [:]
-    /// Change à chaque mise à jour d'une action (icône, titre, badge) : les boutons la suivent (tâche 6.5).
+    /// Changes at each update of an action (icon, title, badge): the buttons follow it (task 6.5).
     private(set) var actionRevision = 0
-    /// Change quand les boutons à montrer changent (bouton masqué ou affiché, fenêtres privées ; tâche 6.5).
+    /// Changes when the buttons to show change (button hidden or shown, private windows; task 6.5).
     private(set) var buttonsRevision = 0
-    /// Boutons des extensions affichés, pour y ancrer leur bulle (tâche 6.5).
+    /// Displayed extension buttons, to anchor their popover to them (task 6.5).
     @ObservationIgnored let buttonAnchors = ExtensionButtonAnchors()
-    /// Réponses aux messages natifs (refusés), espacées par extension.
+    /// Answers to native messages (refused), spaced out per extension.
     @ObservationIgnored var nativeMessages = NativeMessageThrottle()
-    /// Extensions dont un message natif a déjà été refusé (une ligne de journal chacune).
+    /// Extensions that already had a native message refused (one log line each).
     @ObservationIgnored var nativeMessageSenders: Set<String> = []
     @ObservationIgnored var isStarted = false
     @ObservationIgnored var observers: [any NSObjectProtocol] = []
 
     init(configuration: WKWebExtensionController.Configuration, store: ExtensionStateStore, directory: URL?) {
-        // Pages des extensions (popup, options, arrière-plan) : présentées aux sites comme Safari, comme les onglets.
+        // Extension pages (popup, options, background): presented to websites as Safari, like the tabs.
         let pages = WKWebViewConfiguration()
         pages.applicationNameForUserAgent = WebConfigurationFactory.applicationNameForUserAgent
         WebInspection.apply(to: pages.preferences)
@@ -63,15 +63,15 @@ final class ExtensionManager: NSObject {
         controller.delegate = self
         windows.sink = controller
         observeContexts()
-        // Outils pour développeurs : pages des extensions inspectables (Safari > Développement) selon le réglage.
+        // Developer tools: extension pages inspectable (Safari > Develop) depending on the setting.
         observers
             .append(NotificationCenter.default.addObserver(forName: WebInspection.didChange, object: nil, queue: .main) { [weak self] _ in
                 MainActor.assumeIsolated {
                     self?.contexts.values.forEach { $0.isInspectable = WebInspection.isEnabled() }
                 }
             })
-        // Bulle d'une action sous le bouton de son extension (dans la fenêtre et, s'il y en a plusieurs, la carte de
-        // l'onglet visé), sinon au coin haut droit de la fenêtre.
+        // An action's popover below its extension's button (in the window and, if there are several, the card of the
+        // targeted tab), otherwise at the top right corner of the window.
         popups.anchor = { [weak self] action, window in
             guard let self, let context = action.webExtensionContext, let identifier = identifier(of: context),
                   let view = buttonAnchors.view(for: identifier, tabID: (action.associatedTab as? ExtensionTab)?.tabID, in: window)
@@ -83,8 +83,8 @@ final class ExtensionManager: NSObject {
     }
 
     private static func makeShared() -> ExtensionManager {
-        // App hôte des tests unitaires, et base de test (tests d'interface) : rien de l'utilisateur n'est lu ni écrit
-        // (mêmes réglages et même conteneur que l'app).
+        // Host app of the unit tests, and test store (UI tests): nothing of the user's is read or written (same
+        // settings and same container as the app).
         let isUnitTesting = ProcessInfo.processInfo.environment["XCTestConfigurationFilePath"] != nil
         guard !isUnitTesting, !UserDefaults.standard.bool(forKey: BrowserSession.inMemoryStoreKey) else {
             return ExtensionManager(configuration: .nonPersistent(), store: ExtensionStateStore(defaults: nil), directory: nil)
@@ -97,25 +97,25 @@ final class ExtensionManager: NSObject {
         )
     }
 
-    /// Vrai pour une adresse de page d'extension.
+    /// True for the address of an extension page.
     nonisolated static func isExtensionURL(_ url: URL?) -> Bool {
         url?.scheme?.lowercased() == scheme
     }
 
-    /// Branche les extensions sur une configuration de pages (`WebConfigurationFactory`).
+    /// Plugs the extensions into a page configuration (`WebConfigurationFactory`).
     func attach(to configuration: WKWebViewConfiguration) {
         configuration.webExtensionController = controller
     }
 
-    /// Extension dont `url` est une page, si elle est chargée.
+    /// Extension of which `url` is a page, if it is loaded.
     func context(for url: URL) -> WKWebExtensionContext? {
         controller.extensionContext(for: url)
     }
 
-    // MARK: Chargement
+    // MARK: Loading
 
-    /// Lit l'extension installée `identifier` (dossier des extensions ou `.appex` d'une app), sans la charger ; elle
-    /// rejoint `installed`.
+    /// Reads the installed extension `identifier` (extensions folder or an app's `.appex`) without loading it; it joins
+    /// `installed`.
     @discardableResult
     func read(_ identifier: String) async throws -> WKWebExtension {
         let webExtension: WKWebExtension
@@ -133,16 +133,15 @@ final class ExtensionManager: NSObject {
         return webExtension
     }
 
-    /// Charge l'extension du dossier `url` (décompressé, avec son `manifest.json`) sous l'identifiant `identifier`, avec
-    /// les décisions retenues pour lui ; elle est désormais active.
+    /// Loads the extension of folder `url` (unpacked, with its `manifest.json`) under identifier `identifier`, with the
+    /// decisions remembered for it; it is now enabled.
     @discardableResult
     func load(resourceBaseURL url: URL, identifier: String) async throws -> WKWebExtensionContext {
         let webExtension = try await WKWebExtension(resourceBaseURL: url)
         return try load(webExtension, identifier: identifier)
     }
 
-    /// Charge `webExtension` sous l'identifiant `identifier`, avec les décisions retenues pour lui ; elle est désormais
-    /// active.
+    /// Loads `webExtension` under identifier `identifier`, with the decisions remembered for it; it is now enabled.
     @discardableResult
     func load(_ webExtension: WKWebExtension, identifier: String) throws -> WKWebExtensionContext {
         guard ExtensionInstallDirectory.isValidIdentifier(identifier) else {
@@ -158,7 +157,7 @@ final class ExtensionManager: NSObject {
         }
         context.isInspectable = WebInspection.isEnabled()
         (store.state(for: identifier) ?? ExtensionState()).apply(to: context)
-        // WebKit demande les fenêtres ouvertes pendant le chargement : elles doivent être à jour.
+        // WebKit asks for the open windows during loading: they must be up to date.
         windows.update()
         try controller.load(context)
         contexts[identifier] = context
@@ -169,7 +168,7 @@ final class ExtensionManager: NSObject {
         return context
     }
 
-    /// Décharge l'extension `identifier` (ses décisions sont retenues).
+    /// Unloads extension `identifier` (its decisions are remembered).
     func unload(identifier: String) {
         guard let context = contexts.removeValue(forKey: identifier) else {
             return
@@ -183,17 +182,17 @@ final class ExtensionManager: NSObject {
         }
     }
 
-    /// Oublie l'extension désinstallée `identifier` (`+Installed`).
+    /// Forgets the uninstalled extension `identifier` (`+Installed`).
     func forget(_ identifier: String) {
         installed[identifier] = nil
     }
 
-    /// Une action a changé (tâche 6.5 : boutons des extensions).
+    /// An action changed (task 6.5: extension buttons).
     func actionDidUpdate() {
         actionRevision &+= 1
     }
 
-    /// Les boutons à montrer ont changé (tâche 6.5).
+    /// The buttons to show have changed (task 6.5).
     func buttonsDidChange() {
         buttonsRevision &+= 1
     }

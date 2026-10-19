@@ -3,9 +3,9 @@ import Foundation
 import Testing
 import WebKit
 
-/// Ce que fait WebKit des listes de blocage, sur lequel repose la tâche 6.2 (`DECISIONS.md`) : une règle
-/// `ignore-previous-rules` n'agit que dans sa propre liste (d'où des exceptions par page, et non une liste d'exceptions
-/// à part) ; une liste de plus de 150 000 règles est refusée, puis découpée par `BlocklistLoader`.
+/// What WebKit does with blocking lists, which task 6.2 relies on (`DECISIONS.md`): an `ignore-previous-rules`
+/// rule only acts within its own list (hence exceptions per page, and not a separate list of exceptions); a list
+/// of more than 150,000 rules is rejected, then split by `BlocklistLoader`.
 @MainActor
 final class ContentRuleListWebKitTests {
     private let store: WKContentRuleListStore
@@ -21,14 +21,14 @@ final class ContentRuleListWebKitTests {
 
     private static let block = #"{"trigger":{"url-filter":"^obtest://blocked\\.test/"},"action":{"type":"block"}}"#
     private static let hide = #"{"trigger":{"url-filter":".*"},"action":{"type":"css-display-none","selector":".ad"}}"#
-    /// Exception de la page d'essai (`obtest://pages/…`, domaine « pages »), comme une exception de site l'écrirait.
+    /// Exception for the test page (`obtest://pages/…`, domain “pages”), as a site exception would write it.
     private static let ignore = #"{"trigger":{"url-filter":".*","if-domain":["*pages"]},"action":{"type":"ignore-previous-rules"}}"#
 
     private func compile(_ identifier: String, _ rules: [String]) async throws -> WKContentRuleList {
         try await store.compile(identifier, rules: "[" + rules.joined(separator: ",") + "]")
     }
 
-    /// Page d'essai chargée dans une vue munie de `lists`.
+    /// Test page loaded in a view equipped with `lists`.
     private func outcome(with lists: [WKContentRuleList]) async throws -> BlockerTestPages.Outcome {
         let configuration = TestPages.configuration()
         lists.forEach(configuration.userContentController.add)
@@ -42,13 +42,13 @@ final class ContentRuleListWebKitTests {
         #expect(try await outcome(with: [rules]) == .blocked)
         let sameList = try await compile("same-list", [Self.block, Self.hide, Self.ignore])
         #expect(try await outcome(with: [sameList]) == .open)
-        // Liste d'exceptions à part, posée après comme avant : sans effet sur l'autre liste.
+        // Separate exception list, set after as well as before: no effect on the other list.
         let exceptions = try await compile("exceptions", [Self.ignore])
         #expect(try await outcome(with: [rules, exceptions]) == .blocked)
         #expect(try await outcome(with: [exceptions, rules]) == .blocked)
     }
 
-    /// Refus réel de WebKit (150 001 règles), reconnu, puis liste découpée en deux parts qui se compilent.
+    /// Actual rejection by WebKit (150,001 rules), recognized, then list split into two parts that compile.
     @Test func `a list too big for WebKit is refused then split`() async throws {
         let count = RuleListSplitter.webKitMaximumRuleCount + 1
         let rules = "[" + Array(repeating: Self.block, count: count).joined(separator: ",") + "]"
@@ -58,7 +58,7 @@ final class ContentRuleListWebKitTests {
         #expect(refusal.map(ContentRuleListError.isTooManyRules) == true)
 
         var loader = BlocklistLoader(store: store) { _ in Data(rules.utf8) }
-        // Sans découpe d'avance : c'est le refus de WebKit qui la déclenche.
+        // No splitting in advance: WebKit's rejection is what triggers it.
         loader.maximumRuleCount = .max
         let entry = BlocklistEntry(identifier: "big", name: "Big", version: "1", file: "big.json")
         let loaded = try #require(await loader.load([entry], previous: []).first)

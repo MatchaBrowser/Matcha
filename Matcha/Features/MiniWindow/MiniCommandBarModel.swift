@@ -2,28 +2,28 @@ import Foundation
 import Observation
 import OSLog
 
-/// Ce que la barre d'une mini-fenêtre est en train de faire.
+/// What the bar of a mini window is currently doing.
 nonisolated enum MiniCommandBarMode: Equatable, Sendable {
-    /// ⌥⌘N, ⌘T : saisie neuve, la page de la mini-fenêtre sera remplacée.
+    /// ⌥⌘N, ⌘T: fresh input, the mini window's page will be replaced.
     case newSearch
-    /// ⌘L, clic sur l'adresse : l'adresse de la page, sélectionnée.
+    /// ⌘L, click on the address: the page's address, selected.
     case editAddress
 }
 
-/// Suite donnée à Entrée ou à un clic sur une ligne de la barre d'une mini-fenêtre.
+/// What follows Return or a click on a row of a mini window's bar.
 nonisolated enum MiniCommandBarSubmission: Equatable, Sendable {
-    /// Charger l'adresse dans la mini-fenêtre.
+    /// Load the address in the mini window.
     case load(URL)
-    /// Copier l'adresse de la page.
+    /// Copy the page's address.
     case copyURL
-    /// Rien à faire : la barre reste ouverte.
+    /// Nothing to do: the bar stays open.
     case ignore
 }
 
-/// Barre de commande d'une mini-fenêtre : le texte tapé (adresse ou recherche), l'historique et les
-/// suggestions du moteur, jamais d'onglets ni d'actions (la mini-fenêtre n'a qu'une page). Même
-/// déroulé que `CommandBarModel` : lignes reconstruites à chaque frappe, puis une tâche interroge
-/// l'historique puis les suggestions.
+/// Command bar of a mini window: the typed text (address or search), the history and the
+/// engine's suggestions, never tabs or actions (the mini window has only one page). Same
+/// flow as `CommandBarModel`: rows rebuilt on each keystroke, then a task queries
+/// the history, then the suggestions.
 @MainActor
 @Observable
 final class MiniCommandBarModel: CommandBarPanelModel {
@@ -35,20 +35,20 @@ final class MiniCommandBarModel: CommandBarPanelModel {
     private(set) var focusRequest = 0
     private(set) var searchEngine = SearchEngine.defaultEngine
 
-    /// Page de la mini-fenêtre.
+    /// The mini window's page.
     @ObservationIgnored let tab: BrowserTab
     @ObservationIgnored private let faviconService: FaviconService
-    /// Historique puis suggestions (toujours en dernier).
+    /// History, then suggestions (always last).
     @ObservationIgnored private let providers: [any CommandProvider]
     @ObservationIgnored private let ranker: CommandRanker
     @ObservationIgnored private let now: () -> Date
     @ObservationIgnored private var context = CommandContext()
     @ObservationIgnored private var candidates: [[CommandCandidate]]
-    /// Adresse de ⌘L tant que le texte n'a pas été modifié.
+    /// Address from ⌘L as long as the text has not been edited.
     @ObservationIgnored private var pristineURL: URL?
     @ObservationIgnored private var queryTask: Task<Void, Never>?
 
-    /// Sans effet de bord : rien n'est lancé avant la première ouverture.
+    /// Free of side effects: nothing is started before the first opening.
     init(
         tab: BrowserTab,
         faviconService: FaviconService,
@@ -69,20 +69,20 @@ final class MiniCommandBarModel: CommandBarPanelModel {
         rows.first { $0.id == selectedRowID }
     }
 
-    /// Icône du champ : celle du site quand on modifie l'adresse de la page.
+    /// Icon of the field: the site's icon when editing the page's address.
     var editedTab: BrowserTab? {
         mode == .editAddress && tab.url != nil ? tab : nil
     }
 
-    /// Aucune ligne d'onglet dans cette barre.
+    /// No tab row in this bar.
     var rowIcons: CommandRowIcons {
         CommandRowIcons(faviconService: faviconService) { _ in nil }
     }
 
-    // MARK: Ouverture
+    // MARK: Opening
 
-    /// Déjà ouverte dans le même mode : le texte reste, le champ reprend seulement le clavier.
-    /// `.editAddress` sans page revient à `.newSearch`.
+    /// Already open in the same mode: the text stays, the field only takes the keyboard back.
+    /// `.editAddress` without a page falls back to `.newSearch`.
     func present(_ requested: MiniCommandBarMode, settings: CommandBarSettings) {
         let newMode = tab.url == nil ? .newSearch : requested
         focusRequest += 1
@@ -102,7 +102,7 @@ final class MiniCommandBarModel: CommandBarPanelModel {
         Logger.miniWindow.debug("Barre de la mini-fenêtre ouverte")
     }
 
-    /// Réglages modifiés pendant que la barre est ouverte : moteur et suggestions suivent aussitôt.
+    /// Settings changed while the bar is open: engine and suggestions follow immediately.
     func apply(_ settings: CommandBarSettings) {
         let newContext = makeContext(settings)
         guard isPresented, settings.searchEngine != searchEngine || newContext != context else {
@@ -118,7 +118,7 @@ final class MiniCommandBarModel: CommandBarPanelModel {
         startQuery(CommandQuery(text: text, searchEngine: searchEngine))
     }
 
-    // MARK: Saisie et sélection
+    // MARK: Input and selection
 
     func updateText(_ newText: String) {
         guard isPresented, newText != text else {
@@ -143,7 +143,7 @@ final class MiniCommandBarModel: CommandBarPanelModel {
         selectedRowID = rows[min(max(current + delta, 0), rows.count - 1)].id
     }
 
-    /// Suite à donner à Entrée (`rowID` nil : la ligne sélectionnée) ou à un clic sur une ligne.
+    /// What follows Return (`rowID` nil: the selected row) or a click on a row.
     func submission(for rowID: CommandRow.ID?) -> MiniCommandBarSubmission {
         guard isPresented else {
             return .ignore
@@ -176,14 +176,14 @@ final class MiniCommandBarModel: CommandBarPanelModel {
         mode = .newSearch
     }
 
-    /// Tests : attend la fin de la recherche en cours.
+    /// Tests: waits for the current search to finish.
     func waitForPendingResults() async {
         await queryTask?.value
     }
 
-    // MARK: Résultats
+    // MARK: Results
 
-    /// Jamais privée : une mini-fenêtre utilise toujours le profil d'un Space.
+    /// Never private: a mini window always uses the profile of a Space.
     private func makeContext(_ settings: CommandBarSettings) -> CommandContext {
         CommandContext(isPrivate: false, showsSearchSuggestions: settings.showsSearchSuggestions)
     }
@@ -233,7 +233,7 @@ final class MiniCommandBarModel: CommandBarPanelModel {
         queryTask = nil
     }
 
-    /// « Copier l'URL », la seule action de la barre d'une mini-fenêtre (lignes de ⌘L non modifié).
+    /// “Copy URL”, the only action of a mini window's bar (rows of an unedited ⌘L).
     private static var copyURLCandidate: CommandCandidate {
         CommandCandidate(
             kind: .action(.copyURL, keywords: CommandActionID.copyURL.keywords),

@@ -2,8 +2,8 @@ import Foundation
 @testable import Matcha
 import Testing
 
-/// Exceptions du bloqueur (tâche 6.2), sans page web : site d'une adresse, sites relus, enregistrement dans les
-/// réglages ou en mémoire seulement ; vues d'une session (enregistrées, ou en mémoire pour une fenêtre privée).
+/// Blocker exceptions (task 6.2), without a web page: site of an address, sites read back, saving in the settings
+/// or in memory only; views of a session (saved, or in memory for a private window).
 @MainActor
 struct ContentBlockerExceptionsTests {
     private let suiteName = "ContentBlockerExceptionsTests-\(UUID().uuidString)"
@@ -75,7 +75,7 @@ struct ContentBlockerExceptionsTests {
         #expect(service.exceptions.sites.isEmpty)
     }
 
-    /// Fenêtre privée : elle suit les exceptions enregistrées, mais ses changements restent à elle.
+    /// Private window: it follows the saved exceptions, but its changes stay its own.
     @Test func `a private session keeps its changes in memory`() {
         let service = ContentBlockerService(defaults: defaults)
         service.setException(true, forSite: "saved.com")
@@ -92,8 +92,8 @@ struct ContentBlockerExceptionsTests {
         #expect(defaults.stringArray(forKey: ContentBlockerExceptions.defaultsKey) == ["saved.com"])
     }
 
-    /// Une fenêtre privée et une base de test n'enregistrent jamais d'exception ; onglets et fenêtres de connexion
-    /// passent par le bloqueur de leur session.
+    /// A private window and a test store never save an exception; tabs and sign-in windows go through their
+    /// session's blocker.
     @Test func `sessions give their scope to their pages`() throws {
         let privateSession = BrowserSession.makePrivate()
         #expect(!privateSession.contentBlocking.savesExceptions)

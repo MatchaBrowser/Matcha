@@ -1,14 +1,14 @@
 import SwiftUI
 
-/// Grille de symboles SF à choisir, à la largeur disponible : le symbole choisi est entouré, chacun a son nom en bulle
-/// d'aide et pour VoiceOver. Icône d'un dossier (panneau de personnalisation) ou d'un Space (`SpaceEditor`).
+/// Grid of SF Symbols to choose from, at the available width: the chosen symbol is circled, each has its name as a
+/// tooltip and for VoiceOver. Icon of a folder (customization panel) or of a Space (`SpaceEditor`).
 struct SymbolPickerGrid: View {
     static let cellSize = 24.0
 
     let symbols: [SymbolChoice]
-    /// Nom du symbole choisi, nil si aucun ne l'est.
+    /// Name of the chosen symbol, nil if none is.
     let selection: String?
-    /// Préfixe des identifiants d'accessibilité : « <préfixe>.<nom du symbole> ».
+    /// Prefix of the accessibility identifiers: “<prefix>.<symbol name>”.
     let identifierPrefix: String
     let choose: (String) -> Void
 
@@ -33,7 +33,7 @@ struct SymbolPickerGrid: View {
     }
 }
 
-/// Case d'une grille de choix : fond léger au survol, teinte et contour de la couleur d'accent si elle est choisie.
+/// Cell of a choice grid: light background on hover, tint and outline in the accent color if it is chosen.
 struct PickerCellButtonStyle: ButtonStyle {
     let isSelected: Bool
 

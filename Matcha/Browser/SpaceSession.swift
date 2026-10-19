@@ -4,8 +4,8 @@ import OSLog
 import SwiftData
 import WebKit
 
-/// Un Space en cours d'exécution : son enregistrement, son thème, ses onglets et leur enregistrement
-/// automatique.
+/// A running Space: its record, its theme, its tabs and their automatic
+/// saving.
 @MainActor
 @Observable
 final class SpaceSession: Identifiable {
@@ -13,19 +13,19 @@ final class SpaceSession: Identifiable {
     @ObservationIgnored let tabManager: TabManager
     @ObservationIgnored let store: SpaceStore
     @ObservationIgnored private let context: ModelContext
-    /// Profil du Space à son ouverture : ses onglets en ont les données (cookies, stockage).
+    /// Profile of the Space when it was opened: its tabs hold that profile's data (cookies, storage).
     @ObservationIgnored let openedProfileID: UUID?
-    /// Couleurs du fond et de la barre latérale.
+    /// Colors of the background and of the sidebar.
     private(set) var theme: SpaceTheme
 
     var id: UUID {
         record.id
     }
 
-    /// Recharge les onglets enregistrés du Space et enregistre ensuite chaque changement.
-    /// `websiteDataStore` : magasin de données du profil du Space ; `downloadScope` : celui de la fenêtre ;
-    /// `sitePermissions` : décisions de permission de la session, vues pour le profil du Space ; `siteZooms` : zoom des
-    /// pages par site de la session ; `history` : historique de la session (nil pour une fenêtre privée).
+    /// Reloads the saved tabs of the Space, then saves each change.
+    /// `websiteDataStore`: data store of the Space's profile; `downloadScope`: that of the window;
+    /// `sitePermissions`: permission decisions of the session, seen for the Space's profile; `siteZooms`: per-site page
+    /// zoom of the session; `history`: history of the session (nil for a private window).
     init(
         record: SpaceRecord,
         context: ModelContext,
@@ -50,7 +50,7 @@ final class SpaceSession: Identifiable {
         store.startAutosave(of: tabManager)
     }
 
-    /// Change le thème et l'enregistre.
+    /// Changes the theme and saves it.
     func setTheme(_ newTheme: SpaceTheme) {
         theme = newTheme
         record.themeData = newTheme.encoded()
@@ -61,7 +61,7 @@ final class SpaceSession: Identifiable {
         }
     }
 
-    /// Relit le thème enregistré (changé par un autre Mac).
+    /// Reads the saved theme again (changed by another Mac).
     func reloadTheme() {
         let saved = SpaceTheme.decoded(from: record.themeData) ?? .default
         if saved != theme {
@@ -69,15 +69,15 @@ final class SpaceSession: Identifiable {
         }
     }
 
-    /// Icône du Space, lue dans son enregistrement (observé : la barre suit ses changements).
+    /// Icon of the Space, read from its record (observed: the sidebar follows its changes).
     var icon: SidebarIcon {
         record.icon
     }
 
-    /// Change l'icône et l'enregistre : un symbole ou un emoji invalide donne le cercle, `.default` aussi. Rien n'est
-    /// enregistré si elle ne change pas.
+    /// Changes the icon and saves it: an invalid symbol or emoji gives the circle, and so does `.default`. Nothing is
+    /// saved if it does not change.
     func setIcon(_ newIcon: SidebarIcon) {
-        // Aller-retour par la forme enregistrée : la même icône que celle relue au lancement suivant.
+        // Round trip through the stored form: the same icon as the one read back at the next launch.
         let icon = SidebarIcon(spaceSymbol: newIcon.spaceSymbol)
         guard icon.spaceSymbol != record.symbol else {
             return
@@ -90,14 +90,14 @@ final class SpaceSession: Identifiable {
         }
     }
 
-    /// Enregistre tout de suite, avec l'état de navigation de chaque onglet chargé (fermeture de l'app).
+    /// Saves right away, with the navigation state of each loaded tab (app quitting).
     func saveNow() {
         tabManager.captureInteractionStates()
         store.saveNow(tabManager)
     }
 
-    /// Space supprimé : plus d'enregistrement, et son aperçu, ses onglets du jour et épinglés libèrent leur vue web.
-    /// Les favoris, communs au profil, restent ouverts dans les autres Spaces.
+    /// Space deleted: no more saving, and its Peek, today tabs and pinned tabs release their web view.
+    /// The favorites, shared across the profile, stay open in the other Spaces.
     func close() {
         store.stop()
         tabManager.closePeek()

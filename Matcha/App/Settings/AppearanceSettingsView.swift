@@ -1,6 +1,6 @@
 import SwiftUI
 
-/// Réglages d'apparence.
+/// Appearance settings.
 struct AppearanceSettingsView: View {
     @AppStorage(BrowserSettings.Key.appearance) private var appearance = BrowserSettings.appearance
     @AppStorage(BrowserSettings.Key.showsHomeButton) private var showsHomeButton = BrowserSettings.showsHomeButton

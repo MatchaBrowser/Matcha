@@ -1,8 +1,8 @@
 import AppKit
 import SwiftUI
 
-/// Donne accès à la `NSWindow` qui héberge la vue, pour régler ce que SwiftUI n'expose pas.
-/// `configure` est appelé chaque fois que la vue rejoint une fenêtre.
+/// Gives access to the `NSWindow` hosting the view, to adjust what SwiftUI does not expose.
+/// `configure` is called each time the view joins a window.
 struct WindowAccessor: NSViewRepresentable {
     let configure: (NSWindow) -> Void
 
@@ -16,7 +16,7 @@ struct WindowAccessor: NSViewRepresentable {
         view.onWindowChange = configure
     }
 
-    /// Vue invisible qui signale son arrivée dans une fenêtre.
+    /// Invisible view that reports its arrival in a window.
     final class WindowObservingView: NSView {
         var onWindowChange: ((NSWindow) -> Void)?
 

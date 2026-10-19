@@ -2,13 +2,13 @@ import Foundation
 import OSLog
 import SwiftData
 
-/// Suppression dans l'historique : des visites choisies, une période, tout un profil.
+/// Deletion in the history: chosen visits, a period, a whole profile.
 extension HistoryStore {
-    /// Identifiants passés à la base par lots : un seul prédicat avec des dizaines de milliers de valeurs dépasserait
-    /// les limites de SQLite.
+    /// Identifiers passed to the database in batches: a single predicate with tens of thousands of values would
+    /// exceed SQLite's limits.
     private static let deletionBatchSize = 500
 
-    /// Supprime ces visites du profil (lignes de la fenêtre de l'historique).
+    /// Deletes these visits from the profile (rows of the history window).
     func deleteVisits(_ ids: Set<UUID>, profileID: UUID?) {
         guard !ids.isEmpty else {
             return
@@ -24,7 +24,7 @@ extension HistoryStore {
         Logger.history.info("\(ids.count, privacy: .public) visites supprimées")
     }
 
-    /// « Effacer l'historique… » : les visites du profil faites pendant `period`.
+    /// “Clear History…”: the profile's visits made during `period`.
     func clear(_ period: HistoryPeriod, profileID: UUID?) {
         forgetRecentRecords()
         let start = period.start(now: now(), calendar: calendar)
@@ -38,7 +38,7 @@ extension HistoryStore {
         Logger.history.info("Historique effacé (\(period.rawValue, privacy: .public))")
     }
 
-    /// Profil supprimé : tout son historique.
+    /// Deleted profile: its whole history.
     func removeAll(profileID: UUID?) {
         clear(.allHistory, profileID: profileID)
     }

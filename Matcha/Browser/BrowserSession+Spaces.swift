@@ -2,22 +2,22 @@ import Foundation
 import OSLog
 import SwiftData
 
-/// Création, renommage et suppression des Spaces.
+/// Creating, renaming and deleting Spaces.
 extension BrowserSession {
-    /// Symboles donnés tour à tour aux nouveaux Spaces ; ce sont les premiers de leur grille d'icônes
+    /// Symbols given in turn to new Spaces; they are the first ones of their icon grid
     /// (`SymbolChoice.spaceIcons`).
     static let spaceSymbols = [
         "circle.fill", "star.fill", "heart.fill", "bolt.fill", "leaf.fill", "moon.fill", "flame.fill", "briefcase.fill", "house.fill",
     ]
 
-    /// Crée un Space dans le profil de `anchor` (ou du premier Space), avec une icône et un thème
-    /// prédéfini différents des précédents, et l'ajoute à la fin.
+    /// Creates a Space in the profile of `anchor` (or of the first Space), with an icon and a preset theme
+    /// different from the previous ones, and appends it at the end.
     @discardableResult
     func addSpace(inProfileOf anchor: SpaceSession?) -> SpaceSession {
         addSpace(in: anchor?.record.profile ?? spaces.first?.record.profile)
     }
 
-    /// Crée un Space dans `profile`, avec une icône et un thème prédéfini différents des précédents.
+    /// Creates a Space in `profile`, with an icon and a preset theme different from the previous ones.
     @discardableResult
     func addSpace(in profile: ProfileRecord?) -> SpaceSession {
         let context = container.mainContext
@@ -34,8 +34,8 @@ extension BrowserSession {
         return openSpace(record)
     }
 
-    /// Ouvre le Space enregistré `record` (déjà inséré, avec ses onglets et dossiers : import, tâche 7.1) et l'ajoute
-    /// à la fin.
+    /// Opens the saved Space `record` (already inserted, with its tabs and folders: import, task 7.1) and appends it
+    /// at the end.
     @discardableResult
     func openSpace(_ record: SpaceRecord) -> SpaceSession {
         let space = SpaceSession(
@@ -52,7 +52,7 @@ extension BrowserSession {
         return space
     }
 
-    /// Renomme le Space ; un nom vide garde l'ancien.
+    /// Renames the Space; an empty name keeps the old one.
     func renameSpace(_ space: SpaceSession, to name: String) {
         let trimmed = name.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !trimmed.isEmpty else {
@@ -62,7 +62,7 @@ extension BrowserSession {
         save(container.mainContext)
     }
 
-    /// Supprime le Space, ses onglets et ses dossiers. Le dernier Space ne peut pas être supprimé.
+    /// Deletes the Space, its tabs and its folders. The last Space cannot be deleted.
     func deleteSpace(_ space: SpaceSession) {
         guard spaces.count > 1, spaces.contains(where: { $0 === space }) else {
             return

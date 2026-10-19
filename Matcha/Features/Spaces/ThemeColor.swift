@@ -1,6 +1,6 @@
 import Foundation
 
-/// Couleur sRGB enregistrable, composantes entre 0 et 1.
+/// Storable sRGB color, components between 0 and 1.
 nonisolated struct ThemeColor: Codable, Hashable, Sendable {
     var red: Double
     var green: Double
@@ -12,7 +12,7 @@ nonisolated struct ThemeColor: Codable, Hashable, Sendable {
         self.blue = Self.clamp(blue)
     }
 
-    /// Mélange avec `other` : 0 donne cette couleur, 1 donne `other`.
+    /// Mix with `other`: 0 gives this color, 1 gives `other`.
     func mixed(with other: ThemeColor, amount: Double) -> ThemeColor {
         let amount = Self.clamp(amount)
         return ThemeColor(

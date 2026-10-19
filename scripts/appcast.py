@@ -1,9 +1,9 @@
-"""Ajoute une version à appcast.xml, le flux de mises à jour de Sparkle (tâche 8.5), créé s'il n'existe pas.
+"""Adds a version to appcast.xml, Sparkle's update feed (task 8.5), created if it doesn't exist.
 
     python3 -I scripts/appcast.py appcast.xml --version 412 --short-version 1.2.0 \
         --url https://…/Matcha-1.2.0.dmg --signature … --length 12345678 --minimum-system 15.4
 
-La nouvelle version passe en tête ; une version de même numéro est remplacée. Ne dépend que de Python.
+The new version goes first; a version with the same number is replaced. Depends only on Python.
 """
 
 import argparse

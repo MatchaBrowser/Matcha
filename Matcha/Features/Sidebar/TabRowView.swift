@@ -1,8 +1,7 @@
 import SwiftUI
 
-/// Ligne d'un onglet épinglé ou du jour : icône, titre, haut-parleur pendant que la page joue du son (tâche 5.10),
-/// bouton de fermeture au survol. On peut la faire glisser ; un onglet déposé dessus s'insère avant elle, à
-/// `dropDestination`.
+/// Row of a pinned or today tab: icon, title, speaker while the page plays sound (task 5.10), close button on
+/// hover. It can be dragged; a tab dropped on it is inserted before it, at `dropDestination`.
 struct TabRowView: View {
     let tab: BrowserTab
     let tabManager: TabManager
@@ -21,7 +20,7 @@ struct TabRowView: View {
             Text(tab.displayTitle)
                 .lineLimit(1)
                 .truncationMode(.tail)
-                // Onglet épinglé déchargé : présent mais en retrait. Un onglet en veille (tâche 5.6) ne change pas.
+                // Unloaded pinned tab: present but dimmed. A sleeping tab (task 5.6) does not change.
                 .foregroundStyle(tab.appearsLoaded ? .primary : .secondary)
             Spacer(minLength: 0)
             if tab.isPlayingAudio {
@@ -30,7 +29,7 @@ struct TabRowView: View {
                     if isHovered {
                         closeButton
                     } else {
-                        // Place du × : le haut-parleur ne bouge pas quand il apparaît, un clic ne ferme pas l'onglet.
+                        // Room for the ×: the speaker does not move when it appears, a click does not close the tab.
                         Color.clear.frame(width: SidebarIconButtonStyle.size)
                     }
                 }
@@ -60,7 +59,7 @@ struct TabRowView: View {
         .accessibilityAction { TabActivation.activate(tab, in: tabManager) }
         .accessibilityAction(named: "Close Tab") { tabManager.close(tab) }
         .accessibilityIdentifier("tabRow")
-        // « Lecture audio » ; en Debug, « suspended » pour un onglet en veille (tests d'interface de la tâche 5.6).
+        // “Playing Audio”; in Debug, “suspended” for a sleeping tab (UI tests of task 5.6).
         .tabAudioAccessibility(tab)
     }
 
@@ -72,7 +71,7 @@ struct TabRowView: View {
     }
 }
 
-/// Fond d'une ligne ou d'une tuile : marqué pour l'onglet sélectionné, léger au survol.
+/// Background of a row or a tile: marked for the selected tab, light on hover.
 struct SidebarRowBackground: View {
     let isSelected: Bool
     let isHovered: Bool

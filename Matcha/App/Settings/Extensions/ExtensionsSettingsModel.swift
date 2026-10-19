@@ -4,42 +4,42 @@ import OSLog
 import UniformTypeIdentifiers
 import WebKit
 
-/// État de Réglages > Extensions (tâche 6.4) : extensions installées, extensions Safari trouvées dans les apps,
-/// extension en attente de l'accord de l'utilisateur, et ses actions (ajouter, activer, supprimer…).
+/// State of Settings > Extensions (task 6.4): installed extensions, Safari extensions found in apps, the extension
+/// waiting for the user's approval, and its actions (add, enable, remove…).
 @MainActor
 @Observable
 final class ExtensionsSettingsModel {
-    /// Une extension installée, telle que la liste l'affiche.
+    /// An installed extension, as the list shows it.
     struct Installed: Identifiable {
         let id: String
         let name: String
         let version: String?
         let icon: NSImage?
-        /// App de l'extension Safari ; nil pour une extension installée depuis un fichier.
+        /// App of the Safari extension; nil for an extension installed from a file.
         let appName: String?
-        /// Introuvable : app supprimée, dossier effacé.
+        /// Cannot be found: app deleted, folder erased.
         let isMissing: Bool
         let isEnabled: Bool
         let hasOptionsPage: Bool
         let allowsPrivateWindows: Bool
-        /// Bouton près de l'adresse affiché (tâche 6.5).
+        /// Button next to the address shown (task 6.5).
         let showsButton: Bool
     }
 
     let manager: ExtensionManager
-    /// Extensions proposées par vos autres Mac (tâche 7.4).
+    /// Extensions offered by your other Macs (task 7.4).
     let syncAdapter: ExtensionSyncAdapter
     @ObservationIgnored private let installer: ExtensionInstaller
-    /// Extension proposée en cours d'ajout : retirée des propositions une fois installée.
+    /// Offered extension being added: removed from the offers once installed.
     @ObservationIgnored var installingOffer: SyncExtensionFields?
-    /// Extensions Safari des apps installées.
+    /// Safari extensions of the installed apps.
     private(set) var appExtensions: [SafariAppExtension] = []
-    /// Extension préparée, montrée dans l'écran des permissions.
+    /// Prepared extension, shown in the permissions screen.
     var candidate: ExtensionInstallCandidate?
-    /// Dernier échec (préparation, installation), dans la langue de l'utilisateur.
+    /// Last failure (preparation, installation), in the user's language.
     var errorMessage: String?
     private(set) var isWorking = false
-    /// Change à chaque action, pour relire ce qui n'est pas suivi (activée, fenêtres privées).
+    /// Changes on every action, to read again what is not tracked (enabled, private windows).
     private(set) var revision = 0
 
     init(manager: ExtensionManager, syncAdapter: ExtensionSyncAdapter) {
@@ -48,14 +48,14 @@ final class ExtensionsSettingsModel {
         installer = ExtensionInstaller(manager: manager)
     }
 
-    /// Extensions installées, par nom.
+    /// Installed extensions, by name.
     var installed: [Installed] {
         _ = revision
         let identifiers = Set(manager.installedIdentifiers).union(manager.installed.keys)
         return identifiers.map(entry(for:)).sorted { $0.name.localizedStandardCompare($1.name) == .orderedAscending }
     }
 
-    /// Vrai si l'extension Safari `appExtension` est déjà installée.
+    /// True if the Safari extension `appExtension` is already installed.
     func isInstalled(_ appExtension: SafariAppExtension) -> Bool {
         _ = revision
         guard let identifier = ExtensionIdentifier.forAppExtension(bundleIdentifier: appExtension.bundleIdentifier) else {
@@ -64,14 +64,14 @@ final class ExtensionsSettingsModel {
         return manager.installed[identifier] != nil || manager.store.state(for: identifier)?.appExtensionPath != nil
     }
 
-    // MARK: Ajouter
+    // MARK: Add
 
-    /// Relit les extensions Safari des apps (hors du fil principal : lecture de `/Applications`).
+    /// Reads the apps' Safari extensions again (off the main thread: reads `/Applications`).
     func refreshAppExtensions() async {
         appExtensions = await Task.detached { SafariExtensionFinder.find() }.value
     }
 
-    /// Choisir un fichier (`.crx`, `.xpi`, `.zip`) ou un dossier décompressé, puis le préparer.
+    /// Choose a file (`.crx`, `.xpi`, `.zip`) or an unpacked folder, then prepare it.
     func chooseFile() {
         let panel = NSOpenPanel()
         panel.canChooseFiles = true
@@ -89,8 +89,8 @@ final class ExtensionsSettingsModel {
         }
     }
 
-    /// App Store sur sa page des extensions Safari, comme « Plus d'extensions » de Safari ; à défaut de l'app App Store,
-    /// la même page dans un onglet.
+    /// App Store on its Safari extensions page, like Safari's “More Extensions”; without the App Store app, the
+    /// same page in a tab.
     func openAppStore() {
         if let url = URL(string: "macappstore://apps.apple.com/story/id1377753262"), NSWorkspace.shared.open(url) {
             return
@@ -100,7 +100,7 @@ final class ExtensionsSettingsModel {
         }
     }
 
-    /// Modules de Firefox (addons.mozilla.org) dans un onglet de Matcha, sinon dans le navigateur par défaut.
+    /// Firefox add-ons (addons.mozilla.org) in a Matcha tab, otherwise in the default browser.
     func openFirefoxAddOns() {
         guard let url = URL(string: "https://addons.mozilla.org/firefox/") else {
             return
@@ -110,13 +110,13 @@ final class ExtensionsSettingsModel {
         }
     }
 
-    /// Prépare l'extension Safari `appExtension`.
+    /// Prepares the Safari extension `appExtension`.
     func add(_ appExtension: SafariAppExtension) {
         Task { await prepare { try await $0.prepare(appExtension) } }
     }
 
-    /// Installe `candidate`, accepté dans l'écran des permissions (passé tel quel : fermer l'écran remet `candidate` à
-    /// nil avant que l'installation commence).
+    /// Installs `candidate`, accepted in the permissions screen (passed as is: closing the screen resets `candidate`
+    /// to nil before the installation starts).
     func confirm(_ candidate: ExtensionInstallCandidate, allowsPrivateWindows: Bool) async {
         if self.candidate?.id == candidate.id {
             self.candidate = nil
@@ -139,7 +139,7 @@ final class ExtensionsSettingsModel {
         }
     }
 
-    /// Refus dans l'écran des permissions : rien n'est installé.
+    /// Declined in the permissions screen: nothing is installed.
     func cancel(_ candidate: ExtensionInstallCandidate) {
         installingOffer = nil
         installer.discard(candidate)
@@ -160,7 +160,7 @@ final class ExtensionsSettingsModel {
         }
     }
 
-    // MARK: Extensions installées
+    // MARK: Installed extensions
 
     func setEnabled(_ isEnabled: Bool, for identifier: String) {
         Task {
@@ -211,7 +211,7 @@ final class ExtensionsSettingsModel {
         )
     }
 
-    /// Nom de l'app qui contient le `.appex` de `path`.
+    /// Name of the app that contains the `.appex` at `path`.
     private static func appName(containing path: String) -> String? {
         var url = URL(filePath: path)
         while url.pathComponents.count > 1 {

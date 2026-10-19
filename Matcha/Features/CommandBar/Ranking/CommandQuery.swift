@@ -1,27 +1,27 @@
 import Foundation
 
-/// Texte de la barre de commande sous les formes que le classement compare, avec sa lecture
-/// (adresse ou recherche) par `AddressResolver`.
+/// Command bar text in the forms the ranking compares, with its reading (address or search) by
+/// `AddressResolver`.
 nonisolated struct CommandQuery: Equatable, Sendable {
-    /// Texte tel que saisi.
+    /// Text as entered.
     let text: String
-    /// Texte sans espaces aux bords : celui qu'on ouvre ou qu'on cherche.
+    /// Text without surrounding whitespace: the one that is opened or searched.
     let trimmed: String
-    /// Texte replié (`CommandText.fold`).
+    /// Folded text (`CommandText.fold`).
     let folded: String
-    /// Mots du texte replié, séparés par les espaces.
+    /// Words of the folded text, separated by spaces.
     let tokens: [String]
-    /// Ce qui doit commencer un mot pour chaque mot tapé : ses morceaux s'il est coupé par une ponctuation
-    /// (« node.js » → « node », « js »), sinon le mot entier (« c++ » reste « c++ »).
+    /// What must start a word for each typed word: its pieces if it is split by punctuation
+    /// (“node.js” → “node”, “js”), otherwise the whole word (“c++” stays “c++”).
     let wordParts: [[String]]
-    /// Texte replié sans espaces, pour la correspondance approximative.
+    /// Folded text without spaces, for fuzzy matching.
     let compact: String
-    /// Texte replié sans « https:// », « http:// », « www. » ni « / » final, comparé aux adresses.
+    /// Folded text without “https://”, “http://”, “www.” or trailing “/”, compared with addresses.
     let urlFolded: String
     let searchEngine: SearchEngine
-    /// Nil pour un texte vide.
+    /// Nil for an empty text.
     let interpretation: AddressInterpretation?
-    /// Clé (`CommandText.urlKey`) de l'adresse tapée ; nil pour une recherche.
+    /// Key (`CommandText.urlKey`) of the typed address; nil for a search.
     let addressKey: String?
 
     init(text: String, searchEngine: SearchEngine) {
@@ -50,7 +50,7 @@ nonisolated struct CommandQuery: Equatable, Sendable {
         trimmed.isEmpty
     }
 
-    /// Vrai si le texte est lu comme une recherche (et non comme une adresse).
+    /// True if the text is read as a search (and not as an address).
     var isSearch: Bool {
         if case .search = interpretation {
             return true
@@ -58,8 +58,8 @@ nonisolated struct CommandQuery: Equatable, Sendable {
         return false
     }
 
-    /// Nom de domaine tapé seul (« apple.com », « node.js ») : lu comme une adresse `https`, sans
-    /// schéma, port, chemin, requête, fragment ni « @ ».
+    /// Domain name typed alone (“apple.com”, “node.js”): read as an `https` address, without scheme, port, path,
+    /// query, fragment or “@”.
     var isBareDomain: Bool {
         guard case let .address(url) = interpretation, url.scheme == "https" else {
             return false

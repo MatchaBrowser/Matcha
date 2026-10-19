@@ -2,10 +2,10 @@ import AppKit
 import OSLog
 import SwiftUI
 
-/// Panneau des téléchargements d'une fenêtre, en bas de la barre latérale : il monte au clic sur le bouton du pied (ou
-/// par ⌥⌘L), séparé des onglets par un trait. En tête : « Téléchargements », « Effacer » (retire de la liste ce qui
-/// n'est plus en cours, sans jamais effacer de fichier ; le panneau reste ouvert) et une croix pour fermer. Fichiers du
-/// plus récent au plus ancien ; liste vide : « Aucun téléchargement » et un bouton vers le dossier Téléchargements.
+/// Downloads panel of a window, at the bottom of the sidebar: it slides up on a click on the footer button (or with
+/// ⌥⌘L), separated from the tabs by a line. At the top: “Downloads”, “Clear” (removes from the list what is no
+/// longer in progress, never deleting any file; the panel stays open) and a cross to close it. Files from newest to
+/// oldest; empty list: “No Downloads” and a button to the Downloads folder.
 struct DownloadsPanel: View {
     static let maximumListHeight = 280.0
 
@@ -24,7 +24,7 @@ struct DownloadsPanel: View {
                 Button {
                     withAnimation(.easeOut(duration: 0.2)) { downloads.clear(in: scope) }
                 } label: {
-                    // Clé distincte du « Clear » des onglets du jour.
+                    // Key distinct from the “Clear” of today tabs.
                     Text(String(
                         localized: "Clear Downloads",
                         defaultValue: "Clear",
@@ -34,7 +34,7 @@ struct DownloadsPanel: View {
                 }
                 .buttonStyle(.borderless)
                 .foregroundStyle(.secondary)
-                // Grisé quand il n'y a rien à retirer : liste vide, ou seulement des téléchargements en cours.
+                // Disabled when there is nothing to remove: empty list, or only downloads in progress.
                 .disabled(items.allSatisfy(\.isActive))
                 .help("Remove finished downloads from the list. Files stay in the Downloads folder.")
                 .accessibilityIdentifier("downloadsClearButton")
@@ -67,7 +67,7 @@ struct DownloadsPanel: View {
     }
 }
 
-/// Liste vide : « Aucun téléchargement », et un bouton qui ouvre le dossier Téléchargements dans le Finder.
+/// Empty list: “No Downloads”, and a button that opens the Downloads folder in the Finder.
 private struct DownloadsEmptyState: View {
     var body: some View {
         VStack(spacing: 4) {
@@ -85,7 +85,7 @@ private struct DownloadsEmptyState: View {
         .padding(.vertical, 12)
     }
 
-    /// Le vrai dossier Téléchargements de l'utilisateur, jamais le sous-dossier des tests d'interface.
+    /// The user's real Downloads folder, never the UI tests' subfolder.
     private func showDownloadsFolder() {
         guard let folder = DownloadLocation.userDownloadsDirectory() else {
             Logger.downloads.error("Dossier Téléchargements introuvable")

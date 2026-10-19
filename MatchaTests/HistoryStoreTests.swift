@@ -3,7 +3,7 @@ import Foundation
 import SwiftData
 import Testing
 
-/// Horloge réglable des tests de l'historique.
+/// Adjustable clock for the history tests.
 @MainActor
 final class TestClock {
     var now: Date
@@ -17,8 +17,7 @@ final class TestClock {
     }
 }
 
-/// Magasin de l'historique (tâche 5.5) : écriture, lecture hors du fil principal, profils, suppressions, durée de
-/// conservation.
+/// History store (task 5.5): writing, reading off the main thread, profiles, deletions, retention period.
 @MainActor
 struct HistoryStoreTests {
     private let container: ModelContainer
@@ -103,7 +102,7 @@ struct HistoryStoreTests {
         store.setTitle("Titre tardif", ofVisit: visit.id, profileID: profile)
         #expect(!store.refreshVisit(UUID(), title: nil, profileID: profile))
 
-        // Relu par un autre magasin : la date et le titre ont été enregistrés.
+        // Read back by another store: the date and the title have been saved.
         let reopened = makeStore()
         await reopened.load()
         let entry = try #require(reopened.index(for: profile)?.entries["example.com"])
@@ -176,7 +175,7 @@ struct HistoryStoreTests {
         #expect(store.index(for: other)?.entries.keys.sorted() == ["autre-profil.example"])
         #expect(recordCount == 1)
 
-        // Relu depuis la base : la même chose.
+        // Read back from the database: the same thing.
         let reopened = makeStore()
         await reopened.load()
         #expect(reopened.index(for: profile)?.entries.isEmpty == true)

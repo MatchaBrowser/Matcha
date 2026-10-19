@@ -4,8 +4,7 @@ import SwiftData
 import Testing
 import WebKit
 
-/// Ouverture, barre de commande et fermeture des mini-fenêtres, avec de vrais panneaux (jamais affichés) et de
-/// vraies vues web.
+/// Opening, command bar and closing of mini windows, with real panels (never shown) and real web views.
 @MainActor
 struct MiniWindowManagerTests {
     private let session: BrowserSession
@@ -18,7 +17,7 @@ struct MiniWindowManagerTests {
         manager = .forTests(session: session)
     }
 
-    /// Mini-fenêtre ouverte sur la page locale `name`, une fois chargée.
+    /// Mini window opened on the local page `name`, once loaded.
     private func openPage(_ name: String) async throws -> MiniWindowController {
         let mini = manager.openNew(loading: TestPages.url(name), source: .link)
         try await waitUntil { mini.tab.title == name && !mini.tab.isLoading }

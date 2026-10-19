@@ -1,8 +1,8 @@
 import Foundation
 
-/// Réglages de la barre d'une mini-fenêtre, lus dans `UserDefaults` à chaque ouverture (la vue les
-/// suit ensuite avec `@AppStorage`). `bool(forKey:)` lit aussi les arguments de lancement « -clé NO »
-/// des tests d'interface, que `object(forKey:) as? Bool` ne lit pas.
+/// Settings of a mini window's bar, read from `UserDefaults` at each opening (the view then
+/// follows them with `@AppStorage`). `bool(forKey:)` also reads the UI tests' “-key NO” launch
+/// arguments, which `object(forKey:) as? Bool` does not read.
 nonisolated enum MiniWindowSettings {
     static func current(_ defaults: UserDefaults = .standard) -> CommandBarSettings {
         let engine = defaults.string(forKey: BrowserSettings.Key.searchEngine).flatMap(SearchEngine.init(rawValue:))

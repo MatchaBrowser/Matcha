@@ -1,19 +1,19 @@
 import CoreGraphics
 import Foundation
 
-/// Taille et place d'une nouvelle mini-fenêtre (coordonnées d'écran d'AppKit, origine en bas à gauche), sans
-/// dépendance à l'interface.
+/// Size and position of a new mini window (AppKit screen coordinates, origin at the bottom left), with no
+/// dependency on the interface.
 nonisolated enum MiniWindowPlacement {
     static let defaultSize = CGSize(width: 520, height: 680)
     static let minimumSize = CGSize(width: 360, height: 400)
-    /// Marge gardée avec les bords de la zone utile de l'écran.
+    /// Margin kept from the edges of the screen's usable area.
     static let margin = 20.0
-    /// Décalage d'une mini-fenêtre ouverte alors qu'une autre l'est déjà.
+    /// Offset of a mini window opened while another one already is.
     static let cascadeOffset = 24.0
-    /// Clé `UserDefaults` de la dernière taille choisie à la souris (« {520, 680} »).
+    /// `UserDefaults` key of the last size chosen with the mouse (“{520, 680}”).
     static let sizeKey = "miniWindowSize"
 
-    /// Taille retenue, si elle est lisible et au moins égale à la taille minimale.
+    /// Remembered size, if it is readable and at least equal to the minimum size.
     static func storedSize(_ text: String?) -> CGSize? {
         guard let text, !text.isEmpty else {
             return nil
@@ -25,12 +25,12 @@ nonisolated enum MiniWindowPlacement {
         return size
     }
 
-    /// Cadre d'une mini-fenêtre de taille `size` dans `visible` (zone utile de l'écran, moins la marge) :
-    /// - la taille est ramenée à la zone, sans descendre sous la taille minimale ;
-    /// - plus grande que la zone : en haut à gauche de la zone ;
-    /// - décalée de 24 pt vers la droite et le bas depuis `previous` (la dernière mini-fenêtre ouverte), tant
-    ///   qu'elle tient dans la zone ;
-    /// - sinon centrée.
+    /// Frame of a mini window of size `size` in `visible` (usable area of the screen, minus the margin):
+    /// - the size is reduced to fit the area, without going below the minimum size;
+    /// - larger than the area: at the top left of the area;
+    /// - offset by 24 pt to the right and down from `previous` (the last opened mini window), as long as
+    ///   it fits in the area;
+    /// - otherwise centered.
     static func frame(size requested: CGSize, in visible: CGRect, after previous: CGRect?) -> CGRect {
         let available = visible.insetBy(dx: margin, dy: margin)
         let size = CGSize(

@@ -1,11 +1,11 @@
 import Foundation
 
-/// Changements reçus d'un autre Mac (tâche 7.4, `SYNC.md` § 2.4).
+/// Changes received from another Mac (task 7.4, `SYNC.md` § 2.4).
 extension TabManager {
-    /// Reprend les onglets et le rangement enregistrés, changés par la synchro. Un onglet déjà là garde sa vue web ; s'il
-    /// n'est pas affiché et que son adresse a changé, il se décharge et chargera la nouvelle à sa prochaine ouverture. Un
-    /// onglet arrivé n'est ni chargé ni sélectionné. Une page affichée ne change pas sous les yeux de l'utilisateur : un
-    /// onglet affiché fermé ailleurs reste là, à sa place, jusqu'à ce qu'il le ferme.
+    /// Takes back the saved tabs and layout, changed by sync. A tab already there keeps its web view; if it is not
+    /// displayed and its address changed, it unloads and will load the new one the next time it is opened. A newly
+    /// arrived tab is neither loaded nor selected. A displayed page does not change before the user's eyes: a
+    /// displayed tab closed elsewhere stays there, in its place, until the user closes it.
     func reconcile(tabs stored: [StoredTab], layout newLayout: SidebarLayout) {
         let displayed = Set(displayedTabIDs)
         var target = newLayout

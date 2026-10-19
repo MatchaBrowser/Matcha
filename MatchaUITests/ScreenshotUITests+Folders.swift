@@ -1,11 +1,11 @@
 import XCTest
 
-/// Captures de la personnalisation d'un dossier (`MATCHA_SCREENSHOT_FOLDER`, voir `ScreenshotUITests`).
+/// Screenshots of a folder's customization (`MATCHA_SCREENSHOT_FOLDER`, see `ScreenshotUITests`).
 extension ScreenshotUITests {
-    /// Si `MATCHA_SCREENSHOT_FOLDER` est défini : épingle un onglet vide, crée un dossier nommé d'après la valeur
-    /// (« Projets » pour « 1 ») et son sous-dossier « Client » ; le dossier prend le porte-documents et un fond indigo (texte
-    /// lisible choisi par l'app), le sous-dossier la feuille et un texte vert. Capture le panneau ouvert sous le
-    /// sous-dossier (`37-dossier-panneau`), puis les deux lignes, panneau fermé par sa croix (`38-dossier-personnalise`).
+    /// If `MATCHA_SCREENSHOT_FOLDER` is set: pins an empty tab, creates a folder named after the value (“Projets” for
+    /// “1”) and its subfolder “Client”; the folder gets the briefcase and an indigo background (readable text picked
+    /// by the app), the subfolder the leaf and green text. Captures the panel open below the subfolder
+    /// (`37-dossier-panneau`), then both rows, panel closed with its cross (`38-dossier-personnalise`).
     @MainActor
     func captureFolderCustomization(in app: XCUIApplication, window: XCUIElement) {
         guard let value = ProcessInfo.processInfo.environment["MATCHA_SCREENSHOT_FOLDER"] else {
@@ -49,7 +49,7 @@ extension ScreenshotUITests {
         XCTAssertTrue(field.waitForNonExistence(timeout: 3))
     }
 
-    /// « Personnaliser… » du dossier, puis le symbole et les pastilles de couleur donnés (nil : sans y toucher).
+    /// The folder's “Customize…”, then the given symbol and color swatches (nil: left untouched).
     @MainActor
     private func customize(_ folder: XCUIElement, symbol: String, textColor: String?, backgroundColor: String?, in app: XCUIApplication) {
         folder.rightClick()

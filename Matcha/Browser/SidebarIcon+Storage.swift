@@ -1,13 +1,13 @@
 import Foundation
 
-/// Formes enregistrées d'une icône : `FolderRecord.iconValue` et `SpaceRecord.symbol` (champs `icon` d'un dossier et
-/// `symbol` d'un Space dans la synchro, `SYNC.md`). Du texte court, lisible et tolérant : ce qui est illisible redevient
-/// l'icône par défaut.
+/// Stored forms of an icon: `FolderRecord.iconValue` and `SpaceRecord.symbol` (the `icon` field of a folder and the
+/// `symbol` field of a Space in sync, `SYNC.md`). Short, readable and tolerant text: anything unreadable falls back to
+/// the default icon.
 nonisolated extension SidebarIcon {
     private static let symbolPrefix = "symbol:"
     private static let emojiPrefix = "emoji:"
 
-    /// Forme d'un dossier : « symbol:<nom du symbole SF> », « emoji:<emoji> », nil pour l'icône par défaut.
+    /// Form for a folder: “symbol:<SF Symbol name>”, “emoji:<emoji>”, nil for the default icon.
     var storedValue: String? {
         switch self {
         case .default: nil
@@ -16,7 +16,7 @@ nonisolated extension SidebarIcon {
         }
     }
 
-    /// Icône lue dans la forme d'un dossier ; absente, inconnue ou invalide : l'icône par défaut.
+    /// Icon read from a folder's form; missing, unknown or invalid: the default icon.
     init(storedValue: String?) {
         guard let storedValue else {
             self = .default
@@ -32,8 +32,8 @@ nonisolated extension SidebarIcon {
         }
     }
 
-    /// Nom de symbole SF plausible : lettres minuscules ASCII, chiffres et points. Un nom inconnu du système (synchro
-    /// depuis un macOS plus récent) reste enregistré ; la barre affiche alors l'icône par défaut (`displayed`).
+    /// Plausible SF Symbol name: lowercase ASCII letters, digits and dots. A name unknown to the system (synced from a
+    /// more recent macOS) stays stored; the sidebar then displays the default icon (`displayed`).
     static func isSymbolName(_ name: String) -> Bool {
         !name.isEmpty && name.allSatisfy { $0.isASCII && ($0.isLowercase || $0.isNumber || $0 == ".") }
     }
@@ -42,16 +42,16 @@ nonisolated extension SidebarIcon {
 // MARK: - Space
 
 nonisolated extension SidebarIcon {
-    /// Icône d'un Space lue dans `SpaceRecord.symbol` : un nom de symbole seul (la forme d'avant les emoji, toujours
-    /// écrite pour un symbole), « emoji:<emoji> », ou « symbol:<nom> » (forme d'un dossier, acceptée aussi). Jamais
-    /// `.default` : une valeur illisible donne le cercle.
+    /// Icon of a Space read from `SpaceRecord.symbol`: a bare symbol name (the form from before emoji, still written
+    /// for a symbol), “emoji:<emoji>”, or “symbol:<name>” (a folder's form, also accepted). Never `.default`: an
+    /// unreadable value gives the circle.
     init(spaceSymbol: String) {
         let icon = Self.isSymbolName(spaceSymbol) ? .symbol(spaceSymbol) : SidebarIcon(storedValue: spaceSymbol)
         self = icon == .default ? .symbol(Self.defaultSpaceSymbol) : icon
     }
 
-    /// Forme écrite dans `SpaceRecord.symbol` : le nom seul pour un symbole (comme avant les emoji), « emoji:<emoji> »
-    /// pour un emoji ; l'icône par défaut est le cercle.
+    /// Form written to `SpaceRecord.symbol`: the bare name for a symbol (as before emoji), “emoji:<emoji>” for an
+    /// emoji; the default icon is the circle.
     var spaceSymbol: String {
         switch self {
         case .default: Self.defaultSpaceSymbol

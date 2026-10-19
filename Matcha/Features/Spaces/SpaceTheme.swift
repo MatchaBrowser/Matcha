@@ -1,14 +1,14 @@
 import Foundation
 
-/// Thème d'un Space : 2 ou 3 couleurs de base et l'angle du dégradé. Les variantes claire et sombre en
-/// sont tirées, pour que le texte de la barre reste lisible dans les deux apparences.
+/// Theme of a Space: 2 or 3 base colors and the gradient's angle. The light and dark variants are
+/// derived from them, so that the sidebar's text stays readable in both appearances.
 nonisolated struct SpaceTheme: Codable, Hashable, Sendable {
     static let colorCountRange = 2 ... 3
 
-    /// Nom du thème prédéfini d'origine, nil pour un thème personnalisé.
+    /// Name of the original predefined theme, nil for a custom theme.
     var name: String?
     private(set) var colors: [ThemeColor]
-    /// Direction du dégradé en degrés, comme en CSS : 0 vers le haut, 90 vers la droite, 180 vers le bas.
+    /// Direction of the gradient in degrees, as in CSS: 0 upwards, 90 to the right, 180 downwards.
     var angle: Double
 
     init(name: String? = nil, colors: [ThemeColor], angle: Double = 135) {
@@ -17,24 +17,24 @@ nonisolated struct SpaceTheme: Codable, Hashable, Sendable {
         self.angle = angle
     }
 
-    /// Remplace les couleurs ; il en faut 2 ou 3 (la dernière est répétée ou les dernières retirées).
+    /// Replaces the colors; there must be 2 or 3 (the last one is repeated or the last ones removed).
     mutating func setColors(_ newColors: [ThemeColor]) {
         colors = Self.fitted(newColors)
         name = nil
     }
 
-    /// Variante claire : couleurs éclaircies vers un pastel.
+    /// Light variant: colors lightened towards a pastel.
     var lightColors: [ThemeColor] {
         colors.map { $0.mixed(with: .white, amount: 0.65) }
     }
 
-    /// Variante sombre : couleurs assombries.
+    /// Dark variant: darkened colors.
     var darkColors: [ThemeColor] {
         colors.map { $0.mixed(with: .black, amount: 0.7) }
     }
 
-    /// Direction du dégradé ramenée au carré unité (vers la droite et vers le bas), la plus grande
-    /// composante valant 1 en valeur absolue, pour que le dégradé aille d'un bord (ou d'un coin) à l'autre.
+    /// Direction of the gradient brought back to the unit square (to the right and downwards), the largest
+    /// component being 1 in absolute value, so that the gradient goes from one edge (or corner) to the other.
     var direction: (horizontal: Double, vertical: Double) {
         let radians = angle * .pi / 180
         let (horizontal, vertical) = (sin(radians), -cos(radians))
@@ -46,7 +46,7 @@ nonisolated struct SpaceTheme: Codable, Hashable, Sendable {
         try? JSONEncoder().encode(self)
     }
 
-    /// Thème lu dans `data`, ou nil si `data` est vide ou illisible.
+    /// Theme read from `data`, or nil if `data` is empty or unreadable.
     static func decoded(from data: Data?) -> SpaceTheme? {
         data.flatMap { try? JSONDecoder().decode(SpaceTheme.self, from: $0) }
     }

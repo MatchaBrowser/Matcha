@@ -1,13 +1,13 @@
 import Foundation
 
-/// Aperçu d'un lien (tâche 4.4) : une page ouverte par-dessus les pages affichées, dans sa propre vue web, du
-/// même profil. Hors de la barre latérale et jamais enregistré, jusqu'à « Ouvrir en onglet ».
+/// Link peek (task 4.4): a page opened over the displayed pages, in its own web view, from the same profile.
+/// Outside the sidebar and never saved, until “Open as Tab”.
 struct Peek: Identifiable {
-    /// Onglet hors rangement qui possède la vue web de l'aperçu ; il devient l'onglet ouvert.
+    /// Unfiled tab that owns the peek's web view; it becomes the opened tab.
     let tab: BrowserTab
-    /// Onglet par-dessus lequel l'aperçu s'affiche ; en afficher un autre ferme l'aperçu.
+    /// Tab over which the peek is shown; showing another one closes the peek.
     let sourceTabID: BrowserTab.ID
-    /// Point d'où l'aperçu grandit, en fractions de la zone des pages (0…1, origine en haut à gauche).
+    /// Point the peek grows from, as fractions of the pages area (0…1, origin at the top left).
     let openingPoint: CGPoint
 
     var id: BrowserTab.ID {

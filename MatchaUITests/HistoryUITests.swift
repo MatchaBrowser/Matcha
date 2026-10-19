@@ -1,14 +1,14 @@
 import XCTest
 
-/// Historique (5.5) : fenêtre ⌘Y, recherche, suppression, effacement, ouverture d'une ligne, fenêtre privée et barre
-/// de commande. Pages : la documentation de Postfix livrée avec macOS (sans réseau) ; tests ignorés si elle manque.
-/// Ces tests déplacent la vraie souris.
+/// History (5.5): ⌘Y window, search, deletion, clearing, opening a row, private window and command bar. Pages:
+/// the Postfix documentation shipped with macOS (no network); tests skipped if it is missing. These tests move
+/// the real mouse.
 final class HistoryUITests: XCTestCase {
     override func setUpWithError() throws {
         continueAfterFailure = false
     }
 
-    /// Lance l'app et visite deux pages de la documentation de Postfix dans un même onglet.
+    /// Launches the app and visits two pages of the Postfix documentation in the same tab.
     @MainActor
     private func launchAfterVisitingDocs() throws -> XCUIApplication {
         let app = launchApp()
@@ -21,13 +21,13 @@ final class HistoryUITests: XCTestCase {
     func testCommandYOpensTheHistoryWindowAndCommandWClosesIt() {
         let app = launchApp()
         XCTAssertTrue(waitForBrowserWindow(of: app))
-        // Rien ne s'ouvre de soi-même au lancement.
+        // Nothing opens by itself at launch.
         XCTAssertFalse(historyWindow(in: app).exists)
 
         let window = openHistoryWindow(in: app)
         XCTAssertTrue(historyEmptyState(in: window).waitForExistence(timeout: 5))
         XCTAssertEqual(historyRows(in: window).count, 0)
-        // Une seule fenêtre : ⌘Y la ramène devant.
+        // A single window: ⌘Y brings it back to the front.
         app.typeKey("y", modifierFlags: .command)
         XCTAssertEqual(app.windows.matching(NSPredicate(format: "title == %@", "Historique")).count, 1)
 
@@ -42,11 +42,11 @@ final class HistoryUITests: XCTestCase {
         let window = openHistoryWindow(in: app)
         XCTAssertTrue(historyRow(titled: "Postfix Basic Configuration", in: window).waitForExistence(timeout: 5))
         XCTAssertTrue(historyRow(titled: "Postfix Documentation", in: window).exists)
-        // La plus récente en tête.
+        // The most recent first.
         XCTAssertEqual(historyRows(in: window).firstMatch.label, "Postfix Basic Configuration")
         XCTAssertEqual(historyRows(in: window).firstMatch.value as? String, "BASIC_CONFIGURATION_README.html")
 
-        // Recherche sans casse ni accents, sur le titre et l'adresse.
+        // Case- and accent-insensitive search, on the title and the address.
         let search = window.searchFields.firstMatch
         XCTAssertTrue(search.waitForExistence(timeout: 3))
         search.click()
@@ -78,10 +78,10 @@ final class HistoryUITests: XCTestCase {
         XCTAssertEqual(historyRows(in: window).count, 1)
 
         historyRow(titled: "Postfix Documentation", in: window).rightClick()
-        // Menu de la ligne, dans la fenêtre : « Édition > Supprimer » de la barre des menus porte le même titre.
+        // Row menu, in the window: “Edit > Delete” in the menu bar has the same title.
         window.menuItems["Supprimer"].click()
         XCTAssertTrue(historyEmptyState(in: window).waitForExistence(timeout: 3))
-        // Supprimé de l'historique, pas de la barre latérale.
+        // Deleted from the history, not from the sidebar.
         XCTAssertEqual(tabRows(in: app).count, 1)
     }
 
@@ -92,7 +92,7 @@ final class HistoryUITests: XCTestCase {
         XCTAssertTrue(waitForCount(historyRows(in: window), 2, timeout: 5))
         let clear = window.buttons["historyClearButton"]
 
-        // Annuler ne change rien.
+        // Cancel changes nothing.
         clear.click()
         let cancel = dialogButton("Annuler", in: app)
         XCTAssertTrue(cancel.waitForExistence(timeout: 3))
@@ -112,7 +112,7 @@ final class HistoryUITests: XCTestCase {
     @MainActor
     func testDoubleClickOpensTheRowInANewTabOfTheMainWindow() throws {
         let app = try launchAfterVisitingDocs()
-        // Plus d'onglet : la page n'est plus que dans l'historique.
+        // No tab left: the page is now only in the history.
         app.typeKey("w", modifierFlags: .command)
         XCTAssertTrue(waitForCount(tabRows(in: app), 0))
 
@@ -122,7 +122,7 @@ final class HistoryUITests: XCTestCase {
         row.doubleClick()
         XCTAssertTrue(waitForCount(tabRows(in: app), 1, timeout: 5))
         XCTAssertTrue(waitForValue(of: addressPill(in: browserWindow(in: app)), timeout: 10) { $0 == "index.html" })
-        // La fenêtre principale est passée devant : ⌘T y ouvre la barre de commande.
+        // The main window came to the front: ⌘T opens the command bar there.
         openCommandBar(in: app, window: browserWindow(in: app))
         app.typeKey(.escape, modifierFlags: [])
     }
@@ -137,7 +137,7 @@ final class HistoryUITests: XCTestCase {
         app.typeText("file://\(Self.localDocsPath)\n")
         XCTAssertTrue(tabRow(titled: "Postfix Documentation", in: app).waitForExistence(timeout: 10))
 
-        // « Afficher tout l'historique » est grisé dans une fenêtre privée.
+        // “Show All History” is grayed out in a private window.
         app.menuBars.menuBarItems["Historique"].click()
         XCTAssertFalse(app.menuBars.menuItems["Afficher tout l'historique"].isEnabled)
         app.typeKey(.escape, modifierFlags: [])

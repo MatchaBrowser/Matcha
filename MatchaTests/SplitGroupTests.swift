@@ -32,7 +32,7 @@ struct SplitGroupTests {
         #expect(abs(group.fractions[0] - 0.25 * 2 / 3) < 1e-12)
         #expect(abs(group.fractions[1] - 1 / 3.0) < 1e-12)
         #expect(abs(group.fractions[2] - 0.75 * 2 / 3) < 1e-12)
-        // Rang borné : en tête ou à la fin.
+        // Clamped index: at the start or at the end.
         group.insert(ids[3], at: -4)
         group.insert(ids[4], at: 99)
         #expect(group.tabIDs == [ids[3], ids[0], ids[2], ids[1], ids[4]])

@@ -3,7 +3,7 @@ import Foundation
 import Testing
 import WebKit
 
-/// Onglets et fenêtres tels que les voient les extensions, et ce qu'elles peuvent en faire (tâche 6.3).
+/// Tabs and windows as extensions see them, and what extensions can do with them (task 6.3).
 @MainActor
 struct ExtensionAdapterTests {
     private let session: BrowserSession
@@ -23,7 +23,7 @@ struct ExtensionAdapterTests {
         model.space.tabManager
     }
 
-    /// Contexte d'une extension non chargée : les adaptateurs ne s'en servent que pour vérifier le contrôleur.
+    /// Context of an unloaded extension: the adapters only use it to check the controller.
     private func context() async throws -> WKWebExtensionContext {
         let folder = try TestExtension.makeFolder()
         defer { try? FileManager.default.removeItem(at: folder) }
@@ -125,7 +125,7 @@ struct ExtensionAdapterTests {
         #expect(adapter.isSelected(for: context))
         #expect(try !self.adapter(opener).isSelected(for: context))
         #expect(adapter.zoomFactor(for: context) == 1)
-        // Contexte non chargé : pas de contrôleur, donc pas de vue web pour lui.
+        // Unloaded context: no controller, so no web view for it.
         #expect(adapter.webView(for: context) == nil)
     }
 

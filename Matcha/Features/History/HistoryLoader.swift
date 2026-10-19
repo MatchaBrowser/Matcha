@@ -2,11 +2,11 @@ import Foundation
 import OSLog
 import SwiftData
 
-/// Lecture de l'historique enregistré, hors du fil principal : un an de navigation peut compter des dizaines de
-/// milliers de visites (≈ 1,5 s pour 100 000 en Debug, mesuré), à ne pas lire pendant une frappe.
+/// Reads the saved history off the main thread: a year of browsing can amount to tens of thousands of visits
+/// (≈ 1.5 s for 100,000 in Debug, measured), not to be read during a keystroke.
 nonisolated enum HistoryLoader {
-    /// Efface les visites antérieures à `cutoff` (durée de conservation), puis lit les autres, en index par profil.
-    /// Un contexte à part, créé et utilisé ici sans point de suspension : il ne change jamais de fil.
+    /// Erases the visits older than `cutoff` (retention period), then reads the others into an index per profile.
+    /// A separate context, created and used here with no suspension point: it never changes threads.
     @concurrent
     static func load(from container: ModelContainer, purgingBefore cutoff: Date) async -> [UUID?: HistoryIndex] {
         let context = ModelContext(container)

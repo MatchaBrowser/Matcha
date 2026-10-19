@@ -1,27 +1,27 @@
 import Foundation
 import OSLog
 
-/// Ce que Matcha retient d'une extension installée (tâche 6.3) : active ou non, et les décisions de l'utilisateur sur ses
-/// permissions, que WebKit ne garde pas d'un lancement à l'autre (`WKWebExtensionContext.grantedPermissions` et
-/// suivants : « This value should be saved and restored as needed by the app »). Clés en texte : nom de la permission
-/// (« tabs ») ou motif d'adresses (« *://*.example.com/* ») ; valeur : date d'expiration (`Date.distantFuture` sans
-/// expiration). Type pur.
+/// What Matcha remembers about an installed extension (task 6.3): enabled or not, and the user's decisions about its
+/// permissions, which WebKit does not keep from one launch to the next (`WKWebExtensionContext.grantedPermissions` and
+/// following: “This value should be saved and restored as needed by the app”). Keys as text: name of the permission
+/// (“tabs”) or address pattern (“*://*.example.com/*”); value: expiration date (`Date.distantFuture` without
+/// expiration). Pure type.
 nonisolated struct ExtensionState: Codable, Equatable, Sendable {
     var isEnabled = true
     var grantedPermissions: [String: Date] = [:]
     var grantedMatchPatterns: [String: Date] = [:]
     var deniedPermissions: [String: Date] = [:]
     var deniedMatchPatterns: [String: Date] = [:]
-    /// Fenêtres privées : refusées par défaut, comme dans Safari ; seul l'utilisateur les ouvre à une extension (6.4).
+    /// Private windows: denied by default, as in Safari; only the user opens them to an extension (6.4).
     var hasAccessToPrivateData = false
     var hasRequestedOptionalAccessToAllHosts = false
-    /// Extension Safari d'une app (tâche 6.4) : chemin de son `.appex`, chargé sur place ; nil pour une extension copiée
-    /// dans le dossier des extensions.
+    /// Safari extension of an app (task 6.4): path of its `.appex`, loaded in place; nil for an extension copied into
+    /// the extensions folder.
     var appExtensionPath: String?
-    /// Bouton près de l'adresse (tâche 6.5) : faux s'il est masqué ; nil (par défaut) : affiché.
+    /// Button next to the address (task 6.5): false if it is hidden; nil (default): shown.
     var showsButton: Bool?
 
-    /// Sans les décisions expirées à `date`.
+    /// Without the decisions expired at `date`.
     func removingExpired(at date: Date) -> ExtensionState {
         var state = self
         state.grantedPermissions = grantedPermissions.filter { $0.value > date }
@@ -32,9 +32,9 @@ nonisolated struct ExtensionState: Codable, Equatable, Sendable {
     }
 }
 
-/// États des extensions installées, par identifiant (tâche 6.3), enregistrés dans les réglages de l'app
-/// (`installedExtensions`, JSON) ; sans `defaults` (tests, base de test), tout reste en mémoire. Les extensions
-/// elles-mêmes sont des dossiers (`ExtensionInstallDirectory`).
+/// States of the installed extensions, by identifier (task 6.3), saved in the app's settings (`installedExtensions`,
+/// JSON); without `defaults` (tests, test store), everything stays in memory. The extensions themselves are folders
+/// (`ExtensionInstallDirectory`).
 @MainActor
 final class ExtensionStateStore {
     static let defaultsKey = "installedExtensions"
@@ -47,23 +47,23 @@ final class ExtensionStateStore {
         states = Self.load(from: defaults)
     }
 
-    /// Identifiants connus.
+    /// Known identifiers.
     var identifiers: [String] {
         states.keys.sorted()
     }
 
-    /// Extensions Safari d'apps installées (tâche 6.4) : (identifiant, `.appex`), triées par identifiant.
+    /// Installed Safari extensions of apps (task 6.4): (identifier, `.appex`), sorted by identifier.
     var appExtensions: [(identifier: String, url: URL)] {
         states.compactMap { entry in entry.value.appExtensionPath.map { (entry.key, URL(filePath: $0)) } }
             .sorted { $0.identifier < $1.identifier }
     }
 
-    /// État retenu de l'extension `identifier`, nil si elle n'a jamais été chargée.
+    /// Remembered state of extension `identifier`, nil if it has never been loaded.
     func state(for identifier: String) -> ExtensionState? {
         states[identifier]
     }
 
-    /// Retient `state` ; rien n'est écrit s'il ne change pas.
+    /// Remembers `state`; nothing is written if it does not change.
     func setState(_ state: ExtensionState, for identifier: String) {
         guard states[identifier] != state else {
             return
@@ -72,7 +72,7 @@ final class ExtensionStateStore {
         save()
     }
 
-    /// Oublie une extension désinstallée.
+    /// Forgets an uninstalled extension.
     func removeState(for identifier: String) {
         guard states.removeValue(forKey: identifier) != nil else {
             return

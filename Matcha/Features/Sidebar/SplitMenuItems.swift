@@ -1,7 +1,7 @@
 import SwiftUI
 
-/// Éléments « split view » du menu contextuel d'un onglet : l'ouvrir à côté du panneau actif (grisé quand
-/// le split affiché est plein, absent quand c'est impossible), le retirer de son split ou défaire celui-ci.
+/// “Split view” items of a tab's context menu: open it next to the active pane (dimmed when the displayed split
+/// is full, absent when impossible), remove it from its split, or undo the split.
 struct SplitMenuItems: View {
     let tab: BrowserTab
     let tabManager: TabManager

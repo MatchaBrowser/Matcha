@@ -1,19 +1,19 @@
 import Foundation
 import Observation
 
-/// Son d'une page (onglet, aperçu, mini-fenêtre, fenêtre de connexion ; tâche 5.10) : reçoit les messages de son script
-/// (`PageAudioMessageHandler`) et tient l'icône haut-parleur de la barre latérale (`isPlaying`), suivant les règles de
-/// `PageAudioState`. Seule une page rangée dans la barre montre l'icône ; l'aperçu ouvert en onglet garde son état.
+/// Sound of a page (tab, Peek, mini window, sign-in window; task 5.10): receives the messages of its script
+/// (`PageAudioMessageHandler`) and drives the speaker icon of the sidebar (`isPlaying`), following the rules of
+/// `PageAudioState`. Only a page placed in the sidebar shows the icon; Peek opened as a tab keeps its state.
 @MainActor
 @Observable
 final class PageAudio {
-    /// Vrai pendant que la page joue un son, et encore `silenceDelay` après.
+    /// True while the page plays a sound, and for `silenceDelay` afterwards.
     private(set) var isPlaying = false
     @ObservationIgnored private var state = PageAudioState()
-    /// Extinction prévue de l'icône.
+    /// Scheduled switch-off of the icon.
     @ObservationIgnored private var expiry: Task<Void, Never>?
 
-    /// Délai entre la fin du dernier son et l'extinction de l'icône (2 s) ; changé dans les tests.
+    /// Delay between the end of the last sound and the switch-off of the icon (2 s); changed in tests.
     var silenceDelay: TimeInterval {
         get { state.silenceDelay }
         set { state.silenceDelay = newValue }
@@ -24,14 +24,14 @@ final class PageAudio {
         publish()
     }
 
-    /// Tout le son de la page vient d'être mis en pause, ou la page a changé (navigation, mise en veille, arrêt du
-    /// processus, vue web libérée) : l'icône s'éteint tout de suite. Si la page rejoue un son, son script le redit.
+    /// All of the page's sound has just been paused, or the page changed (navigation, sleep, process termination, web
+    /// view released): the icon switches off right away. If the page plays a sound again, its script says so again.
     func reset() {
         state.reset()
         publish()
     }
 
-    /// Recopie l'état (la valeur observée n'est écrite que si elle change) et prévoit l'extinction de l'icône.
+    /// Copies the state (the observed value is only written if it changes) and schedules the switch-off of the icon.
     private func publish() {
         if isPlaying != state.isPlaying {
             isPlaying = state.isPlaying
@@ -47,7 +47,7 @@ final class PageAudio {
             guard !Task.isCancelled, let self else {
                 return
             }
-            // L'échéance n'a pas changé (sinon cette tâche aurait été annulée) : l'horloge ne la manque pas d'un poil.
+            // Same deadline (otherwise this task would have been cancelled): the clock never misses it by a hair.
             state.expire(at: max(.now, deadline))
             publish()
         }

@@ -2,8 +2,8 @@ import Foundation
 @testable import Matcha
 import Testing
 
-/// Règles de l'icône haut-parleur (tâche 5.10) : allumée dès qu'un document joue un son, éteinte 2 s après le dernier,
-/// tout de suite après une pause, une navigation, une mise en veille ou un arrêt du processus.
+/// Speaker icon rules (task 5.10): on as soon as a document plays a sound, off 2 s after the last one, and right away
+/// after a pause, a navigation, a suspension or a process termination.
 struct PageAudioStateTests {
     private func report(_ frame: String = "main", audible: Bool, gone: Bool = false) -> PageAudioReport {
         PageAudioReport(frame: frame, isAudible: audible, isGone: gone)
@@ -41,7 +41,7 @@ struct PageAudioStateTests {
     @Test func `sound coming back before the delay keeps the icon without a blink`() {
         var state = PageAudioState()
         state.apply(report(audible: true), at: fixedNow)
-        // Fin d'un morceau, puis le suivant.
+        // End of a track, then the next one.
         state.apply(report(audible: false), at: fixedNow.addingTimeInterval(1))
         state.apply(report(audible: true), at: fixedNow.addingTimeInterval(2.5))
         state.expire(at: fixedNow.addingTimeInterval(3.5))
@@ -66,13 +66,13 @@ struct PageAudioStateTests {
         #expect(state.isPlaying)
         #expect(state.audibleFrames == ["frame"])
 
-        // L'iframe s'en va (`pagehide`) : son son s'arrête avec elle.
+        // The iframe goes away (`pagehide`): its sound stops with it.
         state.apply(report("frame", audible: true, gone: true), at: fixedNow.addingTimeInterval(20))
         #expect(state.audibleFrames.isEmpty)
         #expect(state.silenceDeadline == fixedNow.addingTimeInterval(22))
     }
 
-    /// Pause par l'icône, navigation, mise en veille, arrêt du processus : `reset`.
+    /// Pause from the icon, navigation, suspension, process termination: `reset`.
     @Test func `a reset puts the icon out at once`() {
         var state = PageAudioState()
         state.apply(report("main", audible: true), at: fixedNow)
@@ -82,7 +82,7 @@ struct PageAudioStateTests {
         #expect(state.audibleFrames.isEmpty)
         #expect(state.silenceDeadline == nil)
 
-        // Pendant le délai aussi ; le délai choisi reste.
+        // During the delay too; the chosen delay is kept.
         state.silenceDelay = 5
         state.apply(report(audible: true), at: fixedNow)
         state.apply(report(audible: false), at: fixedNow.addingTimeInterval(1))
@@ -97,7 +97,7 @@ struct PageAudioStateTests {
         var state = PageAudioState()
         state.apply(report(audible: true), at: fixedNow)
         state.reset()
-        // Le script redit qu'il joue toutes les 2 s : la page a relancé la lecture.
+        // The script repeats every 2 s that it is playing: the page has resumed playback.
         state.apply(report(audible: true), at: fixedNow.addingTimeInterval(2))
         #expect(state.isPlaying)
     }

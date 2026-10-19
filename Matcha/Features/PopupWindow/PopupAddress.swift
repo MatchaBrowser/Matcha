@@ -1,19 +1,19 @@
 import Foundation
 
-/// Adresse montrée par la barre d'une fenêtre de connexion (tâche 5.8) : on doit voir quel site demande le mot de
-/// passe, quel que soit le titre que la page se donne. Le titre de la fenêtre vient de la page, cette barre jamais.
+/// Address shown by the bar of a sign-in window (task 5.8): you must see which site asks for the password,
+/// whatever title the page gives itself. The window title comes from the page, this bar never does.
 nonisolated struct PopupAddress: Equatable, Sendable {
     enum Security: Equatable, Sendable {
-        /// https : connexion chiffrée (cadenas).
+        /// https: encrypted connection (padlock).
         case secure
-        /// http : « Non sécurisé ».
+        /// http: “Not Secure”.
         case notSecure
-        /// Pas un site (fichier local, `about:`, `data:`) : rien.
+        /// Not a site (local file, `about:`, `data:`): nothing.
         case none
     }
 
-    /// L'hôte (sans « www. », avec le port s'il n'est pas celui par défaut) pour un site ; le nom du fichier pour un
-    /// fichier local ; `about:blank` ; sinon le seul schéma (`data:`), jamais le contenu d'une adresse `data:`.
+    /// The host (without “www.”, with the port if it is not the default one) for a site; the file name for a local
+    /// file; `about:blank`; otherwise only the scheme (`data:`), never the content of a `data:` address.
     let text: String
     let security: Security
 }

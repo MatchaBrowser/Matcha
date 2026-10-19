@@ -1,13 +1,13 @@
 import SwiftUI
 
-/// Contenu d'un niveau des épinglés : onglets, splits (une ligne chacun) et dossiers, avec le contenu des
-/// dossiers dépliés, indenté d'un cran par niveau. Sous la ligne d'un dossier, son panneau de personnalisation s'il
-/// est ouvert dans la fenêtre (toute la largeur de la barre, sans retrait).
+/// Content of one level of the pinned items: tabs, splits (one row each) and folders, with the content of the
+/// expanded folders, indented one step per level. Below a folder's row, its customization panel if it is open
+/// in the window (full width of the sidebar, without indentation).
 struct PinnedItemsView: View {
     static let indent = 14.0
 
     let items: [PinnedItem]
-    /// Dossier qui contient ces éléments, nil pour la racine des épinglés.
+    /// Folder that contains these items, nil for the root of the pinned items.
     let parent: UUID?
     let depth: Int
     let tabManager: TabManager
@@ -36,7 +36,7 @@ struct PinnedItemsView: View {
                     .transition(.move(edge: .top).combined(with: .opacity))
                 }
                 if !folder.isCollapsed {
-                    // AnyView : un type de vue ne peut pas se contenir lui-même directement.
+                    // AnyView: a view type cannot directly contain itself.
                     AnyView(PinnedItemsView(items: folder.items, parent: folder.id, depth: depth + 1, tabManager: tabManager))
                 }
             }

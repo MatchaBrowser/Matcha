@@ -1,7 +1,7 @@
 import SwiftUI
 
-/// Aperçu de l'import d'Arc et alerte d'un fichier illisible, attachés à la fenêtre (tâche 7.1). L'import fait,
-/// la fenêtre affiche le premier Space importé.
+/// Arc import preview and unreadable-file alert, attached to the window (task 7.1). Once the import is done,
+/// the window shows the first imported Space.
 struct ArcImportPresenter: ViewModifier {
     let model: WindowModel
 
@@ -17,7 +17,7 @@ struct ArcImportPresenter: ViewModifier {
                     perform(request.sidebar, options: options)
                 }
             }
-            // Sans action : le bouton OK du système.
+            // No action: the system's OK button.
             .alert("This File Can’t Be Imported", isPresented: $arcImport.isFailurePresented) {} message: {
                 Text(ArcImportModel.fileHint)
             }

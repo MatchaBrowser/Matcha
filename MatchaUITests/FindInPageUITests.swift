@@ -1,14 +1,14 @@
 import XCTest
 
-/// Recherche dans la page (5.3) : ⌘F, recherche à la frappe, « Introuvable », ⌘G et ⇧⌘G, ⎋, changement d'onglet,
-/// aperçu. Pages : la documentation de Postfix livrée avec macOS (sans réseau ; tests ignorés si elle manque). Ces
-/// tests déplacent la vraie souris.
+/// Find in page (5.3): ⌘F, search as you type, “Not Found”, ⌘G and ⇧⌘G, ⎋, tab switch, Peek. Pages: the
+/// Postfix documentation shipped with macOS (no network; tests skipped if it is missing). These tests move the
+/// real mouse.
 final class FindInPageUITests: XCTestCase {
     override func setUpWithError() throws {
         continueAfterFailure = false
     }
 
-    /// Lance l'app sur la page d'accueil de la documentation de Postfix, seule dans la barre.
+    /// Launches the app on the home page of the Postfix documentation, alone in the sidebar.
     @MainActor
     private func launchOnLocalDocs() throws -> XCUIApplication {
         let app = launchApp()
@@ -29,12 +29,12 @@ final class FindInPageUITests: XCTestCase {
         replaceFindText(with: "zzqqxx", in: app)
         XCTAssertTrue(waitForNotFound(in: app))
 
-        // Champ vidé : plus de résultat.
+        // Field cleared: no result anymore.
         app.typeKey("a", modifierFlags: .command)
         app.typeKey(.delete, modifierFlags: [])
         XCTAssertTrue(findStatus(in: app).waitForNonExistence(timeout: 3))
 
-        // ⌘F, barre déjà ouverte : le champ garde le clavier.
+        // ⌘F, bar already open: the field keeps keyboard focus.
         openFindBar(in: app)
     }
 
@@ -69,14 +69,14 @@ final class FindInPageUITests: XCTestCase {
         app.typeKey(.escape, modifierFlags: [])
         XCTAssertTrue(field.waitForNonExistence(timeout: 3))
 
-        // ⌘G rouvre la barre avec le même texte, sans lui donner le clavier ; × la referme.
+        // ⌘G reopens the bar with the same text, without giving it keyboard focus; × closes it again.
         app.typeKey("g", modifierFlags: .command)
         XCTAssertTrue(field.waitForExistence(timeout: 3))
         XCTAssertEqual(field.value as? String, "configuration")
         findButton("findCloseButton", in: app).click()
         XCTAssertTrue(field.waitForNonExistence(timeout: 3))
 
-        // La page répond toujours : un lien s'ouvre.
+        // The page still responds: a link opens.
         clickWhenSettled(link(containing: "Basic configuration", in: app))
         XCTAssertTrue(waitForValue(of: addressPill(in: app)) { $0 == "BASIC_CONFIGURATION_README.html" })
     }
@@ -93,23 +93,23 @@ final class FindInPageUITests: XCTestCase {
 
         tabRow(titled: "Nouvel onglet", in: app).click()
         XCTAssertTrue(field.waitForNonExistence(timeout: 3))
-        // Onglet vide : rien à chercher, ⌘F n'ouvre rien.
+        // Empty tab: nothing to search, ⌘F opens nothing.
         app.typeKey("f", modifierFlags: .command)
         XCTAssertFalse(field.waitForExistence(timeout: 1))
 
-        // De retour, la barre est là, avec son texte.
+        // Back again, the bar is there, with its text.
         tabRow(titled: "Postfix Documentation", in: app).click()
         XCTAssertTrue(field.waitForExistence(timeout: 3))
         XCTAssertEqual(field.value as? String, "postfix")
     }
 
-    /// Aperçu ouvert : ⌘F cherche dans sa page ; ⎋ ferme la barre, pas l'aperçu, puis un second ⎋ ferme l'aperçu.
+    /// Peek open: ⌘F searches its page; ⎋ closes the bar, not the Peek, then a second ⎋ closes the Peek.
     @MainActor
     func testFindInPeekAndEscapeClosesOnlyTheBar() throws {
         let app = try launchOnLocalDocs()
         openPeekOnLocalDocs(in: app)
         let field = openFindBar(in: app)
-        // Dans le panneau de l'aperçu, sous sa barre.
+        // In the Peek panel, below its bar.
         XCTAssertGreaterThan(field.frame.minY, peekElement("peekAddress", in: app).frame.maxY)
         app.typeText("postfix")
         XCTAssertFalse(findStatus(in: app).waitForExistence(timeout: 2))

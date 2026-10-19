@@ -1,20 +1,20 @@
 import Foundation
 
-/// Réglage « Libérer la mémoire des onglets inactifs après » (tâche 5.6) : durée après laquelle un onglet caché est mis
-/// en veille. Valeur enregistrée : le nombre de minutes, 0 pour « Jamais ».
+/// “Free memory of inactive tabs after” setting (task 5.6): time after which a hidden tab is suspended. Saved
+/// value: the number of minutes, 0 for “Never”.
 nonisolated enum TabSuspensionDelay: Int, CaseIterable, Identifiable, Sendable {
     case fifteenMinutes = 15
     case thirtyMinutes = 30
     case oneHour = 60
     case twoHours = 120
-    /// Aucune mise en veille automatique, ni après le délai ni pendant une alerte mémoire.
+    /// No automatic suspension, neither after the delay nor during a memory warning.
     case never = 0
 
     var id: Self {
         self
     }
 
-    /// Durée avant la mise en veille ; nil pour « Jamais ».
+    /// Time before suspension; nil for “Never”.
     var duration: Duration? {
         self == .never ? nil : .seconds(rawValue * 60)
     }

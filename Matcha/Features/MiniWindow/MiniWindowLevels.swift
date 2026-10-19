@@ -1,8 +1,8 @@
 import AppKit
 
-/// Niveau des mini-fenêtres : au-dessus des fenêtres de Matcha tant que l'app est active ; quand une autre app
-/// passe devant, au niveau normal, juste au-dessus de la fenêtre de Matcha la plus en avant (elles passent
-/// derrière les fenêtres de l'autre app, mais pas derrière la fenêtre du navigateur). Jamais masquées.
+/// Level of the mini windows: above Matcha's windows while the app is active; when another app comes to the front,
+/// at the normal level, just above Matcha's frontmost window (they go behind the other app's windows, but not
+/// behind the browser window). Never hidden.
 @MainActor
 enum MiniWindowLevels {
     static func raise(_ panels: [NSWindow]) {
@@ -11,7 +11,7 @@ enum MiniWindowLevels {
         }
     }
 
-    /// Du premier plan vers l'arrière, chacune est posée juste au-dessus de l'ancre : leur ordre est gardé.
+    /// From front to back, each one is placed just above the anchor: their order is preserved.
     static func lower(_ panels: [NSWindow]) {
         let windows = orderedFrontToBack()
         let ordered = windows.filter { window in panels.contains { $0 === window } }
@@ -26,7 +26,7 @@ enum MiniWindowLevels {
         }
     }
 
-    /// Fenêtres de l'app, du premier plan vers l'arrière (panneaux compris, contrairement à `NSApp.orderedWindows`).
+    /// The app's windows, from front to back (panels included, unlike `NSApp.orderedWindows`).
     private static func orderedFrontToBack() -> [NSWindow] {
         (NSWindow.windowNumbers(options: []) ?? []).compactMap { NSApp.window(withWindowNumber: $0.intValue) }
     }

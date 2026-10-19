@@ -1,25 +1,25 @@
 import Foundation
 
-/// Contraste selon les WCAG 2 : luminance relative et rapport de contraste, pour choisir un texte lisible sur un fond.
+/// Contrast according to WCAG 2: relative luminance and contrast ratio, to choose readable text on a background.
 nonisolated extension ThemeColor {
-    /// Luminance relative (0 : noir, 1 : blanc) : composantes sRGB linéarisées, pondérées selon la sensibilité de l'œil.
+    /// Relative luminance (0: black, 1: white): linearized sRGB components, weighted by the eye's sensitivity.
     var relativeLuminance: Double {
         0.2126 * Self.linearized(red) + 0.7152 * Self.linearized(green) + 0.0722 * Self.linearized(blue)
     }
 
-    /// Rapport de contraste avec `other`, de 1 (aucun) à 21 (noir sur blanc), quel que soit l'ordre.
+    /// Contrast ratio with `other`, from 1 (none) to 21 (black on white), whatever the order.
     func contrastRatio(with other: ThemeColor) -> Double {
         let (lighter, darker) = (max(relativeLuminance, other.relativeLuminance), min(relativeLuminance, other.relativeLuminance))
         return (lighter + 0.05) / (darker + 0.05)
     }
 
-    /// Texte à écrire sur cette couleur prise comme fond : le noir ou le blanc, celui qui contraste le plus
-    /// (le blanc à égalité).
+    /// Text to write on this color used as a background: black or white, whichever contrasts most
+    /// (white on a tie).
     var readableTextColor: ThemeColor {
         contrastRatio(with: .black) > contrastRatio(with: .white) ? .black : .white
     }
 
-    /// Composante sRGB ramenée à une intensité lumineuse linéaire (courbe de transfert sRGB).
+    /// sRGB component converted to a linear light intensity (sRGB transfer curve).
     private static func linearized(_ component: Double) -> Double {
         component <= 0.040_45 ? component / 12.92 : pow((component + 0.055) / 1.055, 2.4)
     }

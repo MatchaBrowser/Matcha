@@ -1,10 +1,10 @@
 import XCTest
 
-/// Captures des réglages du site et du bandeau de permission (tâche 5.2, voir `ScreenshotUITests`).
+/// Screenshots of the site settings and the permission banner (task 5.2, see `ScreenshotUITests`).
 extension ScreenshotUITests {
-    /// Si `MATCHA_SCREENSHOT_SITE_SETTINGS` est défini : panneau des réglages du site ouvert sur l'onglet affiché
-    /// (`26-reglages-site`), puis la confirmation de l'effacement des données (`27-reglages-site-effacer`), annulée.
-    /// Sans `MATCHA_SCREENSHOT_URLS`, https://example.com est ouvert d'abord (réseau nécessaire).
+    /// If `MATCHA_SCREENSHOT_SITE_SETTINGS` is set: site settings panel opened on the displayed tab
+    /// (`26-reglages-site`), then the data clearing confirmation (`27-reglages-site-effacer`), cancelled.
+    /// Without `MATCHA_SCREENSHOT_URLS`, https://example.com is opened first (network needed).
     @MainActor
     func captureSiteSettings(in app: XCUIApplication, window: XCUIElement) {
         let environment = ProcessInfo.processInfo.environment
@@ -30,10 +30,10 @@ extension ScreenshotUITests {
         app.buttons["siteSettingsCloseButton"].click()
     }
 
-    /// Si `MATCHA_SCREENSHOT_PERMISSION_URL` est défini : cette page est ouverte, le bouton de la page nommé par
-    /// `MATCHA_SCREENSHOT_PERMISSION_BUTTON` est cliqué s'il est défini, puis le bandeau de la demande de caméra ou de
-    /// micro est capturé (`28-permission-bandeau`), sans réponse. Réseau nécessaire ; si macOS n'a pas encore donné
-    /// l'accès à la caméra à Matcha, sa propre demande d'accès peut apparaître et bloquer la capture.
+    /// If `MATCHA_SCREENSHOT_PERMISSION_URL` is set: this page is opened, the page button named by
+    /// `MATCHA_SCREENSHOT_PERMISSION_BUTTON` is clicked if it is set, then the camera or microphone request banner is
+    /// captured (`28-permission-bandeau`), without answering. Network needed; if macOS hasn't given Matcha access to
+    /// the camera yet, its own access request may appear and block the screenshot.
     @MainActor
     func capturePermissionBanner(in app: XCUIApplication, window: XCUIElement) {
         let environment = ProcessInfo.processInfo.environment

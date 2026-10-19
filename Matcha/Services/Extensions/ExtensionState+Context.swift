@@ -1,9 +1,9 @@
 import Foundation
 import WebKit
 
-/// Passage entre l'état retenu d'une extension et son contexte WebKit (tâche 6.3).
+/// Conversion between the remembered state of an extension and its WebKit context (task 6.3).
 extension ExtensionState {
-    /// Décisions actuelles de `context`.
+    /// Current decisions of `context`.
     @MainActor
     init(context: WKWebExtensionContext, isEnabled: Bool) {
         self.isEnabled = isEnabled
@@ -15,7 +15,8 @@ extension ExtensionState {
         hasRequestedOptionalAccessToAllHosts = context.hasRequestedOptionalAccessToAllHosts
     }
 
-    /// Remet ces décisions dans `context` (avant son chargement), sans celles expirées ; un motif illisible est ignoré.
+    /// Puts these decisions back into `context` (before it is loaded), without the expired ones; an unreadable pattern
+    /// is ignored.
     @MainActor
     func apply(to context: WKWebExtensionContext, now: Date = .now) {
         let state = removingExpired(at: now)
@@ -27,7 +28,7 @@ extension ExtensionState {
         context.hasRequestedOptionalAccessToAllHosts = state.hasRequestedOptionalAccessToAllHosts
     }
 
-    /// Clés en texte ; pour deux clés de même texte, l'expiration la plus lointaine.
+    /// Keys as text; for two keys with the same text, the most distant expiration.
     private static func texts<Key>(_ dictionary: [Key: Date], _ text: (Key) -> String) -> [String: Date] {
         Dictionary(dictionary.map { (text($0.key), $0.value) }, uniquingKeysWith: max)
     }

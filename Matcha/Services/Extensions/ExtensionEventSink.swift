@@ -1,11 +1,11 @@
 import WebKit
 
-/// Ce qui reçoit les événements des fenêtres et des onglets (tâche 6.3) : le contrôleur des extensions, qui les donne à
-/// chaque extension chargée ; une fausse version dans les tests, qui les note.
+/// What receives the window and tab events (task 6.3): the extension controller, which gives them to each loaded
+/// extension; a fake version in the tests, which records them.
 @MainActor
 protocol ExtensionEventSink: AnyObject {
-    /// Faux tant qu'aucune extension n'est chargée : rien à prévenir (une extension chargée ensuite lit les fenêtres
-    /// ouvertes par le délégué).
+    /// False as long as no extension is loaded: nobody to notify (an extension loaded later reads the open windows
+    /// through the delegate).
     var isListening: Bool { get }
     func didOpenWindow(_ newWindow: any WKWebExtensionWindow)
     func didCloseWindow(_ closedWindow: any WKWebExtensionWindow)
@@ -26,7 +26,7 @@ extension WKWebExtensionController: ExtensionEventSink {
 }
 
 extension WKWebExtension.TabChangedProperties {
-    /// Équivalent WebKit des changements notés par `ExtensionEventPlanner`.
+    /// WebKit equivalent of the changes recorded by `ExtensionEventPlanner`.
     init(_ changes: ExtensionTabChanges) {
         var properties: WKWebExtension.TabChangedProperties = []
         if changes.contains(.loading) {

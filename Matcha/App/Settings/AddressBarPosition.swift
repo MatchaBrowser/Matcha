@@ -1,10 +1,10 @@
 import Foundation
 
-/// Emplacement de la barre d'adresse.
+/// Position of the address bar.
 nonisolated enum AddressBarPosition: String, CaseIterable, Identifiable, Sendable {
-    /// En haut de la barre latérale, comme dans Arc.
+    /// At the top of the sidebar, as in Arc.
     case sidebar
-    /// En haut de la carte de contenu, sur toute sa largeur, avec les boutons de navigation.
+    /// At the top of the content card, across its full width, with the navigation buttons.
     case top
 
     var id: Self {

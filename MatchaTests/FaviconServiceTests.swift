@@ -4,10 +4,10 @@ import Foundation
 import Testing
 import WebKit
 
-/// Tests sans réseau : les icônes sont servies en URL `data:`.
+/// Tests without network: the icons are served as `data:` URLs.
 @MainActor
 struct FaviconServiceTests {
-    /// Image PNG de 1 × 1 pixel.
+    /// 1 × 1 pixel PNG image.
     static let pngBase64 = "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg=="
     static let pngURL = URL(string: "data:image/png;base64,\(pngBase64)")!
 
@@ -58,8 +58,8 @@ struct FaviconServiceTests {
         let manager = TabManager(websiteDataStore: .nonPersistent(), faviconService: FaviconService(directory: nil))
         let tab = manager.insertTab(configuration: TestPages.configuration(), after: nil, select: true)
         tab.load(TestPages.url("avec-icone", body: "<link rel='icon' href='\(Self.pngURL.absoluteString)'>"))
-        // Chargement, lecture des icônes dans la page puis téléchargement : 0,2 s seul, mais près de 10 s quand toute la
-        // suite tourne (vues web et fil principal partagés), déjà avant la tâche 5.8.
+        // Loading, reading the icons in the page, then downloading: 0.2 s alone, but nearly 10 s when the whole
+        // suite runs (web views and main thread shared), already before task 5.8.
         try await waitUntil(timeout: .seconds(30)) { tab.favicon != nil }
     }
 
@@ -68,8 +68,8 @@ struct FaviconServiceTests {
         let tab = manager.insertTab(configuration: TestPages.configuration(), after: nil, select: true)
         tab.load(TestPages.url("sans-icone"))
         try await waitUntil { tab.title == "sans-icone" && !tab.isLoading }
-        // Laisse la première recherche, infructueuse, se terminer : une recherche encore en cours serait reprise
-        // par le chargement suivant, sans les icônes de sa page (lente quand beaucoup de vues web tournent).
+        // Lets the first search, which finds nothing, finish: a search still in progress would be picked up by the
+        // next load, without the icons of its page (slow when many web views are running).
         try await Task.sleep(for: .milliseconds(300))
         try await waitUntil { !manager.faviconService.isRefreshingIcon(forHost: "pages") }
         #expect(tab.favicon == nil)

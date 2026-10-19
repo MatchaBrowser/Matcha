@@ -2,10 +2,10 @@ import Foundation
 @testable import Matcha
 import Testing
 
-/// Splits déplacés, épinglés, séparés ; lignes de la barre.
+/// Splits moved, pinned, separated; sidebar rows.
 extension SidebarLayoutSplitTests {
     @Test func `moving a group keeps it together`() throws {
-        // Du jour : X (0), A (1), B (2), Y (3) ; split [A, B].
+        // Today: X (0), A (1), B (2), Y (3); split [A, B].
         var layout = todayLayout(4)
         let created = group([1, 2], in: &layout)
         let groupID = try #require(created)
@@ -15,7 +15,7 @@ extension SidebarLayoutSplitTests {
         #expect(today(layout) == [0, 3, 1, 2])
         layout.moveSplit(groupID, to: .today(index: 0))
         #expect(today(layout) == [1, 2, 0, 3])
-        // Sur sa propre ligne : rien ne change.
+        // On its own row: nothing changes.
         layout.moveSplit(groupID, to: .today(index: 0))
         #expect(today(layout) == [1, 2, 0, 3])
         expectSplitInvariants(layout)
@@ -82,7 +82,7 @@ extension SidebarLayoutSplitTests {
         #expect(today(layout) == [0, 1, 2, 3])
     }
 
-    // MARK: Affichage
+    // MARK: Display
 
     @Test func `displayed tabs are the selected tab's group or the tab alone`() {
         var layout = todayLayout(4)

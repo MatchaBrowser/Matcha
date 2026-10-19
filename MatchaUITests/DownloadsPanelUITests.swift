@@ -1,8 +1,8 @@
 import XCTest
 
-/// Panneau des téléchargements sans téléchargement (tâche 5.1, après essai) : bouton toujours visible dans le pied de la
-/// barre, panneau vide avec « Aucun téléchargement » et le bouton du dossier Téléchargements (jamais cliqué : il
-/// ouvrirait le Finder), Présentation > « Afficher les téléchargements » (⌥⌘L). Rien n'est téléchargé.
+/// Downloads panel without any download (task 5.1, after trying it): button always visible in the sidebar footer,
+/// empty panel with “No Downloads” and the Downloads folder button (never clicked: it would open the Finder),
+/// View > “Show Downloads” (⌥⌘L). Nothing is downloaded.
 final class DownloadsPanelUITests: XCTestCase {
     private let showTitle = "Afficher les téléchargements"
     private let hideTitle = "Masquer les téléchargements"
@@ -11,8 +11,8 @@ final class DownloadsPanelUITests: XCTestCase {
         continueAfterFailure = false
     }
 
-    /// Le bouton est là dès le lancement, rien ne s'ouvre de soi-même ; un clic ouvre le panneau vide, la croix le
-    /// ferme et le bouton reste. Même chose dans une fenêtre privée.
+    /// The button is there from launch, nothing opens by itself; a click opens the empty panel, the cross closes it
+    /// and the button stays. Same in a private window.
     @MainActor
     func testButtonIsAlwaysVisibleAndOpensAnEmptyPanel() {
         let app = launchApp()
@@ -25,11 +25,11 @@ final class DownloadsPanelUITests: XCTestCase {
         XCTAssertTrue(downloadsPanel(in: app).waitForExistence(timeout: 3))
         let emptyState = downloadsEmptyState(in: app)
         XCTAssertTrue(emptyState.waitForExistence(timeout: 3))
-        // Texte lu dans le libellé ou dans la valeur, selon la version de macOS.
+        // Text read from the label or the value, depending on the macOS version.
         XCTAssertTrue([emptyState.label, emptyState.value as? String].contains("Aucun téléchargement"))
         XCTAssertTrue(downloadsShowFolderButton(in: app).exists)
         XCTAssertEqual(downloadRows(in: app).count, 0)
-        // Rien à effacer.
+        // Nothing to clear.
         let clear = app.buttons["downloadsClearButton"]
         XCTAssertTrue(clear.exists)
         XCTAssertFalse(clear.isEnabled)
@@ -37,7 +37,7 @@ final class DownloadsPanelUITests: XCTestCase {
         clickWhenSettled(app.buttons["downloadsCloseButton"])
         XCTAssertTrue(downloadsPanel(in: app).waitForNonExistence(timeout: 3))
         XCTAssertTrue(button.exists)
-        // Le bouton referme aussi le panneau.
+        // The button also closes the panel.
         button.click()
         XCTAssertTrue(downloadsPanel(in: app).waitForExistence(timeout: 3))
         button.click()
@@ -52,7 +52,7 @@ final class DownloadsPanelUITests: XCTestCase {
         app.terminate()
     }
 
-    /// ⌥⌘L ouvre puis ferme le panneau ; le titre du menu suit. Grisé quand les Réglages sont au premier plan.
+    /// ⌥⌘L opens then closes the panel; the menu title follows. Grayed out when Settings is in front.
     @MainActor
     func testCommandOptionLTogglesThePanel() {
         let app = launchApp()
@@ -74,7 +74,7 @@ final class DownloadsPanelUITests: XCTestCase {
         app.terminate()
     }
 
-    /// Barre masquée (⌘S) : ⌥⌘L l'affiche d'abord, puis ouvre le panneau dedans.
+    /// Hidden sidebar (⌘S): ⌥⌘L shows it first, then opens the panel in it.
     @MainActor
     func testCommandOptionLShowsTheHiddenSidebarAndThePanel() {
         let app = launchApp()
@@ -90,7 +90,7 @@ final class DownloadsPanelUITests: XCTestCase {
         XCTAssertTrue(newTabButton.waitForExistence(timeout: 3))
         XCTAssertTrue(downloadsPanel(in: app).waitForExistence(timeout: 3))
         XCTAssertTrue(downloadsEmptyState(in: app).exists)
-        // La barre reste affichée, même loin du bord gauche.
+        // The sidebar stays shown, even far from the left edge.
         moveAwayFromLeftEdge(in: window)
         XCTAssertFalse(newTabButton.waitForNonExistence(timeout: 1))
         XCTAssertTrue(waitForMenuItem("Masquer la barre latérale", enabled: true, in: app))

@@ -2,7 +2,7 @@ import Foundation
 @testable import Matcha
 import Testing
 
-/// Archives zip et paquets d'extension (tâche 6.4) : lecture, chemins dangereux, en-tête `.crx`.
+/// Zip archives and extension packages (task 6.4): reading, dangerous paths, `.crx` header.
 @MainActor
 struct ZipArchiveTests {
     private func fixture(_ name: String) throws -> Data {
@@ -54,7 +54,7 @@ struct ZipArchiveTests {
 
     @Test func `a damaged entry is detected by its checksum`() throws {
         var data = try fixture("test-extension-package.xpi")
-        // Premier octet du contenu du premier fichier (rangé tel quel) : en-tête local de 30 octets plus son nom.
+        // First byte of the first file's content (stored as is): 30-byte local header plus its name.
         let nameLength = Int(data[26]) | Int(data[27]) << 8
         data[30 + nameLength] ^= 0xFF
         let archive = try ZipArchive(data: data)
@@ -71,7 +71,7 @@ struct ZipArchiveTests {
         #expect(CRC32.checksum(Data()) == 0)
     }
 
-    // MARK: Paquets
+    // MARK: Packages
 
     @Test func `a crx3 file holds a zip archive after its header`() throws {
         let zip = try ExtensionPackage.zipData(from: fixture("test-extension-package.crx"))

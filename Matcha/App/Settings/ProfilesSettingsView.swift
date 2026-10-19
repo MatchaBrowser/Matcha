@@ -1,6 +1,6 @@
 import SwiftUI
 
-/// Réglages des profils : chacun a ses cookies, ses connexions et ses favoris, partagés par ses Spaces.
+/// Profile settings: each one has its own cookies, logins and favorites, shared by its Spaces.
 struct ProfilesSettingsView: View {
     @Environment(BrowserSession.self) private var session
     @Environment(MiniWindowManager.self) private var miniWindows: MiniWindowManager?
@@ -21,7 +21,7 @@ struct ProfilesSettingsView: View {
                 .accessibilityIdentifier("newProfileButton")
         }
         .formStyle(.grouped)
-        // La fenêtre prend la hauteur du contenu : pas de barre de défilement.
+        // The window takes the height of its content: no scroll bar.
         .scrollDisabled(true)
         .fixedSize(horizontal: false, vertical: true)
         .confirmationDialog(
@@ -34,7 +34,7 @@ struct ProfilesSettingsView: View {
         ) {
             Button("Delete", role: .destructive) {
                 if let profile = profileToDelete {
-                    // Ses mini-fenêtres se ferment d'abord : leurs pages n'utilisent plus ses données.
+                    // Its mini windows close first: their pages no longer use its data.
                     miniWindows?.closeWindows(ofProfile: profile.id)
                     Task { await session.deleteProfile(profile) }
                 }
@@ -45,7 +45,7 @@ struct ProfilesSettingsView: View {
     }
 }
 
-/// Ligne d'un profil : nom modifiable, nombre de Spaces, suppression.
+/// Row of a profile: editable name, number of Spaces, deletion.
 private struct ProfileRow: View {
     let profile: ProfileRecord
     let session: BrowserSession

@@ -3,7 +3,7 @@ import Foundation
 import Testing
 import WebKit
 
-/// « Afficher le code source » : adresse du visualiseur, lecture du texte, page qui le montre sans rien exécuter.
+/// “View Page Source”: viewer address, reading the text, a page that shows it without running anything.
 @MainActor
 struct PageSourceTests {
     @Test func `the viewer address leads back to its page`() throws {

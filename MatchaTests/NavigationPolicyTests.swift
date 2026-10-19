@@ -40,8 +40,8 @@ struct NavigationPolicyTests {
         #expect(NavigationPolicy.decide(request(button: 4)) == .openInNewTab(page, inBackground: true))
     }
 
-    /// Masque de boutons de WebKit, vérifié sur de vrais clics : avant la 4.4, le bouton du milieu était pris
-    /// pour 2 (le bouton droit), si bien que la molette suivait le lien sur place.
+    /// WebKit's button mask, checked on real clicks: before 4.4, the middle button was taken for 2 (the right button),
+    /// so a wheel click followed the link in place.
     @Test func `button numbers follow WebKit's mask`() {
         #expect(NavigationPolicy.leftMouseButton == 1)
         #expect(NavigationPolicy.middleMouseButton == 4)

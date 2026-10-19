@@ -1,13 +1,13 @@
 import Foundation
 import XCTest
 
-/// Outils des tests de l'aperçu (Peek, tâche 4.4). Pages : la documentation de Postfix livrée avec macOS, sans
-/// réseau. « Basic configuration » (sur `index.html`) mène à `BASIC_CONFIGURATION_README.html`, dont les liens
-/// « main.cf » mènent à `postconf.5.html`. `index.html` n'a qu'un lien « All main.cf parameters ».
+/// Helpers for the Peek tests (task 4.4). Pages: the Postfix documentation shipped with macOS, without
+/// network. “Basic configuration” (on `index.html`) leads to `BASIC_CONFIGURATION_README.html`, whose
+/// “main.cf” links lead to `postconf.5.html`. `index.html` has only one “All main.cf parameters” link.
 extension XCTestCase {
     static let localDocsPath = "/usr/share/doc/postfix/html/index.html"
 
-    /// Ouvre la documentation de Postfix dans un nouvel onglet ; le test est ignoré si elle manque.
+    /// Opens the Postfix documentation in a new tab; the test is skipped if it is missing.
     @MainActor
     func openLocalDocs(in app: XCUIApplication) throws {
         try XCTSkipUnless(FileManager.default.isReadableFile(atPath: Self.localDocsPath), "Documentation de Postfix absente")
@@ -15,12 +15,12 @@ extension XCTestCase {
         XCTAssertTrue(tabRow(titled: "Postfix Documentation", in: app).waitForExistence(timeout: 10))
     }
 
-    /// Liens de la page dont le texte contient `text` (ou vaut `text` si `exact`). Si l'accessibilité des pages
-    /// n'expose pas les liens, repli sur les textes, signalé dans le rapport du test.
+    /// Links of the page whose text contains `text` (or equals `text` if `exact`). If page accessibility doesn't
+    /// expose the links, falls back to the texts, flagged in the test report.
     @MainActor
     func links(_ text: String, exact: Bool = false, in app: XCUIApplication) -> XCUIElementQuery {
         let comparison = exact ? "==" : "CONTAINS"
-        // Le texte d'un lien de page est son titre (son libellé est souvent vide) ; sa valeur est son adresse.
+        // The text of a page link is its title (its label is often empty); its value is its address.
         let links = app.links.matching(NSPredicate(format: "title \(comparison) %@ OR label \(comparison) %@", text, text))
         if links.firstMatch.waitForExistence(timeout: 10) {
             return links
@@ -29,13 +29,13 @@ extension XCTestCase {
         return app.staticTexts.matching(NSPredicate(format: "label \(comparison) %@ OR value \(comparison) %@", text, text))
     }
 
-    /// Premier lien dont le texte contient `text`.
+    /// First link whose text contains `text`.
     @MainActor
     func link(containing text: String, in app: XCUIApplication) -> XCUIElement {
         links(text, in: app).firstMatch
     }
 
-    /// Maj+clic, comme l'utilisateur (la vraie touche est tenue pendant le clic).
+    /// Shift-click, like the user (the real key is held down during the click).
     @MainActor
     func shiftClick(_ element: XCUIElement) {
         XCUIElement.perform(withKeyModifiers: .shift) {
@@ -43,13 +43,13 @@ extension XCTestCase {
         }
     }
 
-    /// Élément de l'aperçu : `peek` (la couche), `peekAddress`, `peekOpenAsTabButton`, `peekCloseButton`.
+    /// Peek element: `peek` (the layer), `peekAddress`, `peekOpenAsTabButton`, `peekCloseButton`.
     @MainActor
     func peekElement(_ identifier: String, in app: XCUIApplication) -> XCUIElement {
         app.descendants(matching: .any).matching(identifier: identifier).firstMatch
     }
 
-    /// Maj+clic sur « Basic configuration » de la page affichée : l'aperçu s'ouvre sur cette page.
+    /// Shift-click on “Basic configuration” of the displayed page: Peek opens on that page.
     @MainActor
     func openPeekOnLocalDocs(in app: XCUIApplication) {
         let source = link(containing: "Basic configuration", in: app)
@@ -59,7 +59,7 @@ extension XCTestCase {
         XCTAssertTrue(waitForValue(of: peekElement("peekAddress", in: app), timeout: 10) { $0 == "BASIC_CONFIGURATION_README.html" })
     }
 
-    /// Attend que la valeur de `element` soit vide (pastille d'un onglet sans adresse).
+    /// Waits for the value of `element` to be empty (pill of a tab without an address).
     @MainActor
     func waitForEmptyValue(of element: XCUIElement, timeout: TimeInterval = 5) -> Bool {
         let predicate = NSPredicate { object, _ in

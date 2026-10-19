@@ -1,20 +1,20 @@
 import Foundation
 
-/// Lit le fichier `StorableSidebar.json` d'Arc (tâche 7.1). Le format n'est pas documenté : la lecture est tolérante,
-/// d'après le fichier d'Arc 1.x. La barre locale est le conteneur de `sidebar.containers` qui a `items` et `spaces`,
-/// deux listes de paires (identifiant, objet) :
-/// - un Space a un titre, `containerIDs` (`"pinned"` et `"unpinned"`, chacun suivi de l'identifiant de son conteneur),
-///   `customInfo.iconType` (icône ou emoji), `customInfo.windowTheme` (couleurs) et `profile` ;
-/// - un élément a un titre, `childrenIds` et `data` : `tab` (`savedURL`, `savedTitle`), `list` (dossier),
-///   `itemContainer` (racine d'un conteneur), `arcDocument` (note d'Arc, laissée de côté) ; un autre genre qui a des
-///   enfants (split view…) est remplacé par ses enfants.
-/// - `topAppsContainerIDs` donne, par profil, le conteneur de ses favoris.
-/// Seules les adresses `http`, `https` et `file` sont gardées. Type pur.
+/// Reads Arc's `StorableSidebar.json` file (task 7.1). The format is not documented: reading is lenient, based on the
+/// file of Arc 1.x. The local sidebar is the container of `sidebar.containers` that has `items` and `spaces`, two lists
+/// of pairs (identifier, object):
+/// - a Space has a title, `containerIDs` (`"pinned"` and `"unpinned"`, each followed by the identifier of its
+///   container), `customInfo.iconType` (icon or emoji), `customInfo.windowTheme` (colors) and `profile`;
+/// - an item has a title, `childrenIds` and `data`: `tab` (`savedURL`, `savedTitle`), `list` (folder), `itemContainer`
+///   (root of a container), `arcDocument` (Arc note, left out); another kind that has children (split view…) is
+///   replaced by its children.
+/// - `topAppsContainerIDs` gives, per profile, the container of its favorites.
+/// Only `http`, `https` and `file` addresses are kept. Pure type.
 nonisolated enum ArcSidebarParser {
     enum Failure: Error, Equatable {
-        /// Pas un objet JSON.
+        /// Not a JSON object.
         case unreadable
-        /// Objet JSON sans barre d'Arc reconnue.
+        /// JSON object without a recognized Arc sidebar.
         case notArcSidebar
     }
 
@@ -41,7 +41,7 @@ nonisolated enum ArcSidebarParser {
         return ArcSidebar(spaces: spaces, favorites: favorites, skippedItems: reader.skipped)
     }
 
-    // MARK: Lecture
+    // MARK: Reading
 
     private struct Reader {
         let items: [String: [String: Any]]
@@ -65,7 +65,7 @@ nonisolated enum ArcSidebarParser {
             )
         }
 
-        /// Contenu de l'élément `id`, dans l'ordre.
+        /// Content of item `id`, in order.
         mutating func children(of id: String) -> [ImportNode] {
             guard visited.insert(id).inserted, let item = items[id] else {
                 return []
@@ -74,7 +74,7 @@ nonisolated enum ArcSidebarParser {
             return ids.flatMap { node(for: $0) }
         }
 
-        /// L'élément `id` : un onglet, un dossier, ou ses enfants pour un genre inconnu.
+        /// Item `id`: a tab, a folder, or its children for an unknown kind.
         private mutating func node(for id: String) -> [ImportNode] {
             guard let item = items[id] else {
                 return []
@@ -99,7 +99,7 @@ nonisolated enum ArcSidebarParser {
                 skipped += 1
                 return []
             }
-            // Racine de conteneur, split view ou genre inconnu : ses enfants prennent sa place.
+            // Container root, split view or unknown kind: its children take its place.
             let content = children(of: id)
             if content.isEmpty, data["itemContainer"] == nil {
                 skipped += 1
@@ -108,9 +108,9 @@ nonisolated enum ArcSidebarParser {
         }
     }
 
-    // MARK: Valeurs
+    // MARK: Values
 
-    /// Liste de paires (identifiant, objet) en dictionnaire ; une liste d'objets portant leur `id` est lue aussi.
+    /// List of pairs (identifier, object) as a dictionary; a list of objects carrying their `id` is read too.
     static func pairs(_ value: Any?) -> [String: [String: Any]] {
         Dictionary(orderedPairs(value).map { ($0.key, $0.value) }) { first, _ in first }
     }
@@ -133,7 +133,7 @@ nonisolated enum ArcSidebarParser {
         return result
     }
 
-    /// `["pinned", id, "unpinned", id]`, ou des clés en objet (`{"pinned": {}}`).
+    /// `["pinned", id, "unpinned", id]`, or keys as an object (`{"pinned": {}}`).
     static func containerIDs(_ value: Any?) -> [String: String] {
         let list = value as? [Any] ?? []
         var result: [String: String] = [:]
@@ -150,7 +150,7 @@ nonisolated enum ArcSidebarParser {
         return result
     }
 
-    /// Paires (profil, identifiant du conteneur) de `topAppsContainerIDs`.
+    /// Pairs (profile, container identifier) of `topAppsContainerIDs`.
     static func profilePairs(_ value: Any?) -> [(key: Any, id: String)] {
         let list = value as? [Any] ?? []
         var result: [(key: Any, id: String)] = []
@@ -166,7 +166,7 @@ nonisolated enum ArcSidebarParser {
         return result
     }
 
-    /// `{"default": true}` ou `{"custom": {"_0": {"directoryBasename": "Profile 1"}}}`.
+    /// `{"default": true}` or `{"custom": {"_0": {"directoryBasename": "Profile 1"}}}`.
     static func profile(from value: Any?) -> ArcSidebar.Profile {
         guard let object = value as? [String: Any], let custom = object["custom"] else {
             return .default
@@ -178,7 +178,7 @@ nonisolated enum ArcSidebarParser {
         return .custom(name)
     }
 
-    /// `{"icon": "skull"}`, ou un emoji sous une clé qui contient « emoji ».
+    /// `{"icon": "skull"}`, or an emoji under a key that contains “emoji”.
     static func icon(_ value: Any?) -> ArcSidebar.Icon? {
         guard let object = value as? [String: Any] else {
             return nil
@@ -194,7 +194,7 @@ nonisolated enum ArcSidebarParser {
         return nil
     }
 
-    /// Couleurs du fond du thème (objets `red`, `green`, `blue`), dans l'ordre, sans doublon voisin.
+    /// Background colors of the theme (`red`, `green`, `blue` objects), in order, without adjacent duplicates.
     static func colors(in theme: Any?) -> [ThemeColor] {
         let background = (theme as? [String: Any])?["background"] ?? theme
         var result: [ThemeColor] = []

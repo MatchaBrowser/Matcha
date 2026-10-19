@@ -1,38 +1,38 @@
 import Foundation
 
-/// Onglet d'un Space de la fenêtre, désigné par identifiants : la barre ne garde pas d'objet vivant.
+/// Tab of a Space of the window, designated by identifiers: the bar keeps no live object.
 nonisolated struct TabReference: Hashable, Sendable {
     let tabID: UUID
     let spaceID: UUID
 }
 
-/// Actions proposées par la barre de commande, dans leur ordre d'affichage à égalité.
+/// Actions offered by the command bar, in their display order when tied.
 nonisolated enum CommandActionID: String, CaseIterable, Sendable {
     case newSpace
     case copyURL
     case settings
 }
 
-/// Résultat brut fourni par une source de la barre, avant correspondance et classement.
+/// Raw result provided by a bar source, before matching and ranking.
 nonisolated struct CommandCandidate: Equatable, Sendable {
     enum Kind: Equatable, Sendable {
-        /// Onglet ouvert ; `spaceName` est nil pour le Space affiché.
+        /// Open tab; `spaceName` is nil for the displayed Space.
         case tab(TabReference, place: TabPlace, spaceName: String?, lastActivity: Date)
-        /// Adresse de l'historique, toutes visites regroupées.
+        /// History address, all visits grouped.
         case history(visitCount: Int, lastVisit: Date)
-        /// `keywords` : mots cherchés en plus du titre, jamais affichés.
+        /// `keywords`: words searched in addition to the title, never displayed.
         case action(CommandActionID, keywords: [String])
-        /// Suggestion du moteur de recherche ; le titre est le texte à chercher.
+        /// Search engine suggestion; the title is the text to search.
         case suggestion
     }
 
     let kind: Kind
     let title: String
-    /// Nil pour les actions et les suggestions.
+    /// Nil for actions and suggestions.
     let url: URL?
 
-    /// Identifiant stable, repris par la ligne affichée : `tab:<uuid>`, `history:<clé d'adresse>`,
-    /// `action:<nom>`, `suggestion:<texte replié>`.
+    /// Stable identifier, reused by the displayed row: `tab:<uuid>`, `history:<address key>`, `action:<name>`,
+    /// `suggestion:<folded text>`.
     var id: String {
         switch kind {
         case let .tab(reference, _, _, _): "tab:\(reference.tabID.uuidString)"

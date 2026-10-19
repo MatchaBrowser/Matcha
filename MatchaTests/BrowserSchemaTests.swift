@@ -5,8 +5,8 @@ import Testing
 
 @MainActor
 struct BrowserSchemaTests {
-    /// Règles de CLAUDE.md pour rester compatible CloudKit : pas d'attribut unique, chaque propriété
-    /// optionnelle ou avec une valeur par défaut, chaque relation optionnelle avec son inverse.
+    /// Rules from CLAUDE.md to stay compatible with CloudKit: no unique attribute, every property optional or with
+    /// a default value, every relationship optional with its inverse.
     @Test func `schema stays compatible with CloudKit`() {
         let schema = Schema(BrowserSchema.models)
         for entity in schema.entities {
@@ -62,8 +62,8 @@ struct BrowserSchemaTests {
         #expect(try context.fetchCount(FetchDescriptor<FolderRecord>()) == 0)
     }
 
-    /// Tâche 5.2 : une base créée avant `SitePermissionRecord` s'ouvre avec le schéma actuel (migration légère, faite
-    /// par SwiftData), sans perdre ses données.
+    /// Task 5.2: a store created before `SitePermissionRecord` opens with the current schema (lightweight migration,
+    /// done by SwiftData), without losing its data.
     @Test func `a store from before site permissions opens and keeps its data`() throws {
         let directory = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString, isDirectory: true)
         try FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)
@@ -102,8 +102,8 @@ struct BrowserSchemaTests {
         #expect(SitePermissionStore(context: context).decision(.camera, for: TestOrigins.meet, profileID: profileID) == .allow)
     }
 
-    /// Tâche 5.5 : une base créée avec le schéma de la 5.2 (sans `HistoryRecord`) s'ouvre avec le schéma actuel
-    /// (migration légère, faite par SwiftData), sans perdre ses onglets ni ses décisions de permission.
+    /// Task 5.5: a store created with the 5.2 schema (without `HistoryRecord`) opens with the current schema
+    /// (lightweight migration, done by SwiftData), without losing its tabs or its permission decisions.
     @Test func `a store from before history opens and keeps its data`() async throws {
         let directory = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString, isDirectory: true)
         try FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)
@@ -144,7 +144,7 @@ struct BrowserSchemaTests {
         #expect(SitePermissionStore(context: context).decision(.camera, for: TestOrigins.meet, profileID: profileID) == .allow)
         #expect(try context.fetchCount(FetchDescriptor<HistoryRecord>()) == 0)
 
-        // L'historique s'y écrit et s'y relit.
+        // History is written to it and read back.
         let history = HistoryStore(container: container)
         try history.recordVisit(
             url: #require(URL(string: "https://example.com/")),
@@ -157,9 +157,9 @@ struct BrowserSchemaTests {
         #expect(reopened.index(for: profileID)?.entries["example.com"]?.title == "Exemple")
     }
 
-    /// Personnalisation des dossiers : une base créée avec le schéma d'avant (`FolderRecord` sans icône ni couleurs)
-    /// s'ouvre avec le schéma actuel (migration légère, faite par SwiftData : trois attributs optionnels ajoutés), sans
-    /// rien perdre ; ses dossiers ont l'apparence par défaut, puis enregistrent la leur.
+    /// Folder customization: a store created with the previous schema (`FolderRecord` without icon or colors)
+    /// opens with the current schema (lightweight migration, done by SwiftData: three optional attributes added),
+    /// without losing anything; its folders have the default appearance, then save their own.
     @Test func `a store from before folder appearances opens and keeps its folders`() throws {
         let directory = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString, isDirectory: true)
         try FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)
@@ -191,20 +191,20 @@ struct BrowserSchemaTests {
         #expect(layout.pinned.folder(childID)?.appearance == .default)
         #expect(layout.pinned.folder(childID)?.items.count == 1)
 
-        // L'apparence s'y écrit et s'y relit.
+        // The appearance is written to it and read back.
         let appearance = FolderAppearance(icon: .symbol("star"), textColor: .white, backgroundColor: ThemeColor(rgb: 0x5856D6))
         layout.setFolderAppearance(childID, appearance)
         store.save(tabs: tabs, layout: layout)
         #expect(folders[childID]?.iconValue == "symbol:star")
         #expect(folders[childID]?.backgroundColorHex == "#5856D6")
-        // Relu depuis la base, par un autre contexte.
+        // Read back from the store, through another context.
         let reloaded = try #require(ModelContext(container).fetch(FetchDescriptor<FolderRecord>()).first { $0.id == childID })
         #expect(reloaded.appearance == appearance)
         #expect(reloaded.tabs?.count == 1)
     }
 
-    /// Base créée avec le schéma d'avant la personnalisation des dossiers : un dossier « Travail », son sous-dossier
-    /// « Client » replié et un épinglé dedans. Renvoie les identifiants des deux dossiers.
+    /// Store created with the schema from before folder customization: a “Travail” folder, its collapsed “Client”
+    /// subfolder and a pinned tab inside it. Returns the identifiers of both folders.
     private func makeStoreBeforeFolderAppearances(at url: URL) throws -> (folder: UUID, child: UUID) {
         typealias Old = SchemaBeforeFolderAppearance
         let schema = Schema(Old.models)

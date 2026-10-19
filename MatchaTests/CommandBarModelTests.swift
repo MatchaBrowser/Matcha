@@ -2,7 +2,7 @@ import Foundation
 @testable import Matcha
 import Testing
 
-/// État de la barre de commande : ouverture, saisie, sélection, résultats tardifs et annulation.
+/// Command bar state: opening, typing, selection, late results and cancellation.
 @MainActor
 struct CommandBarModelTests {
     private let session: BrowserSession
@@ -24,7 +24,7 @@ struct CommandBarModelTests {
         windowModel.space.tabManager
     }
 
-    /// Suggestions de `engine`, sans attendre.
+    /// Suggestions from `engine`, without waiting.
     private func makeModel() -> CommandBarModel {
         CommandBarModel(windowModel: windowModel, suggestions: engine.provider(), now: { fixedNow })
     }
@@ -33,11 +33,11 @@ struct CommandBarModelTests {
         model.rows.map(\.id)
     }
 
-    // MARK: Ouverture
+    // MARK: Opening
 
     @Test func `command t opens the bar without creating a tab`() {
         let model = makeModel()
-        // Fermée tant que rien ne l'ouvre : jamais d'ouverture d'elle-même.
+        // Closed until something opens it: it never opens by itself.
         #expect(!model.isPresented)
         model.newTab(Self.settings(newTabPage: .blank, engine: .duckDuckGo))
         #expect(model.isPresented)
@@ -146,7 +146,7 @@ struct CommandBarModelTests {
         #expect(ids(model) == [CommandPrimaryRows.id, "action:copyURL"])
     }
 
-    // MARK: Saisie et sélection
+    // MARK: Typing and selection
 
     @Test func `typing rebuilds the first row synchronously and selects it`() {
         let model = makeModel()
@@ -206,7 +206,7 @@ struct CommandBarModelTests {
         #expect(ids(model).last == "suggestion:blank page")
         #expect(model.selectedRowID == "tab:\(other.id.uuidString)")
 
-        // Une suggestion gardée d'un texte précédent, sélectionnée, puis absente des nouvelles.
+        // A suggestion kept from a previous text, selected, then missing from the new ones.
         engine.suspended = ["blank p"]
         model.updateText("blank p")
         model.moveSelection(by: 10)

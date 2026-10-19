@@ -1,8 +1,7 @@
 import Foundation
 
-/// Commandes de la barre lues dans les sélecteurs que l'éditeur de champ transmet
-/// (`control(_:textView:doCommandBy:)`), après la méthode de saisie. ⌃P et ⌃N arrivent en
-/// `moveUp:` et `moveDown:`.
+/// Bar commands read from the selectors the field editor forwards (`control(_:textView:doCommandBy:)`), after the
+/// input method. ⌃P and ⌃N arrive as `moveUp:` and `moveDown:`.
 nonisolated enum CommandBarKeyCommand: Equatable, Sendable {
     /// ↑, ⌃P, ⇧⇥.
     case moveUp
@@ -13,7 +12,7 @@ nonisolated enum CommandBarKeyCommand: Equatable, Sendable {
     /// ⎋.
     case cancel
 
-    /// Nil pour un sélecteur que l'éditeur traite lui-même.
+    /// Nil for a selector the editor handles itself.
     init?(selectorName: String) {
         guard let command = Self.commands[selectorName] else {
             return nil

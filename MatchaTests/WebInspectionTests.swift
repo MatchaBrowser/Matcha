@@ -3,7 +3,7 @@ import Foundation
 import Testing
 import WebKit
 
-/// Outils pour développeurs web : pages inspectables, inspecteur dans l'app si WebKit le permet.
+/// Web developer tools: inspectable pages, inspector inside the app if WebKit allows it.
 @MainActor
 struct WebInspectionTests {
     @Test func `the setting makes pages inspectable, with the in-app inspector`() {

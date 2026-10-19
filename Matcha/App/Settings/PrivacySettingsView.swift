@@ -2,8 +2,8 @@ import OSLog
 import SwiftUI
 import WebKit
 
-/// Réglages de confidentialité : effacer cookies et données des sites, décisions de permission retenues par site, bloqueur
-/// de publicités et de traqueurs (réglage, listes, exceptions, crédits ; tâche 6.2, caché tant qu'il est mis de côté).
+/// Privacy settings: clear cookies and site data, permission decisions remembered per site, ad and tracker blocker
+/// (setting, lists, exceptions, credits; task 6.2, hidden while it is set aside).
 struct PrivacySettingsView: View {
     @Environment(BrowserSession.self) private var session
     @State private var isConfirmingClear = false
@@ -28,7 +28,7 @@ struct PrivacySettingsView: View {
                     .foregroundStyle(.secondary)
             }
             SitePermissionsSection(store: session.sitePermissions, profiles: session.profiles)
-            // Bloqueur (tâche 6.2) : celui de l'app, avec les exceptions enregistrées.
+            // Blocker (task 6.2): the app's, with the saved exceptions.
             if ContentBlockerService.isAvailable {
                 let contentBlocker = session.contentBlocking.service
                 ContentBlockerSettingsSection(service: contentBlocker)
@@ -37,7 +37,7 @@ struct PrivacySettingsView: View {
             }
         }
         .formStyle(.grouped)
-        // La fenêtre prend la hauteur du contenu : pas de barre de défilement.
+        // The window takes the height of its content: no scroll bar.
         .scrollDisabled(true)
         .fixedSize(horizontal: false, vertical: true)
         .confirmationDialog("Clear cookies and data for all websites?", isPresented: $isConfirmingClear) {
@@ -51,7 +51,7 @@ struct PrivacySettingsView: View {
 
     private func clearWebsiteData() async {
         isClearing = true
-        // Tous les profils : chacun a son propre magasin de données.
+        // All profiles: each one has its own data store.
         for store in session.allDataStores() {
             await store.removeData(ofTypes: WKWebsiteDataStore.allWebsiteDataTypes(), modifiedSince: .distantPast)
         }

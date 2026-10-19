@@ -1,10 +1,10 @@
 import SwiftUI
 
-/// Ligne d'un split : un morceau par onglet, de gauche à droite comme les panneaux. Un clic sur un morceau
-/// affiche le split avec ce panneau actif ; la ligne se glisse en entier ; un onglet ou un dossier déposé
-/// dessus s'insère avant le split, à `dropDestination`.
+/// Row of a split: one segment per tab, from left to right like the panes. A click on a segment
+/// displays the split with that pane active; the row is dragged as a whole; a tab or folder dropped
+/// on it is inserted before the split, at `dropDestination`.
 struct SplitRowView: View {
-    /// Largeur d'un morceau à partir de laquelle il montre le titre de son onglet.
+    /// Width of a segment from which it shows its tab's title.
     static let titleMinimumWidth = 64.0
 
     let group: SplitGroup
@@ -19,12 +19,12 @@ struct SplitRowView: View {
         group.tabIDs.compactMap(tabManager.tab(withID:))
     }
 
-    /// Le split est affiché : l'onglet sélectionné en fait partie.
+    /// The split is displayed: the selected tab is part of it.
     private var isDisplayed: Bool {
         tabManager.selectedTabID.map(group.contains) ?? false
     }
 
-    /// ×, au survol : split du jour, ou split épinglé dont un onglet est chargé.
+    /// ×, on hover: a today split, or a pinned split with a loaded tab.
     private var showsCloseButton: Bool {
         isHovered && (tabManager.layout.place(of: group.tabIDs[0]) == .today || tabManager.hasLoadedTab(inSplit: group.id))
     }
@@ -54,7 +54,7 @@ struct SplitRowView: View {
         }
         .frame(height: 32)
         .background(SidebarRowBackground(isSelected: isDisplayed, isHovered: isHovered))
-        // Par-dessus le dernier morceau : rien ne bouge quand il apparaît.
+        // Over the last segment: nothing moves when it appears.
         .overlay(alignment: .trailing) {
             if showsCloseButton {
                 Button("Close Split View", systemImage: "xmark") { tabManager.closeSplit(group.id) }
@@ -87,18 +87,18 @@ struct SplitRowView: View {
     }
 }
 
-/// Morceau d'un onglet dans la ligne d'un split : icône, titre si la place le permet, et haut-parleur pendant que sa
-/// page joue du son (tâche 5.10).
+/// Segment of a tab in a split's row: icon, title if there is room, and speaker while its page plays sound
+/// (task 5.10).
 private struct SplitSegmentView: View {
-    /// Place du × de la ligne, posé sur le dernier morceau au survol (avec sa marge de 3 pt).
+    /// Room for the row's ×, placed over the last segment on hover (with its 3 pt margin).
     static let closeButtonInset = SidebarIconButtonStyle.size + 3
 
     let tab: BrowserTab
     let tabManager: TabManager
-    /// Panneau actif du split affiché.
+    /// Active pane of the displayed split.
     let isActive: Bool
     let showsTitle: Bool
-    /// Dernier morceau, sous le × de la ligne au survol.
+    /// Last segment, under the row's × on hover.
     let isLast: Bool
 
     var body: some View {
@@ -108,7 +108,7 @@ private struct SplitSegmentView: View {
                 Text(tab.displayTitle)
                     .lineLimit(1)
                     .truncationMode(.tail)
-                    // Onglet épinglé déchargé : présent mais en retrait. Un onglet en veille (tâche 5.6) ne change pas.
+                    // Unloaded pinned tab: present but dimmed. A sleeping tab (task 5.6) does not change.
                     .foregroundStyle(tab.appearsLoaded ? .primary : .secondary)
             }
             if tab.isPlayingAudio {
@@ -119,7 +119,7 @@ private struct SplitSegmentView: View {
             }
         }
         .padding(.leading, 6)
-        // Dernier morceau qui joue du son : le haut-parleur reste à gauche du ×, sans bouger quand il apparaît.
+        // Last segment playing sound: the speaker stays left of the ×, without moving when it appears.
         .padding(.trailing, isLast && tab.isPlayingAudio ? Self.closeButtonInset : 6)
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: showsTitle ? .leading : .center)
         .background {

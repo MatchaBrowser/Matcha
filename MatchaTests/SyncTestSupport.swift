@@ -1,17 +1,17 @@
 import Foundation
 @testable import Matcha
 
-/// Serveur de synchro en mémoire, avec les règles de l'API (`SYNC.md` § 4.6) : un compteur par compte, un changement
-/// appliqué seulement sur la version actuelle, pages par version croissante, curseur expiré après une purge. Les
-/// contenus restent en clair (le chiffrement est celui du transport d'un serveur).
+/// In-memory sync server, with the API rules (`SYNC.md` § 4.6): one counter per account, a change applied only on the
+/// current version, pages by increasing version, cursor expired after a purge. The contents stay in clear text (the
+/// encryption is that of a server's transport).
 actor InMemorySyncServer {
     private(set) var counter = 0
     private(set) var records: [UUID: SyncRemoteRecord] = [:]
-    /// Taille des pages lues.
+    /// Size of the pages read.
     var pageSize = 500
-    /// Curseurs plus anciens que cette version : expirés.
+    /// Cursors older than this version: expired.
     private var oldestCursor = 0
-    /// Changements refusés (`payload_too_large`).
+    /// Rejected changes (`payload_too_large`).
     var refused: Set<UUID> = []
 
     func setPageSize(_ size: Int) {
@@ -49,7 +49,7 @@ actor InMemorySyncServer {
         return SyncChangePage(records: page, cursor: "c_\(last)", hasMore: newer.count > page.count)
     }
 
-    /// Écrit `content` comme un autre client (version plus récente de Matcha, contenu illisible…).
+    /// Writes `content` as another client would (newer version of Matcha, unreadable content…).
     @discardableResult
     func write(_ id: UUID, _ content: SyncContent?) -> Int {
         counter += 1
@@ -57,18 +57,18 @@ actor InMemorySyncServer {
         return counter
     }
 
-    /// Oublie les suppressions, comme après 180 jours : les curseurs d'avant expirent.
+    /// Forgets deletions, as after 180 days: earlier cursors expire.
     func purgeDeletions() {
         records = records.filter { $0.value.content?.deleted != true }
         oldestCursor = counter
     }
 
-    /// Contenu actuel de `id`.
+    /// Current content of `id`.
     func content(of id: UUID) -> SyncContent? {
         records[id]?.content
     }
 
-    // MARK: Paquets
+    // MARK: Blobs
 
     private(set) var blobs: [UUID: Data] = [:]
 
@@ -90,13 +90,13 @@ actor InMemorySyncServer {
         blobs[id] = nil
     }
 
-    /// Remplace le paquet `id` sans contrôle (paquet altéré par le serveur).
+    /// Replaces blob `id` without checks (blob tampered with by the server).
     func replaceBlob(_ data: Data, id: UUID) {
         blobs[id] = data
     }
 }
 
-/// Transport vers un `InMemorySyncServer`.
+/// Transport to an `InMemorySyncServer`.
 struct InMemorySyncTransport: SyncTransport {
     let server: InMemorySyncServer
     var maxChangesPerPush = 500
@@ -126,12 +126,12 @@ struct InMemorySyncTransport: SyncTransport {
     }
 }
 
-/// Données d'un Mac en mémoire : un enregistrement attend tant qu'un de ses parents manque.
+/// A Mac's data in memory: a record waits as long as one of its parents is missing.
 @MainActor
 final class MemorySyncStore: SyncLocalStore {
     var items: [UUID: SyncFields] = [:]
     var hasOnlyFirstLaunchData = false
-    /// Changements appliqués, dans l'ordre.
+    /// Changes applied, in order.
     private(set) var applied: [SyncLocalChange] = []
 
     func snapshot() -> [UUID: SyncFields] {
@@ -157,7 +157,7 @@ final class MemorySyncStore: SyncLocalStore {
     }
 }
 
-/// Un Mac simulé : ses données, son moteur, son heure.
+/// A simulated Mac: its data, its engine, its clock.
 @MainActor
 final class SimulatedMac {
     let store = MemorySyncStore()
@@ -180,7 +180,7 @@ final class SimulatedMac {
         return try await engine.sync()
     }
 
-    // MARK: Données
+    // MARK: Data
 
     func addProfile(_ name: String, order: Int = 0) -> UUID {
         let id = UUID()

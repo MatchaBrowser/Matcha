@@ -3,8 +3,8 @@ import Foundation
 @testable import Matcha
 import Testing
 
-/// Chiffrement de la synchro (tâche 7.5, `SYNC.md` § 3) : vecteurs des RFC et du NIST, vecteurs du schéma calculés par
-/// une autre implémentation (Python `cryptography`), et refus de tout contenu modifié ou déplacé.
+/// Sync encryption (task 7.5, `SYNC.md` § 3): RFC and NIST vectors, scheme vectors computed by another implementation
+/// (Python `cryptography`), and rejection of any modified or moved content.
 struct SyncCryptoTests {
     private func hex(_ text: String) -> Data {
         var data = Data()
@@ -41,10 +41,10 @@ struct SyncCryptoTests {
         #expect(try SyncCrypto
             .pbkdf2(password: password, salt: salt, iterations: 4096) ==
             hex("c5e478d59288c841aa530db6845c4c8d962893a001ce4e11a4963873aa98134a"))
-        // RFC 5869, cas 3 (sel vide, information vide) : les 32 premiers octets.
+        // RFC 5869, case 3 (empty salt, empty info): the first 32 bytes.
         let okm = SyncCrypto.subkey(of: SymmetricKey(data: Data(repeating: 0x0B, count: 22)), info: "")
         #expect(raw(okm) == hex("8da4e775a563c18f715f802a063c5a31b8a11f5c5ee1879ec3454e5f3c738d2d"))
-        // NIST, GCM cas 14 : clé et nonce nuls, 16 octets nuls.
+        // NIST, GCM case 14: zero key and nonce, 16 zero bytes.
         let sealed = try SyncCrypto.seal(
             Data(count: 16),
             key: SymmetricKey(data: Data(count: 32)),
@@ -63,7 +63,7 @@ struct SyncCryptoTests {
         #expect(throws: SyncCryptoError.unreadable) { try SyncCrypto.unpad(Data([1, 2, 0])) }
     }
 
-    // MARK: Schéma de Matcha
+    // MARK: Matcha's scheme
 
     @Test func `the keys of an account match the reference vectors`() throws {
         let password = "Café crème, 2026 !"
@@ -152,7 +152,7 @@ struct SyncCryptoTests {
         #expect(throws: SyncCryptoError.unreadable) { try SyncCrypto.decryptBlob(sealed, id: UUID(), key: key) }
     }
 
-    // MARK: Compte
+    // MARK: Account
 
     @Test func `weak passwords and parameters are refused`() {
         let kdf = SyncKDF.random()

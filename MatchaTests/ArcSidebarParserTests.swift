@@ -2,9 +2,9 @@ import Foundation
 @testable import Matcha
 import Testing
 
-/// Lecture de la barre d'Arc (tâche 7.1), sur un exemple inventé (`Fixtures/arc-sidebar-sample.json`) qui reprend la
-/// structure du fichier d'Arc : icône et emoji, couleur unie et dégradé, profil ajouté, dossiers imbriqués, note,
-/// split view, adresse interne, favoris en double.
+/// Reading of the Arc sidebar (task 7.1), on a made-up sample (`Fixtures/arc-sidebar-sample.json`) that follows the
+/// structure of Arc's file: icon and emoji, solid color and gradient, added profile, nested folders, note, split
+/// view, internal address, duplicate favorites.
 @MainActor
 struct ArcSidebarParserTests {
     private func sample() throws -> ArcSidebar {
@@ -48,7 +48,7 @@ struct ArcSidebarParserTests {
             .tab(ImportedTab(title: "Ouvert", url: url("https://example.com/open"))),
             .tab(ImportedTab(title: "Split", url: url("https://example.com/split"))),
         ])
-        // La note d'Arc et l'adresse `arc://`.
+        // The Arc note and the `arc://` address.
         #expect(sidebar.skippedItems == 2)
     }
 
@@ -68,7 +68,7 @@ struct ArcSidebarParserTests {
     }
 
     @Test func `odd shapes are tolerated`() throws {
-        // Paires remplacées par des objets portant leur `id`, conteneurs en objets, élément sans adresse.
+        // Pairs replaced by objects carrying their `id`, containers as objects, item without an address.
         let json = """
         {"sidebar": {"containers": [{"items": [
             {"id": "P", "childrenIds": ["T", "X", "missing"], "data": {"itemContainer": {}}},

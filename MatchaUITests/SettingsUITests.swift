@@ -1,6 +1,6 @@
 import XCTest
 
-/// Réglages : fenêtre, moteur de recherche, alerte avant de quitter.
+/// Settings: window, search engine, alert before quitting.
 final class SettingsUITests: XCTestCase {
     override func setUpWithError() throws {
         continueAfterFailure = false
@@ -11,19 +11,19 @@ final class SettingsUITests: XCTestCase {
         let app = launchApp()
         XCTAssertTrue(waitForBrowserWindow(of: app))
         app.typeKey(",", modifierFlags: .command)
-        // La fenêtre rouvre le dernier onglet consulté.
+        // The window reopens on the last viewed tab.
         let generalTab = app.toolbars.buttons["Général"]
         XCTAssertTrue(generalTab.waitForExistence(timeout: 5))
         generalTab.click()
         let picker = app.descendants(matching: .any).matching(identifier: "searchEnginePicker").firstMatch
         XCTAssertTrue(picker.waitForExistence(timeout: 5))
         XCTAssertEqual(app.windows.count, 2)
-        // Aperçu des liens des favoris et des épinglés : désactivé par défaut (lu seulement, jamais modifié ici).
+        // Peek for links in Favorites and pinned tabs: off by default (only read, never changed here).
         let peekToggle = app.descendants(matching: .any).matching(identifier: "pinnedLinksInPeekToggle").firstMatch
         XCTAssertTrue(peekToggle.exists)
-        // Case ou interrupteur : valeur 0 (nombre ou texte selon le contrôle).
+        // Checkbox or switch: value 0 (number or text depending on the control).
         XCTAssertEqual(peekToggle.value.map { "\($0)" }, "0")
-        // Mémoire des onglets inactifs (tâche 5.6) : le choix est là (lu seulement, jamais modifié ici).
+        // Memory of inactive tabs (task 5.6): the choice is there (only read, never changed here).
         XCTAssertTrue(app.descendants(matching: .any).matching(identifier: "tabSuspensionDelayPicker").firstMatch.exists)
 
         app.typeKey("w", modifierFlags: .command)
@@ -31,8 +31,8 @@ final class SettingsUITests: XCTestCase {
         XCTAssertEqual(app.windows.count, 1)
     }
 
-    /// Réglages > Extensions (tâche 6.4) : avec une base de test, aucune extension de l'utilisateur n'est visible ; la
-    /// section des extensions Safari et « Choisir… » sont là. Rien n'est installé ici.
+    /// Settings > Extensions (task 6.4): with a test store, none of the user's extensions is visible; the Safari
+    /// extensions section and “Choose…” are there. Nothing is installed here.
     @MainActor
     func testExtensionsTabListsNothingOfTheUser() {
         let app = launchApp()
@@ -44,15 +44,15 @@ final class SettingsUITests: XCTestCase {
         let emptyState = app.descendants(matching: .any).matching(identifier: "extensionsEmptyState").firstMatch
         XCTAssertTrue(emptyState.waitForExistence(timeout: 5))
         XCTAssertTrue(app.descendants(matching: .any).matching(identifier: "extensionsChooseFileButton").firstMatch.exists)
-        // Liens vers les boutiques (jamais cliqués ici : l'App Store s'ouvrirait).
+        // Links to the stores (never clicked here: the App Store would open).
         XCTAssertTrue(app.descendants(matching: .any).matching(identifier: "extensionsAppStoreButton").firstMatch.exists)
         XCTAssertTrue(app.descendants(matching: .any).matching(identifier: "extensionsFirefoxAddOnsButton").firstMatch.exists)
         XCTAssertFalse(app.descendants(matching: .any).matching(identifier: "installedExtensionRow").firstMatch.exists)
         app.typeKey("w", modifierFlags: .command)
     }
 
-    /// Raccourci de la mini-fenêtre affiché dans Général (⌃⌥⇧⌘N donné au lancement : jamais ⌥⌘N, qui atteindrait la
-    /// Matcha de l'utilisateur). Le champ n'est jamais cliqué : aucun raccourci n'est enregistré par un test.
+    /// Mini window shortcut shown in General (⌃⌥⇧⌘N given at launch: never ⌥⌘N, which would reach the user's
+    /// Matcha). The field is never clicked: no shortcut is recorded by a test.
     @MainActor
     func testMiniWindowShortcutIsShownInGeneralSettings() {
         let app = launchApp(settings: ["KeyboardShortcuts_openMiniWindow": Self.shortcutArgument(keyCode: 45, carbonModifiers: 6912)])
@@ -64,7 +64,7 @@ final class SettingsUITests: XCTestCase {
         let label = "Raccourci de la mini-fenêtre"
         let title = app.staticTexts.matching(NSPredicate(format: "value == %@ OR label == %@", label, label)).firstMatch
         XCTAssertTrue(title.waitForExistence(timeout: 3))
-        // Le champ d'enregistrement est un champ de recherche ; ses symboles viennent dans l'ordre ⌃ ⌥ ⇧ ⌘.
+        // The recorder field is a search field; its symbols come in the order ⌃ ⌥ ⇧ ⌘.
         let recorder = app.searchFields.firstMatch
         XCTAssertTrue(recorder.waitForExistence(timeout: 3))
         XCTAssertTrue((recorder.value as? String)?.hasPrefix("⌃⌥⇧⌘") == true, "\(String(describing: recorder.value))")
@@ -100,7 +100,7 @@ final class SettingsUITests: XCTestCase {
         XCTAssertTrue(home.exists)
         let pill = addressPill(in: app)
 
-        // Sans onglet, Accueil en ouvre un.
+        // Without a tab, Home opens one.
         home.click()
         XCTAssertTrue(waitForCount(tabRows(in: app), 1))
         XCTAssertTrue(waitForValue(of: pill) { $0 == "about:blank" })
@@ -128,7 +128,7 @@ final class SettingsUITests: XCTestCase {
         XCTAssertTrue(waitForBrowserWindow(of: app))
         app.typeKey("t", modifierFlags: .command)
         XCTAssertTrue(waitForCount(tabRows(in: app), 1))
-        // La barre de commande s'ouvre sur l'onglet créé et montre son URL complète.
+        // The command bar opens on the created tab and shows its full URL.
         XCTAssertTrue(waitForValue(of: field) { $0 == "about:blank" })
     }
 

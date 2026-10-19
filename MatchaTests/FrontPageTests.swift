@@ -3,13 +3,13 @@ import Foundation
 import Testing
 import WebKit
 
-/// Page visée par les commandes de page (recherche 5.3 ; impression, PDF et zoom 5.4) : mini-fenêtre active, sinon
-/// aperçu, sinon panneau actif.
+/// Page targeted by the page commands (find 5.3; printing, PDF and zoom 5.4): active mini window, otherwise Peek,
+/// otherwise active pane.
 @MainActor
 struct FrontPageTests {
     private let manager = TabManager(websiteDataStore: .nonPersistent())
 
-    /// Onglet sélectionné, en tête des onglets du jour, sur la page locale `name`.
+    /// Selected tab, at the top of today tabs, on the local page `name`.
     private func openPage(_ name: String) async throws -> BrowserTab {
         let tab = manager.insertTab(configuration: TestPages.configuration(), after: nil, select: true)
         tab.load(TestPages.url(name))
@@ -49,7 +49,7 @@ struct FrontPageTests {
     @Test func `a key mini window wins, even without a page`() async throws {
         _ = try await openPage("fenetre")
         let mini = BrowserTab(configuration: TestPages.configuration())
-        // Mini-fenêtre vide : rien à chercher, et jamais la page de la fenêtre derrière elle.
+        // Empty mini window: nothing to search, and never the page of the window behind it.
         #expect(FrontPage.page(miniWindowTab: mini, tabManager: manager) == nil)
 
         mini.load(TestPages.url("mini"))

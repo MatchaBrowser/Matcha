@@ -1,6 +1,6 @@
 import XCTest
 
-/// Barre d'adresse dans la barre latérale ou au-dessus de la page, boutons de navigation.
+/// Address bar in the sidebar or above the page, navigation buttons.
 final class AddressBarPositionUITests: XCTestCase {
     override func setUpWithError() throws {
         continueAfterFailure = false
@@ -12,12 +12,12 @@ final class AddressBarPositionUITests: XCTestCase {
         let window = app.windows.firstMatch
         let pill = addressPill(in: app)
         XCTAssertTrue(pill.waitForExistence(timeout: 5))
-        // À droite de la barre latérale, qui garde ses onglets.
+        // To the right of the sidebar, which keeps its tabs.
         XCTAssertGreaterThan(pill.frame.minX - window.frame.minX, 180)
         XCTAssertTrue(app.buttons["newTabButton"].exists)
         XCTAssertTrue(app.buttons["Précédent"].exists)
 
-        // La pastille ouvre la barre de commande.
+        // The pill opens the command bar.
         pill.click()
         let field = addressField(in: app)
         XCTAssertTrue(field.waitForExistence(timeout: 3))
@@ -38,7 +38,7 @@ final class AddressBarPositionUITests: XCTestCase {
         XCTAssertTrue(app.buttons["newTabButton"].waitForNonExistence(timeout: 3))
         XCTAssertTrue(addressPill(in: app).exists)
 
-        // ⌘L ouvre la barre de commande sans faire apparaître la barre latérale.
+        // ⌘L opens the command bar without revealing the sidebar.
         app.typeKey("l", modifierFlags: .command)
         XCTAssertTrue(field.waitForExistence(timeout: 3))
         XCTAssertTrue(waitForKeyboardFocus(of: field))

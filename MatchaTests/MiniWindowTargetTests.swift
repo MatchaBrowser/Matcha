@@ -9,7 +9,7 @@ struct MiniWindowTargetTests {
     private let office = UUID()
     private let side = UUID()
 
-    /// Perso (personnel), Bureau (travail), Projets (personnel), dans l'ordre de la barre.
+    /// Home (personal), Office (work), Side projects (personal), in sidebar order.
     private var spaces: [MiniWindowTarget.Space] {
         [.init(id: home, profileID: personal), .init(id: office, profileID: work), .init(id: side, profileID: personal)]
     }

@@ -1,23 +1,23 @@
 import Foundation
 
-/// Effet d'une ligne de la barre de commande.
+/// Effect of a command bar row.
 nonisolated enum CommandTarget: Equatable, Sendable {
-    /// Ouvrir l'adresse dans l'onglet visé, ou dans un nouvel onglet.
+    /// Open the address in the target tab, or in a new tab.
     case open(URL)
     case switchToTab(TabReference)
     case perform(CommandActionID)
 }
 
-/// Ligne affichée par la barre de commande.
+/// Row displayed by the command bar.
 nonisolated struct CommandRow: Identifiable, Equatable, Sendable {
     enum Style: Equatable, Sendable {
-        /// Ouvrir le texte tapé lu comme une adresse, ou l'adresse de ⌘L non modifiée.
+        /// Open the typed text read as an address, or the unmodified ⌘L address.
         case openAddress
-        /// Rechercher le texte tapé.
+        /// Search the typed text.
         case search
-        /// Rechercher un nom de domaine tapé seul, en 2e ligne.
+        /// Search a domain name typed alone, as the 2nd row.
         case searchAlternative
-        /// `spaceName` est nil pour un onglet du Space affiché.
+        /// `spaceName` is nil for a tab of the displayed Space.
         case tab(TabReference, place: TabPlace, spaceName: String?)
         case history
         case suggestion
@@ -26,13 +26,13 @@ nonisolated struct CommandRow: Identifiable, Equatable, Sendable {
 
     let id: String
     let style: Style
-    /// Donnée affichée telle quelle (adresse, titre de page, suggestion) ; les titres des actions
-    /// sont déjà traduits par leur source.
+    /// Data displayed as is (address, page title, suggestion); action titles are already localized by their
+    /// source.
     let title: String
-    /// Adresse affichée sous le titre, s'il y en a une. Les sous-titres traduits (« Search %@ »)
-    /// sont produits par la vue d'après `style`.
+    /// Address displayed under the title, if there is one. Localized subtitles (“Search %@”) are produced by the
+    /// view according to `style`.
     let subtitle: String?
-    /// Adresse ouverte ou montrée par la ligne ; nil pour les actions.
+    /// Address opened or shown by the row; nil for actions.
     let url: URL?
     let target: CommandTarget
 }

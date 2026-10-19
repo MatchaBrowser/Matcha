@@ -2,7 +2,7 @@ import Foundation
 import OSLog
 import WebKit
 
-/// Délégué de chaque `WKDownload` : place du fichier, fin, échec. Le fichier terminé porte l'attribut de quarantaine.
+/// Delegate of each `WKDownload`: file location, end, failure. The finished file carries the quarantine attribute.
 extension DownloadManager: WKDownloadDelegate {
     func download(
         _ download: WKDownload,
@@ -36,7 +36,7 @@ extension DownloadManager: WKDownloadDelegate {
             saveList()
             return
         }
-        // Avant que la liste ne propose d'ouvrir le fichier.
+        // Before the list offers to open the file.
         ensureQuarantine(of: item, at: destination)
         let size = try? destination.resourceValues(forKeys: [.fileSizeKey]).fileSize
         item.markFinished(size: size.map(Int64.init))
@@ -63,8 +63,8 @@ extension DownloadManager: WKDownloadDelegate {
         saveList()
     }
 
-    /// Le fichier doit porter l'attribut de quarantaine ; la sandbox le pose d'elle-même, Matcha le pose s'il manque.
-    /// Sans adresse pour un téléchargement privé : macOS les garderait dans son journal des téléchargements.
+    /// The file must carry the quarantine attribute; the sandbox sets it on its own, Matcha sets it if it is missing.
+    /// No address for a private download: macOS would keep them in its downloads log.
     private func ensureQuarantine(of item: DownloadItem, at destination: URL) {
         let isPrivate = item.scope != .regular
         let outcome = DownloadQuarantine.ensure(on: destination, properties: DownloadQuarantine.properties(

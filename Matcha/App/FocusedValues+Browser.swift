@@ -1,9 +1,9 @@
 import SwiftUI
 
-/// Ce que la fenêtre active expose aux commandes de menu.
+/// What the active window exposes to menu commands.
 extension FocusedValues {
-    /// Onglets de la fenêtre active.
+    /// Tabs of the active window.
     @Entry var tabManager: TabManager?
-    /// Actions de la fenêtre active (barre latérale, pastille d'adresse).
+    /// Actions of the active window (sidebar, address pill).
     @Entry var windowActions: WindowActions?
 }

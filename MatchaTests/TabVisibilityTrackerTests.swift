@@ -2,7 +2,7 @@ import Foundation
 @testable import Matcha
 import Testing
 
-/// Depuis quand un onglet est caché (tâche 5.6), modèle pur.
+/// Since when a tab has been hidden (task 5.6), pure model.
 struct TabVisibilityTrackerTests {
     private let first = UUID()
     private let second = UUID()
@@ -25,7 +25,7 @@ struct TabVisibilityTrackerTests {
         tracker.update(visible: [first], present: [first, second], now: fixedNow)
         tracker.update(visible: [first], present: [first, second, third], now: fixedNow.addingTimeInterval(60))
         #expect(tracker.hiddenSince(second) == fixedNow)
-        // Vu caché pour la première fois (ouvert en arrière-plan) : depuis cette mise à jour.
+        // Seen hidden for the first time (opened in the background): since this update.
         #expect(tracker.hiddenSince(third) == fixedNow.addingTimeInterval(60))
     }
 
@@ -42,7 +42,7 @@ struct TabVisibilityTrackerTests {
         tracker.update(visible: [], present: [first, second], now: fixedNow)
         tracker.update(visible: [], present: [first], now: fixedNow.addingTimeInterval(10))
         #expect(tracker.hiddenSince.keys.sorted { $0.uuidString < $1.uuidString } == [first])
-        // Rouvert plus tard (même identifiant) : caché depuis son retour.
+        // Reopened later (same identifier): hidden since its return.
         tracker.update(visible: [], present: [first, second], now: fixedNow.addingTimeInterval(20))
         #expect(tracker.hiddenSince(second) == fixedNow.addingTimeInterval(20))
     }

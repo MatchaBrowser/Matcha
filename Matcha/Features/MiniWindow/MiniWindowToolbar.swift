@@ -1,14 +1,14 @@
 import SwiftUI
 
-/// Barre d'outils d'une mini-fenêtre : fermer, précédent (s'il y a une page avant), l'adresse (un clic la
-/// modifie, comme ⌘L) et le zoom de la page, une zone vide qui déplace la fenêtre, puis « Ouvrir dans ‹Space› ».
+/// Toolbar of a mini window: close, back (if there is a previous page), the address (a click edits it, like ⌘L)
+/// and the page's zoom, an empty area that moves the window, then “Open in ‹Space›”.
 struct MiniWindowToolbar: View {
     static let height = 40.0
 
     let tab: BrowserTab
-    /// Space visé par le bouton (et par ⌘O) ; suit le Space affiché par la fenêtre principale.
+    /// Space targeted by the button (and by ⌘O); follows the Space displayed by the main window.
     let target: SpaceSession
-    /// Zoom par site de la session principale, remis à 100 % par un clic sur le badge du zoom (tâche 5.4).
+    /// Per-site zoom of the main session, reset to 100 % by a click on the zoom badge (task 5.4).
     let siteZooms: SiteZoomStore?
     let close: () -> Void
     let editAddress: () -> Void
@@ -25,7 +25,7 @@ struct MiniWindowToolbar: View {
             AddressPill(tab: tab, edit: editAddress)
                 .frame(minWidth: 120, maxWidth: 280)
             ZoomBadge(page: tab, siteZooms: siteZooms)
-            // Le fond de la fenêtre se voit ici : tirer sur cette zone déplace la fenêtre.
+            // The window's background shows here: dragging this area moves the window.
             Spacer(minLength: 12)
             openButton
         }
@@ -36,8 +36,8 @@ struct MiniWindowToolbar: View {
         .frame(height: Self.height)
     }
 
-    /// « Ouvrir dans ‹Space› », avec l'icône du Space (symbole ou emoji) ; le nom se tronque avant que le bouton ne
-    /// rétrécisse.
+    /// “Open in ‹Space›”, with the Space's icon (symbol or emoji); the name is truncated before the button
+    /// shrinks.
     private var openButton: some View {
         Button(action: openInSpace) {
             HStack(spacing: 6) {

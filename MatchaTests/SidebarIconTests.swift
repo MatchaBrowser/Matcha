@@ -3,10 +3,10 @@ import Foundation
 @testable import Matcha
 import Testing
 
-/// Icône d'un dossier ou d'un Space : forme enregistrée d'un Space (`SpaceRecord.symbol`), ce que la barre dessine,
-/// symbole entouré dans la grille, symboles proposés aux Spaces.
+/// Icon of a folder or a Space: stored form for a Space (`SpaceRecord.symbol`), what the sidebar draws, symbol circled
+/// in the grid, symbols offered to Spaces.
 struct SidebarIconTests {
-    /// Les valeurs d'avant les emoji, des noms de symbole seuls, se lisent telles quelles et se réécrivent à l'identique.
+    /// Values from before emoji, bare symbol names, are read as they are and written back identically.
     @MainActor
     @Test func `legacy space symbols are read as symbols`() {
         for name in BrowserSession.spaceSymbols + ["building.2.fill", "music.note"] {
@@ -19,7 +19,7 @@ struct SidebarIconTests {
         #expect(SidebarIcon(spaceSymbol: "symbol:house.fill") == .symbol("house.fill"))
         #expect(SidebarIcon(spaceSymbol: "emoji:🌿") == .emoji("🌿"))
         #expect(SidebarIcon(spaceSymbol: "emoji: 🇫🇷 ") == .emoji("🇫🇷"))
-        // Un symbole s'écrit sans préfixe, comme avant ; un emoji avec.
+        // A symbol is written without a prefix, as before; an emoji with one.
         #expect(SidebarIcon.symbol("house.fill").spaceSymbol == "house.fill")
         #expect(SidebarIcon.emoji("🌿").spaceSymbol == "emoji:🌿")
         #expect(SidebarIcon.default.spaceSymbol == SidebarIcon.defaultSpaceSymbol)
@@ -32,7 +32,7 @@ struct SidebarIconTests {
         }
     }
 
-    /// Une base modifiée à la main, une synchro ou une version future : un Space garde toujours une icône, le cercle.
+    /// A store edited by hand, a sync or a future version: a Space always keeps an icon, the circle.
     @Test(arguments: ["", " ", "Star", "star fill", "🌿", "symbol:", "symbol:Star", "emoji:", "emoji:a", "emoji:😀😀", "other:x"])
     func `unreadable space icons give the circle`(stored: String) {
         #expect(SidebarIcon(spaceSymbol: stored) == .symbol(SidebarIcon.defaultSpaceSymbol))
@@ -47,7 +47,7 @@ struct SidebarIconTests {
                 == .symbol("circle.fill"),
         )
         #expect(SidebarIcon.default.displayed(defaultSymbol: "folder", symbolExists: known) == .symbol("folder"))
-        // Un emoji ne dépend pas des symboles du système.
+        // An emoji does not depend on the system's symbols.
         #expect(SidebarIcon.emoji("🌿").displayed(defaultSymbol: "folder") { _ in false } == .emoji("🌿"))
     }
 
@@ -60,7 +60,7 @@ struct SidebarIconTests {
         #expect(SidebarIcon.default.emoji == nil)
     }
 
-    /// Les symboles des nouveaux Spaces viennent en premier, dans leur ordre ; tous existent sur ce macOS.
+    /// The symbols for new Spaces come first, in their order; all of them exist on this macOS.
     @MainActor
     @Test func `every space symbol exists on this macOS`() {
         let names = SymbolChoice.spaceIcons.map(\.name)

@@ -1,9 +1,9 @@
 import Foundation
 
-/// Liens ouverts par d'autres apps (tâche 8.2).
+/// Links opened by other apps (task 8.2).
 extension MiniWindowManager {
-    /// Chaque lien dans une mini-fenêtre, ou dans un nouvel onglet du Space affiché par la fenêtre principale (rouverte
-    /// au besoin), qui passe au premier plan.
+    /// Each link in a mini window, or in a new tab of the Space displayed by the main window (reopened if needed),
+    /// which comes to the front.
     func openFromOtherApp(_ urls: [URL], destination: ExternalLinkDestination) {
         switch destination {
         case .miniWindow:

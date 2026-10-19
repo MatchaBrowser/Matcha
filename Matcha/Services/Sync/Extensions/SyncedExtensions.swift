@@ -2,8 +2,8 @@ import Foundation
 import Observation
 import OSLog
 
-/// Paquet d'une extension installée depuis un fichier, tel qu'envoyé (ou reçu) par la synchro (`SYNC.md` § 2.5) : sa
-/// version, l'identifiant du paquet chiffré, sa clé, son empreinte et sa taille. Type pur.
+/// Package of an extension installed from a file, as sent (or received) by sync (`SYNC.md` § 2.5): its version, the
+/// identifier of the encrypted package, its key, its digest and its size. Pure type.
 nonisolated struct SyncedPackage: Codable, Equatable, Sendable {
     var version: String?
     var blobID: UUID
@@ -12,12 +12,12 @@ nonisolated struct SyncedPackage: Codable, Equatable, Sendable {
     var size: Int
     var fileName: String
 
-    /// Origine d'une extension pour la synchro.
+    /// Origin of an extension for sync.
     var source: SyncExtensionSource {
         .package(blobID: blobID, blobKey: blobKey.base64EncodedString(), sha256: sha256, size: size, fileName: fileName)
     }
 
-    /// Paquet décrit par `source`, s'il est complet.
+    /// Package described by `source`, if it is complete.
     init?(source: SyncExtensionSource, version: String?) {
         guard source.kind == .package, let blobID = source.blobId, let key = source.blobKey.flatMap({ Data(base64Encoded: $0) }),
               key.count == 32, let sha256 = source.sha256, let size = source.size
@@ -37,9 +37,9 @@ nonisolated struct SyncedPackage: Codable, Equatable, Sendable {
     }
 }
 
-/// Ce que la synchro des extensions retient sur ce Mac (tâche 7.4), dans un fichier JSON (en mémoire sans fichier) :
-/// paquets envoyés ou reçus, extensions venues des autres Mac en attente de l'accord de l'utilisateur, celles qu'il a
-/// ignorées, paquets à supprimer du serveur.
+/// What extension sync remembers on this Mac (task 7.4), in a JSON file (in memory without a file): packages sent or
+/// received, extensions from the other Macs awaiting the user's consent, those the user ignored, packages to delete
+/// from the server.
 @MainActor
 @Observable
 final class SyncedExtensions {
@@ -51,27 +51,27 @@ final class SyncedExtensions {
         var names: [String: String] = [:]
     }
 
-    /// Paquet de chaque extension installée depuis un fichier.
+    /// Package of each extension installed from a file.
     var packages: [String: SyncedPackage] = [:] {
         didSet { save() }
     }
 
-    /// Extensions des autres Mac, pas installées ici (ou dont la mise à jour demande l'accord de l'utilisateur).
+    /// Extensions from the other Macs, not installed here (or whose update needs the user's consent).
     var offers: [String: SyncExtensionFields] = [:] {
         didSet { save() }
     }
 
-    /// Ignorées sur ce Mac : plus proposées.
+    /// Ignored on this Mac: no longer offered.
     var ignored: Set<String> = [] {
         didSet { save() }
     }
 
-    /// Paquets à supprimer du serveur.
+    /// Packages to delete from the server.
     var obsoleteBlobs: [UUID] = [] {
         didSet { save() }
     }
 
-    /// Dernier nom connu de chaque extension (avant que WebKit l'ait lue au lancement).
+    /// Last known name of each extension (before WebKit has read it at launch).
     var names: [String: String] = [:] {
         didSet { save() }
     }
@@ -93,7 +93,7 @@ final class SyncedExtensions {
         isLoading = false
     }
 
-    /// Offres à montrer, triées par nom.
+    /// Offers to show, sorted by name.
     var sortedOffers: [SyncExtensionFields] {
         offers.values.sorted { $0.name.localizedStandardCompare($1.name) == .orderedAscending }
     }

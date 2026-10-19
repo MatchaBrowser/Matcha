@@ -1,17 +1,17 @@
 import Foundation
 
-/// Premières lignes de la barre, calculées sans attendre les sources : le texte tapé, ouvert comme
-/// adresse ou cherché tel quel, et pour un nom de domaine seul, sa recherche en 2e ligne.
+/// First rows of the bar, computed without waiting for the sources: the typed text, opened as an address or searched
+/// as is, and for a bare domain name, its search as the 2nd row.
 nonisolated enum CommandPrimaryRows {
     static let id = "primary"
     static let searchAlternativeID = "primary.search"
 
-    /// Ligne de l'adresse de ⌘L non modifiée : l'URL entière, jamais réinterprétée.
+    /// Row of the unmodified ⌘L address: the whole URL, never reinterpreted.
     static func current(_ url: URL) -> CommandRow {
         CommandRow(id: id, style: .openAddress, title: url.absoluteString, subtitle: nil, url: url, target: .open(url))
     }
 
-    /// Aucune ligne pour un texte vide.
+    /// No rows for an empty text.
     static func make(for query: CommandQuery) -> [CommandRow] {
         switch query.interpretation {
         case nil:
@@ -19,7 +19,7 @@ nonisolated enum CommandPrimaryRows {
         case let .search(url):
             return [CommandRow(id: id, style: .search, title: query.trimmed, subtitle: nil, url: url, target: .open(url))]
         case let .address(url):
-            // Le sous-titre montre le schéma ajouté (https:// ou http://).
+            // The subtitle shows the added scheme (https:// or http://).
             let subtitle = url.absoluteString == query.trimmed ? nil : url.absoluteString
             let open = CommandRow(id: id, style: .openAddress, title: query.trimmed, subtitle: subtitle, url: url, target: .open(url))
             guard query.isBareDomain, let searchURL = query.searchEngine.searchURL(for: query.trimmed) else {

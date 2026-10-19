@@ -1,15 +1,15 @@
 import SwiftUI
 
-/// Sous-menu Édition > Rechercher (tâche 5.3), comme dans Safari : « Rechercher… » (⌘F), « Rechercher le suivant »
-/// (⌘G), « Rechercher le précédent » (⇧⌘G), sur la page de la fenêtre active (`FrontPage`). Il prend la place des
-/// commandes de recherche standard (`.textEditing`, vide aujourd'hui) : jamais deux ⌘F. Une page qui garde ⌘F ou ⌘G
-/// pour elle (éditeur en ligne) passe avant, comme dans Safari : WebKit lui envoie les raccourcis d'abord.
+/// Edit > Find submenu (task 5.3), as in Safari: “Find…” (⌘F), “Find Next” (⌘G), “Find Previous” (⇧⌘G), on the
+/// page of the active window (`FrontPage`). It takes the place of the standard find commands (`.textEditing`, empty
+/// today): never two ⌘F. A page that keeps ⌘F or ⌘G for itself (online editor) comes first, as in Safari: WebKit
+/// sends it the shortcuts first.
 struct FindCommands: Commands {
     let miniWindows: MiniWindowManager
     @FocusedValue(\.tabManager) private var tabManager
     @FocusedValue(\.windowActions) private var windowActions
 
-    /// Mini-fenêtre active : `keyWindowID` est lu pour que le menu suive, la fenêtre est relue à chaque action.
+    /// Active mini window: `keyWindowID` is read so the menu follows along, the window is read again on each action.
     private var miniWindow: MiniWindowController? {
         _ = miniWindows.keyWindowID
         return miniWindows.keyWindow
@@ -26,7 +26,7 @@ struct FindCommands: Commands {
                 Button("Find…", action: showFindBar)
                     .keyboardShortcut("f")
                     .disabled(page == nil)
-                // ⌘G et ⇧⌘G rouvrent la barre fermée, sans lui donner le clavier.
+                // ⌘G and ⇧⌘G reopen the closed bar, without giving it keyboard focus.
                 Button("Find Next") { self.page?.find.findNext() }
                     .keyboardShortcut("g")
                     .disabled(page?.find.hasQuery != true)
@@ -37,8 +37,8 @@ struct FindCommands: Commands {
         }
     }
 
-    /// ⌘F : la barre de commande ouverte se ferme d'abord (une seule saisie à la fois), puis la barre de recherche
-    /// s'ouvre, ou reste ouverte, et son champ prend le clavier, texte sélectionné.
+    /// ⌘F: the open command bar closes first (only one text entry at a time), then the find bar opens, or stays
+    /// open, and its field takes keyboard focus, with its text selected.
     private func showFindBar() {
         guard let page else {
             return

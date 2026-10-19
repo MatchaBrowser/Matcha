@@ -3,21 +3,21 @@ import OSLog
 import SwiftUI
 import WebKit
 
-/// Une mini-fenêtre : son panneau, sa page (un `BrowserTab` hors de tout Space, jamais enregistré), le conteneur
-/// de sa vue web et sa barre de commande. Créée et suivie par `MiniWindowManager`.
+/// A mini window: its panel, its page (a `BrowserTab` outside any Space, never saved), the container of its web
+/// view and its command bar. Created and tracked by `MiniWindowManager`.
 @MainActor
 final class MiniWindowController: NSObject, Identifiable {
     let id = UUID()
     let tab: BrowserTab
-    /// Profil dont la page utilise les cookies (celui du Space affiché à l'ouverture).
+    /// Profile whose cookies the page uses (that of the Space displayed at opening).
     let profileID: UUID?
     let commandBar: MiniCommandBarModel
     let panel: MiniWindowPanel
     let container = MiniWebViewContainer()
-    /// Confirmation « URL copiée » de cette mini-fenêtre (⇧⌘C, ligne « Copier l'URL »).
+    /// “URL Copied” confirmation of this mini window (⇧⌘C, “Copy URL” row).
     let copyConfirmation = CopyConfirmationModel()
     private weak var manager: MiniWindowManager?
-    /// La page est partie dans un Space : la fermeture ne doit pas la libérer.
+    /// The page has gone into a Space: closing must not release it.
     private(set) var isHandedOff = false
 
     init(tab: BrowserTab, profileID: UUID?, frame: CGRect, manager: MiniWindowManager) {
@@ -32,35 +32,35 @@ final class MiniWindowController: NSObject, Identifiable {
         panel = MiniWindowPanel(frame: frame)
         super.init()
         panel.delegate = self
-        // ⎋ que personne n'a gardé : une mini-fenêtre sans page se ferme ; avec une page, rien (la page reste).
+        // ⎋ that nobody kept: a mini window without a page closes; with a page, nothing (the page stays).
         panel.cancelHandler = { [weak self] in
             if let self, tab.url == nil {
                 close()
             }
         }
         let host = NSHostingView(rootView: MiniWindowView(controller: self, manager: manager))
-        // La taille vient du panneau (réglée par l'utilisateur), jamais du contenu SwiftUI.
+        // The size comes from the panel (set by the user), never from the SwiftUI content.
         host.sizingOptions = []
         panel.contentView = host
         showWebView()
     }
 
-    /// Montre la vue web de la page (créée au premier chargement).
+    /// Shows the page's web view (created on the first load).
     func showWebView() {
         if let webView = tab.webView {
             container.attach(webView)
         }
     }
 
-    // MARK: Barre de commande
+    // MARK: Command bar
 
-    /// ⌘L et clic sur l'adresse ; ⌘T, ⌥⌘N et le menu : saisie neuve.
+    /// ⌘L and click on the address; ⌘T, ⌥⌘N and the menu: fresh input.
     func showCommandBar(_ mode: MiniCommandBarMode) {
         commandBar.present(mode, settings: manager?.commandBarSettings() ?? MiniWindowSettings.current())
     }
 
-    /// ⏎ ou clic sur une ligne : la barre se ferme, puis la page charge l'adresse (ou elle est copiée) et prend
-    /// le clavier.
+    /// ⏎ or click on a row: the bar closes, then the page loads the address (or it is copied) and takes the
+    /// keyboard.
     func submit(_ rowID: CommandRow.ID?) {
         let submission = commandBar.submission(for: rowID)
         guard submission != .ignore else {
@@ -81,7 +81,7 @@ final class MiniWindowController: NSObject, Identifiable {
         TabActivation.focusPage(of: tab)
     }
 
-    /// ⎋ dans le champ : la barre se ferme ; sans page, la mini-fenêtre aussi (rien ne reste).
+    /// ⎋ in the field: the bar closes; without a page, the mini window too (nothing remains).
     func cancelCommandBar() {
         commandBar.dismiss()
         guard tab.url != nil else {
@@ -92,7 +92,7 @@ final class MiniWindowController: NSObject, Identifiable {
         TabActivation.focusPage(of: tab)
     }
 
-    /// ⌘W : ferme la barre si elle est ouverte, sinon la mini-fenêtre.
+    /// ⌘W: closes the bar if it is open, otherwise the mini window.
     func closeCommand() {
         if commandBar.isPresented {
             cancelCommandBar()
@@ -101,28 +101,28 @@ final class MiniWindowController: NSObject, Identifiable {
         }
     }
 
-    /// ⇧⌘C et la ligne « Copier l'URL » : l'adresse de la page, avec la confirmation « URL copiée ».
+    /// ⇧⌘C and the “Copy URL” row: the page's address, with the “URL Copied” confirmation.
     func copyURL(to pasteboard: NSPasteboard = .general) {
         guard let url = tab.url else {
             return
         }
         TabLinkCopier.copy(url, to: pasteboard)
         copyConfirmation.show()
-        // Jamais l'adresse elle-même.
+        // Never the address itself.
         Logger.miniWindow.info("Adresse copiée depuis une mini-fenêtre")
     }
 
-    // MARK: Fermeture
+    // MARK: Closing
 
-    /// « Ouvrir dans le Space » : la vue web quitte le conteneur tout de suite, avant que la fenêtre principale
-    /// ne l'affiche ; la fermeture qui suit ne libère pas la page.
+    /// “Open in Space”: the web view leaves the container right away, before the main window displays it; the
+    /// closing that follows does not release the page.
     func detachForHandOff() {
         isHandedOff = true
         commandBar.dismiss()
         container.detach()
     }
 
-    /// Toutes les fermetures passent par ici (×, ⌘W, ⇧⌘W, ⎋ sans page, `window.close()`, remise, profil supprimé).
+    /// Every closing goes through here (×, ⌘W, ⇧⌘W, ⎋ without a page, `window.close()`, hand-off, deleted profile).
     func close() {
         panel.close()
     }
@@ -141,7 +141,7 @@ extension MiniWindowController: NSWindowDelegate {
         manager?.rememberSize(panel.frame.size)
     }
 
-    /// Fermeture pour de bon : la page est libérée (son, processus), sauf si elle est partie dans un Space.
+    /// Closing for good: the page is released (sound, process), unless it has gone into a Space.
     func windowWillClose(_: Notification) {
         commandBar.dismiss()
         copyConfirmation.cancel()
@@ -152,7 +152,7 @@ extension MiniWindowController: NSWindowDelegate {
         manager?.didClose(self)
         panel.delegate = nil
         panel.cancelHandler = nil
-        // Garde le contrôleur en vie jusqu'à la fin de la fermeture, puis libère la vue SwiftUI (qui le retient).
+        // Keeps the controller alive until the end of the closing, then releases the SwiftUI view (which retains it).
         Task { @MainActor in
             self.panel.contentView = nil
         }

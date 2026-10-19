@@ -1,18 +1,18 @@
 import Foundation
 import WebKit
 
-/// Échec de la préparation d'une extension (tâche 6.4), montré à l'utilisateur dans sa langue.
+/// Failure while preparing an extension (task 6.4), shown to the user in their language.
 nonisolated enum ExtensionInstallError: Error, Equatable, LocalizedError {
-    /// Ni `.crx`, ni `.xpi`, ni `.zip`, ni dossier.
+    /// Neither `.crx`, nor `.xpi`, nor `.zip`, nor a folder.
     case unknownFormat
-    /// Pas de `manifest.json` à la racine (ni dans un unique sous-dossier).
+    /// No `manifest.json` at the root (nor in a single subfolder).
     case noManifest
-    /// Archive abîmée, chiffrée, trop grosse ou d'un format non pris en charge.
+    /// Damaged, encrypted or too large archive, or in an unsupported format.
     case unreadable
-    /// Manifeste refusé par WebKit (version de manifeste non prise en charge, champ obligatoire absent…).
+    /// Manifest rejected by WebKit (unsupported manifest version, required field missing…).
     case invalidManifest(String)
 
-    /// Erreur rapportée par la lecture du paquet, de l'archive ou de WebKit.
+    /// Error reported while reading the package, the archive, or by WebKit.
     init(_ error: any Error) {
         switch error {
         case let error as ExtensionInstallError:

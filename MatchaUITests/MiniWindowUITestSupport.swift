@@ -1,23 +1,23 @@
 import XCTest
 
-/// Outils des tests de la mini-fenêtre. Les recherches visent toujours une fenêtre précise : la fenêtre de
-/// navigation et la mini-fenêtre ont chacune leur pastille d'adresse.
+/// Helpers for the mini window tests. Queries always target a specific window: the browser window and the mini
+/// window each have their own address pill.
 extension XCTestCase {
-    /// Valeur de lancement d'un raccourci de KeyboardShortcuts (« -KeyboardShortcuts_openMiniWindow <valeur> »).
-    /// Les guillemets extérieurs sont indispensables : `UserDefaults` lit alors un texte (le JSON du raccourci) ;
-    /// sans eux, la valeur est perdue.
+    /// Launch value of a KeyboardShortcuts shortcut (“-KeyboardShortcuts_openMiniWindow <value>”).
+    /// The outer quotes are essential: `UserDefaults` then reads a string (the shortcut's JSON); without them,
+    /// the value is lost.
     static func shortcutArgument(keyCode: Int, carbonModifiers: Int) -> String {
         #""{\"carbonKeyCode\":\#(keyCode),\"carbonModifiers\":\#(carbonModifiers)}""#
     }
 
-    /// Mini-fenêtres ouvertes (identifiant du panneau ; repli : les fenêtres qui ont le bouton × de la mini-fenêtre).
+    /// Open mini windows (panel identifier; fallback: the windows that have the mini window's × button).
     @MainActor
     func miniWindows(in app: XCUIApplication) -> XCUIElementQuery {
         let byIdentifier = app.windows.matching(identifier: "miniWindow")
         return byIdentifier.count > 0 ? byIdentifier : app.windows.containing(.button, identifier: "miniWindowClose")
     }
 
-    /// Fenêtre de navigation principale (ni mini-fenêtre ni fenêtre privée).
+    /// Main browser window (neither a mini window nor a private window).
     @MainActor
     func browserWindow(in app: XCUIApplication) -> XCUIElement {
         app.windows.containing(.button, identifier: "newTabButton")
@@ -25,13 +25,13 @@ extension XCTestCase {
             .firstMatch
     }
 
-    /// Bouton « Ouvrir dans ‹Space› » de `mini` ; sa valeur est le nom du Space visé.
+    /// “Open in ‹Space›” button of `mini`; its value is the name of the target Space.
     @MainActor
     func openInSpaceButton(in mini: XCUIElement) -> XCUIElement {
         mini.descendants(matching: .any).matching(identifier: "miniWindowOpenInSpace").firstMatch
     }
 
-    /// Fichier > Nouvelle mini-fenêtre : la mini-fenêtre s'ouvre, barre ouverte, son champ a le clavier.
+    /// File > New Mini Window: the mini window opens, bar open, its field has keyboard focus.
     @MainActor
     @discardableResult
     func openMiniWindow(in app: XCUIApplication) -> XCUIElement {
@@ -39,8 +39,8 @@ extension XCTestCase {
         app.menuBars.menuBarItems["Fichier"].click()
         app.menuBars.menuItems["Nouvelle mini-fenêtre"].click()
         XCTAssertTrue(waitForCount(miniWindows(in: app), count + 1, timeout: 5))
-        // La nouvelle est la seule dont la barre est ouverte : les autres ont perdu le clavier, leur barre s'est fermée.
-        // On la désigne ensuite par son rang, et non par ce champ, qui disparaît dès qu'une adresse est validée.
+        // The new one is the only one whose bar is open: the others lost keyboard focus, their bar closed.
+        // It is then identified by its index, not by this field, which disappears as soon as an address is submitted.
         let windows = miniWindows(in: app)
         XCTAssertTrue(windows.containing(.textField, identifier: "addressField").firstMatch.waitForExistence(timeout: 3))
         let index = windows.allElementsBoundByIndex.firstIndex { $0.textFields["addressField"].exists } ?? 0
@@ -51,7 +51,7 @@ extension XCTestCase {
         return mini
     }
 
-    /// Tape `text` puis Entrée dans la barre de `mini` (déjà ouverte), et attend que la pastille l'affiche.
+    /// Types `text` then Return in the bar of `mini` (already open), and waits for the pill to show it.
     @MainActor
     func load(_ text: String, in mini: XCUIElement, app: XCUIApplication) {
         let field = addressField(in: mini)
@@ -61,8 +61,8 @@ extension XCTestCase {
         XCTAssertTrue(waitForValue(of: addressPill(in: mini)) { $0 == text })
     }
 
-    /// Point de la fenêtre de navigation que la mini-fenêtre ne couvre pas (au bord de la barre latérale ou de la
-    /// page, sur le fond).
+    /// Point of the browser window that the mini window doesn't cover (at the edge of the sidebar or of the page, on
+    /// the background).
     @MainActor
     func uncoveredPoint(of browser: XCUIElement, avoiding mini: XCUIElement) -> XCUICoordinate {
         let offsets = [CGVector(dx: 0.05, dy: 0.5), CGVector(dx: 0.95, dy: 0.5), CGVector(dx: 0.5, dy: 0.05), CGVector(dx: 0.5, dy: 0.95)]

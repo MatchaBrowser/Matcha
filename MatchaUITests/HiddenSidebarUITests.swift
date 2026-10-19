@@ -1,6 +1,6 @@
 import XCTest
 
-/// Barre latérale masquée (⌘S) et son apparition au survol du bord gauche.
+/// Hidden sidebar (⌘S) and its appearance when hovering the left edge.
 final class HiddenSidebarUITests: XCTestCase {
     override func setUpWithError() throws {
         continueAfterFailure = false
@@ -36,7 +36,7 @@ final class HiddenSidebarUITests: XCTestCase {
         moveAwayFromLeftEdge(in: window)
         XCTAssertTrue(newTabButton.waitForNonExistence(timeout: 3))
 
-        // Barre apparue au survol du bord : le même bouton la fixe.
+        // Sidebar revealed by hovering the edge: the same button makes it stay.
         window.coordinate(withNormalizedOffset: CGVector(dx: 0, dy: 0.5)).withOffset(CGVector(dx: 3, dy: 0)).hover()
         XCTAssertTrue(toggle.waitForExistence(timeout: 3))
         XCTAssertEqual(toggle.label, "Afficher la barre latérale")

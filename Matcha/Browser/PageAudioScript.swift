@@ -1,21 +1,21 @@
 import OSLog
 import WebKit
 
-/// Script de son (tâche 5.10), injecté au début de chaque document (cadre principal et iframes, même d'autres sites)
-/// dans un monde isolé (`WKContentWorld`) : la page ne le voit pas, ne peut ni l'appeler ni le tromper, et seul lui peut
-/// écrire à `PageAudioMessageHandler`. Il écoute, en phase de capture, les événements des éléments audio et vidéo du
-/// document (`play`, `playing`, `pause`, `ended`, `emptied`, `volumechange`) et dit à l'app, 100 ms après une rafale,
-/// si l'un d'eux joue avec du son (ni coupé ni à volume nul) ; tant que c'est le cas, il le redit toutes les 2 s (un
-/// élément retiré de la page s'arrête sans événement visible ; l'app, qui efface l'état à la pause, se recale). Rien
-/// d'autre ne tourne quand rien ne joue. Ne voit pas : Web Audio, un élément hors du document (`new Audio()`), un
-/// élément dans un shadow DOM (ses événements n'en sortent pas) — `DECISIONS.md`.
+/// Sound script (task 5.10), injected at the start of each document (main frame and iframes, even from other sites)
+/// in an isolated world (`WKContentWorld`): the page does not see it, can neither call nor fool it, and only it can
+/// write to `PageAudioMessageHandler`. It listens, in the capture phase, to the events of the document's audio and
+/// video elements (`play`, `playing`, `pause`, `ended`, `emptied`, `volumechange`) and tells the app, 100 ms after a
+/// burst, whether one of them plays with sound (neither muted nor at zero volume); as long as that is the case, it says
+/// so again every 2 s (an element removed from the page stops with no visible event; the app, which clears the state on
+/// pause, realigns). Nothing else runs when nothing plays. Does not see: Web Audio, an element outside the document
+/// (`new Audio()`), an element in a shadow DOM (its events do not leave it) — `DECISIONS.md`.
 @MainActor
 enum PageAudioScript {
     static let world = WKContentWorld.world(name: "MatchaPageAudio")
     static let handlerName = "matchaPageAudio"
 
-    /// Branche le script et son destinataire sur `controller` (une fois par configuration : WebKit refuse un second
-    /// destinataire du même nom).
+    /// Hooks the script and its recipient onto `controller` (once per configuration: WebKit refuses a second
+    /// recipient with the same name).
     static func install(in controller: WKUserContentController) {
         controller.add(PageAudioMessageHandler(), contentWorld: world, name: handlerName)
         controller.addUserScript(WKUserScript(source: source, injectionTime: .atDocumentStart, forMainFrameOnly: false, in: world))
@@ -91,8 +91,8 @@ enum PageAudioScript {
     """
 }
 
-/// Reçoit les messages du script de son et les donne au son de la page qui les envoie (`BrowserWebView.audio`). Un
-/// message mal formé, ou d'une vue web déjà libérée par son onglet, est ignoré.
+/// Receives the messages of the sound script and gives them to the sound of the page that sends them
+/// (`BrowserWebView.audio`). A malformed message, or one from a web view already released by its tab, is ignored.
 final class PageAudioMessageHandler: NSObject, WKScriptMessageHandler {
     func userContentController(_: WKUserContentController, didReceive message: WKScriptMessage) {
         guard let report = PageAudioReport(messageBody: message.body) else {

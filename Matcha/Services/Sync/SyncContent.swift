@@ -1,16 +1,16 @@
 import Foundation
 
-/// Contenu d'un enregistrement synchronisé (tâche 7.4, `SYNC.md` § 2.2) : objet JSON en UTF-8, chiffré par le transport
-/// d'un serveur. `type` reste du texte : un type inconnu (venu d'une version plus récente) est gardé tel quel. Type pur.
+/// Content of a synced record (task 7.4, `SYNC.md` § 2.2): a JSON object in UTF-8, encrypted by a server's
+/// transport. `type` stays text: an unknown type (from a newer version) is kept as is. Pure type.
 nonisolated struct SyncContent: Codable, Equatable, Sendable {
     var type: String
     var schema: Int
-    /// Horloge hybride (`SyncClock`), à la milliseconde.
+    /// Hybrid clock (`SyncClock`), to the millisecond.
     var modifiedAt: Date
-    /// Appareil qui a écrit ce contenu.
+    /// Device that wrote this content.
     var modifiedBy: UUID
     var deleted: Bool
-    /// Champs du type ; objet vide pour une suppression.
+    /// Fields of the type; empty object for a deletion.
     var fields: SyncJSON
 
     init(type: String, schema: Int, modifiedAt: Date, modifiedBy: UUID, deleted: Bool, fields: SyncJSON) {
@@ -22,7 +22,7 @@ nonisolated struct SyncContent: Codable, Equatable, Sendable {
         self.fields = deleted ? .emptyObject : fields
     }
 
-    /// Modification de `fields`, au format actuel de leur type.
+    /// Modification of `fields`, in the current format of their type.
     init(fields: SyncFields, modifiedAt: Date, modifiedBy: UUID) {
         self.init(
             type: fields.type.rawValue,
@@ -34,7 +34,7 @@ nonisolated struct SyncContent: Codable, Equatable, Sendable {
         )
     }
 
-    /// Suppression d'un enregistrement de type `type`.
+    /// Deletion of a record of type `type`.
     static func deletion(of type: String, schema: Int, modifiedAt: Date, modifiedBy: UUID) -> SyncContent {
         SyncContent(type: type, schema: schema, modifiedAt: modifiedAt, modifiedBy: modifiedBy, deleted: true, fields: .emptyObject)
     }
@@ -43,7 +43,7 @@ nonisolated struct SyncContent: Codable, Equatable, Sendable {
         SyncRecordType(rawValue: type)
     }
 
-    /// Écrit avec un format plus récent que celui que connaît ce Matcha : gardé tel quel, jamais modifié.
+    /// Written with a newer format than the one this Matcha knows: kept as is, never modified.
     var isFromNewerVersion: Bool {
         guard let recordType else {
             return true
@@ -51,8 +51,8 @@ nonisolated struct SyncContent: Codable, Equatable, Sendable {
         return schema > recordType.schema
     }
 
-    /// Champs lus et vérifiés ; nil pour une suppression, un type ou un format inconnu, ou une valeur illisible
-    /// (`SYNC.md` § 2.3 : l'enregistrement est alors ignoré, sans être écrasé ni supprimé).
+    /// Fields read and checked; nil for a deletion, an unknown type or format, or an unreadable value
+    /// (`SYNC.md` § 2.3: the record is then ignored, without being overwritten or deleted).
     var readableFields: SyncFields? {
         guard !deleted, !isFromNewerVersion, let recordType else {
             return nil
@@ -60,8 +60,8 @@ nonisolated struct SyncContent: Codable, Equatable, Sendable {
         return SyncFields(json: fields, type: recordType)
     }
 
-    /// Règle des conflits (`SYNC.md` § 2.3) : le plus récent `modifiedAt` gagne ; à égalité, le plus grand `modifiedBy`
-    /// (UUID en minuscules, comparés caractère par caractère).
+    /// Conflict rule (`SYNC.md` § 2.3): the most recent `modifiedAt` wins; on a tie, the greatest `modifiedBy`
+    /// (lowercase UUIDs, compared character by character).
     func isNewer(than other: SyncContent) -> Bool {
         let mine = SyncCoding.milliseconds(of: modifiedAt)
         let theirs = SyncCoding.milliseconds(of: other.modifiedAt)

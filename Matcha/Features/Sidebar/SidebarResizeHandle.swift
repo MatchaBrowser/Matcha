@@ -1,12 +1,12 @@
 import SwiftUI
 
-/// Poignée invisible posée sur le bord droit de la barre latérale : la tirer change sa largeur.
+/// Invisible handle placed on the right edge of the sidebar: dragging it changes its width.
 struct SidebarResizeHandle: View {
     static let thickness = 8.0
 
     @Binding var width: Double
 
-    /// Largeur au début du glissement en cours.
+    /// Width at the start of the current drag.
     @State private var startWidth: Double?
 
     var body: some View {

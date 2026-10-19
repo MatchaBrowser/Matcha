@@ -1,10 +1,10 @@
 import XCTest
 
-/// Captures de l'import d'Arc (`MATCHA_SCREENSHOT_ARC`, voir `ScreenshotUITests`).
+/// Screenshots of the Arc import (`MATCHA_SCREENSHOT_ARC`, see `ScreenshotUITests`).
 extension ScreenshotUITests {
-    /// Si `MATCHA_SCREENSHOT_ARC` est défini : Fichier > Importer depuis > Arc…, le sélecteur ouvert sur le dossier d'Arc
-    /// (`39-arc-selecteur`), puis le fichier donné (« 1 » : l'exemple inventé des tests unitaires) choisi par « Aller au
-    /// dossier » : l'aperçu (`40-arc-apercu`), et la fenêtre après « Importer » (`41-arc-importe`).
+    /// If `MATCHA_SCREENSHOT_ARC` is set: File > Import From > Arc…, the picker opened on Arc's folder
+    /// (`39-arc-selecteur`), then the given file (“1”: the made-up example of the unit tests) chosen with “Go to
+    /// Folder”: the preview (`40-arc-apercu`), and the window after “Import” (`41-arc-importe`).
     @MainActor
     func captureArcImport(in app: XCUIApplication, window: XCUIElement) {
         guard let value = ProcessInfo.processInfo.environment["MATCHA_SCREENSHOT_ARC"] else {
@@ -31,7 +31,7 @@ extension ScreenshotUITests {
         attach(window.screenshot(), as: "41-arc-importe")
     }
 
-    /// Exemple inventé des tests unitaires, lu dans les sources.
+    /// Made-up example of the unit tests, read from the sources.
     private static var arcSamplePath: String {
         URL(fileURLWithPath: #filePath).deletingLastPathComponent().deletingLastPathComponent()
             .appending(path: "MatchaTests/Fixtures/arc-sidebar-sample.json").path

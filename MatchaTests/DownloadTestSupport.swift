@@ -1,7 +1,7 @@
 import Foundation
 @testable import Matcha
 
-/// Dossier temporaire propre à un test (dans le conteneur de l'app), effacé avec lui.
+/// Temporary folder specific to a test (in the app's container), deleted along with it.
 @MainActor
 final class TemporaryDownloadsFolder {
     let url: URL
@@ -11,13 +11,13 @@ final class TemporaryDownloadsFolder {
         try FileManager.default.createDirectory(at: url, withIntermediateDirectories: true)
     }
 
-    /// Gestionnaire de téléchargements qui écrit dans ce dossier.
+    /// Download manager that writes into this folder.
     func makeManager() -> DownloadManager {
         let url = url
         return DownloadManager(directory: { url })
     }
 
-    /// Noms des fichiers du dossier, triés.
+    /// Names of the folder's files, sorted.
     func contents() -> [String] {
         ((try? FileManager.default.contentsOfDirectory(atPath: url.path)) ?? []).sorted()
     }

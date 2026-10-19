@@ -1,7 +1,7 @@
 import Foundation
 import WebKit
 
-/// Les pages d'un Space vues par le délégué de navigation : onglets rangés et aperçu (tâche 4.4).
+/// The pages of a Space as seen by the navigation delegate: placed tabs and Peek (task 4.4).
 extension TabManager: TabHost {
     func page(for webView: WKWebView) -> BrowserTab? {
         tabOrPeek(for: webView)
@@ -21,15 +21,15 @@ extension TabManager: TabHost {
         return place != .today
     }
 
-    /// Après l'onglet d'origine ; depuis l'aperçu, après son onglet d'origine.
+    /// After the source tab; from the Peek, after its source tab.
     func openLink(_ url: URL, configuration: WKWebViewConfiguration, from webView: WKWebView, inBackground: Bool) {
         insertTab(configuration: configuration, after: insertionAnchor(for: webView), select: !inBackground).load(url)
     }
 
-    /// Fenêtre sans taille ouverte par l'aperçu : il devient d'abord un onglet, pour que `window.opener` reste
-    /// valable. Une fenêtre de connexion (taille donnée, tâche 5.8) va dans sa propre fenêtre et l'aperçu reste un
-    /// aperçu (`NavigationCoordinator`). En arrière-plan (menu contextuel, tâche 5.9) : après l'onglet d'origine,
-    /// ou celui de l'aperçu, qui reste un aperçu.
+    /// Window without a size opened by the Peek: the Peek first becomes a tab, so that `window.opener` stays valid.
+    /// A sign-in window (size given, task 5.8) goes into its own window and the Peek stays a Peek
+    /// (`NavigationCoordinator`). In the background (context menu, task 5.9): after the source tab, or the Peek's,
+    /// which stays a Peek.
     func openWindow(configuration: WKWebViewConfiguration, from webView: WKWebView, inBackground: Bool) -> WKWebView? {
         if inBackground {
             return insertTab(configuration: configuration, after: insertionAnchor(for: webView), select: false).makeWebViewIfNeeded()
@@ -38,7 +38,7 @@ extension TabManager: TabHost {
         return insertTab(configuration: configuration, after: opener, select: true).makeWebViewIfNeeded()
     }
 
-    /// Refusé si la vue web d'origine n'est pas affichée.
+    /// Refused if the source web view is not displayed.
     func openInPeek(_ url: URL, from webView: WKWebView, openingPoint: CGPoint) -> Bool {
         guard let source = tabOrPeek(for: webView), canPeek(from: source) else {
             return false
@@ -47,19 +47,19 @@ extension TabManager: TabHost {
         return true
     }
 
-    /// Onglets et aperçu partagent le profil du Space.
+    /// Tabs and Peek share the Space's profile.
     func sitePermissions(for _: WKWebView) -> SitePermissionScope? {
         sitePermissions
     }
 
-    /// Onglets et aperçu : le profil et le Space de ce Space.
+    /// Tabs and Peek: the profile and the Space of this Space.
     func historyScope(for _: WKWebView) -> HistoryScope? {
         history
     }
 
-    /// L'aperçu est visible : il ne s'ouvre que par-dessus une page affichée et se ferme avec elle. Un onglet l'est s'il
-    /// est affiché dans une fenêtre ouverte (sélectionné ou panneau de son split, dans le Space affiché : notion de la
-    /// tâche 5.6) ; sans ce suivi (tests), s'il est affiché par ce Space.
+    /// The Peek is visible: it only opens on top of a displayed page and closes with it. A tab is visible if it is
+    /// displayed in an open window (selected or pane of its split, in the displayed Space: notion from task 5.6);
+    /// without this tracking (tests), if it is displayed by this Space.
     func isVisible(_ page: BrowserTab) -> Bool {
         if peek?.tab === page {
             return true

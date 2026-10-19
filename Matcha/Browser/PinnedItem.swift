@@ -1,6 +1,6 @@
 import Foundation
 
-/// Élément de la section des épinglés : un onglet ou un dossier.
+/// Item of the pinned section: a tab or a folder.
 nonisolated enum PinnedItem: Equatable, Sendable, Identifiable {
     case tab(UUID)
     case folder(PinnedFolder)
@@ -12,7 +12,7 @@ nonisolated enum PinnedItem: Equatable, Sendable, Identifiable {
         }
     }
 
-    /// Onglets de l'élément, dossiers compris, dans l'ordre d'affichage.
+    /// Tabs of the item, folders included, in display order.
     var tabIDs: [UUID] {
         switch self {
         case let .tab(id): [id]
@@ -21,19 +21,19 @@ nonisolated enum PinnedItem: Equatable, Sendable, Identifiable {
     }
 }
 
-/// Dossier de la section des épinglés ; il peut contenir des onglets et d'autres dossiers.
+/// Folder of the pinned section; it can contain tabs and other folders.
 nonisolated struct PinnedFolder: Equatable, Sendable, Identifiable {
     let id: UUID
     var name: String
     var isCollapsed = false
     var items: [PinnedItem] = []
-    /// Icône et couleurs choisies dans son panneau de personnalisation.
+    /// Icon and colors chosen in its customization panel.
     var appearance = FolderAppearance()
 }
 
-/// Opérations sur l'arbre des épinglés. Un dossier parent nil désigne la racine de la section.
+/// Operations on the tree of pinned tabs. A nil parent folder designates the root of the section.
 nonisolated extension [PinnedItem] {
-    /// Les mêmes éléments sans l'onglet `id`, où qu'il soit dans les dossiers.
+    /// The same items without the tab `id`, wherever it is in the folders.
     func removingTab(_ id: UUID) -> [PinnedItem] {
         compactMap { item in
             switch item {
@@ -46,7 +46,7 @@ nonisolated extension [PinnedItem] {
         }
     }
 
-    /// Dossier parent et rang de l'élément `itemID` (onglet ou dossier).
+    /// Parent folder and position of the item `itemID` (tab or folder).
     func location(of itemID: UUID, parent: UUID? = nil) -> (parent: UUID?, index: Int)? {
         for (index, item) in enumerated() {
             if item.id == itemID {
@@ -59,7 +59,7 @@ nonisolated extension [PinnedItem] {
         return nil
     }
 
-    /// Le dossier `folderID`, où qu'il soit.
+    /// The folder `folderID`, wherever it is.
     func folder(_ folderID: UUID) -> PinnedFolder? {
         for item in self {
             guard case let .folder(folder) = item else {
@@ -75,8 +75,8 @@ nonisolated extension [PinnedItem] {
         return nil
     }
 
-    /// Insère `item` dans le dossier `folderID` (nil : la racine) à `index`, borné.
-    /// Renvoie faux si le dossier n'existe pas.
+    /// Inserts `item` into the folder `folderID` (nil: the root) at `index`, clamped.
+    /// Returns false if the folder does not exist.
     @discardableResult
     mutating func insert(_ item: PinnedItem, inFolder folderID: UUID?, at index: Int) -> Bool {
         guard let folderID else {
@@ -88,7 +88,7 @@ nonisolated extension [PinnedItem] {
         }
     }
 
-    /// Applique `change` au dossier `folderID`, où qu'il soit. Renvoie faux s'il n'existe pas.
+    /// Applies `change` to the folder `folderID`, wherever it is. Returns false if it does not exist.
     @discardableResult
     mutating func updateFolder(_ folderID: UUID, _ change: (inout PinnedFolder) -> Void) -> Bool {
         for index in indices {
@@ -108,7 +108,7 @@ nonisolated extension [PinnedItem] {
         return false
     }
 
-    /// Retire l'élément `itemID` (onglet ou dossier, avec son contenu) et le renvoie.
+    /// Removes the item `itemID` (tab or folder, with its content) and returns it.
     mutating func removeItem(_ itemID: UUID) -> PinnedItem? {
         for index in indices {
             if self[index].id == itemID {

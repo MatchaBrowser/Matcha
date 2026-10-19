@@ -1,35 +1,35 @@
 import SwiftUI
 
-/// Zoom de la page à côté de la pastille d'adresse (tâche 5.4), comme dans Safari : « 125 % », visible seulement hors
-/// de 100 %. Il suit chaque ⌘+, ⌘-, ⌘0 (chiffres qui défilent, petite pulsation), apparaît et disparaît en fondu ; un clic
-/// ramène le site de la page à 100 %, comme ⌘0. Il est à côté de la pastille et non dedans : un bouton dans le bouton de
-/// la pastille ne recevrait pas ses clics. Il ne prend jamais le clavier.
+/// Page zoom next to the address pill (task 5.4), as in Safari: “125%”, visible only away from 100%. It follows
+/// each ⌘+, ⌘-, ⌘0 (rolling digits, small pulse), fades in and out; a click brings the page's site back to 100%,
+/// like ⌘0. It sits next to the pill and not inside it: a button inside the pill's button would not receive its
+/// clicks. It never takes keyboard focus.
 struct ZoomBadge: View {
-    /// Fond du badge : discret dans une barre d'adresse, matériau sur la barre flottante de l'aperçu.
+    /// Badge background: subtle in an address bar, material on the peek's floating bar.
     enum Style {
         case inline
         case floating
     }
 
-    /// Page décrite : onglet affiché, page de l'aperçu ou de la mini-fenêtre.
+    /// Described page: displayed tab, page of the peek or of the mini window.
     let page: BrowserTab?
-    /// Zoom par site de la fenêtre ; nil : seule la page revient à 100 %.
+    /// Per-site zoom of the window; nil: only the page goes back to 100%.
     let siteZooms: SiteZoomStore?
     var style = Style.inline
 
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
-    /// Vrai si le zoom de `page` n'est pas 100 %.
+    /// True if the zoom of `page` is not 100%.
     static func isShown(for page: BrowserTab?) -> Bool {
         page.map { !ZoomLevels.isActualSize($0.pageZoom) } ?? false
     }
 
-    /// Animation du badge et de la barre qui le porte.
+    /// Animation of the badge and of the bar that holds it.
     static func animation(reduceMotion: Bool) -> Animation {
         reduceMotion ? .easeInOut(duration: 0.15) : .snappy(duration: 0.25)
     }
 
-    /// Clic : le site de `page` revient à 100 % (toutes ses pages ouvertes), comme ⌘0, et VoiceOver l'annonce.
+    /// Click: the site of `page` goes back to 100% (all its open pages), like ⌘0, and VoiceOver announces it.
     static func reset(_ page: BrowserTab, siteZooms: SiteZoomStore?) {
         if let level = PageZoom.apply(.actualSize, to: page, siteZooms: siteZooms) {
             ZoomAnnouncement.post(level)
@@ -46,7 +46,7 @@ struct ZoomBadge: View {
                     .animation(Self.animation(reduceMotion: reduceMotion), value: level)
             }
             .buttonStyle(ZoomBadgeButtonStyle(style: style))
-            // Petite pulsation à chaque changement (aucune avec Réduire les animations).
+            // Small pulse at each change (none with Reduce Motion).
             .phaseAnimator([1.0, 1.12], trigger: reduceMotion ? nil : level) { content, scale in
                 content.scaleEffect(scale)
             } animation: { scale in
@@ -67,8 +67,8 @@ struct ZoomBadge: View {
 }
 
 extension View {
-    /// Anime la barre qui porte le badge du zoom de `page` à chaque changement : le badge apparaît ou disparaît en
-    /// fondu pendant que la pastille d'adresse s'écarte, au lieu de sauter.
+    /// Animates the bar holding the zoom badge of `page` at each change: the badge fades in or out while the
+    /// address pill moves aside, instead of jumping.
     func animatesZoomBadge(of page: BrowserTab?) -> some View {
         modifier(ZoomBadgeAnimation(level: page?.pageZoom))
     }
@@ -84,7 +84,7 @@ private struct ZoomBadgeAnimation: ViewModifier {
     }
 }
 
-/// Capsule du badge, plus marquée au survol, atténuée pendant le clic.
+/// Badge capsule, more pronounced on hover, dimmed during the click.
 private struct ZoomBadgeButtonStyle: ButtonStyle {
     let style: ZoomBadge.Style
 
@@ -108,7 +108,7 @@ private struct ZoomBadgeCapsule: View {
             .frame(height: style == .floating ? PeekLayout.toolbarHeight : 20)
             .background { background }
             .opacity(configuration.isPressed ? 0.6 : 1)
-            // Zone de clic plus haute que la capsule, dans une barre d'adresse.
+            // Click area taller than the capsule, in an address bar.
             .padding(.vertical, style == .floating ? 0 : 4)
             .contentShape(.rect)
             .onHover { isHovered = $0 }
@@ -119,7 +119,7 @@ private struct ZoomBadgeCapsule: View {
         case .inline:
             Capsule().fill(Color.primary.opacity(isHovered ? 0.14 : 0.08))
         case .floating:
-            // Comme l'adresse de la barre de l'aperçu, lisible sur le voile.
+            // Like the address in the peek's bar, readable on the scrim.
             ZStack {
                 Capsule().fill(.regularMaterial)
                 Capsule().fill(Color.primary.opacity(isHovered ? 0.1 : 0))

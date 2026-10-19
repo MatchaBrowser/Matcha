@@ -2,7 +2,7 @@ import Foundation
 @testable import Matcha
 import Testing
 
-/// Emoji d'icône d'un dossier ou d'un Space : un seul caractère qui s'affiche en emoji.
+/// Icon emoji of a folder or a Space: a single character that displays as an emoji.
 struct IconEmojiTests {
     @Test(arguments: ["😀", "🌿", "🇫🇷", "👩🏽‍💻", "👨‍👩‍👧", "❤️", "1️⃣", "#️⃣", "🏴󠁧󠁢󠁳󠁣󠁴󠁿", "👍🏽"])
     func `a single emoji is accepted`(emoji: String) {

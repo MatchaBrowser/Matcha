@@ -1,7 +1,7 @@
 import Foundation
 
-/// Champs d'une extension installée (`SYNC.md` § 2.5) : d'où elle vient, ses réglages et les décisions sur ses
-/// permissions (nom ou motif → date d'expiration, nil sans expiration).
+/// Fields of an installed extension (`SYNC.md` § 2.5): where it comes from, its settings and the decisions on its
+/// permissions (name or pattern → expiration date, nil without expiration).
 nonisolated struct SyncExtensionFields: Codable, Equatable, Sendable {
     var identifier: String
     var name: String
@@ -16,8 +16,8 @@ nonisolated struct SyncExtensionFields: Codable, Equatable, Sendable {
     var deniedMatchPatterns: [String: Date?]
 }
 
-/// Origine d'une extension : l'extension Safari d'une app (chargée depuis l'app sur chaque Mac), ou un paquet installé
-/// depuis un fichier, envoyé chiffré à part (`blobId`, avec sa clé `blobKey` en base 64).
+/// Origin of an extension: an app's Safari extension (loaded from the app on each Mac), or a package installed from a
+/// file, uploaded encrypted separately (`blobId`, with its key `blobKey` in base 64).
 nonisolated struct SyncExtensionSource: Codable, Equatable, Sendable {
     enum Kind: String, Codable, Sendable {
         case appExtension

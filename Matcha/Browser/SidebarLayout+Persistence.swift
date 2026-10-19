@@ -1,32 +1,32 @@
 import Foundation
 
-/// Position d'un onglet dans la barre, telle qu'enregistrée.
+/// Position of a tab in the sidebar, as saved.
 nonisolated struct SidebarPosition: Equatable, Sendable {
     var place: TabPlace
-    /// Rang dans son conteneur : favoris, racine des épinglés ou dossier, onglets du jour.
+    /// Rank in its container: favorites, root of the pinned tabs or folder, today tabs.
     var order: Int
-    /// Dossier qui contient l'onglet épinglé, nil à la racine.
+    /// Folder that contains the pinned tab, nil at the root.
     var folderID: UUID?
-    /// Split de l'onglet et part de largeur de son panneau.
+    /// The tab's split and the width share of its pane.
     var splitGroupID: UUID?
     var splitFraction = 0.0
 }
 
-/// Dossier d'épinglés tel qu'enregistré.
+/// Folder of pinned tabs, as saved.
 nonisolated struct FolderEntry: Equatable, Sendable {
     var id: UUID
     var name: String
     var isCollapsed: Bool
-    /// Dossier parent, nil à la racine des épinglés.
+    /// Parent folder, nil at the root of the pinned tabs.
     var parentID: UUID?
-    /// Rang dans son conteneur, sur la même échelle que les onglets.
+    /// Rank in its container, on the same scale as the tabs.
     var order: Int
     var appearance = FolderAppearance()
 }
 
-/// Passage du rangement en mémoire à sa forme enregistrée (positions à plat), et retour.
+/// Conversion of the in-memory layout to its saved form (flat positions), and back.
 nonisolated extension SidebarLayout {
-    /// Position de chaque onglet rangé, avec son split.
+    /// Position of each placed tab, with its split.
     var positions: [UUID: SidebarPosition] {
         var result: [UUID: SidebarPosition] = [:]
         for (order, id) in favorites.enumerated() {
@@ -45,16 +45,16 @@ nonisolated extension SidebarLayout {
         return result
     }
 
-    /// Dossiers d'épinglés, avec leur parent et leur rang.
+    /// Folders of pinned tabs, with their parent and rank.
     var folderEntries: [FolderEntry] {
         var result: [FolderEntry] = []
         Self.collectFolders(pinned, in: nil, entries: &result)
         return result
     }
 
-    /// Reconstruit le rangement : chaque conteneur dans l'ordre croissant des rangs. Un dossier dont le
-    /// parent est inconnu, ou pris dans une boucle, va à la racine ; un épinglé dans un dossier inconnu aussi.
-    /// Les splits enregistrés sont réparés au besoin (voir `restoreSplits`).
+    /// Rebuilds the layout: each container in increasing order of rank. A folder whose parent is unknown, or
+    /// caught in a loop, goes to the root; so does a pinned tab in an unknown folder.
+    /// The saved splits are repaired if needed (see `restoreSplits`).
     init(positions: [UUID: SidebarPosition], folders: [FolderEntry]) {
         self.init()
         for (id, _) in positions.filter({ $0.value.place == .favorite }).sorted(by: Self.byOrder) {
@@ -73,8 +73,8 @@ nonisolated extension SidebarLayout {
             remaining[id]?.parentID = nil
         }
         fillPinned(in: nil, tabs: pinnedTabs, folders: &remaining)
-        // Dossiers pris dans une boucle de parents : jamais atteints depuis la racine. Les épinglés de la
-        // racine sont déjà placés ; seuls ceux des dossiers restent à ranger.
+        // Folders caught in a parent loop: never reached from the root. The pinned tabs of the root are
+        // already placed; only those of folders remain to be placed.
         let tabsInFolders = pinnedTabs.filter { $0.value.folderID != nil }
         while let orphan = remaining.values.min(by: { $0.order < $1.order }) {
             remaining[orphan.id]?.parentID = nil
@@ -83,10 +83,10 @@ nonisolated extension SidebarLayout {
         restoreSplits(from: positions)
     }
 
-    /// Regroupe les onglets rangés par split, dans l'ordre de la barre. La normalisation répare une base
-    /// invalide (synchro, ancienne version) : groupe d'un seul onglet abandonné, favori retiré, membres hors du
-    /// conteneur du premier retirés, 4 membres au plus, membres regroupés après le premier, parts invalides
-    /// remplacées par des parts égales.
+    /// Groups the placed tabs by split, in sidebar order. Normalization repairs an invalid store (sync, older
+    /// version): a single-tab group is dropped, a favorite removed, members outside the first member's container
+    /// removed, 4 members at most, members gathered after the first one, invalid shares replaced by equal
+    /// shares.
     private mutating func restoreSplits(from positions: [UUID: SidebarPosition]) {
         let rank = Dictionary(orderedTabIDs.enumerated().map { ($1, $0) }) { first, _ in first }
         var members: [UUID: [(id: UUID, fraction: Double)]] = [:]
@@ -99,12 +99,12 @@ nonisolated extension SidebarLayout {
             let sorted = entries.sorted { (rank[$0.id] ?? 0) < (rank[$1.id] ?? 0) }
             return SplitGroup(id: groupID, tabIDs: sorted.map(\.id), fractions: sorted.map(\.fraction))
         }
-        // Ordre fixe : une base invalide est toujours réparée de la même façon.
+        // Fixed order: an invalid store is always repaired the same way.
         setSplits(candidates.sorted { $0.id.uuidString < $1.id.uuidString })
     }
 
-    /// Ajoute, dans l'ordre des rangs, les onglets et dossiers de `parent`, puis le contenu de chaque dossier.
-    /// Chaque dossier placé est retiré de `folders`.
+    /// Adds, in order of rank, the tabs and folders of `parent`, then the content of each folder.
+    /// Each placed folder is removed from `folders`.
     private mutating func fillPinned(in parent: UUID?, tabs: [UUID: SidebarPosition], folders: inout [UUID: FolderEntry]) {
         enum Item { case tab(UUID), folder(FolderEntry) }
         func key(of item: Item) -> String {
@@ -115,7 +115,7 @@ nonisolated extension SidebarLayout {
         }
         let children = tabs.filter { $0.value.folderID == parent }.map { (order: $0.value.order, item: Item.tab($0.key)) }
             + folders.values.filter { $0.parentID == parent }.map { (order: $0.order, item: Item.folder($0)) }
-        // Rangs égaux (deux Mac synchronisés) : l'identifiant départage.
+        // Equal ranks (two synced Macs): the identifier breaks the tie.
         for child in children.sorted(by: { ($0.order, key(of: $0.item)) < ($1.order, key(of: $1.item)) }) {
             switch child.item {
             case let .tab(id):
@@ -159,7 +159,7 @@ nonisolated extension SidebarLayout {
         }
     }
 
-    /// Par rang, puis par identifiant (rangs égaux venus de deux Mac synchronisés).
+    /// By rank, then by identifier (equal ranks coming from two synced Macs).
     private static func byOrder(_ lhs: (key: UUID, value: SidebarPosition), _ rhs: (key: UUID, value: SidebarPosition)) -> Bool {
         (lhs.value.order, lhs.key.uuidString) < (rhs.value.order, rhs.key.uuidString)
     }

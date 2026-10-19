@@ -1,19 +1,19 @@
 import WebKit
 
-/// Fabrique la configuration WebKit commune à toutes les vues web, avec le script de son (tâche 5.10) et le contrôleur
-/// des extensions (tâche 6.3, fenêtres privées comprises : les extensions n'y ont accès que si l'utilisateur le permet).
-/// Chaque page a son propre contrôleur de contenu (`pageConfiguration`) : le bloqueur (tâche 6.2) y pose ou retire ses
-/// listes page par page ; WebKit y injecte les scripts des extensions.
+/// Builds the WebKit configuration shared by all web views, with the sound script (task 5.10) and the extension
+/// controller (task 6.3, private windows included: extensions only have access to them if the user allows it).
+/// Each page has its own content controller (`pageConfiguration`): the blocker (task 6.2) sets or removes its lists
+/// there page by page; WebKit injects the extensions' scripts into it.
 @MainActor
 enum WebConfigurationFactory {
-    /// Version de Safari annoncée aux sites, pour qu'ils traitent l'app comme Safari.
-    /// À tenir à jour avec la version de Safari livrée avec macOS.
+    /// Safari version announced to sites, so that they treat the app as Safari.
+    /// To keep up to date with the Safari version shipped with macOS.
     static let safariVersion = "26.6"
 
-    /// Contrôleurs de contenu déjà donnés à une page (`BrowserTab`).
+    /// Content controllers already given to a page (`BrowserTab`).
     private static let pageControllers = NSHashTable<WKUserContentController>.weakObjects()
 
-    /// Suffixe ajouté par WebKit à son agent utilisateur.
+    /// Suffix added by WebKit to its user agent.
     static var applicationNameForUserAgent: String {
         "Version/\(safariVersion) Safari/605.1.15"
     }
@@ -25,23 +25,23 @@ enum WebConfigurationFactory {
         WebInspection.apply(to: configuration.preferences)
         configuration.applicationNameForUserAgent = applicationNameForUserAgent
         configuration.userContentController = makeUserContentController()
-        // « Afficher le code source » (menu d'une page).
+        // “View Page Source” (menu of a page).
         configuration.setURLSchemeHandler(PageSourceSchemeHandler.shared, forURLScheme: PageSource.scheme)
         ExtensionManager.shared.attach(to: configuration)
         return configuration
     }
 
-    /// Contrôleur de contenu d'une page, avec le script de son.
+    /// Content controller of a page, with the sound script.
     static func makeUserContentController() -> WKUserContentController {
         let controller = WKUserContentController()
         PageAudioScript.install(in: controller)
         return controller
     }
 
-    /// Configuration d'une nouvelle page (`BrowserTab`) : `configuration` telle quelle si son contrôleur de contenu
-    /// n'appartient encore à aucune page ; sinon (page dupliquée, aperçu, lien ⌘-clic, qui reprennent la configuration
-    /// d'une autre page), une copie (même profil, mêmes réglages) avec un contrôleur neuf. Le bloqueur peut ainsi régler
-    /// chaque page sans toucher aux autres.
+    /// Configuration of a new page (`BrowserTab`): `configuration` as is if its content controller does not belong to
+    /// any page yet; otherwise (duplicated page, Peek, ⌘-click link, which reuse the configuration of another page), a
+    /// copy (same profile, same settings) with a new controller. The blocker can thus adjust each page without touching
+    /// the others.
     static func pageConfiguration(from configuration: WKWebViewConfiguration) -> WKWebViewConfiguration {
         var configuration = configuration
         if pageControllers.contains(configuration.userContentController), let copy = configuration.copy() as? WKWebViewConfiguration {
@@ -52,9 +52,9 @@ enum WebConfigurationFactory {
         return configuration
     }
 
-    /// Fenêtre ouverte par une page (`createWebViewWith`) : la configuration fournie par WebKit partage le contrôleur de
-    /// la page d'origine ; elle en reçoit un neuf, sur elle-même (WebKit exige que la vue soit créée avec cet objet ;
-    /// `window.opener` reste, vérifié).
+    /// Window opened by a page (`createWebViewWith`): the configuration supplied by WebKit shares the controller of the
+    /// originating page; it gets a new one, on itself (WebKit requires the view to be created with this object;
+    /// `window.opener` remains, checked).
     static func giveOwnContentController(to configuration: WKWebViewConfiguration) {
         configuration.userContentController = makeUserContentController()
     }

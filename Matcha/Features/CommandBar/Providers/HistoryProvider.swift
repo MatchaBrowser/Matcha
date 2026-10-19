@@ -1,10 +1,10 @@
 import Foundation
 
-/// Historique de navigation dans la barre de commande, lu dans `HistorySource` (tâche 5.5). Rien sans
-/// source ni dans une fenêtre privée.
+/// Browsing history in the command bar, read from `HistorySource` (task 5.5). Nothing without a source or in a
+/// private window.
 @MainActor
 final class HistoryProvider: CommandProvider {
-    /// Adresses demandées à la source : de quoi classer, y compris de façon approximative.
+    /// Addresses requested from the source: enough to rank, including approximately.
     static let fetchLimit = 300
 
     private let source: (any HistorySource)?

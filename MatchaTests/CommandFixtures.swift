@@ -1,19 +1,19 @@
 import Foundation
 @testable import Matcha
 
-// Données partagées des tests de la barre de commande.
+// Shared data for the command bar tests.
 
-/// Instant de référence des tests de classement.
+/// Reference instant for the ranking tests.
 let fixedNow = Date(timeIntervalSinceReferenceDate: 800_000_000)
 
-/// Space affiché des tests de classement.
+/// Displayed Space for the ranking tests.
 let shownSpaceID = UUID()
 
 func query(_ text: String, engine: SearchEngine = .google) -> CommandQuery {
     CommandQuery(text: text, searchEngine: engine)
 }
 
-/// Onglet ouvert : `spaceName` nil pour le Space affiché ; `activity` = dernière activité.
+/// Open tab: `spaceName` nil for the displayed Space; `activity` = last activity.
 func tab(
     _ title: String,
     url: String,
@@ -30,7 +30,7 @@ func tab(
     )
 }
 
-/// Adresse de l'historique visitée `visits` fois, la dernière il y a `daysAgo` jours.
+/// History address visited `visits` times, the last time `daysAgo` days ago.
 func history(_ title: String, url: String, visits: Int = 1, daysAgo: Double = 0) -> CommandCandidate {
     CommandCandidate(
         kind: .history(visitCount: visits, lastVisit: fixedNow.addingTimeInterval(-daysAgo * 86400)),
@@ -39,7 +39,7 @@ func history(_ title: String, url: String, visits: Int = 1, daysAgo: Double = 0)
     )
 }
 
-/// Action avec ses titre et mots-clés anglais (`defaultValue` du catalogue).
+/// Action with its English title and keywords (`defaultValue` from the catalog).
 func action(_ id: CommandActionID) -> CommandCandidate {
     let texts: (title: String, keywords: String) = switch id {
     case .newSpace: ("New Space", "new create add space")
@@ -54,7 +54,7 @@ func suggestion(_ text: String) -> CommandCandidate {
     CommandCandidate(kind: .suggestion, title: text, url: nil)
 }
 
-/// Générateur pseudo-aléatoire reproductible (SplitMix64).
+/// Reproducible pseudo-random generator (SplitMix64).
 struct SeededGenerator: RandomNumberGenerator {
     private var state: UInt64
 

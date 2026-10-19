@@ -1,10 +1,9 @@
 import Foundation
 import WebKit
 
-/// Taille demandée par une page pour la fenêtre qu'elle ouvre (`window.open(url, nom, "width=500,height=600")`, tâche
-/// 5.8), en points, pour la page elle-même (sans barre de titre). Une valeur absente, nulle, négative ou non finie
-/// ne compte pas : WebKit prend alors la taille par défaut. La position demandée (`left`, `top`) n'est pas gardée :
-/// `DECISIONS.md`.
+/// Size requested by a page for the window it opens (`window.open(url, name, "width=500,height=600")`, task 5.8),
+/// in points, for the page itself (without title bar). A missing, zero, negative or non-finite value does not
+/// count: WebKit then uses the default size. The requested position (`left`, `top`) is not kept: `DECISIONS.md`.
 nonisolated struct PopupWindowFeatures: Equatable, Sendable {
     let width: Double?
     let height: Double?
@@ -14,8 +13,8 @@ nonisolated struct PopupWindowFeatures: Equatable, Sendable {
         self.height = Self.dimension(height)
     }
 
-    /// Vrai si la page donne une taille : fenêtre de connexion (Google, Apple, banque, paiement) dans sa propre
-    /// fenêtre. Sinon (lien `target=_blank`, `window.open` sans taille), un onglet, comme avant.
+    /// True if the page gives a size: sign-in window (Google, Apple, bank, payment) in its own window. Otherwise
+    /// (`target=_blank` link, `window.open` without size), a tab, as before.
     var opensPopupWindow: Bool {
         width != nil || height != nil
     }
@@ -29,7 +28,7 @@ nonisolated struct PopupWindowFeatures: Equatable, Sendable {
 }
 
 extension PopupWindowFeatures {
-    /// Ce que WebKit transmet de la chaîne de `window.open` (vérifié : chaque valeur n'est donnée que si la page l'écrit).
+    /// What WebKit passes on from the `window.open` string (verified: each value is given only if the page writes it).
     @MainActor
     init(_ features: WKWindowFeatures) {
         self.init(width: features.width?.doubleValue, height: features.height?.doubleValue)

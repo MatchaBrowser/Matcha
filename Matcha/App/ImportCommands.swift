@@ -1,7 +1,7 @@
 import SwiftUI
 
-/// Fichier > Importer depuis > Arc… (tâche 7.1), comme le menu de Safari. Grisé hors d'une fenêtre de navigation et
-/// dans une fenêtre privée.
+/// File > Import From > Arc… (task 7.1), like Safari's menu. Disabled outside a browsing window and in a private
+/// window.
 struct ImportCommands: Commands {
     @FocusedValue(\.windowActions) private var windowActions
 

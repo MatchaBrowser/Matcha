@@ -2,16 +2,16 @@ import Foundation
 import OSLog
 import WebKit
 
-/// Extensions de Matcha vues par la synchro (tâche 7.4, `SYNC.md` § 2.5). Une extension installée ici suit les réglages
-/// reçus (active, fenêtres privées, bouton, permissions) ; une extension reçue qui n'est pas installée n'est jamais
-/// installée d'office : elle attend sous « Depuis vos autres Mac » (`SyncedExtensions.offers`). Désinstallée sur un
-/// Mac, elle l'est partout.
+/// Matcha's extensions as seen by sync (task 7.4, `SYNC.md` § 2.5). An extension installed here follows the received
+/// settings (enabled, private windows, button, permissions); a received extension that is not installed is never
+/// installed automatically: it waits under “From Your Other Macs” (`SyncedExtensions.offers`). Uninstalled on one
+/// Mac, it is uninstalled everywhere.
 @MainActor
 final class ExtensionSyncAdapter {
     let manager: ExtensionManager
     let synced: SyncedExtensions
     let installer: ExtensionInstaller
-    /// Transport de la synchro en cours, pour télécharger un paquet proposé ; nil sans synchro.
+    /// Transport of the current sync, to download an offered package; nil without sync.
     var transport: (any SyncTransport)?
 
     init(manager: ExtensionManager, synced: SyncedExtensions, installer: ExtensionInstaller? = nil) {
@@ -20,7 +20,7 @@ final class ExtensionSyncAdapter {
         self.installer = installer ?? ExtensionInstaller(manager: manager)
     }
 
-    /// Extensions installées sur ce Mac, par identifiant.
+    /// Extensions installed on this Mac, by identifier.
     func fields() -> [String: SyncExtensionFields] {
         var result: [String: SyncExtensionFields] = [:]
         for identifier in manager.installedIdentifiers {
@@ -46,8 +46,8 @@ final class ExtensionSyncAdapter {
         return result
     }
 
-    /// Extension reçue : réglages appliqués si elle est installée ici (un nouveau paquet attend la prochaine synchro,
-    /// `updatePackages`), sinon proposée, sauf si l'utilisateur l'a ignorée.
+    /// Received extension: settings applied if it is installed here (a new package waits for the next sync,
+    /// `updatePackages`), otherwise offered, unless the user ignored it.
     func apply(_ fields: SyncExtensionFields) {
         let identifier = fields.identifier
         guard ExtensionInstallDirectory.isValidIdentifier(identifier) else {
@@ -60,14 +60,14 @@ final class ExtensionSyncAdapter {
             return
         }
         applySettings(fields)
-        // Nouveau paquet d'une extension installée ici : installé à la prochaine synchro s'il ne demande rien de plus.
+        // New package of an extension installed here: installed at the next sync if it asks for nothing more.
         let package = SyncedPackage(source: fields.source, version: fields.version)
         if let package, let known = synced.packages[identifier], known.blobID != package.blobID {
             synced.offers[identifier] = fields
         }
     }
 
-    /// Extension désinstallée sur un autre Mac : désinstallée ici aussi, ses données avec.
+    /// Extension uninstalled on another Mac: uninstalled here too, along with its data.
     func remove(identifier: String) {
         synced.offers[identifier] = nil
         guard manager.installedIdentifiers.contains(identifier) else {
@@ -78,13 +78,13 @@ final class ExtensionSyncAdapter {
         }
     }
 
-    /// N'est plus proposée sur ce Mac.
+    /// No longer offered on this Mac.
     func ignore(_ identifier: String) {
         synced.offers[identifier] = nil
         synced.ignored.insert(identifier)
     }
 
-    // MARK: Réglages
+    // MARK: Settings
 
     private func applySettings(_ fields: SyncExtensionFields) {
         let identifier = fields.identifier
@@ -117,7 +117,7 @@ final class ExtensionSyncAdapter {
         }
     }
 
-    /// Décisions actuelles : celles du contexte chargé, sinon celles retenues.
+    /// Current decisions: those of the loaded context, otherwise the remembered ones.
     private func currentState(of identifier: String) -> ExtensionState {
         let stored = manager.store.state(for: identifier) ?? ExtensionState()
         guard let context = manager.contexts[identifier] else {
@@ -139,7 +139,7 @@ final class ExtensionSyncAdapter {
         return synced.packages[identifier]?.source ?? .package(blobID: nil, blobKey: nil, sha256: nil, size: nil, fileName: nil)
     }
 
-    /// App qui contient le `.appex` (…/App.app/Contents/PlugIns/X.appex).
+    /// App that contains the `.appex` (…/App.app/Contents/PlugIns/X.appex).
     static func app(containing appex: URL) -> URL? {
         var url = appex.deletingLastPathComponent()
         while url.pathComponents.count > 1 {
@@ -151,7 +151,7 @@ final class ExtensionSyncAdapter {
         return nil
     }
 
-    /// Date d'expiration, nil sans expiration (`Date.distantFuture` dans `ExtensionState`).
+    /// Expiration date, nil without expiration (`Date.distantFuture` in `ExtensionState`).
     static func expirations(_ dates: [String: Date]) -> [String: Date?] {
         dates.mapValues { $0 >= .distantFuture ? nil : $0 }
     }
@@ -162,8 +162,8 @@ final class ExtensionSyncAdapter {
 }
 
 extension ExtensionSyncAdapter {
-    /// Synchro des extensions de l'app, avec ses réglages dans `Application Support/Sync/extensions.json`. Pendant les
-    /// tests (unitaires et base de test), tout reste en mémoire.
+    /// Sync of the app's extensions, with its settings in `Application Support/Sync/extensions.json`. During tests
+    /// (unit tests and test store), everything stays in memory.
     static let shared: ExtensionSyncAdapter = {
         let isTesting = ProcessInfo.processInfo.environment["XCTestConfigurationFilePath"] != nil
             || UserDefaults.standard.bool(forKey: BrowserSession.inMemoryStoreKey)

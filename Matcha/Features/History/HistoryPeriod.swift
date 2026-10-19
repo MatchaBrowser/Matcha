@@ -1,6 +1,6 @@
 import Foundation
 
-/// Période effacée par « Effacer l'historique… », comme dans Safari.
+/// Period erased by “Clear History…”, as in Safari.
 nonisolated enum HistoryPeriod: String, CaseIterable, Identifiable, Sendable {
     case lastHour
     case today
@@ -11,8 +11,8 @@ nonisolated enum HistoryPeriod: String, CaseIterable, Identifiable, Sendable {
         self
     }
 
-    /// Début des visites effacées : il y a une heure, minuit, la veille à minuit (selon `calendar`, son fuseau et ses
-    /// changements d'heure) ; nil pour tout l'historique. Tout ce qui suit est effacé.
+    /// Start of the erased visits: an hour ago, midnight, the previous day at midnight (according to `calendar`, its
+    /// time zone and its clock changes); nil for all history. Everything after it is erased.
     func start(now: Date, calendar: Calendar) -> Date? {
         switch self {
         case .lastHour:

@@ -1,8 +1,8 @@
 import Foundation
 import SwiftData
 
-/// Suppressions reçues d'un autre Mac (tâche 7.4), appliquées du contenu vers les parents. Le dernier profil et le
-/// dernier Space ne sont jamais supprimés.
+/// Deletions received from another Mac (task 7.4), applied from the content up to the parents. The last profile and
+/// the last Space are never deleted.
 extension SyncRecordWriter {
     func delete(_ id: UUID, _ type: SyncRecordType) {
         switch type {
@@ -32,7 +32,7 @@ extension SyncRecordWriter {
         }
     }
 
-    /// Réglage, décision de site ou zoom : retrouvé par son identifiant tiré d'une clé.
+    /// Setting, site decision or zoom: found by its identifier derived from a key.
     private func deletePreference(_ id: UUID, _ type: SyncRecordType) {
         switch type {
         case .setting:
@@ -68,7 +68,7 @@ extension SyncRecordWriter {
         }
     }
 
-    /// Ses Spaces, favoris, décisions et historique partent avec lui ; ses données de sites ensuite.
+    /// Its Spaces, favorites, decisions and history go with it; its website data afterwards.
     private func deleteProfile(_ id: UUID) {
         guard let profile = profiles[id], let removed = session.removeProfile(profile) else {
             return

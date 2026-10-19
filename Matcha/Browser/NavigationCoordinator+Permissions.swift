@@ -1,13 +1,13 @@
 import OSLog
 import WebKit
 
-/// Permissions des sites (tâche 5.2) : caméra et micro. Une décision retenue pour le profil répond aussitôt ; sinon
-/// la demande attend dans le bandeau de la page qui l'a faite (onglet, aperçu ou mini-fenêtre), sans délai ni
-/// réponse automatique. La clé est l'origine de la page principale ; le bandeau nomme le cadre qui demande s'il est
-/// d'un autre site. Localisation (macOS 27) et notifications : reportées, `DECISIONS.md`.
+/// Site permissions (task 5.2): camera and microphone. A decision remembered for the profile answers at once;
+/// otherwise the request waits in the banner of the page that made it (tab, Peek or mini window), with no timeout
+/// and no automatic answer. The key is the origin of the main page; the banner names the requesting frame if it is
+/// from another site. Location (macOS 27) and notifications: postponed, `DECISIONS.md`.
 extension NavigationCoordinator {
-    /// `origin` est celle de la page principale (en-tête de WebKit : « The origin of the page »), `frame` le cadre
-    /// dont le script demande.
+    /// `origin` is that of the main page (WebKit header: “The origin of the page”), `frame` the frame whose script
+    /// makes the request.
     func webView(
         _ webView: WKWebView,
         requestMediaCapturePermissionFor origin: WKSecurityOrigin,
@@ -34,13 +34,13 @@ extension NavigationCoordinator {
         case .cameraAndMicrophone:
             [.camera, .microphone]
         @unknown default:
-            // Type inconnu : refusé (demande vide).
+            // Unknown type: refused (empty request).
             []
         }
     }
 
-    /// Point d'entrée sans types WebKit (testable) : répond d'après les décisions retenues du profil de `webView`,
-    /// ou met la demande dans le bandeau de sa page.
+    /// Entry point without WebKit types (testable): answers from the remembered decisions of the profile of `webView`,
+    /// or puts the request in the banner of its page.
     func requestPermission(
         _ kinds: Set<SitePermissionKind>,
         origin: SiteOrigin?,

@@ -1,11 +1,11 @@
 import SwiftUI
 
-/// Éditeur d'un Space, dans la bulle ouverte par un clic sur l'icône du Space affiché, ou par « Changer l'icône… » et
-/// « Modifier le thème… » de son menu : son nom, son icône (symboles SF ou un emoji), puis son thème. Chaque choix
-/// s'applique tout de suite au Space et s'enregistre.
+/// Editor of a Space, in the popover opened by a click on the displayed Space's icon, or by “Change Icon…” and
+/// “Edit Theme…” in its menu: its name, its icon (SF Symbols or an emoji), then its theme. Each choice applies
+/// right away to the Space and is saved.
 struct SpaceEditor: View {
     let space: SpaceSession
-    /// Échap dans le champ emoji : ferme la bulle (ailleurs, la bulle se ferme d'elle-même).
+    /// Esc in the emoji field: closes the popover (elsewhere, the popover closes by itself).
     let close: () -> Void
 
     var body: some View {
@@ -25,8 +25,8 @@ struct SpaceEditor: View {
     }
 }
 
-/// Icône d'un Space, section de son éditeur : grille de symboles (celui du Space est entouré), puis l'emoji. Vider le
-/// champ emoji rend le cercle, l'icône par défaut.
+/// Icon of a Space, a section of its editor: grid of symbols (the Space's own is circled), then the emoji. Emptying
+/// the emoji field restores the circle, the default icon.
 private struct SpaceIconPicker: View {
     let space: SpaceSession
     let close: () -> Void
@@ -48,7 +48,7 @@ private struct SpaceIconPicker: View {
     }
 }
 
-/// Titre d'une section de l'éditeur d'un Space.
+/// Title of a section of a Space's editor.
 struct SpaceEditorSectionTitle: View {
     let title: Text
 

@@ -1,6 +1,6 @@
 import XCTest
 
-/// Barre latérale : disposition, rangement des onglets, glisser-déposer.
+/// Sidebar: layout, tab organization, drag and drop.
 final class SidebarUITests: XCTestCase {
     override func setUpWithError() throws {
         continueAfterFailure = false
@@ -12,7 +12,7 @@ final class SidebarUITests: XCTestCase {
         let pill = addressPill(in: app)
         XCTAssertTrue(pill.waitForExistence(timeout: 5))
         let window = app.windows.firstMatch
-        // Sans onglet puis avec un onglet vide, la pastille reste sous la barre de titre, pas au milieu.
+        // Without a tab, then with an empty tab, the pill stays below the title bar, not in the middle.
         XCTAssertLessThan(pill.frame.minY - window.frame.minY, 120)
         openEmptyTab(in: app)
         XCTAssertLessThan(pill.frame.minY - window.frame.minY, 120)
@@ -31,11 +31,11 @@ final class SidebarUITests: XCTestCase {
         XCTAssertEqual(window.frame, windowFrame)
         XCTAssertEqual(handle.frame.midX - startX, 60, accuracy: 2)
 
-        // Largeur plafonnée à 400 pt.
+        // Width capped at 400 pt.
         drag(handle, by: 1000)
         XCTAssertEqual(handle.frame.midX - window.frame.minX, 400, accuracy: 2)
 
-        // Rend la largeur d'origine : elle est mémorisée d'un lancement à l'autre.
+        // Restores the original width: it is remembered from one launch to the next.
         drag(handle, by: startX - handle.frame.midX)
         XCTAssertEqual(handle.frame.midX, startX, accuracy: 2)
     }
@@ -46,11 +46,11 @@ final class SidebarUITests: XCTestCase {
         let window = app.windows.firstMatch
         XCTAssertTrue(window.waitForExistence(timeout: 5))
         let start = window.frame
-        // Zone vide sous la barre de titre, à droite des boutons de la fenêtre.
+        // Empty area below the title bar, right of the window buttons.
         let emptyArea = window.coordinate(withNormalizedOffset: .zero).withOffset(CGVector(dx: 150, dy: 34))
-        // Glissement horizontal : verticalement, macOS contraint la fenêtre (barre des menus, aimantation).
+        // Horizontal drag: vertically, macOS constrains the window (menu bar, snapping).
         emptyArea.press(forDuration: 0.2, thenDragTo: emptyArea.withOffset(CGVector(dx: 60, dy: 0)))
-        // La fenêtre suit le geste, à un petit seuil de départ près.
+        // The window follows the gesture, give or take a small starting threshold.
         XCTAssertGreaterThan(window.frame.minX - start.minX, 20)
     }
 
@@ -91,7 +91,7 @@ final class SidebarUITests: XCTestCase {
 
         let pinnedZone = app.descendants(matching: .any).matching(identifier: "pinnedDropZone").firstMatch
         tabRows(in: app).element(boundBy: 1).press(forDuration: 0.5, thenDragTo: pinnedZone)
-        // L'onglet épinglé survit à « Effacer », qui ne ferme que les onglets du jour.
+        // The pinned tab survives “Clear”, which only closes Today tabs.
         clickWhenSettled(app.buttons["Effacer"])
         XCTAssertTrue(waitForCount(tabRows(in: app), 1), "onglets restants : \(tabRows(in: app).count)")
         XCTAssertEqual(favorites.count, 1)
@@ -103,7 +103,7 @@ final class SidebarUITests: XCTestCase {
         let newTabButton = app.buttons["newTabButton"]
         let field = addressField(in: app)
         XCTAssertTrue(newTabButton.waitForExistence(timeout: 5))
-        // Le bouton ouvre la barre de commande ; Entrée sans texte crée l'onglet.
+        // The button opens the command bar; Return without text creates the tab.
         newTabButton.click()
         XCTAssertTrue(field.waitForExistence(timeout: 3))
         XCTAssertTrue(waitForKeyboardFocus(of: field))

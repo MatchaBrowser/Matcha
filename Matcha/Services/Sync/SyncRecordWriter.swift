@@ -1,9 +1,9 @@
 import Foundation
 import SwiftData
 
-/// Écrit les changements reçus d'un autre Mac (tâche 7.4) dans les enregistrements, les réglages et le zoom des sites,
-/// et note ce qui a changé pour que la session le reprenne (`BrowserSession.reload`). Un enregistrement dont le parent
-/// manque n'est pas écrit (`upsert` renvoie faux) : il attend la lecture suivante.
+/// Writes the changes received from another Mac (task 7.4) to the records, the settings and the site zoom, and notes
+/// what changed so the session picks it up (`BrowserSession.reload`). A record whose parent is missing is not written
+/// (`upsert` returns false): it waits for the next read.
 @MainActor
 final class SyncRecordWriter {
     let session: BrowserSession
@@ -27,7 +27,7 @@ final class SyncRecordWriter {
         tabs = Self.byID((try? context.fetch(FetchDescriptor<TabRecord>())) ?? [], id: \.id)
     }
 
-    /// Crée ou modifie `id` ; faux si son parent manque.
+    /// Creates or modifies `id`; false if its parent is missing.
     func upsert(_ id: UUID, _ fields: SyncFields) -> Bool {
         switch fields {
         case let .profile(fields):
@@ -53,7 +53,7 @@ final class SyncRecordWriter {
         }
     }
 
-    // MARK: Profils, Spaces, dossiers
+    // MARK: Profiles, Spaces, folders
 
     private func upsertProfile(_ id: UUID, _ fields: SyncProfileFields) {
         let record = profiles[id] ?? inserted(ProfileRecord(id: id, name: fields.name)) { profiles[id] = $0 }
@@ -98,10 +98,10 @@ final class SyncRecordWriter {
         return true
     }
 
-    // MARK: Onglets
+    // MARK: Tabs
 
-    /// Favori et épinglé : leur adresse d'origine change ; leur adresse actuelle la suit s'ils n'avaient pas quitté
-    /// l'ancienne. Onglet du jour : son adresse actuelle. Un onglet arrivé ne se sélectionnera pas de lui-même.
+    /// Favorite and pinned tab: their original address changes; their current address follows it if they had not left
+    /// the old one. Today tab: its current address. An arriving tab will not select itself.
     private func upsertTab(_ id: UUID, _ fields: SyncTabFields) -> Bool {
         let place: TabPlace = switch fields.place {
         case .favorite: .favorite
@@ -161,9 +161,9 @@ final class SyncRecordWriter {
         return true
     }
 
-    // MARK: Ce qui change
+    // MARK: What changes
 
-    /// Le Space ou les favoris du profil de `record` sont à reprendre.
+    /// The Space of `record`, or the favorites of its profile, need to be reloaded.
     func touch(_ record: TabRecord) {
         touch(record.space)
         if let profileID = record.profile?.id {

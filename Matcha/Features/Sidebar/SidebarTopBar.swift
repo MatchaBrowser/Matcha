@@ -1,17 +1,17 @@
 import SwiftUI
 
-/// Ligne du haut de la barre latérale : place des boutons de la fenêtre, bouton qui masque ou affiche la barre (comme
-/// ⌘S), puis, selon les réglages, précédent, suivant, recharger et Accueil.
+/// Top row of the sidebar: room for the window's buttons, a button that hides or shows the sidebar (like ⌘S),
+/// then, depending on the settings, back, forward, reload and Home.
 struct SidebarTopBar: View {
     static let height = 32.0
-    /// Place des boutons rouge, orange et vert de la fenêtre.
+    /// Room for the window's red, orange and green buttons.
     static let windowButtonsWidth = 70.0
 
     let tab: BrowserTab?
     var showsNavigationButtons = true
-    /// Action du bouton Accueil ; nil pour ne pas l'afficher.
+    /// Action of the Home button; nil to not display it.
     var goHome: (() -> Void)?
-    /// Masque la barre (affichée) ou la fixe (barre flottante) ; nil pour ne pas afficher le bouton.
+    /// Hides the sidebar (shown) or pins it (floating sidebar); nil to not display the button.
     var sidebarToggle: SidebarToggle?
 
     var body: some View {
@@ -33,9 +33,9 @@ struct SidebarTopBar: View {
     }
 }
 
-/// Bouton de la barre qui la masque ou l'affiche.
+/// Button of the sidebar that hides or shows it.
 struct SidebarToggle {
-    /// Barre affichée (sinon : flottante, apparue au survol du bord).
+    /// Sidebar shown (otherwise: floating, appeared on hovering the edge).
     let isVisible: Bool
     let toggle: () -> Void
 
@@ -44,9 +44,9 @@ struct SidebarToggle {
     }
 }
 
-/// Bouton-icône carré de la barre latérale, surligné au survol.
+/// Square icon button of the sidebar, highlighted on hover.
 struct SidebarIconButtonStyle: ButtonStyle {
-    /// Côté du bouton, en points.
+    /// Side of the button, in points.
     static let size = 26.0
 
     func makeBody(configuration: Configuration) -> some View {

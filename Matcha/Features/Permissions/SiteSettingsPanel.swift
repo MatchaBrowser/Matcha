@@ -1,15 +1,15 @@
 import SwiftUI
 
-/// Panneau des réglages du site de l'onglet affiché (tâche 5.2) : sous la pastille d'adresse de la barre latérale, ou
-/// en haut de la carte sous la barre d'adresse au-dessus de la page. Caméra et micro (« Demander », « Autoriser »,
-/// « Refuser », décisions du profil), le zoom du site (tâche 5.4), le bloqueur sur ce site (tâche 6.2, caché tant qu'il
-/// est mis de côté), puis les cookies et données du site, effacés (ce site seulement) après confirmation. Il suit
-/// l'onglet affiché et ne s'ouvre ni ne se ferme de lui-même (bouton, ×).
+/// Site settings panel of the displayed tab (task 5.2): below the address pill of the sidebar, or at the top of the
+/// card below the address bar above the page. Camera and microphone (“Ask”, “Allow”, “Deny”, the profile's
+/// decisions), the site's zoom (task 5.4), the blocker on this site (task 6.2, hidden while it is set aside), then
+/// the site's cookies and data, cleared (this site only) after confirmation. It follows the displayed tab and never
+/// opens or closes by itself (button, ×).
 struct SiteSettingsPanel: View {
     let model: WindowModel
-    /// Onglets du Space de la barre ou de la carte qui montre le panneau.
+    /// Tabs of the Space of the sidebar or card that shows the panel.
     let tabManager: TabManager
-    /// Largeur des réglages dans une carte large ; la barre latérale les laisse prendre toute sa largeur.
+    /// Width of the settings in a wide card; the sidebar lets them take its full width.
     var maximumContentWidth = Double.infinity
 
     private var tab: BrowserTab? {
@@ -37,7 +37,7 @@ struct SiteSettingsPanel: View {
                             Image(systemName: "externaldrive")
                         }
                         Spacer(minLength: 8)
-                        // Confirmation posée sur la fenêtre (`SiteDataClearConfirmation`).
+                        // Confirmation attached to the window (`SiteDataClearConfirmation`).
                         Button("Clear…") {
                             model.siteDataClearRequest = SiteDataClearRequest(tab: tab, origin: origin)
                         }
@@ -61,7 +61,7 @@ struct SiteSettingsPanel: View {
         .accessibilityIdentifier("siteSettingsPanel")
     }
 
-    /// Le site, puis la croix.
+    /// The site, then the cross.
     private func header(_ origin: SiteOrigin?) -> some View {
         HStack(spacing: 8) {
             if let tab, origin != nil {
@@ -85,7 +85,7 @@ struct SiteSettingsPanel: View {
         }
     }
 
-    /// Le site ; sinon l'adresse courte de la page (fichier local) ; sans page, le nom du panneau.
+    /// The site; otherwise the page's short address (local file); without a page, the panel's name.
     private func title(_ origin: SiteOrigin?) -> Text {
         let name = origin?.displayName ?? AddressDisplay.short(for: tab?.url)
         guard !name.isEmpty else {
@@ -98,7 +98,7 @@ struct SiteSettingsPanel: View {
         Text("Close Site Settings", comment: "Button that closes the site settings panel")
     }
 
-    /// Caméra ou micro : « Demander » (aucune décision retenue), « Autoriser », « Refuser ».
+    /// Camera or microphone: “Ask” (no remembered decision), “Allow”, “Deny”.
     private func permissionRow(_ kind: SitePermissionKind, origin: SiteOrigin, scope: SitePermissionScope) -> some View {
         let decision = Binding<SitePermissionDecision?> {
             scope.decision(kind, for: origin)

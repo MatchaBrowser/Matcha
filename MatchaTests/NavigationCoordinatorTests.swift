@@ -3,14 +3,14 @@ import Foundation
 import Testing
 import WebKit
 
-/// Tests d'intégration avec de vraies vues web et les pages locales de `TestPages`.
+/// Integration tests with real web views and the local pages of `TestPages`.
 @MainActor
 struct NavigationCoordinatorTests {
     private let manager = TabManager(websiteDataStore: .nonPersistent())
 
-    /// Onglet chargé avec une page locale contenant `body`, suivi d'un autre onglet vide.
+    /// Tab loaded with a local page containing `body`, followed by another empty tab.
     private func openPage(body: String) async throws -> (page: BrowserTab, other: BrowserTab) {
-        // Les nouveaux onglets vont en tête : on ouvre d'abord celui qui doit être second.
+        // New tabs go on top: open the one that must come second first.
         let other = manager.newTab()
         let page = manager.insertTab(configuration: TestPages.configuration(), after: nil, select: true)
         page.load(TestPages.url("ouvrant", body: body))
@@ -46,7 +46,7 @@ struct NavigationCoordinatorTests {
         let popup = manager.tabs[1]
         try await waitUntil { popup.title == "popup" && !popup.isLoading }
 
-        // Sans la configuration fournie par WebKit, la fenêtre ouverte perdrait son lien avec la page.
+        // Without the configuration provided by WebKit, the opened window would lose its link to the page.
         let hasOpener = try await popup.loadedWebView.evaluateJavaScript("window.opener !== null")
         #expect(hasOpener as? Bool == true)
     }
@@ -83,7 +83,7 @@ struct NavigationCoordinatorTests {
         let second = TestPages.url("deux")
         let recorder = PolicyRecorder()
 
-        // Un clic synthétique en JavaScript ne transmet pas ⌘ : on appelle le délégué directement.
+        // A synthetic click in JavaScript does not carry ⌘: call the delegate directly.
         for url in [first, second] {
             let action = FakeNavigationAction(url: url, modifierFlags: .command)
             manager.coordinator.webView(page.loadedWebView, decidePolicyFor: action, decisionHandler: recorder.record)
@@ -102,7 +102,7 @@ struct NavigationCoordinatorTests {
         let (page, other) = try await openPage(body: "")
         let recorder = PolicyRecorder()
 
-        // Molette : WebKit donne un masque de boutons, 4 pour le bouton du milieu (2 est le bouton droit).
+        // Wheel click: WebKit gives a button mask, 4 for the middle button (2 is the right button).
         let action = FakeNavigationAction(url: TestPages.url("milieu"), modifierFlags: [], buttonNumber: 4)
         manager.coordinator.webView(page.loadedWebView, decidePolicyFor: action, decisionHandler: recorder.record)
 

@@ -1,7 +1,7 @@
 import Foundation
 
-/// Type d'un enregistrement synchronisé (tâche 7.4, `SYNC.md` § 2.1), dans l'ordre d'application d'un lot reçu
-/// (§ 2.3) : profils, Spaces, dossiers, onglets, extensions, réglages, décisions de site. Type pur.
+/// Type of a synced record (task 7.4, `SYNC.md` § 2.1), in the application order of a received batch (§ 2.3):
+/// profiles, Spaces, folders, tabs, extensions, settings, site decisions. Pure type.
 nonisolated enum SyncRecordType: String, CaseIterable, Codable, Sendable {
     case profile
     case space
@@ -12,12 +12,12 @@ nonisolated enum SyncRecordType: String, CaseIterable, Codable, Sendable {
     case sitePermission
     case siteZoom
 
-    /// Version du format des champs de ce type, écrite dans chaque contenu (`schema`).
+    /// Version of the field format of this type, written in each content (`schema`).
     var schema: Int {
         1
     }
 
-    /// Rang dans l'ordre d'application : un parent passe avant ce qu'il contient.
+    /// Rank in the application order: a parent comes before what it contains.
     var applyRank: Int {
         Self.allCases.firstIndex(of: self) ?? Self.allCases.count
     }

@@ -1,14 +1,14 @@
 import Foundation
 import SwiftData
 
-/// Données de Matcha vues par la synchro (tâche 7.4, `SYNC.md` § 2.1) : profils, Spaces, dossiers et onglets
-/// (enregistrements SwiftData), décisions de site, réglages synchronisés et zoom des sites. Les changements reçus sont
-/// écrits dans les enregistrements (`SyncRecordWriter`), puis la session les reprend (`BrowserSession.reload`).
+/// Matcha's data as seen by sync (task 7.4, `SYNC.md` § 2.1): profiles, Spaces, folders and tabs (SwiftData
+/// records), site decisions, synced settings and site zoom. Received changes are written to the records
+/// (`SyncRecordWriter`), then the session picks them up (`BrowserSession.reload`).
 @MainActor
 final class MatchaSyncStore: SyncLocalStore {
     let session: BrowserSession
     let defaults: UserDefaults
-    /// Extensions installées et proposées ; nil : elles ne voyagent pas (tests).
+    /// Installed and offered extensions; nil: they do not travel (tests).
     let extensions: ExtensionSyncAdapter?
 
     init(session: BrowserSession, defaults: UserDefaults, extensions: ExtensionSyncAdapter? = nil) {
@@ -45,7 +45,7 @@ final class MatchaSyncStore: SyncLocalStore {
         return result
     }
 
-    /// Décisions de site, réglages, zooms et extensions.
+    /// Site decisions, settings, zoom levels and extensions.
     private func addPreferences(to result: inout [UUID: SyncFields]) {
         for entry in session.sitePermissions.entries {
             let key = entry.key
@@ -80,7 +80,7 @@ final class MatchaSyncStore: SyncLocalStore {
     }
 
     func apply(_ changes: [SyncLocalChange]) -> Set<UUID> {
-        // Ce qui n'est pas encore enregistré (moins d'une seconde) l'est d'abord : rien ne se perd à la reprise.
+        // What is not saved yet (less than a second old) is saved first: nothing is lost when reloading.
         session.saveAll()
         let writer = SyncRecordWriter(session: session, defaults: defaults, extensions: extensions)
         var waiting: Set<UUID> = []
@@ -96,13 +96,13 @@ final class MatchaSyncStore: SyncLocalStore {
         }
         session.save(session.container.mainContext)
         session.reload(after: writer.changes)
-        // Les onglets affichés que la synchro n'a pas changés sont enregistrés tels quels : ils ne repartent pas.
+        // The displayed tabs that sync did not change are saved as they are: they are not sent again.
         session.saveAll()
         return waiting
     }
 
-    /// Profil « Personnel » et Space « Perso » du premier lancement, sans dossier, favori ni épinglé, et au plus un
-    /// onglet du jour vide.
+    /// “Personal” profile and “Home” Space from the first launch, with no folder, favorite or pinned tab, and at most
+    /// one empty today tab.
     var hasOnlyFirstLaunchData: Bool {
         let profiles = fetch(ProfileRecord.self)
         let spaces = fetch(SpaceRecord.self)
@@ -115,7 +115,7 @@ final class MatchaSyncStore: SyncLocalStore {
         return tabs.count <= 1 && tabs.allSatisfy { $0.place == .today && $0.url == nil }
     }
 
-    // MARK: Champs
+    // MARK: Fields
 
     private static func fields(of folder: FolderRecord) -> SyncFolderFields? {
         guard let spaceID = folder.space?.id else {
@@ -133,7 +133,7 @@ final class MatchaSyncStore: SyncLocalStore {
         )
     }
 
-    /// Favori et épinglé : adresse et titre d'origine ; onglet du jour : adresse, titre et dernière utilisation.
+    /// Favorite and pinned tab: original address and title; today tab: address, title and last use.
     private static func fields(of tab: TabRecord) -> SyncTabFields? {
         switch tab.place {
         case .favorite:

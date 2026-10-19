@@ -3,13 +3,13 @@ import Foundation
 import SwiftData
 import Testing
 
-/// Deux sessions de Matcha synchronisées par le moteur et un serveur en mémoire (tâche 7.4) : le second Mac retrouve
-/// les Spaces, dossiers, favoris, épinglés, onglets du jour et réglages du premier.
+/// Two Matcha sessions synced by the engine and an in-memory server (task 7.4): the second Mac gets back the
+/// Spaces, folders, favorites, pinned tabs, today tabs and settings of the first one.
 @MainActor
 struct MatchaSyncTests {
     private let server = InMemorySyncServer()
 
-    /// Un Mac : sa session, ses réglages, son moteur.
+    /// A Mac: its session, its settings, its engine.
     @MainActor
     private struct Mac {
         let session: BrowserSession
@@ -63,7 +63,7 @@ struct MatchaSyncTests {
         #expect(second.session.spaces.last?.tabManager.todayTabs.map(\.url) == [today.url])
         #expect(second.defaults.string(forKey: BrowserSettings.Key.searchEngine) == "duckDuckGo")
 
-        // Puis dans l'autre sens, sans rien renvoyer en écho.
+        // Then in the other direction, without echoing anything back.
         #expect(try await second.engine.sync()?.sent == 0)
         second.session.renameSpace(mirror, to: "Chez moi")
         try await second.engine.sync()

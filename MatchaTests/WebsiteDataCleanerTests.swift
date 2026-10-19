@@ -3,7 +3,7 @@ import Foundation
 import Testing
 import WebKit
 
-/// « Effacer les cookies et les données du site » (tâche 5.2) : seules les données du site visé partent.
+/// “Clear cookies and website data” (task 5.2): only the data of the targeted site goes.
 @MainActor
 struct WebsiteDataCleanerTests {
     @Test(arguments: [

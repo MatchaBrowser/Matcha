@@ -56,7 +56,7 @@ struct ExtensionStateStoreTests {
         #expect(kept.deniedMatchPatterns.isEmpty)
     }
 
-    // MARK: Dossier des extensions
+    // MARK: Extensions folder
 
     @Test func `identifiers are lowercase host labels`() {
         #expect(ExtensionInstallDirectory.isValidIdentifier("abc-123"))
@@ -88,7 +88,7 @@ struct ExtensionStateStoreTests {
         #expect(ExtensionInstallDirectory.installedExtensions(in: directory.appendingPathComponent("absent")).isEmpty)
     }
 
-    // MARK: Demandes
+    // MARK: Requests
 
     @Test func `requests are sorted and deduplicated`() {
         let permissions = ExtensionPermissionRequest(extensionName: "Ext", permissions: ["tabs", "cookies", "tabs"])

@@ -1,6 +1,6 @@
 import Foundation
 
-/// Résultat local retenu, avec ce qui sert à le trier.
+/// Local result kept, with what is used to sort it.
 private nonisolated struct RankedCandidate {
     enum Group {
         case tab
@@ -12,19 +12,19 @@ private nonisolated struct RankedCandidate {
     let match: CommandMatch
     let group: Group
     let id: String
-    /// Départage deux entrées d'historique de même clé (même identifiant).
+    /// Breaks the tie between two history entries with the same key (same identifier).
     let address: String
     let foldedTitle: String
-    /// Clé d'adresse des onglets et de l'historique.
+    /// Address key of tabs and history.
     let urlKey: String?
-    /// 4 : onglet du Space affiché, 3 : onglet d'un autre Space, 2 : action, 1 : historique.
+    /// 4: tab of the displayed Space, 3: tab of another Space, 2: action, 1: history.
     let kindPriority: Int
-    /// Onglet : dernière activité ; historique : fréquence ; action : opposé de son rang.
+    /// Tab: last activity; history: frecency; action: opposite of its rank.
     let signal: Double
-    /// Historique : dernière visite ; 0 sinon.
+    /// History: last visit; 0 otherwise.
     let secondarySignal: Double
 
-    /// Nil pour une suggestion : elles ne sont pas classées avec les résultats locaux.
+    /// Nil for a suggestion: suggestions are not ranked with the local results.
     init?(_ candidate: CommandCandidate, match: CommandMatch, now: Date) {
         self.candidate = candidate
         self.match = match
@@ -53,9 +53,8 @@ private nonisolated struct RankedCandidate {
         }
     }
 
-    /// Ordre de la barre : palier, tranche approximative, nature, activité ou fréquence, dernière
-    /// visite (décroissants), puis titre replié et identifiant (croissants). Total, car les
-    /// identifiants sont uniques.
+    /// Bar order: tier, fuzzy band, kind, activity or frecency, last visit (descending), then folded title and
+    /// identifier (ascending). Total, because identifiers are unique.
     static func areInIncreasingOrder(_ lhs: Self, _ rhs: Self) -> Bool {
         if lhs.match.tier != rhs.match.tier {
             return lhs.match.tier > rhs.match.tier
@@ -69,7 +68,7 @@ private nonisolated struct RankedCandidate {
         return isBetter(lhs, than: rhs)
     }
 
-    /// Même palier et même nature : activité ou fréquence, dernière visite, titre, identifiant, adresse.
+    /// Same tier and same kind: activity or frecency, last visit, title, identifier, address.
     static func isBetter(_ lhs: Self, than rhs: Self) -> Bool {
         if lhs.signal != rhs.signal {
             return lhs.signal > rhs.signal
@@ -88,8 +87,8 @@ private nonisolated struct RankedCandidate {
 }
 
 nonisolated extension CommandRanker {
-    /// Lignes des résultats locaux qui correspondent : historique dédoublonné, tri, plafonds.
-    /// `primaryKey` : clé de l'adresse tapée, dont l'historique est masqué.
+    /// Rows of the matching local results: history deduplicated, sorting, caps.
+    /// `primaryKey`: key of the typed address, whose history is hidden.
     func localRows(
         _ matches: [(candidate: CommandCandidate, match: CommandMatch)],
         excludingKey primaryKey: String?,
@@ -100,7 +99,7 @@ nonisolated extension CommandRanker {
         return applyCaps(sorted).compactMap { Self.row(for: $0.candidate) }
     }
 
-    /// Suggestions dans l'ordre du moteur, sans celle égale au texte tapé ni doublon, plafonnées.
+    /// Suggestions in the engine's order, without the one equal to the typed text or duplicates, capped.
     func suggestionRows(for query: CommandQuery, candidates: [CommandCandidate]) -> [CommandRow] {
         var seen: Set<String> = [query.folded]
         var rows: [CommandRow] = []
@@ -121,8 +120,7 @@ nonisolated extension CommandRanker {
         return rows
     }
 
-    /// Ligne d'un onglet, d'une adresse de l'historique ou d'une action ; l'identifiant est celui
-    /// du résultat.
+    /// Row of a tab, of a history address or of an action; the identifier is that of the result.
     static func row(for candidate: CommandCandidate) -> CommandRow? {
         switch candidate.kind {
         case let .tab(reference, place, spaceName, _):
@@ -153,11 +151,11 @@ nonisolated extension CommandRanker {
         }
     }
 
-    // MARK: Étapes
+    // MARK: Steps
 
-    /// Retire l'historique d'une adresse déjà ouverte dans un onglet retenu ou égale à l'adresse tapée,
-    /// puis garde une entrée par adresse : la plus fréquente, la plus récente, puis le plus petit titre.
-    /// Les onglets ne sont jamais dédoublonnés par adresse.
+    /// Removes the history of an address already open in a kept tab or equal to the typed address, then keeps one
+    /// entry per address: the most frequent, the most recent, then the smallest title.
+    /// Tabs are never deduplicated by address.
     private static func deduplicateHistory(_ ranked: [RankedCandidate], excludingKey primaryKey: String?) -> [RankedCandidate] {
         var excluded = Set(ranked.filter { $0.group == .tab }.compactMap(\.urlKey))
         if let primaryKey {
@@ -177,8 +175,7 @@ nonisolated extension CommandRanker {
         return others + bestHistory.values
     }
 
-    /// Parcourt la liste triée en gardant chaque résultat tant que sa nature et le total restent
-    /// sous leurs plafonds.
+    /// Walks the sorted list, keeping each result as long as its kind and the total stay under their caps.
     private func applyCaps(_ sorted: [RankedCandidate]) -> [RankedCandidate] {
         var counts: [RankedCandidate.Group: Int] = [:]
         var kept: [RankedCandidate] = []
@@ -201,7 +198,7 @@ nonisolated extension CommandRanker {
         }
     }
 
-    /// `text`, sauf s'il est vide ou égal au titre.
+    /// `text`, unless it is empty or equal to the title.
     private static func subtitle(_ text: String, title: String) -> String? {
         text.isEmpty || text == title ? nil : text
     }

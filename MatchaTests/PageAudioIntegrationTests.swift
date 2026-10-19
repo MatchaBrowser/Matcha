@@ -3,14 +3,14 @@ import Foundation
 import Testing
 import WebKit
 
-/// Son d'une vraie page (tâche 5.10) : le script dans son monde isolé, ses messages, l'icône et la pause par
-/// `pauseAllMediaPlayback`. Les pages jouent du silence (`AudioTestPages`), dans une fenêtre hors de l'écran.
+/// Sound of a real page (task 5.10): the script in its isolated world, its messages, the icon, and pausing through
+/// `pauseAllMediaPlayback`. The pages play silence (`AudioTestPages`), in an offscreen window.
 @MainActor
 struct PageAudioIntegrationTests {
     private let manager = TabManager(websiteDataStore: .nonPersistent())
     private let window = AudioTestWindow()
 
-    /// Onglet sélectionné, dans la fenêtre, une fois `url` chargée (titre `title`).
+    /// Selected tab, in the window, once `url` is loaded (title `title`).
     private func show(_ url: URL, title: String) async throws -> BrowserTab {
         let tab = manager.insertTab(configuration: TestPages.configuration(), after: nil, select: true)
         window.show(tab.loadedWebView)
@@ -23,7 +23,7 @@ struct PageAudioIntegrationTests {
         try await tab.loadedWebView.callAsyncJavaScript(script, arguments: arguments, contentWorld: .page)
     }
 
-    /// Attend que l'élément `son` de la page joue (même coupé).
+    /// Waits until the page's `son` element plays (even muted).
     private func waitUntilPlaying(_ tab: BrowserTab) async throws {
         let clock = ContinuousClock()
         let deadline = clock.now + .seconds(10)
@@ -40,16 +40,16 @@ struct PageAudioIntegrationTests {
         let tab = try await show(AudioTestPages.playingPage(), title: "musique")
         try await waitUntil { tab.isPlayingAudio }
 
-        // Sans attendre le délai (ici très long) : l'icône s'éteint dès que WebKit a mis la page en pause.
+        // Without waiting for the delay (very long here): the icon turns off as soon as WebKit has paused the page.
         tab.audio.silenceDelay = 600
         tab.pauseAudio()
         try await waitUntil { !tab.isPlayingAudio }
         #expect(try await evaluate("return document.getElementById('son').paused", in: tab) as? Bool == true)
-        // Plus rien ne joue : le script ne redit rien (il le redirait toutes les 2 s).
+        // Nothing plays anymore: the script says nothing more (otherwise it would repeat it every 2 s).
         try await Task.sleep(for: .seconds(2.5))
         #expect(!tab.isPlayingAudio)
 
-        // La page (ou l'utilisateur, dans la page) relance la lecture : l'icône revient.
+        // The page (or the user, in the page) resumes playback: the icon comes back.
         _ = try await evaluate("document.getElementById('son').play(); return true", in: tab)
         try await waitUntil { tab.isPlayingAudio }
     }
@@ -72,7 +72,7 @@ struct PageAudioIntegrationTests {
         let tab = try await show(AudioTestPages.playingPage(), title: "musique")
         try await waitUntil { tab.isPlayingAudio }
 
-        // Sans attendre le délai (ici très long) : la page a changé (`didCommit`).
+        // Without waiting for the delay (very long here): the page has changed (`didCommit`).
         tab.audio.silenceDelay = 600
         tab.load(TestPages.url("calme"))
         try await waitUntil { tab.title == "calme" }
@@ -98,12 +98,12 @@ struct PageAudioIntegrationTests {
         """, in: tab, arguments: ["src": frame.absoluteString])
         try await waitUntil { tab.isPlayingAudio }
 
-        // L'iframe s'en va : son son s'arrête avec elle.
+        // The iframe goes away: its sound stops with it.
         _ = try await evaluate("document.getElementById('cadre').remove(); return true", in: tab)
         try await waitUntil { !tab.isPlayingAudio }
     }
 
-    /// Le script redit toutes les 2 s qu'il joue : l'icône se recale si l'app a effacé son état.
+    /// The script repeats every 2 s that it is playing: the icon recovers if the app has cleared its state.
     @Test func `a page still playing after a reset lights the icon again`() async throws {
         let tab = try await show(AudioTestPages.playingPage(), title: "musique")
         try await waitUntil { tab.isPlayingAudio }

@@ -1,14 +1,14 @@
 import Foundation
 import OSLog
 
-/// Première synchro de ce Mac, ou après un changement de mode (`SYNC.md` § 5).
+/// First sync of this Mac, or after a mode change (`SYNC.md` § 5).
 extension SyncEngine {
-    /// Types que « Remplacer les données de ce Mac » retire quand les données synchronisées ne les ont pas. Les
-    /// réglages et les extensions propres à ce Mac restent, sans partir.
+    /// Types that “Replace This Mac's Data” removes when the synced data does not have them. Settings and extensions
+    /// specific to this Mac stay, without being sent.
     static let replaceableTypes: Set<SyncRecordType> = [.profile, .space, .folder, .tab, .sitePermission, .siteZoom]
 
-    /// Lit tout, choisit (rien de synchronisé : tout envoyer ; ce Mac n'a que son premier lancement : prendre les
-    /// données synchronisées ; sinon : demander), applique, puis relève ce qui reste à envoyer.
+    /// Reads everything, chooses (nothing synced: send everything; this Mac only has its first-launch data: take the
+    /// synced data; otherwise: ask), applies, then collects what remains to be sent.
     func firstSync() async throws {
         var remote: [UUID: SyncRemoteRecord] = [:]
         var cursor: String?
@@ -48,11 +48,11 @@ extension SyncEngine {
         state.cursor = cursor
         state.hasCompletedFirstSync = true
         save()
-        // Ce que ce Mac a de plus : des créations (sur la version du serveur pour un identifiant tiré d'une clé).
+        // What this Mac has in addition: creations (on the server's version for an identifier derived from a key).
         detectLocalChanges()
     }
 
-    /// Applique les données synchronisées et retire de ce Mac ce qu'elles n'ont pas.
+    /// Applies the synced data and removes from this Mac what it does not have.
     private func replaceLocalData(keeping liveIDs: Set<UUID>) {
         let before = store.snapshot()
         applyRemote(Array(liveIDs))
@@ -61,7 +61,7 @@ extension SyncEngine {
             if Self.replaceableTypes.contains(fields.type) {
                 deletions.append(.delete(id, fields.type))
             } else {
-                // Gardé sur ce Mac sans partir : sa référence est son état actuel.
+                // Kept on this Mac without being sent: its reference is its current state.
                 var entry = state.entries[id] ?? SyncEntry(type: fields.type.rawValue)
                 entry.local = fields.json
                 state.entries[id] = entry
@@ -70,8 +70,8 @@ extension SyncEngine {
         _ = store.apply(SyncLocalChange.ordered(deletions))
     }
 
-    /// Met en attente la suppression de ce qui est synchronisé sans être sur ce Mac ; le reste de ce Mac partira comme
-    /// des créations, plus récentes que tout ce qui a été lu (`detectLocalChanges`).
+    /// Queues the deletion of what is synced but not on this Mac; the rest of this Mac will be sent as creations,
+    /// newer than everything that was read (`detectLocalChanges`).
     private func replaceRemoteData(liveIDs: [UUID]) {
         let local = store.snapshot()
         for id in liveIDs where local[id] == nil {

@@ -2,70 +2,70 @@ import Foundation
 import Observation
 import OSLog
 
-/// Sens d'une recherche dans la page.
+/// Direction of a find in the page.
 nonisolated enum FindDirection: Equatable, Sendable {
     case forward
     case backward
 }
 
-/// Résultat de la dernière recherche : rien à signaler, une occurrence trouvée (et sélectionnée), ou aucune.
+/// Result of the last search: nothing to report, a match found (and selected), or none.
 nonisolated enum FindStatus: Equatable, Sendable {
     case idle
     case found
     case notFound
 }
 
-/// Ce qui cherche dans une page : l'onglet et sa vue web (`BrowserTab+Find`), un faux dans les tests.
+/// What searches in a page: the tab and its web view (`BrowserTab+Find`), a fake in the tests.
 @MainActor
 protocol FindPerformer: AnyObject {
-    /// Cherche `query` sans tenir compte de la casse, en repartant du début une fois au bout. Vrai si une occurrence
-    /// est trouvée (elle est alors sélectionnée et montrée) ; nil si la page ne peut pas chercher (pas de vue web).
+    /// Searches for `query` case-insensitively, wrapping around to the start at the end. True if a match is found
+    /// (it is then selected and shown); nil if the page cannot search (no web view).
     func search(_ query: String, direction: FindDirection) async -> Bool?
-    /// Désélectionne l'occurrence trouvée.
+    /// Deselects the match found.
     func deselectMatch()
 }
 
-/// Recherche dans une page (tâche 5.3) : barre ouverte ou non, texte cherché, résultat. Chaque page a la sienne
-/// (onglet, aperçu, mini-fenêtre) : elle suit la page d'un onglet à l'autre et se retrouve telle quelle au retour.
+/// Find in a page (task 5.3): bar open or not, searched text, result. Each page has its own (tab, peek, mini
+/// window): it stays with its page as you switch tabs and is found unchanged when you come back.
 ///
-/// La frappe lance la recherche 150 ms après la dernière touche ; une frappe plus récente l'annule. Entrée, ⌘G et
-/// ⇧⌘G cherchent tout de suite. WebKit garde l'occurrence sélectionnée quand le texte s'allonge (« p », « po »)
-/// et passe à la suivante pour le même texte. Le texte cherché n'est jamais journalisé.
+/// Typing starts the search 150 ms after the last keystroke; a more recent keystroke cancels it. Return, ⌘G and
+/// ⇧⌘G search right away. WebKit keeps the selected match when the text grows longer (“p”, “po”) and moves to the
+/// next one for the same text. The searched text is never logged.
 @MainActor
 @Observable
 final class FindSession {
     typealias Sleep = @MainActor (Duration) async throws -> Void
 
-    /// Attente après une frappe.
+    /// Wait after a keystroke.
     nonisolated static let typingDelay = Duration.milliseconds(150)
 
     private(set) var isPresented = false
     private(set) var query = ""
-    /// `!query.isEmpty`, suivi à part : le menu (⌘G, ⇧⌘G) n'est pas recalculé à chaque frappe.
+    /// `!query.isEmpty`, tracked separately: the menu (⌘G, ⇧⌘G) is not recomputed at each keystroke.
     private(set) var hasQuery = false
     private(set) var status = FindStatus.idle
-    /// Incrémenté à chaque ⌘F : le champ prend le clavier et sélectionne son texte.
+    /// Incremented at each ⌘F: the field takes keyboard focus and selects its text.
     private(set) var focusRequest = 0
 
-    /// Page où chercher ; l'onglet qui possède la recherche.
+    /// Page to search in; the tab that owns the search.
     @ObservationIgnored weak var performer: (any FindPerformer)?
     @ObservationIgnored private let sleep: Sleep
     @ObservationIgnored private var searchTask: Task<Void, Never>?
-    /// Dernière demande de clavier servie par le champ : un champ recréé (retour sur l'onglet) ne reprend pas le
-    /// clavier à la page.
+    /// Last keyboard request served by the field: a recreated field (back on the tab) does not take keyboard focus
+    /// back from the page.
     @ObservationIgnored private var servedFocusRequest = 0
-    /// Une recherche a sélectionné une occurrence : la fermeture la désélectionne.
+    /// A search selected a match: closing deselects it.
     @ObservationIgnored private var hasSelectedMatch = false
 
-    /// `sleep` est remplacé dans les tests.
+    /// `sleep` is replaced in the tests.
     init(sleep: @escaping Sleep = { try await Task.sleep(for: $0) }) {
         self.sleep = sleep
     }
 
-    // MARK: Barre
+    // MARK: Bar
 
-    /// ⌘F : ouvre la barre, ou la garde ouverte ; dans les deux cas, le champ prend le clavier et sélectionne son
-    /// texte (le dernier texte cherché dans cette page).
+    /// ⌘F: opens the bar, or keeps it open; in both cases, the field takes keyboard focus and selects its text (the
+    /// last text searched in this page).
     func present() {
         if !isPresented {
             isPresented = true
@@ -74,7 +74,7 @@ final class FindSession {
         focusRequest += 1
     }
 
-    /// Vrai une seule fois par demande de clavier (`present`) : au champ de la prendre.
+    /// True only once per keyboard request (`present`): it is up to the field to take it.
     func takeFocusRequest() -> Bool {
         guard servedFocusRequest != focusRequest else {
             return false
@@ -83,8 +83,8 @@ final class FindSession {
         return true
     }
 
-    /// ⎋ et × : la barre se ferme, la recherche en attente est annulée et l'occurrence trouvée désélectionnée. Le
-    /// texte reste pour ⌘G et la prochaine ouverture.
+    /// ⎋ and ×: the bar closes, the pending search is cancelled and the match found is deselected. The text stays
+    /// for ⌘G and the next opening.
     func close() {
         guard isPresented else {
             return
@@ -99,7 +99,7 @@ final class FindSession {
         Logger.browser.debug("Recherche dans la page fermée")
     }
 
-    /// Page libérée (onglet déchargé, aperçu ou mini-fenêtre fermés) : tout est oublié, sans toucher à la page.
+    /// Page released (tab unloaded, peek or mini window closed): everything is forgotten, without touching the page.
     func reset() {
         cancelSearch()
         isPresented = false
@@ -108,23 +108,23 @@ final class FindSession {
         hasSelectedMatch = false
     }
 
-    /// La page a changé d'adresse : le dernier résultat ne vaut plus. La barre et son texte restent.
+    /// The page changed address: the last result no longer holds. The bar and its text stay.
     func pageDidChange() {
         status = .idle
         hasSelectedMatch = false
     }
 
-    /// Le processus de la page s'est arrêté (tâche 5.7) : la recherche en attente est annulée et le résultat oublié,
-    /// sans rien demander à la page (il n'y a plus d'occurrence sélectionnée). La barre et son texte restent : ⌘G
-    /// cherche de nouveau dans la page rechargée.
+    /// The page's process stopped (task 5.7): the pending search is cancelled and the result forgotten, without
+    /// asking anything of the page (there is no selected match anymore). The bar and its text stay: ⌘G searches
+    /// again in the reloaded page.
     func pageDidTerminate() {
         cancelSearch()
         pageDidChange()
     }
 
-    // MARK: Recherche
+    // MARK: Search
 
-    /// Nouveau texte du champ : recherché vers l'avant après `typingDelay`, sauf s'il est vide.
+    /// New text of the field: searched forward after `typingDelay`, unless it is empty.
     func updateQuery(_ text: String) {
         guard text != query else {
             return
@@ -148,23 +148,23 @@ final class FindSession {
         }
     }
 
-    /// Entrée, ⌘G, bouton ⌄ : occurrence suivante.
+    /// Return, ⌘G, ⌄ button: next match.
     func findNext() {
         search(.forward)
     }
 
-    /// ⇧Entrée, ⇧⌘G, bouton ⌃ : occurrence précédente.
+    /// ⇧Return, ⇧⌘G, ⌃ button: previous match.
     func findPrevious() {
         search(.backward)
     }
 
-    /// Tests : attend la fin de la recherche en cours.
+    /// Tests: waits for the end of the current search.
     func waitForPendingSearch() async {
         await searchTask?.value
     }
 
-    /// Cherche tout de suite (la frappe en attente est annulée) ; barre fermée (⌘G), elle s'ouvre sans prendre le
-    /// clavier. Rien sans texte.
+    /// Searches right away (the pending keystroke is cancelled); if the bar is closed (⌘G), it opens without taking
+    /// keyboard focus. Nothing without text.
     private func search(_ direction: FindDirection) {
         guard !query.isEmpty else {
             return
@@ -177,7 +177,7 @@ final class FindSession {
         }
     }
 
-    /// Résultat ignoré si une autre recherche a pris le relais, si le texte a changé ou si la barre est fermée.
+    /// Result ignored if another search has taken over, if the text has changed or if the bar is closed.
     private func perform(_ text: String, direction: FindDirection) async {
         let found = await performer?.search(text, direction: direction)
         guard !Task.isCancelled, text == query, isPresented else {

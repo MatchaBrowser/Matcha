@@ -3,7 +3,7 @@ import Foundation
 import Testing
 import WebKit
 
-/// Mise en veille des onglets d'une session (tâche 5.6) : ce qui est visible, quand et quoi mettre en veille.
+/// Suspension of a session's tabs (task 5.6): what is visible, when and what to suspend.
 @MainActor
 struct TabLifecycleServiceTests {
     private let session: BrowserSession
@@ -13,7 +13,7 @@ struct TabLifecycleServiceTests {
     private let fakes = FakeTabProbes()
     private let settings = SettingsBox()
 
-    /// Réglage modifiable pendant un test.
+    /// Setting that can be changed during a test.
     @MainActor
     final class SettingsBox {
         var delay: Duration? = .seconds(30 * 60)
@@ -34,7 +34,7 @@ struct TabLifecycleServiceTests {
         model.space.tabManager
     }
 
-    /// Ouvre `count` onglets ; le dernier est sélectionné, les autres sont cachés depuis maintenant.
+    /// Opens `count` tabs; the last one is selected, the others are hidden from now on.
     private func openTabs(_ count: Int) -> [BrowserTab] {
         let tabs = (0 ..< count).map { _ in manager.newTab() }
         service.refreshVisibility()
@@ -48,7 +48,7 @@ struct TabLifecycleServiceTests {
 
         clock.advance(60)
         manager.select(tabs[0])
-        // Suivi des changements : noté à l'heure du changement, sans attendre une vérification.
+        // Change tracking: noted at the time of the change, without waiting for a check.
         try await waitUntil { service.hiddenSince(tabs[1]) != nil }
         #expect(service.hiddenSince(tabs[1]) == fixedNow.addingTimeInterval(60))
         #expect(service.hiddenSince(tabs[0]) == nil)
@@ -85,7 +85,7 @@ struct TabLifecycleServiceTests {
     @Test func `tabs hidden longer than the delay are suspended, never the displayed one`() async {
         let tabs = openTabs(2)
         clock.advance(20 * 60)
-        // Le deuxième onglet est caché depuis 20 minutes ; le nouveau est affiché.
+        // The second tab has been hidden for 20 minutes; the new one is shown.
         let shown = openTabs(1)[0]
         clock.advance(11 * 60)
 
@@ -96,11 +96,11 @@ struct TabLifecycleServiceTests {
         #expect(tabs[1].isLoaded)
         #expect(shown.isLoaded)
         #expect(fakes.snapshotRequests == 1)
-        // Déjà en veille : rien de plus.
+        // Already suspended: nothing more.
         #expect(await service.check(.inactivity) == 0)
     }
 
-    /// Caméra et micro : `TabSuspensionPolicyTests` (WebKit ne les simule pas).
+    /// Camera and microphone: `TabSuspensionPolicyTests` (WebKit does not simulate them).
     @Test func `tabs playing media or asking for a permission are kept`() async throws {
         let tabs = openTabs(3)
         fakes.playing = try [ObjectIdentifier(#require(tabs[0].webView))]
@@ -112,7 +112,7 @@ struct TabLifecycleServiceTests {
         #expect(allLoaded)
     }
 
-    /// Tâche 5.10 : l'icône haut-parleur suffit, sans attendre la réponse de WebKit.
+    /// Task 5.10: the speaker icon is enough, without waiting for WebKit's answer.
     @Test func `a tab whose page plays sound is kept without asking WebKit`() async {
         let tabs = openTabs(2)
         tabs[0].audio.receive(PageAudioReport(frame: "main", isAudible: true))
@@ -121,7 +121,7 @@ struct TabLifecycleServiceTests {
         #expect(tabs[0].isLoaded)
         #expect(fakes.mediaRequests == 0)
 
-        // Plus de son : WebKit est de nouveau consulté.
+        // No more sound: WebKit is asked again.
         tabs[0].audio.reset()
         #expect(await service.check(.inactivity) == 1)
         #expect(fakes.mediaRequests == 1)
@@ -137,7 +137,7 @@ struct TabLifecycleServiceTests {
     }
 
     @Test func `a memory warning suspends the oldest half without snapshots`() async {
-        // Chaque onglet est caché quand le suivant s'ouvre.
+        // Each tab is hidden when the next one opens.
         var tabs = openTabs(2)
         clock.advance(300)
         tabs.append(contentsOf: openTabs(1))
@@ -147,7 +147,7 @@ struct TabLifecycleServiceTests {
         tabs.append(contentsOf: openTabs(1))
         clock.advance(30)
 
-        // Cachés depuis 15, 10 et 5 min, et 30 s : le dernier est épargné, la moitié (arrondie) des trois autres part.
+        // Hidden for 15, 10 and 5 min, and 30 s: the last one is spared, half (rounded) of the other three go.
         #expect(await service.check(.memoryWarning) == 2)
         #expect(tabs[0].suspension.isSuspended)
         #expect(tabs[1].suspension.isSuspended)
@@ -173,7 +173,7 @@ struct TabLifecycleServiceTests {
         #expect(tabs[2].isLoaded)
     }
 
-    /// Une alerte mémoire lance une vérification sans attendre la minuterie.
+    /// A memory warning starts a check without waiting for the timer.
     @Test func `a memory alert runs a check right away`() async throws {
         let tabs = openTabs(2)
         service.schedule(.memoryCritical)
@@ -190,7 +190,7 @@ struct TabLifecycleServiceTests {
         #expect(!tabs[0].suspension.isSuspended)
     }
 
-    /// L'aperçu n'est pas un onglet rangé : jamais mis en veille, et son onglet d'origine est affiché.
+    /// Peek is not a placed tab: never suspended, and its originating tab is shown.
     @Test func `the Peek page and its source are never suspended`() async throws {
         let source = manager.insertTab(configuration: TestPages.configuration(), after: nil, select: true)
         source.load(TestPages.url("source"))
@@ -202,8 +202,8 @@ struct TabLifecycleServiceTests {
         #expect(peek.tab.isLoaded)
     }
 
-    /// Tâche 5.8 : tant que la fenêtre de connexion ouverte par un onglet l'est encore, l'onglet garde sa page, sans
-    /// quoi `window.opener` ne la retrouverait plus.
+    /// Task 5.8: as long as the sign-in window opened by a tab is still open, the tab keeps its page, otherwise
+    /// `window.opener` would no longer find it.
     @Test func `a tab with an open sign-in window is never suspended`() async throws {
         session.popupWindows.prepareForTests()
         let tabs = openTabs(2)
@@ -225,7 +225,7 @@ struct TabLifecycleServiceTests {
         #expect(opener.suspension.isSuspended)
     }
 
-    /// Un favori est commun aux Spaces du profil : un seul onglet, examiné une fois.
+    /// A favorite is shared by the Spaces of the profile: a single tab, examined once.
     @Test func `a favorite shared by two Spaces is shown in the displayed one`() async {
         let favorite = openTabs(1)[0]
         manager.setPlace(favorite, to: .favorite)

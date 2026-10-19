@@ -1,16 +1,16 @@
 import Foundation
 import Security
 
-/// Extension Safari d'une app installée (tâche 6.4) : un `.appex` au point `com.apple.Safari.web-extension`, avec son
-/// `manifest.json`. Matcha la charge sur place (`WKWebExtension(appExtensionBundle:)`) : les mises à jour de l'app
-/// (App Store) la mettent à jour.
+/// Safari extension of an installed app (task 6.4): an `.appex` at the `com.apple.Safari.web-extension` extension
+/// point, with its `manifest.json`. Matcha loads it in place (`WKWebExtension(appExtensionBundle:)`): the app's updates
+/// (App Store) update it.
 nonisolated struct SafariAppExtension: Equatable, Identifiable, Sendable {
     let appURL: URL
     let appName: String
     let extensionURL: URL
     let bundleIdentifier: String
-    /// Nom de l'extension donné par son manifeste, sinon celui de l'app (le nom du `.appex` est souvent générique :
-    /// « Safari Extension »).
+    /// Name of the extension given by its manifest, otherwise that of the app (the name of the `.appex` is often
+    /// generic: “Safari Extension”).
     let displayName: String
 
     var id: String {
@@ -18,12 +18,12 @@ nonisolated struct SafariAppExtension: Equatable, Identifiable, Sendable {
     }
 }
 
-/// Cherche les extensions Safari des apps de `/Applications` (et de ses sous-dossiers directs, comme Utilitaires) et de
-/// `~/Applications` : aucune API publique ne les liste. Lecture des `Info.plist` seulement. Type pur.
+/// Looks for the Safari extensions of the apps in `/Applications` (and its direct subfolders, like Utilities) and in
+/// `~/Applications`: no public API lists them. Reads `Info.plist` files only. Pure type.
 nonisolated enum SafariExtensionFinder {
     static let extensionPoint = "com.apple.Safari.web-extension"
 
-    /// Dossiers d'apps habituels.
+    /// Usual app folders.
     static var applicationFolders: [URL] {
         let home = FileManager.default.homeDirectoryForCurrentUser
         return [
@@ -32,7 +32,7 @@ nonisolated enum SafariExtensionFinder {
         ]
     }
 
-    /// Extensions Safari trouvées dans `folders`, triées par nom, chacune une fois.
+    /// Safari extensions found in `folders`, sorted by name, each one once.
     static func find(in folders: [URL] = applicationFolders, fileManager: FileManager = .default) -> [SafariAppExtension] {
         var found: [String: SafariAppExtension] = [:]
         for app in folders.flatMap({ apps(in: $0, fileManager: fileManager) }) {
@@ -43,7 +43,7 @@ nonisolated enum SafariExtensionFinder {
         return found.values.sorted { $0.displayName.localizedStandardCompare($1.displayName) == .orderedAscending }
     }
 
-    /// Extensions Safari d'une app.
+    /// Safari extensions of an app.
     static func extensions(of app: URL, fileManager: FileManager = .default) -> [SafariAppExtension] {
         let plugIns = app.appending(path: "Contents/PlugIns", directoryHint: .isDirectory)
         let appexes = ((try? fileManager.contentsOfDirectory(at: plugIns, includingPropertiesForKeys: nil)) ?? [])
@@ -69,9 +69,9 @@ nonisolated enum SafariExtensionFinder {
         }
     }
 
-    /// Identifiant que Safari donne à l'extension du `.appex` `url` : « identifiant du bundle (équipe) », l'équipe lue
-    /// dans sa signature (« me.proton.pass.catalyst.safari-extension (2SB5Z68H26) ») ; sans signature d'équipe,
-    /// l'identifiant du bundle seul. Les sites de l'extension l'appellent par cet identifiant (`externally_connectable`).
+    /// Identifier that Safari gives to the extension of the `.appex` `url`: “bundle identifier (team)”, the team read
+    /// from its signature (“me.proton.pass.catalyst.safari-extension (2SB5Z68H26)”); without a team signature, the
+    /// bundle identifier alone. The extension's websites call it by this identifier (`externally_connectable`).
     static func safariIdentifier(ofAppExtensionAt url: URL) -> String? {
         guard let bundleIdentifier = infoDictionary(ofBundleAt: url)?["CFBundleIdentifier"] as? String else {
             return nil
@@ -82,7 +82,7 @@ nonisolated enum SafariExtensionFinder {
         return "\(bundleIdentifier) (\(team))"
     }
 
-    /// Équipe de développement qui a signé le bundle `url`, lue par l'API publique de Security.
+    /// Development team that signed bundle `url`, read through the public Security API.
     static func teamIdentifier(ofBundleAt url: URL) -> String? {
         var code: SecStaticCode?
         guard SecStaticCodeCreateWithPath(url as CFURL, [], &code) == errSecSuccess, let code else {
@@ -98,7 +98,7 @@ nonisolated enum SafariExtensionFinder {
         return information[kSecCodeInfoTeamIdentifier as String] as? String
     }
 
-    /// Apps d'un dossier et de ses sous-dossiers directs.
+    /// Apps of a folder and of its direct subfolders.
     private static func apps(in folder: URL, fileManager: FileManager) -> [URL] {
         let contents = (try? fileManager.contentsOfDirectory(at: folder, includingPropertiesForKeys: nil, options: .skipsHiddenFiles)) ?? []
         return contents.flatMap { url -> [URL] in

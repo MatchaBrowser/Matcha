@@ -1,17 +1,17 @@
 import Foundation
 
-/// Fichier d'extension choisi par l'utilisateur (tâche 6.4) : `.crx` de Chrome (en-tête « Cr24 » version 2 ou 3, suivi
-/// d'une archive zip), `.xpi` de Firefox ou `.zip` (archives zip). La signature d'un `.crx` n'est pas vérifiée : c'est
-/// l'utilisateur qui choisit le fichier, et l'écran des permissions passe avant toute installation. Type pur.
+/// Extension file chosen by the user (task 6.4): Chrome `.crx` (“Cr24” header version 2 or 3, followed by a zip
+/// archive), Firefox `.xpi` or `.zip` (zip archives). The signature of a `.crx` is not verified: the user chooses the
+/// file, and the permissions screen comes before any installation. Pure type.
 nonisolated enum ExtensionPackage {
     enum Failure: Error, Equatable {
-        /// Ni un `.crx` ni une archive zip.
+        /// Neither a `.crx` nor a zip archive.
         case unknownFormat
-        /// En-tête `.crx` illisible ou version inconnue.
+        /// Unreadable `.crx` header or unknown version.
         case invalidCRX
     }
 
-    /// Archive zip contenue dans `data` : `data` lui-même pour une archive zip, sans son en-tête pour un `.crx`.
+    /// Zip archive contained in `data`: `data` itself for a zip archive, without its header for a `.crx`.
     static func zipData(from data: Data) throws -> Data {
         if starts(data, with: [0x50, 0x4B, 0x03, 0x04]) || starts(data, with: [0x50, 0x4B, 0x05, 0x06]) {
             return data
@@ -25,13 +25,13 @@ nonisolated enum ExtensionPackage {
         let archiveStart: Int
         switch version {
         case 2:
-            // Clé publique et signature, de longueurs données.
+            // Public key and signature, of given lengths.
             guard let keyLength = uint32(data, at: 8), let signatureLength = uint32(data, at: 12) else {
                 throw Failure.invalidCRX
             }
             archiveStart = 16 + Int(keyLength) + Int(signatureLength)
         case 3:
-            // En-tête (protobuf) de longueur donnée.
+            // Header (protobuf) of given length.
             guard let headerLength = uint32(data, at: 8) else {
                 throw Failure.invalidCRX
             }

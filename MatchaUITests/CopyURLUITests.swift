@@ -1,11 +1,10 @@
 import AppKit
 import XCTest
 
-/// Copier l'URL (⇧⌘C, action de la barre de commande, menu contextuel) : l'adresse arrive dans le
-/// presse-papiers et la confirmation « URL copiée » apparaît puis disparaît d'elle-même. Hors ligne :
-/// `about:blank?copy`. Ces tests écrivent dans le presse-papiers général ; son contenu est vérifié par
-/// un collage (⌘V) dans l'app, jamais lu par le lanceur de tests : une lecture directe du contenu
-/// d'une autre app peut déclencher l'alerte d'accès au presse-papiers de macOS.
+/// Copy URL (⇧⌘C, command bar action, context menu): the address reaches the pasteboard and the “URL Copied”
+/// confirmation appears then goes away by itself. Offline: `about:blank?copy`. These tests write to the general
+/// pasteboard; its content is checked by pasting (⌘V) in the app, never read by the test runner: directly reading
+/// the content of another app can trigger the macOS pasteboard access alert.
 final class CopyURLUITests: XCTestCase {
     private static let address = "about:blank?copy"
 
@@ -13,7 +12,7 @@ final class CopyURLUITests: XCTestCase {
         continueAfterFailure = false
     }
 
-    /// Confirmation affichée, avec son texte français.
+    /// Confirmation shown, with its French text.
     @MainActor
     private func confirmation(in app: XCUIApplication) -> XCUIElement {
         app.descendants(matching: .any)
@@ -21,7 +20,7 @@ final class CopyURLUITests: XCTestCase {
             .firstMatch
     }
 
-    /// Lance l'app et attend sa fenêtre (aucun onglet).
+    /// Launches the app and waits for its window (no tab).
     @MainActor
     private func launch() -> XCUIApplication {
         let app = launchApp()
@@ -29,13 +28,13 @@ final class CopyURLUITests: XCTestCase {
         return app
     }
 
-    /// Remplace le contenu du presse-papiers par `text` : écrire ne déclenche aucune alerte.
+    /// Replaces the pasteboard content with `text`: writing triggers no alert.
     private func writePasteboard(_ text: String) {
         NSPasteboard.general.clearContents()
         NSPasteboard.general.setString(text, forType: .string)
     }
 
-    /// Ouvre `about:blank?copy` par la barre de commande, puis remplace le presse-papiers.
+    /// Opens `about:blank?copy` from the command bar, then replaces the pasteboard.
     @MainActor
     private func openPage(in app: XCUIApplication) {
         openAddress(Self.address, in: app)
@@ -44,8 +43,8 @@ final class CopyURLUITests: XCTestCase {
         writePasteboard("avant")
     }
 
-    /// Colle (⌘V) dans la barre de commande (⌘T), puis la referme : un collage voulu, sans alerte
-    /// d'accès au presse-papiers. Vrai si le champ reçoit `expected`.
+    /// Pastes (⌘V) into the command bar (⌘T), then closes it: an intentional paste, without a pasteboard access
+    /// alert. True if the field receives `expected`.
     @MainActor
     private func pastes(_ expected: String, in app: XCUIApplication) -> Bool {
         let field = openCommandBar(in: app)
@@ -56,7 +55,7 @@ final class CopyURLUITests: XCTestCase {
         return pasted
     }
 
-    /// Juste après la copie : la confirmation apparaît puis disparaît seule ; l'adresse est copiée.
+    /// Right after the copy: the confirmation appears then goes away by itself; the address is copied.
     @MainActor
     private func assertCopied(in app: XCUIApplication) {
         let confirmation = confirmation(in: app)
@@ -65,7 +64,7 @@ final class CopyURLUITests: XCTestCase {
         XCTAssertTrue(pastes(Self.address, in: app))
     }
 
-    /// Élément « Copier l'URL » du menu Édition devenu (in)actif.
+    /// “Copy URL” item of the Edit menu, once it becomes enabled (or disabled).
     @MainActor
     private func waitForMenuItem(_ item: XCUIElement, enabled: Bool) -> Bool {
         let predicate = NSPredicate(format: "isEnabled == %@", NSNumber(value: enabled))
@@ -75,14 +74,14 @@ final class CopyURLUITests: XCTestCase {
     @MainActor
     func testShiftCommandCCopiesTheURL() {
         let app = launch()
-        // Sans onglet, la commande est grisée : ⇧⌘C ne copie ni ne confirme rien.
+        // Without a tab, the command is grayed out: ⇧⌘C neither copies nor confirms anything.
         let menuItem = app.menuBars.menuItems["Copier l'URL"]
         XCTAssertTrue(menuItem.waitForExistence(timeout: 2))
         XCTAssertTrue(waitForMenuItem(menuItem, enabled: false))
         writePasteboard("avant")
         app.typeKey("c", modifierFlags: [.command, .shift])
         XCTAssertFalse(confirmation(in: app).waitForExistence(timeout: 1))
-        // ⌘T puis Échap ne laisse aucun onglet.
+        // ⌘T then Escape leaves no tab.
         XCTAssertTrue(pastes("avant", in: app))
         XCTAssertTrue(waitForCount(tabRows(in: app), 0))
 
@@ -100,7 +99,7 @@ final class CopyURLUITests: XCTestCase {
         let row = commandBarRows(in: app).matching(NSPredicate(format: "label == %@", "Copier l'URL")).firstMatch
         XCTAssertTrue(row.waitForExistence(timeout: 3))
         row.click()
-        // Même confirmation que ⇧⌘C ; la barre s'est fermée.
+        // Same confirmation as ⇧⌘C; the bar has closed.
         assertCopied(in: app)
         XCTAssertFalse(field.exists)
     }

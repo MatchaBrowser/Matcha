@@ -1,25 +1,26 @@
 import Foundation
 import SwiftData
 
-/// Onglet enregistré. Un favori appartient au profil ; un épinglé ou un onglet du jour, au Space.
+/// Saved tab. A favorite belongs to the profile; a pinned tab or a today tab, to the Space.
 @Model
 final class TabRecord {
     var id = UUID()
     var url: URL?
     var title: String?
-    /// Place, en texte : `favorite`, `pinned`, `today`, ou `archived` (onglet archivé ; archivage reporté, voir `FEATURES.md`).
+    /// Placement, as text: `favorite`, `pinned`, `today`, or `archived` (archived tab; archiving postponed, see
+    /// `FEATURES.md`).
     var placeValue = TabPlace.today.rawValue
-    /// Rang dans son conteneur (favoris, racine des épinglés, dossier, onglets du jour).
+    /// Rank in its container (favorites, root of the pinned tabs, folder, today tabs).
     var order = 0
     var lastActivity = Date.now
-    /// Adresse et titre d'origine d'un épinglé ou d'un favori.
+    /// Original address and title of a pinned tab or a favorite.
     var pinnedURL: URL?
     var pinnedTitle: String?
-    /// État de navigation de WebKit (historique précédent/suivant), pour la restauration.
+    /// WebKit navigation state (back/forward history), for restoration.
     @Attribute(.externalStorage) var interactionState: Data?
-    /// Split view (tâche 4.3) dont l'onglet fait partie ; nil hors split. Jamais pour un favori.
+    /// Split view (task 4.3) the tab is part of; nil outside a split. Never for a favorite.
     var splitGroupID: UUID?
-    /// Part de largeur de son panneau dans le split ; 0 : inconnue (parts égales).
+    /// Width share of its pane in the split; 0: unknown (equal shares).
     var splitFraction = 0.0
     var space: SpaceRecord?
     var profile: ProfileRecord?
@@ -33,7 +34,7 @@ final class TabRecord {
         self.order = order
     }
 
-    /// Place dans la barre ; nil pour un onglet archivé.
+    /// Placement in the sidebar; nil for an archived tab.
     var place: TabPlace? {
         get { TabPlace(rawValue: placeValue) }
         set { placeValue = newValue?.rawValue ?? "archived" }

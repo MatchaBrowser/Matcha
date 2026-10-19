@@ -1,25 +1,25 @@
 import Foundation
 import OSLog
 
-/// Liste de blocage compilée dans le magasin de WebKit (tâche 6.2), retenue dans les réglages de l'app : au lancement
-/// suivant, la même version est relue telle quelle (`WKContentRuleListStore.lookUpContentRuleList`) au lieu d'être
-/// recompilée. Le nombre de règles et la date servent aux réglages.
+/// Blocklist compiled in WebKit's store (task 6.2), remembered in the app's settings: at the next launch, the same
+/// version is looked up as is (`WKContentRuleListStore.lookUpContentRuleList`) instead of being recompiled. The rule
+/// count and the date are used by the settings.
 nonisolated struct CompiledBlocklist: Codable, Equatable, Sendable {
-    /// Réglage de l'app : les listes compilées, en JSON.
+    /// App setting: the compiled lists, as JSON.
     static let defaultsKey = "contentBlockerCompiledLists"
-    /// Début des identifiants de nos listes dans le magasin : les autres identifiants n'y sont jamais touchés.
+    /// Prefix of our lists' identifiers in the store: other identifiers there are never touched.
     static let storePrefix = "matcha-blocklist."
 
     let identifier: String
     let version: String
-    /// Listes du magasin : une seule, ou une par part si WebKit a refusé la liste entière (trop de règles).
+    /// Lists in the store: a single one, or one per part if WebKit refused the whole list (too many rules).
     let storeIdentifiers: [String]
     let ruleCount: Int
     let compiledAt: Date
 
-    /// Identifiant dans le magasin de la liste `entry` entière (« matcha-blocklist.easylist.2026.10.18 ») ou de ses
-    /// parts (« ….part-1 », « ….part-2 »…) : la version en fait partie, une nouvelle version ne remplace donc jamais
-    /// l'ancienne avant d'être prête.
+    /// Identifier in the store of the whole `entry` list (“matcha-blocklist.easylist.2026.10.18”) or of its parts
+    /// (“….part-1”, “….part-2”…): the version is part of it, so a new version never replaces the old one before it
+    /// is ready.
     static func storeIdentifiers(for entry: BlocklistEntry, partCount: Int) -> [String] {
         let base = "\(storePrefix)\(entry.identifier).\(entry.version)"
         guard partCount > 1 else {
@@ -28,20 +28,20 @@ nonisolated struct CompiledBlocklist: Codable, Equatable, Sendable {
         return (1 ... partCount).map { "\(base).part-\($0)" }
     }
 
-    /// Vrai si `self` est la version compilée de `entry` (même identifiant, même version, parts nommées pour elle) :
-    /// il reste à la relire dans le magasin.
+    /// True if `self` is the compiled version of `entry` (same identifier, same version, parts named for it): it only
+    /// remains to look it up in the store.
     func matches(_ entry: BlocklistEntry) -> Bool {
         identifier == entry.identifier && version == entry.version && !storeIdentifiers.isEmpty
             && storeIdentifiers == Self.storeIdentifiers(for: entry, partCount: storeIdentifiers.count)
     }
 
-    /// Nos identifiants du magasin qui ne servent plus (ancienne version, liste retirée de l'app, compilation
-    /// interrompue), triés ; ceux d'un autre préfixe ne sont jamais rendus.
+    /// Our identifiers in the store that are no longer used (old version, list removed from the app, interrupted
+    /// compilation), sorted; those with another prefix are never returned.
     static func staleIdentifiers(available: [String], keeping kept: Set<String>) -> [String] {
         available.filter { $0.hasPrefix(storePrefix) && !kept.contains($0) }.sorted()
     }
 
-    /// Listes retenues dans `defaults` ; aucune sans réglages, ou si la valeur est illisible.
+    /// Lists remembered in `defaults`; none without settings, or if the value is unreadable.
     static func load(from defaults: UserDefaults?) -> [CompiledBlocklist] {
         guard let data = defaults?.data(forKey: defaultsKey) else {
             return []

@@ -1,10 +1,10 @@
 import XCTest
 
-/// Captures de la recherche dans la page (`MATCHA_SCREENSHOT_FIND`, voir `ScreenshotUITests`).
+/// Screenshots of find in page (`MATCHA_SCREENSHOT_FIND`, see `ScreenshotUITests`).
 extension ScreenshotUITests {
-    /// Si `MATCHA_SCREENSHOT_FIND` est défini : ce texte est cherché (⌘F) dans l'onglet affiché, une occurrence
-    /// trouvée (`29-recherche-trouvee`), puis « zzqqxx » (`30-recherche-introuvable`), et la barre se ferme (⎋). Sans
-    /// `MATCHA_SCREENSHOT_URLS`, la documentation de Postfix livrée avec macOS est ouverte d'abord (sans réseau).
+    /// If `MATCHA_SCREENSHOT_FIND` is set: this text is searched (⌘F) in the displayed tab, one match found
+    /// (`29-recherche-trouvee`), then “zzqqxx” (`30-recherche-introuvable`), and the bar closes (⎋). Without
+    /// `MATCHA_SCREENSHOT_URLS`, the Postfix documentation shipped with macOS is opened first (no network).
     @MainActor
     func captureFindBar(in app: XCUIApplication, window: XCUIElement) throws {
         let environment = ProcessInfo.processInfo.environment

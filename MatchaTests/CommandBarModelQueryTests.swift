@@ -2,7 +2,7 @@ import Foundation
 @testable import Matcha
 import Testing
 
-/// Barre de commande : quelles recherches partent, et quand elles sont abandonnées.
+/// Command bar: which searches are sent, and when they are abandoned.
 @MainActor
 struct CommandBarModelQueryTests {
     private let session: BrowserSession
@@ -15,7 +15,7 @@ struct CommandBarModelQueryTests {
         windowModel = WindowModel(session: session, defaults: nil)
     }
 
-    /// `sleep` nil : la vraie attente de 150 ms avant les suggestions.
+    /// `sleep` nil: the real 150 ms wait before suggestions.
     private func makeModel(
         in windowModel: WindowModel? = nil,
         history: (any HistorySource)? = nil,
@@ -38,7 +38,7 @@ struct CommandBarModelQueryTests {
         await model.waitForPendingResults()
         #expect(engine.requests == ["abc"])
 
-        // « a », puis « ab » pendant l'attente de « a » (attente factice : aucun délai réel en jeu).
+        // “a”, then “ab” during the wait for “a” (fake sleep: no real delay involved).
         let gate = GatedSleep()
         let gated = makeModel(sleep: { try await gate.sleep($0) })
         gated.newTab(settings)
@@ -104,7 +104,7 @@ struct CommandBarModelQueryTests {
         await model.waitForPendingResults()
         #expect(model.rows.map(\.title) == ["pain", "pain perdu"])
 
-        // Suggestions coupées barre ouverte : les reçues disparaissent, plus rien ne part.
+        // Suggestions turned off while the bar is open: the received ones disappear, nothing more is sent.
         model.apply(off)
         await model.waitForPendingResults()
         #expect(model.rows.map(\.title) == ["pain"])
@@ -112,7 +112,7 @@ struct CommandBarModelQueryTests {
         await model.waitForPendingResults()
         #expect(engine.requests == ["pain"])
 
-        // Moteur changé barre ouverte, y compris par une nouvelle ouverture dans le même mode.
+        // Engine changed while the bar is open, including by opening it again in the same mode.
         let duckDuckGo = CommandBarSettings(searchEngine: .duckDuckGo, newTabPage: .blank, homePage: "", showsSearchSuggestions: true)
         model.newTab(duckDuckGo)
         await model.waitForPendingResults()

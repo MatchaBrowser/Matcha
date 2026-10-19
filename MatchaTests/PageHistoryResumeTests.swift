@@ -3,7 +3,7 @@ import Foundation
 import SwiftData
 import Testing
 
-/// Historique d'une page qui sort de veille (tâche 5.6) : seul le rechargement de la même adresse est sauté.
+/// History of a page waking from suspension (task 5.6): only the reload of the same address is skipped.
 @MainActor
 struct PageHistoryResumeTests {
     private let container: ModelContainer
@@ -22,7 +22,7 @@ struct PageHistoryResumeTests {
         let history = PageHistory()
         let page = try #require(URL(string: "https://example.com/page"))
         history.pageWillResume(url: page)
-        // Même adresse, fragment ignoré : sautée.
+        // Same address, fragment ignored: skipped.
         history.pageDidFinishLoading(url: URL(string: "https://example.com/page#haut"), title: "Page", scope: scope)
         #expect(visits == 0)
         history.pageDidFinishLoading(url: page, title: "Page", scope: scope)

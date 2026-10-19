@@ -1,7 +1,7 @@
 import SwiftUI
 
-/// Fond de la fenêtre et de la barre latérale, aux couleurs du thème du Space.
-/// Un changement de thème (ou de Space) se fait en fondu.
+/// Background of the window and of the sidebar, in the colors of the Space's theme.
+/// A change of theme (or of Space) fades.
 struct SpaceBackground: View {
     let theme: SpaceTheme
 

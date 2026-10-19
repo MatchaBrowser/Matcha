@@ -4,7 +4,7 @@ import SwiftData
 import Testing
 import WebKit
 
-/// « Ouvrir dans le Space » : la page d'une mini-fenêtre passe dans un Space et la fenêtre principale la montre.
+/// “Open in Space”: the page of a mini window moves into a Space and the main window shows it.
 @MainActor
 struct MiniWindowOpenInSpaceTests {
     private let session: BrowserSession
@@ -17,7 +17,7 @@ struct MiniWindowOpenInSpaceTests {
         manager = .forTests(session: session)
     }
 
-    /// Mini-fenêtre ouverte sur la page locale `name`, une fois chargée.
+    /// Mini window opened on the local page `name`, once loaded.
     private func openPage(_ name: String) async throws -> MiniWindowController {
         let mini = manager.openNew(loading: TestPages.url(name), source: .link)
         try await waitUntil { mini.tab.title == name && !mini.tab.isLoading }
@@ -43,7 +43,7 @@ struct MiniWindowOpenInSpaceTests {
         #expect(link.broughtToFront == 1)
         #expect(reopened == 0)
         try await waitUntil { manager.windows.isEmpty }
-        // La fermeture de la mini-fenêtre ne libère pas la page remise.
+        // Closing the mini window does not release the handed-over page.
         #expect(mini.tab.webView === webView)
         let marker = try await webView.evaluateJavaScript("window.marker")
         #expect(marker as? Int == 42)
@@ -67,7 +67,7 @@ struct MiniWindowOpenInSpaceTests {
         let second = model.space
         #expect(manager.defaultTarget(profileID: mini.profileID) === second)
 
-        // Space d'un autre profil affiché : le premier Space du profil de la page, et la fenêtre y passe.
+        // Space of another profile displayed: the first Space of the page's profile, and the window switches to it.
         model.select(session.addProfile(named: "Travail"))
         #expect(manager.defaultTarget(profileID: mini.profileID) === session.spaces[0])
         manager.openInSpace(mini) {}
@@ -86,7 +86,7 @@ struct MiniWindowOpenInSpaceTests {
 
         #expect(reopened == 1)
         #expect(session.spaces[0].tabManager.selectedTab === mini.tab)
-        // La fenêtre rouverte affiche un autre Space : le lien la ramène sur celui de la page.
+        // The reopened window displays another Space: the link brings it back to the page's Space.
         model.newSpace()
         manager.linkMainWindow(FakeMainWindowLink(windowModel: model))
         #expect(model.space === session.spaces[0])

@@ -1,28 +1,28 @@
 import Foundation
 
-/// Son d'une page (tâche 5.10), d'après les messages de son script (`PageAudioReport`). L'icône haut-parleur s'allume dès
-/// qu'un document de la page (cadre principal ou iframe) joue un son, et s'éteint `silenceDelay` (2 s) après le dernier :
-/// pas de clignotement entre deux morceaux, une publicité et la vidéo, ou pendant un changement de source (comme Chrome).
-/// Elle s'éteint tout de suite (`reset`) quand l'utilisateur met la page en pause, quand la page change (navigation),
-/// est mise en veille ou que son processus s'arrête.
+/// Sound of a page (task 5.10), from the messages of its script (`PageAudioReport`). The speaker icon lights up as soon
+/// as a document of the page (main frame or iframe) plays a sound, and switches off `silenceDelay` (2 s) after the last
+/// one: no flicker between two tracks, an ad and the video, or during a source change (like Chrome). It switches off
+/// right away (`reset`) when the user pauses the page, when the page changes (navigation), is put to sleep or its
+/// process stops.
 nonisolated struct PageAudioState: Equatable, Sendable {
     static let defaultSilenceDelay: TimeInterval = 2
 
-    /// Délai entre la fin du dernier son et l'extinction de l'icône ; changé dans les tests.
+    /// Delay between the end of the last sound and the switch-off of the icon; changed in tests.
     var silenceDelay = defaultSilenceDelay
-    /// Documents qui jouent un son.
+    /// Documents playing a sound.
     private(set) var audibleFrames: Set<String> = []
-    /// Icône affichée.
+    /// Icon displayed.
     private(set) var isPlaying = false
-    /// Moment où le dernier son s'est arrêté, tant que l'icône reste allumée.
+    /// Moment the last sound stopped, as long as the icon stays on.
     private(set) var silentSince: Date?
 
-    /// Moment où l'icône doit s'éteindre ; nil si rien n'est prévu.
+    /// Moment the icon must switch off; nil if nothing is scheduled.
     var silenceDeadline: Date? {
         silentSince.map { $0.addingTimeInterval(silenceDelay) }
     }
 
-    /// Un document prévient qu'il joue un son, qu'il n'en joue plus ou qu'il s'en va.
+    /// A document reports that it plays a sound, no longer plays one, or goes away.
     mutating func apply(_ report: PageAudioReport, at date: Date) {
         if report.isAudible, !report.isGone {
             audibleFrames.insert(report.frame)
@@ -37,7 +37,7 @@ nonisolated struct PageAudioState: Equatable, Sendable {
         }
     }
 
-    /// L'icône s'éteint si plus rien ne joue depuis `silenceDelay` à `date`.
+    /// The icon switches off if nothing has played for `silenceDelay` at `date`.
     mutating func expire(at date: Date) {
         guard let silenceDeadline, date >= silenceDeadline else {
             return
@@ -46,7 +46,7 @@ nonisolated struct PageAudioState: Equatable, Sendable {
         silentSince = nil
     }
 
-    /// Plus aucun son : tout est en pause, ou la page a changé. Un document qui rejoue un son le redit.
+    /// No sound anymore: everything is paused, or the page changed. A document that plays a sound again says so.
     mutating func reset() {
         audibleFrames = []
         isPlaying = false

@@ -1,20 +1,19 @@
 import Foundation
 import WebKit
 
-/// Outils pour développeurs web (réglage « Afficher les fonctions pour les développeurs web », Réglages > Avancé) :
-/// « Inspecter l'élément » dans le menu des pages ouvre l'inspecteur web dans Matcha, et pages et extensions sont aussi
-/// inspectables depuis le menu Développement de Safari. Désactivés par défaut (activés en Debug), suivis aussitôt par
-/// les pages ouvertes (`didChange`).
+/// Web developer tools (“Show features for web developers” setting, Settings > Advanced): “Inspect Element” in the
+/// page menu opens the web inspector in Matcha, and pages and extensions can also be inspected from Safari's Develop
+/// menu. Off by default (on in Debug), followed at once by the open pages (`didChange`).
 ///
-/// Exception à la règle des API publiques, voulue par l'utilisateur (`DECISIONS.md`, 2026-10-18) : WebKit n'offre
-/// l'inspecteur dans l'app que par sa préférence privée `developerExtrasEnabled`. Elle n'est posée que si `WKPreferences`
-/// la connaît encore ; sinon, rien ne casse et seule l'inspection depuis Safari (`isInspectable`, public) reste.
+/// Exception to the public API rule, wanted by the user (`DECISIONS.md`, 2026-10-18): WebKit only offers the in-app
+/// inspector through its private `developerExtrasEnabled` preference. It is only set if `WKPreferences` still knows
+/// it; otherwise, nothing breaks and only inspection from Safari (`isInspectable`, public) remains.
 @MainActor
 enum WebInspection {
-    /// Le réglage a changé : les vues web le reprennent.
+    /// The setting changed: the web views pick it up.
     static let didChange = Notification.Name("MatchaWebInspectionDidChange")
 
-    /// Accesseur privé de WebKit derrière la clé `developerExtrasEnabled`.
+    /// Private WebKit setter behind the `developerExtrasEnabled` key.
     private static let developerExtrasSetter = NSSelectorFromString("_setDeveloperExtrasEnabled:")
 
     static func isEnabled(in defaults: UserDefaults = .standard) -> Bool {
@@ -23,7 +22,7 @@ enum WebInspection {
             : defaults.bool(forKey: BrowserSettings.Key.showsDeveloperTools)
     }
 
-    /// Vrai si ce WebKit permet l'inspecteur dans l'app.
+    /// True if this WebKit allows the in-app inspector.
     static var offersInAppInspector: Bool {
         WKPreferences().responds(to: developerExtrasSetter)
     }

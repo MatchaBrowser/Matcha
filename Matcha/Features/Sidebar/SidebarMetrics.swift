@@ -1,11 +1,11 @@
 import Foundation
 
-/// Dimensions de la barre latérale.
+/// Dimensions of the sidebar.
 nonisolated enum SidebarMetrics {
     static let defaultWidth = 240.0
     static let widthRange = 180.0 ... 400.0
 
-    /// Largeur ramenée dans les limites autorisées.
+    /// Width brought back within the allowed limits.
     static func clampedWidth(_ width: Double) -> Double {
         min(max(width, widthRange.lowerBound), widthRange.upperBound)
     }

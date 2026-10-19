@@ -1,55 +1,54 @@
 import Foundation
 import WebKit
 
-/// Ce que le délégué de navigation (`NavigationCoordinator`) demande à qui possède les pages : les onglets d'un
-/// Space et leur aperçu (`TabManager`), les mini-fenêtres (`MiniWindowManager`, tâche 4.5) ou les fenêtres de
-/// connexion (`PopupWindowManager`, tâche 5.8). Un seul délégué pour toutes les pages : les tâches 5.5 (historique)
-/// et 5.8 (fenêtres de connexion) valent pour toutes.
+/// What the navigation delegate (`NavigationCoordinator`) asks of whoever owns the pages: the tabs of a Space and their
+/// Peek (`TabManager`), the mini windows (`MiniWindowManager`, task 4.5) or the sign-in windows (`PopupWindowManager`,
+/// task 5.8). A single delegate for all pages: tasks 5.5 (history) and 5.8 (sign-in windows) apply to all of them.
 @MainActor
 protocol TabHost: AnyObject {
     var faviconService: FaviconService { get }
-    /// Fenêtre à laquelle reviennent les téléchargements de ces pages (tâche 5.1).
+    /// Window the downloads of these pages go back to (task 5.1).
     var downloadScope: DownloadScope { get }
-    /// Onglet, ou page hors de la barre (aperçu, mini-fenêtre), qui possède `webView`.
+    /// Tab, or page outside the sidebar (Peek, mini window), that owns `webView`.
     func page(for webView: WKWebView) -> BrowserTab?
-    /// Vue web d'où part une navigation, pour `NavigationPolicy`.
+    /// Web view a navigation starts from, for `NavigationPolicy`.
     func navigationSource(of webView: WKWebView) -> NavigationSource
-    /// Vrai si `webView` est celle d'un favori ou d'un épinglé (liens vers d'autres sites dans l'aperçu).
+    /// True if `webView` belongs to a favorite or a pinned tab (links to other sites in Peek).
     func isFavoriteOrPinned(_ webView: WKWebView) -> Bool
-    /// ⌘-clic, clic du milieu : `url` dans un onglet ; `configuration` est celle de la vue d'origine (même profil).
+    /// ⌘-click, middle click: `url` in a tab; `configuration` is that of the originating view (same profile).
     func openLink(_ url: URL, configuration: WKWebViewConfiguration, from webView: WKWebView, inBackground: Bool)
-    /// `target=_blank`, `window.open` sans taille : une vue créée avec `configuration` telle quelle, sans quoi
-    /// `window.opener` ne fonctionne pas ; nil refuse la fenêtre. Avec une taille, `popupWindows` la reçoit.
-    /// `inBackground` : « Ouvrir … dans un nouvel onglet » du menu contextuel (tâche 5.9), un onglet en arrière-plan
-    /// placé comme celui d'un ⌘-clic (`openLink`).
+    /// `target=_blank`, `window.open` without a size: a view created with `configuration` as is, otherwise
+    /// `window.opener` does not work; nil refuses the window. With a size, `popupWindows` receives it.
+    /// `inBackground`: “Open … in New Tab” from the context menu (task 5.9), a background tab placed like that of a
+    /// ⌘-click (`openLink`).
     func openWindow(configuration: WKWebViewConfiguration, from webView: WKWebView, inBackground: Bool) -> WKWebView?
-    /// Fenêtres de connexion de la session (tâche 5.8) : une page qui ouvre une fenêtre en donnant sa taille l'obtient
-    /// dans sa propre petite fenêtre ; nil (tests) : un onglet, comme sans taille.
+    /// Sign-in windows of the session (task 5.8): a page that opens a window giving its size gets it in its own small
+    /// window; nil (tests): a tab, as without a size.
     var popupWindows: PopupWindowManager? { get }
-    /// Maj+clic : `url` dans l'aperçu ; faux si c'est refusé (le lien suit alors son cours).
+    /// Shift-click: `url` in Peek; false if it is refused (the link then proceeds as usual).
     func openInPeek(_ url: URL, from webView: WKWebView, openingPoint: CGPoint) -> Bool
-    /// La page a appelé `window.close()`.
+    /// The page called `window.close()`.
     func closePage(of webView: WKWebView)
-    /// Décisions de permission du profil de `webView` (tâche 5.2) ; nil : rien n'est retenu.
+    /// Permission decisions of the profile of `webView` (task 5.2); nil: nothing is remembered.
     func sitePermissions(for webView: WKWebView) -> SitePermissionScope?
-    /// Zoom des pages par site (tâche 5.4) ; nil : les pages gardent leur zoom d'une page à l'autre.
+    /// Per-site page zoom (task 5.4); nil: pages keep their zoom from one page to the next.
     var siteZooms: SiteZoomStore? { get }
-    /// Bloqueur de la session (tâche 6.2) ; nil (tests) : les pages ne sont pas suivies par le bloqueur.
+    /// Blocker of the session (task 6.2); nil (tests): the pages are not followed by the blocker.
     var contentBlocking: ContentBlockerScope? { get }
-    /// Historique où retenir les visites de `webView` (tâche 5.5) ; nil : rien n'est retenu (fenêtre privée).
+    /// History where the visits of `webView` are recorded (task 5.5); nil: nothing is recorded (private window).
     func historyScope(for webView: WKWebView) -> HistoryScope?
-    /// Vrai si `page` est à l'écran (tâche 5.7) : une page dont le processus s'arrête se recharge tout de suite si
-    /// elle est visible, sinon quand on l'affiche.
+    /// True if `page` is on screen (task 5.7): a page whose process stops reloads right away if it is visible,
+    /// otherwise when it is shown.
     func isVisible(_ page: BrowserTab) -> Bool
-    /// Une navigation de `webView` vient de devenir un téléchargement (tâche 5.1), déjà confié à la liste.
+    /// A navigation of `webView` has just become a download (task 5.1), already handed to the list.
     func downloadDidStart(in webView: WKWebView)
 }
 
 extension TabHost {
-    /// Rien par défaut : un onglet ouvert pour un téléchargement reste ouvert (`FEATURES.md`).
+    /// Nothing by default: a tab opened for a download stays open (`FEATURES.md`).
     func downloadDidStart(in _: WKWebView) {}
 
-    /// Sans bloqueur par défaut (hôtes des tests).
+    /// No blocker by default (test hosts).
     var contentBlocking: ContentBlockerScope? {
         nil
     }

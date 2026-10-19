@@ -1,12 +1,12 @@
 import AppKit
 import WebKit
 
-/// Rend le clavier à la vue web de l'aperçu une fois passée dans la carte : AppKit retire le premier
-/// répondant d'une vue qui change de parent.
+/// Gives keyboard focus back to the peek's web view once it has moved into the card: AppKit removes the first
+/// responder from a view that changes parent.
 @MainActor
 enum PeekFocus {
-    /// Attend (une seconde au plus) que `webView` soit dans une fenêtre sous un autre parent que `oldHost`,
-    /// puis lui donne le clavier si personne ne l'a pris entre-temps.
+    /// Waits (one second at most) for `webView` to be in a window under a parent other than `oldHost`, then gives
+    /// it keyboard focus if nobody took it in the meantime.
     static func focus(_ webView: WKWebView, awayFrom oldHost: NSView?) {
         Task { @MainActor [weak webView, weak oldHost] in
             for _ in 0 ..< 20 {

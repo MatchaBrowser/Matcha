@@ -1,8 +1,8 @@
 import SwiftUI
 
-/// Barre d'adresse d'une fenêtre de connexion (tâche 5.8), en lecture seule : le site de la page et, pour un site, si la
-/// connexion est chiffrée (cadenas) ou non (« Non sécurisé »). On doit voir à qui l'on donne son mot de passe : la page
-/// ne choisit que le titre de la fenêtre, jamais cette barre. L'adresse complète est dans la bulle d'aide.
+/// Address bar of a sign-in window (task 5.8), read-only: the page's site and, for a site, whether the connection
+/// is encrypted (padlock) or not (“Not Secure”). You must see who you are giving your password to: the page only
+/// chooses the window title, never this bar. The full address is in the help tag.
 struct PopupAddressBar: View {
     static let height = 30.0
 
@@ -36,7 +36,7 @@ struct PopupAddressBar: View {
         .frame(height: Self.height)
         .background(.bar)
         .overlay(alignment: .bottom) { Divider() }
-        // Adresse complète d'un site seulement : celle d'une page `data:` peut contenir toute la page.
+        // Full address of a site only: that of a `data:` page can contain the whole page.
         .help(Text(verbatim: address.security == .none ? address.text : page.url?.absoluteString ?? ""))
         .accessibilityElement(children: .contain)
     }

@@ -1,20 +1,20 @@
 import Foundation
 
-/// Ordre de la barre latérale vu par le clavier (tâche 4.8) : ce qu'elle montre, de haut en bas. Favoris,
-/// puis épinglés (le contenu d'un dossier replié n'est pas montré, il n'y est pas), puis onglets du jour.
-/// Un split tient sur une ligne, mais ses panneaux se suivent de gauche à droite dans `tabIDs`. Type pur.
+/// Order of the sidebar as seen by the keyboard (task 4.8): what it shows, from top to bottom. Favorites,
+/// then pinned tabs (the content of a collapsed folder is not shown, so it is not included), then today tabs.
+/// A split fits on one row, but its panes follow one another from left to right in `tabIDs`. Pure type.
 nonisolated struct SidebarOrder: Equatable, Sendable {
-    /// Une tuile de favori ou une ligne : un onglet, ou les panneaux d'un split de gauche à droite.
+    /// A favorite tile or a row: a tab, or the panes of a split from left to right.
     typealias Item = [UUID]
 
-    /// ⌘1 à ⌘8.
+    /// ⌘1 to ⌘8.
     static let numberedShortcuts = 1 ... 8
 
-    /// Tuiles des favoris, puis lignes des épinglés visibles : celles que numérotent ⌘1 à ⌘8.
+    /// Favorite tiles, then visible pinned rows: those numbered by ⌘1 to ⌘8.
     let numbered: [Item]
-    /// Lignes des onglets du jour.
+    /// Rows of today tabs.
     let today: [Item]
-    /// Tous les onglets rangés, visibles ou non : situe un onglet sélectionné caché dans un dossier replié.
+    /// All the placed tabs, visible or not: locates a selected tab hidden in a collapsed folder.
     private let allTabIDs: [UUID]
 
     init(_ layout: SidebarLayout) {
@@ -23,13 +23,13 @@ nonisolated struct SidebarOrder: Equatable, Sendable {
         allTabIDs = layout.orderedTabIDs
     }
 
-    /// Onglets visibles, de haut en bas ; les panneaux d'un split à la suite.
+    /// Visible tabs, from top to bottom; the panes of a split one after the other.
     var tabIDs: [UUID] {
         (numbered + today).flatMap(\.self)
     }
 
-    /// ⌘1 à ⌘8 : la tuile ou la ligne n° `number` (à partir de 1) des favoris puis des épinglés ; nil au-delà
-    /// (les onglets du jour ne sont jamais numérotés).
+    /// ⌘1 to ⌘8: the tile or row number `number` (starting at 1) of the favorites then the pinned tabs; nil beyond
+    /// (today tabs are never numbered).
     func numberedItem(_ number: Int) -> Item? {
         guard Self.numberedShortcuts.contains(number), number <= numbered.count else {
             return nil
@@ -37,20 +37,20 @@ nonisolated struct SidebarOrder: Equatable, Sendable {
         return numbered[number - 1]
     }
 
-    /// ⌘9 : la dernière ligne de la barre (onglets du jour, sinon épinglés, sinon favoris).
+    /// ⌘9: the last row of the sidebar (today tabs, otherwise pinned tabs, otherwise favorites).
     var lastItem: Item? {
         today.last ?? numbered.last
     }
 
-    /// ⌃⇥ (`forward`) et ⌃⇧⇥ : l'onglet visible qui suit (ou précède) `current`, en reprenant au début après
-    /// le dernier (et à la fin avant le premier). Dans un split, le panneau voisin vient d'abord. Sans onglet
-    /// sélectionné : le premier (ou le dernier). Nil s'il n'y a pas d'autre onglet visible.
+    /// ⌃⇥ (`forward`) and ⌃⇧⇥: the visible tab that follows (or precedes) `current`, wrapping to the start after
+    /// the last one (and to the end before the first). In a split, the neighboring pane comes first. With no selected
+    /// tab: the first (or the last). Nil if there is no other visible tab.
     func tab(after current: UUID?, forward: Bool) -> UUID? {
         let visible = tabIDs
         guard let current, let position = allTabIDs.firstIndex(of: current) else {
             return forward ? visible.first : visible.last
         }
-        // Parcours de l'ordre complet : un onglet caché (dossier replié) mène à son voisin visible.
+        // Walks the full order: a hidden tab (collapsed folder) leads to its visible neighbor.
         let shown = Set(visible)
         let count = allTabIDs.count
         for step in 1 ..< count {
@@ -62,8 +62,8 @@ nonisolated struct SidebarOrder: Equatable, Sendable {
         return nil
     }
 
-    /// Une entrée par ligne : l'onglet ou les panneaux du split ; un dossier déplié donne ses propres lignes,
-    /// à la suite, et un dossier replié aucune.
+    /// One entry per row: the tab or the panes of the split; an expanded folder gives its own rows,
+    /// one after the other, and a collapsed folder none.
     private static func items(of rows: [SidebarRow], in layout: SidebarLayout) -> [Item] {
         rows.flatMap { row -> [Item] in
             switch row {

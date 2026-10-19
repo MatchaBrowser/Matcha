@@ -1,17 +1,17 @@
 import Foundation
 
-/// Onglet importé d'un autre navigateur (tâches 7.1 et 7.2) : son adresse et son titre. Type pur.
+/// Tab imported from another browser (tasks 7.1 and 7.2): its address and its title. Pure type.
 nonisolated struct ImportedTab: Equatable, Sendable {
     var title: String
     var url: URL
 }
 
-/// Élément importé : un onglet, ou un dossier et son contenu, dans l'ordre d'origine. Type pur.
+/// Imported item: a tab, or a folder and its content, in the original order. Pure type.
 indirect nonisolated enum ImportNode: Equatable, Sendable {
     case tab(ImportedTab)
     case folder(name: String, children: [ImportNode])
 
-    /// Nombre d'onglets, dossiers compris.
+    /// Number of tabs, folders included.
     static func tabCount(of nodes: [ImportNode]) -> Int {
         nodes.reduce(0) { count, node in
             switch node {
@@ -21,7 +21,7 @@ indirect nonisolated enum ImportNode: Equatable, Sendable {
         }
     }
 
-    /// Nombre de dossiers, sous-dossiers compris.
+    /// Number of folders, subfolders included.
     static func folderCount(of nodes: [ImportNode]) -> Int {
         nodes.reduce(0) { count, node in
             switch node {
@@ -31,7 +31,7 @@ indirect nonisolated enum ImportNode: Equatable, Sendable {
         }
     }
 
-    /// Onglets seuls, dossiers mis à plat, dans l'ordre.
+    /// Tabs only, folders flattened, in order.
     static func flattenedTabs(of nodes: [ImportNode]) -> [ImportedTab] {
         nodes.flatMap { node -> [ImportedTab] in
             switch node {

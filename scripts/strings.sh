@@ -1,11 +1,11 @@
 #!/bin/bash
-# Affiche les textes d'une langue des catalogues, lisibles dans le terminal : anglais → traduction.
+# Shows the texts of one language of the catalogs, readable in the terminal: English → translation.
 #
-#   scripts/strings.sh fr               tous les textes en français
-#   scripts/strings.sh de --missing     seulement ce qui manque ou est à revoir en allemand
-#   scripts/strings.sh it --comments    avec le commentaire laissé aux traducteurs
+#   scripts/strings.sh fr               all the texts in French
+#   scripts/strings.sh de --missing     only what is missing or needs review in German
+#   scripts/strings.sh it --comments    with the comment left for translators
 #
-# Langues : fr, de, es, it (en affiche les textes anglais). Ne modifie rien.
+# Languages: fr, de, es, it (en shows the English texts). Changes nothing.
 set -euo pipefail
 
 cd "$(dirname "$0")/.."
@@ -34,7 +34,7 @@ title = lambda text: paint(text, "1")
 STATES = {"translated": None, "new": "à traduire", "needs_review": "à revoir", "stale": "plus utilisé"}
 
 def units(localization):
-    """(variante, texte, état) d'une localisation : une ligne, ou une par forme du pluriel."""
+    """(variant, text, state) of a localization: one line, or one per plural form."""
     if localization is None:
         return []
     plural = localization.get("variations", {}).get("plural")

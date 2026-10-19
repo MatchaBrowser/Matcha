@@ -3,10 +3,9 @@ import OSLog
 import UniformTypeIdentifiers
 import WebKit
 
-/// « Exporter en PDF… » (tâche 5.4) : toute la page au premier plan, d'un seul tenant (`createPDF`, sans découpage en
-/// feuilles : pour des pages, « Imprimer… » puis « PDF »). La zone d'enregistrement s'ouvre en feuille sur la fenêtre
-/// de la page, avec le titre de la page pour nom ; le PDF n'est créé qu'une fois l'emplacement choisi. Une erreur est
-/// montrée dans une alerte.
+/// “Export as PDF…” (task 5.4): the whole frontmost page, in one piece (`createPDF`, without splitting into sheets:
+/// for pages, “Print…” then “PDF”). The save panel opens as a sheet on the page's window, with the page's title as
+/// name; the PDF is created only once the location is chosen. An error is shown in an alert.
 @MainActor
 enum PDFExport {
     static func start(for page: BrowserTab) {

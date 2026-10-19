@@ -1,8 +1,8 @@
 import AppKit
 import SwiftUI
 
-/// Signale la fenêtre de navigation (principale ou privée) aux extensions (tâche 6.3) : à son apparition, quand sa
-/// `NSWindow` change, et à sa disparition.
+/// Reports the browser window (main or private) to extensions (task 6.3): when it appears, when its `NSWindow`
+/// changes, and when it disappears.
 struct ExtensionWindowModifier: ViewModifier {
     let model: WindowModel
     let window: NSWindow?
@@ -16,7 +16,7 @@ struct ExtensionWindowModifier: ViewModifier {
 }
 
 extension View {
-    /// Voir `ExtensionWindowModifier`.
+    /// See `ExtensionWindowModifier`.
     func seenByExtensions(model: WindowModel, window: NSWindow?) -> some View {
         modifier(ExtensionWindowModifier(model: model, window: window))
     }

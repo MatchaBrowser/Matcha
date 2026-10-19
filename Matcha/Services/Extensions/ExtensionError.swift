@@ -1,21 +1,21 @@
 import Foundation
 
-/// Erreurs rendues aux extensions et aux appelants de `ExtensionManager` (tâche 6.3). Leur texte, en anglais, est lu
-/// par les développeurs d'extensions (console, promesse rejetée), comme les messages de WebKit : il n'est pas traduit.
+/// Errors returned to extensions and to callers of `ExtensionManager` (task 6.3). Their text, in English, is read by
+/// extension developers (console, rejected promise), like WebKit's messages: it is not translated.
 nonisolated enum ExtensionError: Error, Equatable, LocalizedError {
-    /// Matcha ne fait pas cela (fermer une fenêtre de navigation, fenêtre privée demandée par une extension…).
+    /// Matcha does not do this (closing a browser window, private window requested by an extension…).
     case unsupported(String)
-    /// L'onglet ou la fenêtre visés n'existent plus.
+    /// The targeted tab or window no longer exists.
     case notFound
-    /// Aucune fenêtre de navigation ouverte où mettre un onglet.
+    /// No browser window open to put a tab in.
     case noBrowserWindow
-    /// Identifiant d'extension invalide (`ExtensionInstallDirectory.isValidIdentifier`).
+    /// Invalid extension identifier (`ExtensionInstallDirectory.isValidIdentifier`).
     case invalidIdentifier(String)
-    /// Une extension de même identifiant est déjà chargée.
+    /// An extension with the same identifier is already loaded.
     case alreadyLoaded(String)
-    /// Aucune extension installée sous cet identifiant (dossier absent, app supprimée).
+    /// No extension installed under this identifier (folder missing, app deleted).
     case notInstalled(String)
-    /// Messages vers l'app d'une extension (`runtime.sendNativeMessage`, `connectNative`).
+    /// Messages to an extension's app (`runtime.sendNativeMessage`, `connectNative`).
     case nativeMessagingUnsupported
 
     var errorDescription: String? {

@@ -1,19 +1,19 @@
 import SwiftUI
 
-/// Une couleur d'un dossier (texte ou fond) dans son panneau : titre et sélecteur du système pour toute couleur, puis
-/// le nuancier : « Aucune couleur » et les couleurs de `FolderColorPreset`. La couleur choisie est entourée.
+/// One color of a folder (text or background) in its panel: title and system picker for any color, then the
+/// swatches: “No Color” and the colors of `FolderColorPreset`. The chosen color is circled.
 struct FolderColorRow: View {
     static let swatchSize = 13.0
-    /// Pastille et anneau de sélection.
+    /// Swatch and selection ring.
     static let cellSize = 18.0
-    /// Couleur du sélecteur tant qu'aucune n'est choisie.
+    /// Color of the picker as long as none is chosen.
     private static let unsetPickerColor = ThemeColor(red: 0.5, green: 0.5, blue: 0.5)
 
     let title: LocalizedStringKey
-    /// Nom du sélecteur de couleur pour VoiceOver et en bulle d'aide.
+    /// Name of the color picker for VoiceOver and in the tooltip.
     let pickerTitle: LocalizedStringKey
     let selection: ThemeColor?
-    /// Préfixe des identifiants d'accessibilité : « <préfixe>.red », « <préfixe>.none », « <préfixe>Picker ».
+    /// Prefix of the accessibility identifiers: “<prefix>.red”, “<prefix>.none”, “<prefix>Picker”.
     let identifier: String
     let choose: (ThemeColor?) -> Void
 
@@ -39,7 +39,7 @@ struct FolderColorRow: View {
         }
     }
 
-    /// Une couleur hors du nuancier, choisie dans le sélecteur du système, en sRGB.
+    /// A color outside the swatches, chosen in the system picker, in sRGB.
     private var pickerBinding: Binding<Color> {
         Binding {
             (selection ?? Self.unsetPickerColor).color
@@ -48,7 +48,7 @@ struct FolderColorRow: View {
         }
     }
 
-    /// Pastille d'une couleur du nuancier, ou « Aucune couleur » (`preset` nil : celle du système).
+    /// Swatch of a color from the swatches, or “No Color” (`preset` nil: the system's color).
     private func swatch(_ preset: FolderColorPreset?) -> some View {
         let isSelected = preset?.color == selection
         let name = preset.map { Text($0.title) } ?? Text("No Color", comment: "Folder color swatch: use the system color")

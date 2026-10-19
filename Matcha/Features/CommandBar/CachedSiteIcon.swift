@@ -1,7 +1,7 @@
 import SwiftUI
 
-/// Icône d'un site sans onglet ouvert (adresse tapée, historique) : celle déjà en cache pour son
-/// domaine, sinon l'initiale. Ne télécharge rien.
+/// Icon of a site with no open tab (typed address, history): the one already cached for its domain, otherwise the
+/// initial. Downloads nothing.
 struct CachedSiteIcon: View {
     let host: String?
     let service: FaviconService

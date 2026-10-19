@@ -2,15 +2,15 @@ import Foundation
 import OSLog
 import WebKit
 
-/// Aperçu (Peek, tâche 4.4) : une page ouverte par-dessus les pages affichées, hors de la barre latérale. C'est
-/// un `BrowserTab` que la barre ne connaît pas ; « Ouvrir en onglet » range ce même objet : même vue web, même
-/// historique, rien n'est rechargé. Il n'est jamais enregistré.
-/// Tâche 5.7 : une page d'aperçu plantée est visible (`isVisible`), elle se recharge.
-/// Tâche 6.3 : pour les extensions, l'aperçu ouvert est un onglet, juste après son onglet d'origine, et l'onglet actif
+/// Peek (task 4.4): a page opened on top of the displayed pages, outside the sidebar. It is a `BrowserTab` that the
+/// sidebar does not know; “Open as Tab” places this same object: same web view, same history, nothing is reloaded.
+/// It is never saved.
+/// Task 5.7: a crashed Peek page is visible (`isVisible`), so it reloads.
+/// Task 6.3: for extensions, the open Peek is a tab, right after its source tab, and the active tab
 /// (`ExtensionWindows`).
 extension TabManager {
-    /// Page au premier plan : l'aperçu s'il est ouvert, sinon l'onglet sélectionné, qui est aussi le panneau
-    /// actif d'un split (⌘R, ⌘[, ⌘], ⇧⌘C ; 5.3, 5.4).
+    /// Page in the foreground: the Peek if it is open, otherwise the selected tab, which is also the active pane
+    /// of a split (⌘R, ⌘[, ⌘], ⇧⌘C; 5.3, 5.4).
     var frontTab: BrowserTab? {
         peek?.tab ?? selectedTab
     }
@@ -19,13 +19,13 @@ extension TabManager {
         peek.map { $0.tab.webView === webView } ?? false
     }
 
-    /// Onglet rangé, ou page de l'aperçu, qui possède `webView` (`tab(for:)` reste limité aux onglets rangés).
+    /// Placed tab, or Peek page, that owns `webView` (`tab(for:)` stays limited to placed tabs).
     func tabOrPeek(for webView: WKWebView) -> BrowserTab? {
         tab(for: webView) ?? (isPeek(webView) ? peek?.tab : nil)
     }
 
-    /// Onglet après lequel ranger ce que `webView` ouvre : le sien, ou pour l'aperçu, son onglet d'origine.
-    /// Tâche 5.9 : « Ouvrir dans un nouvel onglet » depuis l'aperçu s'en sert, avec `select: false`.
+    /// Tab after which to place what `webView` opens: its own, or for the Peek, its source tab.
+    /// Task 5.9: “Open Link in New Tab” from the Peek uses it, with `select: false`.
     func insertionAnchor(for webView: WKWebView) -> BrowserTab? {
         if let tab = tab(for: webView) {
             return tab
@@ -36,15 +36,15 @@ extension TabManager {
         return tab(withID: peek.sourceTabID)
     }
 
-    /// Un aperçu ne s'ouvre que par-dessus une page affichée (l'onglet sélectionné ou un panneau de son split),
-    /// ou depuis l'aperçu lui-même, qui charge le lien.
+    /// A Peek only opens on top of a displayed page (the selected tab or a pane of its split), or from the Peek
+    /// itself, which loads the link.
     func canPeek(from source: BrowserTab) -> Bool {
         source === peek?.tab || displayedTabIDs.contains(source.id)
     }
 
-    /// Ouvre `url` dans un nouvel aperçu, avec la configuration de `source` (même profil) ; un aperçu déjà ouvert
-    /// est d'abord fermé, et un panneau de split devient le panneau actif. Depuis l'aperçu, `url` s'y charge.
-    /// Nil si `source` n'est pas affiché. Point d'entrée du menu contextuel des pages (tâche 5.9).
+    /// Opens `url` in a new Peek, with the configuration of `source` (same profile); a Peek already open is closed
+    /// first, and a split pane becomes the active pane. From the Peek, `url` loads in it.
+    /// Nil if `source` is not displayed. Entry point of the pages' context menu (task 5.9).
     @discardableResult
     func openPeek(_ url: URL, from source: BrowserTab, openingPoint: CGPoint = PeekLayout.center) -> Peek? {
         if let peek, source === peek.tab {
@@ -57,7 +57,7 @@ extension TabManager {
         }
         closePeek()
         if source.id != selectedTabID {
-            // Panneau d'un split (Maj+Entrée sur un lien) : l'aperçu appartient au panneau actif.
+            // Pane of a split (Shift+Return on a link): the Peek belongs to the active pane.
             setSelection(source.id)
         }
         let page = BrowserTab(configuration: source.configuration, openerID: source.id)
@@ -69,7 +69,7 @@ extension TabManager {
         return newPeek
     }
 
-    /// Ferme l'aperçu : sa vue web est libérée (son, processus). Ne touche pas au clavier (`PeekActions`).
+    /// Closes the Peek: its web view is released (sound, process). Does not touch the keyboard (`PeekActions`).
     func closePeek() {
         guard let peek else {
             return
@@ -79,8 +79,8 @@ extension TabManager {
         Logger.peek.debug("Aperçu fermé")
     }
 
-    /// « Ouvrir en onglet » : la page de l'aperçu devient un onglet du jour, seule, après son onglet d'origine (et
-    /// son split) et ceux déjà ouverts depuis lui (en tête s'il est épinglé ou favori), et sélectionné.
+    /// “Open as Tab”: the Peek page becomes a today tab, on its own, after its source tab (and its split) and those
+    /// already opened from it (at the top if it is pinned or a favorite), and selected.
     @discardableResult
     func openPeekAsTab() -> BrowserTab? {
         guard let peek else {

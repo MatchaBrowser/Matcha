@@ -3,13 +3,13 @@ import Foundation
 import Testing
 import WebKit
 
-/// Aperçu (Peek, tâche 4.4) par le délégué de navigation, avec de vraies vues web et les pages de `TestPages`.
-/// Un clic simulé en JavaScript n'emporte aucune touche : les clics avec Maj passent par `FakeNavigationAction`.
+/// Peek (task 4.4) through the navigation delegate, with real web views and the pages of `TestPages`.
+/// A click simulated in JavaScript carries no modifier key: Shift-clicks go through `FakeNavigationAction`.
 @MainActor
 struct NavigationCoordinatorPeekTests {
     private let manager = TabManager(websiteDataStore: .nonPersistent())
 
-    /// Onglet sélectionné sur une page locale, en tête, suivi d'un autre onglet vide.
+    /// Selected tab on a local page, at the top, followed by another empty tab.
     private func openPage() async throws -> (page: BrowserTab, other: BrowserTab) {
         let other = manager.newTab()
         let page = manager.insertTab(configuration: TestPages.configuration(), after: nil, select: true)
@@ -18,7 +18,7 @@ struct NavigationCoordinatorPeekTests {
         return (page, other)
     }
 
-    /// Envoie au délégué un clic sur `url` dans `webView` et rend les décisions prises.
+    /// Sends the delegate a click on `url` in `webView` and returns the decisions made.
     private func click(
         _ url: URL,
         in webView: WKWebView,
@@ -31,7 +31,7 @@ struct NavigationCoordinatorPeekTests {
         return recorder.policies
     }
 
-    /// Aperçu de la page locale `name`, ouvert par Maj+clic depuis `page`, une fois chargé.
+    /// Peek of the local page `name`, opened by Shift-click from `page`, once loaded.
     private func shiftClick(_ name: String, from page: BrowserTab) async throws -> Peek {
         #expect(click(TestPages.url(name), in: page.loadedWebView) == [.cancel])
         let peek = try #require(manager.peek)
@@ -53,7 +53,7 @@ struct NavigationCoordinatorPeekTests {
         let peek = try await shiftClick("cible", from: page)
         let webView = try #require(peek.tab.webView)
 
-        // Le faux n'a pas de cadre cible : c'est un lien qui ouvrirait une fenêtre, chargé dans l'aperçu.
+        // The fake has no target frame: it is a link that would open a window, loaded in the Peek.
         #expect(click(TestPages.url("deux"), in: webView) == [.cancel])
         try await waitUntil { peek.tab.title == "deux" && !peek.tab.isLoading }
         #expect(manager.peek?.id == peek.id)
@@ -95,7 +95,7 @@ struct NavigationCoordinatorPeekTests {
         let (page, _) = try await openPage()
         let peek = try await shiftClick("cible", from: page)
 
-        // Accepté par WebKit tant que l'historique de la vue n'a qu'une page.
+        // Accepted by WebKit as long as the history of the view has only one page.
         _ = try await peek.tab.loadedWebView.evaluateJavaScript("window.close(); true")
         try await waitUntil { manager.peek == nil }
         #expect(peek.tab.webView == nil)
@@ -131,7 +131,7 @@ struct NavigationCoordinatorPeekTests {
 
     @Test func `a tab that is not selected follows the link`() async throws {
         let (page, other) = try await openPage()
-        // Configuration de l'app, sans le schéma des pages de test : un lien web.
+        // App configuration, without the scheme of the test pages: a web link.
         let link = try #require(URL(string: "https://example.org/cible"))
         #expect(click(link, in: other.loadedWebView) == [.allow])
         #expect(manager.peek == nil)

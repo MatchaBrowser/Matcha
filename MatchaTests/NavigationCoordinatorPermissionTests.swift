@@ -3,9 +3,9 @@ import Foundation
 import Testing
 import WebKit
 
-/// Demandes de caméra et de micro reçues par le délégué (tâche 5.2), avec de vraies vues web. WebKit ne permet pas de
-/// créer un `WKSecurityOrigin` : les tests passent par `requestPermission`, que la méthode du délégué appelle après
-/// conversion. Une vraie demande `getUserMedia` ferait apparaître la demande d'accès de macOS : contrôle manuel.
+/// Camera and microphone requests received by the delegate (task 5.2), with real web views. WebKit does not allow
+/// creating a `WKSecurityOrigin`: the tests go through `requestPermission`, which the delegate method calls after
+/// conversion. A real `getUserMedia` request would bring up the macOS access prompt: manual check.
 @MainActor
 struct NavigationCoordinatorPermissionTests {
     private let session: BrowserSession
@@ -27,7 +27,7 @@ struct NavigationCoordinatorPermissionTests {
         manager.sitePermissions!
     }
 
-    /// Onglet sélectionné sur la page locale `name`, une fois chargée.
+    /// Selected tab on the local page `name`, once loaded.
     private func openTab(_ name: String = "visio") async throws -> BrowserTab {
         let tab = manager.insertTab(configuration: TestPages.configuration(), after: nil, select: true)
         tab.load(TestPages.url(name))
@@ -89,7 +89,7 @@ struct NavigationCoordinatorPermissionTests {
         tab.permissionPrompts.answer(.alwaysAllow)
         #expect(recorder.answers == [true])
         #expect(scope.decisions(for: TestOrigins.meet) == [.camera: .allow, .microphone: .allow])
-        // La prochaine fois, plus de bandeau.
+        // Next time, no more banner.
         request([.camera, .microphone], from: tab)
         #expect(recorder.answers == [true, true])
     }
@@ -98,7 +98,7 @@ struct NavigationCoordinatorPermissionTests {
         let tab = try await openTab()
         request([.camera], from: tab, frame: TestOrigins.other)
         #expect(tab.permissionPrompts.current?.frameName == "other.example.org")
-        // La décision vaut pour la page principale.
+        // The decision applies to the main page.
         tab.permissionPrompts.answer(.deny)
         #expect(scope.decisions(for: TestOrigins.meet) == [.camera: .deny])
         #expect(scope.decisions(for: TestOrigins.other).isEmpty)
@@ -119,7 +119,7 @@ struct NavigationCoordinatorPermissionTests {
         manager.close(tab)
         #expect(recorder.answers == [false])
 
-        // Un épinglé fermé se décharge : même refus.
+        // A closed pinned tab unloads: same refusal.
         let pinned = try await openTab("epingle")
         manager.setPlace(pinned, to: .pinned)
         request([.microphone], from: pinned)

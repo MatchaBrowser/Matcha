@@ -1,8 +1,7 @@
 import SwiftUI
 
-/// Fenêtre de navigation privée : sa propre session, en mémoire, oubliée à la fermeture de la fenêtre. Ses
-/// téléchargements terminés restent dans Téléchargements, mais quittent la liste ; ceux en cours sont annulés. Ses
-/// fenêtres de connexion (tâche 5.8) se ferment avec elle.
+/// Private browser window: its own session, in memory, forgotten when the window closes. Its finished downloads stay
+/// in Downloads but leave the list; those in progress are cancelled. Its sign-in windows (task 5.8) close with it.
 struct PrivateWindowView: View {
     @State private var session = BrowserSession.makePrivate()
     @Environment(DownloadManager.self) private var downloads

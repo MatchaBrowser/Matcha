@@ -1,9 +1,9 @@
 import XCTest
 
-/// Impression et export en PDF (tâche 5.4) : ⌘P ouvre la zone d'impression de macOS en feuille sur la fenêtre, et
-/// « Exporter au format PDF… » la zone d'enregistrement, nommée d'après la page ; ⎋ les ferme sans rien imprimer ni
-/// enregistrer. Page : la documentation de Postfix livrée avec macOS (sans réseau ; tests ignorés si elle manque). Ces
-/// tests déplacent la vraie souris.
+/// Printing and PDF export (task 5.4): ⌘P opens the macOS print panel as a sheet on the window, and “Export as
+/// PDF…” the save panel, named after the page; ⎋ closes them without printing or saving anything. Page: the
+/// Postfix documentation shipped with macOS (no network; tests skipped if it is missing). These tests move the
+/// real mouse.
 final class PrintUITests: XCTestCase {
     override func setUpWithError() throws {
         continueAfterFailure = false
@@ -29,7 +29,7 @@ final class PrintUITests: XCTestCase {
 
         app.typeKey(.escape, modifierFlags: [])
         XCTAssertTrue(sheet.waitForNonExistence(timeout: 5))
-        // La page est toujours là, seule.
+        // The page is still there, alone.
         XCTAssertEqual(tabRows(in: app).count, 1)
         XCTAssertEqual(addressPill(in: app).value as? String, "index.html")
     }
@@ -41,8 +41,8 @@ final class PrintUITests: XCTestCase {
         app.menuBars.menuItems["Exporter au format PDF…"].click()
         let sheet = windowSheet(in: app)
         XCTAssertTrue(sheet.waitForExistence(timeout: 10))
-        // La zone d'enregistrement d'une app sandboxée est dessinée par un autre processus : son champ du nom n'est
-        // vérifié que s'il est exposé.
+        // The save panel of a sandboxed app is drawn by another process: its name field is only checked if it is
+        // exposed.
         let name = sheet.textFields.firstMatch
         if name.waitForExistence(timeout: 3) {
             XCTAssertEqual(name.value as? String, "Postfix Documentation.pdf")

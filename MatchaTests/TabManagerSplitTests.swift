@@ -3,13 +3,13 @@ import Foundation
 import Testing
 import WebKit
 
-/// Split view dans le gestionnaire d'onglets : affichage, panneau actif, fermeture, rangement.
+/// Split view in the tab manager: display, active pane, closing, placement.
 @MainActor
 struct TabManagerSplitTests {
     private let manager = TabManager(websiteDataStore: .nonPersistent())
 
-    /// Onglets du jour sur `about:blank?<nom>`, dans l'ordre d'ouverture : le dernier est en tête de la barre
-    /// et sélectionné.
+    /// Today tabs on `about:blank?<name>`, in opening order: the last one is at the top of the sidebar
+    /// and selected.
     private func openTabs(_ names: [String]) async throws -> [BrowserTab] {
         let tabs = names.map { manager.newTab(url: blankPage($0)) }
         try await waitUntil { tabs.allSatisfy { $0.url != nil } }
@@ -20,7 +20,7 @@ struct TabManagerSplitTests {
         tabs.map(\.id)
     }
 
-    /// Split [t2, t1, t0] (du jour : t2, t1, t0), dont t0 est le panneau actif.
+    /// Split [t2, t1, t0] (today: t2, t1, t0), where t0 is the active pane.
     private func threePaneSplit() async throws -> [BrowserTab] {
         let tabs = try await openTabs(["t0", "t1", "t2"])
         #expect(manager.openInSplit(tabs[1]))
@@ -30,7 +30,7 @@ struct TabManagerSplitTests {
         return tabs
     }
 
-    // MARK: Ouverture et affichage
+    // MARK: Opening and display
 
     @Test func `open in split shows both tabs with the new one active`() async throws {
         let tabs = try await openTabs(["one", "two"])
@@ -40,7 +40,7 @@ struct TabManagerSplitTests {
         #expect(manager.displayedSplit?.tabIDs == ids([tabs[1], tabs[0]]))
         let allLoaded = manager.displayedTabs.allSatisfy(\.isLoaded)
         #expect(allLoaded)
-        // Déjà dans le split affiché : refusé.
+        // Already in the displayed split: refused.
         #expect(!manager.openInSplit(tabs[1]))
     }
 
@@ -100,7 +100,7 @@ struct TabManagerSplitTests {
         #expect(manager.layout.pinned == [.tab(tabs[1].id), .tab(tabs[0].id)])
     }
 
-    // MARK: Fermeture et retrait
+    // MARK: Closing and removal
 
     @Test func `closing the active today pane selects its neighbor and dissolves at one`() async throws {
         let tabs = try await threePaneSplit()
@@ -183,7 +183,7 @@ struct TabManagerSplitTests {
         #expect(manager.place(of: tabs[1]) == .favorite)
     }
 
-    // MARK: Rangement
+    // MARK: Placement
 
     @Test func `moving a whole split into pinned pins every member`() async throws {
         let tabs = try await openTabs(["a", "b", "c"])

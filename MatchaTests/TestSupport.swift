@@ -4,15 +4,15 @@ import Testing
 import WebKit
 
 extension BrowserTab {
-    /// Vue web de l'onglet, créée si besoin.
+    /// The tab's web view, created if needed.
     var loadedWebView: WKWebView {
         makeWebViewIfNeeded()
     }
 }
 
-/// Règles des splits (I1–I3), vérifiées après chaque changement dans les tests : 2 à 4 membres, une part par
-/// membre (somme 1), groupes disjoints, membres rangés hors des favoris, voisins dans un même conteneur dans
-/// l'ordre des panneaux, groupes triés par identifiant.
+/// Split rules (I1–I3), checked after every change in the tests: 2 to 4 members, one share per member (sum 1),
+/// disjoint groups, members placed outside the favorites, adjacent in the same container in pane order, groups sorted
+/// by identifier.
 func expectSplitInvariants(_ layout: SidebarLayout, sourceLocation: SourceLocation = #_sourceLocation) {
     var seen: Set<UUID> = []
     for group in layout.splits {
@@ -39,9 +39,9 @@ struct WaitTimeoutError: Error, CustomStringConvertible {
     }
 }
 
-/// Attend que `condition` devienne vraie, en la vérifiant toutes les 20 ms. 30 s par défaut : le chargement d'une page
-/// (surtout un vrai fichier, `file:`) prend moins d'une seconde seul, mais plus de 10 s quand toute la suite tourne en
-/// parallèle (vues web et fil principal partagés) ; une condition vraie n'attend pas plus longtemps pour autant.
+/// Waits until `condition` becomes true, checking it every 20 ms. 30 s by default: loading a page (especially a real
+/// file, `file:`) takes less than a second alone, but more than 10 s when the whole suite runs in parallel (web views
+/// and main thread shared); a true condition does not wait any longer because of it.
 @MainActor
 func waitUntil(timeout: Duration = .seconds(30), line: Int = #line, _ condition: () -> Bool) async throws {
     let clock = ContinuousClock()
@@ -54,9 +54,9 @@ func waitUntil(timeout: Duration = .seconds(30), line: Int = #line, _ condition:
     }
 }
 
-/// Sert des pages HTML locales sous le schéma `obtest:`, pour tester la navigation sans réseau.
-/// `obtest://pages/<nom>` renvoie une page dont le titre est `<nom>` ; le paramètre `body`
-/// fournit le contenu HTML du corps. Un nom en `.svg` renvoie une image (un carré bleu de 400 points).
+/// Serves local HTML pages under the `obtest:` scheme, to test navigation without network.
+/// `obtest://pages/<name>` returns a page whose title is `<name>`; the `body` parameter
+/// provides the HTML content of the body. A name ending in `.svg` returns an image (a blue square of 400 points).
 @MainActor
 final class TestPages: NSObject, WKURLSchemeHandler {
     static let scheme = "obtest"
@@ -72,7 +72,7 @@ final class TestPages: NSObject, WKURLSchemeHandler {
         return components.url!
     }
 
-    /// Configuration de l'app, avec en plus le schéma `obtest:`.
+    /// The app's configuration, with the `obtest:` scheme added.
     static func configuration() -> WKWebViewConfiguration {
         let configuration = WebConfigurationFactory.makeConfiguration(websiteDataStore: .nonPersistent())
         configuration.setURLSchemeHandler(TestPages(), forURLScheme: scheme)

@@ -1,22 +1,22 @@
 import Foundation
 import OSLog
 
-/// Moteur de synchro (tâche 7.4, `SYNC.md` § 2 et § 5), le même pour tous les transports. Un cycle relève les
-/// changements de ce Mac, les envoie, lit ceux des autres et les applique, puis renvoie ce qui reste en attente. L'état
-/// (`SyncState`) est enregistré après chaque étape : un cycle interrompu reprend où il en était.
+/// Sync engine (task 7.4, `SYNC.md` § 2 and § 5), the same for all transports. A cycle collects this Mac's changes,
+/// sends them, reads the others' and applies them, then sends what is still pending. The state (`SyncState`)
+/// is saved after each step: an interrupted cycle resumes where it left off.
 @MainActor
 final class SyncEngine {
-    /// Choix de la première synchro quand ce Mac et les données synchronisées ont chacun leurs données (§ 5).
+    /// Choice for the first sync when this Mac and the synced data each have their own data (§ 5).
     enum FirstSyncChoice: Sendable {
-        /// Union par identifiant ; ce qui est déjà synchronisé l'emporte.
+        /// Union by identifier; what is already synced wins.
         case merge
-        /// Ce Mac prend les données synchronisées et retire les siennes.
+        /// This Mac takes the synced data and removes its own.
         case replaceLocal
-        /// Les données de ce Mac remplacent les données synchronisées.
+        /// This Mac's data replaces the synced data.
         case replaceRemote
     }
 
-    /// Bilan d'un cycle.
+    /// Summary of a cycle.
     struct Report: Equatable, Sendable {
         var sent = 0
         var received = 0
@@ -28,11 +28,11 @@ final class SyncEngine {
     let transport: any SyncTransport
     private let file: SyncStateFile
     var detector = SyncChangeDetector()
-    /// Heure du Mac (remplacée dans les tests).
+    /// The Mac's time (replaced in tests).
     var now: () -> Date = { .now }
-    /// Choix de la première synchro quand il faut le demander ; fusionner par défaut.
+    /// Choice for the first sync when it must be asked; merge by default.
     var chooseFirstSync: @MainActor () async -> FirstSyncChoice = { .merge }
-    /// Date à laquelle relire ce Mac pour une page d'onglet du jour en attente ; nil s'il n'y en a pas.
+    /// Date at which to read this Mac again for a waiting today tab page; nil if there is none.
     private(set) var nextCheck: Date?
     private(set) var isSyncing = false
     var report = Report()
@@ -44,7 +44,7 @@ final class SyncEngine {
         state = file.load() ?? SyncState()
     }
 
-    /// Un cycle ; nil si un cycle tourne déjà (une seule synchro à la fois).
+    /// One cycle; nil if a cycle is already running (only one sync at a time).
     @discardableResult
     func sync() async throws -> Report? {
         guard !isSyncing else {
@@ -61,7 +61,7 @@ final class SyncEngine {
         } else {
             try await firstSync()
         }
-        // Changements de ce Mac plus récents que ceux lus : repartent sur la version lue.
+        // This Mac's changes that are newer than those read: sent again on top of the version read.
         try await push()
         save()
         await store.finish(using: transport)
@@ -72,9 +72,9 @@ final class SyncEngine {
         return report
     }
 
-    // MARK: Changements de ce Mac
+    // MARK: This Mac's changes
 
-    /// Relève les changements de ce Mac depuis sa dernière synchro et les met en attente d'envoi.
+    /// Collects this Mac's changes since its last sync and queues them for sending.
     func detectLocalChanges() {
         let (changes, next) = detector.changes(in: store.snapshot(), state: state, now: now())
         nextCheck = next
@@ -91,7 +91,7 @@ final class SyncEngine {
             }
             state.pending[id] = SyncPendingChange(content: content, local: fields.json)
         } else if state.entries[id]?.version == nil {
-            // Jamais arrivé sur le serveur : rien à y supprimer.
+            // Never reached the server: nothing to delete there.
             state.pending[id] = nil
             state.entries[id] = nil
         } else if let type = state.type(of: id) {

@@ -1,21 +1,21 @@
 import Foundation
 import SwiftData
 
-/// Session après des changements reçus d'un autre Mac (tâche 7.4), déjà écrits dans les enregistrements.
+/// The session after changes received from another Mac (task 7.4), already written to the records.
 extension BrowserSession {
-    /// Ce que la synchro a changé dans les enregistrements.
+    /// What sync changed in the records.
     struct SyncChanges {
         var profiles = false
         var spaces = false
-        /// Spaces dont les onglets ou les dossiers ont changé.
+        /// Spaces whose tabs or folders changed.
         var spaceContents: Set<UUID> = []
-        /// Profils dont les favoris ont changé.
+        /// Profiles whose favorites changed.
         var favorites: Set<UUID> = []
     }
 
-    /// Met les profils, les Spaces et leurs onglets en accord avec les enregistrements : un Space reçu s'ouvre, un Space
-    /// passé à un autre profil se rouvre avec les données de ce profil, l'ordre et les thèmes suivent, et chaque Space
-    /// touché reprend ses onglets (`TabManager.reconcile`).
+    /// Brings the profiles, the Spaces and their tabs in line with the records: a received Space opens, a Space moved
+    /// to another profile reopens with that profile's data, order and themes follow, and each affected Space reloads
+    /// its tabs (`TabManager.reconcile`).
     func reload(after changes: SyncChanges) {
         if changes.profiles {
             refreshProfiles()
@@ -36,15 +36,15 @@ extension BrowserSession {
     private func reloadSpaces() {
         let context = container.mainContext
         let records = (try? context.fetch(FetchDescriptor<SpaceRecord>())) ?? []
-        // Passé à un autre profil : ses onglets changent de cookies, le Space se rouvre depuis ses enregistrements (déjà à
-        // jour : l'enregistrer maintenant mêlerait les favoris des deux profils).
+        // Moved to another profile: its tabs change cookies, so the Space reopens from its records (already up to date:
+        // saving it now would mix the favorites of both profiles).
         for space in spaces where space.openedProfileID != space.record.profile?.id {
             handOverFavorites(from: space, saving: false)
             space.close()
             removeSpace(space)
             openSpace(space.record)
         }
-        // Space reçu : ses onglets sont là, aucun n'est sélectionné (rien ne se charge de lui-même à son affichage).
+        // Received Space: its tabs are there, none is selected (nothing loads by itself when it is shown).
         for record in records where !spaces.contains(where: { $0.record === record }) {
             openSpace(record).tabManager.restoreSelection(nil)
         }

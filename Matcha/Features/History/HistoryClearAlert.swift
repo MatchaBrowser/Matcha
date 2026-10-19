@@ -1,13 +1,13 @@
 import AppKit
 
-/// « Effacer l'historique… » : alerte en feuille sur la fenêtre de l'historique, un bouton par période (la dernière
-/// heure, aujourd'hui, aujourd'hui et hier, tout l'historique), puis « Annuler » (Échap). Une `NSAlert` et non
-/// `confirmationDialog` : sous macOS, SwiftUI n'y montre que quatre boutons ; avec un cinquième, la dernière période
-/// disparaît et « Annuler » devient « OK » (`DECISIONS.md`).
+/// “Clear History…”: a sheet alert on the history window, one button per period (the last hour, today, today and
+/// yesterday, all history), then “Cancel” (Esc). An `NSAlert` rather than `confirmationDialog`: on macOS, SwiftUI
+/// only shows four buttons there; with a fifth, the last period disappears and “Cancel” becomes “OK”
+/// (`DECISIONS.md`).
 @MainActor
 enum HistoryClearAlert {
-    /// `profileName` : nom du profil montré quand il y en a plusieurs. `clear` reçoit la période choisie ; rien pour
-    /// « Annuler ». Sans fenêtre (ou si elle a déjà une feuille), l'alerte est une fenêtre à part.
+    /// `profileName`: name of the profile shown when there are several. `clear` receives the chosen period; nothing
+    /// for “Cancel”. Without a window (or if it already has a sheet), the alert is a separate window.
     static func present(in window: NSWindow?, profileName: String?, clear: @escaping (HistoryPeriod) -> Void) {
         let alert = NSAlert()
         alert.messageText = String(localized: "Clear History", comment: "Title of the dialog that clears the history")
@@ -28,7 +28,7 @@ enum HistoryClearAlert {
         }
     }
 
-    /// Période du bouton `response` (dans l'ordre de `HistoryPeriod.allCases`) ; nil pour « Annuler ».
+    /// Period of the `response` button (in the order of `HistoryPeriod.allCases`); nil for “Cancel”.
     nonisolated static func period(for response: NSApplication.ModalResponse) -> HistoryPeriod? {
         let index = response.rawValue - NSApplication.ModalResponse.alertFirstButtonReturn.rawValue
         return HistoryPeriod.allCases.indices.contains(index) ? HistoryPeriod.allCases[index] : nil

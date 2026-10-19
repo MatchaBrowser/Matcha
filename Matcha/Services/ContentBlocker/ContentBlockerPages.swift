@@ -1,10 +1,10 @@
 import Foundation
 import WebKit
 
-/// Pages suivies par le bloqueur (tâche 6.2), par contrôleur de contenu : chaque page a le sien
-/// (`WebConfigurationFactory.pageConfiguration`), ce qui permet de poser ou de retirer les listes page par page. Pour
-/// chacune : sa vue web (rechargée quand l'exception de son site change), sa session (`ContentBlockerScope`), le site de
-/// son document principal et si les listes y sont posées. Références faibles : une page fermée sort d'elle-même.
+/// Pages tracked by the blocker (task 6.2), by content controller: each page has its own
+/// (`WebConfigurationFactory.pageConfiguration`), which lets lists be added or removed page by page. For each one:
+/// its web view (reloaded when its website's exception changes), its session (`ContentBlockerScope`), the website of
+/// its main document, and whether the lists are added to it. Weak references: a closed page drops out on its own.
 @MainActor
 struct ContentBlockerPages {
     struct Page {
@@ -17,16 +17,16 @@ struct ContentBlockerPages {
 
     private var pages: [ObjectIdentifier: Page] = [:]
 
-    /// Pages suivies encore ouvertes.
+    /// Tracked pages that are still open.
     var count: Int {
         pages.values.count { $0.controller != nil }
     }
 
-    /// Suit (ou met à jour) la page de `webView`, qui va afficher un document de `site` ; renvoie sa clé.
+    /// Tracks (or updates) the page of `webView`, which is about to show a document from `site`; returns its key.
     mutating func track(_ webView: WKWebView, site: String?, scope: ContentBlockerScope?) -> ObjectIdentifier {
         let controller = webView.configuration.userContentController
         let key = ObjectIdentifier(controller)
-        // Une clé peut resservir à un nouveau contrôleur à la même adresse : l'ancienne page est alors oubliée.
+        // A key can be reused by a new controller at the same address: the old page is then forgotten.
         var page = pages[key].flatMap { $0.controller === controller ? $0 : nil } ?? Page(controller: controller)
         page.webView = webView
         page.scope = scope
@@ -35,8 +35,8 @@ struct ContentBlockerPages {
         return key
     }
 
-    /// Pose ou retire `lists` sur chaque page (ou seulement celle de `key`) selon `blocks` ; renvoie les pages qui ont
-    /// changé. Les pages fermées sont oubliées au passage.
+    /// Adds or removes `lists` on each page (or only the one for `key`) according to `blocks`; returns the pages that
+    /// changed. Closed pages are forgotten along the way.
     @discardableResult
     mutating func apply(_ lists: [WKContentRuleList], only key: ObjectIdentifier? = nil, blocks: (Page) -> Bool) -> [Page] {
         pages = pages.filter { $0.value.controller != nil }

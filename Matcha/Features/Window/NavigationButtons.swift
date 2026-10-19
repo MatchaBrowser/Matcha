@@ -1,11 +1,11 @@
 import SwiftUI
 
-/// Précédent, suivant, recharger (ou arrêter) pour l'onglet, puis Accueil si demandé.
-/// Le conteneur choisit le style des boutons.
+/// Back, forward, reload (or stop) for the tab, then Home if requested.
+/// The container chooses the button style.
 struct NavigationButtons: View {
     let tab: BrowserTab?
     var showsHistoryButtons = true
-    /// Action du bouton Accueil ; nil pour ne pas l'afficher.
+    /// Action of the Home button; nil to hide it.
     var goHome: (() -> Void)?
 
     var body: some View {

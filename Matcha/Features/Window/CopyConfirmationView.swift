@@ -1,10 +1,10 @@
 import Accessibility
 import SwiftUI
 
-/// Petite capsule « URL copiée » en bas de la carte de contenu : apparaît en fondu, reste 1,5 s puis
-/// disparaît en fondu. Elle ne prend jamais le clavier ni les clics ; VoiceOver annonce chaque copie.
+/// Small “URL Copied” capsule at the bottom of the content card: fades in, stays 1.5 s, then fades out. It never
+/// takes the keyboard or clicks; VoiceOver announces each copy.
 struct CopyConfirmationView: View {
-    /// Écart avec le bas de la carte.
+    /// Gap with the bottom of the card.
     static let bottomMargin = 16.0
 
     let model: CopyConfirmationModel
@@ -35,8 +35,8 @@ struct CopyConfirmationView: View {
         .padding(.horizontal, 14)
         .padding(.vertical, 8)
         .background {
-            // Matériau comme la barre de commande, en plus épais : en sombre sur une page claire, le
-            // matériau normal tourne au gris moyen et le texte blanc devient peu lisible.
+            // Material like the command bar, but thicker: in dark mode on a light page, the regular material turns
+            // medium gray and white text becomes hard to read.
             Capsule()
                 .fill(.thickMaterial)
                 .shadow(color: .black.opacity(0.2), radius: 10, y: 4)
@@ -50,8 +50,8 @@ struct CopyConfirmationView: View {
         .accessibilityIdentifier("copyConfirmation")
     }
 
-    /// Priorité haute : VoiceOver lit aussi la fermeture du menu ou le passage du clavier à la page,
-    /// qui couperaient une annonce de priorité normale.
+    /// High priority: VoiceOver also reads the menu closing or the keyboard moving to the page, which would cut off
+    /// a normal-priority announcement.
     private static var announcement: AttributedString {
         var announcement = AttributedString(message)
         announcement.accessibilitySpeechAnnouncementPriority = .high

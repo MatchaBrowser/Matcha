@@ -1,18 +1,18 @@
 import Foundation
 import XCTest
 
-/// Outils des tests des téléchargements (tâche 5.1), sans réseau : un fichier livré avec macOS que WebKit n'affiche
-/// pas, ouvert depuis la barre de commande, est téléchargé.
+/// Helpers for the downloads tests (task 5.1), without network: a file shipped with macOS that WebKit doesn't
+/// display, opened from the command bar, is downloaded.
 ///
-/// L'app écrit dans ~/Downloads/MatchaUITests (arguments `downloadsSubfolder` et `resetDownloadsSubfolder`), jamais à
-/// côté des fichiers de l'utilisateur. Le lanceur des tests est sandboxé par Xcode, en lecture seule sur tout le
-/// disque : il lit le fichier et son attribut de quarantaine, mais ne peut rien effacer. C'est l'app, relancée avec
-/// `resetDownloadsSubfolder`, qui efface le dossier (`removeDownloadsTestFolder`, à la fin de chaque test).
+/// The app writes to ~/Downloads/MatchaUITests (arguments `downloadsSubfolder` and `resetDownloadsSubfolder`),
+/// never next to the user's files. The test runner is sandboxed by Xcode, read-only on the whole disk: it reads
+/// the file and its quarantine attribute, but can't delete anything. It is the app, relaunched with
+/// `resetDownloadsSubfolder`, that deletes the folder (`removeDownloadsTestFolder`, at the end of each test).
 extension XCTestCase {
     static let downloadsTestFolderName = "MatchaUITests"
-    /// Réglages de lancement : téléchargements dans le dossier de test, vidé au lancement.
+    /// Launch settings: downloads in the test folder, emptied at launch.
     static let downloadsTestSettings = ["downloadsSubfolder": downloadsTestFolderName, "resetDownloadsSubfolder": "YES"]
-    /// Fichiers livrés avec macOS que WebKit n'affiche pas ; le premier présent sert (les mêmes que dans
+    /// Files shipped with macOS that WebKit doesn't display; the first one present is used (the same as in
     /// `DownloadIntegrationTests`).
     static let undisplayableFiles = [
         "/usr/share/firmware/bluetooth/20702_8289.dfu",
@@ -20,13 +20,13 @@ extension XCTestCase {
         "/usr/share/tokenizer/th/matrix.bin",
     ]
 
-    /// ~/Downloads/MatchaUITests, dans le vrai dossier personnel (celui du lanceur sandboxé est son conteneur).
+    /// ~/Downloads/MatchaUITests, in the real home folder (the sandboxed runner's one is its container).
     var downloadsTestFolder: URL {
         let home = getpwuid(getuid()).map { String(cString: $0.pointee.pw_dir) } ?? NSHomeDirectory()
         return URL(fileURLWithPath: home).appendingPathComponent("Downloads").appendingPathComponent(Self.downloadsTestFolderName)
     }
 
-    /// Fichier à télécharger ; le test est ignoré s'il n'y en a aucun.
+    /// File to download; the test is skipped if there is none.
     func undisplayableFile() throws -> String {
         guard let path = Self.undisplayableFiles.first(where: FileManager.default.isReadableFile(atPath:)) else {
             throw XCTSkip("Aucun fichier non affichable livré avec macOS")
@@ -34,7 +34,7 @@ extension XCTestCase {
         return path
     }
 
-    /// Ouvre `path` (fichier local) dans un nouvel onglet de `window` (l'app si nil) : il est téléchargé.
+    /// Opens `path` (local file) in a new tab of `window` (the app if nil): it gets downloaded.
     @MainActor
     func download(_ path: String, in app: XCUIApplication, window: XCUIElement? = nil) {
         let field = openCommandBar(in: app, window: window)
@@ -47,7 +47,7 @@ extension XCTestCase {
         scope.buttons["downloadsButton"]
     }
 
-    /// `scope` : l'app, ou une fenêtre précise (chaque fenêtre a son panneau).
+    /// `scope`: the app, or a specific window (each window has its own panel).
     @MainActor
     func downloadsPanel(in scope: XCUIElement) -> XCUIElement {
         scope.descendants(matching: .any).matching(identifier: "downloadsPanel").firstMatch
@@ -58,26 +58,26 @@ extension XCTestCase {
         scope.descendants(matching: .any).matching(identifier: "downloadRow")
     }
 
-    /// Texte « Aucun téléchargement » du panneau vide.
+    /// “No Downloads” text of the empty panel.
     @MainActor
     func downloadsEmptyState(in scope: XCUIElement) -> XCUIElement {
         scope.descendants(matching: .any).matching(identifier: "downloadsEmptyState").firstMatch
     }
 
-    /// Bouton « Afficher le dossier Téléchargements » du panneau vide ; jamais cliqué par les tests (il ouvrirait le
-    /// Finder). Cherché par son identifiant seul : son style de lien peut en faire un lien pour l'accessibilité.
+    /// “Show Downloads Folder” button of the empty panel; never clicked by the tests (it would open the
+    /// Finder). Looked up by its identifier only: its link style may make it a link for accessibility.
     @MainActor
     func downloadsShowFolderButton(in scope: XCUIElement) -> XCUIElement {
         scope.descendants(matching: .any).matching(identifier: "downloadsShowFolderButton").firstMatch
     }
 
-    /// Présentation > « Afficher les téléchargements » / « Masquer les téléchargements » (⌥⌘L).
+    /// View > “Show Downloads” / “Hide Downloads” (⌥⌘L).
     @MainActor
     func toggleDownloadsWithKeyboard(in app: XCUIApplication) {
         app.typeKey("l", modifierFlags: [.command, .option])
     }
 
-    /// Valeur de `com.apple.quarantine` (« drapeaux;date;app;événement »), nil si le fichier ne la porte pas.
+    /// Value of `com.apple.quarantine` (“flags;date;app;event”), nil if the file doesn't carry it.
     func quarantineAttribute(of file: URL) -> String? {
         let length = getxattr(file.path, "com.apple.quarantine", nil, 0, 0, 0)
         guard length > 0 else {
@@ -90,7 +90,7 @@ extension XCTestCase {
         return String(bytes: buffer, encoding: .utf8)
     }
 
-    /// Relance l'app avec `resetDownloadsSubfolder` : elle efface le dossier de test au lancement, puis se ferme.
+    /// Relaunches the app with `resetDownloadsSubfolder`: it deletes the test folder at launch, then quits.
     @MainActor
     func removeDownloadsTestFolder() {
         let app = launchApp(settings: Self.downloadsTestSettings)

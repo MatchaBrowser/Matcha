@@ -13,7 +13,7 @@ struct SpaceStoreTests {
         container = try BrowserSchema.makeContainer(inMemory: true)
     }
 
-    /// Profil et Space enregistrés, vides.
+    /// Stored profile and Space, empty.
     private func makeStore() -> SpaceStore {
         let context = container.mainContext
         let profile = ProfileRecord(name: "Personnel")
@@ -23,7 +23,7 @@ struct SpaceStoreTests {
         return SpaceStore(space: space, context: context)
     }
 
-    /// Favori, épinglé dans un dossier, épinglé, deux onglets du jour : tous chargés avec une page.
+    /// Favorite, pinned tab in a folder, pinned tab, two today tabs: all loaded with a page.
     private func fillManager() async throws -> [BrowserTab] {
         let tabs = (0 ..< 5).map { index in manager.newTab(url: URL(string: "about:blank#\(index)")) }
         try await waitUntil { tabs.allSatisfy { $0.url != nil && !$0.isLoading } }
@@ -48,8 +48,8 @@ struct SpaceStoreTests {
         #expect(store.space.folders?.first?.name == "Travail")
     }
 
-    /// Icône et couleurs des dossiers (sous-dossiers compris) : enregistrées en texte court, relues à l'identique ;
-    /// « Réinitialiser » vide les champs.
+    /// Icon and colors of the folders (subfolders included): stored as short text, read back identically; “Reset”
+    /// clears the fields.
     @Test func `folder appearances are saved and loaded back`() async throws {
         let store = makeStore()
         _ = try await fillManager()
@@ -104,7 +104,7 @@ struct SpaceStoreTests {
         let tab = manager.newTab()
         manager.setPlace(tab, to: .pinned)
         #expect(store.space.tabs?.isEmpty != false)
-        // Délai par défaut (10 s) : avec tous les tests en parallèle, l'enregistrement attend le fil principal.
+        // Default timeout (10 s): with all the tests in parallel, saving waits for the main thread.
         try await waitUntil { store.space.tabs?.first?.id == tab.id }
         #expect(store.space.tabs?.first?.place == .pinned)
     }
@@ -128,7 +128,7 @@ struct SpaceStoreTests {
             #expect(records[tab.id]?.splitFraction == 0)
         }
 
-        // Relance : le split revient, et chacun de ses panneaux crée sa vue web à l'affichage.
+        // Relaunch: the split comes back, and each of its panes creates its web view when shown.
         let (stored, layout) = SpaceStore(space: store.space, context: container.mainContext).load()
         #expect(layout == manager.layout)
         let restored = TabManager(websiteDataStore: .nonPersistent())
@@ -159,7 +159,7 @@ struct SpaceStoreTests {
 
         manager.restore(tabs: stored, layout: layout)
         #expect(manager.layout == layout)
-        // Le plus récemment utilisé est sélectionné ; rien ne se charge avant l'affichage du Space.
+        // The most recently used one is selected; nothing loads before the Space is shown.
         #expect(manager.selectedTab?.id == ids[2])
         #expect(manager.tabs.allSatisfy { !$0.isLoaded })
         manager.loadSelectedTab()
@@ -170,7 +170,7 @@ struct SpaceStoreTests {
     }
 
     @Test func `tabs never used are not selected on restore`() {
-        // Onglets importés (tâche 7.1) : `distantPast`, jamais sélectionnés d'eux-mêmes.
+        // Imported tabs (task 7.1): `distantPast`, never selected on their own.
         let ids = [UUID(), UUID()]
         let stored = ids.map { StoredTab(id: $0, url: URL(string: "about:blank"), lastActivity: .distantPast) }
         var layout = SidebarLayout()

@@ -1,18 +1,17 @@
 import Foundation
 
-/// Ce que la barre de commande lit dans l'historique (`HistorySource`).
+/// What the command bar reads from the history (`HistorySource`).
 nonisolated extension HistoryIndex {
-    /// Adresses qui correspondent à `query` selon `CommandMatcher` (le même que `CommandRanker`), donc un
-    /// sur-ensemble de ce que la barre gardera ; au plus `limit`, les meilleures dans l'ordre du classement :
-    /// palier, tranche approximative, fréquence et récence, dernière visite, clé. Un masque de caractères écarte
-    /// d'abord les adresses qui ne peuvent pas correspondre, sans les comparer une à une. Rien si la tâche en cours
-    /// est annulée (une frappe plus récente).
+    /// Addresses that match `query` according to `CommandMatcher` (the same as `CommandRanker`), hence a superset of
+    /// what the bar will keep; at most `limit`, the best ones in ranking order: tier, approximate band, frequency and
+    /// recency, last visit, key. A character mask first rules out the addresses that cannot match, without comparing
+    /// them one by one. Nothing if the current task is cancelled (a more recent keystroke).
     func entries(matching query: CommandQuery, limit: Int, now: Date) -> [HistoryEntry] {
         guard !query.isEmpty, limit > 0 else {
             return []
         }
-        // Tout palier demande les lettres et chiffres de l'adresse tapée sans « https:// » ni « www. » (le plus
-        // petit des textes comparés), sauf la même page, qui passe par la clé.
+        // Every tier requires the letters and digits of the typed address without “https://” or “www.” (the
+        // shortest of the compared texts), except the same page, which goes through the key.
         let required = HistoryCharacterMask([query.urlFolded])
         var matches: [Match] = []
         for (offset, entry) in entries.values.enumerated() {
@@ -34,7 +33,7 @@ nonisolated extension HistoryIndex {
         return matches.prefix(limit).map(\.entry.historyEntry)
     }
 
-    /// Adresse retenue et ce qui sert à la classer.
+    /// A kept address and what is used to rank it.
     private struct Match {
         let entry: HistoryIndexEntry
         let match: CommandMatch

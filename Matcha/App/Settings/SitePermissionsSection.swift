@@ -1,7 +1,7 @@
 import SwiftUI
 
-/// Réglages > Confidentialité : les décisions retenues par site (caméra, micro), chacune avec un bouton pour
-/// l'oublier (tâche 5.2). Le profil est nommé dès qu'il y en a plusieurs. Les fenêtres privées n'y figurent pas.
+/// Settings > Privacy: the decisions remembered per site (camera, microphone), each with a button to forget it
+/// (task 5.2). The profile is named as soon as there are several. Private windows are not listed.
 struct SitePermissionsSection: View {
     static let rowHeight = 30.0
     static let maximumListHeight = 210.0
@@ -23,7 +23,7 @@ struct SitePermissionsSection: View {
                         }
                     }
                 }
-                // La fenêtre des réglages prend la hauteur de son contenu : la liste défile au-delà de quelques lignes.
+                // The settings window takes the height of its content: the list scrolls beyond a few rows.
                 .scrollDisabled(false)
                 .frame(height: min(Double(entries.count) * Self.rowHeight, Self.maximumListHeight))
             }

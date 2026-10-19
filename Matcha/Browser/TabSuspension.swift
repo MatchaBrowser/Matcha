@@ -1,43 +1,43 @@
 import AppKit
 import Observation
 
-/// Capture posée sur une page sortie de veille, le temps de son rechargement.
+/// Snapshot laid over a page woken from sleep, while it reloads.
 struct TabCover {
     let image: NSImage
-    /// Largeur de la page capturée, en points.
+    /// Width of the captured page, in points.
     let pageWidth: Double
 }
 
-/// Mise en veille d'un onglet pour libérer sa mémoire (tâche 5.6, `TabLifecycleService`). En veille, l'onglet n'a plus
-/// de vue web mais garde son adresse, son titre, son icône et son état de navigation : la barre latérale l'affiche comme
-/// avant, et il se recrée quand on l'affiche. Sa capture, prise avant la veille, couvre alors la page recréée le temps
-/// de son premier chargement, au plus `coverDuration` ; pendant ce rechargement, un titre vide ou une adresse absente de
-/// la vue web neuve ne remplacent pas ceux de l'onglet.
+/// Putting a tab to sleep to free its memory (task 5.6, `TabLifecycleService`). While asleep, the tab no longer has a
+/// web view but keeps its address, title, icon and navigation state: the sidebar displays it as before, and it is
+/// recreated when it is shown. Its snapshot, taken before sleep, then covers the recreated page during its first load,
+/// for at most `coverDuration`; during this reload, an empty title or a missing address in the new web view do not
+/// replace those of the tab.
 @MainActor
 @Observable
 final class TabSuspension {
-    /// Durée maximale de la capture par-dessus la page recréée : au-delà, la page se montre même en cours de chargement.
+    /// Maximum duration of the snapshot over the recreated page: beyond it, the page shows itself even while loading.
     static let coverDuration = Duration.seconds(2)
-    /// Fin du rechargement sans réponse de la page : le titre et l'adresse suivent de nouveau la vue web.
+    /// End of the reload with no answer from the page: the title and address follow the web view again.
     static let restoreTimeout = Duration.seconds(10)
 
-    /// Page suivie : relue à la fin du rechargement.
+    /// Followed page: read again at the end of the reload.
     @ObservationIgnored weak var page: BrowserTab?
-    /// Vrai pendant la veille.
+    /// True while asleep.
     private(set) var isSuspended = false
-    /// Capture montrée par-dessus la page recréée, tant qu'elle n'est pas chargée.
+    /// Snapshot shown over the recreated page, as long as it is not loaded.
     private(set) var cover: TabCover?
-    /// Capture gardée pendant la veille.
+    /// Snapshot kept while asleep.
     @ObservationIgnored private(set) var snapshot: TabSnapshot?
-    /// Moment de la mise en veille (les captures les plus anciennes partent les premières).
+    /// Moment the tab was put to sleep (the oldest snapshots go first).
     @ObservationIgnored private(set) var suspendedAt: Date?
-    /// Vrai de la recréation de la vue jusqu'à la fin de son premier chargement.
+    /// True from the recreation of the view until the end of its first load.
     @ObservationIgnored private(set) var isRestoring = false
-    /// Adresse de la page capturée qui couvre la page recréée.
+    /// Address of the captured page that covers the recreated page.
     @ObservationIgnored private var coverURL: URL?
     @ObservationIgnored private var restoreTask: Task<Void, Never>?
 
-    /// La vue web vient d'être libérée.
+    /// The web view has just been released.
     func didSuspend(snapshot: TabSnapshot?, at date: Date) {
         reset()
         isSuspended = true
@@ -45,7 +45,7 @@ final class TabSuspension {
         suspendedAt = date
     }
 
-    /// La vue web est recréée pour afficher `url` : la capture la couvre si elle montre cette adresse.
+    /// The web view is recreated to display `url`: the snapshot covers it if it shows that address.
     func didResume(url: URL?) {
         guard isSuspended else {
             return
@@ -72,14 +72,14 @@ final class TabSuspension {
         }
     }
 
-    /// L'adresse de la page recréée a changé : une capture d'une autre page ne la couvre plus.
+    /// The address of the recreated page changed: a snapshot of another page no longer covers it.
     func pageURLDidChange(to url: URL?) {
         if let url, url != coverURL {
             dropCover()
         }
     }
 
-    /// Premier chargement terminé ou échoué, autre navigation demandée : la capture part, l'onglet suit la vue web.
+    /// First load finished or failed, other navigation requested: the snapshot goes away, the tab follows the web view.
     func endRestoring() {
         guard isRestoring else {
             return
@@ -91,13 +91,13 @@ final class TabSuspension {
         page?.syncWithWebView()
     }
 
-    /// Le service garde un nombre limité de captures : celle-ci part, la veille continue.
+    /// The service keeps a limited number of snapshots: this one goes away, the sleep continues.
     func discardSnapshot() {
         snapshot = nil
     }
 
-    /// Onglet déchargé, ramené à une autre adresse ou fermé : plus de veille ni de capture. Les valeurs observées ne
-    /// sont écrites que si elles changent : la barre latérale n'est pas redessinée pour rien.
+    /// Tab unloaded, brought back to another address or closed: no more sleep or snapshot. The observed values are
+    /// only written if they change: the sidebar is not redrawn for nothing.
     func reset() {
         restoreTask?.cancel()
         restoreTask = nil
@@ -110,7 +110,7 @@ final class TabSuspension {
         suspendedAt = nil
     }
 
-    /// Retire la capture de la page ; la valeur observée n'est écrite que si elle change.
+    /// Removes the snapshot from the page; the observed value is only written if it changes.
     private func dropCover() {
         if cover != nil {
             cover = nil

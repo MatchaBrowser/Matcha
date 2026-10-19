@@ -1,7 +1,7 @@
 import SwiftUI
 
-/// Contenu d'une mini-fenêtre : fond aux couleurs du Space visé, barre d'outils minimale, page dans une carte, et
-/// la barre de commande sous la barre d'outils.
+/// Content of a mini window: background in the target Space's colors, minimal toolbar, page in a card, and the
+/// command bar below the toolbar.
 struct MiniWindowView: View {
     static let cardMargin = 6.0
     static let cardCornerRadius = 8.0
@@ -17,7 +17,7 @@ struct MiniWindowView: View {
         controller.tab
     }
 
-    /// Space où « Ouvrir dans … » enverrait la page maintenant.
+    /// Space where “Open in …” would send the page now.
     private var target: SpaceSession {
         manager.defaultTarget(profileID: controller.profileID)
     }
@@ -54,20 +54,20 @@ struct MiniWindowView: View {
         }
         .ignoresSafeArea()
         .background {
-            // Tirer sur le fond (zones vides de la barre) déplace la fenêtre.
+            // Dragging the background (empty areas of the bar) moves the window.
             SpaceBackground(theme: target.theme)
                 .gesture(WindowDragGesture())
                 .allowsWindowActivationEvents(true)
         }
-        // Titre invisible, lu par VoiceOver, Mission Control et le menu Fenêtre.
+        // Invisible title, read by VoiceOver, Mission Control and the Window menu.
         .onChange(of: windowTitle, initial: true) { _, title in controller.panel.title = title }
-        // Moteur ou suggestions changés dans les Réglages pendant que la barre reste ouverte.
+        // Engine or suggestions changed in Settings while the bar stays open.
         .onChange(of: settings) { _, settings in controller.commandBar.apply(settings) }
     }
 
-    /// Page de la mini-fenêtre (conteneur AppKit, jamais recréé), ou une invite tant qu'elle n'a rien chargé, ou le
-    /// message d'une page plantée plusieurs fois de suite (tâche 5.7) ; au-dessus, sa barre de recherche (tâche 5.3) et
-    /// le bandeau de ses demandes de permission (tâche 5.2).
+    /// The mini window's page (AppKit container, never recreated), or a prompt as long as it has loaded nothing, or
+    /// the message of a page that crashed several times in a row (task 5.7); above it, its find bar (task 5.3) and
+    /// the banner of its permission requests (task 5.2).
     private var page: some View {
         VStack(spacing: 0) {
             FindBar(page: tab)

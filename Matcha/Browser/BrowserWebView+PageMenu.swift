@@ -2,18 +2,18 @@ import AppKit
 import OSLog
 import WebKit
 
-/// Ce que le menu contextuel d'une page demande au délégué d'interface de sa vue web (`NavigationCoordinator`).
+/// What the context menu of a page asks of the UI delegate of its web view (`NavigationCoordinator`).
 @MainActor
 protocol PageMenuDelegate: AnyObject {
-    /// Vrai si « Ouvrir dans un aperçu » a un sens dans `webView` : un onglet de la barre (ni l'aperçu, où un lien
-    /// se charge déjà sur place, ni une mini-fenêtre ou une fenêtre de connexion, qui n'ont pas d'aperçu).
+    /// True if “Open Link in Peek” makes sense in `webView`: a tab of the sidebar (not Peek, where a link already loads
+    /// in place, nor a mini window or a sign-in window, which have no Peek).
     func pageMenuOffersPeek(in webView: WKWebView) -> Bool
-    /// Enregistrer sous…, Imprimer…, Afficher le code source, choisis dans le menu de la page de `webView`.
+    /// Save As…, Print…, View Page Source, chosen in the page menu of `webView`.
     func pageMenu(perform command: PageCommand, in webView: WKWebView)
 }
 
-/// Élément de Matcha dans le menu : ce qu'il fait, l'élément de WebKit qu'il déclenche et le point d'où un aperçu
-/// grandirait.
+/// Matcha item in the menu: what it does, the WebKit item it triggers and the point from which a Peek would
+/// grow.
 final class PageMenuChoice: NSObject {
     let item: PageMenuItem
     let original: NSMenuItem
@@ -26,17 +26,16 @@ final class PageMenuChoice: NSObject {
     }
 }
 
-/// Menu contextuel des pages (tâche 5.9). « Ouvrir le lien dans un nouvel onglet » et « Ouvrir l'image dans un nouvel
-/// onglet » prennent la place des éléments « … dans une nouvelle fenêtre » de WebKit ; « Ouvrir dans un aperçu » suit
-/// le premier, dans les onglets. Le reste (« Copier le lien », « Télécharger le fichier lié », « Inspecter l'élément »
-/// avec les outils pour développeurs…) est le menu de WebKit, inchangé ; sans les identifiants attendus, le menu entier
-/// l'est.
+/// Context menu of pages (task 5.9). “Open Link in New Tab” and “Open Image in New Tab” take the place of WebKit's
+/// “… in New Window” items; “Open Link in Peek” follows the first one, in tabs. The rest (“Copy Link”, “Download
+/// Linked File”, “Inspect Element” with the developer tools…) is WebKit's menu, unchanged; without the expected
+/// identifiers, the whole menu is left unchanged.
 ///
-/// Un élément de Matcha retient le choix (`pageMenuIntent`) puis déclenche l'élément de WebKit qu'il remplace, par
-/// `NSApp.sendAction` avec l'action, la cible et l'élément de WebKit eux-mêmes : WebKit ouvre alors la fenêtre du lien,
-/// que `NavigationCoordinator` range selon le choix.
+/// A Matcha item records the choice (`pageMenuIntent`) then triggers the WebKit item it replaces, through
+/// `NSApp.sendAction` with the WebKit item's own action, target and item: WebKit then opens the link's window, which
+/// `NavigationCoordinator` places according to the choice.
 extension BrowserWebView {
-    /// Réécrit `menu`, que WebKit s'apprête à ouvrir. Un choix encore en attente (menu précédent) est oublié.
+    /// Rewrites `menu`, which WebKit is about to open. A choice still pending (previous menu) is forgotten.
     func rewritePageMenu(_ menu: NSMenu) {
         pageMenuIntent.cancel()
         if addPageCommands(to: menu) {
@@ -47,12 +46,12 @@ extension BrowserWebView {
         guard !replacements.isEmpty else {
             return
         }
-        // À l'ouverture du menu, le pointeur est sur l'élément cliqué.
+        // When the menu opens, the pointer is over the clicked element.
         let openingPoint = pointerPeekPoint
-        // De la fin vers le début : la place des éléments suivants ne bouge pas.
+        // From the end to the start: the position of the following items does not move.
         for replacement in replacements.reversed() {
             let original = menu.items[replacement.index]
-            // Sans action, l'élément de WebKit ne pourrait pas être déclenché : il reste.
+            // Without an action, the WebKit item could not be triggered: it stays.
             guard original.action != nil else {
                 continue
             }
@@ -69,9 +68,9 @@ extension BrowserWebView {
         menuItem.identifier = NSUserInterfaceItemIdentifier(choice.item.identifier)
         menuItem.target = self
         menuItem.representedObject = choice
-        // WebKit ne laisse pas AppKit activer ses éléments (`autoenablesItems` faux) : on reprend l'état du sien.
+        // WebKit does not let AppKit enable its items (`autoenablesItems` false): we copy the state of its own item.
         menuItem.isEnabled = choice.original.isEnabled
-        // Icônes des menus (macOS 26 et plus) : seulement si WebKit en met une aux siens.
+        // Menu icons (macOS 26 and later): only if WebKit puts one on its own items.
         if choice.original.image != nil {
             menuItem.image = NSImage(systemSymbolName: choice.item.symbolName, accessibilityDescription: nil)
         }
@@ -93,8 +92,8 @@ extension BrowserWebView {
 }
 
 extension WKWebView {
-    /// Point d'où l'aperçu grandit : le pointeur, en fractions de la vue web (origine en haut à gauche) ; le centre
-    /// hors d'une fenêtre.
+    /// Point from which Peek grows: the pointer, as fractions of the web view (origin at the top left); the center
+    /// outside a window.
     var pointerPeekPoint: CGPoint {
         guard let window else {
             return PeekLayout.center
@@ -125,7 +124,7 @@ private extension PageMenuItem {
         }
     }
 
-    /// Pour le journal : jamais l'adresse.
+    /// For the log: never the address.
     var logName: String {
         switch self {
         case .openLinkInNewTab:

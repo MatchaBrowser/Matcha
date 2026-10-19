@@ -3,15 +3,15 @@ import Foundation
 import Testing
 import WebKit
 
-/// Extensions synchronisées (tâche 7.4, `SYNC.md` § 2.5) : deux Mac simulés (dossiers temporaires), un serveur en
-/// mémoire, l'extension d'essai des tests d'installation.
+/// Synced extensions (task 7.4, `SYNC.md` § 2.5): two simulated Macs (temporary folders), an in-memory server, the
+/// test extension of the installation tests.
 @MainActor
 struct ExtensionSyncTests {
     private let root: URL
     private let server = InMemorySyncServer()
     private let identifier = "matcha-test-extension"
 
-    /// Un Mac : son gestionnaire d'extensions, son installeur, sa synchro des extensions.
+    /// A Mac: its extension manager, its installer, its extension sync.
     @MainActor
     private struct Mac {
         let manager: ExtensionManager
@@ -45,7 +45,7 @@ struct ExtensionSyncTests {
         return Mac(manager: manager, installer: installer, adapter: adapter)
     }
 
-    /// Un Mac où l'extension d'essai est installée depuis son fichier, et son paquet envoyé.
+    /// A Mac where the test extension is installed from its file, and its package uploaded.
     private func macWithExtension() async throws -> Mac {
         let mac = makeMac("A")
         let file = try #require(Bundle(for: TestPages.self).url(forResource: "test-extension-package.zip", withExtension: nil))
@@ -78,7 +78,7 @@ struct ExtensionSyncTests {
         let installed = try #require(mac.manager.directory?.appendingPathComponent("\(identifier)/manifest.json"))
         #expect(try archive.contents(of: manifest) == Data(contentsOf: installed))
 
-        // Même version : rien n'est renvoyé.
+        // Same version: nothing is sent again.
         await mac.adapter.preparePackages(using: transport)
         #expect(await server.blobs.count == 1)
     }

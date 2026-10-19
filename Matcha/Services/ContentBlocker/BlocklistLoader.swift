@@ -1,34 +1,34 @@
 import Foundation
 import OSLog
 
-/// Prépare les listes de blocage livrées dans un magasin de listes compilées (tâche 6.2). Pour chaque liste du
-/// manifeste : la version déjà compilée est relue telle quelle si elle est retenue et toujours dans le magasin ; sinon
-/// la liste est compilée (WebKit compile sur sa propre file, la lecture et la découpe se font hors du fil principal).
-/// Une liste de plus de `maximumRuleCount` règles est découpée d'avance ; une part que WebKit refuse quand même pour
-/// trop de règles fait redécouper la liste en parts deux fois plus petites. Une liste illisible ou refusée pour une
-/// autre raison est ignorée (journal), les autres restent. Enfin, nos listes du magasin qui ne servent plus
-/// (ancienne version, liste retirée de l'app) en sont supprimées.
+/// Prepares the shipped blocklists in a store of compiled lists (task 6.2). For each list in the manifest: the
+/// already compiled version is looked up as is if it is remembered and still in the store; otherwise the list is
+/// compiled (WebKit compiles on its own queue, reading and splitting happen off the main thread). A list with more
+/// than `maximumRuleCount` rules is split beforehand; a part that WebKit still refuses for too many rules makes the
+/// list be split again into parts half as big. A list that is unreadable or refused for another reason is skipped
+/// (log), the others stay. Finally, our lists in the store that are no longer used (old version, list removed from
+/// the app) are deleted from it.
 @MainActor
 struct BlocklistLoader<Store: ContentRuleListStoring> {
-    /// Une liste prête : son entrée, ce qui en est retenu et ses listes compilées (une par part).
+    /// A ready list: its entry, what is remembered about it, and its compiled lists (one per part).
     struct Loaded {
         let entry: BlocklistEntry
         let record: CompiledBlocklist
         let ruleLists: [Store.RuleList]
-        /// Faux si la version déjà compilée a été relue.
+        /// False if the already compiled version was looked up.
         let wasCompiled: Bool
     }
 
     let store: Store
-    /// Règles d'une liste (contenu de son fichier).
+    /// Rules of a list (contents of its file).
     let readRules: (BlocklistEntry) async throws -> Data
-    /// Au-delà, une liste est découpée avant d'être donnée à WebKit.
+    /// Beyond this, a list is split before being handed to WebKit.
     var maximumRuleCount = RuleListSplitter.webKitMaximumRuleCount
-    /// Taille de part en dessous de laquelle on ne redécoupe plus (la liste est alors ignorée).
+    /// Part size below which the list is no longer split again (the list is then skipped).
     var minimumPartSize = 1000
     var now: () -> Date = { .now }
 
-    /// Prépare `entries` (dans l'ordre) à partir de ce qui a été retenu au lancement précédent (`previous`).
+    /// Prepares `entries` (in order) from what was remembered at the previous launch (`previous`).
     func load(_ entries: [BlocklistEntry], previous: [CompiledBlocklist]) async -> [Loaded] {
         var loaded: [Loaded] = []
         for entry in entries {
@@ -49,7 +49,7 @@ struct BlocklistLoader<Store: ContentRuleListStoring> {
         return loaded
     }
 
-    /// Relit chaque part de la version compilée ; nil s'il en manque une (elle est alors recompilée).
+    /// Looks up each part of the compiled version; nil if one is missing (it is then recompiled).
     private func reuse(_ record: CompiledBlocklist, of entry: BlocklistEntry) async -> Loaded? {
         var lists: [Store.RuleList] = []
         for identifier in record.storeIdentifiers {
@@ -82,8 +82,8 @@ struct BlocklistLoader<Store: ContentRuleListStoring> {
                 )
                 return Loaded(entry: entry, record: record, ruleLists: lists, wasCompiled: true)
             } catch {
-                // Les parts déjà compilées de cet essai ne sont pas gardées : elles partent avec les listes périmées.
-                // Moitié arrondie au-dessus : 150 001 règles donnent deux parts, pas trois.
+                // The parts already compiled in this attempt are not kept: they go away with the stale lists.
+                // Half rounded up: 150,001 rules give two parts, not three.
                 let current = min(size, split.ruleCount)
                 let next = (current + 1) / 2
                 guard ContentRuleListError.isTooManyRules(error), next >= minimumPartSize, next < current else {

@@ -1,6 +1,6 @@
 import XCTest
 
-/// Dossiers d'épinglés : création, renommage, rangement, repli, imbrication.
+/// Pinned folders: creation, renaming, filing, collapsing, nesting.
 final class FolderUITests: XCTestCase {
     override func setUpWithError() throws {
         continueAfterFailure = false
@@ -11,7 +11,7 @@ final class FolderUITests: XCTestCase {
         app.descendants(matching: .any).matching(identifier: "folderRow")
     }
 
-    /// Crée un dossier par le menu `menuItem` de `element` et lui donne le nom `name`.
+    /// Creates a folder through the `menuItem` menu item of `element` and names it `name`.
     @MainActor
     private func createFolder(named name: String, from element: XCUIElement, menuItem: String, in app: XCUIApplication) {
         element.rightClick()
@@ -33,13 +33,13 @@ final class FolderUITests: XCTestCase {
         tabRows(in: app).firstMatch.rightClick()
         app.menuItems["Épingler"].click()
 
-        // Le dossier est créé depuis l'onglet épinglé, puis nommé.
+        // The folder is created from the pinned tab, then named.
         let pinned = tabRows(in: app).firstMatch
         createFolder(named: "Travail", from: pinned, menuItem: "Nouveau dossier", in: app)
         let folder = folderRows(in: app).firstMatch
         XCTAssertEqual(folder.label, "Travail")
 
-        // L'onglet épinglé, déposé au milieu de la ligne du dossier, y entre ; replier le dossier le cache.
+        // The pinned tab, dropped on the middle of the folder row, goes into it; collapsing the folder hides it.
         pinned.press(forDuration: 0.5, thenDragTo: folder)
         XCTAssertTrue(waitForCount(tabRows(in: app), 2))
         folder.click()
@@ -47,7 +47,7 @@ final class FolderUITests: XCTestCase {
         folder.click()
         XCTAssertTrue(waitForCount(tabRows(in: app), 2))
 
-        // Sous-dossier : replier le parent cache aussi le sous-dossier.
+        // Subfolder: collapsing the parent also hides the subfolder.
         createFolder(named: "Client", from: folder, menuItem: "Nouveau sous-dossier", in: app)
         XCTAssertTrue(waitForCount(folderRows(in: app), 2))
         folder.click()

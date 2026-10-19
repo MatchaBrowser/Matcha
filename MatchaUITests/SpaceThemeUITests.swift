@@ -1,6 +1,6 @@
 import XCTest
 
-/// Éditeur du thème du Space.
+/// Space theme editor.
 final class SpaceThemeUITests: XCTestCase {
     override func setUpWithError() throws {
         continueAfterFailure = false
@@ -19,7 +19,7 @@ final class SpaceThemeUITests: XCTestCase {
         app.buttons["Forêt"].click()
         XCTAssertTrue(app.sliders.firstMatch.exists)
 
-        // Un clic à côté ferme le popover.
+        // A click beside it closes the popover.
         app.windows.firstMatch.coordinate(withNormalizedOffset: CGVector(dx: 0.7, dy: 0.5)).click()
         XCTAssertTrue(presets.firstMatch.waitForNonExistence(timeout: 3))
     }

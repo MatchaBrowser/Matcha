@@ -1,7 +1,7 @@
 import Foundation
 
-/// Valeur JSON quelconque (tâche 7.4) : les champs (`fields`) d'un enregistrement synchronisé, gardés tels quels quand
-/// ils viennent d'une version plus récente de Matcha. Type pur.
+/// Any JSON value (task 7.4): the fields (`fields`) of a synced record, kept as they are when they come from a newer
+/// version of Matcha. Pure type.
 nonisolated enum SyncJSON: Codable, Hashable, Sendable {
     case null
     case bool(Bool)
@@ -41,17 +41,17 @@ nonisolated enum SyncJSON: Codable, Hashable, Sendable {
         }
     }
 
-    /// `value` en JSON, avec les conventions de la synchro (dates à la milliseconde).
+    /// `value` as JSON, with sync's conventions (dates to the millisecond).
     static func encoding(_ value: some Encodable) throws -> SyncJSON {
         try SyncCoding.decoder().decode(SyncJSON.self, from: SyncCoding.encoder().encode(value))
     }
 
-    /// Cette valeur lue comme un `T`.
+    /// This value read as a `T`.
     func decoded<T: Decodable>(as type: T.Type) throws -> T {
         try SyncCoding.decoder().decode(type, from: SyncCoding.encoder().encode(self))
     }
 
-    /// Champs d'un objet ; vide pour une autre valeur.
+    /// Fields of an object; empty for any other value.
     var objectValue: [String: SyncJSON] {
         if case let .object(value) = self {
             return value
@@ -59,8 +59,8 @@ nonisolated enum SyncJSON: Codable, Hashable, Sendable {
         return [:]
     }
 
-    /// Cet objet complété par les clés de `base` qu'il n'a pas : les champs inconnus de cette version de Matcha, reçus
-    /// d'une plus récente, repartent avec une modification.
+    /// This object completed with the keys of `base` it does not have: fields unknown to this version of Matcha,
+    /// received from a newer one, are sent back along with a modification.
     func keepingUnknownKeys(of base: SyncJSON) -> SyncJSON {
         .object(objectValue.merging(base.objectValue) { mine, _ in mine })
     }

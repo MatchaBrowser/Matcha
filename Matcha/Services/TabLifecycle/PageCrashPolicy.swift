@@ -1,21 +1,21 @@
-/// Ce qu'une page fait quand son processus s'arrête (tâche 5.7).
+/// What a page does when its process terminates (task 5.7).
 nonisolated enum PageCrashAction: String, Equatable, Sendable {
-    /// Page visible : rechargée tout de suite, dans la même vue web (historique précédent/suivant gardé).
+    /// Visible page: reloaded right away, in the same web view (back/forward history kept).
     case reload
-    /// Page cachée : vue web libérée comme pour une mise en veille (tâche 5.6), recréée quand on l'affiche.
+    /// Hidden page: web view released as when the tab is put to sleep (task 5.6), recreated when it is displayed.
     case reloadWhenShown
-    /// Arrêts répétés : plus de rechargement automatique, un message dans la page invite à la recharger.
+    /// Repeated terminations: no more automatic reload, a message in the page invites the user to reload it.
     case showProblem
 }
 
-/// Règles de la reprise d'une page dont le processus s'est arrêté (plantage, ou processus arrêté par le système pour
-/// la mémoire ; tâche 5.7). « Visible » : onglet sélectionné ou panneau de son split, dans le Space affiché d'une
-/// fenêtre ouverte (notion de la tâche 5.6), page de l'aperçu, page d'une mini-fenêtre.
+/// Rules for recovering a page whose process terminated (crash, or process terminated by the system for memory; task
+/// 5.7). “Visible”: selected tab or pane of its split, in the displayed Space of an open window (notion from task 5.6),
+/// Peek page, mini window page.
 nonisolated enum PageCrashPolicy {
-    /// Rechargements automatiques permis par fenêtre de `PageCrashCounter` : au-delà, la page attend l'utilisateur.
+    /// Automatic reloads allowed within a `PageCrashCounter` time window: beyond that, the page waits for the user.
     static let automaticReloads = 1
 
-    /// `recentTerminations` : arrêts des 30 dernières secondes, celui-ci compris (`PageCrashCounter`).
+    /// `recentTerminations`: terminations in the last 30 seconds, this one included (`PageCrashCounter`).
     static func action(isVisible: Bool, recentTerminations: Int) -> PageCrashAction {
         if recentTerminations > automaticReloads {
             return .showProblem

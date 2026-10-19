@@ -1,16 +1,16 @@
 import XCTest
 
-/// Zoom des pages (tâche 5.4) : ⌘+, ⌘=, ⌘-, ⌘0 et le badge « 115 % » à côté de la pastille d'adresse (absent à 100 %,
-/// un clic revient à 100 %), menus grisés, zoom retenu pour le site (ici les fichiers locaux, qui forment un seul site)
-/// sur une autre page et dans un autre onglet, aperçu, mini-fenêtre, barre d'adresse au-dessus de la page, ligne
-/// « Zoom » des réglages du site (réseau : example.com). Pages : la documentation de Postfix livrée avec macOS (sans
-/// réseau ; tests ignorés si elle manque). Ces tests déplacent la vraie souris.
+/// Page zoom (task 5.4): ⌘+, ⌘=, ⌘-, ⌘0 and the “115 %” badge next to the address pill (absent at 100 %, a click
+/// goes back to 100 %), grayed-out menus, zoom remembered for the site (here local files, which form a single
+/// site) on another page and in another tab, Peek, mini window, address bar above the page, “Zoom” row of the site
+/// settings (network: example.com). Pages: the Postfix documentation shipped with macOS (no network; tests
+/// skipped if it is missing). These tests move the real mouse.
 final class PageZoomUITests: XCTestCase {
     override func setUpWithError() throws {
         continueAfterFailure = false
     }
 
-    /// Lance l'app (avec `settings` en plus) sur la page d'accueil de la documentation de Postfix, seule dans la barre.
+    /// Launches the app (with `settings` added) on the home page of the Postfix documentation, alone in the sidebar.
     @MainActor
     private func launchOnLocalDocs(settings: [String: String] = [:]) throws -> XCUIApplication {
         let app = launchApp(settings: settings)
@@ -23,14 +23,14 @@ final class PageZoomUITests: XCTestCase {
     @MainActor
     func testKeyboardZoomShowsTheBadgeAndUpdatesTheMenus() throws {
         let app = try launchOnLocalDocs()
-        // À 100 %, pas de badge.
+        // At 100 %, no badge.
         XCTAssertFalse(zoomBadge(in: app).waitForExistence(timeout: 1))
         XCTAssertTrue(waitForMenuItem("Taille réelle", enabled: false, in: app))
         XCTAssertTrue(waitForMenuItem("Zoom avant", enabled: true, in: app))
 
         zoom("+", expecting: 115, in: app)
         XCTAssertEqual(zoomBadge(in: app).label, "Zoom de la page")
-        // ⌘= vaut ⌘+, comme dans Safari.
+        // ⌘= is the same as ⌘+, like in Safari.
         zoom("=", expecting: 125, in: app)
         XCTAssertTrue(waitForMenuItem("Taille réelle", enabled: true, in: app))
         zoom("-", expecting: 115, in: app)
@@ -39,11 +39,11 @@ final class PageZoomUITests: XCTestCase {
         zoom("0", expecting: 100, in: app)
         XCTAssertTrue(waitForMenuItem("Taille réelle", enabled: false, in: app))
 
-        // Rien d'autre ne s'est ouvert.
+        // Nothing else opened.
         XCTAssertEqual(tabRows(in: app).count, 1)
         XCTAssertFalse(addressField(in: app).exists)
 
-        // Au bout de la liste (50 %), « Zoom arrière » est grisé ; le badge reste affiché.
+        // At the end of the list (50 %), “Zoom Out” is grayed out; the badge stays shown.
         for percent in [85, 75, 50] {
             zoom("-", expecting: percent, in: app)
         }
@@ -51,8 +51,8 @@ final class PageZoomUITests: XCTestCase {
         XCTAssertTrue(waitForPercent(50, of: zoomBadge(in: app), inValue: true))
     }
 
-    /// Un clic sur le badge ramène le site à 100 %, comme ⌘0 : le badge disparaît, la barre de commande ne s'ouvre pas
-    /// (le badge est à côté de la pastille, pas dedans), et une autre page du site s'ouvre à 100 %.
+    /// A click on the badge brings the site back to 100 %, like ⌘0: the badge goes away, the command bar doesn't
+    /// open (the badge is next to the pill, not inside it), and another page of the site opens at 100 %.
     @MainActor
     func testClickOnTheBadgeResetsTheSite() throws {
         let app = try launchOnLocalDocs()
@@ -75,27 +75,27 @@ final class PageZoomUITests: XCTestCase {
         zoom("+", expecting: 115, in: app)
         zoom("+", expecting: 125, in: app)
 
-        // Autre page du même site (fichiers locaux) : elle s'ouvre à 125 %, le badge le dit ; ⌘+ passe à 150 %.
+        // Another page of the same site (local files): it opens at 125 %, the badge says so; ⌘+ goes to 150 %.
         clickWhenSettled(link(containing: "Basic configuration", in: app))
         XCTAssertTrue(waitForValue(of: addressPill(in: app)) { $0 == "BASIC_CONFIGURATION_README.html" })
         XCTAssertTrue(waitForPercent(125, of: zoomBadge(in: app), inValue: true))
         zoom("+", expecting: 150, in: app)
 
-        // Autre onglet du même site : même zoom.
+        // Another tab of the same site: same zoom.
         openAddress("file:///usr/share/doc/postfix/html/postconf.5.html", in: app)
         XCTAssertTrue(waitForValue(of: addressPill(in: app)) { $0 == "postconf.5.html" })
         XCTAssertTrue(waitForPercent(150, of: zoomBadge(in: app), inValue: true))
         zoom("-", expecting: 125, in: app)
 
-        // Une page sans site (about:blank) reste à 100 % : pas de badge.
+        // A page without a site (about:blank) stays at 100 %: no badge.
         openAddress("about:blank?zoom", in: app)
         XCTAssertTrue(waitForValue(of: addressPill(in: app)) { $0.hasPrefix("about:blank") })
         XCTAssertTrue(zoomBadge(in: app).waitForNonExistence(timeout: 3))
         zoom("+", expecting: 115, in: app)
     }
 
-    /// Aperçu ouvert : ⌘+ zoome sa page, montré par le badge de sa barre ; la page derrière, du même site, suit (badge
-    /// de la barre latérale). Un clic sur le badge de l'aperçu ramène le site à 100 % sans fermer l'aperçu.
+    /// Peek open: ⌘+ zooms its page, shown by the badge in its bar; the page behind, from the same site, follows
+    /// (sidebar badge). A click on the Peek's badge brings the site back to 100 % without closing the Peek.
     @MainActor
     func testZoomInPeekShowsTheBadgeInItsToolbar() throws {
         let app = try launchOnLocalDocs()
@@ -119,7 +119,7 @@ final class PageZoomUITests: XCTestCase {
         zoom("+", expecting: 125, in: app)
     }
 
-    /// Mini-fenêtre : le badge est dans sa barre d'outils ; la fenêtre de navigation derrière n'en montre pas.
+    /// Mini window: the badge is in its toolbar; the browser window behind shows none.
     @MainActor
     func testZoomInMiniWindowShowsTheBadgeInItsToolbar() throws {
         try XCTSkipUnless(FileManager.default.isReadableFile(atPath: Self.localDocsPath), "Documentation de Postfix absente")
@@ -138,7 +138,7 @@ final class PageZoomUITests: XCTestCase {
         XCTAssertTrue(zoomBadge(in: mini).waitForNonExistence(timeout: 3))
     }
 
-    /// Barre d'adresse au-dessus de la page : le badge est dans la barre de la carte.
+    /// Address bar above the page: the badge is in the card's bar.
     @MainActor
     func testBadgeInTheTopAddressBar() throws {
         let app = try launchOnLocalDocs(settings: ["addressBarPosition": "top"])
@@ -162,8 +162,8 @@ final class PageZoomUITests: XCTestCase {
         XCTAssertFalse(zoomBadge(in: app).waitForExistence(timeout: 1))
     }
 
-    /// Ligne « Zoom » des réglages du site : − / % / +, un clic sur le pourcentage revient à 100 % ; elle suit ⌘+, et le
-    /// badge suit la ligne.
+    /// “Zoom” row of the site settings: − / % / +, a click on the percentage goes back to 100 %; it follows ⌘+, and
+    /// the badge follows the row.
     @MainActor
     func testSiteSettingsZoomRow() throws {
         try skipIfOffline()
@@ -183,7 +183,7 @@ final class PageZoomUITests: XCTestCase {
         siteZoomButton("siteZoomInButton", in: app).click()
         XCTAssertTrue(waitForPercent(115, of: reset, inValue: true))
         XCTAssertTrue(waitForPercent(115, of: zoomBadge(in: app), inValue: true))
-        // Le clavier et la ligne visent le même zoom.
+        // The keyboard and the row target the same zoom.
         zoom("+", expecting: 125, in: app)
         XCTAssertTrue(waitForPercent(125, of: reset, inValue: true))
 

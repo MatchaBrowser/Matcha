@@ -3,12 +3,12 @@ import Foundation
 import Testing
 import WebKit
 
-/// Choix du menu contextuel en attente de sa fenêtre (tâche 5.9) : rendu une seule fois, à la seule fenêtre qui peut
-/// venir du menu, dans la seconde.
+/// Context menu choice waiting for its window (task 5.9): handed over only once, to the only window that can come from
+/// the menu, within a second.
 struct PageMenuIntentTests {
     private let start = Date(timeIntervalSinceReferenceDate: 800_000_000)
     private let point = CGPoint(x: 0.25, y: 0.75)
-    /// La fenêtre que WebKit ouvre pour un élément du menu (vérifié) : `.other`, sans taille.
+    /// The window WebKit opens for a menu item (verified): `.other`, no size.
     private let menuWindow = PageMenuWindowRequest(navigationType: .other, opensPopupWindow: false)
 
     private func pending(_ destination: PageMenuDestination = .backgroundTab) -> PendingPageMenuIntent {
@@ -23,7 +23,7 @@ struct PageMenuIntentTests {
         #expect(intent?.destination == .peek)
         #expect(intent?.openingPoint == point)
         #expect(pending.intent == nil)
-        // La fenêtre suivante (un `window.open` de la page) suit les règles habituelles.
+        // The next window (a `window.open` from the page) follows the usual rules.
         #expect(pending.take(for: menuWindow, at: start.addingTimeInterval(0.1)) == nil)
     }
 
@@ -41,7 +41,7 @@ struct PageMenuIntentTests {
         #expect(onTime.take(for: menuWindow, at: start.addingTimeInterval(PageMenuIntent.lifetime)) != nil)
     }
 
-    /// Lien `target=_blank`, formulaire, fenêtre de connexion : jamais la fenêtre du menu, qui peut encore arriver.
+    /// A `target=_blank` link, a form, a sign-in window: never the menu's window, which may still arrive.
     @Test(arguments: [
         PageMenuWindowRequest(navigationType: .linkActivated, opensPopupWindow: false),
         PageMenuWindowRequest(navigationType: .formSubmitted, opensPopupWindow: false),

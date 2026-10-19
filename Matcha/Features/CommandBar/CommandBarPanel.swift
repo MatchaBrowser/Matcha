@@ -1,6 +1,6 @@
 import SwiftUI
 
-/// Panneau de la barre de commande : le champ, puis la liste des résultats s'il y en a.
+/// Command bar panel: the field, then the list of results if there are any.
 struct CommandBarPanel: View {
     static let cornerRadius = 14.0
     static let fieldHeight = 52.0
@@ -8,12 +8,12 @@ struct CommandBarPanel: View {
     static let listPadding = 6.0
 
     let model: any CommandBarPanelModel
-    /// ⏎ ou clic : la ligne `id` (nil : la ligne sélectionnée).
+    /// ⏎ or click: row `id` (nil: the selected row).
     let submit: (CommandRow.ID?) -> Void
     /// ⎋.
     let cancel: () -> Void
     let theme: SpaceTheme
-    /// Hauteur maximale du panneau ; la liste défile au-delà.
+    /// Maximum height of the panel; the list scrolls beyond it.
     let maxHeight: Double
 
     @Environment(\.colorScheme) private var colorScheme
@@ -27,8 +27,8 @@ struct CommandBarPanel: View {
             }
         }
         .background {
-            // Le flou ne voit pas le contenu des pages (couches de WebKit hors du processus) : le
-            // panneau prend la teinte de fond de la page. Même résultat avec NSVisualEffectView.
+            // The blur does not see the content of pages (WebKit layers outside the process): the panel takes the
+            // page's background tint. Same result with NSVisualEffectView.
             RoundedRectangle(cornerRadius: Self.cornerRadius)
                 .fill(.regularMaterial)
                 .shadow(color: .black.opacity(0.25), radius: 24, y: 12)
@@ -42,9 +42,9 @@ struct CommandBarPanel: View {
         .accessibilityIdentifier("commandBar")
     }
 
-    // MARK: Champ
+    // MARK: Field
 
-    /// Le champ garde sa place : seule l'icône qui le précède change.
+    /// The field keeps its place: only the icon before it changes.
     private var fieldRow: some View {
         HStack(spacing: 10) {
             leadingIcon
@@ -61,7 +61,7 @@ struct CommandBarPanel: View {
         .frame(height: Self.fieldHeight)
     }
 
-    /// Icône du site de l'onglet modifié (⌘L), sinon une loupe.
+    /// Site icon of the modified tab (⌘L), otherwise a magnifying glass.
     @ViewBuilder private var leadingIcon: some View {
         if let target = model.editedTab, target.url != nil {
             FaviconView(tab: target, size: 18)
@@ -72,7 +72,7 @@ struct CommandBarPanel: View {
         }
     }
 
-    // MARK: Résultats
+    // MARK: Results
 
     private var results: some View {
         ScrollViewReader { proxy in
@@ -93,7 +93,7 @@ struct CommandBarPanel: View {
                 }
                 .padding(Self.listPadding)
             }
-            // Une vue défilante prend toute la hauteur offerte : la sienne est donc fixée ici.
+            // A scroll view takes all the height offered: its own is therefore set here.
             .frame(height: min(Double(model.rows.count) * Self.rowHeight + 2 * Self.listPadding, maxHeight - Self.fieldHeight - 1))
             .onChange(of: model.selectedRowID) { _, id in
                 if let id {
@@ -106,12 +106,12 @@ struct CommandBarPanel: View {
         .accessibilityIdentifier("commandBarResults")
     }
 
-    /// Teinte de la ligne sélectionnée : première couleur du Space (gris en fenêtre privée).
+    /// Tint of the selected row: first color of the Space (gray in a private window).
     private var tint: Color {
         theme.swiftUIColors(for: colorScheme).first ?? .accentColor
     }
 
-    // MARK: Clavier
+    // MARK: Keyboard
 
     private func handle(_ command: CommandBarKeyCommand) {
         switch command {
@@ -126,7 +126,7 @@ struct CommandBarPanel: View {
         }
     }
 
-    /// VoiceOver lit le titre de la ligne nouvellement sélectionnée.
+    /// VoiceOver reads the title of the newly selected row.
     private func moveSelection(by delta: Int) {
         model.moveSelection(by: delta)
         if let row = model.selectedRow {
@@ -134,7 +134,7 @@ struct CommandBarPanel: View {
         }
     }
 
-    /// Le champ a perdu le clavier sans passer par la barre : elle se ferme (jamais de barre « zombie »).
+    /// The field lost the keyboard without going through the bar: the bar closes (never a “zombie” bar).
     private func endEditing() {
         if model.isPresented {
             model.dismiss()

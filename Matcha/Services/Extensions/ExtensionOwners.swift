@@ -1,20 +1,20 @@
 import AppKit
 import WebKit
 
-/// Ce qui possède un onglet vu par les extensions (tâche 6.3) : de quoi agir sur lui (l'activer, le fermer, l'épingler,
-/// régler son zoom).
+/// What owns a tab seen by extensions (task 6.3): what is needed to act on it (activate it, close it, pin it, set its
+/// zoom).
 @MainActor
 enum ExtensionTabOwner {
-    /// Onglet rangé d'un Space d'une fenêtre de navigation ; pour un favori, le Space qui le tient.
+    /// Sidebar tab of a Space of a browser window; for a favorite, the Space that holds it.
     case space(SpaceSession, WindowModel)
-    /// Page de l'aperçu (Peek, tâche 4.4) ouvert dans le Space affiché.
+    /// Page of the Peek (task 4.4) open in the displayed Space.
     case peek(SpaceSession, WindowModel)
-    /// Page d'une mini-fenêtre (tâche 4.5).
+    /// Page of a mini window (task 4.5).
     case miniWindow(MiniWindowController, MiniWindowManager)
-    /// Page d'une fenêtre de connexion (tâche 5.8).
+    /// Page of a sign-in window (task 5.8).
     case popupWindow(PopupWindowController, PopupWindowManager)
 
-    /// Zoom par site de la page (tâche 5.4).
+    /// Per-site zoom of the page (task 5.4).
     var siteZooms: SiteZoomStore? {
         switch self {
         case let .space(space, _), let .peek(space, _): space.tabManager.siteZooms
@@ -24,10 +24,10 @@ enum ExtensionTabOwner {
     }
 }
 
-/// Ce qui est derrière une fenêtre vue par les extensions (tâche 6.3).
+/// What is behind a window seen by extensions (task 6.3).
 @MainActor
 enum ExtensionWindowOwner {
-    /// Fenêtre de navigation (principale ou privée) : les onglets de tous ses Spaces.
+    /// Browser window (main or private): the tabs of all its Spaces.
     case browser(WindowModel, NSWindow?)
     case miniWindow(MiniWindowController)
     case popupWindow(PopupWindowController, PopupWindowManager)
@@ -40,7 +40,7 @@ enum ExtensionWindowOwner {
         }
     }
 
-    /// Mini-fenêtres et fenêtres de connexion n'ont qu'une page, sans barre d'onglets : des fenêtres « popup ».
+    /// Mini windows and sign-in windows have only one page, with no tab bar: “popup” windows.
     var windowType: WKWebExtension.WindowType {
         switch self {
         case .browser: .normal
@@ -48,7 +48,7 @@ enum ExtensionWindowOwner {
         }
     }
 
-    /// Une mini-fenêtre n'est jamais privée ; une fenêtre de connexion l'est avec sa session.
+    /// A mini window is never private; a sign-in window is private when its session is.
     var isPrivate: Bool {
         switch self {
         case let .browser(model, _): model.session.isPrivate

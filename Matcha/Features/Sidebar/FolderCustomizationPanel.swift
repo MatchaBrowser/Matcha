@@ -1,10 +1,10 @@
 import SwiftUI
 
-/// Panneau de personnalisation d'un dossier d'épinglés, ouvert sous sa ligne par « Personnaliser… » (il pousse les
-/// lignes suivantes), entre deux traits, comme le panneau des téléchargements. En tête : le nom du dossier,
-/// « Réinitialiser » et une croix. Puis l'icône (symboles SF, ou un emoji), la couleur du texte et celle du fond.
-/// Chaque choix s'applique tout de suite à la ligne et s'enregistre avec le rangement. Échap le ferme quand il a le
-/// clavier (il le prend à l'ouverture).
+/// Customization panel of a pinned folder, opened below its row by “Customize…” (it pushes the following rows
+/// down), between two lines, like the downloads panel. At the top: the folder's name, “Reset” and a close cross.
+/// Then the icon (SF Symbols, or an emoji), the text color and the background color. Each choice applies right
+/// away to the row and is saved with the layout. Esc closes it when it has the keyboard (it takes it on
+/// opening).
 struct FolderCustomizationPanel: View {
     let folder: PinnedFolder
     let tabManager: TabManager
@@ -50,7 +50,7 @@ struct FolderCustomizationPanel: View {
         .focused($isFocused)
         .onExitCommand(perform: close)
         .task {
-            // Ouvert depuis un menu contextuel : on attend sa fermeture pour prendre le clavier (Échap).
+            // Opened from a context menu: wait for the menu to close before taking the keyboard (Esc).
             try? await Task.sleep(for: .milliseconds(80))
             isFocused = true
         }
@@ -59,7 +59,7 @@ struct FolderCustomizationPanel: View {
         .accessibilityIdentifier("folderCustomizationPanel")
     }
 
-    /// Le dossier, « Réinitialiser », puis la croix.
+    /// The folder, “Reset”, then the cross.
     private var header: some View {
         HStack(spacing: 8) {
             Text(folder.name)
@@ -89,7 +89,7 @@ struct FolderCustomizationPanel: View {
         }
     }
 
-    /// Symboles (le dossier, en premier, est l'icône par défaut), puis l'emoji.
+    /// Symbols (the folder, first, is the default icon), then the emoji.
     private var iconSection: some View {
         VStack(alignment: .leading, spacing: 6) {
             Text("Icon")

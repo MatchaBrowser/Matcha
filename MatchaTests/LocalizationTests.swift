@@ -1,21 +1,21 @@
 import Foundation
 import Testing
 
-/// Langues livrées dans Matcha.app. La compilation des catalogues y met un dossier `<langue>.lproj`
-/// par langue, avec des listes de propriétés : `Localizable.strings` (textes), `Localizable.stringsdict`
-/// (pluriels) et `InfoPlist.strings` (textes de l'Info.plist). Une langue sans valeur pour une clé n'a
-/// pas cette clé : macOS afficherait alors l'anglais. L'anglais, langue source, ne contient que ce qui
-/// diffère des clés (les pluriels) : ses autres textes sont les clés du code et l'Info.plist lui-même.
+/// Languages shipped in Matcha.app. Compiling the catalogs puts a `<language>.lproj` folder there per
+/// language, with property lists: `Localizable.strings` (texts), `Localizable.stringsdict` (plurals)
+/// and `InfoPlist.strings` (texts of the Info.plist). A language without a value for a key does not have
+/// that key: macOS would then show the English text. English, the source language, only contains what
+/// differs from the keys (the plurals): its other texts are the keys in the code and the Info.plist itself.
 ///
-/// Ces tests ne voient que l'app compilée : ils vérifient que les langues concordent entre elles.
-/// Une clé traduite dans aucune langue (cas d'un texte qui vient d'être ajouté au code) ou une traduction
-/// à l'état `new` ou `needs_review` (compilée comme les autres) n'est repérée que par
-/// `scripts/check-localizations.sh`, qui lit le catalogue : l'app de test est sandboxée et ne le peut pas.
+/// These tests only see the compiled app: they check that the languages agree with one another.
+/// A key translated in no language (the case of a text just added to the code) or a translation
+/// in the `new` or `needs_review` state (compiled like the others) is only caught by
+/// `scripts/check-localizations.sh`, which reads the catalog: the test app is sandboxed and cannot.
 struct LocalizationTests {
     static let sourceLanguage = "en"
     static let translations = ["fr", "de", "es", "it"]
     static let languages = [sourceLanguage] + translations
-    /// Catégories de pluriel exigées (CLDR) ; « other » sert de repli aux autres (many…).
+    /// Required plural categories (CLDR); “other” serves as the fallback for the others (many…).
     static let requiredPluralCategories = [
         "en": ["one", "other"], "fr": ["one", "other"], "de": ["one", "other"],
         "es": ["one", "other"], "it": ["one", "other"],
@@ -26,7 +26,7 @@ struct LocalizationTests {
         #expect(Bundle.main.developmentLocalization == Self.sourceLanguage)
     }
 
-    /// Les clés présentes dans une langue au moins doivent l'être dans toutes.
+    /// The keys present in at least one language must be present in all of them.
     @Test(arguments: translations)
     func `every text and plural is translated`(language: String) throws {
         let keys = try Set(Self.table("Localizable", "strings", language).keys)
@@ -72,9 +72,9 @@ struct LocalizationTests {
         #expect(missing.isEmpty, "Info.plist sans texte anglais : \(missing)")
     }
 
-    // MARK: - Lecture du bundle
+    // MARK: - Reading the bundle
 
-    /// Table compilée d'une langue ; vide si la langue n'a pas ce fichier.
+    /// Compiled table of a language; empty if the language does not have this file.
     private static func table(_ name: String, _ type: String, _ language: String) throws -> [String: Any] {
         guard let url = Bundle.main.url(forResource: name, withExtension: type, subdirectory: nil, localization: language) else {
             return [:]
@@ -83,7 +83,7 @@ struct LocalizationTests {
         return try #require(plist as? [String: Any], "\(language).lproj/\(name).\(type) illisible")
     }
 
-    /// Toutes les clés présentes dans au moins une langue : chaque traduction doit les avoir toutes.
+    /// All the keys present in at least one language: each translation must have all of them.
     private static func localizableKeys() throws -> Set<String> {
         var keys = try pluralKeys()
         for language in languages {
@@ -100,7 +100,7 @@ struct LocalizationTests {
         return keys
     }
 
-    /// Textes de l'Info.plist montrés par macOS (autorisations), plus ceux traduits dans une langue.
+    /// Info.plist texts shown by macOS (permissions), plus those translated in some language.
     private static func infoPlistKeys() throws -> Set<String> {
         let info = Bundle.main.infoDictionary ?? [:]
         var keys = Set(info.keys.filter { $0.hasPrefix("NS") && $0.hasSuffix("UsageDescription") })

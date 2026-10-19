@@ -1,16 +1,16 @@
 import Foundation
 
-/// Choix de l'icône d'une page parmi celles qu'elle déclare.
+/// Choice of a page's icon among those it declares.
 nonisolated enum FaviconSelector {
-    /// Taille retenue pour une icône vectorielle ou déclarée « any ».
+    /// Size assumed for a vector icon or one declared “any”.
     static let scalableSize = 1024
-    /// Taille habituelle d'une `apple-touch-icon` qui ne la précise pas.
+    /// Usual size of an `apple-touch-icon` that does not specify it.
     static let appleTouchIconSize = 180
-    /// Taille supposée d'une icône sans indication.
+    /// Assumed size of an icon without any indication.
     static let unknownSize = 16
 
-    /// Adresses à essayer, de la meilleure à la moins bonne : la plus grande d'abord, à taille égale
-    /// dans l'ordre de la page, puis `/favicon.ico` à la racine du site. Sans doublon.
+    /// Addresses to try, from best to worst: the largest first, in page order for equal sizes, then `/favicon.ico` at
+    /// the root of the website. Without duplicates.
     static func urlsToTry(candidates: [FaviconCandidate], pageURL: URL) -> [URL] {
         let ranked = candidates
             .filter { ["http", "https", "data"].contains($0.url.scheme?.lowercased() ?? "") }
@@ -27,7 +27,7 @@ nonisolated enum FaviconSelector {
         return urls
     }
 
-    /// Taille estimée d'une icône, en pixels.
+    /// Estimated size of an icon, in pixels.
     static func size(of candidate: FaviconCandidate) -> Int {
         if let declared = largestDeclaredSize(candidate.sizes) {
             return declared
@@ -41,7 +41,7 @@ nonisolated enum FaviconSelector {
         return unknownSize
     }
 
-    /// Plus grande taille de l'attribut `sizes` (« 16x16 32x32 » → 32), nil s'il n'en donne aucune.
+    /// Largest size in the `sizes` attribute (“16x16 32x32” → 32), nil if it gives none.
     static func largestDeclaredSize(_ sizes: String) -> Int? {
         let tokens = sizes.lowercased().split(separator: " ")
         if tokens.contains("any") {
@@ -50,7 +50,7 @@ nonisolated enum FaviconSelector {
         return tokens.compactMap { $0.split(separator: "x").first.flatMap { Int($0) } }.max()
     }
 
-    /// `/favicon.ico` à la racine du site de `pageURL`, pour une page web.
+    /// `/favicon.ico` at the root of the website of `pageURL`, for a web page.
     static func defaultIconURL(for pageURL: URL) -> URL? {
         guard ["http", "https"].contains(pageURL.scheme?.lowercased() ?? ""),
               var components = URLComponents(url: pageURL, resolvingAgainstBaseURL: false),

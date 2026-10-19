@@ -1,13 +1,13 @@
 import Foundation
 
-/// Restauration, enregistrement et échanges d'onglets entre Spaces.
+/// Restoring, saving, and exchanging tabs between Spaces.
 extension TabManager {
-    // MARK: Enregistrement
+    // MARK: Saving
 
-    /// Remet les onglets enregistrés, sans vue web : chacun la crée à son premier affichage.
-    /// L'onglet utilisé le plus récemment est sélectionné, sans charger sa page : elle se charge quand
-    /// le Space s'affiche (`loadSelectedTab`). Un onglet jamais utilisé (importé, `lastActivity` à `distantPast`)
-    /// ne l'est pas : rien ne se charge de lui-même.
+    /// Puts back the saved tabs, without a web view: each creates it the first time it is shown.
+    /// The most recently used tab is selected, without loading its page: it loads when the Space is
+    /// shown (`loadSelectedTab`). A tab never used (imported, `lastActivity` at `distantPast`) is not
+    /// selected: nothing loads by itself.
     func restore(tabs stored: [StoredTab], layout restoredLayout: SidebarLayout) {
         var restored: [BrowserTab] = []
         for entry in stored where restoredLayout.place(of: entry.id) != nil {
@@ -25,13 +25,13 @@ extension TabManager {
         restoreSelection(used.max { $0.lastActivity < $1.lastActivity }?.id)
     }
 
-    /// Crée la vue web des onglets affichés (l'onglet sélectionné et son split), pour les afficher (Space
-    /// affiché, lancement).
+    /// Creates the web view of the displayed tabs (the selected tab and its split), to display them (Space
+    /// shown, launch).
     func loadSelectedTab() {
         displayedTabs.forEach { $0.makeWebViewIfNeeded() }
     }
 
-    /// Ce qu'il faut enregistrer de chaque onglet rangé.
+    /// What to save of each placed tab.
     func storedTabs() -> [StoredTab] {
         tabs.map { tab in
             StoredTab(
@@ -46,12 +46,12 @@ extension TabManager {
         }
     }
 
-    /// Retient l'état de navigation de chaque onglet chargé (fermeture de l'app).
+    /// Keeps the navigation state of each loaded tab (app quitting).
     func captureInteractionStates() {
         tabs.forEach { $0.captureInteractionState() }
     }
 
-    /// Ajoute `stored` à la fin des favoris, sans vue web (import, tâche 7.1).
+    /// Appends `stored` at the end of the favorites, without a web view (import, task 7.1).
     func appendFavorites(_ stored: [StoredTab]) {
         for entry in stored {
             let configuration = WebConfigurationFactory.makeConfiguration(websiteDataStore: websiteDataStore)
@@ -61,10 +61,10 @@ extension TabManager {
         }
     }
 
-    // MARK: Entre Spaces
+    // MARK: Between Spaces
 
-    /// Reprend les favoris de `other`, un autre Space du même profil : mêmes onglets, mêmes vues web.
-    /// Leurs fenêtres et liens s'ouvrent désormais dans ce Space-ci.
+    /// Takes over the favorites of `other`, another Space of the same profile: same tabs, same web views.
+    /// Their windows and links now open in this Space.
     func adoptFavorites(from other: TabManager) {
         guard other !== self else {
             return
@@ -80,7 +80,7 @@ extension TabManager {
         }
     }
 
-    /// Retire l'onglet de ce Space sans le fermer, pour l'envoyer dans un autre Space du même profil.
+    /// Removes the tab from this Space without closing it, to send it to another Space of the same profile.
     @discardableResult
     func detach(_ tab: BrowserTab) -> BrowserTab? {
         guard self.tab(withID: tab.id) != nil else {
@@ -93,7 +93,7 @@ extension TabManager {
         return tab
     }
 
-    /// Accueille un onglet venu d'un autre Space, en tête des onglets du jour.
+    /// Takes in a tab coming from another Space, at the top of the today tabs.
     func attach(_ tab: BrowserTab) {
         register(tab)
         tab.pinnedURL = nil

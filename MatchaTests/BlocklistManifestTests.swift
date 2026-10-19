@@ -2,7 +2,7 @@ import Foundation
 @testable import Matcha
 import Testing
 
-/// Manifeste des listes de blocage (tâche 6.2) : lecture, entrées invalides ou en double ignorées, format inconnu.
+/// Manifest of the blocking lists (task 6.2): reading, invalid or duplicate entries ignored, unknown format.
 struct BlocklistManifestTests {
     private func manifest(_ json: String) throws -> BlocklistManifest {
         try BlocklistManifest(data: Data(json.utf8))
@@ -35,7 +35,7 @@ struct BlocklistManifestTests {
         #expect(try manifest(#"{ "format" : 1, "lists" : [] }"#).lists.isEmpty)
     }
 
-    /// Le manifeste livré avec l'app (vide tant que la tâche 6.1 n'a pas ajouté de liste) se lit.
+    /// The manifest shipped with the app (empty until task 6.1 has added a list) can be read.
     @Test func `the bundled manifest is readable`() async throws {
         let bundled = try await BlocklistBundle(bundle: .main).manifest()
         #expect(bundled != nil)

@@ -1,20 +1,20 @@
 import Compression
 import Foundation
 
-/// Écriture d'une archive zip (tâche 7.4) : le dossier d'une extension installée, envoyé chiffré à vos autres Mac
-/// (`SYNC.md` § 2.5). Chaque fichier est compressé en « deflate » s'il y gagne, rangé tel quel sinon ; les entrées
-/// suivent l'ordre des chemins ; les liens symboliques et les fichiers cachés du système (`.DS_Store`) sont ignorés.
-/// Relue par `ZipArchive`. Type pur.
+/// Writing of a zip archive (task 7.4): the folder of an installed extension, sent encrypted to your other Macs
+/// (`SYNC.md` § 2.5). Each file is compressed with “deflate” if that makes it smaller, stored as is otherwise; the
+/// entries follow the order of the paths; symbolic links and hidden system files (`.DS_Store`) are ignored. Read back
+/// by `ZipArchive`. Pure type.
 nonisolated enum ZipWriter {
     enum Failure: Error, Equatable {
         case unreadableFolder
         case tooLarge
     }
 
-    /// Taille d'un fichier au plus (pas de zip64).
+    /// Maximum size of a file (no zip64).
     static let maximumFileSize = Int(UInt32.max)
 
-    /// Archive du contenu de `folder`, chemins relatifs à lui.
+    /// Archive of the content of `folder`, with paths relative to it.
     static func archive(folder: URL, fileManager: FileManager = .default) throws -> Data {
         let base = folder.standardizedFileURL.resolvingSymlinksInPath()
         guard let enumerator = fileManager.enumerator(at: base, includingPropertiesForKeys: [.isRegularFileKey, .isSymbolicLinkKey]) else {
@@ -32,7 +32,7 @@ nonisolated enum ZipWriter {
         return try archive(files.sorted { $0.path < $1.path }.map { file in try (file.path, Data(contentsOf: file.url)) })
     }
 
-    /// Archive de `entries` (chemin relatif, contenu), dans l'ordre donné.
+    /// Archive of `entries` (relative path, content), in the given order.
     static func archive(_ entries: [(path: String, contents: Data)]) throws -> Data {
         var output = Data()
         var central = Data()
@@ -49,19 +49,19 @@ nonisolated enum ZipWriter {
                 (0, entry.contents)
             }
             let offset = UInt32(output.count)
-            // En-tête local : signature, version 2.0, drapeau UTF-8, méthode, date nulle.
+            // Local header: signature, version 2.0, UTF-8 flag, method, zero date.
             output.append(le32(0x0403_4B50))
             output.append(le16(20) + le16(0x0800) + le16(method) + le16(0) + le16(0x21))
             output.append(le32(crc) + le32(UInt32(stored.count)) + le32(UInt32(entry.contents.count)))
             output.append(le16(UInt16(name.count)) + le16(0))
             output.append(name)
             output.append(stored)
-            // Entrée du répertoire central.
+            // Central directory entry.
             central.append(le32(0x0201_4B50))
             central.append(le16(0x031E) + le16(20) + le16(0x0800) + le16(method) + le16(0) + le16(0x21))
             central.append(le32(crc) + le32(UInt32(stored.count)) + le32(UInt32(entry.contents.count)))
             central.append(le16(UInt16(name.count)) + le16(0) + le16(0) + le16(0) + le16(0))
-            // Attributs externes : fichier ordinaire, lecture et écriture (0644).
+            // External attributes: regular file, read and write (0644).
             central.append(le32(0o100644 << 16) + le32(offset))
             central.append(name)
         }
@@ -72,7 +72,7 @@ nonisolated enum ZipWriter {
         return output
     }
 
-    /// « deflate » brut (RFC 1951), comme dans les archives zip ; nil si la compression échoue.
+    /// Raw “deflate” (RFC 1951), as in zip archives; nil if compression fails.
     private static func deflate(_ data: Data) -> Data? {
         guard !data.isEmpty else {
             return nil
@@ -86,7 +86,7 @@ nonisolated enum ZipWriter {
                 else {
                     return 0
                 }
-                // `COMPRESSION_ZLIB` écrit le « deflate » brut, sans en-tête zlib.
+                // `COMPRESSION_ZLIB` writes raw “deflate”, without a zlib header.
                 return compression_encode_buffer(target, capacity, origin, data.count, nil, COMPRESSION_ZLIB)
             }
         }

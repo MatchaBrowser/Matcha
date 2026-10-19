@@ -3,8 +3,8 @@ import Foundation
 import Testing
 import WebKit
 
-/// Installation des extensions (tâche 6.4) : depuis un fichier ou un dossier, depuis une extension Safari d'app ;
-/// permissions accordées à l'installation, mise à jour, désinstallation. Dossiers temporaires, rien chez l'utilisateur.
+/// Extension installation (task 6.4): from a file or a folder, from an app's Safari extension; permissions granted
+/// at installation, update, uninstallation. Temporary folders only, nothing in the user's folders.
 @MainActor
 struct ExtensionInstallerTests {
     private let root: URL
@@ -14,7 +14,7 @@ struct ExtensionInstallerTests {
     private let installer: ExtensionInstaller
 
     init() throws {
-        // Les motifs `obtest://*/*` du manifeste d'essai ne se lisent qu'une fois le schéma déclaré.
+        // The `obtest://*/*` patterns of the test manifest can only be read once the scheme is declared.
         WKWebExtension.MatchPattern.registerCustomURLScheme(TestPages.scheme)
         root = FileManager.default.temporaryDirectory.appendingPathComponent(
             "ExtensionInstallerTests-\(UUID().uuidString)",
@@ -129,9 +129,9 @@ struct ExtensionInstallerTests {
         #expect(!FileManager.default.fileExists(atPath: directory.appendingPathComponent(candidate.identifier).path))
     }
 
-    // MARK: Extension Safari d'une app
+    // MARK: Safari extension of an app
 
-    /// `.appex` factice : l'extension d'essai dans `Contents/Resources`.
+    /// Fake `.appex`: the test extension in `Contents/Resources`.
     private func makeAppExtension() throws -> SafariAppExtension {
         let app = root.appendingPathComponent("Test.app", isDirectory: true)
         let appex = app.appendingPathComponent("Contents/PlugIns/Extension.appex", isDirectory: true)
@@ -152,8 +152,8 @@ struct ExtensionInstallerTests {
         defer { cleanUp() }
         let appExtension = try makeAppExtension()
         #expect(appExtension.displayName == "Matcha Test Extension")
-        // WebKit vérifie le manifeste avec la signature du `.appex` : une extension d'app modifiée ou non signée ne se
-        // charge pas.
+        // WebKit checks the manifest against the signature of the `.appex`: a modified or unsigned app extension does
+        // not load.
         await #expect {
             try await installer.prepare(appExtension)
         } throws: { error in
@@ -184,7 +184,7 @@ struct ExtensionInstallerTests {
     }
 
     @Test func `safari identifiers carry the signing team, like in Safari`() throws {
-        // L'app hôte des tests est signée ; sans équipe (signature ad hoc), l'identifiant du bundle seul.
+        // The tests' host app is signed; without a team (ad hoc signature), the bundle identifier alone.
         let app = Bundle.main.bundleURL
         let bundleIdentifier = try #require(Bundle.main.bundleIdentifier)
         let identifier = try #require(SafariExtensionFinder.safariIdentifier(ofAppExtensionAt: app))

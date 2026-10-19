@@ -1,13 +1,13 @@
 import Foundation
 
-/// Page visée par les commandes de page : recherche (⌘F, ⌘G, ⇧⌘G ; tâche 5.3), impression, export en PDF et zoom
-/// (⌘P, ⌘+, ⌘-, ⌘0 ; tâche 5.4). C'est celle de la mini-fenêtre active, sinon la page au premier plan de la fenêtre
-/// de navigation active (l'aperçu s'il est ouvert, sinon l'onglet sélectionné, panneau actif d'un split). Nil sans
-/// page chargée : onglet vide ou déchargé, aucune fenêtre de navigation active (Réglages), mini-fenêtre vide.
+/// Page targeted by the page commands: find (⌘F, ⌘G, ⇧⌘G; task 5.3), printing, PDF export and zoom (⌘P, ⌘+, ⌘-,
+/// ⌘0; task 5.4). It is the active mini window's page, otherwise the front page of the active browsing window (the
+/// peek if it is open, otherwise the selected tab, the active pane of a split). Nil without a loaded page: empty or
+/// unloaded tab, no active browsing window (Settings), empty mini window.
 @MainActor
 enum FrontPage {
     static func page(miniWindowTab: BrowserTab?, tabManager: TabManager?) -> BrowserTab? {
-        // Une mini-fenêtre active sans page ne renvoie jamais à la fenêtre de navigation derrière elle.
+        // An active mini window without a page never falls back to the browsing window behind it.
         guard let page = miniWindowTab ?? tabManager?.frontTab, page.hasURL, page.isLoaded else {
             return nil
         }

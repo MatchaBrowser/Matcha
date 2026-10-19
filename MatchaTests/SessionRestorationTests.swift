@@ -6,7 +6,7 @@ import WebKit
 
 @MainActor
 struct SessionRestorationTests {
-    /// Onglet passé par deux pages locales : « un » puis « deux », précédent disponible.
+    /// Tab that went through two local pages: “un” then “deux”, back available.
     private func tabWithHistory() async throws -> BrowserTab {
         let tab = BrowserTab(configuration: TestPages.configuration())
         tab.load(TestPages.url("un"))

@@ -3,20 +3,19 @@ import Observation
 import OSLog
 import SwiftData
 
-/// Enregistre dans SwiftData les onglets d'un Space (épinglés, du jour, dossiers) et les favoris de
-/// son profil, et les recharge au lancement.
+/// Saves a Space's tabs (pinned, Today, folders) and its profile's favorites in SwiftData, and reloads them at launch.
 @MainActor
 final class SpaceStore {
-    /// Délai entre un changement et son enregistrement : les changements rapprochés sont groupés.
+    /// Delay between a change and its saving: close changes are grouped.
     static let saveDelay = Duration.seconds(1)
 
     let space: SpaceRecord
     private let context: ModelContext
     private var pendingSave: Task<Void, Never>?
-    /// Vrai une fois le Space supprimé : plus rien n'est enregistré.
+    /// True once the Space is deleted: nothing is saved anymore.
     private var isStopped = false
-    /// Vrai si ce Space tient les favoris de son profil : sinon ils ne sont ni écrits ni supprimés
-    /// (`BrowserSession+Favorites`). Toujours vrai hors d'une session (tests).
+    /// True if this Space holds its profile's favorites: otherwise they are neither written nor deleted
+    /// (`BrowserSession+Favorites`). Always true outside a session (tests).
     var savesFavorites: () -> Bool = { true }
 
     init(space: SpaceRecord, context: ModelContext) {
@@ -24,9 +23,9 @@ final class SpaceStore {
         self.context = context
     }
 
-    // MARK: Chargement
+    // MARK: Loading
 
-    /// Onglets enregistrés et leur rangement. Les onglets archivés ne sont pas rechargés.
+    /// Saved tabs and their arrangement. Archived tabs are not reloaded.
     func load() -> (tabs: [StoredTab], layout: SidebarLayout) {
         let records = tabRecords().filter { $0.place != nil }
         var positions: [UUID: SidebarPosition] = [:]
@@ -65,10 +64,10 @@ final class SpaceStore {
         return (tabs, SidebarLayout(positions: positions, folders: folders))
     }
 
-    // MARK: Enregistrement
+    // MARK: Saving
 
-    /// Enregistre `manager` une seconde après chaque changement de ce qui s'enregistre (rangement,
-    /// adresses, titres, activité), tant que le store et le gestionnaire existent.
+    /// Saves `manager` one second after each change of what is saved (arrangement, addresses, titles, activity), as
+    /// long as the store and the manager exist.
     func startAutosave(of manager: TabManager) {
         withObservationTracking {
             _ = manager.layout
@@ -84,7 +83,7 @@ final class SpaceStore {
         }
     }
 
-    /// Enregistre tout de suite (fermeture de l'app), en annulant l'enregistrement différé.
+    /// Saves right away (app quitting), cancelling the deferred save.
     func saveNow(_ manager: TabManager) {
         pendingSave?.cancel()
         pendingSave = nil
@@ -94,7 +93,7 @@ final class SpaceStore {
         save(tabs: manager.storedTabs(), layout: manager.layout)
     }
 
-    /// N'enregistre plus rien (Space supprimé).
+    /// Stops saving anything (Space deleted).
     func stop() {
         isStopped = true
         pendingSave?.cancel()
@@ -112,8 +111,7 @@ final class SpaceStore {
         }
     }
 
-    /// Met les enregistrements à jour : crée ce qui manque, supprime les onglets et dossiers fermés.
-    /// Les onglets archivés sont conservés.
+    /// Updates the records: creates what is missing, deletes the closed tabs and folders. Archived tabs are kept.
     func save(tabs: [StoredTab], layout: SidebarLayout) {
         let folders = saveFolders(layout.folderEntries)
         let positions = layout.positions
@@ -134,10 +132,10 @@ final class SpaceStore {
             record.place = position.place
             record.order = position.order
             record.folder = position.folderID.flatMap { folders[$0] }
-            // Jamais de split pour un favori (`positions` n'en donne pas).
+            // Never a split for a favorite (`positions` does not give one).
             record.splitGroupID = position.splitGroupID
             record.splitFraction = position.splitFraction
-            // Un favori appartient au profil, les autres onglets au Space.
+            // A favorite belongs to the profile, the other tabs to the Space.
             record.profile = position.place == .favorite ? space.profile : nil
             record.space = position.place == .favorite ? nil : space
         }
@@ -151,7 +149,7 @@ final class SpaceStore {
         }
     }
 
-    /// Met à jour les dossiers du Space et renvoie les enregistrements par identifiant.
+    /// Updates the Space's folders and returns the records by identifier.
     private func saveFolders(_ entries: [FolderEntry]) -> [UUID: FolderRecord] {
         var existing = Dictionary((space.folders ?? []).map { ($0.id, $0) }) { first, _ in first }
         var saved: [UUID: FolderRecord] = [:]
@@ -177,7 +175,7 @@ final class SpaceStore {
         return saved
     }
 
-    /// Onglets du Space et favoris de son profil.
+    /// Tabs of the Space and favorites of its profile.
     private func tabRecords() -> [TabRecord] {
         (space.tabs ?? []) + (space.profile?.favorites ?? [])
     }

@@ -2,8 +2,8 @@ import Foundation
 @testable import Matcha
 import Testing
 
-/// Bandeau des demandes de permission d'une page (tâche 5.2) : une demande à la fois, réponses, décisions retenues,
-/// refus quand la page change ou se ferme ; et la réponse à WebKit, donnée une seule fois.
+/// Banner for a page's permission requests (task 5.2): one request at a time, answers, remembered decisions, denial
+/// when the page changes or closes; and the answer to WebKit, given only once.
 @MainActor
 struct PermissionPromptQueueTests {
     private let queue = PermissionPromptQueue()
@@ -16,7 +16,7 @@ struct PermissionPromptQueueTests {
         queue.enqueue(first)
         queue.enqueue(second)
         #expect(queue.current?.id == first.id)
-        // Sans réponse, rien ne part : la page attend.
+        // Without an answer, nothing is sent: the page waits.
         #expect(recorder.answers.isEmpty)
 
         queue.answer(.allowOnce)
@@ -64,7 +64,7 @@ struct PermissionPromptQueueTests {
         queue.answer(.alwaysAllow)
         #expect(recorder.answers == [true])
         #expect(later.answers == [true])
-        // L'autre site attend toujours sa réponse.
+        // The other site is still waiting for its answer.
         #expect(queue.requests.map(\.origin) == [TestOrigins.other])
     }
 
@@ -74,7 +74,7 @@ struct PermissionPromptQueueTests {
         queue.denyAll()
         #expect(recorder.answers == [false, false])
         #expect(queue.current == nil)
-        // Rien n'est retenu : la page pourra redemander.
+        // Nothing is remembered: the page can ask again.
         #expect(scope.store.entries.isEmpty)
         queue.answer(.alwaysAllow)
         #expect(recorder.answers == [false, false])
@@ -88,7 +88,7 @@ struct PermissionPromptQueueTests {
         #expect(response.hasAnswered)
     }
 
-    /// WebKit lève une exception si son gestionnaire est libéré sans être appelé : la réponse refuse d'elle-même.
+    /// WebKit raises an exception if its handler is released without being called: the answer denies by itself.
     @Test func `a response released without an answer denies`() async throws {
         do {
             let response = recorder.response()

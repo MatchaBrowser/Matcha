@@ -3,7 +3,7 @@ import AppKit
 import Testing
 import WebKit
 
-/// Conteneur AppKit de la page de l'aperçu, dans une fenêtre hors de l'écran : clavier, ⎋, taille.
+/// AppKit container of the Peek page, in an offscreen window: keyboard, ⎋, size.
 @MainActor
 struct PeekWebContainerTests {
     private let window = NSWindow(
@@ -74,7 +74,7 @@ struct PeekWebContainerTests {
         contentView.addSubview(container)
         #expect(window.firstResponder === peekPage)
 
-        // Comme « Ouvrir en onglet » : le clavier est rendu à la fenêtre, puis la vue change de parent.
+        // Like “Open as Tab”: the keyboard is given back to the window, then the view changes parent.
         window.makeFirstResponder(nil)
         PeekFocus.focus(peekPage, awayFrom: container)
         let card = NSView(frame: contentView.bounds)

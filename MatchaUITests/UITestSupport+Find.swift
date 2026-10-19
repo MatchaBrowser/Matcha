@@ -1,26 +1,26 @@
 import XCTest
 
-/// Recherche dans la page (tâche 5.3) : barre, champ et résultat.
+/// Find in page (task 5.3): bar, field and result.
 extension XCTestCase {
-    /// Champ de la barre de recherche ; sa valeur est le texte cherché.
+    /// Field of the find bar; its value is the searched text.
     @MainActor
     func findField(in app: XCUIApplication) -> XCUIElement {
         app.textFields["findField"].firstMatch
     }
 
-    /// « Introuvable », affiché au bout du champ quand la dernière recherche n'a rien trouvé.
+    /// “Not Found”, shown at the end of the field when the last search found nothing.
     @MainActor
     func findStatus(in app: XCUIApplication) -> XCUIElement {
         app.descendants(matching: .any).matching(identifier: "findStatus").firstMatch
     }
 
-    /// Bouton de la barre : `findPreviousButton`, `findNextButton`, `findCloseButton`.
+    /// Button of the bar: `findPreviousButton`, `findNextButton`, `findCloseButton`.
     @MainActor
     func findButton(_ identifier: String, in app: XCUIApplication) -> XCUIElement {
         app.buttons[identifier].firstMatch
     }
 
-    /// ⌘F : la barre s'ouvre (ou reste ouverte) et son champ prend le clavier.
+    /// ⌘F: the bar opens (or stays open) and its field takes keyboard focus.
     @MainActor
     @discardableResult
     func openFindBar(in app: XCUIApplication) -> XCUIElement {
@@ -31,14 +31,14 @@ extension XCTestCase {
         return field
     }
 
-    /// Le champ a le clavier : ⌘A puis `text`, qui remplace le texte cherché.
+    /// The field has keyboard focus: ⌘A then `text`, which replaces the searched text.
     @MainActor
     func replaceFindText(with text: String, in app: XCUIApplication) {
         app.typeKey("a", modifierFlags: .command)
         app.typeText(text)
     }
 
-    /// « Introuvable » est affiché (texte ou valeur de l'élément, selon ce que SwiftUI expose).
+    /// “Not Found” is shown (text or value of the element, depending on what SwiftUI exposes).
     @MainActor
     func waitForNotFound(in app: XCUIApplication, timeout: TimeInterval = 3) -> Bool {
         let status = findStatus(in: app)

@@ -1,15 +1,15 @@
 import AppKit
 import SwiftUI
 
-/// Signale la fenêtre de navigation aux mini-fenêtres (« Ouvrir dans le Space », Space visé, profil des nouvelles
-/// mini-fenêtres) : à son apparition, quand sa `NSWindow` change, et à sa disparition. Jamais une fenêtre privée.
+/// Reports the browser window to mini windows (“Open in Space”, target Space, profile of new mini windows): when it
+/// appears, when its `NSWindow` changes, and when it disappears. Never a private window.
 struct MainWindowLinkModifier: ViewModifier {
     let session: BrowserSession
     let model: WindowModel
     let window: NSWindow?
     let dismissCommandBar: @MainActor () -> Void
 
-    /// Absent des fenêtres privées.
+    /// Absent from private windows.
     @Environment(MiniWindowManager.self) private var miniWindows: MiniWindowManager?
     @Environment(\.openWindow) private var openWindow
 
@@ -29,13 +29,13 @@ struct MainWindowLinkModifier: ViewModifier {
             return
         }
         miniWindows.linkMainWindow(BrowserWindowLink(windowModel: model, window: window, dismissCommandBar: dismissCommandBar))
-        // Pour rouvrir la fenêtre principale fermée (liens d'autres apps, tâche 8.2).
+        // To reopen the main window once closed (links from other apps, task 8.2).
         miniWindows.openMainWindow = { [openWindow] in openWindow(id: MatchaApp.browserWindowID) }
     }
 }
 
 extension View {
-    /// Voir `MainWindowLinkModifier`.
+    /// See `MainWindowLinkModifier`.
     func linkedToMiniWindows(
         session: BrowserSession,
         model: WindowModel,

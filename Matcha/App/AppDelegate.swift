@@ -1,8 +1,8 @@
 import AppKit
 
-/// Délégué de l'application : liens ouverts par d'autres apps, confirmation avant de quitter.
+/// App delegate: links opened by other apps, confirmation before quitting.
 final class AppDelegate: NSObject, NSApplicationDelegate {
-    /// Adresses web et fichiers HTML que macOS confie à Matcha (tâche 8.2).
+    /// Web addresses and HTML files that macOS hands over to Matcha (task 8.2).
     func application(_: NSApplication, open urls: [URL]) {
         IncomingLinks.shared.receive(urls)
     }

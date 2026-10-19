@@ -2,14 +2,13 @@ import AppKit
 import OSLog
 import WebKit
 
-/// Ce qu'une extension peut faire d'un onglet (tâche 6.3). Non pris en charge (erreur de WebKit « not implemented ») :
-/// couper le son (aucune API publique), mode lecture, sélection multiple hors des splits (`setSelected`), changer
-/// d'onglet parent.
+/// What an extension can do with a tab (task 6.3). Not supported (WebKit error “not implemented”): muting (no public
+/// API), reader mode, multiple selection outside splits (`setSelected`), changing the parent tab.
 extension ExtensionTab {
     typealias Completion = @Sendable ((any Error)?) -> Void
 
-    /// Une page web, ou une page de la même extension : WebKit refuse de passer de l'une à l'autre dans la même vue web
-    /// (`WKWebExtensionContext.webViewConfiguration`) ; ces pages s'ouvrent dans un nouvel onglet (`FEATURES.md`).
+    /// A web page, or a page of the same extension: WebKit refuses to switch from one to the other in the same web view
+    /// (`WKWebExtensionContext.webViewConfiguration`); these pages open in a new tab (`FEATURES.md`).
     func loadURL(_ url: URL, for _: WKWebExtensionContext, completionHandler: @escaping Completion) {
         guard let page, let owner else {
             completionHandler(ExtensionError.notFound)
@@ -26,7 +25,7 @@ extension ExtensionTab {
         completionHandler(nil)
     }
 
-    /// Recharge la page ; un onglet sans vue web (déchargé, en veille) la recrée, ce qui la recharge.
+    /// Reloads the page; a tab without a web view (unloaded, asleep) recreates it, which reloads it.
     func reload(fromOrigin: Bool, for _: WKWebExtensionContext, completionHandler: @escaping Completion) {
         guard let page else {
             completionHandler(ExtensionError.notFound)
@@ -60,9 +59,8 @@ extension ExtensionTab {
         completionHandler(nil)
     }
 
-    /// Comme un clic dans la barre, sans prendre le clavier : la fenêtre affiche le Space de l'onglet, l'aperçu se ferme
-    /// et l'onglet est sélectionné. L'aperçu, la page d'une mini-fenêtre ou d'une fenêtre de connexion sont toujours
-    /// actifs.
+    /// Like a click in the sidebar, without taking keyboard focus: the window displays the tab's Space, Peek closes and
+    /// the tab is selected. Peek, and the page of a mini window or of a sign-in window, are always active.
     func activate(for _: WKWebExtensionContext, completionHandler: @escaping Completion) {
         guard let page, let owner else {
             completionHandler(ExtensionError.notFound)
@@ -79,9 +77,8 @@ extension ExtensionTab {
         completionHandler(nil)
     }
 
-    /// Comme ⌘W : un onglet du jour se ferme ; un épinglé ou un favori revient à son adresse d'origine et se décharge,
-    /// mais reste dans la barre (comme dans Arc) ; l'aperçu se ferme ; la page d'une mini-fenêtre ou d'une fenêtre de
-    /// connexion ferme celle-ci.
+    /// Like ⌘W: a Today tab closes; a pinned tab or a favorite goes back to its original address and unloads, but stays
+    /// in the sidebar (as in Arc); Peek closes; the page of a mini window or of a sign-in window closes that window.
     func close(for _: WKWebExtensionContext, completionHandler: @escaping Completion) {
         guard let page, let owner else {
             completionHandler(ExtensionError.notFound)
@@ -101,8 +98,8 @@ extension ExtensionTab {
         completionHandler(nil)
     }
 
-    /// Épingler range l'onglet du jour à la fin des épinglés ; désépingler (un épinglé ou un favori) le remet en tête
-    /// des onglets du jour, comme le menu de la barre.
+    /// Pinning moves the Today tab to the end of the pinned tabs; unpinning (a pinned tab or a favorite) puts it back
+    /// at the top of the Today tabs, like the sidebar menu.
     func setPinned(_ pinned: Bool, for context: WKWebExtensionContext, completionHandler: @escaping Completion) {
         guard let page, case let .space(space, _) = owner else {
             completionHandler(ExtensionError.unsupported("Only tabs of a browser window can be pinned."))
@@ -115,8 +112,8 @@ extension ExtensionTab {
         completionHandler(nil)
     }
 
-    /// Zoom du site de la page, comme ⌘+ et ⌘- (tâche 5.4) : toutes les pages ouvertes de ce site le prennent, comme
-    /// la portée « per-origin » de Chrome.
+    /// Zoom of the page's website, like ⌘+ and ⌘- (task 5.4): all open pages of this website take it, like Chrome's
+    /// “per-origin” scope.
     func setZoomFactor(_ zoomFactor: Double, for _: WKWebExtensionContext, completionHandler: @escaping Completion) {
         guard let page else {
             completionHandler(ExtensionError.notFound)
@@ -130,8 +127,8 @@ extension ExtensionTab {
         completionHandler(nil)
     }
 
-    /// Comme « Dupliquer » de la barre : la copie, avec son historique, s'ouvre juste après l'onglet ; elle n'est active
-    /// que si l'extension le demande.
+    /// Like “Duplicate Tab” in the sidebar: the copy, with its history, opens right after the tab; it is active only if
+    /// the extension asks for it.
     func duplicate(
         using configuration: WKWebExtension.TabConfiguration,
         for _: WKWebExtensionContext,

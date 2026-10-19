@@ -2,10 +2,9 @@ import AppKit
 import SwiftUI
 import WebKit
 
-/// Affiche la vue web de l'aperçu dans un conteneur AppKit. Le conteneur, parent de la vue web dans la
-/// chaîne des répondeurs, reçoit `cancelOperation:` quand la page n'a pas gardé ⎋ (ni ⌘.) : l'aperçu se
-/// ferme. La vue web n'est ajoutée qu'à la création : quand elle part dans la carte (« Ouvrir en onglet »),
-/// le conteneur ne la reprend jamais.
+/// Shows the peek's web view in an AppKit container. The container, parent of the web view in the responder
+/// chain, receives `cancelOperation:` when the page has not kept ⎋ (or ⌘.): the peek closes. The web view is only
+/// added at creation: when it leaves for the card (“Open as Tab”), the container never takes it back.
 struct PeekWebHost: NSViewRepresentable {
     let webView: WKWebView
     let onCancel: () -> Void
@@ -21,11 +20,11 @@ struct PeekWebHost: NSViewRepresentable {
     }
 }
 
-/// Parent AppKit de la vue web de l'aperçu.
+/// AppKit parent of the peek's web view.
 final class PeekWebContainer: NSView {
     let webView: WKWebView
     var onCancel: (() -> Void)?
-    /// La page prend le clavier une seule fois, à la première apparition.
+    /// The page takes keyboard focus only once, at the first appearance.
     private var wantsFocus = true
 
     init(webView: WKWebView) {
@@ -40,8 +39,8 @@ final class PeekWebContainer: NSView {
         nil
     }
 
-    /// La vue web suit la taille du conteneur tant qu'elle y est (sans toucher à son `autoresizingMask`,
-    /// que la carte gère une fois qu'elle l'a reçue).
+    /// The web view follows the container's size as long as it is in it (without touching its `autoresizingMask`,
+    /// which the card manages once it has received it).
     override func setFrameSize(_ newSize: NSSize) {
         super.setFrameSize(newSize)
         if webView.superview === self {
@@ -49,7 +48,8 @@ final class PeekWebContainer: NSView {
         }
     }
 
-    /// À l'apparition, la page de l'aperçu prend le clavier à la page d'origine (ou à personne), jamais à un champ.
+    /// On appearance, the peek's page takes keyboard focus from the originating page (or from nobody), never from
+    /// a field.
     override func viewDidMoveToWindow() {
         super.viewDidMoveToWindow()
         guard wantsFocus, let window, webView.superview === self else {
@@ -61,7 +61,7 @@ final class PeekWebContainer: NSView {
         }
     }
 
-    /// ⎋ ou ⌘. que la page n'a pas gardés.
+    /// ⎋ or ⌘. that the page did not keep.
     override func cancelOperation(_: Any?) {
         onCancel?()
     }

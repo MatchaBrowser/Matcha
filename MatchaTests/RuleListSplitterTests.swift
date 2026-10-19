@@ -2,9 +2,9 @@ import Foundation
 @testable import Matcha
 import Testing
 
-/// Découpe d'une liste de règles trop grosse pour WebKit (tâche 6.2) : parts dans l'ordre, liste courte intacte.
+/// Splitting a rule list too big for WebKit (task 6.2): parts in order, a short list left intact.
 struct RuleListSplitterTests {
-    /// Règle numérotée `index`, pour suivre l'ordre.
+    /// Rule numbered `index`, to follow the order.
     private static func rule(_ index: Int) -> String {
         #"{"trigger":{"url-filter":"^https?://r\#(index)\\.example/"},"action":{"type":"block"}}"#
     }
@@ -13,7 +13,7 @@ struct RuleListSplitterTests {
         Data(("[" + (0 ..< count).map(rule).joined(separator: ",") + "]").utf8)
     }
 
-    /// Filtres des règles de `part`, dans l'ordre.
+    /// Filters of the rules of `part`, in order.
     private static func filters(of part: String) throws -> [String] {
         let rules = try #require(try JSONSerialization.jsonObject(with: Data(part.utf8)) as? [[String: [String: String]]])
         return rules.compactMap { $0["trigger"]?["url-filter"] }
@@ -35,7 +35,7 @@ struct RuleListSplitterTests {
         #expect(parts.flatMap(\.self) == expected)
     }
 
-    /// Les barres obliques des expressions ne sont pas échappées (« \/ ») : les parts restent lisibles et légères.
+    /// Slashes in the expressions are not escaped (“\/”): the parts stay readable and light.
     @Test func `parts keep slashes unescaped`() throws {
         let result = try RuleListSplitter.parts(of: Self.list(2), maximumRuleCount: 1)
         #expect(result.parts.allSatisfy { !$0.contains(#"\/"#) && $0.contains("://") })

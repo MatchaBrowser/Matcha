@@ -1,33 +1,33 @@
 import Foundation
 
-/// Ce que la barre de commande modifie quand une adresse s'ouvre.
+/// What the command bar modifies when an address opens.
 nonisolated enum CommandBarMode: Equatable, Sendable {
-    /// Ouverture dans un nouvel onglet (⌘T).
+    /// Opening in a new tab (⌘T).
     case newTab
-    /// Édition de l'onglet `UUID` du Space affiché.
+    /// Editing tab `UUID` of the displayed Space.
     case currentTab(UUID)
 }
 
-/// Ce que les sources savent de l'ouverture en cours.
+/// What the sources know about the current opening.
 nonisolated struct CommandContext: Equatable, Sendable {
     var isPrivate = false
     var showsSearchSuggestions = false
 
-    /// Suggestions du moteur permises : réglage activé et fenêtre non privée.
+    /// Engine suggestions allowed: setting enabled and window not private.
     var allowsSuggestions: Bool {
         showsSearchSuggestions && !isPrivate
     }
 }
 
-/// Réglages lus par la fenêtre (@AppStorage) à chaque ouverture de la barre, puis suivis tant
-/// qu'elle reste ouverte (`CommandBarModel.apply`).
+/// Settings read by the window (@AppStorage) each time the bar opens, then followed as long as it stays open
+/// (`CommandBarModel.apply`).
 nonisolated struct CommandBarSettings: Equatable, Sendable {
     var searchEngine: SearchEngine
-    /// Page des nouveaux onglets : nil = barre de commande puis onglet vide.
+    /// Page of new tabs: nil = command bar then empty tab.
     var newTabHomeURL: URL?
     var showsSearchSuggestions: Bool
 
-    /// `newTabHomeURL` = `BrowserSettings.homeURL(from: homePage, searchEngine:)` seulement si
+    /// `newTabHomeURL` = `BrowserSettings.homeURL(from: homePage, searchEngine:)` only if
     /// `newTabPage == .homePage`.
     init(searchEngine: SearchEngine, newTabPage: NewTabPage, homePage: String, showsSearchSuggestions: Bool) {
         self.searchEngine = searchEngine
@@ -36,12 +36,12 @@ nonisolated struct CommandBarSettings: Equatable, Sendable {
     }
 }
 
-/// Suite donnée à Entrée ou à un clic sur une ligne.
+/// What follows Return or a click on a row.
 nonisolated enum CommandBarSubmission: Equatable, Sendable {
-    /// Exécuter la cible de la ligne, dans le mode de la barre.
+    /// Run the row's target, in the bar's mode.
     case run(CommandTarget, mode: CommandBarMode)
-    /// Entrée sans texte en mode nouvel onglet : un onglet vide.
+    /// Return with no text in new tab mode: an empty tab.
     case openEmptyTab
-    /// Rien à faire : la barre reste ouverte.
+    /// Nothing to do: the bar stays open.
     case ignore
 }

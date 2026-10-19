@@ -1,13 +1,13 @@
 import Dispatch
 
-/// Niveau d'une alerte mémoire du système.
+/// Level of a system memory warning.
 nonisolated enum MemoryPressureLevel: String, Sendable {
     case warning
     case critical
 }
 
-/// Alertes mémoire du système (`DispatchSource.makeMemoryPressureSource`), reçues sur le fil principal ; le retour à la
-/// normale est ignoré. La source est arrêtée avec l'objet.
+/// System memory warnings (`DispatchSource.makeMemoryPressureSource`), received on the main thread; the return to
+/// normal is ignored. The source is stopped with the object.
 final nonisolated class MemoryPressureMonitor {
     private let source: any DispatchSourceMemoryPressure
 

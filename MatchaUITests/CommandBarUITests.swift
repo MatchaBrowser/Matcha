@@ -1,7 +1,7 @@
 import XCTest
 
-/// Barre de commande (⌘T, ⌘L) : ouverture, fermeture, lignes et clavier. Hors ligne : les onglets se
-/// distinguent par `about:blank?…` (WebKit réécrit `#` en `%23`).
+/// Command bar (⌘T, ⌘L): opening, closing, rows and keyboard. Offline: tabs are told apart by
+/// `about:blank?…` (WebKit rewrites `#` as `%23`).
 final class CommandBarUITests: XCTestCase {
     override func setUpWithError() throws {
         continueAfterFailure = false
@@ -12,13 +12,13 @@ final class CommandBarUITests: XCTestCase {
         app.descendants(matching: .any).matching(identifier: "spaceButton")
     }
 
-    /// Ligne de la barre dont le titre est exactement `title`.
+    /// Row of the bar whose title is exactly `title`.
     @MainActor
     private func commandBarRow(titled title: String, in scope: XCUIElement) -> XCUIElement {
         commandBarRows(in: scope).matching(NSPredicate(format: "label == %@", title)).firstMatch
     }
 
-    /// Lance l'app (aucun onglet, barre fermée) et attend sa fenêtre.
+    /// Launches the app (no tab, bar closed) and waits for its window.
     @MainActor
     private func launch() -> XCUIApplication {
         let app = launchApp()
@@ -26,7 +26,7 @@ final class CommandBarUITests: XCTestCase {
         return app
     }
 
-    /// Lance l'app, ouvre la barre (⌘T) et attend que son champ ait le clavier.
+    /// Launches the app, opens the bar (⌘T) and waits until its field has keyboard focus.
     @MainActor
     private func launchAndOpenBar() -> (app: XCUIApplication, field: XCUIElement) {
         let app = launch()
@@ -68,14 +68,14 @@ final class CommandBarUITests: XCTestCase {
         openAddress("about:blank?one", in: app)
         XCTAssertTrue(waitForCount(tabRows(in: app), 1))
 
-        // L'URL complète, sélectionnée : ligne de l'adresse puis « Copier l'URL ».
+        // The full URL, selected: address row then “Copy URL”.
         let field = openCommandBar(in: app, newTab: false)
         XCTAssertTrue(waitForValue(of: field) { $0 == "about:blank?one" })
         let rows = commandBarRows(in: app)
         XCTAssertTrue(waitForCount(rows, 2))
         XCTAssertEqual(rows.element(boundBy: 1).label, "Copier l'URL")
 
-        // La frappe remplace l'adresse ; elle s'ouvre dans le même onglet.
+        // Typing replaces the address; it opens in the same tab.
         app.typeText("about:blank?two\n")
         XCTAssertTrue(field.waitForNonExistence(timeout: 3))
         XCTAssertTrue(waitForValue(of: addressPill(in: app)) { $0 == "about:blank?two" })
@@ -89,13 +89,13 @@ final class CommandBarUITests: XCTestCase {
         openAddress("about:blank?two", in: app)
         XCTAssertTrue(waitForCount(tabRows(in: app), 2))
 
-        // « blank » : la recherche, puis l'onglet ?one (l'onglet affiché n'est pas proposé).
+        // “blank”: the search, then the ?one tab (the displayed tab is not suggested).
         let field = openCommandBar(in: app)
         app.typeText("blank")
         let rows = commandBarRows(in: app)
         XCTAssertTrue(waitForCount(rows, 2))
 
-        // La sélection ne boucle pas.
+        // The selection doesn't wrap around.
         app.typeKey(.upArrow, modifierFlags: [])
         XCTAssertTrue(rows.element(boundBy: 0).isSelected)
         app.typeKey(.downArrow, modifierFlags: [])
@@ -129,7 +129,7 @@ final class CommandBarUITests: XCTestCase {
         XCTAssertTrue(waitForCount(tabRows(in: app), 2))
 
         let field = openCommandBar(in: app)
-        // Le clic ferme la barre et sélectionne l'onglet, du premier coup.
+        // The click closes the bar and selects the tab, on the first try.
         tabRow(titled: "about:blank?one", in: app).click()
         XCTAssertTrue(field.waitForNonExistence(timeout: 3))
         XCTAssertTrue(waitForValue(of: addressPill(in: app)) { $0 == "about:blank?one" })
@@ -142,7 +142,7 @@ final class CommandBarUITests: XCTestCase {
         XCTAssertTrue(waitForCount(spaceButtons(in: app), 2))
         let field = openCommandBar(in: app)
         app.typeText("swift")
-        // ⌃1 : le menu Spaces passe au premier Space ; la barre se ferme sans rien ouvrir.
+        // ⌃1: the Spaces menu switches to the first Space; the bar closes without opening anything.
         app.typeKey("1", modifierFlags: .control)
         XCTAssertTrue(field.waitForNonExistence(timeout: 3))
         XCTAssertEqual(tabRows(in: app).count, 0)
@@ -179,7 +179,7 @@ final class CommandBarUITests: XCTestCase {
 
         app.typeText("space")
         XCTAssertFalse(commandBarRow(titled: "Nouveau Space", in: privateWindow).waitForExistence(timeout: 1))
-        // Seule la recherche du texte reste.
+        // Only the text search remains.
         XCTAssertEqual(commandBarRows(in: privateWindow).count, 1)
     }
 }

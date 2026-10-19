@@ -1,8 +1,7 @@
 import AppKit
 
-/// Fenêtre d'une fenêtre de connexion (tâche 5.8) : une vraie fenêtre à barre de titre (le titre de la page),
-/// redimensionnable, sans bouton de réduction (elle reste attachée à sa fenêtre d'origine), jamais restaurée ni
-/// regroupée en onglets.
+/// Window of a sign-in window (task 5.8): a real window with a title bar (the page's title), resizable, without a
+/// minimize button (it stays attached to its originating window), never restored nor grouped into tabs.
 final class PopupWindow: NSWindow {
     static let accessibilityID = "popupWindow"
     static let style: NSWindow.StyleMask = [.titled, .closable, .resizable]
@@ -12,7 +11,7 @@ final class PopupWindow: NSWindow {
         isReleasedWhenClosed = false
         isRestorable = false
         tabbingMode = .disallowed
-        // Par-dessus une fenêtre en plein écran ; le bouton vert agrandit sans passer en plein écran.
+        // Over a full-screen window; the green button zooms without going full screen.
         collectionBehavior = [.fullScreenAuxiliary]
         let minimum = PopupWindowPlacement.minimumPageSize
         contentMinSize = CGSize(width: minimum.width, height: minimum.height + PopupAddressBar.height)
@@ -20,8 +19,8 @@ final class PopupWindow: NSWindow {
         setFrame(frame, display: false)
     }
 
-    /// ⌘W ferme la fenêtre de connexion, avant la page et le menu : l'élément « Fermer l'onglet » ne doit jamais
-    /// viser l'onglet de la fenêtre de navigation qui est derrière.
+    /// ⌘W closes the sign-in window, before the page and the menu: the “Close Tab” item must never target the tab
+    /// of the browsing window behind it.
     override func performKeyEquivalent(with event: NSEvent) -> Bool {
         if Self.isCloseShortcut(event) {
             performClose(nil)
@@ -30,8 +29,7 @@ final class PopupWindow: NSWindow {
         return super.performKeyEquivalent(with: event)
     }
 
-    /// ⌘W seul (sans Maj : ⇧⌘W reste « Fermer la fenêtre », qui la ferme aussi) ; le verrouillage des majuscules ne
-    /// compte pas.
+    /// ⌘W alone (without Shift: ⇧⌘W stays “Close Window”, which closes it too); Caps Lock does not count.
     static func isCloseShortcut(_ event: NSEvent) -> Bool {
         event.type == .keyDown
             && event.modifierFlags.intersection([.command, .shift, .option, .control]) == .command

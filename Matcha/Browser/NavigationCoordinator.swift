@@ -2,30 +2,29 @@ import AppKit
 import OSLog
 import WebKit
 
-/// Délégué de navigation et d'interface des vues web d'un `TabHost` (les onglets d'un Space et leur aperçu, les
-/// mini-fenêtres ou les fenêtres de connexion) : nouvelles fenêtres, fenêtres de connexion (`PopupWindowManager`),
-/// fermeture par la page, liens vers d'autres apps, clics avec modificateur, aperçu (Peek), téléchargements,
-/// permissions des sites (`+Permissions`), historique (`+History`), arrêt du processus d'une page (`+Crash`), menu
-/// contextuel des pages (`+PageMenu`), bloqueur (tâche 6.2). Les règles viennent de `NavigationPolicy`,
-/// `PopupWindowFeatures`, `DownloadPolicy`, `SitePermissionPolicy`, `PageCrashPolicy` et `PendingPageMenuIntent` ;
-/// l'hôte décide où vont les pages.
+/// Navigation and UI delegate of the web views of a `TabHost` (the tabs of a Space and their Peek, the mini windows
+/// or the sign-in windows): new windows, sign-in windows (`PopupWindowManager`), closing by the page, links to other
+/// apps, clicks with modifiers, Peek, downloads, site permissions (`+Permissions`), history (`+History`),
+/// termination of a page's process (`+Crash`), context menu of pages (`+PageMenu`), blocker (task 6.2). The rules
+/// come from `NavigationPolicy`, `PopupWindowFeatures`, `DownloadPolicy`, `SitePermissionPolicy`, `PageCrashPolicy`
+/// and `PendingPageMenuIntent`; the host decides where pages go.
 @MainActor
 final class NavigationCoordinator: NSObject {
     weak var tabHost: (any TabHost)?
-    /// Reçoit les téléchargements ; remplacé dans les tests (dossier temporaire).
+    /// Receives the downloads; replaced in tests (temporary folder).
     var downloadManager = DownloadManager.shared
 
-    /// Confie une URL à l'app qui la gère ; remplaçable dans les tests.
+    /// Hands a URL to the app that handles it; replaceable in tests.
     var openExternally: (URL) -> Bool = { NSWorkspace.shared.open($0) }
-    /// Réglage « liens des favoris et des épinglés vers d'autres sites dans l'aperçu », lu à chaque clic ;
-    /// remplaçable dans les tests.
+    /// “Open links to other websites from Favorites and pinned tabs in Peek” setting, read at each click;
+    /// replaceable in tests.
     var opensPinnedLinksInPeek: () -> Bool = { BrowserSettings.pinnedLinksOpenInPeek() }
-    /// Heure des arrêts du processus des pages (tâche 5.7) ; remplacée dans les tests.
+    /// Time of page process terminations (task 5.7); replaced in tests.
     var now: () -> Date = { .now }
 
     private func request(for navigationAction: WKNavigationAction, in webView: WKWebView) -> NavigationRequest {
         let url = navigationAction.request.url
-        // Sans hôte, la page n'est rangée nulle part : un Maj+clic y reste un clic.
+        // Without a host, the page is placed nowhere: a Shift-click stays a click there.
         let source = tabHost?.navigationSource(of: webView) ?? .other
         return NavigationRequest(
             url: url,
@@ -42,9 +41,9 @@ final class NavigationCoordinator: NSObject {
         )
     }
 
-    /// Vrai si WebKit charge lui-même ce schéma ou si la configuration de la vue lui associe un gestionnaire. Les pages
-    /// des extensions (`webkit-extension:`, tâche 6.3) sont servies par WebKit sans gestionnaire visible : jamais confiées
-    /// à une autre app (WebKit refuse lui-même de les charger dans une vue qui n'est pas celle de leur extension).
+    /// True if WebKit loads this scheme itself or if the view's configuration associates a handler with it. Extension
+    /// pages (`webkit-extension:`, task 6.3) are served by WebKit without a visible handler: never handed to another
+    /// app (WebKit itself refuses to load them in a view that is not their extension's).
     func handles(_ url: URL, in webView: WKWebView) -> Bool {
         guard let scheme = url.scheme?.lowercased() else {
             return true
@@ -62,8 +61,8 @@ final class NavigationCoordinator: NSObject {
         }
     }
 
-    /// Confie à `downloadManager` un téléchargement que WebKit vient de créer. La page d'origine est le référent de
-    /// la requête, sinon la page affichée (jamais l'adresse en cours de chargement, qui est celle du fichier).
+    /// Hands to `downloadManager` a download WebKit has just created. The originating page is the request's referrer,
+    /// otherwise the displayed page (never the address being loaded, which is the file's).
     private func track(_ download: WKDownload, from webView: WKWebView) {
         let referrer = download.originalRequest?.value(forHTTPHeaderField: "Referer").flatMap(URL.init(string:))
         downloadManager.track(
@@ -74,13 +73,13 @@ final class NavigationCoordinator: NSObject {
         tabHost?.downloadDidStart(in: webView)
     }
 
-    /// Lien à ouvrir dans l'aperçu ; faux si l'hôte ne peut pas l'ouvrir (le lien suit alors son cours).
+    /// Link to open in Peek; false if the host cannot open it (the link then proceeds as usual).
     private func openInPeek(_ url: URL, from webView: WKWebView) -> Bool {
         tabHost?.openInPeek(url, from: webView, openingPoint: webView.pointerPeekPoint) == true
     }
 
-    /// Navigation autorisée. Bloqueur (tâche 6.2) : pour le document principal, les listes de la page sont d'abord
-    /// posées, ou retirées si le site de destination est en exception ; elles valent ainsi dès ce chargement (vérifié).
+    /// Navigation allowed. Blocker (task 6.2): for the main document, the page's lists are set first, or removed if
+    /// the destination site is an exception; they thus apply from this very load (checked).
     private func allow(
         _ navigationAction: WKNavigationAction,
         in webView: WKWebView,
@@ -92,9 +91,9 @@ final class NavigationCoordinator: NSObject {
         decisionHandler(.allow)
     }
 
-    /// Bloqueur (tâche 6.2) : une navigation autorisée qui n'aboutit pas (erreur réseau, réponse devenue un
-    /// téléchargement) laisse la page affichée, dont les listes reviennent à l'état de son document. Sauf annulation :
-    /// c'est le plus souvent qu'une autre navigation la remplace, déjà préparée.
+    /// Blocker (task 6.2): an allowed navigation that does not complete (network error, response turned into a
+    /// download) leaves the displayed page, whose lists return to the state of its document. Except on cancellation:
+    /// most often another navigation, already prepared, is replacing it.
     func provisionalNavigationDidFail(in webView: WKWebView, error: any Error) {
         let error = error as NSError
         guard error.domain != NSURLErrorDomain || error.code != NSURLErrorCancelled else {
@@ -105,14 +104,14 @@ final class NavigationCoordinator: NSObject {
 }
 
 extension NavigationCoordinator: WKNavigationDelegate {
-    /// Nouvelle page affichée (onglet, aperçu ou mini-fenêtre) : icône connue de son domaine, ou pastille en
-    /// attendant mieux, et zoom de son site (tâche 5.4). Les demandes de permission de l'ancienne page n'ont plus
-    /// d'objet : refusées ; son son s'est arrêté avec elle (tâche 5.10).
+    /// New page displayed (tab, Peek or mini window): known icon of its domain, or a placeholder badge until something
+    /// better comes, and zoom of its site (task 5.4). The permission requests of the old page no longer apply: refused;
+    /// its sound stopped with it (task 5.10).
     func webView(_ webView: WKWebView, didCommit _: WKNavigation!) {
         guard let tabHost, let tab = tabHost.page(for: webView) else {
             return
         }
-        // Bloqueur (tâche 6.2) : recalé sur le document affiché (redirection, retour depuis le cache).
+        // Blocker (task 6.2): realigned on the displayed document (redirect, back from the cache).
         tabHost.contentBlocking?.prepare(webView, for: webView.url)
         tab.permissionPrompts.denyAll()
         tab.audio.reset()
@@ -124,14 +123,14 @@ extension NavigationCoordinator: WKNavigationDelegate {
         guard let tabHost, let tab = tabHost.page(for: webView) else {
             return
         }
-        // Page sortie de veille rechargée (tâche 5.6) : sa capture laisse la place à la page ; page rechargée après un
-        // arrêt de son processus (5.7) : l'onglet suit de nouveau sa vue web.
+        // Page woken from sleep reloaded (task 5.6): its snapshot gives way to the page; page reloaded after its
+        // process stopped (5.7): the tab follows its web view again.
         tab.suspension.endRestoring()
         tab.crash.end()
         tabHost.faviconService.refreshIcon(of: tab)
-        // Retenu à chaque page chargée : un plantage ne fait pas perdre l'historique.
+        // Recorded at each loaded page: a crash does not lose the history.
         tab.captureInteractionState()
-        // Visite retenue dans l'historique du profil (tâche 5.5), jamais pour une fenêtre privée.
+        // Visit recorded in the profile's history (task 5.5), never for a private window.
         tab.history.pageDidFinishLoading(url: webView.url, title: webView.title, scope: tabHost.historyScope(for: webView))
     }
 
@@ -150,7 +149,7 @@ extension NavigationCoordinator: WKNavigationDelegate {
             open(externally: url)
         case let .openInNewTab(url, inBackground):
             decisionHandler(.cancel)
-            // Même configuration que la vue d'origine : même profil.
+            // Same configuration as the originating view: same profile.
             tabHost?.openLink(url, configuration: webView.configuration, from: webView, inBackground: inBackground)
         case let .openInPeek(url):
             if openInPeek(url, from: webView) {
@@ -163,7 +162,7 @@ extension NavigationCoordinator: WKNavigationDelegate {
         }
     }
 
-    /// Une réponse que WebKit ne sait pas afficher, ou une pièce jointe, devient un téléchargement.
+    /// A response WebKit cannot display, or an attachment, becomes a download.
     func webView(
         _: WKWebView,
         decidePolicyFor navigationResponse: WKNavigationResponse,
@@ -183,11 +182,11 @@ extension NavigationCoordinator: WKNavigationDelegate {
 }
 
 extension NavigationCoordinator: WKUIDelegate {
-    /// Lien `target=_blank` ou `window.open` : la nouvelle vue doit être créée avec la configuration
-    /// fournie, sans quoi `window.opener` ne fonctionne pas. WebKit y charge ensuite la requête. Une fenêtre dont la
-    /// page donne la taille (connexion Google, Apple, banque) s'ouvre dans sa propre petite fenêtre (tâche 5.8), même
-    /// depuis un aperçu (qui reste un aperçu) ou une mini-fenêtre ; sinon, l'hôte en fait un onglet (ou une
-    /// mini-fenêtre). Une fenêtre ouverte pour un choix du menu contextuel (tâche 5.9) suit ce choix (`+PageMenu`).
+    /// `target=_blank` link or `window.open`: the new view must be created with the supplied configuration, otherwise
+    /// `window.opener` does not work. WebKit then loads the request in it. A window whose page gives its size (Google,
+    /// Apple or bank sign-in) opens in its own small window (task 5.8), even from Peek (which stays Peek) or a mini
+    /// window; otherwise, the host turns it into a tab (or a mini window). A window opened for a context menu choice
+    /// (task 5.9) follows that choice (`+PageMenu`).
     func webView(
         _ webView: WKWebView,
         createWebViewWith configuration: WKWebViewConfiguration,
@@ -197,7 +196,7 @@ extension NavigationCoordinator: WKUIDelegate {
         guard let tabHost else {
             return nil
         }
-        // La nouvelle page a son propre contrôleur de contenu (bloqueur, tâche 6.2), pas celui de la page d'origine.
+        // The new page has its own content controller (blocker, task 6.2), not that of the originating page.
         WebConfigurationFactory.giveOwnContentController(to: configuration)
         let features = PopupWindowFeatures(windowFeatures)
         if let intent = takePageMenuIntent(of: webView, for: navigationAction, features: features) {
@@ -206,13 +205,13 @@ extension NavigationCoordinator: WKUIDelegate {
         guard features.opensPopupWindow, let popupWindows = tabHost.popupWindows else {
             return tabHost.openWindow(configuration: configuration, from: webView, inBackground: false)
         }
-        // Jamais l'adresse : l'hôte seulement.
+        // Never the address: only the host.
         let host = navigationAction.request.url?.host() ?? "?"
         Logger.browser.info("Fenêtre de connexion ouverte (\(host, privacy: .private))")
         return popupWindows.open(configuration: configuration, features: features, opener: PopupOpener(host: tabHost, webView: webView))
     }
 
-    /// La page a appelé `window.close()`.
+    /// The page called `window.close()`.
     func webViewDidClose(_ webView: WKWebView) {
         tabHost?.closePage(of: webView)
     }

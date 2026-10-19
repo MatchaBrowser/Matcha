@@ -1,7 +1,7 @@
 import XCTest
 
-/// Outils pour développeurs web (Réglages > Avancé) : « Inspecter l'élément » dans le menu des pages ouvre l'inspecteur
-/// web dans Matcha ; réglage désactivé, l'élément disparaît. Page locale sans réseau (documentation de Postfix).
+/// Web developer tools (Settings > Advanced): “Inspect Element” in the page menu opens the web inspector in Matcha;
+/// with the setting off, the item goes away. Local page without network (Postfix documentation).
 final class DeveloperToolsUITests: XCTestCase {
     private let page = "file:///usr/share/doc/postfix/html/index.html"
 
@@ -13,7 +13,7 @@ final class DeveloperToolsUITests: XCTestCase {
         )
     }
 
-    /// Ouvre la page, puis le menu contextuel sur son titre ; renvoie l'élément « Inspecter l'élément » (peut-être absent).
+    /// Opens the page, then the context menu on its title; returns the “Inspect Element” item (possibly missing).
     @MainActor
     private func inspectItem(settings: [String: String]) -> (XCUIApplication, XCUIElement) {
         let app = launchApp(settings: settings)
@@ -34,8 +34,8 @@ final class DeveloperToolsUITests: XCTestCase {
         let page = app.descendants(matching: .any)["pagePane"].scrollViews.firstMatch
         let height = page.frame.height
         item.click()
-        // L'inspecteur s'ouvre sous la page, dans la carte : la page rétrécit (son contenu n'est pas exposé à
-        // l'accessibilité).
+        // The inspector opens below the page, in the card: the page shrinks (its content isn't exposed to
+        // accessibility).
         let shrunk = NSPredicate { _, _ in page.frame.height < height - 100 }
         wait(for: [XCTNSPredicateExpectation(predicate: shrunk, object: nil)], timeout: 5)
     }

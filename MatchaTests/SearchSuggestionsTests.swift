@@ -2,7 +2,7 @@ import Foundation
 @testable import Matcha
 import Testing
 
-/// Adresses et lecture des suggestions de recherche (sans réseau).
+/// Addresses and parsing of search suggestions (without network).
 struct SearchSuggestionsTests {
     private func parse(_ json: String, encoding: String? = "utf-8") throws -> [String] {
         try SearchSuggestionParser.parse(Data(json.utf8), textEncodingName: encoding)
@@ -62,7 +62,7 @@ struct SearchSuggestionsTests {
     }
 }
 
-/// Texte et contexte d'une demande de suggestions, et la décision attendue.
+/// Text and context of a suggestions request, and the expected decision.
 struct SuggestionPolicyCase: CustomTestStringConvertible, Sendable {
     let text: String
     var setting = true
@@ -86,7 +86,7 @@ private let suggestionPolicyCases: [SuggestionPolicyCase] = [
     SuggestionPolicyCase(text: "localhost:3000", allowed: false),
     SuggestionPolicyCase(text: "https://x.y", allowed: false),
     SuggestionPolicyCase(text: "about:blank", allowed: false),
-    // Lus comme des recherches, mais tapés comme des adresses (hôte local, chemin, e-mail).
+    // Read as searches, but typed like addresses (local host, path, email).
     SuggestionPolicyCase(text: "intranet:8080", allowed: false),
     SuggestionPolicyCase(text: "nas:5000/photos", allowed: false),
     SuggestionPolicyCase(text: "wiki/rh", allowed: false),

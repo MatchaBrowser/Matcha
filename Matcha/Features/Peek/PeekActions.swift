@@ -2,16 +2,16 @@ import AppKit
 import Foundation
 import WebKit
 
-/// Fermer l'aperçu, l'ouvrir en onglet ; le clavier suit.
+/// Closing the peek, opening it as a tab; keyboard focus follows.
 @MainActor
 enum PeekActions {
-    /// Bulle d'aide et libellé du ×, élément du menu Fichier à la place de « Fermer l'onglet » (⌘W).
+    /// Help tag and label of the ×, File menu item in place of “Close Tab” (⌘W).
     static let closeTitle = LocalizedStringResource(
         "Close Peek",
         comment: "Peek: help tag and accessibility label of the × button; File menu item replacing “Close Tab” (⌘W) while a peek is open",
     )
 
-    /// ⎋, ⌘W, ×, clic à côté, `window.close()` : l'aperçu se ferme, la page d'origine reprend le clavier.
+    /// ⎋, ⌘W, ×, click beside it, `window.close()`: the peek closes, the originating page takes keyboard focus back.
     static func close(in tabManager: TabManager) {
         guard let peek = tabManager.peek else {
             return
@@ -24,9 +24,9 @@ enum PeekActions {
         }
     }
 
-    /// « Ouvrir en onglet » : la page passe dans la carte, puis reprend le clavier perdu pendant le déplacement.
-    /// La vue web quitte l'aperçu dans la même mise à jour qu'elle entre dans la carte : elle n'a jamais
-    /// deux parents (AppKit la retire de son conteneur quand la carte l'ajoute).
+    /// “Open as Tab”: the page moves into the card, then takes back the keyboard focus lost during the move.
+    /// The web view leaves the peek in the same update as it enters the card: it never has two parents (AppKit
+    /// removes it from its container when the card adds it).
     static func openAsTab(in tabManager: TabManager) {
         guard let webView = tabManager.peek?.tab.webView else {
             return
@@ -37,7 +37,7 @@ enum PeekActions {
         PeekFocus.focus(webView, awayFrom: oldHost)
     }
 
-    /// Rend le clavier à la fenêtre s'il est dans la page de l'aperçu (jamais pris à un autre champ).
+    /// Gives keyboard focus back to the window if it is in the peek's page (never taken from another field).
     private static func releaseKeyboard(from webView: WKWebView?) {
         guard let webView, let window = webView.window, let responder = window.firstResponder as? NSView else {
             return

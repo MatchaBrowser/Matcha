@@ -1,11 +1,11 @@
 import SwiftUI
 
-/// Message posé sur une page dont le processus s'est arrêté plusieurs fois de suite (tâche 5.7) : elle ne se recharge
-/// plus d'elle-même. Le bouton, comme ⌘R, la recharge. Même style que l'accueil d'un onglet vide ; il couvre la page
-/// (carte d'un panneau, aperçu, mini-fenêtre) et en prend les clics.
+/// Message placed over a page whose process stopped several times in a row (task 5.7): it no longer reloads by
+/// itself. The button, like ⌘R, reloads it. Same style as the welcome view of an empty tab; it covers the page (card
+/// of a pane, peek, mini window) and takes its clicks.
 struct PageProblemView: View {
     let page: BrowserTab
-    /// Rend la page active (panneau d'un split) quand on clique le message ou son bouton.
+    /// Makes the page active (pane of a split) when the message or its button is clicked.
     var activate: () -> Void = {}
 
     var body: some View {
@@ -19,7 +19,7 @@ struct PageProblemView: View {
                 Image(systemName: "exclamationmark.triangle")
             }
         } description: {
-            // Le site, sans l'adresse complète.
+            // The site, without the full address.
             Text(verbatim: AddressDisplay.short(for: page.url))
         } actions: {
             Button("Reload") { page.reload() }
@@ -28,7 +28,7 @@ struct PageProblemView: View {
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .background(.background)
         .contentShape(Rectangle())
-        // Comme la barre d'adresse d'un panneau : un clic rend la page active, sans prendre le sien au bouton.
+        // Like the address bar of a pane: a click makes the page active, without taking the button's own click.
         .simultaneousGesture(TapGesture().onEnded { activate() })
         .accessibilityElement(children: .contain)
         .accessibilityIdentifier("pageProblem")

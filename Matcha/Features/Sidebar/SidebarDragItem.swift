@@ -3,15 +3,15 @@ import Foundation
 import UniformTypeIdentifiers
 
 nonisolated extension UTType {
-    /// Éléments glissés de la barre : type dynamique (aucune déclaration dans l'Info.plist), connu de Matcha seule.
-    /// Ni la page (`WKWebView`) ni une autre app ne l'acceptent.
+    /// Items dragged from the sidebar: dynamic type (no declaration in the Info.plist), known only to Matcha.
+    /// Neither the page (`WKWebView`) nor another app accepts it.
     static let matchaSidebarItem = UTType(mimeType: "application/x-matcha-sidebar-item", conformingTo: .data)!
 }
 
-/// Élément glissé dans la barre latérale : un onglet, un split ou un dossier d'épinglés, par son identifiant.
+/// Item dragged in the sidebar: a tab, a split or a pinned folder, by its identifier.
 ///
-/// L'identifiant voyage en texte préfixé, encodé en UTF-8 dans un type de données privé (voir DECISIONS.md) :
-/// une page ne reçoit jamais « matcha-tab:… » dans un champ. Toute autre donnée est refusée.
+/// The identifier travels as prefixed text, encoded in UTF-8 in a private data type (see DECISIONS.md):
+/// a page never receives “matcha-tab:…” in a field. Any other data is refused.
 nonisolated enum SidebarDragItem: Transferable, Equatable, Sendable {
     case tab(UUID)
     case folder(UUID)
@@ -41,7 +41,7 @@ nonisolated enum SidebarDragItem: Transferable, Equatable, Sendable {
         }
     }
 
-    /// Texte UTF-8 de `text`.
+    /// UTF-8 text of `text`.
     init?(data: Data) {
         guard let text = String(data: data, encoding: .utf8) else {
             return nil

@@ -1,6 +1,6 @@
 import Foundation
 
-/// Textes et icônes des permissions des sites (bandeau, réglages du site, Réglages > Confidentialité).
+/// Texts and icons of site permissions (banner, site settings, Settings > Privacy).
 extension SitePermissionKind {
     var title: String {
         switch self {
@@ -22,7 +22,7 @@ extension SitePermissionKind {
 }
 
 extension SitePermissionDecision {
-    /// État d'une décision retenue, dans la liste des Réglages.
+    /// State of a remembered decision, in the Settings list.
     var stateTitle: String {
         switch self {
         case .allow:

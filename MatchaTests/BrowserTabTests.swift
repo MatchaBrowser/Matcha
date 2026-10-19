@@ -79,7 +79,7 @@ struct BrowserTabTests {
         #expect(tab.title == "Origine")
         #expect(!tab.canGoBack && !tab.isLoading)
 
-        // La vue recréée garde la configuration (ici, le schéma de test) et charge l'adresse retenue.
+        // The recreated view keeps the configuration (here, the test scheme) and loads the saved address.
         tab.makeWebViewIfNeeded()
         try await waitUntil { tab.title == "origine" && !tab.isLoading }
         #expect(tab.url == origin)

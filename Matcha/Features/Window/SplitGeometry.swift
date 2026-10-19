@@ -1,27 +1,27 @@
 import Foundation
 
-/// Endroit d'un dépôt sur la carte : le bord gauche ou droit d'un panneau.
+/// Place of a drop on the card: the left or right edge of a pane.
 nonisolated struct SplitDropTarget: Equatable, Sendable {
     let paneIndex: Int
     let side: SplitSide
 
-    /// Rang du nouvel onglet parmi les panneaux.
+    /// Position of the new tab among the panes.
     var insertionIndex: Int {
         side == .leading ? paneIndex : paneIndex + 1
     }
 }
 
-/// Disposition des panneaux d'un split dans la carte : largeurs, séparateurs, zones de dépôt. Type pur.
+/// Layout of a split's panes in the card: widths, dividers, drop zones. Pure type.
 nonisolated enum SplitGeometry {
-    /// Intervalle entre deux cartes ; égal à `BrowserWindowView.cardMargin` (vérifié par un test).
+    /// Gap between two cards; equal to `BrowserWindowView.cardMargin` (checked by a test).
     static let gap = 8.0
     static let minimumPaneWidth = 200.0
-    /// Pas VoiceOver : part de la largeur des panneaux.
+    /// VoiceOver step: fraction of the panes' width.
     static let accessibilityStep = 0.05
 
-    /// Largeurs en points entiers des `count` panneaux dans `totalWidth`, intervalles compris : selon les
-    /// parts, chaque panneau ayant au moins `minimumPaneWidth` (pris aux autres en proportion), ou des
-    /// largeurs égales si la place manque. Les parts ne sont jamais réécrites.
+    /// Widths in whole points of the `count` panes within `totalWidth`, gaps included: according to the fractions,
+    /// each pane having at least `minimumPaneWidth` (taken from the others proportionally), or equal widths if space
+    /// is lacking. The fractions are never rewritten.
     static func paneWidths(fractions: [Double], count: Int, totalWidth: Double) -> [Double] {
         guard count > 0 else {
             return []
@@ -47,7 +47,7 @@ nonisolated enum SplitGeometry {
                 widths[index] = shareSum > 0 ? remaining * shares[index] / shareSum : remaining / Double(free.count)
             }
         }
-        // Bords cumulés arrondis : aucune erreur d'arrondi ne s'accumule sur un panneau.
+        // Rounded cumulative edges: no rounding error accumulates on a pane.
         var result: [Double] = []
         var sum = 0.0
         var previousEdge = 0.0
@@ -60,7 +60,7 @@ nonisolated enum SplitGeometry {
         return result
     }
 
-    /// Bord gauche de chaque panneau, intervalles compris.
+    /// Left edge of each pane, gaps included.
     static func paneOrigins(widths: [Double]) -> [Double] {
         var origins: [Double] = []
         var origin = 0.0
@@ -71,8 +71,8 @@ nonisolated enum SplitGeometry {
         return origins
     }
 
-    /// Parts après un glissement de `delta` points du séparateur `index` (entre les panneaux `index` et
-    /// `index + 1`) depuis `startWidths` : seuls ces deux panneaux changent, sans passer sous la largeur minimale.
+    /// Fractions after dragging divider `index` (between panes `index` and `index + 1`) by `delta` points from
+    /// `startWidths`: only these two panes change, without going below the minimum width.
     static func fractions(draggingDivider index: Int, by delta: Double, startWidths: [Double]) -> [Double] {
         guard index >= 0, index + 1 < startWidths.count else {
             return normalized(startWidths)
@@ -86,13 +86,13 @@ nonisolated enum SplitGeometry {
         return normalized(widths)
     }
 
-    /// Largeur de la bande de dépôt de chaque bord d'un panneau : un quart, entre 60 et 180 pt, la moitié au plus.
+    /// Width of the drop strip of each edge of a pane: a quarter, between 60 and 180 pt, half at most.
     static func dropZoneWidth(forPaneWidth width: Double) -> Double {
         min(max(width * 0.25, 60), 180, width / 2)
     }
 
-    /// Bord de panneau sous l'abscisse `position` (depuis le bord gauche des panneaux) ; nil au milieu d'un
-    /// panneau ou dans un intervalle.
+    /// Pane edge under the x-coordinate `position` (from the left edge of the panes); nil in the middle of a pane or
+    /// in a gap.
     static func dropTarget(atX position: Double, widths: [Double]) -> SplitDropTarget? {
         for (index, origin) in paneOrigins(widths: widths).enumerated() {
             let width = widths[index]

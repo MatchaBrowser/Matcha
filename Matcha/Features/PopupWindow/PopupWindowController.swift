@@ -2,13 +2,13 @@ import AppKit
 import SwiftUI
 import WebKit
 
-/// Une fenêtre de connexion (tâche 5.8) : sa fenêtre, sa page (un `BrowserTab` hors de tout Space, jamais
-/// enregistré), le conteneur de sa vue web et la page qui l'a ouverte. Créée et suivie par `PopupWindowManager`.
+/// A sign-in window (task 5.8): its window, its page (a `BrowserTab` outside any Space, never saved), the
+/// container of its web view and the page that opened it. Created and tracked by `PopupWindowManager`.
 ///
-/// Elle est fenêtre enfant de la fenêtre d'origine : elle reste au-dessus d'elle (un clic sur la fenêtre du navigateur
-/// ne la cache pas), la suit quand on la déplace et prend son niveau (au-dessus des autres fenêtres avec une
-/// mini-fenêtre). AppKit retire les enfants de l'écran avec leur parent : quand la fenêtre d'origine se ferme, la
-/// fenêtre de connexion s'en détache et reste ouverte.
+/// It is a child window of the originating window: it stays above it (a click on the browser window does not hide
+/// it), follows it when it is moved and takes its level (above the other windows with a mini window). AppKit
+/// removes children from the screen with their parent: when the originating window closes, the sign-in window
+/// detaches from it and stays open.
 @MainActor
 final class PopupWindowController: NSObject, Identifiable {
     let id = UUID()
@@ -26,12 +26,12 @@ final class PopupWindowController: NSObject, Identifiable {
         window = PopupWindow(frame: frame)
         super.init()
         window.delegate = self
-        // Fenêtre privée : sombre, comme elle.
+        // Private window: dark, like it.
         if isPrivate {
             window.appearance = NSAppearance(named: .darkAqua)
         }
         let host = NSHostingView(rootView: PopupWindowView(controller: self))
-        // La taille vient de la fenêtre (demandée par la page, puis réglée par l'utilisateur), jamais du contenu.
+        // The size comes from the window (requested by the page, then set by the user), never from the content.
         host.sizingOptions = []
         window.contentView = host
         if let webView = tab.webView {
@@ -39,11 +39,11 @@ final class PopupWindowController: NSObject, Identifiable {
         }
     }
 
-    /// Place la fenêtre au-dessus de `parent`, la fenêtre d'origine, tant que celle-ci est ouverte.
+    /// Places the window above `parent`, the originating window, as long as the latter is open.
     func attach(to parent: NSWindow) {
         detachFromParent()
         parent.addChildWindow(window, ordered: .above)
-        // Sans file : appelé pendant la fermeture, avant qu'AppKit ne retire les fenêtres enfants de l'écran.
+        // No queue: called during closing, before AppKit removes the child windows from the screen.
         parentObserver = NotificationCenter.default.addObserver(
             forName: NSWindow.willCloseNotification,
             object: parent,
@@ -53,8 +53,8 @@ final class PopupWindowController: NSObject, Identifiable {
         }
     }
 
-    /// Plus de fenêtre parente : la fenêtre reste où elle est, au niveau normal (un enfant garde sinon le niveau
-    /// de son ancien parent, vérifié).
+    /// No more parent window: the window stays where it is, at the normal level (otherwise a child keeps the level
+    /// of its former parent, verified).
     func detachFromParent() {
         if let parentObserver {
             NotificationCenter.default.removeObserver(parentObserver)
@@ -66,22 +66,22 @@ final class PopupWindowController: NSObject, Identifiable {
         }
     }
 
-    /// Fermeture par l'app : `window.close()` de la page, fenêtre privée ou profil fermés, fenêtre qui ne fait que
-    /// télécharger. Le bouton, ⌘W et ⇧⌘W ferment la fenêtre directement ; tout finit dans `windowWillClose`.
+    /// Closing by the app: the page's `window.close()`, private window or profile closed, window that only
+    /// downloads. The button, ⌘W and ⇧⌘W close the window directly; everything ends in `windowWillClose`.
     func close() {
         window.close()
     }
 }
 
 extension PopupWindowController: NSWindowDelegate {
-    /// Fermeture pour de bon : la page est libérée (son, processus, demandes de permission refusées).
+    /// Closing for good: the page is released (sound, process, permission requests denied).
     func windowWillClose(_: Notification) {
         detachFromParent()
         container.detach()
         tab.unload(resettingTo: nil, title: nil)
         manager?.didClose(self)
         window.delegate = nil
-        // Garde le contrôleur en vie jusqu'à la fin de la fermeture, puis libère la vue SwiftUI (qui le retient).
+        // Keeps the controller alive until the end of closing, then releases the SwiftUI view (which retains it).
         Task { @MainActor in
             self.window.contentView = nil
         }

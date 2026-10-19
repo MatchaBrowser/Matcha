@@ -1,15 +1,15 @@
 import XCTest
 
-/// Raccourcis des onglets (4.8) : ⌘1 à ⌘8 pour les favoris puis les épinglés, ⌘9 pour le dernier onglet, ⌃⇥ et
-/// ⌃⇧⇥ dans l'ordre de la barre, en boucle, panneau par panneau dans un split ; menu Onglets. Hors ligne :
+/// Tab shortcuts (4.8): ⌘1 to ⌘8 for Favorites then pinned tabs, ⌘9 for the last tab, ⌃⇥ and
+/// ⌃⇧⇥ in sidebar order, wrapping around, pane by pane in a split; Tabs menu. Offline:
 /// `about:blank?…`.
 final class TabShortcutsUITests: XCTestCase {
     override func setUpWithError() throws {
         continueAfterFailure = false
     }
 
-    /// Lance l'app et ouvre un onglet `about:blank?<nom>` par nom, dans l'ordre : le dernier est en tête et
-    /// affiché.
+    /// Launches the app and opens one `about:blank?<name>` tab per name, in order: the last one is on top and
+    /// displayed.
     @MainActor
     private func launch(opening names: [String]) -> XCUIApplication {
         let app = launchApp()
@@ -25,14 +25,14 @@ final class TabShortcutsUITests: XCTestCase {
         "about:blank?\(name)"
     }
 
-    /// Attend que la pastille de `scope` affiche l'onglet `name`.
+    /// Waits for the pill of `scope` to show the tab `name`.
     @MainActor
     private func waitForDisplayed(_ name: String, in scope: XCUIElement) -> Bool {
         waitForValue(of: addressPill(in: scope)) { $0 == self.address(name) }
     }
 
-    /// Vrai si la pastille de `scope` garde l'onglet `name` pendant deux secondes. XCTest ne vérifie une attente
-    /// qu'au bout d'environ 1 s : une attente plus courte ne pourrait jamais voir de changement.
+    /// True if the pill of `scope` keeps the tab `name` for two seconds. XCTest only checks a wait
+    /// after about 1 s: a shorter wait could never see a change.
     @MainActor
     private func keepsDisplaying(_ name: String, in scope: XCUIElement) -> Bool {
         !waitForValue(of: addressPill(in: scope), timeout: 2) { $0 != self.address(name) }
@@ -45,7 +45,7 @@ final class TabShortcutsUITests: XCTestCase {
         app.menuItems["Ajouter aux favoris"].click()
         tabRow(titled: address("two"), in: app).rightClick()
         app.menuItems["Épingler"].click()
-        // Favori « one », épinglé « two », onglets du jour « four » (affiché) et « three ».
+        // Favorite “one”, pinned “two”, Today tabs “four” (displayed) and “three”.
         XCTAssertTrue(waitForCount(tabRows(in: app), 3))
 
         app.typeKey("1", modifierFlags: .command)
@@ -53,13 +53,13 @@ final class TabShortcutsUITests: XCTestCase {
         app.typeKey("2", modifierFlags: .command)
         XCTAssertTrue(waitForDisplayed("two", in: app))
         XCTAssertTrue(tabRow(titled: address("two"), in: app).isSelected)
-        // Ni 3ᵉ favori ni 2ᵉ épinglé : ⌘3 ne fait rien (les onglets du jour ne sont pas numérotés).
+        // No 3rd favorite nor 2nd pinned tab: ⌘3 does nothing (Today tabs aren't numbered).
         app.typeKey("3", modifierFlags: .command)
         XCTAssertTrue(keepsDisplaying("two", in: app))
         app.typeKey("9", modifierFlags: .command)
         XCTAssertTrue(waitForDisplayed("three", in: app))
 
-        // Barre de commande ouverte : ⌘1 la ferme et affiche le favori.
+        // Command bar open: ⌘1 closes it and shows the favorite.
         let field = openCommandBar(in: app)
         app.typeKey("1", modifierFlags: .command)
         XCTAssertTrue(field.waitForNonExistence(timeout: 3))
@@ -73,13 +73,13 @@ final class TabShortcutsUITests: XCTestCase {
         app.menuItems["Épingler"].click()
         XCTAssertTrue(waitForDisplayed("two", in: app))
 
-        // Menu Onglets seulement : le menu Fenêtre liste aussi la fenêtre sous le titre de l'onglet affiché.
+        // Tabs menu only: the Window menu also lists the window under the title of the displayed tab.
         let menu = app.menuBars.menuBarItems["Onglets"]
         menu.click()
         XCTAssertTrue(menu.menuItems["Afficher l'onglet suivant"].waitForExistence(timeout: 3))
         XCTAssertTrue(menu.menuItems["Afficher l'onglet précédent"].exists)
         XCTAssertTrue(menu.menuItems["Afficher le dernier onglet"].exists)
-        // Seul l'épinglé est numéroté ; l'onglet du jour n'est pas listé.
+        // Only the pinned tab is numbered; the Today tab isn't listed.
         XCTAssertFalse(menu.menuItems[address("two")].exists)
         menu.menuItems[address("one")].click()
         XCTAssertTrue(waitForDisplayed("one", in: app))
@@ -87,17 +87,17 @@ final class TabShortcutsUITests: XCTestCase {
 
     @MainActor
     func testControlTabWalksTheSidebarAndWrapsAround() {
-        // Onglets du jour : « three » (affiché), « two », « one ».
+        // Today tabs: “three” (displayed), “two”, “one”.
         let app = launch(opening: ["one", "two", "three"])
         app.typeKey(.tab, modifierFlags: .control)
         XCTAssertTrue(waitForDisplayed("two", in: app))
         app.typeKey(.tab, modifierFlags: .control)
         XCTAssertTrue(waitForDisplayed("one", in: app))
-        // Après le dernier : le premier.
+        // After the last one: the first one.
         app.typeKey(.tab, modifierFlags: .control)
         XCTAssertTrue(waitForDisplayed("three", in: app))
         XCTAssertTrue(tabRow(titled: address("three"), in: app).isSelected)
-        // Avant le premier : le dernier.
+        // Before the first one: the last one.
         app.typeKey(.tab, modifierFlags: [.control, .shift])
         XCTAssertTrue(waitForDisplayed("one", in: app))
         app.typeKey(.tab, modifierFlags: [.control, .shift])
@@ -107,7 +107,7 @@ final class TabShortcutsUITests: XCTestCase {
     @MainActor
     func testControlTabStepsThroughEachPaneOfASplit() {
         let app = launch(opening: ["one", "two", "three"])
-        // Split « three | one » (panneau actif : « one »), puis l'onglet « two ».
+        // Split “three | one” (active pane: “one”), then the tab “two”.
         openInSplit(address("one"), in: app)
         XCTAssertTrue(waitForCount(pagePanes(in: app), 2))
         XCTAssertTrue(waitForDisplayed("one", in: app))
@@ -115,7 +115,7 @@ final class TabShortcutsUITests: XCTestCase {
         app.typeKey(.tab, modifierFlags: .control)
         XCTAssertTrue(waitForDisplayed("two", in: app))
         XCTAssertTrue(waitForCount(pagePanes(in: app), 1))
-        // En boucle, le split revient par son premier panneau, puis passe au second.
+        // Wrapping around, the split comes back through its first pane, then moves on to the second.
         app.typeKey(.tab, modifierFlags: .control)
         XCTAssertTrue(waitForDisplayed("three", in: app))
         XCTAssertTrue(waitForCount(pagePanes(in: app), 2))
@@ -128,7 +128,7 @@ final class TabShortcutsUITests: XCTestCase {
         XCTAssertTrue(waitForDisplayed("three", in: app))
     }
 
-    /// Mini-fenêtre active : les raccourcis ne touchent pas à la fenêtre de navigation.
+    /// Mini window active: the shortcuts don't touch the browser window.
     @MainActor
     func testShortcutsDoNothingInAMiniWindow() {
         let app = launch(opening: ["one", "two"])

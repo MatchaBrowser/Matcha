@@ -27,7 +27,7 @@ struct SidebarDragItemTests {
         #expect(!type.conforms(to: .text))
         #expect(!type.conforms(to: .plainText))
         #expect(!type.conforms(to: .url))
-        // Le même identifiant à chaque lancement : le glisser d'une fenêtre reste lisible par une autre.
+        // The same identifier at every launch: a drag from one window stays readable by another.
         #expect(UTType(mimeType: "application/x-matcha-sidebar-item", conformingTo: .data)?.identifier == type.identifier)
     }
 
@@ -39,7 +39,7 @@ struct SidebarDragItemTests {
         #expect(SidebarDragItem(data: data) == item)
         let imported = try await SidebarDragItem(importing: data, contentType: .matchaSidebarItem)
         #expect(imported == item)
-        // CoreTransferable enveloppe l'erreur de l'importation dans la sienne.
+        // CoreTransferable wraps the import error in its own.
         await #expect(throws: (any Error).self) {
             _ = try await SidebarDragItem(importing: Data("bonjour".utf8), contentType: .matchaSidebarItem)
         }

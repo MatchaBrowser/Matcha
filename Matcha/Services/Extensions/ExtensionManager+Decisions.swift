@@ -1,11 +1,11 @@
 import AppKit
 import WebKit
 
-/// Décisions de l'utilisateur sur les extensions (tâche 6.3) : permissions, sites, fenêtres privées, retenues par
-/// `ExtensionStateStore` et remises à chaque chargement.
+/// User decisions about extensions (task 6.3): permissions, websites, private windows, remembered by
+/// `ExtensionStateStore` and restored at each load.
 extension ExtensionManager {
-    /// Ouvre (ou ferme) les fenêtres privées à l'extension `identifier` : choix de l'utilisateur seulement (tâche 6.4) ;
-    /// retenu, et appliqué tout de suite si elle est chargée.
+    /// Opens (or closes) private windows to extension `identifier`: the user's choice only (task 6.4); remembered, and
+    /// applied right away if it is loaded.
     func setAccessToPrivateData(_ isAllowed: Bool, identifier: String) {
         defer { buttonsDidChange() }
         if let context = contexts[identifier] {
@@ -18,8 +18,8 @@ extension ExtensionManager {
         }
     }
 
-    /// Retient les décisions actuelles de `context`, chargé sous l'identifiant `identifier` (permissions, sites,
-    /// fenêtres privées).
+    /// Remembers the current decisions of `context`, loaded under identifier `identifier` (permissions, websites,
+    /// private windows).
     func saveState(of context: WKWebExtensionContext, identifier: String) {
         guard contexts[identifier] === context || store.state(for: identifier) != nil else {
             return
@@ -28,15 +28,15 @@ extension ExtensionManager {
         store.setState(state(of: context, identifier: identifier, isEnabled: isEnabled), for: identifier)
     }
 
-    /// Retient les décisions de toutes les extensions chargées.
+    /// Remembers the decisions of all loaded extensions.
     func saveAllStates() {
         for (identifier, context) in contexts {
             saveState(of: context, identifier: identifier)
         }
     }
 
-    /// État retenu de `context` : ses décisions actuelles, l'emplacement de son `.appex` s'il vient d'une app et
-    /// l'affichage de son bouton.
+    /// Remembered state of `context`: its current decisions, the location of its `.appex` if it comes from an app, and
+    /// whether its button is displayed.
     func state(of context: WKWebExtensionContext, identifier: String, isEnabled: Bool) -> ExtensionState {
         var state = ExtensionState(context: context, isEnabled: isEnabled)
         let stored = store.state(for: identifier)
@@ -45,16 +45,16 @@ extension ExtensionManager {
         return state
     }
 
-    /// Identifiant de l'extension `identifier` pour WebKit et les sites (`runtime.id`, messages des sites autorisés par
-    /// `externally_connectable`) : pour une extension Safari d'app, celui que Safari lui donne (« identifiant du bundle
-    /// (équipe) »), que ses sites connaissent ; sinon `identifier`.
+    /// Identifier of extension `identifier` for WebKit and websites (`runtime.id`, messages from websites allowed by
+    /// `externally_connectable`): for an app's Safari extension, the one Safari gives it (“bundle identifier (team)”),
+    /// which its websites know; otherwise `identifier`.
     func webExtensionIdentifier(for identifier: String) -> String {
         store.state(for: identifier)?.appExtensionPath
             .flatMap { SafariExtensionFinder.safariIdentifier(ofAppExtensionAt: URL(filePath: $0)) } ?? identifier
     }
 
-    /// Décisions retenues dès que WebKit les change (réponse à une demande, `permissions.remove()`…), et à la fermeture
-    /// de l'app.
+    /// Decisions remembered as soon as WebKit changes them (answer to a request, `permissions.remove()`…), and when the
+    /// app quits.
     func observeContexts() {
         let names: [Notification.Name] = [
             WKWebExtensionContext.permissionsWereGrantedNotification,
@@ -66,8 +66,8 @@ extension ExtensionManager {
             WKWebExtensionContext.grantedPermissionMatchPatternsWereRemovedNotification,
             WKWebExtensionContext.deniedPermissionMatchPatternsWereRemovedNotification,
         ]
-        // Toutes les extensions chargées sont relues (rien n'est écrit pour celles qui n'ont pas changé) : la
-        // notification ne traverse pas la frontière d'isolation.
+        // All loaded extensions are read again (nothing is written for those that have not changed): the notification
+        // does not cross the isolation boundary.
         for name in names + [NSApplication.willTerminateNotification] {
             observers.append(NotificationCenter.default.addObserver(forName: name, object: nil, queue: .main) { [weak self] _ in
                 MainActor.assumeIsolated {

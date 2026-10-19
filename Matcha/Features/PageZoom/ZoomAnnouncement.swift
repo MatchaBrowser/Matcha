@@ -1,9 +1,9 @@
 import Accessibility
 import Foundation
 
-/// Annonce VoiceOver du zoom de la page (tâche 5.4) après ⌘+, ⌘-, ⌘0 ou un clic sur le badge du zoom : « Zoom de la
-/// page : 125 % ». Le badge de la barre d'adresse change sans que VoiceOver s'y déplace : sans annonce, le changement
-/// passerait inaperçu.
+/// VoiceOver announcement of the page zoom (task 5.4) after ⌘+, ⌘-, ⌘0 or a click on the zoom badge: “Page zoom:
+/// 125%”. The address bar badge changes without VoiceOver moving to it: without an announcement, the change would
+/// go unnoticed.
 enum ZoomAnnouncement {
     nonisolated static func text(for level: Double) -> String {
         String(
@@ -12,8 +12,8 @@ enum ZoomAnnouncement {
         )
     }
 
-    /// Priorité haute : VoiceOver lit aussi la fermeture du menu ou le passage du clavier à la page, qui couperaient
-    /// une annonce de priorité normale.
+    /// High priority: VoiceOver also reads the menu closing or keyboard focus moving to the page, which would cut
+    /// off an announcement of normal priority.
     static func post(_ level: Double) {
         var announcement = AttributedString(text(for: level))
         announcement.accessibilitySpeechAnnouncementPriority = .high

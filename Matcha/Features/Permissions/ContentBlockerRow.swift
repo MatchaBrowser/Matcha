@@ -1,12 +1,12 @@
 import SwiftUI
 
-/// Ligne « Bloquer les publicités et les traqueurs » des réglages du site (tâche 6.2) : le bloqueur sur le site de
-/// l'onglet affiché (le domaine et ses sous-domaines). La désactiver met le site en exception, et ses pages ouvertes se
-/// rechargent ; dans une fenêtre privée, rien n'est enregistré. Grisée avec une note tant qu'aucune liste n'est prête,
-/// ou si le bloqueur est désactivé dans les réglages.
+/// “Block Ads and Trackers” row of the site settings (task 6.2): the blocker on the displayed tab's site (the
+/// domain and its subdomains). Turning it off adds the site to the exceptions, and its open pages reload; in a
+/// private window, nothing is saved. Disabled with a note as long as no list is ready, or if the blocker is turned
+/// off in the settings.
 struct ContentBlockerRow: View {
     let tab: BrowserTab
-    /// Bloqueur de la session de l'onglet.
+    /// Blocker of the tab's session.
     let scope: ContentBlockerScope
 
     private var site: String? {
@@ -48,7 +48,7 @@ struct ContentBlockerRow: View {
         Text("Block Ads and Trackers", comment: "Site settings: switch that turns the content blocker on or off for this website")
     }
 
-    /// Vrai si le bloqueur agit sur le site ; toujours faux (grisé) s'il n'est pas disponible.
+    /// True if the blocker acts on the site; always false (disabled) if it is not available.
     private func blocks(on site: String?, isAvailable: Bool) -> Binding<Bool> {
         Binding {
             guard isAvailable, let site else {
@@ -62,7 +62,7 @@ struct ContentBlockerRow: View {
         }
     }
 
-    /// Pourquoi la ligne est grisée.
+    /// Why the row is disabled.
     private func note(_ service: ContentBlockerService) -> Text? {
         if service.state == .loading {
             return Text(

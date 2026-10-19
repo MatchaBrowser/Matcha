@@ -1,6 +1,6 @@
 import SwiftUI
 
-/// Onglets épinglés et leurs dossiers, suivis d'une zone de dépôt.
+/// Pinned tabs and their folders, followed by a drop zone.
 struct PinnedSection: View {
     let tabManager: TabManager
 

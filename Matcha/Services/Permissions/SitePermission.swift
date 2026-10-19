@@ -1,7 +1,7 @@
 import Foundation
 
-/// Permission qu'une page demande et dont la décision se retient par site (tâche 5.2). La localisation (API publique
-/// à partir de macOS 27 seulement) et les notifications (aucune API publique) sont reportées : `DECISIONS.md`.
+/// Permission that a page requests and whose decision is remembered per website (task 5.2). Location (public API from
+/// macOS 27 only) and notifications (no public API) are postponed: `DECISIONS.md`.
 nonisolated enum SitePermissionKind: String, CaseIterable, Identifiable, Sendable {
     case camera
     case microphone
@@ -11,17 +11,17 @@ nonisolated enum SitePermissionKind: String, CaseIterable, Identifiable, Sendabl
     }
 }
 
-/// Décision retenue pour un site.
+/// Decision remembered for a website.
 nonisolated enum SitePermissionDecision: String, CaseIterable, Sendable {
     case allow
     case deny
 }
 
-/// Réponse de l'utilisateur dans le bandeau de la page.
+/// The user's answer in the page's banner.
 nonisolated enum SitePermissionAnswer: Sendable {
-    /// Accordé pour cette demande seulement (WebKit le garde le temps de la page) ; rien n'est retenu.
+    /// Granted for this request only (WebKit keeps it for the lifetime of the page); nothing is remembered.
     case allowOnce
     case alwaysAllow
-    /// Refusé, et retenu (« Refuser »).
+    /// Denied, and remembered (“Don't Allow”).
     case deny
 }

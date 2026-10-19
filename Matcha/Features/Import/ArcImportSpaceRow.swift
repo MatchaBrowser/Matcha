@@ -1,7 +1,7 @@
 import SwiftUI
 
-/// Un Space d'Arc dans l'aperçu de l'import (tâche 7.1) : son icône sur ses couleurs, son nom, ce qu'il contient et
-/// son profil s'il n'est pas le principal.
+/// An Arc Space in the import preview (task 7.1): its icon on its colors, its name, what it contains, and its
+/// profile if it is not the main one.
 struct ArcImportSpaceRow: View {
     let space: ArcSidebar.Space
 
@@ -41,7 +41,7 @@ struct ArcImportSpaceRow: View {
         .accessibilityHidden(true)
     }
 
-    /// « 12 pinned tabs · 3 folders · Profile 1 ».
+    /// “12 pinned tabs · 3 folders · Profile 1”.
     private var details: String {
         let tabs = ImportNode.tabCount(of: space.pinned)
         let folders = ImportNode.folderCount(of: space.pinned)

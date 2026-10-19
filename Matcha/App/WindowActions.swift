@@ -1,35 +1,35 @@
-/// Actions que la fenêtre active offre aux commandes de menu.
+/// Actions that the active window offers to menu commands.
 struct WindowActions {
-    /// Ouvre la barre de commande (nouvel onglet), ou un onglet sur la page d'accueil si les réglages le demandent.
+    /// Opens the command bar (new tab), or a tab on the homepage if the settings ask for it.
     let newTab: () -> Void
-    /// Ouvre la barre de commande sur l'adresse de l'onglet affiché (⌘L).
+    /// Opens the command bar on the address of the displayed tab (⌘L).
     let editAddress: () -> Void
-    /// Barre de commande ouverte : ⌘W la ferme au lieu de fermer l'onglet.
+    /// Command bar open: ⌘W closes it instead of closing the tab.
     let isCommandBarPresented: Bool
-    /// Ferme la barre de commande et rend le clavier à la page.
+    /// Closes the command bar and gives keyboard focus back to the page.
     let closeCommandBar: () -> Void
-    /// Masque ou affiche la barre latérale.
+    /// Hides or shows the sidebar.
     let toggleSidebar: () -> Void
     let isSidebarVisible: Bool
-    /// Ouvre ou ferme le panneau des téléchargements (⌥⌘L) ; barre masquée, elle s'affiche d'abord.
+    /// Opens or closes the downloads panel (⌥⌘L); if the sidebar is hidden, it is shown first.
     let toggleDownloads: () -> Void
-    /// Panneau des téléchargements visible (ouvert, dans une barre affichée) : le menu propose de le masquer.
+    /// Downloads panel visible (open, in a shown sidebar): the menu offers to hide it.
     let isDownloadsPanelShown: Bool
-    /// Copie l'adresse de l'onglet affiché et confirme « URL copiée » (⇧⌘C), comme l'action de la
-    /// barre de commande ; nil si l'onglet affiché n'a pas d'adresse.
+    /// Copies the address of the displayed tab and confirms “URL Copied” (⇧⌘C), like the command bar
+    /// action; nil if the displayed tab has no address.
     let copyURL: (() -> Void)?
-    /// Charge la page d'accueil ; nil sans page d'accueil réglée.
+    /// Loads the homepage; nil without a homepage set.
     let goHome: (() -> Void)?
-    /// Noms des Spaces, dans l'ordre de la barre.
+    /// Names of the Spaces, in sidebar order.
     let spaceNames: [String]
     let currentSpaceIndex: Int
     let selectSpace: (Int) -> Void
     let newSpace: () -> Void
-    /// Affiche un onglet de la fenêtre comme un clic sur sa ligne (⌘1 à ⌘9, ⌃⇥) : la barre de commande et
-    /// l'aperçu se ferment, la page prend le clavier.
+    /// Shows a tab of the window like a click on its row (⌘1 to ⌘9, ⌃⇥): the command bar and the peek close, the
+    /// page takes keyboard focus.
     let showTab: (BrowserTab) -> Void
-    /// Fenêtre privée : « Afficher tout l'historique » (⌘Y) y est grisé, elle n'a pas d'historique.
+    /// Private window: “Show All History” (⌘Y) is disabled there, it has no history.
     let isPrivate: Bool
-    /// Fichier > Importer depuis > Arc… (tâche 7.1) ; nil dans une fenêtre privée.
+    /// File > Import From > Arc… (task 7.1); nil in a private window.
     let importFromArc: (() -> Void)?
 }

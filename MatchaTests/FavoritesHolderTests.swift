@@ -3,8 +3,8 @@ import Foundation
 import SwiftData
 import Testing
 
-/// Favoris d'un profil tenus par un seul Space à la fois (`BrowserSession+Favorites`) : un Space resté en arrière-plan
-/// n'écrase plus à son enregistrement les favoris ajoutés ailleurs.
+/// A profile's favorites held by a single Space at a time (`BrowserSession+Favorites`): a Space left in the
+/// background no longer overwrites, when it saves, the favorites added elsewhere.
 @MainActor
 struct FavoritesHolderTests {
     private let session: BrowserSession
@@ -32,7 +32,7 @@ struct FavoritesHolderTests {
         let favorite = addFavorite(in: first)
         session.saveAll()
         #expect(try favoriteRecords().map(\.id) == [favorite.id])
-        // Le Space en arrière-plan s'enregistre encore seul : il ne touche pas aux favoris.
+        // The background Space still saves on its own: it does not touch the favorites.
         second.saveNow()
         #expect(try favoriteRecords().map(\.id) == [favorite.id])
     }
@@ -45,7 +45,7 @@ struct FavoritesHolderTests {
         #expect(second.tabManager.favoriteTabs.map(\.id) == [favorite.id])
         #expect(session.holdsFavorites(second))
         #expect(!session.holdsFavorites(first))
-        // Retiré depuis le Space qui les tient : le premier Space, resté en arrière-plan, ne le remet pas.
+        // Removed from the Space that holds them: the first Space, left in the background, does not put it back.
         second.tabManager.delete(favorite)
         session.saveAll()
         #expect(try favoriteRecords().isEmpty)

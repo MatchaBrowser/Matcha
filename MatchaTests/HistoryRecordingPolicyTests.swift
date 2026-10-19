@@ -2,7 +2,7 @@ import Foundation
 @testable import Matcha
 import Testing
 
-/// Règles de l'historique (tâche 5.5) : ce qui est retenu et quand une visite en prolonge une autre.
+/// History rules (task 5.5): what is recorded and when a visit extends another one.
 struct HistoryRecordingPolicyTests {
     private func stored(_ address: String) -> String? {
         HistoryRecordingPolicy.storedURL(for: URL(string: address))?.absoluteString
@@ -55,7 +55,7 @@ struct HistoryRecordingPolicyTests {
         #expect(accepts(hasTitle: true, after: 5))
         #expect(!accepts(hasTitle: true, after: 6))
         #expect(accepts(hasTitle: false, after: 3600))
-        // La page est déjà ailleurs : le titre est celui d'une autre page.
+        // The page is already elsewhere: the title is that of another page.
         #expect(!accepts(hasTitle: false, key: "example.com/autre", after: 1))
         #expect(!accepts(hasTitle: false, key: nil, after: 1))
     }
@@ -80,7 +80,7 @@ struct HistoryRecordingPolicyTests {
         let now = try #require(calendar.date(from: DateComponents(year: 2026, month: 10, day: 18, hour: 9)))
         let cutoff = HistoryRecordingPolicy.retentionCutoff(now: now, calendar: calendar)
         #expect(cutoff == calendar.date(from: DateComponents(year: 2025, month: 10, day: 18, hour: 9)))
-        // 29 février : la veille d'un an plus tard.
+        // February 29: one year earlier is the day before (February 28).
         let leap = try #require(calendar.date(from: DateComponents(year: 2028, month: 2, day: 29, hour: 12)))
         let leapCutoff = HistoryRecordingPolicy.retentionCutoff(now: leap, calendar: calendar)
         #expect(leapCutoff == calendar.date(from: DateComponents(year: 2027, month: 2, day: 28, hour: 12)))

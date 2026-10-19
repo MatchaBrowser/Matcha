@@ -1,9 +1,9 @@
 import SwiftUI
 import WebKit
 
-/// Boutons des extensions (tâche 6.5) : un par extension chargée dont le bouton n'est pas masqué ; dans une fenêtre
-/// privée, seulement celles qui y ont accès. Ils visent `tab` (onglet affiché, aperçu compris, ou panneau de la carte).
-/// Rien sans extension à montrer.
+/// Extension buttons (task 6.5): one per loaded extension whose button is not hidden; in a private window, only those
+/// that have access to it. They target `tab` (displayed tab, peek included, or pane of the card).
+/// Nothing when there is no extension to show.
 struct ExtensionButtonsRow: View {
     let tab: BrowserTab?
     let isPrivate: Bool
@@ -25,8 +25,8 @@ struct ExtensionButtonsRow: View {
     }
 }
 
-/// Bouton d'une extension : icône de son action pour l'onglet visé, badge de texte, titre en info-bulle ; menu
-/// contextuel (options, masquer le bouton, gérer les extensions). Sa bulle s'ouvre dessous.
+/// Button of an extension: icon of its action for the target tab, text badge, title as tooltip; context menu
+/// (options, hide the button, manage extensions). Its popover opens below it.
 struct ExtensionActionButton: View {
     static let iconSize = CGSize(width: 16, height: 16)
 
@@ -69,7 +69,7 @@ struct ExtensionActionButton: View {
         .accessibilityIdentifier("extensionButton")
     }
 
-    /// Onglet visé, tel que WebKit le connaît (pour ancrer la bulle sous ce bouton-ci).
+    /// Target tab, as WebKit knows it (to anchor the popover under this very button).
     private var tabID: UUID? {
         tab.flatMap { manager.windows.adapter(for: $0)?.tabID }
     }
@@ -84,7 +84,7 @@ struct ExtensionActionButton: View {
         }
     }
 
-    /// Badge de texte de l'action (nombre de publicités bloquées, de mots de passe…) ; plus vif s'il n'a pas été vu.
+    /// Text badge of the action (number of blocked ads, of passwords…); brighter if it has not been seen.
     @ViewBuilder private func badge(_ action: WKWebExtension.Action?) -> some View {
         if let action, !action.badgeText.isEmpty {
             Text(verbatim: action.badgeText)
@@ -101,7 +101,7 @@ struct ExtensionActionButton: View {
     }
 }
 
-/// Vue AppKit derrière un bouton d'extension, inscrite dans `ExtensionButtonAnchors` pour y ancrer sa bulle.
+/// AppKit view behind an extension button, registered in `ExtensionButtonAnchors` to anchor its popover there.
 private struct ExtensionButtonAnchor: NSViewRepresentable {
     let identifier: String
     let tabID: UUID?

@@ -2,10 +2,10 @@ import Foundation
 @testable import Matcha
 import SwiftData
 
-/// Copie figée des modèles liés aux dossiers tels qu'avant leur personnalisation (sans `iconValue`, `textColorHex`,
-/// `backgroundColorHex` sur `FolderRecord`), pour créer une base ancienne dans `BrowserSchemaTests`. Mêmes noms
-/// d'entités que les modèles de l'app (SwiftData les nomme d'après la classe, sans l'espace de noms) ; les modèles
-/// sans relation, inchangés, sont ceux de l'app. Ne plus modifier.
+/// Frozen copy of the folder-related models as they were before their customization (without `iconValue`,
+/// `textColorHex`, `backgroundColorHex` on `FolderRecord`), to create an old store in `BrowserSchemaTests`. Same entity
+/// names as the app's models (SwiftData names them after the class, without the namespace); the models without
+/// relationships, unchanged, are the app's. Do not modify anymore.
 enum SchemaBeforeFolderAppearance {
     static let models: [any PersistentModel.Type] = [
         ProfileRecord.self, SpaceRecord.self, FolderRecord.self, TabRecord.self, SitePermissionRecord.self, HistoryRecord.self,

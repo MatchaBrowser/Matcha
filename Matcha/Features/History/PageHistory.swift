@@ -1,26 +1,26 @@
 import Foundation
 
-/// Visites d'une page (onglet, aperçu, page d'une mini-fenêtre), tâche 5.5. La page retient sa dernière visite pour
-/// la prolonger (rechargement peu après), lui donner un titre arrivé tard, et compter les adresses que la page change
-/// elle-même (History API : `pushState`, `replaceState`). Règles : `HistoryRecordingPolicy`. Rien n'est retenu sans
-/// `HistoryScope` (fenêtre privée).
+/// Visits of a page (tab, Peek, mini window page), task 5.5. The page keeps its last visit to extend it (reload
+/// shortly after), give it a title that arrives late, and count the addresses the page changes itself (History
+/// API: `pushState`, `replaceState`). Rules: `HistoryRecordingPolicy`. Nothing is kept without a `HistoryScope`
+/// (private window).
 @MainActor
 final class PageHistory {
-    /// Page suivie : son adresse, son titre et son chargement sont relus avant de retenir un changement d'adresse.
+    /// Followed page: its address, title and loading state are read again before keeping an address change.
     weak var page: BrowserTab?
-    /// Attente avant de retenir une adresse changée par la page ; raccourcie dans les tests.
+    /// Wait before keeping an address changed by the page; shortened in tests.
     var sameDocumentDelay = HistoryRecordingPolicy.sameDocumentDelay
 
     private var scope: HistoryScope?
     private var lastVisit: HistoryRecordingPolicy.PageVisit?
     private var lastVisitHasTitle = false
-    /// Adresse du dernier document chargé : un changement d'adresse sans chargement doit rester sur son origine.
+    /// Address of the last loaded document: an address change without loading must stay on its origin.
     private var loadedURL: URL?
-    /// Clé de la page rechargée par la sortie de veille (tâche 5.6) : son prochain chargement n'est pas une visite.
+    /// Key of the page reloaded when waking from sleep (task 5.6): its next load is not a visit.
     private var resumedURLKey: String?
     private var pendingChange: Task<Void, Never>?
 
-    /// Un document a fini de se charger dans la page (`didFinish` du cadre principal).
+    /// A document has finished loading in the page (`didFinish` of the main frame).
     func pageDidFinishLoading(url: URL?, title: String?, scope: HistoryScope?) {
         cancelPendingChange()
         self.scope = scope
@@ -33,20 +33,20 @@ final class PageHistory {
         record(url: url, title: title)
     }
 
-    /// La page sort de veille et va recharger `url` (tâche 5.6) : ce rechargement, que l'utilisateur n'a pas demandé,
-    /// n'est pas une nouvelle visite. Une autre adresse chargée d'abord en est une.
+    /// The page wakes from sleep and is about to reload `url` (task 5.6): this reload, which the user did not ask
+    /// for, is not a new visit. Another address loaded first is one.
     func pageWillResume(url: URL?) {
         resumedURLKey = HistoryRecordingPolicy.storedURL(for: url).map(CommandText.urlKey)
     }
 
-    /// Chargement échoué ou interrompu : une adresse changée en attente n'est pas retenue.
+    /// Load failed or interrupted: a pending changed address is not kept.
     func navigationDidFail() {
         cancelPendingChange()
         resumedURLKey = nil
     }
 
-    /// L'adresse de la page a changé. Sans chargement en cours, c'est la page elle-même : l'adresse est retenue si
-    /// elle tient `sameDocumentDelay` (seule la dernière d'une rafale compte). Un fragment seul ne change pas la clé.
+    /// The page's address has changed. With no load in progress, it is the page itself: the address is kept if it
+    /// lasts `sameDocumentDelay` (only the last of a burst counts). A fragment alone does not change the key.
     func urlDidChange(to url: URL?, isLoading: Bool) {
         cancelPendingChange()
         guard !isLoading, scope != nil, let url, let stored = HistoryRecordingPolicy.storedURL(for: url),
@@ -65,8 +65,8 @@ final class PageHistory {
         }
     }
 
-    /// Le titre de la page a changé : il renomme la dernière visite s'il arrive peu après elle, à la même adresse, ou
-    /// si elle n'avait pas encore de titre.
+    /// The page's title has changed: it renames the last visit if it arrives shortly after it, at the same address,
+    /// or if the visit did not have a title yet.
     func titleDidChange(to title: String?, pageURL: URL?) {
         guard let scope, let lastVisit, let title = HistoryRecordingPolicy.normalizedTitle(title) else {
             return
@@ -84,7 +84,7 @@ final class PageHistory {
         lastVisitHasTitle = true
     }
 
-    /// Page libérée (onglet déchargé, mini-fenêtre fermée) : tout est oublié.
+    /// Page released (tab unloaded, mini window closed): everything is forgotten.
     func reset() {
         cancelPendingChange()
         scope = nil

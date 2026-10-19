@@ -3,12 +3,12 @@ import Foundation
 import Testing
 import WebKit
 
-/// Pages d'extension dans les pages web (comme le menu de Bitwarden dans les champs) : une page d'extension accessible
-/// au web, intégrée par un script de contenu, se charge et s'exécute avec l'API des extensions. Le schéma reste celui de
-/// WebKit : ceux de Safari, Chrome et Firefox ne se chargent pas dans les pages web d'une autre app (`DECISIONS.md`).
+/// Extension pages inside web pages (like Bitwarden's menu in fields): a web-accessible extension page, embedded
+/// by a content script, loads and runs with the extensions API. The scheme stays WebKit's: those of Safari, Chrome
+/// and Firefox do not load in the web pages of another app (`DECISIONS.md`).
 @MainActor
 struct ExtensionPageFramesTests {
-    /// Extension Manifest V2 : son script de contenu ajoute l'iframe `frame.html`, qui annonce son schéma à la page.
+    /// Manifest V2 extension: its content script adds the `frame.html` iframe, which announces its scheme to the page.
     private func makeExtension() throws -> URL {
         WKWebExtension.MatchPattern.registerCustomURLScheme(TestPages.scheme)
         let folder = FileManager.default.temporaryDirectory.appendingPathComponent(
@@ -70,7 +70,7 @@ struct ExtensionPageFramesTests {
         for pattern in context.webExtension.allRequestedMatchPatterns {
             context.setPermissionStatus(.grantedExplicitly, for: pattern)
         }
-        // Les scripts de contenu ne sont posés qu'une fois l'arrière-plan chargé.
+        // Content scripts are only injected once the background has loaded.
         try await TestExtension.waitForBackground(of: context)
         let storeID = UUID()
         let configuration = TestPages.configuration()

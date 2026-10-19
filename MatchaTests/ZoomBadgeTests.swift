@@ -2,8 +2,8 @@ import Foundation
 @testable import Matcha
 import Testing
 
-/// Badge du zoom à côté de la pastille d'adresse (tâche 5.4) : visible hors de 100 % seulement, annonce VoiceOver.
-/// Le clic (retour du site à 100 %) est vérifié avec de vraies pages dans `PageZoomIntegrationTests`.
+/// Zoom badge next to the address pill (task 5.4): visible only outside 100%, VoiceOver announcement.
+/// The click (site back to 100%) is checked with real pages in `PageZoomIntegrationTests`.
 @MainActor
 struct ZoomBadgeTests {
     @Test func `the badge shows only away from 100 percent`() {
@@ -15,7 +15,7 @@ struct ZoomBadgeTests {
         #expect(ZoomBadge.isShown(for: tab))
         tab.setPageZoom(0.5)
         #expect(ZoomBadge.isShown(for: tab))
-        // Un zoom arrondi par WebKit compte comme 100 %.
+        // A zoom rounded by WebKit counts as 100%.
         tab.setPageZoom(1.0004)
         #expect(!ZoomBadge.isShown(for: tab))
 

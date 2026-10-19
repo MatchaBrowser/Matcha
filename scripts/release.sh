@@ -1,21 +1,21 @@
 #!/bin/bash
-# Publie une version de Matcha (tâche 8.5) : archive Release signée Developer ID, notarisée et agrafée, image disque
-# signée et notarisée, signature Sparkle, entrée ajoutée à appcast.xml (branche gh-pages, servie par GitHub Pages),
-# étiquette git et « Release » GitHub avec l'image disque.
+# Publishes a Matcha release (task 8.5): Release archive signed with Developer ID, notarized and stapled, disk image
+# signed and notarized, Sparkle signature, entry added to appcast.xml (gh-pages branch, served by GitHub Pages),
+# git tag and GitHub “Release” with the disk image.
 #
-#   scripts/release.sh 1.2.0             publie la version 1.2.0
-#   scripts/release.sh 1.2.0 --dry-run   prépare tout dans build/release/1.2.0 sans rien publier
+#   scripts/release.sh 1.2.0             publishes version 1.2.0
+#   scripts/release.sh 1.2.0 --dry-run   prepares everything in build/release/1.2.0 without publishing anything
 #
-# Une fois pour toutes (étapes manuelles, voir TESTS_MANUELS.md, phase 8) : certificat « Developer ID Application »,
-# profil de notarisation (xcrun notarytool store-credentials matcha-notary), clé EdDSA de Sparkle dans le trousseau
-# (generate_keys), `brew install create-dmg`, `gh auth login`, GitHub Pages sur la branche gh-pages.
-# Le projet n'est pas modifié : numéro de version et de build sont passés à xcodebuild.
+# Once and for all (manual steps, see TESTS_MANUELS.md, phase 8): “Developer ID Application” certificate,
+# notarization profile (xcrun notarytool store-credentials matcha-notary), Sparkle EdDSA key in the keychain
+# (generate_keys), `brew install create-dmg`, `gh auth login`, GitHub Pages on the gh-pages branch.
+# The project isn't modified: the version and build numbers are passed to xcodebuild.
 set -euo pipefail
 
 cd "$(dirname "$0")/.."
 
 if [[ $# -lt 1 || ! "$1" =~ ^[0-9]+\.[0-9]+(\.[0-9]+)?$ ]]; then
-    sed -n '2,13p' "$0" | sed 's/^# \{0,1\}//'
+    sed -n '2,12p' "$0" | sed 's/^# \{0,1\}//'
     exit 1
 fi
 
@@ -28,7 +28,7 @@ REPO="MatchaBrowser/Matcha"
 NOTARY_PROFILE="${MATCHA_NOTARY_PROFILE:-matcha-notary}"
 MINIMUM_SYSTEM="15.4"
 TAG="v$VERSION"
-# Numéro de build : toujours croissant (Sparkle compare `sparkle:version`).
+# Build number: always increasing (Sparkle compares `sparkle:version`).
 BUILD="$(git rev-list --count HEAD)"
 WORK="build/release/$VERSION"
 ARCHIVE="$WORK/Matcha.xcarchive"
@@ -40,7 +40,7 @@ DOWNLOAD_URL="https://github.com/$REPO/releases/download/$TAG/Matcha-$VERSION.dm
 step() { printf '\n\033[1m▸ %s\033[0m\n' "$*"; }
 fail() { printf '\033[31m✗ %s\033[0m\n' "$*" >&2; exit 1; }
 
-# MARK: Vérifications
+# MARK: Checks
 
 step "Vérifications"
 [[ -z "$(git status --porcelain)" ]] || fail "Des changements ne sont pas commités."
@@ -52,7 +52,7 @@ $DRY_RUN || command -v gh >/dev/null || fail "gh manque (brew install gh)."
 security find-identity -v -p codesigning | grep -q "Developer ID Application" \
     || fail "Certificat « Developer ID Application » absent du trousseau."
 
-# MARK: Archive et export
+# MARK: Archive and export
 
 step "Archive Release $VERSION ($BUILD)"
 rm -rf "$WORK"
@@ -76,7 +76,7 @@ PLIST
 xcodebuild -exportArchive -archivePath "$ARCHIVE" -exportPath "$EXPORT" -exportOptionsPlist "$WORK/ExportOptions.plist" \
     | xcbeautify --quiet
 
-# MARK: Notarisation
+# MARK: Notarization
 
 notarize() {
     xcrun notarytool submit "$1" --keychain-profile "$NOTARY_PROFILE" --wait \
@@ -129,7 +129,7 @@ if $DRY_RUN; then
     exit 0
 fi
 
-# MARK: Publication
+# MARK: Publishing
 
 step "Publication"
 git tag -a "$TAG" -m "Matcha $VERSION"

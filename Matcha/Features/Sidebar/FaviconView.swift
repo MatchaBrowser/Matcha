@@ -1,6 +1,6 @@
 import SwiftUI
 
-/// Icône d'un onglet : celle de son site (`SiteIcon`), suivie au fil de la navigation.
+/// Icon of a tab: that of its site (`SiteIcon`), followed as it navigates.
 struct FaviconView: View {
     let tab: BrowserTab
     var size = 16.0

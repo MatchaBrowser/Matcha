@@ -1,17 +1,17 @@
 import Foundation
 
-/// Commandes du champ de recherche lues dans les sélecteurs que l'éditeur de champ transmet
-/// (`control(_:textView:doCommandBy:)`), donc après la méthode de saisie : une composition (japonais, touches
-/// mortes) n'en déclenche aucune. ⇧Entrée n'a pas de sélecteur à elle : c'est `insertNewline:` avec Maj enfoncée.
+/// Find field commands read from the selectors that the field editor forwards (`control(_:textView:doCommandBy:)`),
+/// hence after the input method: a composition (Japanese, dead keys) triggers none of them. ⇧Return has no selector
+/// of its own: it is `insertNewline:` with Shift held down.
 nonisolated enum FindKeyCommand: Equatable, Sendable {
-    /// ⏎ (et ⌥⏎, ⌃⏎) : occurrence suivante.
+    /// ⏎ (and ⌥⏎, ⌃⏎): next match.
     case next
-    /// ⇧⏎ : occurrence précédente.
+    /// ⇧⏎: previous match.
     case previous
-    /// ⎋ (et ⌥⎋) : ferme la barre.
+    /// ⎋ (and ⌥⎋): closes the bar.
     case close
 
-    /// Nil pour un sélecteur que l'éditeur traite lui-même (⇥ change de champ, ↑ ↓ déplacent le curseur…).
+    /// Nil for a selector the editor handles itself (⇥ changes field, ↑ ↓ move the cursor…).
     init?(selectorName: String, isShiftDown: Bool) {
         switch selectorName {
         case "insertNewline:", "insertNewlineIgnoringFieldEditor:", "insertLineBreak:":

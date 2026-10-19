@@ -2,11 +2,11 @@ import Foundation
 @testable import Matcha
 import Testing
 
-/// Règles des splits dans le rangement de la barre (suite dans `SidebarLayoutSplitTests+Groups.swift`).
+/// Split rules in the sidebar layout (continued in `SidebarLayoutSplitTests+Groups.swift`).
 struct SidebarLayoutSplitTests {
     let ids = (0 ..< 8).map { _ in UUID() }
 
-    /// Onglets du jour `ids[0]`… `ids[count - 1]`, dans cet ordre.
+    /// Today tabs `ids[0]`… `ids[count - 1]`, in this order.
     func todayLayout(_ count: Int) -> SidebarLayout {
         var layout = SidebarLayout()
         for id in ids.prefix(count) {
@@ -15,7 +15,7 @@ struct SidebarLayoutSplitTests {
         return layout
     }
 
-    /// Split de `members` (indices dans `ids`), chacun ajouté à droite du précédent.
+    /// Split of `members` (indices in `ids`), each added to the right of the previous one.
     @discardableResult
     func group(_ members: [Int], in layout: inout SidebarLayout) -> UUID? {
         var groupID: UUID?
@@ -33,7 +33,7 @@ struct SidebarLayoutSplitTests {
         group?.tabIDs.compactMap { ids.firstIndex(of: $0) } ?? []
     }
 
-    // MARK: Création
+    // MARK: Creation
 
     @Test func `joining builds a group in pane order on either side`() throws {
         var layout = todayLayout(5)
@@ -78,7 +78,7 @@ struct SidebarLayoutSplitTests {
         group([2, 3], in: &layout)
         layout.joinSplit(ids[1], anchor: ids[2], at: 2)
         expectSplitInvariants(layout)
-        // Rien n'est désépinglé : le split du jour rejoint l'épinglé chez lui.
+        // Nothing is unpinned: the today split joins the pinned tab in its section.
         #expect(layout.pinned == [.tab(ids[0]), .tab(ids[2]), .tab(ids[3]), .tab(ids[1])])
         #expect(today(layout) == [4])
         #expect(members(layout.split(containing: ids[1])) == [2, 3, 1])
@@ -92,7 +92,7 @@ struct SidebarLayoutSplitTests {
         #expect(favoriteAnchor == nil)
         #expect(favoriteTab == nil)
         #expect(layout.splits.isEmpty)
-        // Un favori glissé dans un split en sort aussitôt.
+        // A favorite dragged into a split leaves it at once.
         layout.setSplits([SplitGroup(tabIDs: [ids[0], ids[1], ids[2]])])
         expectSplitInvariants(layout)
         #expect(members(layout.splits.first) == [1, 2])
@@ -121,7 +121,7 @@ struct SidebarLayoutSplitTests {
         #expect(today(layout) == [0, 1, 3, 2])
     }
 
-    /// Onglet et ancre, par leur indice dans `ids` (`ids[7]` n'est jamais rangé), et disponibilité attendue.
+    /// Tab and anchor, by their index in `ids` (`ids[7]` is never placed), and expected availability.
     struct AvailabilityCase: Sendable, CustomTestStringConvertible {
         let name: String
         let tab: Int
@@ -147,7 +147,7 @@ struct SidebarLayoutSplitTests {
 
     @Test(arguments: availabilityCases)
     func `availability matrix`(situation: AvailabilityCase) {
-        // Du jour : 0 à 5, dont le split plein [0, 1, 2, 3] ; favori : 6.
+        // Today: 0 to 5, including the full split [0, 1, 2, 3]; favorite: 6.
         var layout = todayLayout(6)
         layout.setPlace(ids[6], to: .favorite)
         group([0, 1, 2, 3], in: &layout)
@@ -155,7 +155,7 @@ struct SidebarLayoutSplitTests {
         #expect(layout.splitAvailability(of: ids[situation.tab], anchor: anchor) == situation.expected)
     }
 
-    // MARK: Retrait et règles
+    // MARK: Removal and rules
 
     @Test func `remove from split puts the tab right after the group`() {
         var layout = todayLayout(5)

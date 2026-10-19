@@ -3,9 +3,9 @@ import Foundation
 import Testing
 import WebKit
 
-/// Pages et listes d'essai du bloqueur (tâche 6.2). Les listes du paquet des tests (`Fixtures/`) : « test-block »
-/// bloque tout ce qui vient de `obtest://blocked.test/`, « test-hide » masque les éléments `.ad` de toute page. Une
-/// page d'essai contient un tel élément et une image de `blocked.test` ; son titre dit si l'image s'est chargée.
+/// Test pages and lists for the blocker (task 6.2). The lists of the test bundle (`Fixtures/`): “test-block”
+/// blocks everything coming from `obtest://blocked.test/`, “test-hide” hides the `.ad` elements of any page. A test
+/// page contains such an element and an image from `blocked.test`; its title says whether the image loaded.
 @MainActor
 enum BlockerTestPages {
     static let fixtures = BlocklistBundle(bundle: Bundle(for: TestPages.self), manifestName: "blocker-test-manifest.json")
@@ -15,7 +15,7 @@ enum BlockerTestPages {
     <img src='obtest://blocked.test/a.svg' onload="document.title='loaded'" onerror="document.title='blocked'">
     """
 
-    /// Page d'essai servie par `TestPages` sous l'hôte `host` (son « site » dans les tests).
+    /// Test page served by `TestPages` under the host `host` (its “site” in the tests).
     static func url(host: String = "pages") -> URL {
         var components = URLComponents()
         components.scheme = TestPages.scheme
@@ -25,21 +25,21 @@ enum BlockerTestPages {
         return components.url!
     }
 
-    /// Magasin de listes compilées dans un dossier temporaire neuf (à effacer après le test), jamais celui de l'app.
+    /// Compiled list store in a new temporary folder (to delete after the test), never the app's own.
     static func temporaryStore() throws -> (store: WKContentRuleListStore, directory: URL) {
         let directory = FileManager.default.temporaryDirectory.appendingPathComponent("ContentRuleLists-\(UUID().uuidString)")
         try FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)
         return (WKContentRuleListStore(url: directory), directory)
     }
 
-    /// Bloqueur dont le site d'une page `obtest:` est son hôte (« excepted.test »).
+    /// Blocker for which the site of an `obtest:` page is its host (“excepted.test”).
     static func service(defaults: UserDefaults? = nil) -> ContentBlockerService {
         let service = ContentBlockerService(defaults: defaults)
         service.siteOfURL = { $0?.host() }
         return service
     }
 
-    /// État de la page de `tab` une fois chargée : l'image (« loaded » ou « blocked ») et l'affichage de l'élément `.ad`.
+    /// State of the page of `tab` once loaded: the image (“loaded” or “blocked”) and the display of the `.ad` element.
     static func outcome(of tab: BrowserTab, line: Int = #line) async throws -> Outcome {
         try await waitUntil(line: line) { tab.title == "loaded" || tab.title == "blocked" }
         let script = "getComputedStyle(document.querySelector('.ad')).display"
@@ -47,7 +47,7 @@ enum BlockerTestPages {
         return Outcome(imageLoaded: tab.title == "loaded", adHidden: display == "none")
     }
 
-    /// Prépare un rechargement : le titre de la page est effacé pour attendre celui de la nouvelle.
+    /// Prepares a reload: the page title is cleared so as to wait for the new page's title.
     static func forgetOutcome(of tab: BrowserTab) async throws {
         _ = try await tab.loadedWebView.evaluateJavaScript("document.title = 'stale'; true")
         try await waitUntil { tab.title == "stale" }

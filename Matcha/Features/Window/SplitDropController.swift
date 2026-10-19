@@ -1,18 +1,18 @@
 import AppKit
 import Foundation
 
-/// Dépôt sur les pages de la carte : un onglet glissé depuis la barre et lâché sur le bord gauche ou droit d'un
-/// panneau rejoint le split de ce côté. Pendant le survol, seul compte ce qui est affiché ; l'élément glissé
-/// n'est lu qu'au dépôt. La carte le reconfigure à chaque affichage.
+/// Drop on the card's pages: a tab dragged from the sidebar and dropped on the left or right edge of a pane joins the
+/// split on that side. During hovering, only what is displayed counts; the dragged item is read only on drop. The card
+/// reconfigures it on each render.
 @MainActor
 final class SplitDropController: SidebarItemDropTarget {
-    /// Onglets affichés, de gauche à droite.
+    /// Displayed tabs, from left to right.
     var panes: [BrowserTab] = []
-    /// Largeurs des panneaux, de gauche à droite.
+    /// Widths of the panes, from left to right.
     var widths: [Double] = []
-    /// Largeur cachée par la barre flottante à gauche des panneaux : pas de dépôt dessous.
+    /// Width hidden by the floating sidebar to the left of the panes: no drop underneath.
     var leadingInset = 0.0
-    /// Ce qui est affiché peut-il prendre un panneau de plus ?
+    /// Can what is displayed take one more pane?
     var canTakeTab = false
     var onTargetChange: (SplitDropTarget?) -> Void = { _ in }
     var onDrop: (UUID, SplitDropTarget) -> Void = { _, _ in }
@@ -39,7 +39,7 @@ final class SplitDropController: SidebarItemDropTarget {
     func sidebarItemDropped(_ info: any NSDraggingInfo, on webView: BrowserWebView) -> Bool {
         let target = dropTarget(for: info, over: webView)
         setTarget(nil)
-        // Seul un onglet rejoint un split ; un dossier ou un split lâché ici est refusé.
+        // Only a tab joins a split; a folder or a split dropped here is refused.
         guard let target,
               let data = info.draggingPasteboard.data(forType: BrowserWebView.sidebarItemType),
               case let .tab(id)? = SidebarDragItem(data: data)
@@ -50,7 +50,7 @@ final class SplitDropController: SidebarItemDropTarget {
         return true
     }
 
-    /// Bord du panneau de `webView` sous le pointeur, hors de la barre flottante.
+    /// Edge of the pane of `webView` under the pointer, outside the floating sidebar.
     private func dropTarget(for info: any NSDraggingInfo, over webView: BrowserWebView) -> SplitDropTarget? {
         guard canTakeTab,
               let index = panes.firstIndex(where: { $0.webView === webView }),

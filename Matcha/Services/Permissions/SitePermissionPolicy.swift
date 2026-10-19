@@ -1,18 +1,18 @@
 import Foundation
 
-/// Règles des demandes de permission (tâche 5.2), sans WebKit ni interface.
+/// Rules of permission requests (task 5.2), without WebKit or interface.
 nonisolated enum SitePermissionPolicy {
     enum Outcome: Equatable, Sendable {
-        /// Décisions retenues : accordé sans rien demander.
+        /// Remembered decisions: granted without asking anything.
         case grant
-        /// Une décision retenue refuse : refusé sans rien demander.
+        /// A remembered decision denies: denied without asking anything.
         case deny
-        /// Le bandeau demande ces permissions, celles sans décision retenue.
+        /// The banner asks for these permissions, those without a remembered decision.
         case ask(Set<SitePermissionKind>)
     }
 
-    /// Une permission demandée et refusée l'emporte (WebKit accorde ou refuse la demande en entier) ; toutes
-    /// autorisées : accordé ; sinon, on demande celles qui n'ont pas de décision. Une demande vide est refusée.
+    /// A requested permission that is denied wins (WebKit grants or denies the whole request); all allowed: granted;
+    /// otherwise, we ask for those that have no decision. An empty request is denied.
     static func evaluate(
         _ requested: Set<SitePermissionKind>,
         stored: [SitePermissionKind: SitePermissionDecision],
@@ -24,12 +24,12 @@ nonisolated enum SitePermissionPolicy {
         return undecided.isEmpty ? .grant : .ask(undecided)
     }
 
-    /// Réponse transmise à WebKit.
+    /// Answer passed to WebKit.
     static func grants(_ answer: SitePermissionAnswer) -> Bool {
         answer != .deny
     }
 
-    /// Décisions à retenir pour les permissions `asked` : aucune pour « Autoriser une fois ».
+    /// Decisions to remember for the `asked` permissions: none for “Allow Once”.
     static func decisionsToStore(
         for answer: SitePermissionAnswer,
         asked: Set<SitePermissionKind>,

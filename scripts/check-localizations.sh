@@ -1,14 +1,14 @@
 #!/usr/bin/env bash
-# Vérifie les catalogues de chaînes (Localizable.xcstrings, InfoPlist.xcstrings) sans compiler :
-# les clés sont celles que le compilateur a extraites lors de la dernière compilation dans build/
-# (fichiers .stringsdata) et celles de l'Info.plist produit. Signale les clés absentes du catalogue,
-# les clés périmées, toute clé sans valeur « translated » dans une langue de l'app (pluriels compris,
-# avec chacune de leurs catégories) et tout texte anglais du catalogue qui ne correspond plus au code
-# ou à l'Info.plist (ses traductions sont alors à revoir).
+# Checks the string catalogs (Localizable.xcstrings, InfoPlist.xcstrings) without building:
+# the keys are those the compiler extracted during the last build in build/
+# (.stringsdata files) and those of the produced Info.plist. Reports keys missing from the catalog,
+# stale keys, any key without a “translated” value in one of the app's languages (plurals included,
+# with each of their categories) and any English text of the catalog that no longer matches the code
+# or the Info.plist (its translations then need review).
 #
-# Usage : scripts/check-localizations.sh   (après la compilation Debug décrite dans CLAUDE.md)
-#         CONFIGURATION=Release scripts/check-localizations.sh
-# Code de sortie : 0 si tout est en ordre, 1 sinon.
+# Usage: scripts/check-localizations.sh   (after the Debug build described in CLAUDE.md)
+#        CONFIGURATION=Release scripts/check-localizations.sh
+# Exit code: 0 if everything is in order, 1 otherwise.
 set -euo pipefail
 cd "$(dirname "$0")/.."
 
@@ -24,10 +24,10 @@ ROOT = os.getcwd()
 TARGET = "Matcha"
 INTERMEDIATES = os.path.join(ROOT, "build/Build/Intermediates.noindex", f"{TARGET}.build")
 PRODUCTS = os.path.join(ROOT, "build/Build/Products")
-# Clés de l'Info.plist que l'on traduit, et celles qu'Xcode peut ajouter d'office au catalogue.
+# Info.plist keys that we translate, and those that Xcode may add to the catalog on its own.
 INFO_PLIST_KEY = re.compile(r"^(NS\w+UsageDescription|CFBundleDisplayName|CFBundleSpokenName|NSHumanReadableCopyright)$")
 INFO_PLIST_OPTIONAL = {"CFBundleName"}
-# Catégories de pluriel exigées par langue (CLDR) ; « other » sert de repli aux autres (many…).
+# Plural categories required per language (CLDR); “other” is the fallback for the others (many…).
 REQUIRED_PLURALS = {language: {"one", "other"} for language in ("en", "fr", "de", "es", "it")}
 PLACEHOLDER = re.compile(r"%(?:\d+\$)?[-+ #0]*\d*(?:\.\d+)?(?:hh|h|ll|l|q|z|t|j|L)?[@dDiuUxXoOfFeEgGcCsSpaA]")
 
@@ -40,7 +40,7 @@ def fail(message):
 
 
 def app_languages():
-    """Langues de l'app : les knownRegions du projet, sans la langue source ni Base."""
+    """App languages: the project's knownRegions, without the source language or Base."""
     with open(os.path.join(ROOT, f"{TARGET}.xcodeproj/project.pbxproj"), encoding="utf-8") as file:
         project = file.read()
     regions = re.search(r"knownRegions = \(([^)]*)\);", project)
@@ -52,7 +52,7 @@ def app_languages():
 
 
 def last_build():
-    """Dossier intermédiaire et produit de la dernière compilation (ou de $CONFIGURATION)."""
+    """Intermediate folder and product of the last build (or of $CONFIGURATION)."""
     configuration = os.environ.get("CONFIGURATION")
     pattern = os.path.join(INTERMEDIATES, configuration or "*", f"{TARGET}.build/Objects-normal/*/{TARGET}.SwiftFileList")
     lists = glob.glob(pattern)
@@ -64,8 +64,8 @@ def last_build():
 
 
 def extracted_keys(objects):
-    """Clés extraites par table, avec leur texte anglais (`defaultValue` du code, sinon la clé),
-    pour les seuls fichiers de la dernière compilation."""
+    """Keys extracted per table, with their English text (`defaultValue` in the code, otherwise the key),
+    for the files of the last build only."""
     with open(os.path.join(objects, f"{TARGET}.SwiftFileList"), encoding="utf-8") as file:
         sources = {line.strip() for line in file if line.strip()}
     tables, built = {}, {}
@@ -74,9 +74,9 @@ def extracted_keys(objects):
             data = json.load(file)
         source = data.get("source", "")
         if source.endswith(".swift") and source not in sources:
-            continue  # fichier supprimé depuis : ses chaînes ne comptent plus
-        # Le compilateur ne réécrit pas un .stringsdata dont les chaînes n'ont pas changé : la date de
-        # compilation du fichier est la plus récente de ses sorties (.o, .d, .stringsdata).
+            continue  # file deleted since then: its strings no longer count
+        # The compiler doesn't rewrite a .stringsdata whose strings haven't changed: the build date of
+        # the file is the most recent of its outputs (.o, .d, .stringsdata).
         stem = os.path.splitext(path)[0]
         outputs = [path] + [stem + ext for ext in (".o", ".d") if os.path.exists(stem + ext)]
         built[source] = max(os.path.getmtime(output) for output in outputs)
@@ -87,7 +87,7 @@ def extracted_keys(objects):
                 if keys.get(key, text) != text:
                     problems.append(f"{table} : {key!r} a deux textes anglais dans le code : {keys[key]!r}, {text!r}")
                 keys[key] = text
-    # Une compilation plus ancienne que les sources donnerait une liste de clés fausse.
+    # A build older than the sources would give a wrong list of keys.
     outdated = sorted(
         os.path.relpath(source, ROOT)
         for source in sources
@@ -127,7 +127,7 @@ def find_catalog(table):
 
 
 def string_units(localization, path=()):
-    """Toutes les valeurs d'une langue : la valeur simple et chaque variante (pluriel, appareil…)."""
+    """All the values of a language: the simple value and each variant (plural, device…)."""
     if "stringUnit" in localization:
         yield path, localization["stringUnit"]
     for kind, cases in localization.get("variations", {}).items():
@@ -142,7 +142,7 @@ def placeholders(text):
 
 
 def check_catalog(table, expected, languages, optional=frozenset()):
-    """`expected` : clé → texte anglais construit (code ou Info.plist)."""
+    """`expected`: key → English text as built (code or Info.plist)."""
     path = find_catalog(table)
     if path is None:
         problems.append(f"{table} : catalogue {table}.xcstrings introuvable (ou en double) sous {TARGET}/")

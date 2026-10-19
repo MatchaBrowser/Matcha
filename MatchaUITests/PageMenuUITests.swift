@@ -1,8 +1,8 @@
 import XCTest
 
-/// Menu contextuel des pages (5.9) : « Ouvrir le lien dans un nouvel onglet », « Ouvrir dans un aperçu » et « Ouvrir
-/// l'image dans un nouvel onglet », depuis un onglet, l'aperçu et une mini-fenêtre. Pages : la documentation de
-/// Postfix livrée avec macOS (sans réseau). Ces tests déplacent la vraie souris.
+/// Page context menu (5.9): “Open Link in New Tab”, “Open Link in Peek” and “Open Image in New Tab”, from a tab,
+/// the Peek and a mini window. Pages: the Postfix documentation shipped with macOS (no network). These tests move
+/// the real mouse.
 final class PageMenuUITests: XCTestCase {
     private static let newTabItem = "Ouvrir le lien dans un nouvel onglet"
     private static let peekItem = "Ouvrir dans un aperçu"
@@ -12,7 +12,7 @@ final class PageMenuUITests: XCTestCase {
         continueAfterFailure = false
     }
 
-    /// Lance l'app sur la page d'accueil de la documentation de Postfix, seule dans la barre.
+    /// Launches the app on the home page of the Postfix documentation, alone in the sidebar.
     @MainActor
     private func launchOnLocalDocs() throws -> XCUIApplication {
         let app = launchApp()
@@ -22,14 +22,14 @@ final class PageMenuUITests: XCTestCase {
         return app
     }
 
-    /// Élément du menu contextuel ouvert, par son titre.
+    /// Item of the open context menu, by its title.
     @MainActor
     private func menuItem(_ title: String, in app: XCUIApplication) -> XCUIElement {
         app.menuItems.matching(NSPredicate(format: "title == %@", title)).firstMatch
     }
 
-    /// Clic droit au centre du lien `element` une fois sa position stable (aperçu qui s'ouvre), par coordonnées : un
-    /// lien de page est entièrement couvert par son texte. Le menu du lien s'ouvre.
+    /// Right-click at the center of the link `element` once its position is stable (Peek opening), by coordinates: a
+    /// page link is entirely covered by its text. The link menu opens.
     @MainActor
     private func rightClickWhenSettled(_ element: XCUIElement, in app: XCUIApplication) {
         var previous = element.frame
@@ -53,7 +53,7 @@ final class PageMenuUITests: XCTestCase {
 
         XCTAssertTrue(waitForCount(tabRows(in: app), 2, timeout: 5))
         XCTAssertTrue(tabRow(titled: "Basic Configuration", in: app).waitForExistence(timeout: 10))
-        // Juste après la page d'origine, qui reste affichée.
+        // Right after the original page, which stays displayed.
         XCTAssertTrue(tabRows(in: app).element(boundBy: 1).label.contains("Basic Configuration"))
         XCTAssertEqual(addressPill(in: app).value as? String, "index.html")
         XCTAssertFalse(peekElement("peekCloseButton", in: app).exists)
@@ -71,8 +71,8 @@ final class PageMenuUITests: XCTestCase {
         XCTAssertEqual(addressPill(in: app).value as? String, "index.html")
     }
 
-    /// Dans l'aperçu : un onglet en arrière-plan après l'onglet d'origine, et l'aperçu reste ouvert ; pas d'« Ouvrir dans
-    /// un aperçu », un lien s'y charge déjà sur place.
+    /// In the Peek: a background tab after the original tab, and the Peek stays open; no “Open Link in Peek”, a link
+    /// already loads in place there.
     @MainActor
     func testOpenLinkInNewTabFromThePeekKeepsThePeek() throws {
         let app = try launchOnLocalDocs()
@@ -88,7 +88,7 @@ final class PageMenuUITests: XCTestCase {
         XCTAssertEqual(addressPill(in: app).value as? String, "index.html")
     }
 
-    /// Logo de Postfix, à gauche du titre de la page (texte de remplacement vide : l'image n'est pas exposée).
+    /// Postfix logo, left of the page title (empty alternative text: the image isn't exposed).
     @MainActor
     func testOpenImageInNewTabOpensABackgroundTab() throws {
         let app = try launchOnLocalDocs()
@@ -107,7 +107,7 @@ final class PageMenuUITests: XCTestCase {
         XCTAssertTrue(waitForValue(of: addressPill(in: app)) { $0 == "postfix-logo.jpg" })
     }
 
-    /// Depuis une mini-fenêtre : un onglet en arrière-plan dans la fenêtre principale, comme ⌘-clic ; pas d'aperçu.
+    /// From a mini window: a background tab in the main window, like ⌘-click; no Peek.
     @MainActor
     func testOpenLinkInNewTabFromAMiniWindowAddsATabToTheSidebar() throws {
         try XCTSkipUnless(FileManager.default.isReadableFile(atPath: Self.localDocsPath), "Documentation de Postfix absente")
@@ -127,15 +127,15 @@ final class PageMenuUITests: XCTestCase {
         XCTAssertEqual(addressPill(in: mini).value as? String, "index.html")
     }
 
-    /// Menu d'une page (hors d'un lien) : Précédent, Suivant, Recharger, Enregistrer sous…, Imprimer…, Afficher le code
-    /// source ; ce dernier ouvre le code dans un nouvel onglet au premier plan.
+    /// Page menu (outside a link): Back, Forward, Reload, Save As…, Print…, View Page Source; the last one opens the
+    /// source in a new foreground tab.
     @MainActor
     func testThePageMenuOpensTheSourceInANewTab() throws {
         let app = try launchOnLocalDocs()
         let page = app.webViews.firstMatch
         let title = page.staticTexts["Postfix Documentation"]
         XCTAssertTrue(title.waitForExistence(timeout: 5))
-        // Sous le titre, à droite du tampon : le fond de la page.
+        // Below the title, right of the stamp: the page background.
         page.coordinate(withNormalizedOffset: CGVector(dx: 0.9, dy: 0.06)).rightClick()
         for item in ["Précédent", "Suivant", "Recharger", "Enregistrer sous…", "Imprimer…"] {
             XCTAssertTrue(menuItem(item, in: app).waitForExistence(timeout: 3), item)

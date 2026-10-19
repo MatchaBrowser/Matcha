@@ -3,9 +3,9 @@ import Foundation
 import Testing
 import WebKit
 
-/// « … dans un nouvel onglet » du menu contextuel (tâche 5.9) depuis une fenêtre privée, une mini-fenêtre et une
-/// fenêtre de connexion. Vraies vues web ; la fenêtre est demandée au délégué comme le fait WebKit pour un élément du
-/// menu (`.other`, sans bouton ni touche, sans taille). Aucune fenêtre à l'écran.
+/// “… in New Tab” from the context menu (task 5.9) from a private window, a mini window and a sign-in window. Real web
+/// views; the window is requested from the delegate as WebKit does for a menu item (`.other`, no button or key, no
+/// size). No window on screen.
 @MainActor
 @Suite(.serialized)
 final class PageMenuHostsTests {
@@ -22,7 +22,7 @@ final class PageMenuHostsTests {
         session.popupWindows.closeAll()
     }
 
-    /// Retient dans `webView` le choix « nouvel onglet », puis lui fait demander une fenêtre pour `url`.
+    /// Records the “new tab” choice in `webView`, then makes it request a window for `url`.
     private func openInNewTab(_ url: URL, from webView: WKWebView, coordinator: NavigationCoordinator) throws -> WKWebView? {
         let browserWebView = try #require(webView as? BrowserWebView)
         browserWebView.pageMenuIntent.choose(.backgroundTab, openingPoint: PeekLayout.center, at: .now)
@@ -38,7 +38,7 @@ final class PageMenuHostsTests {
         let privateSession = BrowserSession.makePrivate()
         let tabManager = privateSession.spaces[0].tabManager
         let page = tabManager.newTab()
-        // Configuration de l'app, sans le schéma des pages de test : un lien web (jamais chargé ici).
+        // The app's configuration, without the test pages' scheme: a web link (never loaded here).
         let link = try #require(URL(string: "https://example.org/cible"))
 
         let created = try openInNewTab(link, from: page.loadedWebView, coordinator: tabManager.coordinator)
@@ -51,7 +51,7 @@ final class PageMenuHostsTests {
         #expect(created?.configuration.websiteDataStore.isPersistent == false)
     }
 
-    /// Comme ⌘-clic : un onglet en arrière-plan du Space visé, sans nouvelle mini-fenêtre.
+    /// Like ⌘-click: a background tab in the target Space, with no new mini window.
     @Test func `a mini window opens a background tab in the target Space`() async throws {
         let miniWindows = MiniWindowManager.forTests(session: session)
         miniWindows.linkMainWindow(FakeMainWindowLink(windowModel: model))
@@ -69,7 +69,7 @@ final class PageMenuHostsTests {
         #expect(miniWindows.windows.map(\.id) == [mini.id])
     }
 
-    /// Comme depuis sa page d'origine : un onglet en arrière-plan après elle, dans sa fenêtre.
+    /// As from its originating page: a background tab after it, in its window.
     @Test func `a sign-in window opens a background tab after its opener`() async throws {
         let tabManager = session.spaces[0].tabManager
         let other = tabManager.newTab()

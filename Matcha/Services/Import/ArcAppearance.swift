@@ -1,8 +1,8 @@
 import Foundation
 
-/// Apparence d'un Space d'Arc dans Matcha (tâche 7.1) : son icône et son thème. Type pur.
+/// Appearance of an Arc Space in Matcha (task 7.1): its icon and its theme. Pure type.
 nonisolated enum ArcAppearance {
-    /// Icônes d'Arc dont le nom diffère du symbole SF le plus proche.
+    /// Arc icons whose name differs from the closest SF symbol.
     static let symbolNames: [String: String] = [
         "grid": "square.grid.2x2.fill",
         "server": "server.rack",
@@ -23,7 +23,7 @@ nonisolated enum ArcAppearance {
         "planet": "globe.americas.fill",
     ]
 
-    /// Icônes d'Arc sans symbole SF proche, rendues par un emoji.
+    /// Arc icons without a close SF symbol, rendered with an emoji.
     static let emojiNames: [String: String] = [
         "skull": "💀",
         "ghost": "👻",
@@ -32,10 +32,9 @@ nonisolated enum ArcAppearance {
         "rocket": "🚀",
     ]
 
-    /// Icône enregistrée (`SidebarIcon.spaceSymbol`) : l'emoji, ou le premier symbole SF existant parmi le nom
-    /// connu, la variante pleine du nom d'Arc (comme les icônes des Spaces) et ce nom, sinon l'emoji connu ; nil s'il n'y en a pas (le
-    /// Space garde l'icône
-    /// donnée par défaut).
+    /// Stored icon (`SidebarIcon.spaceSymbol`): the emoji, or the first existing SF symbol among the known name, the
+    /// filled variant of Arc's name (like the Spaces' icons) and that name, otherwise the known emoji; nil if there is
+    /// none (the Space keeps its default icon).
     static func spaceSymbol(for icon: ArcSidebar.Icon?, symbolExists: (String) -> Bool) -> String? {
         switch icon {
         case let .emoji(emoji):
@@ -48,8 +47,8 @@ nonisolated enum ArcAppearance {
         }
     }
 
-    /// Thème du Space : les couleurs d'Arc (une seule couleur donne un dégradé vers une teinte plus sombre) ; nil sans
-    /// couleur (le Space garde le thème donné par défaut).
+    /// Theme of the Space: Arc's colors (a single color gives a gradient towards a darker shade); nil without a color
+    /// (the Space keeps its default theme).
     static func theme(for colors: [ThemeColor]) -> SpaceTheme? {
         switch colors.count {
         case 0:

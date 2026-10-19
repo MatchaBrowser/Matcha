@@ -1,15 +1,15 @@
 import Foundation
 
-/// Espace les réponses aux messages natifs d'une extension (`runtime.sendNativeMessage`, refusés par Matcha) : une par
-/// intervalle et par extension. Un message isolé reçoit sa réponse tout de suite ; une extension qui en envoie en
-/// boucle (Bitwarden attend de son app une réponse différée à « sleep », puis recommence) est ralentie au lieu
-/// d'occuper le processeur. Type pur.
+/// Spaces out the answers to an extension's native messages (`runtime.sendNativeMessage`, refused by Matcha): one per
+/// interval and per extension. An isolated message gets its answer right away; an extension that sends them in a loop
+/// (Bitwarden expects a delayed answer to “sleep” from its app, then starts again) is slowed down instead of keeping
+/// the processor busy. Pure type.
 nonisolated struct NativeMessageThrottle {
     static let interval = Duration.seconds(1)
 
     private var nextReply: [String: ContinuousClock.Instant] = [:]
 
-    /// Délai avant de répondre au message que l'extension `identifier` envoie à `now`.
+    /// Delay before answering the message that extension `identifier` sends at `now`.
     mutating func delay(for identifier: String, at now: ContinuousClock.Instant) -> Duration {
         let reply = max(now, nextReply[identifier] ?? now)
         nextReply[identifier] = reply + Self.interval

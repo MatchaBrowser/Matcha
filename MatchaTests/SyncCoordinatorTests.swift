@@ -3,13 +3,12 @@ import Foundation
 import SwiftData
 import Testing
 
-/// Déclenchement de la synchro (tâche 7.4) : un premier cycle au démarrage, puis un cycle peu après chaque changement
-/// enregistré de ce Mac.
+/// Sync triggering (task 7.4): a first cycle at startup, then a cycle shortly after each change saved on this Mac.
 @MainActor
 struct SyncCoordinatorTests {
     private let server = InMemorySyncServer()
 
-    /// Attend que `condition` devienne vraie (2 secondes au plus).
+    /// Waits until `condition` becomes true (2 seconds at most).
     private func eventually(_ condition: () async -> Bool) async throws -> Bool {
         for _ in 0 ..< 100 {
             if await condition() {

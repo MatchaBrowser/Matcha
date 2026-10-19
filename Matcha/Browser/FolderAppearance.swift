@@ -1,7 +1,7 @@
 import Foundation
 
-/// Apparence d'un dossier d'épinglés, choisie dans son panneau de personnalisation : icône, couleur du texte et
-/// couleur du fond (nil : celles du système). Les couleurs s'affichent telles quelles, en clair comme en sombre.
+/// Appearance of a folder of pinned tabs, chosen in its customization panel: icon, text color and background color
+/// (nil: the system ones). The colors are displayed as is, in light as in dark mode.
 nonisolated struct FolderAppearance: Hashable, Sendable {
     var icon = SidebarIcon.default
     var textColor: ThemeColor?
@@ -13,15 +13,15 @@ nonisolated struct FolderAppearance: Hashable, Sendable {
         self == .default
     }
 
-    /// Couleur du nom et du symbole : celle choisie ; sinon, sur un fond choisi, le noir ou le blanc, le plus lisible
-    /// sur ce fond ; sinon nil (couleur du texte du système).
+    /// Color of the name and symbol: the chosen one; otherwise, on a chosen background, black or white, whichever is
+    /// more readable on that background; otherwise nil (system text color).
     var displayedTextColor: ThemeColor? {
         textColor ?? backgroundColor?.readableTextColor
     }
 
-    /// La même apparence telle qu'elle sera enregistrée et relue : couleurs ramenées à 8 bits par composante
-    /// (`#RRGGBB`), emoji et nom de symbole vérifiés (invalides : l'icône par défaut). Un rangement ainsi tenu
-    /// en mémoire est identique après un aller-retour par la base.
+    /// The same appearance as it will be stored and read back: colors reduced to 8 bits per component (`#RRGGBB`),
+    /// emoji and symbol name checked (invalid: the default icon). An arrangement held in memory this way is identical
+    /// after a round trip through the database.
     var normalized: FolderAppearance {
         FolderAppearance(storedIcon: storedIcon, textColorHex: storedTextColor, backgroundColorHex: storedBackgroundColor)
     }

@@ -1,8 +1,8 @@
 import XCTest
 
-/// Personnalisation d'un dossier d'épinglés : panneau ouvert sous sa ligne par « Personnaliser… », symbole, couleurs
-/// du texte et du fond, « Réinitialiser », fermeture par la croix, le menu ou Échap. En Debug, la valeur
-/// d'accessibilité de la ligne résume son apparence (« symbol:star text:#FF3B30 background:#FFCC00 »).
+/// Customization of a pinned folder: panel opened below its row by “Customize…”, symbol, text and background
+/// colors, “Reset”, closing with the cross, the menu or Escape. In Debug, the row's accessibility value sums up
+/// its appearance (“symbol:star text:#FF3B30 background:#FFCC00”).
 final class FolderCustomizationUITests: XCTestCase {
     private static let defaultAppearance = "default text:none background:none"
 
@@ -15,19 +15,19 @@ final class FolderCustomizationUITests: XCTestCase {
         let app = launchApp()
         let folder = makeFolder(named: "Projets", in: app)
         XCTAssertEqual(folder.value as? String, Self.defaultAppearance)
-        // Rien ne s'ouvre de soi-même.
+        // Nothing opens by itself.
         let panel = customizationPanel(in: app)
         XCTAssertFalse(panel.exists)
 
         openCustomization(of: folder, in: app)
-        // Sous la ligne du dossier (une fois l'animation finie), avec son nom.
+        // Below the folder row (once the animation is over), with its name.
         sleep(1)
         XCTAssertGreaterThanOrEqual(panel.frame.minY, folder.frame.maxY - 1)
         XCTAssertEqual(panel.staticTexts["folderCustomizationTitle"].value as? String, "Projets")
         XCTAssertTrue(app.buttons["folderSymbol.folder"].isSelected)
         XCTAssertTrue(app.buttons["folderTextColor.none"].isSelected)
         XCTAssertFalse(app.buttons["folderAppearanceResetButton"].isEnabled)
-        // Noms traduits pour VoiceOver.
+        // Names translated for VoiceOver.
         XCTAssertEqual(app.buttons["folderSymbol.star"].label, "Étoile")
         XCTAssertEqual(app.buttons["folderBackgroundColor.yellow"].label, "Jaune")
 
@@ -43,7 +43,7 @@ final class FolderCustomizationUITests: XCTestCase {
         XCTAssertTrue(app.buttons["folderBackgroundColor.yellow"].isSelected)
         XCTAssertFalse(app.buttons["folderBackgroundColor.none"].isSelected)
 
-        // « Aucune couleur » pour le texte : la couleur lisible sur le fond est choisie par l'app.
+        // “No Color” for the text: the app picks a color that reads well on the background.
         app.buttons["folderTextColor.none"].click()
         XCTAssertTrue(waitForValue(of: folder, timeout: 3) { $0 == "symbol:star text:none background:#FFCC00" })
 
@@ -53,7 +53,7 @@ final class FolderCustomizationUITests: XCTestCase {
 
         app.buttons["folderCustomizationCloseButton"].click()
         XCTAssertTrue(panel.waitForNonExistence(timeout: 3))
-        // L'apparence choisie reste quand le panneau se ferme.
+        // The chosen appearance stays when the panel closes.
         XCTAssertEqual(folder.value as? String, Self.defaultAppearance)
     }
 
@@ -66,20 +66,20 @@ final class FolderCustomizationUITests: XCTestCase {
         openCustomization(of: folder, in: app)
         clickWhenSettled(app.buttons["folderSymbol.book"])
         XCTAssertTrue(waitForValue(of: folder, timeout: 3) { $0.hasPrefix("symbol:book ") })
-        // Le menu du dossier ouvert propose de fermer le panneau.
+        // With the panel open, the folder's menu offers to close it.
         folder.rightClick()
         app.menuItems["Fermer la personnalisation"].click()
         XCTAssertTrue(panel.waitForNonExistence(timeout: 3))
         XCTAssertEqual(folder.value as? String, "symbol:book text:none background:none")
 
-        // Échap ferme le panneau, qui prend le clavier à l'ouverture.
+        // Escape closes the panel, which takes keyboard focus when it opens.
         openCustomization(of: folder, in: app)
         sleep(1)
         app.typeKey(.escape, modifierFlags: [])
         XCTAssertTrue(panel.waitForNonExistence(timeout: 3))
     }
 
-    /// Onglet vide épinglé, puis un dossier créé depuis lui et nommé `name`.
+    /// Empty pinned tab, then a folder created from it and named `name`.
     @MainActor
     private func makeFolder(named name: String, in app: XCUIApplication) -> XCUIElement {
         XCTAssertTrue(waitForBrowserWindow(of: app))
@@ -108,13 +108,13 @@ final class FolderCustomizationUITests: XCTestCase {
 }
 
 extension XCTestCase {
-    /// Première ligne de dossier de la barre.
+    /// First folder row of the sidebar.
     @MainActor
     func folderRow(in app: XCUIApplication) -> XCUIElement {
         app.descendants(matching: .any).matching(identifier: "folderRow").firstMatch
     }
 
-    /// Panneau de personnalisation d'un dossier.
+    /// Customization panel of a folder.
     @MainActor
     func customizationPanel(in app: XCUIApplication) -> XCUIElement {
         app.descendants(matching: .any).matching(identifier: "folderCustomizationPanel").firstMatch

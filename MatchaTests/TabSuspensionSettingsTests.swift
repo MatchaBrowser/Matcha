@@ -2,7 +2,7 @@ import Foundation
 @testable import Matcha
 import Testing
 
-/// Réglage « Libérer la mémoire des onglets inactifs après » (tâche 5.6).
+/// “Free memory of inactive tabs after” setting (task 5.6).
 struct TabSuspensionSettingsTests {
     private func emptyDefaults() -> UserDefaults {
         let name = "TabSuspensionSettingsTests-\(UUID().uuidString)"
@@ -33,7 +33,7 @@ struct TabSuspensionSettingsTests {
         #expect(TabSuspensionSettings.current(in: defaults).delay == nil)
     }
 
-    /// Les arguments de lancement (« -tabSuspensionDelay 0 ») arrivent sous forme de texte.
+    /// Launch arguments (“-tabSuspensionDelay 0”) arrive as text.
     @Test(arguments: [
         ("0", TabSuspensionDelay.never),
         ("15", .fifteenMinutes),

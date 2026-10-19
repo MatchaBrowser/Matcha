@@ -1,16 +1,16 @@
 import AppKit
 
-/// ⌘= vaut ⌘+ (« Zoom avant »), comme dans Safari : sur un clavier où « + » se tape avec Maj (QWERTY, AZERTY), on
-/// zoome sans Maj. Un menu AppKit ne reconnaît que le caractère de son raccourci (« + ») : `BrowserWebView` propose au
-/// menu un ⌘+ à la place du ⌘=.
+/// ⌘= counts as ⌘+ (“Zoom In”), as in Safari: on a keyboard where “+” is typed with Shift (QWERTY, AZERTY), you
+/// zoom without Shift. An AppKit menu only recognizes its shortcut's character (“+”): `BrowserWebView` offers the
+/// menu a ⌘+ instead of the ⌘=.
 nonisolated enum ZoomKeyAlias {
-    /// Vrai pour ⌘= (Maj permise, ni ⌥ ni ⌃).
+    /// True for ⌘= (Shift allowed, neither ⌥ nor ⌃).
     static func isZoomIn(charactersIgnoringModifiers characters: String?, modifierFlags: NSEvent.ModifierFlags) -> Bool {
         let flags = modifierFlags.intersection([.command, .option, .control])
         return characters == "=" && flags == .command
     }
 
-    /// ⌘+ équivalent à `event`, ou nil si `event` n'est pas ⌘=.
+    /// ⌘+ equivalent to `event`, or nil if `event` is not ⌘=.
     @MainActor
     static func zoomInEvent(for event: NSEvent) -> NSEvent? {
         guard event.type == .keyDown,

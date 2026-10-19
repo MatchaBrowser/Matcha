@@ -3,9 +3,9 @@ import Foundation
 import Testing
 import WebKit
 
-/// Bloqueur avec WebKit (tâche 6.2) : listes d'essai compilées dans un magasin temporaire, puis de vraies pages
-/// (`BlockerTestPages`) dans les onglets d'un Space : image bloquée et élément masqué, listes posées après coup,
-/// réglage global, exception d'un site (ses pages se rechargent), fenêtre privée, fenêtre ouverte par une page.
+/// Blocker with WebKit (task 6.2): test lists compiled into a temporary store, then real pages
+/// (`BlockerTestPages`) in the tabs of a Space: blocked image and hidden element, lists set afterwards, global
+/// setting, site exception (its pages reload), private window, window opened by a page.
 @MainActor
 final class ContentBlockerIntegrationTests {
     private let service = BlockerTestPages.service()
@@ -43,7 +43,7 @@ final class ContentBlockerIntegrationTests {
         #expect(await store.identifiers().sorted() == ["matcha-blocklist.test-block.1", "matcha-blocklist.test-hide.1"])
     }
 
-    /// Second lancement : les listes sont relues telles quelles (même date de compilation), sans recompiler.
+    /// Second launch: the lists are read back as they are (same compilation date), without recompiling.
     @Test func `a second launch reuses the compiled lists`() async throws {
         let suiteName = "ContentBlockerIntegrationTests-\(UUID().uuidString)"
         let defaults = try #require(UserDefaults(suiteName: suiteName))
@@ -65,7 +65,7 @@ final class ContentBlockerIntegrationTests {
 
         await service.load(from: BlockerTestPages.fixtures, store: store)
         #expect(try await reload(tab) == .blocked)
-        // Une nouvelle page est bloquée dès son premier chargement.
+        // A new page is blocked from its first load.
         #expect(try await BlockerTestPages.outcome(of: open()) == .blocked)
     }
 
@@ -80,7 +80,7 @@ final class ContentBlockerIntegrationTests {
         #expect(try await reload(tab) == .blocked)
     }
 
-    /// L'exception d'un site recharge ses pages, sans toucher aux autres sites ; la retirer les rebloque.
+    /// A site exception reloads its pages, without touching other sites; removing it blocks them again.
     @Test func `an exception reloads the pages of its site unblocked`() async throws {
         await service.load(from: BlockerTestPages.fixtures, store: store)
         let excepted = open(host: "excepted.test")
@@ -94,7 +94,7 @@ final class ContentBlockerIntegrationTests {
         #expect(try await BlockerTestPages.outcome(of: excepted) == .open)
         #expect(other.title == "stale")
         #expect(try await reload(other) == .blocked)
-        // Un nouvel onglet du site n'est pas bloqué non plus.
+        // A new tab of the site is not blocked either.
         #expect(try await BlockerTestPages.outcome(of: open(host: "excepted.test")) == .open)
 
         try await BlockerTestPages.forgetOutcome(of: excepted)
@@ -102,7 +102,7 @@ final class ContentBlockerIntegrationTests {
         #expect(try await BlockerTestPages.outcome(of: excepted) == .blocked)
     }
 
-    /// Une exception prise dans une fenêtre privée ne vaut que pour ses pages.
+    /// An exception made in a private window only applies to its pages.
     @Test func `a private exception leaves the main session blocked`() async throws {
         await service.load(from: BlockerTestPages.fixtures, store: store)
         let privateManager = TabManager(websiteDataStore: .nonPersistent())
@@ -120,13 +120,13 @@ final class ContentBlockerIntegrationTests {
         #expect(service.exceptions.sites.isEmpty)
     }
 
-    /// Une page ouverte par `window.open` a son propre contrôleur (sans quoi l'exception de l'une toucherait l'autre),
-    /// garde `window.opener` et reste bloquée.
+    /// A page opened by `window.open` has its own controller (otherwise the exception of one would affect the
+    /// other), keeps `window.opener` and stays blocked.
     @Test func `a window opened by a page has its own controller`() async throws {
         await service.load(from: BlockerTestPages.fixtures, store: store)
         let opener = open(host: "excepted.test")
         #expect(try await BlockerTestPages.outcome(of: opener) == .blocked)
-        // Apostrophes encodées : l'adresse va dans une chaîne JavaScript entre apostrophes.
+        // Encoded single quotes: the address goes into a single-quoted JavaScript string.
         let address = BlockerTestPages.url(host: "other.test").absoluteString.replacingOccurrences(of: "'", with: "%27")
         _ = try await opener.loadedWebView.evaluateJavaScript("window.open('\(address)'); true")
         try await waitUntil { manager.tabs.count == 2 }
@@ -140,13 +140,13 @@ final class ContentBlockerIntegrationTests {
         try await BlockerTestPages.forgetOutcome(of: popup)
         manager.contentBlocking?.setBlocks(false, onSite: "excepted.test")
         #expect(try await BlockerTestPages.outcome(of: opener) == .open)
-        // La fenêtre (autre site) n'a pas été rechargée, et reste bloquée.
+        // The window (another site) has not been reloaded, and stays blocked.
         #expect(popup.title == "stale")
         #expect(try await reload(popup) == .blocked)
     }
 
-    /// Navigation vers un autre site qui échoue avant d'afficher quoi que ce soit : la page restée affichée (site en
-    /// exception) retrouve son état, et une image qu'elle charge ensuite n'est pas bloquée.
+    /// Navigation to another site that fails before showing anything: the page still shown (site with an
+    /// exception) gets its state back, and an image it loads afterwards is not blocked.
     @Test func `a failed navigation leaves the displayed page as it was`() async throws {
         await service.load(from: BlockerTestPages.fixtures, store: store)
         manager.contentBlocking?.setBlocks(false, onSite: "excepted.test")
@@ -173,7 +173,7 @@ final class ContentBlockerIntegrationTests {
     }
 }
 
-/// Schéma dont chaque chargement échoue (hôte introuvable), pour une navigation qui n'aboutit pas.
+/// Scheme whose every load fails (host not found), for a navigation that does not complete.
 @MainActor
 final class FailingPages: NSObject, WKURLSchemeHandler {
     static let scheme = "obfail"

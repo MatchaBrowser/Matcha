@@ -3,26 +3,26 @@ import Foundation
 import OSLog
 import WebKit
 
-/// Extension prête à installer, en attente de l'accord de l'utilisateur (écran des permissions, tâche 6.4).
+/// Extension ready to install, waiting for the user's approval (permissions screen, task 6.4).
 struct ExtensionInstallCandidate: Identifiable {
     enum Source {
-        /// Fichier ou dossier choisi : décompressé dans `staging`, manifeste dans `root`.
+        /// Chosen file or folder: unpacked into `staging`, manifest in `root`.
         case package(root: URL, staging: URL, fileName: String)
-        /// Extension Safari d'une app, chargée sur place.
+        /// Safari extension of an app, loaded in place.
         case appExtension(SafariAppExtension)
     }
 
     let identifier: String
     let webExtension: WKWebExtension
     let source: Source
-    /// Une extension de même identifiant est déjà installée : elle sera remplacée, ses données gardées.
+    /// An extension with the same identifier is already installed: it will be replaced, its data kept.
     let isUpdate: Bool
 
     var id: String {
         identifier
     }
 
-    /// Ce que l'extension pourra faire, pour l'écran des permissions.
+    /// What the extension will be able to do, for the permissions screen.
     var summary: [ExtensionPermissionSummary.Line] {
         ExtensionPermissionSummary.lines(
             permissions: Set(webExtension.requestedPermissions.map(\.rawValue)),
@@ -31,10 +31,10 @@ struct ExtensionInstallCandidate: Identifiable {
     }
 }
 
-/// Installe les extensions (tâche 6.4) : un fichier (`.crx`, `.xpi`, `.zip`) ou un dossier décompressé est préparé dans
-/// un dossier temporaire, puis, une fois accepté, déplacé dans `Application Support/Extensions/<identifiant>/` ; une
-/// extension Safari d'app reste dans son app. À l'installation, les permissions et les sites demandés sont accordés
-/// (l'utilisateur vient de les voir), les fenêtres privées seulement s'il l'a choisi ; puis l'extension est chargée.
+/// Installs extensions (task 6.4): a file (`.crx`, `.xpi`, `.zip`) or an unpacked folder is prepared in a temporary
+/// folder, then, once accepted, moved to `Application Support/Extensions/<identifier>/`; an app's Safari extension
+/// stays in its app. On installation, the requested permissions and websites are granted (the user has just seen them),
+/// private windows only if the user chose so; then the extension is loaded.
 @MainActor
 final class ExtensionInstaller {
     let manager: ExtensionManager
@@ -48,7 +48,7 @@ final class ExtensionInstaller {
         )
     }
 
-    /// Prépare l'extension du fichier ou du dossier `url`.
+    /// Prepares the extension of the file or folder `url`.
     func prepare(fileAt url: URL) async throws -> ExtensionInstallCandidate {
         let staging = stagingRoot.appendingPathComponent(UUID().uuidString, isDirectory: true)
         do {
@@ -77,7 +77,7 @@ final class ExtensionInstaller {
         }
     }
 
-    /// Prépare l'extension Safari d'une app.
+    /// Prepares an app's Safari extension.
     func prepare(_ appExtension: SafariAppExtension) async throws -> ExtensionInstallCandidate {
         guard let identifier = ExtensionIdentifier.forAppExtension(bundleIdentifier: appExtension.bundleIdentifier),
               let bundle = Bundle(url: appExtension.extensionURL)
@@ -97,7 +97,7 @@ final class ExtensionInstaller {
         }
     }
 
-    /// Installe `candidate` (accepté par l'utilisateur) et le charge ; une version déjà installée est remplacée.
+    /// Installs `candidate` (accepted by the user) and loads it; an already installed version is replaced.
     func install(_ candidate: ExtensionInstallCandidate, allowsPrivateWindows: Bool) async throws {
         let identifier = candidate.identifier
         manager.unload(identifier: identifier)
@@ -135,14 +135,14 @@ final class ExtensionInstaller {
         Logger.extensions.info("Extension \(kind, privacy: .public) (\(identifier, privacy: .public))")
     }
 
-    /// Abandonne `candidate` (refusé) : son dossier temporaire est effacé.
+    /// Discards `candidate` (refused): its temporary folder is erased.
     func discard(_ candidate: ExtensionInstallCandidate) {
         if case let .package(_, staging, _) = candidate.source {
             try? FileManager.default.removeItem(at: staging)
         }
     }
 
-    /// Dossier du manifeste : `folder` lui-même, ou son unique sous-dossier (archive d'un dossier).
+    /// Folder of the manifest: `folder` itself, or its single subfolder (archive of a folder).
     static func manifestFolder(in folder: URL) throws -> URL {
         let manifest = ExtensionInstallDirectory.manifestName
         if FileManager.default.fileExists(atPath: folder.appendingPathComponent(manifest).path) {
@@ -162,7 +162,7 @@ final class ExtensionInstaller {
         return folders[0]
     }
 
-    /// Identifiant d'une extension dont le nom n'a aucune lettre ASCII : `extension-` et le début de son empreinte.
+    /// Identifier of an extension whose name has no ASCII letter: `extension-` and the start of its digest.
     static func fallbackIdentifier(for name: String) -> String {
         let digest = SHA256.hash(data: Data(name.utf8)).prefix(6).map { String(format: "%02x", $0) }.joined()
         return "extension-\(digest)"

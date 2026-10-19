@@ -1,27 +1,27 @@
 import Foundation
 
-/// Classement des lignes de la barre de commande, pur et lexicographique (voir `DECISIONS.md`,
-/// « Classement pur et lexicographique ») :
-/// 1. les lignes du texte tapé (`CommandPrimaryRows`), toujours en tête ;
-/// 2. onglets, actions et historique qui correspondent au texte, par palier de correspondance, nature,
-///    activité ou fréquence, titre puis identifiant ; plafonnés par nature et au total ;
-/// 3. les suggestions du moteur, dans son ordre, seulement pour une recherche.
+/// Ranking of the command bar rows, pure and lexicographic (see `DECISIONS.md`,
+/// “Classement pur et lexicographique”):
+/// 1. the rows of the typed text (`CommandPrimaryRows`), always on top;
+/// 2. tabs, actions and history matching the text, by match tier, kind, activity or frecency, title then
+///    identifier; capped per kind and in total;
+/// 3. the engine's suggestions, in its order, only for a search.
 nonisolated struct CommandRanker: Sendable {
-    /// Nombre de lignes gardées.
+    /// Number of rows kept.
     struct Limits: Equatable, Sendable {
         var tabs = 4
         var history = 4
         var actions = 2
-        /// Onglets, historique et actions ensemble.
+        /// Tabs, history and actions together.
         var local = 6
         var suggestions = 4
     }
 
     var limits = Limits()
 
-    /// Lignes pour le texte de `query` ; aucune pour un texte vide. Le résultat ne dépend pas de
-    /// l'ordre de `candidates`, sauf celui des suggestions (l'ordre du moteur) et le choix du premier
-    /// exemplaire d'un même onglet (la source liste le Space affiché d'abord).
+    /// Rows for the text of `query`; none for an empty text. The result does not depend on the order of
+    /// `candidates`, except that of the suggestions (the engine's order) and the choice of the first copy of the
+    /// same tab (the source lists the displayed Space first).
     func rank(_ query: CommandQuery, candidates: [CommandCandidate], now: Date) -> [CommandRow] {
         guard !query.isEmpty else {
             return []
@@ -36,22 +36,22 @@ nonisolated struct CommandRanker: Sendable {
         return primary + local + suggestions
     }
 
-    /// Lignes de ⌘L avant toute modification : l'adresse actuelle, puis « Copier l'URL » si elle fait
-    /// partie de `actions`. Aucune source n'est interrogée.
+    /// ⌘L rows before any modification: the current address, then “Copy URL” if it is part of `actions`. No source
+    /// is queried.
     func pristineRows(currentURL: URL, actions: [CommandCandidate]) -> [CommandRow] {
         let copy = actions.first { $0.actionID == .copyURL }.flatMap(Self.row(for:))
         return [CommandPrimaryRows.current(currentURL), copy].compactMap(\.self)
     }
 
-    /// Suggestions reçues pour un texte précédent qui prolongent encore `query`, dans leur ordre :
-    /// elles restent affichées jusqu'à l'arrivée des nouvelles.
+    /// Suggestions received for a previous text that still extend `query`, in their order: they stay displayed
+    /// until the new ones arrive.
     static func carriedOver(_ suggestions: [CommandCandidate], to query: CommandQuery) -> [CommandCandidate] {
         suggestions.filter { CommandText.fold($0.title).hasPrefix(query.folded) }
     }
 
-    // MARK: Correspondance
+    // MARK: Matching
 
-    /// Onglets (un seul exemplaire par identifiant, le premier), actions et historique avec adresse.
+    /// Tabs (a single copy per identifier, the first), actions and history with an address.
     private static func uniqueLocal(_ candidates: [CommandCandidate]) -> [CommandCandidate] {
         var seen: Set<String> = []
         return candidates.filter { candidate in
@@ -63,8 +63,8 @@ nonisolated struct CommandRanker: Sendable {
         }
     }
 
-    /// Onglets et historique sur leur titre et leur adresse ; actions sur leur titre et leurs mots-clés,
-    /// à partir de deux caractères et jamais de façon lâche (début de mot au moins).
+    /// Tabs and history on their title and address; actions on their title and keywords, from two characters on and
+    /// never loosely (word start at least).
     private static func match(_ candidate: CommandCandidate, _ query: CommandQuery) -> CommandMatch? {
         switch candidate.kind {
         case .tab, .history:

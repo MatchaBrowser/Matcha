@@ -2,14 +2,13 @@ import AppKit
 import SwiftUI
 import WebKit
 
-/// Fenêtre de navigation : fond du Space, barre latérale à gauche, page dans une carte à droite, et la
-/// barre de commande par-dessus. La barre latérale peut être masquée (⌘S) ; elle réapparaît alors
-/// par-dessus la page au survol du bord gauche.
+/// Browser window: Space background, sidebar on the left, page in a card on the right, and the command bar on top.
+/// The sidebar can be hidden (⌘S); it then reappears over the page when hovering the left edge.
 struct BrowserWindowView: View {
-    /// Marge autour de la carte de contenu, sauf du côté de la barre latérale.
+    /// Margin around the content card, except on the sidebar's side.
     static let cardMargin = 8.0
     static let cardCornerRadius = 10.0
-    /// Largeur de la bande du bord gauche dont le survol fait apparaître la barre masquée.
+    /// Width of the left edge strip whose hovering reveals the hidden sidebar.
     static let revealEdgeWidth = 8.0
 
     let session: BrowserSession
@@ -26,31 +25,31 @@ struct BrowserWindowView: View {
     @AppStorage(BrowserSettings.Key.showsNavigationButtons) private var showsNavigationButtons = BrowserSettings.showsNavigationButtons
     @AppStorage(BrowserSettings.Key.showsSearchSuggestions) private var showsSearchSuggestions = BrowserSettings.showsSearchSuggestions
     @Environment(\.openSettings) private var openSettings
-    /// Barre masquée affichée par-dessus la page parce que le pointeur la survole.
+    /// Hidden sidebar shown over the page because the pointer hovers it.
     @State private var isFloatingSidebarHovered = false
 
-    /// Sans effet de bord : ni tâche ni lecture de fichier.
+    /// No side effects: no task and no file read.
     init(session: BrowserSession) {
         self.session = session
-        // Le Space affiché est retenu d'un lancement à l'autre, sauf avec une base de test.
+        // The displayed Space is remembered from one launch to the next, except with a test store.
         let windowModel = WindowModel(session: session, defaults: session.isInMemory ? nil : .standard)
         _model = State(initialValue: windowModel)
-        // Historique du profil du Space affiché, relu à chaque frappe ; aucun pour une fenêtre privée.
+        // History of the displayed Space's profile, reread on each keystroke; none for a private window.
         let history = session.history.map { store in ProfileHistory(store: store) { windowModel.space.record.profile?.id } }
         _commandBar = State(initialValue: CommandBarModel(windowModel: windowModel, history: history))
     }
 
-    /// Space affiché.
+    /// Displayed Space.
     private var space: SpaceSession {
         model.space
     }
 
-    /// Onglets du Space affiché.
+    /// Tabs of the displayed Space.
     private var tabManager: TabManager {
         space.tabManager
     }
 
-    /// Thème du Space, ou thème fixe d'une fenêtre privée.
+    /// Theme of the Space, or fixed theme of a private window.
     private var theme: SpaceTheme {
         session.isPrivate ? .privateBrowsing : space.theme
     }
@@ -59,12 +58,12 @@ struct BrowserWindowView: View {
         SidebarMetrics.clampedWidth(sidebarWidth)
     }
 
-    /// Barre masquée affichée : survolée. Le panneau des téléchargements en fait partie : il réapparaît avec elle.
+    /// Hidden sidebar shown: hovered. The downloads panel is part of it: it reappears with it.
     private var isFloatingSidebarShown: Bool {
         !isSidebarVisible && isFloatingSidebarHovered
     }
 
-    /// Panneau des téléchargements visible : ouvert, dans la barre fixe ou flottante.
+    /// Downloads panel visible: open, in the fixed or floating sidebar.
     private var isDownloadsPanelShown: Bool {
         model.isDownloadsPresented && (isSidebarVisible || isFloatingSidebarShown)
     }
@@ -82,11 +81,10 @@ struct BrowserWindowView: View {
                 showsNavigationButtons: showsNavigationButtons,
                 goHome: homeButtonAction,
                 editAddress: editAddress,
-                // La barre flottante couvre le début de la carte : la zone de dépôt du split commence après.
+                // The floating sidebar covers the start of the card: the split drop zone starts after it.
                 dropInset: isFloatingSidebarShown ? max(0, width - Self.cardMargin) : 0,
             )
-            // En bas : le haut de la carte accueille la barre d'adresse (réglage) et, plus haut, la
-            // barre de commande.
+            // At the bottom: the top of the card hosts the address bar (setting) and, higher up, the command bar.
             .overlay(alignment: .bottom) { CopyConfirmationView(model: model.copyConfirmation) }
             .padding(isSidebarVisible ? [.top, .trailing, .bottom] : .all, Self.cardMargin)
         }
@@ -96,7 +94,7 @@ struct BrowserWindowView: View {
         }
         .ignoresSafeArea()
         .background {
-            // Tirer sur le fond (zones vides) déplace la fenêtre.
+            // Dragging the background (empty areas) moves the window.
             SpaceBackground(theme: theme)
                 .gesture(WindowDragGesture())
                 .allowsWindowActivationEvents(true)
@@ -107,55 +105,55 @@ struct BrowserWindowView: View {
                 Task { self.window = window }
             }
         }
-        // Comme dans Arc, les boutons de la fenêtre disparaissent avec la barre latérale.
+        // As in Arc, the window buttons disappear with the sidebar.
         .onChange(of: window) { WindowChrome.setButtonsHidden(!(isSidebarVisible || isFloatingSidebarShown), in: window) }
         .onChange(of: isSidebarVisible || isFloatingSidebarShown) { _, shown in WindowChrome.setButtonsHidden(!shown, in: window) }
-        // La barre vise un onglet du Space affiché : changer de Space la ferme. Le panneau des téléchargements, lui,
-        // appartient à la fenêtre : il reste ouvert.
+        // The bar targets a tab of the displayed Space: changing Space closes it. The downloads panel, however,
+        // belongs to the window: it stays open.
         .onChange(of: model.currentSpaceID) {
             commandBar.dismiss()
         }
-        // Moteur ou suggestions changés dans les Réglages pendant que la barre reste ouverte.
+        // Engine or suggestions changed in Settings while the bar stays open.
         .onChange(of: commandBarSettings) { _, settings in commandBar.apply(settings) }
         .navigationTitle(session.isPrivate ? String(localized: "Private Browsing") : tabManager.selectedTab?.displayTitle ?? "Matcha")
-        // Une fenêtre privée est toujours sombre, pour qu'on la reconnaisse.
+        // A private window is always dark, so that it can be recognized.
         .preferredColorScheme(session.isPrivate ? .dark : nil)
         .frame(minWidth: 700, minHeight: 450)
-        // Pas de `.defaultFocus` : SwiftUI rendrait le clavier à un champ dès que plus rien n'a le
-        // focus, et l'enlèverait au champ de nom d'un nouveau dossier.
-        // Sans onglet sélectionné, la page vide invite à ⌘T : la barre ne s'ouvre jamais d'elle-même.
+        // No `.defaultFocus`: SwiftUI would give the keyboard back to a field as soon as nothing has focus, and
+        // would take it away from the name field of a new folder.
+        // With no selected tab, the empty page invites ⌘T: the bar never opens by itself.
         .onAppear {
             session.showFavorites(in: space)
             tabManager.loadSelectedTab()
-            // Les onglets affichés par cette fenêtre ne sont jamais mis en veille (tâche 5.6).
+            // The tabs displayed by this window are never put to sleep (task 5.6).
             session.tabLifecycle.windowDidAppear(model)
         }
         .onDisappear {
             model.copyConfirmation.cancel()
-            // Fenêtre fermée : l'aperçu ne reste pas ouvert (son, processus) sans elle.
+            // Window closed: the peek does not stay open (sound, process) without it.
             tabManager.closePeek()
             session.tabLifecycle.windowDidDisappear(model)
         }
         .task { await session.removeOrphanDataStores() }
-        // Deux fenêtres sur deux Spaces d'un même profil : la fenêtre active tient les favoris (et les enregistre).
+        // Two windows on two Spaces of the same profile: the active window holds the favorites (and saves them).
         .onReceive(NotificationCenter.default.publisher(for: NSWindow.didBecomeKeyNotification)) { notification in
             if let window, notification.object as? NSWindow === window {
                 session.showFavorites(in: space)
             }
         }
-        // « Effacer… » des réglages du site (tâche 5.2) : l'alerte appartient à la fenêtre.
+        // “Clear…” in the site settings (task 5.2): the alert belongs to the window.
         .modifier(SiteDataClearConfirmation(model: model))
         .modifier(ArcImportPresenter(model: model))
-        // Les mini-fenêtres envoient leurs pages dans cette fenêtre (tâche 4.5).
+        // Mini windows send their pages to this window (task 4.5).
         .linkedToMiniWindows(session: session, model: model, window: window) { [commandBar] in commandBar.dismiss() }
-        // Fenêtre et onglets vus par les extensions (tâche 6.3).
+        // Window and tabs as seen by extensions (task 6.3).
         .seenByExtensions(model: model, window: window)
         .environment(model)
         .focusedSceneValue(\.tabManager, tabManager)
         .focusedSceneValue(\.windowActions, windowActions)
     }
 
-    /// Barre latérale du Space affiché ; changer de Space la fait glisser comme une page.
+    /// Sidebar of the displayed Space; changing Space slides it like a page.
     private var sidebar: some View {
         ZStack {
             SidebarView(
@@ -179,10 +177,10 @@ struct BrowserWindowView: View {
         }
     }
 
-    /// Barre visible : poignée de largeur. Barre masquée : bande de survol, et la barre flottante.
+    /// Visible sidebar: width handle. Hidden sidebar: hover strip, and the floating sidebar.
     @ViewBuilder private var sidebarOverlay: some View {
         if isSidebarVisible {
-            // Au-dessus de la barre et de la carte, à cheval sur leur frontière.
+            // Above the sidebar and the card, straddling their boundary.
             SidebarResizeHandle(width: $sidebarWidth)
                 .offset(x: width - SidebarResizeHandle.thickness / 2)
         } else {
@@ -205,7 +203,7 @@ struct BrowserWindowView: View {
         }
     }
 
-    /// Réglages lus à chaque ouverture de la barre de commande, et suivis pendant qu'elle est ouverte.
+    /// Settings read each time the command bar opens, and followed while it is open.
     private var commandBarSettings: CommandBarSettings {
         CommandBarSettings(
             searchEngine: searchEngine,
@@ -229,7 +227,7 @@ struct BrowserWindowView: View {
             isSidebarVisible: isSidebarVisible,
             toggleDownloads: toggleDownloads,
             isDownloadsPanelShown: isDownloadsPanelShown,
-            // `hasURL` et non `url` : la fenêtre n'est pas recalculée à chaque changement d'adresse.
+            // `hasURL` and not `url`: the window is not recomputed on each address change.
             copyURL: tabManager.frontTab?.hasURL == true ? { model.copySelectedTabURL() } : nil,
             goHome: homeURL.map { url in { goHome(to: url) } },
             spaceNames: session.spaces.map(\.record.name),
@@ -242,24 +240,24 @@ struct BrowserWindowView: View {
         )
     }
 
-    /// ⌘1 à ⌘9, ⌃⇥ et ⌃⇧⇥ : comme un clic dans la barre, qui ferme la barre de commande et l'aperçu (même
-    /// sur l'onglet déjà affiché).
+    /// ⌘1 to ⌘9, ⌃⇥ and ⌃⇧⇥: like a click in the sidebar, which closes the command bar and the peek (even on the
+    /// tab already displayed).
     private func showTab(_ tab: BrowserTab) {
         commandBar.dismiss()
         tabManager.closePeek()
         TabActivation.activate(tab, in: tabManager)
     }
 
-    /// ⌘T et « Nouvel onglet » : la barre de commande, ou un onglet sur la page d'accueil.
+    /// ⌘T and “New Tab”: the command bar, or a tab on the home page.
     private func openCommandBarForNewTab() {
-        // Une seule couche flottante : la barre de commande ferme l'aperçu.
+        // A single floating layer: the command bar closes the peek.
         tabManager.closePeek()
         commandBar.newTab(commandBarSettings)
     }
 
-    /// ⌘L et la pastille d'adresse : la barre de commande sur l'adresse de l'onglet affiché.
+    /// ⌘L and the address pill: the command bar on the address of the displayed tab.
     private func editAddress() {
-        // Une seule couche flottante : la barre de commande ferme l'aperçu.
+        // A single floating layer: the command bar closes the peek.
         tabManager.closePeek()
         commandBar.editCurrentTab(commandBarSettings)
     }
@@ -271,7 +269,7 @@ struct BrowserWindowView: View {
         }
     }
 
-    /// ⌥⌘L : masque le panneau des téléchargements s'il est visible ; sinon affiche la barre masquée, puis l'ouvre.
+    /// ⌥⌘L: hides the downloads panel if it is visible; otherwise shows the hidden sidebar, then opens it.
     private func toggleDownloads() {
         let show = !isDownloadsPanelShown
         withAnimation(.easeInOut(duration: 0.2)) {
@@ -283,7 +281,7 @@ struct BrowserWindowView: View {
         }
     }
 
-    /// Action du bouton Accueil, s'il est affiché et qu'une page d'accueil est réglée.
+    /// Action of the Home button, if it is displayed and a home page is set.
     private var homeButtonAction: (() -> Void)? {
         showsHomeButton ? windowActions.goHome : nil
     }
@@ -292,7 +290,7 @@ struct BrowserWindowView: View {
         BrowserSettings.homeURL(from: homePage, searchEngine: searchEngine)
     }
 
-    /// Charge la page d'accueil dans l'onglet sélectionné, ou dans un nouvel onglet s'il n'y en a pas.
+    /// Loads the home page in the selected tab, or in a new tab if there is none.
     private func goHome(to url: URL) {
         tabManager.closePeek()
         if let tab = tabManager.selectedTab {

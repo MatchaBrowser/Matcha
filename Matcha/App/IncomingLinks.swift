@@ -1,15 +1,15 @@
 import Foundation
 import OSLog
 
-/// Liens ouverts par d'autres apps (tâche 8.2) : adresses web cliquées dans Mail ou Messages, fichiers HTML ouverts
-/// depuis le Finder. Reçus par le délégué de l'app, ils attendent que l'app soit prête (`handler`), au lancement.
+/// Links opened by other apps (task 8.2): web addresses clicked in Mail or Messages, HTML files opened from the
+/// Finder. Received by the app delegate, they wait until the app is ready (`handler`), at launch.
 @MainActor
 final class IncomingLinks {
     static let shared = IncomingLinks()
-    /// Schémas acceptés ; les autres sont ignorés.
+    /// Accepted schemes; the others are ignored.
     static let schemes: Set<String> = ["http", "https", "file"]
 
-    /// Ouvre les liens ; tant qu'il est nil, ils attendent.
+    /// Opens the links; as long as it is nil, they wait.
     var handler: (([URL]) -> Void)? {
         didSet {
             guard let handler, !waiting.isEmpty else {
@@ -28,7 +28,7 @@ final class IncomingLinks {
         guard !accepted.isEmpty else {
             return
         }
-        // Jamais l'adresse : le nombre seulement.
+        // Never the address: only the count.
         Logger.app.info("Liens d'une autre app : \(accepted.count, privacy: .public)")
         if let handler {
             handler(accepted)

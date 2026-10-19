@@ -1,8 +1,8 @@
 import AppKit
 import SwiftUI
 
-/// Réglages > Général, navigateur par défaut (tâches 8.2 et 8.3) : état et « Choisir par défaut… », puis où s'ouvrent
-/// les liens cliqués dans d'autres apps.
+/// Settings > General, default browser (tasks 8.2 and 8.3): status and “Make Default…”, then where links clicked in
+/// other apps open.
 struct DefaultBrowserSection: View {
     @AppStorage(BrowserSettings.Key.externalLinkDestination) private var destination = BrowserSettings.externalLinkDestination
     @State private var isDefault = DefaultBrowser.isMatcha
@@ -39,7 +39,7 @@ struct DefaultBrowserSection: View {
                 .font(.caption)
                 .foregroundStyle(.secondary)
         }
-        // Changé ailleurs (Réglages Système, un autre navigateur) : relu au retour dans Matcha.
+        // Changed elsewhere (System Settings, another browser): read again on returning to Matcha.
         .onReceive(NotificationCenter.default.publisher(for: NSApplication.didBecomeActiveNotification)) { _ in
             isDefault = DefaultBrowser.isMatcha
         }

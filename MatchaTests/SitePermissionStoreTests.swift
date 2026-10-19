@@ -3,7 +3,7 @@ import Foundation
 import SwiftData
 import Testing
 
-/// Décisions retenues (tâche 5.2) : table en mémoire, enregistrement SwiftData, fenêtres privées, profils supprimés.
+/// Remembered decisions (task 5.2): in-memory table, SwiftData storage, private windows, deleted profiles.
 @MainActor
 struct SitePermissionStoreTests {
     private let meet = TestOrigins.meet
@@ -19,7 +19,7 @@ struct SitePermissionStoreTests {
         #expect(table.decisions(for: meet, profileID: profile) == [.camera: .allow, .microphone: .deny])
         #expect(table.decisions(for: meet, profileID: UUID()).isEmpty)
         #expect(table.decisions(for: TestOrigins.other, profileID: profile).isEmpty)
-        // Même hôte, autre schéma ou autre port : une autre origine.
+        // Same host, another scheme or another port: another origin.
         #expect(try table.decisions(for: #require(SiteOrigin(scheme: "http", host: meet.host, port: nil)), profileID: profile).isEmpty)
 
         table.set(nil, for: .camera, origin: meet, profileID: profile)
@@ -60,7 +60,7 @@ struct SitePermissionStoreTests {
         #expect(table.decisions(for: meet, profileID: other) == [.camera: .deny])
     }
 
-    // MARK: Enregistrement
+    // MARK: Storage
 
     @Test func `decisions are saved and read back`() throws {
         let container = try BrowserSchema.makeContainer(inMemory: true)
@@ -116,7 +116,7 @@ struct SitePermissionStoreTests {
 
         #expect(store.decision(.camera, for: meet, profileID: nil) == .allow)
         #expect(try session.container.mainContext.fetchCount(FetchDescriptor<SitePermissionRecord>()) == 0)
-        // Une autre fenêtre privée, ou la session normale, ne la voit pas.
+        // Another private window, or the normal session, does not see it.
         #expect(BrowserSession.makePrivate().sitePermissions.entries.isEmpty)
         let regular = try BrowserSession(container: BrowserSchema.makeContainer(inMemory: true))
         #expect(regular.sitePermissions.isPersistent)
@@ -138,7 +138,7 @@ struct SitePermissionStoreTests {
         #expect(records.map(\.profileID) == [kept])
     }
 
-    /// Les Spaces donnent à leurs onglets les décisions de leur profil.
+    /// Spaces give their tabs the decisions of their profile.
     @Test func `spaces see the decisions of their profile`() throws {
         let session = try BrowserSession(container: BrowserSchema.makeContainer(inMemory: true))
         let work = session.addProfile(named: "Travail")

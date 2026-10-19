@@ -1,19 +1,19 @@
 import Foundation
 
-/// Adresse de l'historique d'un profil, toutes visites de même clé regroupées.
+/// An address in a profile's history, with all visits of the same key grouped together.
 nonisolated struct HistoryIndexEntry: Equatable, Sendable {
     let urlKey: String
-    /// Adresse de la visite la plus récente.
+    /// Address of the most recent visit.
     let url: URL
-    /// Titre de la visite la plus récente qui en a un.
+    /// Title of the most recent visit that has one.
     let title: String?
     let visitCount: Int
     let lastVisit: Date
-    /// Titre et adresse repliés, comparés au texte de la barre de commande et à la recherche de la fenêtre.
+    /// Folded title and address, compared with the command bar's text and the window's search.
     let fields: CommandMatchFields
     let characters: HistoryCharacterMask
 
-    /// `previous` : l'entrée remplacée, dont les champs repliés sont repris si l'adresse et le titre n'ont pas changé.
+    /// `previous`: the replaced entry, whose folded fields are reused if the address and title have not changed.
     init(urlKey: String, url: URL, title: String?, visitCount: Int, lastVisit: Date, previous: Self? = nil) {
         self.urlKey = urlKey
         self.url = url
@@ -24,13 +24,13 @@ nonisolated struct HistoryIndexEntry: Equatable, Sendable {
             fields = previous.fields
             characters = previous.characters
         } else {
-            // Le titre que la barre de commande affiche et compare (`HistoryProvider`) : l'adresse lisible à défaut.
+            // The title the command bar shows and compares (`HistoryProvider`): the readable address otherwise.
             fields = CommandMatchFields(titles: [title ?? CommandText.displayURL(url)], url: url)
             characters = HistoryCharacterMask(fields.titles + [fields.address].compactMap(\.self))
         }
     }
 
-    /// Ce que la barre de commande reçoit.
+    /// What the command bar receives.
     var historyEntry: HistoryEntry {
         HistoryEntry(url: url, title: title, visitCount: visitCount, lastVisit: lastVisit)
     }

@@ -1,9 +1,9 @@
 import Foundation
 
-/// Dossiers d'épinglés.
+/// Folders of pinned tabs.
 extension TabManager {
-    /// Crée un dossier en fin de `parent` (nil : racine des épinglés), déplie le parent et ouvre
-    /// la saisie de son nom.
+    /// Creates a folder at the end of `parent` (nil: root of the pinned tabs), expands the parent and starts
+    /// editing its name.
     @discardableResult
     func newFolder(in parent: UUID? = nil) -> UUID {
         if let parent {
@@ -15,7 +15,7 @@ extension TabManager {
         return id
     }
 
-    /// Termine la saisie du nom ; un nom vide garde l'ancien.
+    /// Ends the name editing; an empty name keeps the old one.
     func renameFolder(_ id: UUID, to name: String) {
         let trimmed = name.trimmingCharacters(in: .whitespacesAndNewlines)
         if !trimmed.isEmpty {
@@ -37,13 +37,13 @@ extension TabManager {
         updateLayout { $0.moveFolder(id, to: destination) }
     }
 
-    /// Supprime le dossier ; ses onglets et sous-dossiers prennent sa place.
+    /// Deletes the folder; its tabs and subfolders take its place.
     func deleteFolder(_ id: UUID) {
         updateLayout { $0.removeFolder(id) }
     }
 
-    /// Donne au dossier `appearance` (icône, couleurs), telle qu'elle sera enregistrée (`FolderAppearance.normalized`).
-    /// Sans effet si rien ne change : pas d'enregistrement inutile pendant qu'on glisse dans le sélecteur de couleur.
+    /// Gives the folder `appearance` (icon, colors), as it will be saved (`FolderAppearance.normalized`).
+    /// No effect if nothing changes: no needless saving while dragging in the color picker.
     func setFolderAppearance(_ id: UUID, _ appearance: FolderAppearance) {
         let normalized = appearance.normalized
         guard let folder = layout.pinned.folder(id), folder.appearance != normalized else {
@@ -52,7 +52,7 @@ extension TabManager {
         updateLayout { $0.setFolderAppearance(id, normalized) }
     }
 
-    /// Applique `change` à l'apparence actuelle du dossier (panneau de personnalisation).
+    /// Applies `change` to the folder's current appearance (customization panel).
     func updateFolderAppearance(_ id: UUID, _ change: (inout FolderAppearance) -> Void) {
         guard var appearance = layout.pinned.folder(id)?.appearance else {
             return

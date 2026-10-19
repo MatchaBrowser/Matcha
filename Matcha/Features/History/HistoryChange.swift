@@ -1,13 +1,13 @@
 import Foundation
 
-/// Changement de l'historique, appliqué aux index des profils (`HistoryStore`). Ceux faits pendant le chargement
-/// sont rejoués ensuite : ils sont idempotents (`HistoryIndex`), qu'ils soient déjà dans ce qui a été lu ou non.
+/// A history change, applied to the profiles' indexes (`HistoryStore`). Changes made during loading are replayed
+/// afterwards: they are idempotent (`HistoryIndex`), whether or not they are already in what was read.
 nonisolated enum HistoryChange: Equatable, Sendable {
     case insert(HistoryVisit, profileID: UUID?)
     case setTitle(String?, visitID: UUID, profileID: UUID?)
     case refresh(visitID: UUID, date: Date, title: String?, profileID: UUID?)
     case remove(Set<UUID>, profileID: UUID?)
-    /// Visites faites depuis cette date ; nil : tout l'historique du profil.
+    /// Visits made since this date; nil: the profile's whole history.
     case removeSince(Date?, profileID: UUID?)
 
     func apply(to indexes: inout [UUID?: HistoryIndex]) {

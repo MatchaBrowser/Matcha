@@ -1,7 +1,7 @@
 import SwiftUI
 
-/// Fenêtre de l'historique (⌘Y, menu Historique) : les visites du profil du Space affiché par la fenêtre principale.
-/// Une seule fenêtre, ouverte seulement par l'utilisateur, jamais restaurée au lancement.
+/// History window (⌘Y, History menu): the visits of the profile of the Space displayed by the main window. A single
+/// window, opened only by the user, never restored at launch.
 struct HistoryWindow: View {
     let session: BrowserSession
     @Environment(MiniWindowManager.self) private var miniWindows
@@ -13,7 +13,7 @@ struct HistoryWindow: View {
     }
 }
 
-/// Contenu de la fenêtre : son modèle suit le profil montré.
+/// Content of the window: its model follows the profile shown.
 private struct HistoryContent: View {
     let session: BrowserSession
     let miniWindows: MiniWindowManager
@@ -26,18 +26,18 @@ private struct HistoryContent: View {
         _model = State(initialValue: HistoryWindowModel(store: store, profileID: miniWindows.historyProfile?.id))
     }
 
-    /// Profil montré.
+    /// Profile shown.
     private var profile: ProfileRecord? {
         miniWindows.historyProfile
     }
 
-    /// Nom du profil montré quand il y en a plusieurs : sous-titre de la fenêtre et message de l'effacement.
+    /// Name of the profile shown when there are several: the window's subtitle and the clearing dialog's message.
     private var profileName: String? {
         session.profiles.count > 1 ? profile?.name : nil
     }
 
     var body: some View {
-        // Conteneur de navigation : la recherche se place dans la barre d'outils de la fenêtre.
+        // Navigation container: the search goes into the window's toolbar.
         NavigationStack {
             HistoryView(model: model, faviconService: session.faviconService, profileName: profileName, open: open)
                 .navigationTitle(Text("History"))
@@ -47,8 +47,8 @@ private struct HistoryContent: View {
         .frame(minWidth: 480, minHeight: 320)
     }
 
-    /// Double-clic, Entrée, « Ouvrir dans un nouvel onglet » : chaque ligne dans un nouvel onglet de la fenêtre
-    /// principale, qui passe au premier plan (rouverte au besoin, comme « Ouvrir dans le Space »).
+    /// Double-click, Return, “Open in New Tab”: each row in a new tab of the main window, which comes to the front
+    /// (reopened if needed, like “Open in Space”).
     private func open(_ rows: [HistoryRow]) {
         miniWindows.openFromHistory(rows.map(\.url), profileID: model.profileID) {
             openWindow(id: MatchaApp.browserWindowID)

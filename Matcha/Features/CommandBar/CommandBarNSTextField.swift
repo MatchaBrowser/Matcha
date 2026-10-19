@@ -1,16 +1,16 @@
 import AppKit
 
-/// Champ de la barre de commande et de la barre de recherche dans la page : il prend le clavier dans la mise à jour
-/// même qui l'insère, pour qu'aucune frappe tapée juste après ⌘T (ou ⌘F) n'atteigne la page.
+/// Field of the command bar and of the find-in-page bar: it takes the keyboard in the very update that inserts it,
+/// so that no keystroke typed right after ⌘T (or ⌘F) reaches the page.
 final class CommandBarNSTextField: NSTextField {
     override static var cellClass: AnyClass? {
         get { CommandBarFieldCell.self }
         set { super.cellClass = newValue }
     }
 
-    /// Le champ doit prendre le clavier dès qu'il sera dans une fenêtre.
+    /// The field must take the keyboard as soon as it is in a window.
     var wantsFocus = false
-    /// Appelé quand le champ prend le clavier (clic, ⌘F).
+    /// Called when the field takes the keyboard (click, ⌘F).
     var onBecomeFirstResponder: (() -> Void)?
 
     override func becomeFirstResponder() -> Bool {
@@ -28,7 +28,7 @@ final class CommandBarNSTextField: NSTextField {
         }
     }
 
-    /// Jamais makeFirstResponder sur un champ déjà en édition : l'édition se terminerait et fermerait la barre.
+    /// Never makeFirstResponder on a field already being edited: editing would end and close the bar.
     func focusAndSelectAll() {
         guard let window else {
             wantsFocus = true
@@ -42,9 +42,8 @@ final class CommandBarNSTextField: NSTextField {
     }
 }
 
-/// Cellule du champ, avec son propre éditeur : pas de guillemets typographiques, de tirets, de
-/// remplacements ni de correction, qui fausseraient une adresse ou une recherche exacte. L'éditeur
-/// partagé de la fenêtre (champ de nom de dossier) garde les réglages de l'utilisateur.
+/// Cell of the field, with its own editor: no smart quotes, dashes, substitutions or correction, which would
+/// distort an exact address or search. The window's shared editor (folder name field) keeps the user's settings.
 final class CommandBarFieldCell: NSTextFieldCell {
     private lazy var editor: NSTextView = {
         let editor = NSTextView()

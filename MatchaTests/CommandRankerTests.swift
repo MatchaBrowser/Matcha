@@ -2,11 +2,11 @@ import Foundation
 @testable import Matcha
 import Testing
 
-/// Ordre des lignes de la barre de commande (tests de classement demandés par le plan).
+/// Order of the command bar rows (ranking tests required by the plan).
 struct CommandRankerTests {
     private let ranker = CommandRanker()
 
-    /// Titres des lignes qui suivent les lignes du texte tapé.
+    /// Titles of the rows that follow the rows of the typed text.
     private func localTitles(_ rows: [CommandRow]) -> [String] {
         rows.filter { !$0.id.hasPrefix(CommandPrimaryRows.id) && $0.style != .suggestion }.map(\.title)
     }
@@ -55,16 +55,16 @@ struct CommandRankerTests {
     }
 
     @Test func `tier and fuzzy quality come before the kind`() {
-        // Préfixe d'une entrée d'historique peu visitée avant un onglet du Space affiché trouvé de
-        // façon approximative.
+        // Prefix of a rarely visited history entry before a tab of the displayed Space found
+        // approximately.
         let byTier = [
             tab("GitHub", url: "https://github.com", activity: fixedNow),
             history("gthb tracker", url: "https://tracker.example/gthb", visits: 1, daysAgo: 200),
         ]
         #expect(localTitles(rank("gthb", byTier)) == ["gthb tracker", "GitHub"])
 
-        // Deux correspondances approximatives : la plus compacte (tranche 3, qualité 80) avant
-        // l'onglet du Space affiché (tranche 1, qualité 36).
+        // Two approximate matches: the most compact one (bucket 3, quality 80) before
+        // the tab of the displayed Space (bucket 1, quality 36).
         let byBucket = [
             tab("Google Drive", url: "https://drive.example", activity: fixedNow),
             history("gdrive notes", url: "https://notes.example", visits: 1, daysAgo: 200),

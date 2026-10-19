@@ -2,8 +2,8 @@ import Foundation
 @testable import Matcha
 import Testing
 
-/// Liste des téléchargements, noms réservés, annulation, « Effacer », fenêtres privées (tâche 5.1). Les éléments sont
-/// créés sans objet WebKit ; le parcours réel est couvert par `DownloadIntegrationTests`.
+/// Download list, reserved names, cancellation, “Clear”, private windows (task 5.1). The items are created without
+/// a WebKit object; the real flow is covered by `DownloadIntegrationTests`.
 @MainActor
 struct DownloadManagerTests {
     private let folder: TemporaryDownloadsFolder
@@ -44,7 +44,7 @@ struct DownloadManagerTests {
         #expect(download.fileName == "rapport 2.pdf")
     }
 
-    /// WebKit n'a pas encore créé le premier fichier quand le second choisit sa place.
+    /// WebKit has not created the first file yet when the second one picks its place.
     @Test func `simultaneous downloads never share a name`() throws {
         let first = try #require(reserve(item()))
         let second = try #require(reserve(item()))

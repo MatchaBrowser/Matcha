@@ -1,11 +1,10 @@
 import Foundation
 
-/// Site sous lequel le zoom d'une page est retenu (tâche 5.4) : le domaine enregistrable approché de `SiteDomain`
-/// pour une page web (« mail.google.com » et « docs.google.com » partagent « google.com » ; schéma, port et « www. »
-/// ne comptent pas), une seule clé pour tous les fichiers locaux, rien pour les autres pages (`about:`, `data:`,
-/// `blob:`), qui restent à 100 %.
+/// Site under which a page's zoom is remembered (task 5.4): the registrable domain approximated by `SiteDomain` for
+/// a web page (“mail.google.com” and “docs.google.com” share “google.com”; scheme, port and “www.” do not count), a
+/// single key for all local files, nothing for the other pages (`about:`, `data:`, `blob:`), which stay at 100%.
 nonisolated enum SiteZoomKey {
-    /// Clé commune aux fichiers locaux : elle ne peut pas être un hôte (`SiteDomain` n'en donne jamais avec « / »).
+    /// Key shared by local files: it cannot be a host (`SiteDomain` never gives one with “/”).
     static let localFiles = "file://"
 
     static func key(for url: URL?) -> String? {

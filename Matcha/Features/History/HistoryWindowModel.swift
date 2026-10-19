@@ -1,14 +1,14 @@
 import Foundation
 import Observation
 
-/// État de la fenêtre de l'historique (⌘Y) : profil montré, texte cherché, sections affichées et lignes choisies.
-/// Les sections sont recalculées hors du fil principal (un an d'historique peut compter des dizaines de milliers de
-/// visites) à chaque changement de l'historique, du profil ou du texte cherché.
+/// State of the history window (⌘Y): profile shown, searched text, displayed sections and selected rows. The
+/// sections are recomputed off the main thread (a year of history can amount to tens of thousands of visits) on
+/// every change of the history, the profile or the searched text.
 @MainActor
 @Observable
 final class HistoryWindowModel {
     let store: HistoryStore
-    /// Profil montré (`MiniWindowManager.historyProfile`) ; changer de profil vide la sélection.
+    /// Profile shown (`MiniWindowManager.historyProfile`); changing the profile clears the selection.
     var profileID: UUID? {
         didSet {
             if profileID != oldValue {
@@ -20,7 +20,7 @@ final class HistoryWindowModel {
     var searchText = ""
     var selection: Set<HistoryRow.ID> = []
     private(set) var sections: [HistorySection] = []
-    /// Vrai une fois les premières sections calculées (avant : indicateur d'attente plutôt que « Aucun historique »).
+    /// True once the first sections are computed (before that: a progress indicator rather than “No History”).
     private(set) var isReady = false
 
     init(store: HistoryStore, profileID: UUID?) {
@@ -28,7 +28,7 @@ final class HistoryWindowModel {
         self.profileID = profileID
     }
 
-    /// Ce qui demande de recalculer les sections.
+    /// What requires recomputing the sections.
     struct RefreshKey: Equatable {
         let revision: Int
         let profileID: UUID?
@@ -39,7 +39,7 @@ final class HistoryWindowModel {
         RefreshKey(revision: store.revision, profileID: profileID, searchText: searchText)
     }
 
-    /// Recalcule les sections ; une tâche annulée entre-temps (nouvelle frappe) n'affiche rien.
+    /// Recomputes the sections; a task cancelled in the meantime (new keystroke) displays nothing.
     func refresh() async {
         await store.load()
         guard let index = store.index(for: profileID) else {
@@ -57,12 +57,12 @@ final class HistoryWindowModel {
         }
     }
 
-    /// Lignes affichées parmi `ids`, dans l'ordre de la liste.
+    /// Displayed rows among `ids`, in the list's order.
     func rows(_ ids: Set<HistoryRow.ID>) -> [HistoryRow] {
         sections.flatMap(\.rows).filter { ids.contains($0.id) }
     }
 
-    /// Supprime toutes les visites de ces lignes.
+    /// Deletes all the visits of these rows.
     func delete(_ ids: Set<HistoryRow.ID>) {
         let visits = Set(rows(ids).flatMap(\.visitIDs))
         store.deleteVisits(visits, profileID: profileID)

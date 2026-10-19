@@ -1,14 +1,14 @@
 import XCTest
 
-/// Aperçu (Peek, 4.4) : Maj+clic, fermeture (⎋, ⌘W, ×, clic à côté, autre onglet, barre de commande),
-/// « Ouvrir en onglet » et split view. Pages : la documentation de Postfix livrée avec macOS (sans réseau).
-/// Ces tests déplacent la vraie souris et tiennent la touche Maj.
+/// Peek (4.4): Shift-click, closing (⎋, ⌘W, ×, click beside it, another tab, command bar), “Open as Tab” and
+/// split view. Pages: the Postfix documentation shipped with macOS (no network).
+/// These tests move the real mouse and hold the Shift key.
 final class PeekUITests: XCTestCase {
     override func setUpWithError() throws {
         continueAfterFailure = false
     }
 
-    /// Lance l'app sur la page d'accueil de la documentation de Postfix, seule dans la barre.
+    /// Launches the app on the home page of the Postfix documentation, alone in the sidebar.
     @MainActor
     private func launchOnLocalDocs() throws -> XCUIApplication {
         let app = launchApp()
@@ -22,11 +22,11 @@ final class PeekUITests: XCTestCase {
     func testShiftClickOpensPeekAndEscapeClosesIt() throws {
         let app = try launchOnLocalDocs()
         openPeekOnLocalDocs(in: app)
-        // Ni onglet ni navigation : la page d'origine reste affichée derrière.
+        // Neither a tab nor a navigation: the original page stays displayed behind.
         XCTAssertEqual(tabRows(in: app).count, 1)
         XCTAssertEqual(addressPill(in: app).value as? String, "index.html")
 
-        // La page de l'aperçu a le clavier et ne garde pas ⎋ : l'aperçu se ferme.
+        // The Peek page has keyboard focus and doesn't keep ⎋: the Peek closes.
         app.typeKey(.escape, modifierFlags: [])
         XCTAssertTrue(peekElement("peekCloseButton", in: app).waitForNonExistence(timeout: 3))
         XCTAssertEqual(tabRows(in: app).count, 1)
@@ -38,7 +38,7 @@ final class PeekUITests: XCTestCase {
         let app = try launchOnLocalDocs()
         openPeekOnLocalDocs(in: app)
 
-        // Un lien dans l'aperçu s'y charge.
+        // A link in the Peek loads there.
         clickWhenSettled(links("main.cf", exact: true, in: app).firstMatch)
         XCTAssertTrue(waitForValue(of: peekElement("peekAddress", in: app), timeout: 10) { $0 == "postconf.5.html" })
         XCTAssertEqual(tabRows(in: app).count, 1)
@@ -49,7 +49,7 @@ final class PeekUITests: XCTestCase {
         let pill = addressPill(in: app)
         XCTAssertTrue(waitForValue(of: pill) { $0 == "postconf.5.html" })
 
-        // Même vue web : l'historique de l'aperçu est là.
+        // Same web view: the Peek's history is there.
         app.typeKey("[", modifierFlags: .command)
         XCTAssertTrue(waitForValue(of: pill) { $0 == "BASIC_CONFIGURATION_README.html" })
 
@@ -63,10 +63,10 @@ final class PeekUITests: XCTestCase {
         let sourceFrame = link(containing: "Basic configuration", in: app).frame
         openPeekOnLocalDocs(in: app)
 
-        // Sur le voile, à gauche du panneau ; si possible juste au-dessus du lien d'origine, qui ne doit pas être suivi.
+        // On the scrim, left of the panel; if possible right above the original link, which must not be followed.
         let window = app.windows.firstMatch
         let address = peekElement("peekAddress", in: app)
-        // Fin de l'animation d'ouverture : la barre est à sa place.
+        // End of the opening animation: the bar is in place.
         Thread.sleep(forTimeInterval: 0.6)
         let sourceIsVisible = sourceFrame.midY > window.frame.minY && sourceFrame.midY < window.frame.maxY
         let target = CGPoint(x: address.frame.minX - 6, y: sourceIsVisible ? sourceFrame.midY : address.frame.midY)
@@ -117,8 +117,8 @@ final class PeekUITests: XCTestCase {
         XCTAssertTrue(field.waitForNonExistence(timeout: 3))
     }
 
-    /// Split de deux pages : l'aperçu s'ouvre depuis le panneau de gauche ; « Ouvrir en onglet » range la page
-    /// hors du split, affichée seule.
+    /// Split of two pages: the Peek opens from the left pane; “Open as Tab” moves the page out of the split,
+    /// displayed alone.
     @MainActor
     func testPeekOverASplitOpensAsATabOutsideTheSplit() throws {
         let app = try launchOnLocalDocs()
@@ -129,7 +129,7 @@ final class PeekUITests: XCTestCase {
         app.menuItems["Ouvrir en split"].click()
         XCTAssertTrue(waitForCount(pagePanes(in: app), 2))
 
-        // Lien du panneau de gauche, qui n'est pas le panneau actif : le clic l'active, puis l'aperçu s'ouvre.
+        // Link of the left pane, which isn't the active pane: the click activates it, then the Peek opens.
         let sources = links("Basic configuration", in: app).allElementsBoundByIndex
         let leftSource = try XCTUnwrap(sources.min { $0.frame.minX < $1.frame.minX })
         shiftClick(leftSource)

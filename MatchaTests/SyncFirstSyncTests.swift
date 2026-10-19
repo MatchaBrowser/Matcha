@@ -2,8 +2,8 @@ import Foundation
 @testable import Matcha
 import Testing
 
-/// Première synchro d'un Mac (tâche 7.4, `SYNC.md` § 5) : tout envoyer, prendre les données synchronisées, fusionner,
-/// remplacer d'un côté ou de l'autre.
+/// First sync of a Mac (task 7.4, `SYNC.md` § 5): send everything, take the synced data, merge, replace on one side or
+/// the other.
 @MainActor
 struct SyncFirstSyncTests {
     private let server = InMemorySyncServer()
@@ -14,14 +14,14 @@ struct SyncFirstSyncTests {
         .setting(SyncSettingFields(key: key, value: .string(value)))
     }
 
-    /// Un Mac, son profil et son Space.
+    /// A Mac, its profile and its Space.
     private struct Setup {
         let mac: SimulatedMac
         let profile: UUID
         let space: UUID
     }
 
-    /// Un premier Mac synchronisé, avec son profil, son Space et son moteur de recherche.
+    /// A first synced Mac, with its profile, its Space and its search engine.
     private func firstMac() async throws -> Setup {
         let mac = SimulatedMac(server: server)
         let profile = mac.addProfile("Personnel")
@@ -31,7 +31,7 @@ struct SyncFirstSyncTests {
         return Setup(mac: mac, profile: profile, space: space)
     }
 
-    /// Un second Mac avec ses propres données.
+    /// A second Mac with its own data.
     private func secondMac() -> Setup {
         let mac = SimulatedMac(server: server)
         let profile = mac.addProfile("Travail")
@@ -68,7 +68,7 @@ struct SyncFirstSyncTests {
         #expect(second.store.items[ownProfile] == nil)
         #expect(second.store.items[ownSpace] == nil)
         #expect(await server.content(of: ownSpace) == nil)
-        // Un réglage propre à ce Mac reste, sans partir.
+        // A setting specific to this Mac stays, without being sent.
         #expect(second.store.items[appearance] == setting("appearance", "dark"))
         #expect(await server.content(of: appearance) == nil)
     }

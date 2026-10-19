@@ -3,8 +3,7 @@ import Foundation
 @testable import Matcha
 import Testing
 
-/// Niveaux de zoom (tâche 5.4) : ceux de Safari, pas suivant et précédent depuis n'importe quel zoom, bornes, texte
-/// affiché, et ⌘= lu comme ⌘+.
+/// Zoom levels (task 5.4): Safari's, next and previous step from any zoom, bounds, displayed text, and ⌘= read as ⌘+.
 struct ZoomLevelsTests {
     @Test func `the steps are Safari's`() {
         #expect(ZoomLevels.steps == [0.5, 0.75, 0.85, 1, 1.15, 1.25, 1.5, 1.75, 2, 2.5, 3])
@@ -48,7 +47,8 @@ struct ZoomLevelsTests {
 
     @Test func `percent text follows the language`() {
         #expect(ZoomLevels.percentText(1.15, locale: Locale(identifier: "en_US")) == "115%")
-        // Espace fine insécable (U+202F) ou insécable (U+00A0) selon la version d'ICU : seuls les chiffres et « % » comptent.
+        // Narrow no-break space (U+202F) or no-break space (U+00A0) depending on the ICU version: only the digits and
+        // “%” count.
         let french = ZoomLevels.percentText(0.85, locale: Locale(identifier: "fr_FR"))
         #expect(french.hasPrefix("85"))
         #expect(french.hasSuffix("%"))
@@ -86,7 +86,7 @@ struct ZoomLevelsTests {
         #expect(zoomIn.modifierFlags.contains(.command))
         #expect(zoomIn.keyCode == 24)
 
-        // Un vrai menu le reconnaît comme « Zoom avant » (⌘+), et ne reconnaît pas ⌘=.
+        // A real menu recognizes it as “Zoom In” (⌘+), and does not recognize ⌘=.
         final class Target: NSObject {
             var count = 0
             @objc func zoomIn(_: Any?) {

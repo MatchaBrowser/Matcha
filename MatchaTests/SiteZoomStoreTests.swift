@@ -3,8 +3,8 @@ import Foundation
 import Testing
 import WebKit
 
-/// Zoom retenu par site (tâche 5.4), sans page web : clé du site, réglage retenu ou oublié, enregistrement dans les
-/// réglages, mémoire seule pour une fenêtre privée, pages suivies.
+/// Zoom remembered per site (task 5.4), without a web page: site key, setting remembered or forgotten, saving in the
+/// settings, memory only for a private window, tracked pages.
 @MainActor
 struct SiteZoomStoreTests {
     private let suiteName = "SiteZoomStoreTests-\(UUID().uuidString)"
@@ -14,7 +14,7 @@ struct SiteZoomStoreTests {
         defaults = try #require(UserDefaults(suiteName: suiteName))
     }
 
-    /// Page sans vue web : seul compte son zoom recopié (`BrowserTab.pageZoom`).
+    /// Page without a web view: only its copied zoom counts (`BrowserTab.pageZoom`).
     private func page() -> BrowserTab {
         BrowserTab(configuration: WKWebViewConfiguration())
     }
@@ -79,7 +79,7 @@ struct SiteZoomStoreTests {
         #expect(!store.isPersistent)
         store.setLevel(2, forSite: "example.com")
         #expect(store.level(forSite: "example.com") == 2)
-        // Une autre session ne le voit pas.
+        // Another session does not see it.
         #expect(SiteZoomStore(defaults: nil).levels.isEmpty)
     }
 
@@ -106,14 +106,14 @@ struct SiteZoomStoreTests {
         #expect(second.pageZoom == 1.5)
         #expect(other.pageZoom == 1)
 
-        // ⌘+ sur une page : son site retient le zoom, ses autres pages le prennent, pas celles d'un autre site.
+        // ⌘+ on a page: its site remembers the zoom, its other pages take it, but not those of another site.
         store.setZoom(1.75, for: first)
         #expect(store.level(forSite: "example.com") == 1.75)
         #expect(first.pageZoom == 1.75)
         #expect(second.pageZoom == 1.75)
         #expect(other.pageZoom == 1)
 
-        // Une page qui change de site ne suit plus l'ancien, et prend le zoom du nouveau.
+        // A page that changes site no longer follows the old one, and takes the zoom of the new one.
         store.pageDidCommit(second, url: URL(string: "https://apple.com/mac"))
         #expect(second.pageZoom == 1)
         store.setLevel(1.25, forSite: "example.com")
@@ -129,7 +129,7 @@ struct SiteZoomStoreTests {
         #expect(blank.pageZoom == 1.25)
         #expect(store.levels.isEmpty)
 
-        // Nouveau document sans site : 100 %.
+        // New document without a site: 100%.
         store.pageDidCommit(blank, url: URL(string: "data:text/html,salut"))
         #expect(blank.pageZoom == 1)
     }
@@ -138,7 +138,7 @@ struct SiteZoomStoreTests {
         let store = SiteZoomStore(defaults: nil)
         let tab = page()
         store.pageDidCommit(tab, url: URL(string: "https://example.com/"))
-        // `tab.url` n'a pas d'adresse ici : seul compte le site du document affiché.
+        // `tab.url` has no address here: only the site of the displayed document counts.
         store.setZoom(0.85, for: tab)
         #expect(store.levels == ["example.com": 0.85])
     }

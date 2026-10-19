@@ -2,11 +2,11 @@ import AppKit
 import OSLog
 import WebKit
 
-/// Onglets et mini-fenêtres ouverts pour les extensions, et demandes à l'utilisateur (tâche 6.3).
+/// Tabs and mini windows opened for extensions, and requests to the user (task 6.3).
 extension ExtensionManager {
-    /// Configuration d'une page d'extension (`webkit-extension:`) ouverte dans un onglet ou une mini-fenêtre : celle de
-    /// son extension (WebKit refuse sinon la navigation), avec un contrôleur de contenu à la page (tâche 6.2) ; nil pour
-    /// une autre adresse ou une extension non chargée.
+    /// Configuration of an extension page (`webkit-extension:`) opened in a tab or a mini window: that of its extension
+    /// (otherwise WebKit refuses the navigation), with a per-page content controller (task 6.2); nil for another
+    /// address or an extension that is not loaded.
     func pageConfiguration(for url: URL) -> WKWebViewConfiguration? {
         guard Self.isExtensionURL(url), let configuration = context(for: url)?.webViewConfiguration else {
             return nil
@@ -15,8 +15,8 @@ extension ExtensionManager {
         return configuration
     }
 
-    /// Fenêtre de navigation où ouvrir des onglets : `requested` si c'en est une, sinon la fenêtre active, sinon la
-    /// fenêtre principale ; une fenêtre privée seulement pour une extension qui y a accès.
+    /// Browser window in which to open tabs: `requested` if it is one, otherwise the active window, otherwise the main
+    /// window; a private window only for an extension that has access to it.
     func browserWindow(for requested: (any WKWebExtensionWindow)?, context: WKWebExtensionContext) -> WindowModel? {
         let allowsPrivate = context.hasAccessToPrivateData
         for candidate in [requested as? ExtensionWindow, windows.focusedWindow] {
@@ -28,8 +28,8 @@ extension ExtensionManager {
         return models.first { !$0.session.isPrivate } ?? (allowsPrivate ? models.first : nil)
     }
 
-    /// Ouvre `url` (rien : un onglet vide) dans le Space affiché par `model`, en tête des onglets du jour, ou après
-    /// `parent` s'il est de ce Space ; actif (sélectionné) et épinglé à la demande.
+    /// Opens `url` (none: an empty tab) in the Space displayed by `model`, at the top of the Today tabs, or after
+    /// `parent` if it belongs to this Space; active (selected) and pinned on request.
     @discardableResult
     func openTab(_ url: URL?, in model: WindowModel, after parent: BrowserTab?, isActive: Bool, isPinned: Bool) -> BrowserTab {
         let tabManager = model.space.tabManager
@@ -48,8 +48,8 @@ extension ExtensionManager {
         return tab
     }
 
-    /// Mini-fenêtre (fenêtre « popup » d'une extension) sur `url`, dans le profil du Space affiché ; sans adresse, sa
-    /// barre de saisie s'ouvre.
+    /// Mini window (an extension's “popup” window) on `url`, in the profile of the displayed Space; without an address,
+    /// its input bar opens.
     @discardableResult
     func openMiniWindow(_ url: URL?, in miniWindows: MiniWindowManager) -> MiniWindowController {
         let profile = miniWindows.displayedSpace.record.profile
@@ -67,12 +67,12 @@ extension ExtensionManager {
         return controller
     }
 
-    /// Nom de l'extension pour l'utilisateur.
+    /// Name of the extension for the user.
     func displayName(of context: WKWebExtensionContext) -> String {
         context.webExtension.displayName ?? context.uniqueIdentifier
     }
 
-    /// Pose la question à l'utilisateur (`permissionPrompter`) ; une demande vide est refusée sans rien montrer.
+    /// Asks the user (`permissionPrompter`); an empty request is denied without showing anything.
     func ask(_ request: ExtensionPermissionRequest, completion: @escaping @MainActor (Bool) -> Void) {
         guard !request.isEmpty else {
             completion(false)

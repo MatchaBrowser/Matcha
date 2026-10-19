@@ -90,9 +90,9 @@ struct SidebarLayoutTests {
         #expect(withoutNested.count == 2)
     }
 
-    // MARK: Glisser-déposer
+    // MARK: Drag and drop
 
-    /// Quatre onglets du jour, dans l'ordre 0, 1, 2, 3.
+    /// Four today tabs, in the order 0, 1, 2, 3.
     private func todayLayout() -> SidebarLayout {
         var layout = SidebarLayout()
         for id in ids.prefix(4) {
@@ -177,7 +177,7 @@ struct SidebarLayoutTests {
         #expect(layout.pinned.folder(folder)?.name == "Lectures")
     }
 
-    // MARK: Dossiers
+    // MARK: Folders
 
     @Test func `rename and collapse a nested folder`() {
         var layout = SidebarLayout()

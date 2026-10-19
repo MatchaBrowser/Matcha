@@ -1,6 +1,6 @@
 import Foundation
 
-/// Décision retenue d'un profil pour une origine et une permission.
+/// Remembered decision of a profile for an origin and a permission.
 nonisolated struct SitePermissionEntry: Hashable, Identifiable, Sendable {
     struct Key: Hashable, Sendable {
         let profileID: UUID?
@@ -29,19 +29,19 @@ nonisolated struct SitePermissionEntry: Hashable, Identifiable, Sendable {
     }
 }
 
-/// Toutes les décisions retenues, en mémoire : recherche, modification, oubli (tâche 5.2). Type pur, sans
-/// enregistrement ; `SitePermissionStore` l'enregistre.
+/// All the remembered decisions, in memory: lookup, change, removal (task 5.2). Pure type, without saving;
+/// `SitePermissionStore` saves it.
 nonisolated struct SitePermissionTable: Sendable {
     private(set) var entries: [SitePermissionEntry.Key: SitePermissionEntry] = [:]
 
-    /// Pour une même clé, la décision la plus récente l'emporte.
+    /// For the same key, the most recent decision wins.
     init(_ entries: [SitePermissionEntry] = []) {
         for entry in entries where self.entries[entry.key].map({ $0.date <= entry.date }) ?? true {
             self.entries[entry.key] = entry
         }
     }
 
-    /// Décisions du profil pour cette origine, par permission.
+    /// Decisions of the profile for this origin, by permission.
     func decisions(for origin: SiteOrigin, profileID: UUID?) -> [SitePermissionKind: SitePermissionDecision] {
         var decisions: [SitePermissionKind: SitePermissionDecision] = [:]
         for kind in SitePermissionKind.allCases {
@@ -50,7 +50,7 @@ nonisolated struct SitePermissionTable: Sendable {
         return decisions
     }
 
-    /// Retient `decision`, ou l'oublie si elle est nil.
+    /// Remembers `decision`, or forgets it if it is nil.
     mutating func set(
         _ decision: SitePermissionDecision?,
         for kind: SitePermissionKind,
@@ -62,13 +62,13 @@ nonisolated struct SitePermissionTable: Sendable {
         entries[key] = decision.map { SitePermissionEntry(key: key, decision: $0, date: date) }
     }
 
-    /// Oublie toutes les décisions d'un profil (profil supprimé).
+    /// Forgets all the decisions of a profile (deleted profile).
     mutating func removeAll(profileID: UUID?) {
         entries = entries.filter { $0.key.profileID != profileID }
     }
 
-    /// Ordre des réglages : par site (hôte affiché, puis clé), puis permission dans l'ordre de `SitePermissionKind`,
-    /// puis profil.
+    /// Order of the settings: by website (displayed host, then key), then permission in the order of
+    /// `SitePermissionKind`, then profile.
     var sortedEntries: [SitePermissionEntry] {
         let kinds = SitePermissionKind.allCases
         return entries.values.sorted { lhs, rhs in

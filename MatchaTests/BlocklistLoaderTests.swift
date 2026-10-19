@@ -3,8 +3,8 @@ import Foundation
 import Testing
 import WebKit
 
-/// Magasin de listes en mémoire : une liste compilée est son JSON. Refuse, comme WebKit, une liste de plus de
-/// `maximumRuleCount` règles, et toute liste qui contient « invalide ».
+/// In-memory list store: a compiled list is its JSON. Like WebKit, it rejects a list of more than
+/// `maximumRuleCount` rules, and any list that contains “invalide”.
 @MainActor
 final class FakeRuleListStore: ContentRuleListStoring {
     private(set) var lists: [String: String] = [:]
@@ -51,8 +51,8 @@ final class FakeRuleListStore: ContentRuleListStoring {
     }
 }
 
-/// Préparation des listes (tâche 6.2) avec un faux magasin : compilation au premier lancement, réutilisation ensuite,
-/// nouvelle version, liste retirée ou disparue du magasin, liste trop grosse découpée, liste invalide ignorée.
+/// Preparation of the lists (task 6.2) with a fake store: compilation on first launch, reuse afterwards,
+/// new version, list removed or gone from the store, oversized list split, invalid list ignored.
 @MainActor
 struct BlocklistLoaderTests {
     private let store = FakeRuleListStore()
@@ -141,14 +141,14 @@ struct BlocklistLoaderTests {
         #expect(loaded.first?.ruleLists.count == 3)
     }
 
-    /// WebKit refuse la liste entière, puis des parts de 5 : la liste finit en parts de 3 (moitiés arrondies au-dessus).
+    /// WebKit rejects the whole list, then parts of 5: the list ends up in parts of 3 (halves rounded up).
     @Test func `a list refused as too big is split in halves until it compiles`() async {
         store.maximumRuleCount = 3
         let loaded = await loader(rules: ["a": Self.rules(10)]).load([Self.entry("a")], previous: [])
         #expect(loaded.first?.record.storeIdentifiers == (1 ... 4).map { "matcha-blocklist.a.1.part-\($0)" })
         #expect(loaded.first?.record.ruleCount == 10)
         #expect(store.compiled.first == "matcha-blocklist.a.1")
-        // Rien des essais refusés ne reste dans le magasin.
+        // Nothing from the rejected attempts remains in the store.
         #expect(await store.identifiers() == (1 ... 4).map { "matcha-blocklist.a.1.part-\($0)" })
     }
 

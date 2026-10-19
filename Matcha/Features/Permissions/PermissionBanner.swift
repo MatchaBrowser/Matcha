@@ -1,8 +1,8 @@
 import SwiftUI
 
-/// Bandeau des demandes de permission d'une page (tâche 5.2), en haut de sa carte (ou de l'aperçu, ou de la page
-/// d'une mini-fenêtre) : il descend et pousse la page, sans la couvrir. Une demande à la fois : le site, ce qu'il
-/// demande, et « Refuser », « Autoriser une fois », « Toujours autoriser ». Rien ne répond à la place de l'utilisateur.
+/// Banner for a page's permission requests (task 5.2), at the top of its card (or of the peek, or of a mini
+/// window's page): it slides down and pushes the page, without covering it. One request at a time: the site, what
+/// it asks for, and “Don't Allow”, “Allow Once”, “Always Allow”. Nothing answers on the user's behalf.
 struct PermissionBanner: View {
     let prompts: PermissionPromptQueue
 
@@ -25,7 +25,7 @@ private struct PermissionBannerContent: View {
     let answer: (SitePermissionAnswer) -> Void
 
     var body: some View {
-        // Tout sur une ligne si la carte est assez large ; sinon le texte, puis les boutons (en colonne au besoin).
+        // All on one line if the card is wide enough; otherwise the text, then the buttons (in a column if needed).
         ViewThatFits(in: .horizontal) {
             HStack(spacing: 12) {
                 icon
@@ -89,7 +89,7 @@ private struct PermissionBannerContent: View {
         }
     }
 
-    /// « meet.google.com souhaite utiliser votre caméra et votre micro. » : ne nomme que ce qui est demandé.
+    /// “meet.google.com wants to use your camera and microphone.”: names only what is requested.
     private var prompt: Text {
         let site = request.origin.map { Text(verbatim: $0.displayName).bold() }
             ?? Text("This page", comment: "Permission banner: the page asking, when it has no website name (local file)")

@@ -4,32 +4,32 @@ import Observation
 import OSLog
 import WebKit
 
-/// Téléchargements de toute l'app (tâche 5.1) : ceux de toutes les fenêtres, aperçus et mini-fenêtres arrivent ici
-/// par `NavigationCoordinator`. Chaque fichier est écrit dans le dossier Téléchargements (`DownloadLocation`), sous un
-/// nom libre choisi au moment où WebKit le demande. La liste des fenêtres ordinaires est retenue d'un lancement à
-/// l'autre (`SavedDownloadList`) jusqu'à « Effacer » ; celle d'une fenêtre privée, jamais. Rien ne s'ouvre de soi-même,
-/// ni la liste ni le fichier.
+/// Downloads of the whole app (task 5.1): those of all windows, peeks and mini windows arrive here through
+/// `NavigationCoordinator`. Each file is written to the Downloads folder (`DownloadLocation`), under a free name
+/// chosen when WebKit asks for it. The list of regular windows is kept from one launch to the next
+/// (`SavedDownloadList`) until “Clear”; that of a private window, never. Nothing opens by itself, neither the list
+/// nor the file.
 @MainActor
 @Observable
 final class DownloadManager: NSObject {
     static let shared = DownloadManager()
 
-    /// Téléchargements de cette session de l'app et ceux repris de la liste retenue, du plus récent au plus ancien.
+    /// Downloads of this app session and those restored from the saved list, from newest to oldest.
     private(set) var items: [DownloadItem] = []
-    /// Téléchargements terminés depuis le lancement, par fenêtre : le bouton de la barre rebondit à chacun.
+    /// Downloads finished since launch, per window: the sidebar button bounces for each one.
     private(set) var finishedCounts: [DownloadScope: Int] = [:]
-    /// Dossier où écrire les fichiers ; nil s'il est introuvable.
+    /// Folder where files are written; nil if it cannot be found.
     @ObservationIgnored let directory: @MainActor () -> URL?
-    /// Téléchargements en cours, par objet WebKit.
+    /// Downloads in progress, by WebKit object.
     @ObservationIgnored private var active: [ObjectIdentifier: DownloadItem] = [:]
-    /// Noms choisis pour des téléchargements dont le fichier n'existe pas encore, ou n'est pas encore effacé
-    /// (comparés sans tenir compte de la casse, comme le disque).
+    /// Names chosen for downloads whose file does not exist yet, or is not deleted yet (compared case-insensitively,
+    /// like the disk).
     @ObservationIgnored private var reservedNames: Set<String> = []
     @ObservationIgnored private var terminationObserver: (any NSObjectProtocol)?
-    /// Réglages où la liste est retenue ; nil (tests, base de test) : rien n'est lu ni écrit.
+    /// Settings where the list is kept; nil (tests, test store): nothing is read or written.
     @ObservationIgnored private var defaults: UserDefaults?
 
-    /// `directory` : relu à chaque téléchargement ; remplacé dans les tests par un dossier temporaire.
+    /// `directory`: read again for each download; replaced in tests by a temporary folder.
     init(directory: @escaping @MainActor () -> URL? = { DownloadLocation.directory() }) {
         self.directory = directory
         super.init()
@@ -45,8 +45,8 @@ final class DownloadManager: NSObject {
         }
     }
 
-    /// Reprend la liste retenue au lancement précédent, puis la retient à chaque fin de téléchargement et à chaque
-    /// « Effacer ». Une fois, au lancement.
+    /// Restores the list saved at the previous launch, then saves it at each download end and at each “Clear”.
+    /// Once, at launch.
     func restoreList(from defaults: UserDefaults) {
         self.defaults = defaults
         let saved = SavedDownloadList.load(from: defaults)
@@ -54,8 +54,8 @@ final class DownloadManager: NSObject {
         Logger.downloads.info("Liste des téléchargements reprise : \(saved.count, privacy: .public)")
     }
 
-    /// Retient les téléchargements des fenêtres ordinaires qui ne sont plus en cours ; à la fermeture de l'app, aussi
-    /// ceux en cours, comme interrompus.
+    /// Saves the downloads of regular windows that are no longer in progress; when the app quits, also those in
+    /// progress, as interrupted.
     func saveList(includingActive: Bool = false) {
         guard let defaults else {
             return
@@ -64,13 +64,13 @@ final class DownloadManager: NSObject {
         SavedDownloadList.save(saved, to: defaults)
     }
 
-    /// Téléchargements que montre une fenêtre, du plus récent au plus ancien.
+    /// Downloads that a window shows, from newest to oldest.
     func items(in scope: DownloadScope) -> [DownloadItem] {
         items.filter { $0.scope == scope }
     }
 
-    /// Prend en charge un téléchargement que WebKit vient de créer : il entre en tête de la liste.
-    /// `pageURL` : page d'où il part, pour l'attribut de quarantaine.
+    /// Takes charge of a download that WebKit just created: it goes to the top of the list.
+    /// `pageURL`: page it starts from, for the quarantine attribute.
     @discardableResult
     func track(_ download: WKDownload, scope: DownloadScope, pageURL: URL?) -> DownloadItem {
         let item = DownloadItem(download: download, scope: scope, sourceURL: download.originalRequest?.url, pageURL: pageURL)
@@ -82,12 +82,12 @@ final class DownloadManager: NSObject {
         return item
     }
 
-    /// Ajoute `item` en tête de la liste (primitive de `track`, utilisée telle quelle par les tests).
+    /// Adds `item` to the top of the list (primitive of `track`, used as is by the tests).
     func insert(_ item: DownloadItem) {
         items.insert(item, at: 0)
     }
 
-    /// Bouton « Annuler » : le fichier partiel est effacé une fois WebKit arrêté.
+    /// “Cancel” button: the partial file is deleted once WebKit has stopped.
     func cancel(_ item: DownloadItem) {
         guard item.isActive else {
             return
@@ -106,14 +106,14 @@ final class DownloadManager: NSObject {
         }
     }
 
-    /// « Effacer » : retire de la liste d'une fenêtre ce qui n'est plus en cours ; aucun fichier n'est effacé.
+    /// “Clear”: removes from a window's list what is no longer in progress; no file is deleted.
     func clear(in scope: DownloadScope) {
         items.removeAll { $0.scope == scope && !$0.isActive }
         saveList()
     }
 
-    /// Fenêtre privée fermée : ses téléchargements en cours sont annulés (fichiers partiels effacés), ceux qui sont
-    /// terminés restent dans Téléchargements, et tous quittent la liste.
+    /// Private window closed: its downloads in progress are cancelled (partial files deleted), the finished ones
+    /// stay in Downloads, and all of them leave the list.
     func forgetDownloads(in scope: DownloadScope) {
         for item in items where item.scope == scope && item.isActive {
             cancel(item)
@@ -130,10 +130,10 @@ final class DownloadManager: NSObject {
         finishedCounts[scope, default: 0]
     }
 
-    // MARK: Primitives du délégué WebKit (`+Delegate`)
+    // MARK: WebKit delegate primitives (`+Delegate`)
 
-    /// Place du fichier : un nom libre dans le dossier, réservé jusqu'à ce que le fichier existe ; nil si le dossier
-    /// est introuvable (le téléchargement échoue).
+    /// File location: a free name in the folder, reserved until the file exists; nil if the folder cannot be found
+    /// (the download fails).
     func reserveDestination(for item: DownloadItem, suggestedFilename: String, response: URLResponse) -> URL? {
         guard let directory = directory() else {
             return nil
@@ -149,25 +149,25 @@ final class DownloadManager: NSObject {
         return destination
     }
 
-    /// Le téléchargement n'est plus suivi par WebKit : plus de rappel attendu pour lui.
+    /// The download is no longer tracked by WebKit: no more callbacks expected for it.
     func stopTracking(_ item: DownloadItem) {
         active = active.filter { $0.value !== item }
     }
 
-    /// Un téléchargement de `scope` vient de se terminer.
+    /// A download of `scope` has just finished.
     func recordFinish(in scope: DownloadScope) {
         finishedCounts[scope, default: 0] += 1
     }
 
-    /// Libère le nom réservé par `item` : son fichier existe désormais, ou a été effacé.
+    /// Releases the name reserved by `item`: its file now exists, or has been deleted.
     func releaseReservation(of item: DownloadItem) {
         if let name = item.destinationURL?.lastPathComponent {
             reservedNames.remove(Self.reservationKey(name))
         }
     }
 
-    /// Efface le fichier partiel d'un téléchargement arrêté (jamais un autre : son nom était libre et réservé), puis
-    /// libère son nom.
+    /// Deletes the partial file of a stopped download (never another one: its name was free and reserved), then
+    /// releases its name.
     func discardPartialFile(of item: DownloadItem) {
         if let destination = item.destinationURL, Self.itemExists(at: destination) {
             do {
@@ -179,19 +179,19 @@ final class DownloadManager: NSObject {
         releaseReservation(of: item)
     }
 
-    /// Hôte de l'adresse demandée, ou son schéma (`data`, `blob`) : jamais l'adresse complète dans le journal.
+    /// Host of the requested address, or its scheme (`data`, `blob`): never the full address in the log.
     static func origin(of item: DownloadItem) -> String {
         item.sourceURL?.host() ?? item.sourceURL?.scheme ?? "?"
     }
 
-    /// Fermeture de l'app : WebKit s'arrête avec elle, les fichiers partiels n'ont plus d'avenir.
+    /// App quitting: WebKit stops with it, the partial files have no future.
     private func removePartialFiles() {
         for item in items where item.isActive {
             discardPartialFile(of: item)
         }
     }
 
-    /// Vrai si quelque chose occupe ce chemin, lien symbolique cassé compris (`fileExists` le suivrait).
+    /// True if something occupies this path, broken symbolic link included (`fileExists` would follow it).
     private static func itemExists(at url: URL) -> Bool {
         (try? FileManager.default.attributesOfItem(atPath: url.path)) != nil
     }

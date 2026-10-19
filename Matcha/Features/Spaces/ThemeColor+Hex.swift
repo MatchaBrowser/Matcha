@@ -1,8 +1,8 @@
 import Foundation
 
-/// Couleur écrite en hexadécimal « #RRGGBB » (sRGB, 8 bits par composante) : forme enregistrée des couleurs d'un dossier.
+/// Color written in hexadecimal “#RRGGBB” (sRGB, 8 bits per component): the saved form of a folder's colors.
 nonisolated extension ThemeColor {
-    /// Couleur `0xRRGGBB`.
+    /// Color `0xRRGGBB`.
     init(rgb: UInt32) {
         self.init(
             red: Double((rgb >> 16) & 0xFF) / 255,
@@ -11,7 +11,7 @@ nonisolated extension ThemeColor {
         )
     }
 
-    /// Couleur lue dans « #RRGGBB » ou « RRGGBB » (majuscules ou minuscules) ; nil pour tout autre texte.
+    /// Color read from “#RRGGBB” or “RRGGBB” (uppercase or lowercase); nil for any other text.
     init?(hexString: String) {
         let digits = hexString.hasPrefix("#") ? hexString.dropFirst() : Substring(hexString)
         guard digits.count == 6, digits.allSatisfy(\.isHexDigit), let rgb = UInt32(digits, radix: 16) else {
@@ -20,7 +20,7 @@ nonisolated extension ThemeColor {
         self.init(rgb: rgb)
     }
 
-    /// « #RRGGBB », en majuscules, chaque composante arrondie au plus proche des 256 niveaux.
+    /// “#RRGGBB”, in uppercase, each component rounded to the nearest of the 256 levels.
     var hexString: String {
         let levels = [red, green, blue].map { Int(($0 * 255).rounded()) }
         return "#" + levels.map { String(format: "%02X", $0) }.joined()

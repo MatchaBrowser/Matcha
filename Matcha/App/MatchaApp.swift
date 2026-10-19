@@ -10,43 +10,42 @@ struct MatchaApp: App {
     @NSApplicationDelegateAdaptor(AppDelegate.self) private var appDelegate
     @AppStorage(BrowserSettings.Key.appearance) private var appearance = BrowserSettings.appearance
     @State private var session: BrowserSession
-    /// Mini-fenêtres de toute l'app (tâche 4.5).
+    /// Mini windows of the whole app (task 4.5).
     @State private var miniWindows: MiniWindowManager
 
     init() {
-        // Les onglets sont les nôtres : pas d'onglets de fenêtre macOS (« Afficher la barre d'onglets »).
+        // The tabs are ours: no macOS window tabs (“Show Tab Bar”).
         NSWindow.allowsAutomaticWindowTabbing = false
-        // Tests d'interface : leur dossier de téléchargements repart vide (sans effet sinon).
+        // UI tests: their downloads folder starts out empty again (no effect otherwise).
         DownloadLocation.resetTestSubfolderIfRequested()
         let session = BrowserSession.launch()
-        // Historique lu dès le lancement, hors du fil principal, après l'effacement des visites de plus d'un an : la
-        // barre de commande le trouve prêt.
+        // History read at launch, off the main thread, after deleting visits older than a year: the command bar
+        // finds it ready.
         if let history = session.history {
             Task { await history.load() }
         }
-        // Rien n'est retenu (taille, Space affiché) avec une base de test.
+        // Nothing is remembered (size, displayed Space) with a test store.
         let miniWindows = MiniWindowManager(session: session, defaults: session.isInMemory ? nil : .standard)
-        // Liste des téléchargements retenue d'un lancement à l'autre, sauf là aussi.
+        // Downloads list kept from one launch to the next, except there too.
         if !session.isInMemory {
             DownloadManager.shared.restoreList(from: .standard)
         }
-        // Raccourci global de la mini-fenêtre, sauf dans l'app hôte des tests unitaires : il serait pris à
-        // l'utilisateur, et son premier accès écrirait ⌥⌘N dans ses réglages (même identifiant d'app). Bloqueur (tâche
-        // 6.2, mis de côté) : listes relues ou compilées en tâche de fond, sauf là aussi (les tests ont leur propre
-        // magasin).
+        // Global mini window shortcut, except in the unit tests' host app: it would be taken from the user, and its
+        // first access would write ⌥⌘N into their settings (same app identifier). Blocker (task 6.2, set aside):
+        // lists read again or compiled in the background, except there too (the tests have their own store).
         if ProcessInfo.processInfo.environment["XCTestConfigurationFilePath"] == nil {
             miniWindows.start()
             if ContentBlockerService.isAvailable {
                 ContentBlockerService.shared.start()
             }
         }
-        // Extensions (tâche 6.3) : les mini-fenêtres leur sont des fenêtres ; les extensions installées se chargent en
-        // tâche de fond, sauf avec une base de test (tests d'interface) : jamais celles de l'utilisateur.
+        // Extensions (task 6.3): mini windows are windows to them; installed extensions load in the background,
+        // except with a test store (UI tests): never the user's.
         ExtensionManager.shared.windows.miniWindows = miniWindows
         if !session.isInMemory {
             ExtensionManager.shared.start()
         }
-        // Liens d'autres apps (tâche 8.2), y compris celui qui a lancé l'app.
+        // Links from other apps (task 8.2), including the one that launched the app.
         IncomingLinks.shared.handler = { [miniWindows] urls in
             miniWindows.openFromOtherApp(urls, destination: ExternalLinkDestination.current())
         }
@@ -55,32 +54,32 @@ struct MatchaApp: App {
     }
 
     var body: some Scene {
-        // Une seule fenêtre principale tant que le partage des Spaces entre fenêtres n'est pas défini.
+        // A single main window until sharing Spaces between windows is defined.
         Window(Text(verbatim: "Matcha"), id: Self.browserWindowID) {
             BrowserWindowView(session: session)
                 .environment(miniWindows)
                 .environment(DownloadManager.shared)
         }
         .windowStyle(.hiddenTitleBar)
-        // Les liens d'autres apps passent par le délégué (`IncomingLinks`) : aucune fenêtre n'est créée pour eux.
+        // Links from other apps go through the delegate (`IncomingLinks`): no window is created for them.
         .handlesExternalEvents(matching: [])
         .commands {
             BrowserCommands(miniWindows: miniWindows)
         }
         .onChange(of: appearance, initial: true) { appearance.apply() }
 
-        // Fenêtres privées : chacune a sa session en mémoire, rien n'est enregistré.
+        // Private windows: each one has its own in-memory session, nothing is saved.
         WindowGroup("Private Browsing", id: Self.privateWindowID) {
             PrivateWindowView()
                 .environment(DownloadManager.shared)
         }
         .windowStyle(.hiddenTitleBar)
         .handlesExternalEvents(matching: [])
-        // Sans ses commandes par défaut (« Close », « Close All ») qui écraseraient ⌘W et ⇧⌘W.
+        // Without its default commands (“Close”, “Close All”), which would override ⌘W and ⇧⌘W.
         .commandsRemoved()
 
-        // Historique (⌘Y, tâche 5.5) : une seule fenêtre, ouverte seulement par l'utilisateur, jamais au lancement ni
-        // restaurée ; sans commandes à elle (pas d'élément en plus dans le menu Fenêtre).
+        // History (⌘Y, task 5.5): a single window, opened only by the user, never at launch nor restored; without
+        // commands of its own (no extra item in the Window menu).
         Window(Text("History"), id: Self.historyWindowID) {
             HistoryWindow(session: session)
                 .environment(miniWindows)

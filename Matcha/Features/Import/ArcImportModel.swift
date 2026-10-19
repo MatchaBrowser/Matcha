@@ -3,43 +3,43 @@ import Observation
 import OSLog
 import UniformTypeIdentifiers
 
-/// Import depuis Arc d'une fenêtre (tâche 7.1) : choix du fichier `StorableSidebar.json`, lecture, puis l'aperçu
-/// (`request`) ou l'alerte d'un fichier illisible. Seul l'utilisateur lance l'import (Fichier > Importer depuis).
+/// A window's import from Arc (task 7.1): picking the `StorableSidebar.json` file, reading it, then the preview
+/// (`request`) or the alert for an unreadable file. Only the user starts the import (File > Import From).
 @MainActor
 @Observable
 final class ArcImportModel {
-    /// Barre d'Arc lue, montrée dans l'aperçu avant l'import.
+    /// Arc sidebar that was read, shown in the preview before the import.
     struct Request: Identifiable {
         let id = UUID()
         let sidebar: ArcSidebar
     }
 
     var request: Request?
-    /// Le fichier choisi n'est pas une barre d'Arc.
+    /// The chosen file is not an Arc sidebar.
     var isFailurePresented = false
 
-    /// Fichier à choisir, rappelé par le sélecteur et par l'alerte d'un fichier illisible.
+    /// File to pick, reminded by the file picker and by the alert for an unreadable file.
     static let fileHint: LocalizedStringResource = .init(
         "Choose StorableSidebar.json, in Arc’s folder (~/Library/Application Support/Arc).",
         comment: "Open panel and error alert of the Arc import",
     )
 
-    /// Dossier d'Arc de l'utilisateur. Le dossier personnel vient du système : dans le bac à sable,
-    /// `homeDirectoryForCurrentUser` donne celui du conteneur de l'app.
+    /// The user's Arc folder. The home folder comes from the system: in the sandbox,
+    /// `homeDirectoryForCurrentUser` returns the app container's.
     static var arcFolder: URL {
         let home = getpwuid(getuid()).map { String(cString: $0.pointee.pw_dir) } ?? NSHomeDirectory()
         return URL(fileURLWithPath: home, isDirectory: true)
             .appending(path: "Library/Application Support/Arc", directoryHint: .isDirectory)
     }
 
-    /// Ouvre le sélecteur de fichier sur le dossier d'Arc, attaché à `window` s'il y en a une.
+    /// Opens the file picker on the Arc folder, attached to `window` if there is one.
     func chooseFile(in window: NSWindow?) {
         let panel = NSOpenPanel()
         panel.message = String(localized: Self.fileHint)
         panel.allowedContentTypes = [.json]
         panel.allowsMultipleSelection = false
         panel.canChooseDirectories = false
-        // Arc garde des copies datées à côté de son fichier : celui-ci est présélectionné s'il existe.
+        // Arc keeps dated copies next to its file: this one is preselected if it exists.
         let file = Self.arcFolder.appending(path: "StorableSidebar.json")
         panel.directoryURL = FileManager.default.fileExists(atPath: file.path) ? file : Self.arcFolder
         Task {
@@ -54,7 +54,7 @@ final class ArcImportModel {
         }
     }
 
-    /// Lit `url` : l'aperçu s'ouvre, ou l'alerte.
+    /// Reads `url`: the preview opens, or the alert.
     func open(_ url: URL) {
         do {
             let sidebar = try ArcSidebarParser.parse(Data(contentsOf: url))

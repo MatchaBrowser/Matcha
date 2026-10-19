@@ -2,11 +2,11 @@ import AppKit
 import OSLog
 import SwiftUI
 
-/// Lien avec la fenêtre principale et « Ouvrir dans le Space ».
+/// Link with the main window and “Open in Space”.
 extension MiniWindowManager {
-    // MARK: Fenêtre principale
+    // MARK: Main window
 
-    /// Space affiché par la fenêtre principale ; fermée : celui qu'elle affichait, sinon le premier.
+    /// Space displayed by the main window; closed: the one it was displaying, otherwise the first.
     var displayedSpace: SpaceSession {
         if let space = mainWindow?.windowModel?.space {
             return space
@@ -14,15 +14,15 @@ extension MiniWindowManager {
         return session.spaces.first { $0.id == lastMainSpaceID } ?? session.spaces[0]
     }
 
-    /// Space où va la page d'une mini-fenêtre du profil `profileID` (bouton, ⌘O, ⌘-clic) : voir `MiniWindowTarget`.
+    /// Space where the page of a mini window of profile `profileID` goes (button, ⌘O, ⌘-click): see `MiniWindowTarget`.
     func defaultTarget(profileID: UUID?) -> SpaceSession {
         let spaces = session.spaces.map { MiniWindowTarget.Space(id: $0.id, profileID: $0.record.profile?.id) }
         let id = MiniWindowTarget.defaultSpaceID(profileID: profileID, displayedSpaceID: displayedSpace.id, spaces: spaces)
         return session.spaces.first { $0.id == id } ?? displayedSpace
     }
 
-    /// La fenêtre principale se signale à son affichage et quand sa `NSWindow` change ; une remise en attente
-    /// (fenêtre rouverte par « Ouvrir dans le Space ») s'y termine.
+    /// The main window reports itself when it appears and when its `NSWindow` changes; a pending hand-off (window
+    /// reopened by “Open in Space”) completes there.
     func linkMainWindow(_ link: any MainWindowLink) {
         setMainWindow(link)
         guard let pending = pendingReveal, let windowModel = link.windowModel else {
@@ -35,7 +35,7 @@ extension MiniWindowManager {
         TabActivation.focusPage(of: pending.tab)
     }
 
-    /// La fenêtre principale disparaît : son Space affiché est retenu pour les prochaines mini-fenêtres.
+    /// The main window disappears: its displayed Space is remembered for the next mini windows.
     func unlinkMainWindow(_ windowModel: WindowModel) {
         guard let link = mainWindow, link.windowModel === windowModel else {
             return
@@ -44,20 +44,20 @@ extension MiniWindowManager {
         setMainWindow(nil)
     }
 
-    // MARK: Remise
+    // MARK: Hand-off
 
-    /// La page de `controller` passe dans le Space visé (voir `MiniWindowHandOff`), la mini-fenêtre se ferme, la
-    /// fenêtre principale affiche ce Space et la page prend le clavier. `openMainWindow` rouvre la fenêtre
-    /// principale si elle est fermée.
+    /// The page of `controller` moves into the target Space (see `MiniWindowHandOff`), the mini window closes, the
+    /// main window displays that Space and the page takes the keyboard. `openMainWindow` reopens the main window if
+    /// it is closed.
     func openInSpace(_ controller: MiniWindowController, openMainWindow: () -> Void) {
-        // Une page à remettre, et une seule fois (double clic, ⌘O répété).
+        // One page to hand off, and only once (double click, repeated ⌘O).
         guard controller.tab.url != nil, windows.contains(where: { $0 === controller }) else {
             return
         }
         let space = defaultTarget(profileID: controller.profileID)
         if space.record.profile?.id == controller.profileID {
             controller.tab.captureInteractionState()
-            // Avant tout rendu de la fenêtre principale : la vue web n'a jamais deux parents.
+            // Before any rendering of the main window: the web view never has two parents.
             controller.detachForHandOff()
         }
         guard let tab = MiniWindowHandOff.move(controller.tab, profileID: controller.profileID, to: space) else {
@@ -68,8 +68,8 @@ extension MiniWindowManager {
         Logger.miniWindow.info("Page ouverte dans un Space")
     }
 
-    /// La fenêtre principale affiche `space` et passe au premier plan, la page de `tab` prend le clavier ; fermée,
-    /// elle est rouverte par `openMainWindow` et la page s'y montre dès son affichage (`linkMainWindow`).
+    /// The main window displays `space` and comes to the front, the page of `tab` takes the keyboard; if closed, it
+    /// is reopened by `openMainWindow` and the page shows there as soon as it appears (`linkMainWindow`).
     func reveal(_ tab: BrowserTab, in space: SpaceSession, openMainWindow: () -> Void) {
         if let link = mainWindow, link.isShown, let windowModel = link.windowModel {
             if windowModel.space !== space {

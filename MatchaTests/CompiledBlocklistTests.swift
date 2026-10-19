@@ -2,8 +2,8 @@ import Foundation
 @testable import Matcha
 import Testing
 
-/// Listes compilées retenues (tâche 6.2) : identifiants du magasin (version comprise, parts), version à réutiliser,
-/// identifiants périmés (jamais ceux d'un autre préfixe), enregistrement dans les réglages.
+/// Saved compiled lists (task 6.2): store identifiers (version included, parts), version to reuse, stale
+/// identifiers (never those of another prefix), saving in the settings.
 struct CompiledBlocklistTests {
     private let entry = BlocklistEntry(identifier: "easylist", name: "EasyList", version: "2026.10.18", file: "a.json")
 

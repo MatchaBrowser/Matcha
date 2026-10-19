@@ -1,17 +1,17 @@
 import Foundation
 
-/// Un réglage de l'app (`SYNC.md` § 2.6) : sa clé et sa valeur telle que l'app la garde.
+/// An app setting (`SYNC.md` § 2.6): its key and its value as the app stores it.
 nonisolated struct SyncSettingFields: Codable, Equatable, Sendable {
     var key: String
     var value: SyncJSON
 
-    /// Clé de la liste des réglages synchronisés, valeur connue.
+    /// Key from the list of synced settings, known value.
     var isValid: Bool {
         SyncedSettings.isValid(value, for: key)
     }
 }
 
-/// Décision d'un profil pour une origine et une permission (`SitePermissionRecord`).
+/// A profile's decision for an origin and a permission (`SitePermissionRecord`).
 nonisolated struct SyncSitePermissionFields: Codable, Equatable, Sendable {
     var origin: String
     var kind: String
@@ -23,7 +23,7 @@ nonisolated struct SyncSitePermissionFields: Codable, Equatable, Sendable {
     }
 }
 
-/// Zoom retenu pour un site (`siteZoomLevels`).
+/// Zoom level remembered for a website (`siteZoomLevels`).
 nonisolated struct SyncSiteZoomFields: Codable, Equatable, Sendable {
     var site: String
     var level: Double
@@ -33,8 +33,8 @@ nonisolated struct SyncSiteZoomFields: Codable, Equatable, Sendable {
     }
 }
 
-/// Réglages de l'app synchronisés et leurs valeurs (`SYNC.md` § 2.6). Une clé absente de la liste, ou une valeur
-/// inconnue, est ignorée à la réception. Type pur.
+/// Synced app settings and their values (`SYNC.md` § 2.6). A key missing from the list, or an unknown value, is
+/// ignored on reception. Pure type.
 nonisolated enum SyncedSettings {
     private enum Kind {
         case choice(Set<String>)
@@ -58,7 +58,7 @@ nonisolated enum SyncedSettings {
         BrowserSettings.Key.externalLinkDestination: .choice(Set(ExternalLinkDestination.allCases.map(\.rawValue))),
     ]
 
-    /// Clés synchronisées, triées.
+    /// Synced keys, sorted.
     static var keys: [String] {
         kinds.keys.sorted()
     }
@@ -73,8 +73,8 @@ nonisolated enum SyncedSettings {
         }
     }
 
-    /// Valeur d'un réglage telle que `UserDefaults` la rend, en JSON ; nil si elle n'est pas d'un genre attendu pour
-    /// `key` (un argument de lancement « YES » pour un booléen compte comme `true`).
+    /// Value of a setting as `UserDefaults` returns it, as JSON; nil if it is not of an expected kind for `key` (a
+    /// launch argument “YES” for a Boolean counts as `true`).
     static func value(_ object: Any, for key: String) -> SyncJSON? {
         let value: SyncJSON? = switch kinds[key] {
         case .boolean:
@@ -95,7 +95,7 @@ nonisolated enum SyncedSettings {
         return value.flatMap { isValid($0, for: key) ? $0 : nil }
     }
 
-    /// Valeur à écrire dans `UserDefaults` pour `value`.
+    /// Value to write to `UserDefaults` for `value`.
     static func defaultsValue(of value: SyncJSON) -> Any? {
         switch value {
         case let .bool(flag): flag

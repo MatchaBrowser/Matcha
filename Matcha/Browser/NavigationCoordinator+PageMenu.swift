@@ -1,22 +1,22 @@
 import WebKit
 
-/// Menu contextuel des pages (tâche 5.9), côté délégué : la fenêtre que WebKit ouvre pour un élément de Matcha
-/// (`BrowserWebView+PageMenu`) suit le choix retenu par la vue web d'origine, une seule fois et dans la seconde.
-/// - « … dans un nouvel onglet » : un onglet en arrière-plan créé avec la configuration fournie par WebKit, après
-///   l'onglet d'origine ; depuis l'aperçu, après son onglet d'origine, et l'aperçu reste un aperçu ; depuis une
-///   mini-fenêtre, dans le Space visé (comme ⌘-clic) ; depuis une fenêtre de connexion, comme depuis sa page
-///   d'origine (`TabHost.openWindow(configuration:from:inBackground:)`).
-/// - « Ouvrir dans un aperçu » : `TabHost.openInPeek` (donc `TabManager.openPeek(_:from:openingPoint:)`) avec l'adresse
-///   demandée, et WebKit n'a pas de fenêtre ; refusé (onglet qui n'est plus affiché, schéma about, blob, data,
-///   javascript), un onglet en arrière-plan. La fenêtre du menu n'a pas de `window.opener` (vérifié) : rien à garder.
-/// - Lien vers une autre app (mailto:…) : confié à cette app, comme ⌘-clic.
+/// Context menu of pages (task 5.9), delegate side: the window WebKit opens for a Matcha item
+/// (`BrowserWebView+PageMenu`) follows the choice recorded by the originating web view, only once and within a second.
+/// - “… in New Tab”: a background tab created with the configuration supplied by WebKit, after the originating tab;
+///   from Peek, after its originating tab, and Peek stays Peek; from a mini window, in the target Space (like
+///   ⌘-click); from a sign-in window, as from its originating page
+///   (`TabHost.openWindow(configuration:from:inBackground:)`).
+/// - “Open Link in Peek”: `TabHost.openInPeek` (hence `TabManager.openPeek(_:from:openingPoint:)`) with the requested
+///   address, and WebKit gets no window; if refused (tab no longer displayed, about, blob, data or javascript
+///   scheme), a background tab. The menu's window has no `window.opener` (checked): nothing to keep.
+/// - Link to another app (mailto:…): handed to that app, like ⌘-click.
 extension NavigationCoordinator: PageMenuDelegate {
     func pageMenuOffersPeek(in webView: WKWebView) -> Bool {
         tabHost?.navigationSource(of: webView) == .tab
     }
 
-    /// Enregistrer sous… et Imprimer… : sur la page de `webView` ; Afficher le code source : dans un nouvel onglet
-    /// au premier plan, après elle (comme un lien ouvert dans un nouvel onglet), même profil.
+    /// Save As… and Print…: on the page of `webView`; View Page Source: in a new foreground tab, after it (like a link
+    /// opened in a new tab), same profile.
     func pageMenu(perform command: PageCommand, in webView: WKWebView) {
         guard let tabHost, let page = tabHost.page(for: webView) else {
             return
@@ -35,9 +35,9 @@ extension NavigationCoordinator: PageMenuDelegate {
         }
     }
 
-    /// Choix du menu contextuel de `webView` que cette fenêtre doit suivre, s'il y en a un ; il est alors oublié.
-    /// Une fenêtre demandée par la page elle-même (lien `target=_blank`, formulaire, taille donnée, ou après
-    /// l'échéance) ne le prend jamais.
+    /// Context menu choice of `webView` that this window must follow, if there is one; it is then forgotten.
+    /// A window requested by the page itself (`target=_blank` link, form, given size, or after the deadline) never
+    /// takes it.
     func takePageMenuIntent(
         of webView: WKWebView,
         for navigationAction: WKNavigationAction,
@@ -50,7 +50,7 @@ extension NavigationCoordinator: PageMenuDelegate {
         return webView.pageMenuIntent.take(for: request, at: now())
     }
 
-    /// Vue de la fenêtre demandée pour `intent` ; nil si la page s'ouvre ailleurs (aperçu, autre app).
+    /// View of the window requested for `intent`; nil if the page opens elsewhere (Peek, another app).
     func openWindow(
         for intent: PageMenuIntent,
         configuration: WKWebViewConfiguration,
@@ -69,7 +69,7 @@ extension NavigationCoordinator: PageMenuDelegate {
         return tabHost.openWindow(configuration: configuration, from: webView, inBackground: true)
     }
 
-    /// Les schémas que Maj+clic n'ouvre jamais dans l'aperçu (`NavigationPolicy`) n'y vont pas non plus par le menu.
+    /// The schemes that Shift-click never opens in Peek (`NavigationPolicy`) do not go there through the menu either.
     private static func canOpenInPeek(_ url: URL) -> Bool {
         !NavigationPolicy.schemesKeptInPlace.contains(url.scheme?.lowercased() ?? "")
     }

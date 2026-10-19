@@ -1,10 +1,10 @@
 import AppKit
 import OSLog
 
-/// Navigateur par défaut de ce Mac (tâche 8.3). macOS demande confirmation avant le changement.
+/// This Mac's default browser (task 8.3). macOS asks for confirmation before the change.
 @MainActor
 enum DefaultBrowser {
-    /// Vrai si Matcha ouvre les liens web de ce Mac.
+    /// True if Matcha opens this Mac's web links.
     static var isMatcha: Bool {
         guard let page = URL(string: "https://example.com"), let app = NSWorkspace.shared.urlForApplication(toOpen: page) else {
             return false
@@ -12,8 +12,8 @@ enum DefaultBrowser {
         return Bundle(url: app)?.bundleIdentifier == Bundle.main.bundleIdentifier
     }
 
-    /// Fait de Matcha le navigateur par défaut, pour `http` puis `https` ; vrai s'il l'est ensuite (l'utilisateur peut
-    /// refuser dans la demande de macOS).
+    /// Makes Matcha the default browser, for `http` then `https`; true if it is afterwards (the user can decline
+    /// in macOS's prompt).
     @discardableResult
     static func makeMatcha() async -> Bool {
         for scheme in ["http", "https"] {

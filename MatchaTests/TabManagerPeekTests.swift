@@ -3,12 +3,12 @@ import Foundation
 import Testing
 import WebKit
 
-/// Aperçu (Peek, tâche 4.4) dans le gestionnaire d'onglets : hors de la barre, fermeture, « Ouvrir en onglet ».
+/// Peek (task 4.4) in the tab manager: outside the sidebar, closing, “Open as Tab”.
 @MainActor
 struct TabManagerPeekTests {
     private let manager = TabManager(websiteDataStore: .nonPersistent())
 
-    /// Onglet sélectionné, en tête des onglets du jour, sur la page locale `name`.
+    /// Selected tab, at the top of today tabs, on the local page `name`.
     private func openSource(_ name: String = "source") async throws -> BrowserTab {
         let source = manager.insertTab(configuration: TestPages.configuration(), after: nil, select: true)
         source.load(TestPages.url(name))
@@ -16,7 +16,7 @@ struct TabManagerPeekTests {
         return source
     }
 
-    /// Aperçu de la page locale `name` ouvert depuis `source`, une fois chargé.
+    /// Peek of the local page `name` opened from `source`, once loaded.
     private func openPeek(from source: BrowserTab, _ name: String = "apercu") async throws -> Peek {
         let peek = try #require(manager.openPeek(TestPages.url(name), from: source))
         try await waitUntil { peek.tab.title == name && !peek.tab.isLoading }
@@ -37,7 +37,7 @@ struct TabManagerPeekTests {
         #expect(manager.isPeek(webView))
         #expect(peek.tab.openerID == source.id)
         #expect(peek.sourceTabID == source.id)
-        // Même profil : même magasin de données, mêmes schémas.
+        // Same profile: same data store, same schemes.
         #expect(webView.configuration.websiteDataStore === source.loadedWebView.configuration.websiteDataStore)
         #expect(webView.configuration.urlSchemeHandler(forURLScheme: TestPages.scheme) != nil)
     }
@@ -109,7 +109,7 @@ struct TabManagerPeekTests {
     @Test func `opening as a tab keeps the page after its source`() async throws {
         let other = manager.newTab()
         let source = try await openSource()
-        // Un onglet déjà ouvert depuis la source (⌘-clic) : l'aperçu va après lui.
+        // A tab already opened from the source (⌘-click): Peek goes after it.
         let child = manager.insertTab(configuration: source.configuration, after: source, select: false)
         let peek = try await openPeek(from: source)
         let webView = try #require(peek.tab.webView)
@@ -123,7 +123,7 @@ struct TabManagerPeekTests {
         #expect(manager.tabs.map(\.id) == [source.id, child.id, peek.tab.id, other.id])
         #expect(manager.selectedTab === peek.tab)
         #expect(manager.peek == nil)
-        // Même page, sans rechargement : l'état JavaScript est intact.
+        // Same page, no reload: the JavaScript state is intact.
         let marker = try await webView.evaluateJavaScript("window.marker")
         #expect((marker as? NSNumber)?.intValue == 42)
         #expect(peek.tab.title == "apercu")

@@ -1,7 +1,7 @@
 import Foundation
 
-/// Réglages du navigateur : clés dans `UserDefaults` et valeurs par défaut.
-/// Les vues les lisent avec `@AppStorage(BrowserSettings.Key…)`.
+/// Browser settings: keys in `UserDefaults` and default values.
+/// Views read them with `@AppStorage(BrowserSettings.Key…)`.
 nonisolated enum BrowserSettings {
     enum Key {
         static let searchEngine = "searchEngine"
@@ -22,61 +22,61 @@ nonisolated enum BrowserSettings {
 
     static let searchEngine = SearchEngine.defaultEngine
     static let appearance = AppearanceMode.system
-    /// Tant que les onglets ne sont pas restaurés au lancement (phase 3), quitter les perd.
+    /// As long as tabs are not restored at launch (phase 3), quitting loses them.
     static let confirmBeforeQuitting = true
-    /// Page d'accueil telle que saisie ; vide tant qu'elle n'est pas choisie.
+    /// Homepage as typed; empty until one is chosen.
     static let homePage = ""
     static let newTabPage = NewTabPage.blank
     static let showsHomeButton = false
     static let addressBarPosition = AddressBarPosition.sidebar
     static let showsNavigationButtons = true
-    /// Suggestions du moteur de recherche dans la barre de commande (jamais en fenêtre privée).
+    /// Search engine suggestions in the command bar (never in a private window).
     static let showsSearchSuggestions = true
-    /// Liens d'un favori ou d'un épinglé vers un autre site ouverts dans l'aperçu (tâche 4.4), comme dans Arc ;
-    /// désactivé par défaut : un clic ordinaire garde son comportement tant qu'on ne l'a pas choisi.
+    /// Links from a favorite or a pinned tab to another site open in the peek (task 4.4), as in Arc; off by
+    /// default: a plain click keeps its behavior until you choose otherwise.
     static let opensPinnedLinksInPeek = false
-    /// Mémoire libérée après 30 minutes sans affichage (tâche 5.6).
+    /// Memory freed after 30 minutes without being displayed (task 5.6).
     static let tabSuspensionDelay = TabSuspensionDelay.thirtyMinutes
-    /// Bloqueur de publicités et de traqueurs (tâche 6.2), actif dès que des listes sont livrées.
+    /// Ad and tracker blocker (task 6.2), on as soon as lists are bundled.
     static let blocksAdsAndTrackers = true
-    // Outils pour développeurs web (`WebInspection`) : comme Safari, désactivés par défaut ; activés en Debug.
+    // Web developer tools (`WebInspection`): as in Safari, off by default; on in Debug.
     #if DEBUG
         static let showsDeveloperTools = true
     #else
         static let showsDeveloperTools = false
     #endif
-    /// Liens d'autres apps (tâche 8.2) : dans une mini-fenêtre, comme Little Arc.
+    /// Links from other apps (task 8.2): in a mini window, like Little Arc.
     static let externalLinkDestination = ExternalLinkDestination.miniWindow
 
-    /// Adresse de la page d'accueil saisie dans les réglages, interprétée comme dans la barre d'adresse ;
-    /// nil si elle est vide.
+    /// Address of the homepage typed in the settings, interpreted as in the address bar;
+    /// nil if it is empty.
     static func homeURL(from text: String, searchEngine: SearchEngine) -> URL? {
         AddressResolver(searchEngine: searchEngine).resolve(text)
     }
 
-    /// Valeur de l'alerte avant de quitter dans `defaults`, ou sa valeur par défaut.
+    /// Value of the alert before quitting in `defaults`, or its default value.
     static func confirmsBeforeQuitting(in defaults: UserDefaults = .standard) -> Bool {
         defaults.object(forKey: Key.confirmBeforeQuitting) as? Bool ?? confirmBeforeQuitting
     }
 
-    /// Valeur du réglage de l'aperçu dans `defaults`, ou sa valeur par défaut. `bool(forKey:)` lit aussi les
-    /// « YES » et « NO » des arguments de lancement (`as? Bool` les ignore).
+    /// Value of the peek setting in `defaults`, or its default value. `bool(forKey:)` also reads the
+    /// “YES” and “NO” of launch arguments (`as? Bool` ignores them).
     static func pinnedLinksOpenInPeek(in defaults: UserDefaults = .standard) -> Bool {
         defaults.object(forKey: Key.opensPinnedLinksInPeek) == nil
             ? opensPinnedLinksInPeek
             : defaults.bool(forKey: Key.opensPinnedLinksInPeek)
     }
 
-    /// Délai de mise en veille des onglets cachés dans `defaults` (minutes, nombre ou texte d'un argument de lancement
-    /// comme « -tabSuspensionDelay 0 »), ou sa valeur par défaut si la valeur manque ou n'est pas une option.
+    /// Suspension delay of hidden tabs in `defaults` (minutes, a number or the text of a launch argument
+    /// such as “-tabSuspensionDelay 0”), or its default value if the value is missing or is not an option.
     static func tabSuspensionDelay(in defaults: UserDefaults = .standard) -> TabSuspensionDelay {
         let stored = defaults.object(forKey: Key.tabSuspensionDelay)
         let minutes = (stored as? NSNumber)?.intValue ?? (stored as? String).flatMap { Int($0) }
         return minutes.flatMap(TabSuspensionDelay.init(rawValue:)) ?? tabSuspensionDelay
     }
 
-    /// Valeur du réglage du bloqueur dans `defaults` (« YES » et « NO » des arguments de lancement compris), ou sa
-    /// valeur par défaut ; sans réglages (tests), la valeur par défaut.
+    /// Value of the blocker setting in `defaults` (“YES” and “NO” of launch arguments included), or its
+    /// default value; without settings (tests), the default value.
     static func blocksAdsAndTrackers(in defaults: UserDefaults?) -> Bool {
         guard let defaults, defaults.object(forKey: Key.blocksAdsAndTrackers) != nil else {
             return blocksAdsAndTrackers

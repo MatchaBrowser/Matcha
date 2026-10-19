@@ -2,27 +2,26 @@ import Foundation
 import OSLog
 import WebKit
 
-/// Les pages des mini-fenêtres vues par le délégué de navigation (`NavigationCoordinator`) :
-/// - `target=_blank` et `window.open` sans taille : une nouvelle mini-fenêtre, créée avec la configuration fournie
-///   par WebKit (`window.opener` reste valable), même profil ;
-/// - `window.open` avec une taille (fenêtre de connexion, tâche 5.8) : une petite fenêtre au-dessus de la
-///   mini-fenêtre (`PopupWindowManager` de la session principale) ;
-/// - ⌘-clic, clic du milieu, ⇧⌘-clic, « … dans un nouvel onglet » du menu contextuel (tâche 5.9) : un onglet en
-///   arrière-plan dans le Space visé, la fenêtre principale ne passe pas devant ; sans Space de ce profil, une
-///   nouvelle mini-fenêtre (jamais les cookies d'un autre profil) ;
-/// - `window.close()` : la mini-fenêtre se ferme ;
-/// - pas d'aperçu : un Maj+clic reste un clic (`NavigationSource.other`), pas de « Ouvrir dans un aperçu » ;
-/// - téléchargements : dans la liste de la fenêtre principale ;
-/// - permissions des sites : décisions du profil de la mini-fenêtre, bandeau dans sa page ;
-/// - historique : visites retenues pour le profil de la mini-fenêtre, sans Space ;
-/// - processus de la page arrêté : la page est visible tant que sa mini-fenêtre est ouverte, elle se recharge.
+/// The mini windows' pages as seen by the navigation delegate (`NavigationCoordinator`):
+/// - `target=_blank` and `window.open` without a size: a new mini window, created with the configuration provided
+///   by WebKit (`window.opener` stays valid), same profile;
+/// - `window.open` with a size (sign-in window, task 5.8): a small window above the mini window
+///   (`PopupWindowManager` of the main session);
+/// - ⌘-click, middle click, ⇧⌘-click, “… in New Tab” from the context menu (task 5.9): a background tab in the
+///   target Space, the main window does not come to the front; without a Space of that profile, a new mini window
+///   (never another profile's cookies);
+/// - `window.close()`: the mini window closes;
+/// - no Peek: a Shift-click stays a click (`NavigationSource.other`), no “Open Link in Peek”;
+/// - downloads: in the main window's list;
+/// - site permissions: decisions of the mini window's profile, banner in its page;
+/// - history: visits kept for the mini window's profile, without a Space;
+/// - page process terminated: the page is visible as long as its mini window is open, it reloads.
 extension MiniWindowManager: TabHost {
     var faviconService: FaviconService {
         session.faviconService
     }
 
-    /// Les mini-fenêtres n'ont pas de barre latérale : leurs téléchargements vont dans la liste de la fenêtre
-    /// principale.
+    /// Mini windows have no sidebar: their downloads go into the main window's list.
     var downloadScope: DownloadScope {
         .regular
     }
@@ -44,7 +43,7 @@ extension MiniWindowManager: TabHost {
         let profileID = opener?.profileID ?? displayedSpace.record.profile?.id
         let space = defaultTarget(profileID: profileID)
         guard space.record.profile?.id == profileID else {
-            // Plus aucun Space de ce profil : la page s'ouvre à côté, dans une mini-fenêtre du même profil.
+            // No Space of this profile left: the page opens alongside, in a mini window of the same profile.
             let controller = show(BrowserTab(configuration: configuration, openerID: opener?.tab.id), profileID: profileID)
             controller.tab.load(url)
             controller.showWebView()
@@ -55,8 +54,8 @@ extension MiniWindowManager: TabHost {
         Logger.miniWindow.info("Lien d'une mini-fenêtre ouvert en arrière-plan dans un Space")
     }
 
-    /// Une nouvelle mini-fenêtre. En arrière-plan (menu contextuel, tâche 5.9) : un onglet en arrière-plan du Space
-    /// visé, comme ⌘-clic ; sans Space de ce profil, une mini-fenêtre tout de même.
+    /// A new mini window. In the background (context menu, task 5.9): a background tab of the target Space, like
+    /// ⌘-click; without a Space of that profile, a mini window all the same.
     func openWindow(configuration: WKWebViewConfiguration, from webView: WKWebView, inBackground: Bool) -> WKWebView? {
         let opener = window(for: webView)
         let profileID = opener?.profileID ?? displayedSpace.record.profile?.id
@@ -74,7 +73,7 @@ extension MiniWindowManager: TabHost {
         return newWebView
     }
 
-    /// Pas d'aperçu dans une mini-fenêtre (jamais demandé) : refusé, le lien suit son cours sur place.
+    /// No Peek in a mini window (never requested): refused, the link proceeds in place.
     func openInPeek(_: URL, from _: WKWebView, openingPoint _: CGPoint) -> Bool {
         false
     }
@@ -83,32 +82,32 @@ extension MiniWindowManager: TabHost {
         window(for: webView)?.close()
     }
 
-    /// Mini-fenêtre ouverte, même au second plan (comme une fenêtre réduite pour la mise en veille, tâche 5.6).
+    /// Mini window open, even in the background (like a minimized window for sleeping, task 5.6).
     func isVisible(_ page: BrowserTab) -> Bool {
         window(for: page) != nil
     }
 
-    /// Zoom par site de la session principale : une mini-fenêtre n'est jamais privée (tâche 5.4).
+    /// Per-site zoom of the main session: a mini window is never private (task 5.4).
     var siteZooms: SiteZoomStore? {
         session.siteZooms
     }
 
-    /// Fenêtres de connexion de la session principale (tâche 5.8).
+    /// Sign-in windows of the main session (task 5.8).
     var popupWindows: PopupWindowManager? {
         session.popupWindows
     }
 
-    /// Bloqueur de la session principale (tâche 6.2) : ses exceptions enregistrées.
+    /// Blocker of the main session (task 6.2): its saved exceptions.
     var contentBlocking: ContentBlockerScope? {
         session.contentBlocking
     }
 
-    /// Décisions du profil de la mini-fenêtre (jamais privée : elles sont enregistrées).
+    /// Decisions of the mini window's profile (never private: they are saved).
     func sitePermissions(for webView: WKWebView) -> SitePermissionScope? {
         window(for: webView).map { SitePermissionScope(store: session.sitePermissions, profileID: $0.profileID) }
     }
 
-    /// Historique du profil de la mini-fenêtre, sans Space (tâche 5.5).
+    /// History of the mini window's profile, without a Space (task 5.5).
     func historyScope(for webView: WKWebView) -> HistoryScope? {
         guard let store = session.history, let controller = window(for: webView) else {
             return nil

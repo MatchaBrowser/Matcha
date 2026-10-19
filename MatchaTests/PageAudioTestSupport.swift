@@ -3,12 +3,12 @@ import Foundation
 @testable import Matcha
 import WebKit
 
-/// Pages qui jouent un son, sans réseau (tâche 5.10) : un fichier WAV de silence fabriqué ici, en adresse `data:`, dans
-/// une page locale de `TestPages`. On n'entend rien, mais WebKit le joue comme un vrai son (ni coupé, ni à volume nul).
-/// WebKit ne charge un média que si la vue web est dans une fenêtre : `AudioTestWindow` en donne une, hors de l'écran.
+/// Pages that play a sound, without network (task 5.10): a WAV file of silence built here, as a `data:` address, in a
+/// local page of `TestPages`. Nothing can be heard, but WebKit plays it as a real sound (neither muted nor at zero
+/// volume). WebKit only loads media if the web view is in a window: `AudioTestWindow` provides one, offscreen.
 @MainActor
 enum AudioTestPages {
-    /// Une seconde de silence (8 kHz, 8 bits, mono), en adresse `data:`.
+    /// One second of silence (8 kHz, 8 bits, mono), as a `data:` address.
     static let silence: String = {
         let samples = 8000
         var data = Data("RIFF".utf8)
@@ -20,7 +20,7 @@ enum AudioTestPages {
         }
         append(UInt32(36 + samples))
         data.append(contentsOf: Data("WAVEfmt ".utf8))
-        // PCM, 1 canal, 8 000 Hz, 8 000 octets par seconde, 1 octet par échantillon, 8 bits.
+        // PCM, 1 channel, 8,000 Hz, 8,000 bytes per second, 1 byte per sample, 8 bits.
         append(UInt32(16))
         append(UInt16(1))
         append(UInt16(1))
@@ -34,18 +34,18 @@ enum AudioTestPages {
         return "data:audio/wav;base64," + data.base64EncodedString()
     }()
 
-    /// Élément audio qui joue en boucle dès le chargement ; `attributes` en plus (`muted`…).
+    /// Audio element that plays in a loop as soon as it loads; extra `attributes` (`muted`…).
     static func audio(id: String = "son", attributes: String = "") -> String {
         "<audio id='\(id)' autoplay loop \(attributes) src='\(silence)'></audio>"
     }
 
-    /// Page locale `name` qui joue un son en boucle dès son chargement.
+    /// Local page `name` that plays a sound in a loop as soon as it loads.
     static func playingPage(_ name: String = "musique", attributes: String = "") -> URL {
         TestPages.url(name, body: audio(attributes: attributes))
     }
 }
 
-/// Fenêtre hors de l'écran qui montre une vue web : sans fenêtre, WebKit ne charge pas les médias.
+/// Offscreen window that shows a web view: without a window, WebKit does not load media.
 @MainActor
 final class AudioTestWindow {
     private let window = NSWindow(

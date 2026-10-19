@@ -1,6 +1,6 @@
 import XCTest
 
-/// Navigation et raccourcis : on pilote l'app comme un utilisateur.
+/// Navigation and shortcuts: we drive the app like a user.
 final class NavigationUITests: XCTestCase {
     override func setUpWithError() throws {
         continueAfterFailure = false
@@ -11,7 +11,7 @@ final class NavigationUITests: XCTestCase {
         let app = launchApp()
         XCTAssertTrue(waitForBrowserWindow(of: app))
         XCTAssertEqual(tabRows(in: app).count, 0)
-        // La barre ne s'ouvre jamais d'elle-même : la page vide invite à ⌘T.
+        // The bar never opens by itself: the empty page suggests ⌘T.
         let hint = "Appuyez sur ⌘T"
         let predicate = NSPredicate(format: "value CONTAINS %@ OR label CONTAINS %@", hint, hint)
         XCTAssertTrue(app.staticTexts.matching(predicate).firstMatch.waitForExistence(timeout: 3))
@@ -27,18 +27,18 @@ final class NavigationUITests: XCTestCase {
 
         XCTAssertTrue(tabRow(titled: "Example Domain", in: app).waitForExistence(timeout: 20))
         XCTAssertEqual(tabRows(in: app).count, 1)
-        // La pastille n'affiche que le domaine.
+        // The pill only shows the domain.
         XCTAssertTrue(waitForValue(of: addressPill(in: app)) { $0 == "example.com" })
     }
 
-    // MARK: Raccourcis
+    // MARK: Shortcuts
 
     @MainActor
     func testCommandTOpensTheCommandBarWithoutCreatingATab() {
         let app = launchApp()
         XCTAssertTrue(waitForBrowserWindow(of: app))
 
-        // ⌘T ouvre la barre sans créer d'onglet ; Échap ne laisse rien.
+        // ⌘T opens the bar without creating a tab; Escape leaves nothing behind.
         let field = openCommandBar(in: app)
         XCTAssertEqual(tabRows(in: app).count, 0)
         app.typeKey(.escape, modifierFlags: [])
@@ -84,7 +84,7 @@ final class NavigationUITests: XCTestCase {
         tabRows(in: app).firstMatch.click()
         XCTAssertFalse(field.exists)
 
-        // Onglet vide : la barre s'ouvre sur un texte vide.
+        // Empty tab: the bar opens with an empty text.
         app.typeKey("l", modifierFlags: .command)
         XCTAssertTrue(field.waitForExistence(timeout: 3))
         XCTAssertTrue(waitForKeyboardFocus(of: field))
@@ -121,7 +121,7 @@ final class NavigationUITests: XCTestCase {
         app.menuItems["Épingler"].click()
         tabRows(in: app).firstMatch.click()
 
-        // L'épinglé reste ; la sélection passe à l'onglet du jour, que ⌘W ferme pour de bon.
+        // The pinned tab stays; the selection moves to the Today tab, which ⌘W closes for good.
         app.typeKey("w", modifierFlags: .command)
         XCTAssertTrue(waitForCount(tabRows(in: app), 2))
         app.typeKey("w", modifierFlags: .command)

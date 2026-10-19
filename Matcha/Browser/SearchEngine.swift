@@ -1,15 +1,15 @@
 import Foundation
 
-/// Moteur de recherche utilisé quand le texte saisi n'est pas une adresse.
+/// Search engine used when the typed text is not an address.
 nonisolated enum SearchEngine: String, CaseIterable, Sendable {
     case google
     case duckDuckGo
     case bing
 
-    /// Moteur utilisé tant que l'utilisateur n'en a pas choisi d'autre.
+    /// Engine used as long as the user has not chosen another one.
     static let defaultEngine = SearchEngine.google
 
-    /// Nom affiché dans les réglages.
+    /// Name displayed in the settings.
     var name: String {
         switch self {
         case .google: "Google"
@@ -18,13 +18,13 @@ nonisolated enum SearchEngine: String, CaseIterable, Sendable {
         }
     }
 
-    /// URL de recherche de `query`, encodée en entier.
+    /// Search URL for `query`, fully encoded.
     func searchURL(for query: String) -> URL? {
         Self.url(base: searchBaseURL, query: query)
     }
 
-    /// URL des suggestions de recherche de `query` (format OpenSearch : `["texte", ["suggestion", …]]`),
-    /// encodée en entier.
+    /// URL of the search suggestions for `query` (OpenSearch format: `["text", ["suggestion", …]]`),
+    /// fully encoded.
     func suggestionsURL(for query: String) -> URL? {
         Self.url(base: suggestionsBaseURL, query: query)
     }
@@ -37,7 +37,7 @@ nonisolated enum SearchEngine: String, CaseIterable, Sendable {
         }
     }
 
-    /// Adresses non documentées, celles qu'utilise Firefox (vérifiées le 2026-10-17).
+    /// Undocumented addresses, the ones Firefox uses (checked on 2026-10-17).
     private var suggestionsBaseURL: String {
         switch self {
         case .google: "https://www.google.com/complete/search?client=firefox&ie=utf-8&oe=utf-8&q="
@@ -53,8 +53,8 @@ nonisolated enum SearchEngine: String, CaseIterable, Sendable {
         return URL(string: base + encoded)
     }
 
-    /// Caractères non réservés de la RFC 3986. Tout le reste est encodé, y compris `+`, `&`, `#`
-    /// et les lettres accentuées (que `CharacterSet.alphanumerics` laisserait passer).
+    /// Unreserved characters of RFC 3986. Everything else is encoded, including `+`, `&`, `#`
+    /// and accented letters (which `CharacterSet.alphanumerics` would let through).
     private static let unreservedCharacters = CharacterSet(
         charactersIn: "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-._~",
     )

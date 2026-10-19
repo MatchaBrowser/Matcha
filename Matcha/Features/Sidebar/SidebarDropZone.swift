@@ -1,11 +1,11 @@
 import SwiftUI
 
-/// Zone de dépôt en fin de section : fine au repos, elle s'agrandit quand on y amène un élément.
-/// Dans une section vide, elle affiche le nom de la section.
+/// Drop zone at the end of a section: thin at rest, it grows when an item is brought over it.
+/// In an empty section, it shows the section's name.
 struct SidebarDropZone: View {
     let tabManager: TabManager
     let destination: SidebarDestination
-    /// Nom de la section, affiché quand elle est vide.
+    /// Name of the section, displayed when it is empty.
     var label: LocalizedStringResource?
     var restingHeight = 8.0
 
@@ -29,7 +29,7 @@ struct SidebarDropZone: View {
             .accessibilityLabel(accessibilityLabel)
     }
 
-    /// « Déposer dans Favoris » dans une section vide, « Déposer ici » sinon.
+    /// “Drop into Favorites” in an empty section, “Drop here” otherwise.
     private var accessibilityLabel: Text {
         if let label {
             Text(
@@ -43,8 +43,8 @@ struct SidebarDropZone: View {
 }
 
 extension View {
-    /// Accepte un onglet, un split ou un dossier glissé et le range à la destination calculée d'après
-    /// l'endroit du dépôt dans la vue. Un dossier n'est accepté que parmi les épinglés, un split hors des favoris.
+    /// Accepts a dragged tab, split or folder and puts it at the destination computed from
+    /// where it was dropped in the view. A folder is accepted only among the pinned items, a split outside favorites.
     func sidebarDropDestination(
         tabManager: TabManager,
         isTargeted: Binding<Bool>,
@@ -81,12 +81,12 @@ extension View {
         }
     }
 
-    /// Accepte un élément glissé et le range à `destination`.
+    /// Accepts a dragged item and puts it at `destination`.
     func sidebarDropDestination(tabManager: TabManager, destination: SidebarDestination, isTargeted: Binding<Bool>) -> some View {
         sidebarDropDestination(tabManager: tabManager, isTargeted: isTargeted) { _ in destination }
     }
 
-    /// Rend l'onglet déplaçable, avec un aperçu compact.
+    /// Makes the tab draggable, with a compact preview.
     func tabDraggable(_ tab: BrowserTab) -> some View {
         draggable(SidebarDragItem.tab(tab.id)) {
             SidebarDragPreview(title: tab.displayTitle) { FaviconView(tab: tab) }
@@ -94,7 +94,7 @@ extension View {
     }
 }
 
-/// Aperçu affiché sous le pointeur pendant un glisser.
+/// Preview displayed under the pointer during a drag.
 struct SidebarDragPreview<Icon: View>: View {
     let title: String
     @ViewBuilder let icon: () -> Icon
@@ -111,7 +111,7 @@ struct SidebarDragPreview<Icon: View>: View {
     }
 }
 
-/// Trait qui marque l'endroit où l'élément glissé sera inséré.
+/// Line marking where the dragged item will be inserted.
 struct InsertionLine: View {
     var body: some View {
         Capsule()

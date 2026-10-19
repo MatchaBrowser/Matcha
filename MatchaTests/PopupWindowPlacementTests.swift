@@ -3,7 +3,7 @@ import Foundation
 @testable import Matcha
 import Testing
 
-/// Fenêtres de connexion (tâche 5.8) : quand une fenêtre ouverte par une page en devient une, sa taille et sa place.
+/// Sign-in windows (task 5.8): when a window opened by a page becomes one, its size and position.
 @MainActor
 struct PopupWindowPlacementTests {
     private let screen = CGRect(x: 0, y: 25, width: 1440, height: 875)
@@ -14,7 +14,7 @@ struct PopupWindowPlacementTests {
         #expect(PopupWindowFeatures(height: 600).opensPopupWindow)
     }
 
-    /// `target=_blank`, `window.open(url)`, `noopener` : rien. Une taille nulle veut dire « par défaut » pour WebKit.
+    /// `target=_blank`, `window.open(url)`, `noopener`: nothing. A zero size means “default” for WebKit.
     @Test func `no usable size keeps a tab`() {
         #expect(!PopupWindowFeatures().opensPopupWindow)
         #expect(!PopupWindowFeatures(width: 0, height: 0).opensPopupWindow)
@@ -53,7 +53,7 @@ struct PopupWindowPlacementTests {
         #expect(frame == screen)
     }
 
-    /// Fenêtre d'origine contre un bord (ou en partie hors de l'écran) : la fenêtre de connexion glisse pour tenir.
+    /// Originating window against an edge (or partly offscreen): the sign-in window slides to fit.
     @Test func `the window stays inside the screen`() {
         let left = PopupWindowPlacement.frame(
             size: CGSize(width: 500, height: 630),
@@ -69,7 +69,7 @@ struct PopupWindowPlacementTests {
         #expect(top == CGRect(x: 940, y: 270, width: 500, height: 630))
     }
 
-    /// Second écran à droite du premier, plus bas : les coordonnées d'AppKit s'y prolongent.
+    /// Second screen to the right of the first, lower: AppKit coordinates extend onto it.
     @Test func `the window opens on the screen of its opener`() {
         let second = CGRect(x: 1440, y: -200, width: 1920, height: 1055)
         let opener = CGRect(x: 1600, y: -100, width: 1200, height: 800)

@@ -1,7 +1,7 @@
 import Foundation
 @testable import Matcha
 
-/// Garde les réponses données à WebKit par les demandes de permission (vrai : accordé).
+/// Keeps the answers given to WebKit by permission requests (true: granted).
 @MainActor
 final class PermissionRecorder {
     private(set) var answers: [Bool] = []
@@ -11,7 +11,7 @@ final class PermissionRecorder {
     }
 }
 
-/// Origines des tests de permission.
+/// Origins for the permission tests.
 nonisolated enum TestOrigins {
     static let meet = SiteOrigin(scheme: "https", host: "meet.example.com", port: nil)!
     static let other = SiteOrigin(scheme: "https", host: "other.example.org", port: nil)!
@@ -19,7 +19,7 @@ nonisolated enum TestOrigins {
 }
 
 extension SitePermissionRequest {
-    /// Demande de test : `asked` vaut `requested` par défaut.
+    /// Test request: `asked` defaults to `requested`.
     @MainActor
     static func test(
         _ requested: Set<SitePermissionKind>,

@@ -1,17 +1,16 @@
 import AppKit
 import SwiftUI
 
-/// Champ de saisie de la barre de commande (`NSTextField`) : le texte vient du modèle, chaque
-/// modification et chaque commande clavier (↑ ↓ ⏎ ⎋) lui est renvoyée. Les commandes passent par
-/// `control(_:textView:doCommandBy:)`, donc après la méthode de saisie : une composition (japonais,
-/// touches mortes) n'est jamais interrompue.
+/// Command bar input field (`NSTextField`): the text comes from the model, each change and each keyboard command
+/// (↑ ↓ ⏎ ⎋) is sent back to it. Commands go through `control(_:textView:doCommandBy:)`, so after the input method:
+/// a composition (Japanese, dead keys) is never interrupted.
 struct CommandBarTextField: NSViewRepresentable {
     let text: String
-    /// Change à chaque demande d'ouverture : le champ reprend le clavier et sélectionne tout.
+    /// Changes on each open request: the field takes the keyboard back and selects all.
     let focusRequest: Int
     let onTextChange: (String) -> Void
     let onKey: (CommandBarKeyCommand) -> Void
-    /// Le champ a cessé d'être édité (clic ailleurs, autre champ…).
+    /// The field stopped being edited (click elsewhere, another field…).
     let onEditingEnded: () -> Void
 
     func makeCoordinator() -> Coordinator {
@@ -45,7 +44,7 @@ struct CommandBarTextField: NSViewRepresentable {
     func updateNSView(_ field: CommandBarNSTextField, context: Context) {
         context.coordinator.parent = self
         if let editor = field.currentEditor() as? NSTextView {
-            // Pendant l'édition, jamais stringValue (NSControl abandonnerait l'édition) ni pendant une composition.
+            // During editing, never stringValue (NSControl would abandon editing), nor during a composition.
             if !editor.hasMarkedText(), editor.string != text {
                 Self.replaceText(of: editor, with: text)
             }
@@ -58,14 +57,13 @@ struct CommandBarTextField: NSViewRepresentable {
         }
     }
 
-    /// Remplace le texte en cours d'édition (changement de mode, barre rouverte) par le système de
-    /// texte, pour que l'annulation (⌘Z) le connaisse : une simple affectation de `string` laisserait
-    /// les annulations de frappe sur d'anciennes plages, et ⌘Z déborderait du texte. Le
-    /// `controlTextDidChange` qui suit renvoie au modèle le texte qu'il a déjà.
+    /// Replaces the text being edited (mode change, bar reopened) through the text system, so that undo (⌘Z) knows
+    /// about it: a plain assignment of `string` would leave typing undos on old ranges, and ⌘Z would overflow the
+    /// text. The `controlTextDidChange` that follows sends the model back the text it already has.
     private static func replaceText(of editor: NSTextView, with text: String) {
         let range = NSRange(location: 0, length: (editor.string as NSString).length)
         guard editor.shouldChangeText(in: range, replacementString: text) else {
-            // Champ non modifiable (ne devrait pas arriver) : texte forcé, annulations oubliées.
+            // Non-editable field (should not happen): text forced, undos forgotten.
             editor.string = text
             editor.undoManager?.removeAllActions()
             return
@@ -90,7 +88,7 @@ struct CommandBarTextField: NSViewRepresentable {
             guard let field = notification.object as? NSTextField else {
                 return
             }
-            // Composition en cours (touche morte, méthode de saisie) : le texte n'est pas encore tapé.
+            // Composition in progress (dead key, input method): the text is not typed yet.
             if let editor = field.currentEditor() as? NSTextView, editor.hasMarkedText() {
                 return
             }
@@ -98,7 +96,7 @@ struct CommandBarTextField: NSViewRepresentable {
         }
 
         func control(_: NSControl, textView: NSTextView, doCommandBy commandSelector: Selector) -> Bool {
-            // Pendant une composition, ↑ ↓ ⏎ ⎋ appartiennent à la méthode de saisie.
+            // During a composition, ↑ ↓ ⏎ ⎋ belong to the input method.
             guard !textView.hasMarkedText(),
                   let command = CommandBarKeyCommand(selectorName: NSStringFromSelector(commandSelector))
             else {

@@ -1,7 +1,7 @@
 @testable import Matcha
 import Testing
 
-/// Règles des demandes de permission (tâche 5.2) : décisions retenues, ce que le bandeau demande, ce qu'il retient.
+/// Permission request rules (task 5.2): remembered decisions, what the banner asks, what it remembers.
 struct SitePermissionPolicyTests {
     @Test func `without a saved decision the banner asks`() {
         #expect(SitePermissionPolicy.evaluate([.camera], stored: [:]) == .ask([.camera]))
@@ -15,14 +15,14 @@ struct SitePermissionPolicyTests {
     }
 
     @Test func `a denied permission wins over an allowed one`() {
-        // WebKit accorde ou refuse la demande en entier.
+        // WebKit grants or denies the request as a whole.
         #expect(SitePermissionPolicy.evaluate([.camera, .microphone], stored: [.camera: .allow, .microphone: .deny]) == .deny)
         #expect(SitePermissionPolicy.evaluate([.camera, .microphone], stored: [.microphone: .deny]) == .deny)
     }
 
     @Test func `the banner only asks for what has no decision`() {
         #expect(SitePermissionPolicy.evaluate([.camera, .microphone], stored: [.microphone: .allow]) == .ask([.camera]))
-        // Une décision sur une autre permission ne compte pas.
+        // A decision on another permission does not count.
         #expect(SitePermissionPolicy.evaluate([.camera], stored: [.microphone: .deny]) == .ask([.camera]))
         #expect(SitePermissionPolicy.evaluate([.camera], stored: [.microphone: .allow]) == .ask([.camera]))
     }

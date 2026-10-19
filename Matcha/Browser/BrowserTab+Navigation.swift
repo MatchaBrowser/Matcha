@@ -1,9 +1,9 @@
 import Foundation
 import WebKit
 
-/// Titre affiché et commandes de navigation de la page (boutons, menus, raccourcis).
+/// Displayed title and navigation commands of the page (buttons, menus, shortcuts).
 extension BrowserTab {
-    /// Titre à afficher : titre de la page, sinon hôte, sinon « Nouvel onglet ».
+    /// Title to display: the page's title, otherwise the host, otherwise “New Tab”.
     var displayTitle: String {
         if let title, !title.isEmpty {
             return title
@@ -14,8 +14,8 @@ extension BrowserTab {
         return url?.absoluteString ?? String(localized: "New Tab")
     }
 
-    /// Les commandes de navigation mènent ailleurs que la page sortie de veille : plus de capture par-dessus ; une page
-    /// plantée (tâche 5.7) quitte son message.
+    /// Navigation commands lead away from the page woken from sleep: no more snapshot on top of it; a crashed page
+    /// (task 5.7) leaves its message.
     func goBack() {
         suspension.endRestoring()
         crash.pageWillNavigate()
@@ -28,9 +28,9 @@ extension BrowserTab {
         webView?.goForward()
     }
 
-    /// Après un arrêt du processus (tâche 5.7 : rechargement automatique, bouton du message, ⌘R), le rechargement
-    /// n'est pas une nouvelle visite de l'historique, comme la sortie de veille ; une page arrêtée avant d'avoir rien
-    /// affiché (rien à recharger) charge son adresse.
+    /// After the process terminated (task 5.7: automatic reload, the message's button, ⌘R), reloading is not a new
+    /// history visit, like waking from sleep; a page terminated before it displayed anything (nothing to reload) loads
+    /// its address.
     func reload() {
         suspension.endRestoring()
         guard crash.isRecovering else {

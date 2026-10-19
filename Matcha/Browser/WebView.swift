@@ -1,14 +1,14 @@
 import SwiftUI
 import WebKit
 
-/// Affiche la vue web d'un onglet dans SwiftUI.
+/// Displays a tab's web view in SwiftUI.
 ///
-/// La vue appartient à l'onglet : on ne la recrée jamais ici. Pour changer d'onglet ou après un
-/// rechargement de l'onglet, afficher une autre instance avec `.id(ObjectIdentifier(webView))`, afin
-/// que SwiftUI appelle de nouveau `makeNSView` au lieu de réutiliser l'ancienne vue.
+/// The view belongs to the tab: it is never recreated here. To switch tabs or after the tab is reloaded, display
+/// another instance with `.id(ObjectIdentifier(webView))`, so that SwiftUI calls `makeNSView` again instead of reusing
+/// the old view.
 struct WebView: NSViewRepresentable {
     let webView: WKWebView
-    /// Destinataire des éléments de la barre lâchés sur la page (split view) ; nil : refusés.
+    /// Recipient of the sidebar items dropped on the page (split view); nil: refused.
     var sidebarDropTarget: (any SidebarItemDropTarget)?
 
     func makeNSView(context _: Context) -> WKWebView {

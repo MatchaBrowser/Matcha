@@ -1,17 +1,17 @@
 import Foundation
 import WebKit
 
-/// Extensions proposées par vos autres Mac (`SYNC.md` § 2.5) : préparées pour l'écran des permissions, jamais
-/// installées sans l'accord de l'utilisateur.
+/// Extensions offered by your other Macs (`SYNC.md` § 2.5): prepared for the permissions screen, never installed
+/// without the user's consent.
 extension ExtensionSyncAdapter {
     enum OfferError: Error, Equatable {
-        /// Extension Safari dont l'app n'est pas sur ce Mac.
+        /// Safari extension whose app is not on this Mac.
         case appMissing
-        /// Paquet absent : extension trop grosse, ou synchro arrêtée.
+        /// Missing package: extension too big, or sync turned off.
         case packageUnavailable
     }
 
-    /// Prépare l'extension proposée `fields` : celle de son app sur ce Mac, ou son paquet téléchargé.
+    /// Prepares the offered extension `fields`: the one from its app on this Mac, or its downloaded package.
     func prepareOffer(_ fields: SyncExtensionFields) async throws -> ExtensionInstallCandidate {
         switch fields.source.kind {
         case .appExtension:
@@ -29,7 +29,7 @@ extension ExtensionSyncAdapter {
         }
     }
 
-    /// Extension Safari de l'offre, si son app est sur ce Mac.
+    /// Safari extension of the offer, if its app is on this Mac.
     func findAppExtension(of fields: SyncExtensionFields) -> SafariAppExtension? {
         guard let bundleIdentifier = fields.source.bundleIdentifier else {
             return nil
@@ -37,8 +37,8 @@ extension ExtensionSyncAdapter {
         return SafariExtensionFinder.find().first { $0.bundleIdentifier == bundleIdentifier }
     }
 
-    /// L'extension proposée vient d'être installée : son paquet est celui reçu (rien à renvoyer), elle n'est plus
-    /// proposée.
+    /// The offered extension was just installed: its package is the one received (nothing to send back), it is no
+    /// longer offered.
     func didInstallOffer(_ fields: SyncExtensionFields) {
         if let package = SyncedPackage(source: fields.source, version: fields.version) {
             synced.packages[fields.identifier] = package
@@ -46,7 +46,7 @@ extension ExtensionSyncAdapter {
         synced.offers[fields.identifier] = nil
     }
 
-    /// Page de l'app dans l'App Store, trouvée par l'API publique de recherche d'iTunes ; nil si elle est inconnue.
+    /// The app's page in the App Store, found through the public iTunes Search API; nil if it is unknown.
     static func appStoreURL(forBundleIdentifier bundleIdentifier: String, session: URLSession = .shared) async -> URL? {
         var components = URLComponents(string: "https://itunes.apple.com/lookup")
         components?.queryItems = [

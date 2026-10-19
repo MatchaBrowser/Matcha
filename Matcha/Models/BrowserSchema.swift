@@ -1,16 +1,16 @@
 import Foundation
 import SwiftData
 
-/// Schéma SwiftData du navigateur et fabrication de son conteneur.
+/// The browser's SwiftData schema and the making of its container.
 enum BrowserSchema {
-    /// Ajouter un modèle est une migration légère : SwiftData ajoute sa table et garde les données existantes
-    /// (vérifié par `BrowserSchemaTests`, sur une base créée avec l'ancien schéma).
+    /// Adding a model is a lightweight migration: SwiftData adds its table and keeps the existing data
+    /// (checked by `BrowserSchemaTests`, on a store created with the old schema).
     static let models: [any PersistentModel.Type] = [
         ProfileRecord.self, SpaceRecord.self, FolderRecord.self, TabRecord.self, SitePermissionRecord.self, HistoryRecord.self,
     ]
 
-    /// Conteneur local (la synchronisation iCloud viendra en phase 7) ; en mémoire pour les tests.
-    /// `name` choisit la base (`<name>.store` dans Application Support), nil pour la base par défaut.
+    /// Local container (iCloud sync will come in phase 7); in memory for tests.
+    /// `name` picks the store (`<name>.store` in Application Support), nil for the default store.
     static func makeContainer(inMemory: Bool = false, name: String? = nil) throws -> ModelContainer {
         let schema = Schema(models)
         let configuration = ModelConfiguration(name, schema: schema, isStoredInMemoryOnly: inMemory, cloudKitDatabase: .none)

@@ -65,11 +65,11 @@ struct WindowModelTests {
         let first = model.space
         model.newSpace()
         let second = model.space
-        // « Changer l'icône… » sur un Space caché : il s'affiche, sa bulle s'ouvre (l'état survit à la barre recréée).
+        // “Change Icon…” on a hidden Space: it is shown, its popover opens (the state survives the rebuilt sidebar).
         model.editSpace(first)
         #expect(model.space === first)
         #expect(model.editedSpaceID == first.id)
-        // Changer de Space ferme la bulle ; rester sur le même Space ne la ferme pas.
+        // Switching Space closes the popover; staying on the same Space does not close it.
         model.select(first)
         #expect(model.editedSpaceID == first.id)
         model.select(second)
@@ -87,7 +87,7 @@ struct WindowModelTests {
         #expect(second.favoriteTabs.first === favorite)
         #expect(second.todayTabs.isEmpty)
         #expect(second.tab(withID: today.id) == nil)
-        // Les fenêtres ouvertes depuis le favori arrivent désormais dans le Space affiché.
+        // Windows opened from the favorite now arrive in the displayed Space.
         #expect(favorite.webView?.uiDelegate === second.coordinator)
 
         second.setPlace(second.newTab(), to: .favorite)
@@ -189,7 +189,7 @@ struct WindowModelTests {
         pasteboard.clearContents()
         pasteboard.setString("avant", forType: .string)
 
-        // Aucun onglet, puis un onglet vide.
+        // No tab, then an empty tab.
         #expect(!model.copySelectedTabURL(to: pasteboard))
         model.space.tabManager.newTab()
         #expect(!model.copySelectedTabURL(to: pasteboard))
@@ -210,7 +210,7 @@ struct WindowModelTests {
         #expect(pasteboard.string(forType: .string) == "about:blank?apercu")
     }
 
-    // MARK: Aperçu (tâche 4.4)
+    // MARK: Peek (task 4.4)
 
     @Test func `changing Space closes Peek`() throws {
         let tabManager = model.space.tabManager
@@ -227,7 +227,7 @@ struct WindowModelTests {
         let second = model.space
         let source = second.tabManager.newTab(url: blankPage("source"))
         model.selectSpace(at: 0)
-        // L'aperçu du Space supprimé est fermé par la suppression elle-même, pas par un changement de Space.
+        // The Peek of the deleted Space is closed by the deletion itself, not by a Space change.
         let peek = try #require(second.tabManager.openPeek(blankPage("apercu"), from: source))
         model.deleteSpace(second)
         #expect(second.tabManager.peek == nil)

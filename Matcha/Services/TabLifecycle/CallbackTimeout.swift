@@ -1,7 +1,7 @@
 import Foundation
 
-/// Attend la réponse d'une API à rappel (WebKit) au plus `timeout` : sans réponse à temps, `fallback`. Une réponse
-/// arrivée après le délai est ignorée. Le rappel peut ne jamais venir (processus de la page bloqué).
+/// Waits at most `timeout` for the answer of a callback API (WebKit): without an answer in time, `fallback`. An answer
+/// that arrives after the deadline is ignored. The callback may never come (page process stuck).
 @MainActor
 enum CallbackTimeout {
     static func value<Value: Sendable>(
@@ -20,7 +20,7 @@ enum CallbackTimeout {
     }
 }
 
-/// Continuation reprise une seule fois : par la réponse ou par le délai, le premier des deux.
+/// Continuation resumed only once: by the answer or by the deadline, whichever comes first.
 @MainActor
 private final class OnceContinuation<Value: Sendable> {
     private var continuation: CheckedContinuation<Value, Never>?

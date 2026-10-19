@@ -3,8 +3,8 @@ import Foundation
 import Testing
 import WebKit
 
-/// Son d'un onglet (tâche 5.10), avec des messages simulés : l'icône suit les messages, s'éteint après le délai, et
-/// tout de suite quand la vue web est libérée (veille, déchargement) ou que le processus de la page s'arrête.
+/// Sound of a tab (task 5.10), with simulated messages: the icon follows the messages, turns off after the delay, and
+/// right away when the web view is released (suspension, unloading) or the page's process terminates.
 @MainActor
 struct PageAudioTests {
     private let tab = BrowserTab(configuration: WebConfigurationFactory.makeConfiguration(websiteDataStore: .nonPersistent()))
@@ -44,9 +44,9 @@ struct PageAudioTests {
         tab.audio.receive(playing)
         tab.suspend(snapshot: nil)
         #expect(!tab.isPlayingAudio)
-        // Un message tardif de l'ancienne vue n'atteint plus l'onglet.
+        // A late message from the old view no longer reaches the tab.
         #expect(webView.audio == nil)
-        // La vue recréée lui écrit de nouveau.
+        // The recreated view writes to it again.
         let resumed = try #require(tab.loadedWebView as? BrowserWebView)
         #expect(resumed.audio === tab.audio)
     }

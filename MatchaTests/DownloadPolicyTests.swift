@@ -3,7 +3,7 @@ import AppKit
 import Testing
 import WebKit
 
-/// Réponse affichée ou téléchargée, et liens `download` (tâche 5.1).
+/// Response displayed or downloaded, and `download` links (task 5.1).
 struct DownloadPolicyTests {
     private func response(canShow: Bool = true, disposition: String? = nil, status: Int? = 200) -> DownloadResponse {
         DownloadResponse(canShowMIMEType: canShow, contentDisposition: disposition, statusCode: status)
@@ -58,7 +58,7 @@ struct DownloadPolicyTests {
         #expect(!DownloadPolicy.isAttachment(nil))
     }
 
-    // MARK: Réponse de WebKit
+    // MARK: WebKit response
 
     private func http(_ headers: [String: String], status: Int = 200) -> HTTPURLResponse {
         HTTPURLResponse(url: URL(string: "https://example.com/r")!, statusCode: status, httpVersion: "HTTP/1.1", headerFields: headers)!
@@ -79,7 +79,7 @@ struct DownloadPolicyTests {
         #expect(!DownloadPolicy.shouldDownload(DownloadResponse(http([:], status: 204), canShowMIMEType: false)))
     }
 
-    /// Fichier local, `data:` ou schéma de l'app : ni en-tête ni code.
+    /// Local file, `data:` or app scheme: neither header nor status code.
     @Test func `other responses only depend on their type`() {
         let file = URLResponse(
             url: URL(fileURLWithPath: "/tmp/a.zip"),
@@ -96,7 +96,7 @@ struct DownloadPolicyTests {
         #expect(!DownloadPolicy.shouldDownload(DownloadResponse(file, canShowMIMEType: true)))
     }
 
-    // MARK: Liens `download`
+    // MARK: `download` links
 
     private func request(
         url: String = "https://example.com/fichier.zip",
@@ -123,7 +123,7 @@ struct DownloadPolicyTests {
         #expect(NavigationPolicy.decide(request()) == .download)
     }
 
-    /// Un onglet ou un aperçu ouvert sur un lien `download` resterait vide.
+    /// A tab or a Peek opened on a `download` link would stay empty.
     @Test func `download link is downloaded whatever the click`() {
         #expect(NavigationPolicy.decide(request(modifiers: .command)) == .download)
         #expect(NavigationPolicy.decide(request(button: 4)) == .download)

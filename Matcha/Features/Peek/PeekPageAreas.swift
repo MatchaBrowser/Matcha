@@ -1,7 +1,7 @@
 import SwiftUI
 
-/// Pages des panneaux affichés (sans leur barre d'adresse), relevées par chaque `PageCard` : l'aperçu se place
-/// sur leur réunion et voile chacune (tâche 4.4).
+/// Pages of the displayed panes (without their address bar), reported by each `PageCard`: the peek is placed on
+/// their union and puts a scrim over each one (task 4.4).
 nonisolated struct PeekPageAreas: PreferenceKey {
     static var defaultValue: [Anchor<CGRect>] {
         []

@@ -2,7 +2,7 @@ import Foundation
 @testable import Matcha
 import Testing
 
-/// Sources des onglets, des actions et de l'historique de la barre de commande.
+/// Command bar sources for tabs, actions and history.
 @MainActor
 struct CommandProvidersTests {
     private let session: BrowserSession
@@ -35,7 +35,7 @@ struct CommandProvidersTests {
         "tab:\(tab.id.uuidString)"
     }
 
-    // MARK: Onglets
+    // MARK: Tabs
 
     @Test func `lists tabs of every space with the shown space first`() async {
         let first = windowModel.space
@@ -70,7 +70,7 @@ struct CommandProvidersTests {
         let second = shownTabs.newTab(url: blankPage("two"))
         shownTabs.openInSplit(first)
         #expect(shownTabs.displayedTabs.count == 2)
-        // Le panneau actif est exclu ; l'autre panneau reste proposé, pour y passer depuis la barre.
+        // The active pane is excluded; the other pane is still offered, to switch to it from the bar.
         #expect(await openTabs().map(\.id) == [id(second)])
     }
 
@@ -81,7 +81,7 @@ struct CommandProvidersTests {
         shown.tabManager.newTab()
         shown.saveNow()
         let other = session.addSpace(inProfileOf: shown)
-        // L'autre Space du profil a sa propre copie du favori, sous le même identifiant.
+        // The profile's other Space has its own copy of the favorite, under the same identifier.
         let copy = try #require(other.tabManager.tab(withID: favorite.id))
         #expect(copy !== favorite)
 
@@ -91,8 +91,8 @@ struct CommandProvidersTests {
             TabReference(tabID: favorite.id, spaceID: shown.id), place: .favorite, spaceName: nil, lastActivity: favorite.lastActivity,
         ))
 
-        // Favori affiché : la copie de l'autre Space n'est pas proposée à sa place (y aller
-        // changerait de Space pour la page déjà à l'écran).
+        // Favorite shown: the copy from the other Space is not offered in its place (going there
+        // would switch Space for the page already on screen).
         shown.tabManager.select(favorite)
         #expect(windowModel.space === shown)
         #expect(await openTabs().allSatisfy { $0.id != id(favorite) })
@@ -168,7 +168,7 @@ struct CommandProvidersTests {
         #expect(!settings.keywords.isEmpty)
     }
 
-    // MARK: Historique
+    // MARK: History
 
     @Test func `history maps entries and is never read in private windows`() async throws {
         let visit = fixedNow.addingTimeInterval(-3600)

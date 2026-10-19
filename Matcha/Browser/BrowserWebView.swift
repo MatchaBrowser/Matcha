@@ -2,39 +2,39 @@ import AppKit
 import UniformTypeIdentifiers
 import WebKit
 
-/// Reçoit les éléments de la barre glissés sur une page (split view).
+/// Receives sidebar items dragged onto a page (split view).
 @MainActor
 protocol SidebarItemDropTarget: AnyObject {
-    /// Opération proposée pendant le survol de `webView` ; `[]` pour refuser.
+    /// Operation offered while hovering over `webView`; `[]` to refuse.
     func sidebarItemDragUpdated(_ info: any NSDraggingInfo, over webView: BrowserWebView) -> NSDragOperation
-    /// Le glisser quitte la page ou se termine.
+    /// The drag leaves the page or ends.
     func sidebarItemDragExited()
-    /// Dépôt sur `webView` ; faux s'il est refusé.
+    /// Drop on `webView`; false if it is refused.
     func sidebarItemDropped(_ info: any NSDraggingInfo, on webView: BrowserWebView) -> Bool
 }
 
-/// Vue web des onglets de Matcha.
+/// Web view of Matcha's tabs.
 ///
-/// ⌃⇥ et ⌃⇧⇥ changent d'onglet, comme dans Safari : le menu de l'app passe avant WebKit, qui s'en servirait
-/// pour déplacer le focus dans la page. ⌘= est proposé au menu comme ⌘+ (« Zoom avant », tâche 5.4).
+/// ⌃⇥ and ⌃⇧⇥ switch tabs, as in Safari: the app menu goes before WebKit, which would use them to move the focus
+/// within the page. ⌘= is offered to the menu as ⌘+ (“Zoom In”, task 5.4).
 ///
-/// Un élément glissé depuis la barre n'atteint jamais la page : le glisser de SwiftUI porte aussi des promesses
-/// de fichier, pour lesquelles WebKit est inscrit, si bien que la page recevrait tout glisser qui la survole.
-/// Ceux qui portent le type privé de la barre vont à `sidebarDropTarget`, ou sont refusés.
+/// An item dragged from the sidebar never reaches the page: the SwiftUI drag also carries file promises, which WebKit
+/// is registered for, so the page would receive any drag that hovers over it. Those carrying the sidebar's private
+/// type go to `sidebarDropTarget`, or are refused.
 ///
-/// Menu contextuel de la page (tâche 5.9) : `BrowserWebView+PageMenu`.
+/// Context menu of the page (task 5.9): `BrowserWebView+PageMenu`.
 final class BrowserWebView: WKWebView {
     static let sidebarItemType = NSPasteboard.PasteboardType(UTType.matchaSidebarItem.identifier)
 
-    /// Destinataire des éléments de la barre lâchés sur cette page ; nil : refusés.
+    /// Recipient of the sidebar items dropped on this page; nil: refused.
     weak var sidebarDropTarget: (any SidebarItemDropTarget)?
-    /// Choix du menu contextuel en attente de la fenêtre que WebKit ouvre pour lui, lu par `NavigationCoordinator`.
+    /// Context menu choice waiting for the window WebKit opens for it, read by `NavigationCoordinator`.
     var pageMenuIntent = PendingPageMenuIntent()
-    /// Son de l'onglet dont c'est la vue web (tâche 5.10), destinataire des messages du script de son ; nil une fois la
-    /// vue libérée par son onglet.
+    /// Sound of the tab this web view belongs to (task 5.10), recipient of the messages of the sound script; nil once
+    /// the view is released by its tab.
     weak var audio: PageAudio?
 
-    /// Inspectable selon le réglage des outils pour développeurs, suivi tant que la vue existe.
+    /// Inspectable according to the developer tools setting, followed as long as the view exists.
     override init(frame: CGRect, configuration: WKWebViewConfiguration) {
         super.init(frame: frame, configuration: configuration)
         WebInspection.apply(to: self)
@@ -116,14 +116,14 @@ final class BrowserWebView: WKWebView {
         if Self.isTabSwitch(event), NSApp.mainMenu?.performKeyEquivalent(with: event) == true {
             return true
         }
-        // ⌘= : « Zoom avant » (⌘+) ; sans lui, le menu ne le reconnaîtrait pas.
+        // ⌘=: “Zoom In” (⌘+); without this, the menu would not recognize it.
         if let zoomIn = ZoomKeyAlias.zoomInEvent(for: event), NSApp.mainMenu?.performKeyEquivalent(with: zoomIn) == true {
             return true
         }
         return super.performKeyEquivalent(with: event)
     }
 
-    /// ⌃⇥ ou ⌃⇧⇥, sans ⌘ ni ⌥.
+    /// ⌃⇥ or ⌃⇧⇥, without ⌘ or ⌥.
     private static func isTabSwitch(_ event: NSEvent) -> Bool {
         let flags = event.modifierFlags.intersection(.deviceIndependentFlagsMask)
         return event.type == .keyDown
@@ -132,7 +132,7 @@ final class BrowserWebView: WKWebView {
             && flags.isDisjoint(with: [.command, .option])
     }
 
-    /// Le glisser porte-t-il un élément de la barre ? Seuls les types sont lus, jamais les données.
+    /// Does the drag carry a sidebar item? Only the types are read, never the data.
     private static func carriesSidebarItem(_ info: any NSDraggingInfo) -> Bool {
         info.draggingPasteboard.types?.contains(sidebarItemType) == true
     }

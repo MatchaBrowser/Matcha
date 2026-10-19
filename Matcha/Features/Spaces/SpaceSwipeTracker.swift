@@ -1,11 +1,11 @@
 import Foundation
 
-/// Suit un glissement à deux doigts et décide quand changer de Space : une fois par geste, dès que le
-/// déplacement horizontal dépasse le seuil, sauf si le geste est surtout vertical (défilement).
+/// Follows a two-finger swipe and decides when to switch Space: once per gesture, as soon as the
+/// horizontal movement exceeds the threshold, unless the gesture is mostly vertical (scrolling).
 nonisolated struct SpaceSwipeTracker: Sendable {
-    /// Déplacement horizontal, en points, qui déclenche le changement.
+    /// Horizontal movement, in points, that triggers the switch.
     static let threshold = 80.0
-    /// Le geste doit être au moins autant de fois plus horizontal que vertical.
+    /// The gesture must be at least this many times more horizontal than vertical.
     static let horizontalDominance = 1.5
 
     enum Phase: Sendable {
@@ -13,7 +13,7 @@ nonisolated struct SpaceSwipeTracker: Sendable {
     }
 
     enum Direction: Equatable, Sendable {
-        /// Doigts vers la gauche : le Space suivant arrive de la droite.
+        /// Fingers to the left: the next Space comes in from the right.
         case next
         case previous
     }
@@ -23,8 +23,8 @@ nonisolated struct SpaceSwipeTracker: Sendable {
     private var isTracking = false
     private var hasTriggered = false
 
-    /// Traite un événement de défilement. `fingerDeltaX` suit le mouvement des doigts (positif vers la
-    /// droite), quel que soit le réglage du défilement naturel. Renvoie un sens au plus une fois par geste.
+    /// Handles a scroll event. `fingerDeltaX` follows the movement of the fingers (positive to the
+    /// right), whatever the natural scrolling setting. Returns a direction at most once per gesture.
     mutating func handle(phase: Phase, fingerDeltaX: Double, deltaY: Double) -> Direction? {
         switch phase {
         case .began:

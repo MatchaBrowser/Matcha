@@ -1,9 +1,9 @@
 import WebKit
 
-/// Historique (tâche 5.5) : la visite est retenue à la fin du chargement (`didFinish`, dans le fichier principal) ;
-/// un chargement qui échoue n'en laisse aucune, et une adresse changée en attente d'être retenue est oubliée. Le
-/// rechargement d'une page sortie de veille (tâche 5.6) ou dont le processus s'est arrêté (5.7) est aussi terminé. Le
-/// bloqueur (tâche 6.2) revient à l'état de la page restée affichée.
+/// History (task 5.5): the visit is recorded at the end of loading (`didFinish`, in the main file); a failed load
+/// leaves none, and a changed address waiting to be recorded is forgotten. The reload of a page woken from sleep
+/// (task 5.6) or whose process stopped (5.7) is also ended. The blocker (task 6.2) returns to the state of the page
+/// still displayed.
 extension NavigationCoordinator {
     func webView(_ webView: WKWebView, didFailProvisionalNavigation _: WKNavigation!, withError error: any Error) {
         navigationDidFail(in: webView)

@@ -1,14 +1,14 @@
 import SwiftUI
 
-/// Poignée entre deux panneaux d'un split : elle occupe l'intervalle entre les cartes, sans jamais couvrir
-/// une page. La tirer règle les largeurs ; un double-clic les égalise ; VoiceOver la règle par pas.
+/// Handle between two panes of a split: it fills the gap between the cards, without ever covering a page. Dragging
+/// it adjusts the widths; a double-click equalizes them; VoiceOver adjusts it step by step.
 struct SplitDivider: View {
-    /// Déplacement horizontal depuis le début du glissement.
+    /// Horizontal movement since the start of the drag.
     let onDrag: (Double) -> Void
     let onDragEnded: () -> Void
-    /// Double-clic : parts égales.
+    /// Double-click: equal fractions.
     let onReset: () -> Void
-    /// VoiceOver : +1 (Augmenter) ou -1 (Diminuer).
+    /// VoiceOver: +1 (Increment) or -1 (Decrement).
     let onStep: (Int) -> Void
 
     @State private var isHovered = false

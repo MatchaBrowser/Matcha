@@ -1,6 +1,6 @@
 import Foundation
 
-/// Ce qu'on enregistre d'un onglet (hors sa place dans la barre, décrite par `SidebarPosition`).
+/// What is saved of a tab (apart from its place in the sidebar, described by `SidebarPosition`).
 nonisolated struct StoredTab: Hashable, Sendable {
     var id: UUID
     var url: URL?
@@ -8,6 +8,6 @@ nonisolated struct StoredTab: Hashable, Sendable {
     var pinnedURL: URL?
     var pinnedTitle: String?
     var lastActivity: Date
-    /// État de navigation de WebKit (historique précédent/suivant, défilement), opaque.
+    /// WebKit navigation state (back/forward history, scrolling), opaque.
     var interactionState: Data?
 }

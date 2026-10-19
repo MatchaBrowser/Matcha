@@ -1,16 +1,16 @@
 import SwiftUI
 
-/// Menu Onglets (tâche 4.8), après le menu Spaces comme dans Arc : ⌃⇥ et ⌃⇧⇥ parcourent les onglets dans
-/// l'ordre de la barre latérale, en boucle ; ⌘1 à ⌘8 choisissent les premiers favoris puis épinglés (listés
-/// sous leur titre, comme les Spaces) ; ⌘9 le dernier onglet. Inactif quand une mini-fenêtre est active, ou
-/// sans fenêtre de navigation active (Réglages).
+/// Tabs menu (task 4.8), after the Spaces menu as in Arc: ⌃⇥ and ⌃⇧⇥ cycle through the tabs in sidebar order,
+/// wrapping around; ⌘1 to ⌘8 select the first favorites then pinned tabs (listed under their title, like the
+/// Spaces); ⌘9 the last tab. Inactive when a mini window is active, or without an active browsing window
+/// (Settings).
 struct TabCommands: Commands {
     let miniWindows: MiniWindowManager
     @FocusedValue(\.tabManager) private var focusedTabManager
     @FocusedValue(\.windowActions) private var windowActions
 
-    /// Onglets de la fenêtre de navigation active ; nil quand une mini-fenêtre est active (`keyWindowID` est lu
-    /// pour que le menu suive, la fenêtre est relue à chaque action).
+    /// Tabs of the active browsing window; nil when a mini window is active (`keyWindowID` is read so the menu
+    /// follows along, the window is read again on each action).
     private var tabManager: TabManager? {
         _ = miniWindows.keyWindowID
         return miniWindows.keyWindow == nil ? focusedTabManager : nil

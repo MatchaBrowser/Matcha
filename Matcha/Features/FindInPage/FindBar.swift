@@ -1,18 +1,18 @@
 import SwiftUI
 
-/// Barre de recherche dans la page (tâche 5.3), en haut de la page qu'elle vise (carte, aperçu, mini-fenêtre) : sous
-/// la barre d'adresse s'il y en a une, au-dessus du bandeau des permissions. Elle descend et pousse la page, sans la
-/// couvrir. Loupe, champ (« Introuvable » au bout quand la dernière recherche n'a rien trouvé ; l'API publique ne
-/// donne pas le nombre d'occurrences), occurrence précédente et suivante, ×.
+/// Find-in-page bar (task 5.3), at the top of the page it targets (card, peek, mini window): below the address bar
+/// if there is one, above the permissions banner. It slides down and pushes the page, without covering it.
+/// Magnifying glass, field (“Not Found” at the end when the last search found nothing; the public API does not give
+/// the number of matches), previous and next match, ×.
 struct FindBar: View {
-    /// Nom de la barre, texte d'invite et libellé de son champ.
+    /// Name of the bar, placeholder text and label of its field.
     static let title = LocalizedStringResource(
         "Find in Page",
         comment: "Find bar: placeholder of the search field, accessibility label of the bar and of its field",
     )
 
     let page: BrowserTab
-    /// Rend actif le panneau de split de la page (clic dans le champ, flèches) ; nil hors de la carte.
+    /// Makes the page's split pane active (click in the field, arrows); nil outside the card.
     var activate: (() -> Void)?
 
     var body: some View {
@@ -75,7 +75,7 @@ private struct FindBarContent: View {
         .accessibilityElement(children: .contain)
         .accessibilityLabel(Text(FindBar.title))
         .accessibilityIdentifier("findBar")
-        // VoiceOver annonce « Introuvable » : le texte seul n'est pas lu quand il apparaît.
+        // VoiceOver announces “Not Found”: the text alone is not read when it appears.
         .onChange(of: session.status) { _, status in
             if status == .notFound {
                 AccessibilityNotification.Announcement(String(localized: notFoundTitle)).post()
@@ -83,7 +83,7 @@ private struct FindBarContent: View {
         }
     }
 
-    /// Loupe, champ et résultat dans un même cadre arrondi.
+    /// Magnifying glass, field and result in a single rounded frame.
     private var field: some View {
         HStack(spacing: 5) {
             Image(systemName: "magnifyingglass")
@@ -110,7 +110,7 @@ private struct FindBarContent: View {
         .padding(.horizontal, 7)
         .frame(minWidth: 90, maxWidth: 300)
         .frame(height: 24)
-        // Dans une carte étroite, le champ passe avant l'espace libre.
+        // In a narrow card, the field takes priority over the free space.
         .layoutPriority(1)
         .background(RoundedRectangle(cornerRadius: 6).fill(Color.primary.opacity(0.05)))
         .overlay(RoundedRectangle(cornerRadius: 6).strokeBorder(Color.primary.opacity(0.15), lineWidth: 1))

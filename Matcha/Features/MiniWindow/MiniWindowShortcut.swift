@@ -1,19 +1,19 @@
 import KeyboardShortcuts
 
-/// Raccourci global des mini-fenêtres, réglable dans Réglages > Général.
+/// Global shortcut of the mini windows, configurable in Settings > General.
 nonisolated enum MiniWindowShortcut {
-    /// Nom enregistré (`KeyboardShortcuts_openMiniWindow` dans les réglages) : ne jamais le changer, le
-    /// raccourci choisi par l'utilisateur serait perdu.
+    /// Saved name (`KeyboardShortcuts_openMiniWindow` in the defaults): never change it, the shortcut chosen by the
+    /// user would be lost.
     static let storageName = "openMiniWindow"
-    /// ⌥⌘N, comme Little Arc : touche N (`kVK_ANSI_N`) avec les modificateurs Carbon `cmdKey | optionKey`.
+    /// ⌥⌘N, like Little Arc: the N key (`kVK_ANSI_N`) with the Carbon modifiers `cmdKey | optionKey`.
     static let defaultCarbonKeyCode = 45
     static let defaultCarbonModifiers = 2304
     static let defaultShortcut = KeyboardShortcuts.Shortcut(carbonKeyCode: defaultCarbonKeyCode, carbonModifiers: defaultCarbonModifiers)
 }
 
 extension KeyboardShortcuts.Name {
-    /// Ouvre une mini-fenêtre depuis n'importe quelle app. Le premier accès enregistre ⌥⌘N dans les réglages
-    /// s'il n'y a encore rien (comportement de KeyboardShortcuts) : jamais lu par les tests unitaires, dont
-    /// l'app hôte a le même identifiant que l'app.
+    /// Opens a mini window from any app. The first access saves ⌥⌘N in the defaults if there is nothing there yet
+    /// (KeyboardShortcuts behavior): never read by the unit tests, whose host app has the same identifier as the
+    /// app.
     static let openMiniWindow = Self(MiniWindowShortcut.storageName, initial: MiniWindowShortcut.defaultShortcut)
 }

@@ -1,11 +1,11 @@
 import XCTest
 
-/// Captures des téléchargements (`MATCHA_SCREENSHOT_DOWNLOADS`, voir `ScreenshotUITests`).
+/// Screenshots of the downloads (`MATCHA_SCREENSHOT_DOWNLOADS`, see `ScreenshotUITests`).
 extension ScreenshotUITests {
-    /// Si `MATCHA_SCREENSHOT_DOWNLOADS` est défini : le panneau vide, ouvert par le bouton du pied de la barre
-    /// (`36-telechargements-vide`) ; puis télécharge ce fichier (chemin d'un fichier local que WebKit n'affiche pas, ou
-    /// « 1 » pour celui des tests) et capture le bouton (`24-telechargement-bouton`) et la liste ouverte
-    /// (`25-telechargements-liste`), refermée ensuite par sa croix. Le dossier de test est effacé à la fin
+    /// If `MATCHA_SCREENSHOT_DOWNLOADS` is set: the empty panel, opened by the button in the sidebar footer
+    /// (`36-telechargements-vide`); then downloads this file (path of a local file that WebKit doesn't display, or
+    /// “1” for the one of the tests) and captures the button (`24-telechargement-bouton`) and the open list
+    /// (`25-telechargements-liste`), then closed with its cross. The test folder is deleted at the end
     /// (`removeDownloadsTestFolder`).
     @MainActor
     func captureDownloads(in app: XCUIApplication, window: XCUIElement) throws {

@@ -3,31 +3,31 @@ import Observation
 import OSLog
 import WebKit
 
-/// Mémoire des onglets d'une session (tâche 5.6) : un onglet caché depuis plus longtemps que le délai réglé est mis en
-/// veille (capture, état de navigation retenu, vue web libérée) ; il reste dans la barre latérale et se recrée quand on
-/// l'affiche. Une vérification par minute, et à chaque alerte mémoire du système : la moitié la plus ancienne des onglets
-/// cachés (alerte simple), ou tous (alerte critique), sans capture. Règles : `TabSuspensionPolicy`. Ne voit que les
-/// onglets rangés des Spaces : jamais l'aperçu, les pages des mini-fenêtres ni celles des fenêtres de connexion.
+/// Memory of a session's tabs (task 5.6): a tab hidden for longer than the configured delay is put to sleep (snapshot,
+/// navigation state remembered, web view released); it stays in the sidebar and is recreated when it is displayed. One
+/// check per minute, and at each system memory warning: the oldest half of the hidden tabs (simple warning), or all of
+/// them (critical warning), without snapshots. Rules: `TabSuspensionPolicy`. Only sees the sidebar tabs of the Spaces:
+/// never Peek, nor the pages of mini windows or those of sign-in windows.
 @MainActor
 @Observable
 final class TabLifecycleService {
-    /// Captures gardées au plus (les plus récentes), quelques mégaoctets en tout.
+    /// Maximum number of snapshots kept (the most recent ones), a few megabytes in total.
     static let maximumSnapshots = 30
 
-    /// Fenêtres ouvertes de la session, observées : en ouvrir ou en fermer change ce qui est visible.
+    /// Open windows of the session, observed: opening or closing one changes what is visible.
     private var displays: [DisplayReference] = []
     @ObservationIgnored weak var session: BrowserSession?
-    /// Réglages relus à chaque vérification ; remplacés dans les tests.
+    /// Settings read again at each check; replaced in the tests.
     @ObservationIgnored var settings: @MainActor () -> TabSuspensionSettings = { .current() }
     @ObservationIgnored var now: @MainActor () -> Date = { .now }
     @ObservationIgnored var probes = TabLifecycleProbes.webKit
-    /// Faux dans les tests : les vraies alertes mémoire de la machine ne s'y mêlent pas.
+    /// False in the tests: the machine's real memory warnings do not interfere with them.
     @ObservationIgnored var listensToMemoryPressure = true
     @ObservationIgnored private var tracker = TabVisibilityTracker()
     @ObservationIgnored private var isStarted = false
     @ObservationIgnored private var timer: Task<Void, Never>?
     @ObservationIgnored private var pressureMonitor: MemoryPressureMonitor?
-    /// Vérification en cours ; les suivantes l'attendent.
+    /// Check in progress; the following ones wait for it.
     @ObservationIgnored private var pass: Task<Void, Never>?
     @ObservationIgnored private var passNumber = 0
 
@@ -35,18 +35,18 @@ final class TabLifecycleService {
         weak var display: (any TabDisplay)?
     }
 
-    /// Une fenêtre de la session s'affiche : ses onglets affichés deviennent visibles. Lance le suivi au premier appel.
+    /// A window of the session is displayed: its displayed tabs become visible. Starts tracking on the first call.
     func windowDidAppear(_ display: any TabDisplay) {
         displays = displays.filter { $0.display != nil && $0.display !== display } + [DisplayReference(display: display)]
         start()
     }
 
-    /// La fenêtre se ferme : ses onglets sont cachés à partir de maintenant.
+    /// The window closes: its tabs are hidden from now on.
     func windowDidDisappear(_ display: any TabDisplay) {
         displays = displays.filter { $0.display != nil && $0.display !== display }
     }
 
-    /// Suit ce qui est affiché, vérifie chaque minute et écoute les alertes mémoire. Sans effet au second appel.
+    /// Tracks what is displayed, checks every minute and listens to memory warnings. No effect on a second call.
     func start() {
         guard !isStarted else {
             return
@@ -71,7 +71,7 @@ final class TabLifecycleService {
         }
     }
 
-    /// Lance une vérification après celle en cours ; une vérification régulière est sautée si une autre tourne encore.
+    /// Starts a check after the one in progress; a regular check is skipped if another one is still running.
     func schedule(_ reason: TabSuspensionReason) {
         if reason == .inactivity, pass != nil {
             return
@@ -88,7 +88,7 @@ final class TabLifecycleService {
         }
     }
 
-    /// Met en veille les onglets que les règles désignent et renvoie leur nombre.
+    /// Puts to sleep the tabs that the rules designate and returns their number.
     @discardableResult
     func check(_ reason: TabSuspensionReason) async -> Int {
         guard let delay = settings().delay else {
@@ -110,8 +110,8 @@ final class TabLifecycleService {
             }
         }
         let selected = TabSuspensionPolicy.limit(idle, reason: reason)
-        // Captures des onglets quittés le plus récemment (la fin de la liste), les plus susceptibles d'être rouverts ;
-        // aucune pendant une alerte : elles demanderaient de la mémoire.
+        // Snapshots of the most recently left tabs (the end of the list), the most likely to be reopened; none during a
+        // warning: they would require memory.
         let captured = reason == .inactivity ? Set(selected.suffix(Self.maximumSnapshots)) : []
         var count = 0
         for id in selected {
@@ -121,7 +121,7 @@ final class TabLifecycleService {
             var snapshot: TabSnapshot?
             if captured.contains(id), let webView = tab.webView {
                 snapshot = await probes.snapshot(webView, tab.url)
-                // L'onglet a pu être affiché ou fermé pendant la capture.
+                // The tab may have been displayed or closed during the snapshot.
                 guard canSuspend(tab) else {
                     continue
                 }
@@ -136,25 +136,25 @@ final class TabLifecycleService {
         return count
     }
 
-    /// Depuis quand `tab` est caché ; nil s'il est affiché ou inconnu.
+    /// Since when `tab` has been hidden; nil if it is displayed or unknown.
     func hiddenSince(_ tab: BrowserTab) -> Date? {
         tracker.hiddenSince(tab.id)
     }
 
-    /// Vrai si `tab` est affiché dans une fenêtre ouverte de la session (tâche 5.7 : une page dont le processus s'arrête
-    /// se recharge tout de suite).
+    /// True if `tab` is displayed in an open window of the session (task 5.7: a page whose process terminates reloads
+    /// right away).
     func isVisible(_ tab: BrowserTab) -> Bool {
         visibleTabIDs().contains(tab.id)
     }
 
-    /// Relit ce qui est affiché et note l'heure des changements.
+    /// Reads what is displayed again and records the time of the changes.
     func refreshVisibility() {
         tracker.update(visible: visibleTabIDs(), present: Set(openTabs().map(\.id)), now: now())
     }
 
-    // MARK: Suivi
+    // MARK: Tracking
 
-    /// Relit ce qui est affiché à chaque changement (fenêtres, Space affiché, sélection, splits, onglets ouverts).
+    /// Reads what is displayed again at each change (windows, displayed Space, selection, splits, open tabs).
     private func observeVisibility() {
         withObservationTracking {
             _ = visibleTabIDs()
@@ -167,8 +167,8 @@ final class TabLifecycleService {
         refreshVisibility()
     }
 
-    /// Onglets affichés dans les fenêtres ouvertes : l'onglet sélectionné et tout son split, dans le Space affiché.
-    /// L'onglet d'origine d'un aperçu en fait partie (l'aperçu se ferme quand il n'est plus affiché).
+    /// Tabs displayed in the open windows: the selected tab and its whole split, in the displayed Space. The
+    /// originating tab of a Peek is one of them (Peek closes when that tab is no longer displayed).
     private func visibleTabIDs() -> Set<UUID> {
         var ids = Set<UUID>()
         for reference in displays {
@@ -183,13 +183,13 @@ final class TabLifecycleService {
         return ids
     }
 
-    /// Onglets rangés de tous les Spaces de la session ; un favori commun à plusieurs Spaces n'y est qu'une fois.
+    /// Sidebar tabs of all the Spaces of the session; a favorite shared by several Spaces appears only once.
     private func openTabs() -> [BrowserTab] {
         var seen = Set<ObjectIdentifier>()
         return (session?.spaces ?? []).flatMap(\.tabManager.tabs).filter { seen.insert(ObjectIdentifier($0)).inserted }
     }
 
-    // MARK: Règles
+    // MARK: Rules
 
     private func candidate(for tab: BrowserTab, visible: Set<UUID>, now: Date) -> TabLifecycleCandidate {
         let webView = tab.webView
@@ -204,7 +204,7 @@ final class TabLifecycleService {
         )
     }
 
-    /// Vérifié juste avant de libérer la vue : l'onglet est toujours ouvert, caché et sans activité qui l'interdit.
+    /// Checked just before releasing the view: the tab is still open, hidden and without any activity that forbids it.
     private func canSuspend(_ tab: BrowserTab) -> Bool {
         guard openTabs().contains(where: { $0 === tab }) else {
             return false
@@ -212,7 +212,7 @@ final class TabLifecycleService {
         return TabSuspensionPolicy.isEligible(candidate(for: tab, visible: visibleTabIDs(), now: now()))
     }
 
-    /// Garde les `count` captures les plus récentes des onglets en veille.
+    /// Keeps the `count` most recent snapshots of the sleeping tabs.
     private func trimSnapshots(keeping count: Int) {
         let suspended = openTabs()
             .filter { $0.suspension.snapshot != nil }

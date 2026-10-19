@@ -2,13 +2,13 @@ import Foundation
 @testable import Matcha
 import Testing
 
-/// Ordre de la barre pour ⌘1 à ⌘9, ⌃⇥ et ⌃⇧⇥ (tâche 4.8).
+/// Sidebar order for ⌘1 to ⌘9, ⌃⇥ and ⌃⇧⇥ (task 4.8).
 struct SidebarOrderTests {
     let ids = (0 ..< 12).map { _ in UUID() }
     let folder = UUID()
     let subfolder = UUID()
 
-    /// Favoris `favorites`, épinglés `pinned` et onglets du jour `today` (indices dans `ids`), dans cet ordre.
+    /// Favorites `favorites`, pinned `pinned` and today tabs `today` (indices in `ids`), in this order.
     func layout(favorites: [Int] = [], pinned: [Int] = [], today: [Int] = []) -> SidebarLayout {
         var layout = SidebarLayout()
         favorites.forEach { layout.setPlace(ids[$0], to: .favorite) }
@@ -17,7 +17,7 @@ struct SidebarOrderTests {
         return layout
     }
 
-    /// Indices dans `ids` de chaque tuile ou ligne.
+    /// Indices in `ids` of each tile or row.
     func items(_ items: [SidebarOrder.Item]) -> [[Int]] {
         items.map(indices)
     }
@@ -30,7 +30,7 @@ struct SidebarOrderTests {
         order.tab(after: index.map { ids[$0] }, forward: forward).flatMap { ids.firstIndex(of: $0) }
     }
 
-    // MARK: ⌘1 à ⌘9
+    // MARK: ⌘1 to ⌘9
 
     @Test func `favorites then pinned are numbered, never today's tabs`() {
         let order = SidebarOrder(layout(favorites: [0, 1], pinned: [2, 3], today: [4, 5]))
@@ -57,7 +57,7 @@ struct SidebarOrderTests {
         #expect(SidebarOrder(SidebarLayout()).numbered.isEmpty)
     }
 
-    // MARK: ⌃⇥ et ⌃⇧⇥
+    // MARK: ⌃⇥ and ⌃⇧⇥
 
     @Test func `next and previous follow the sidebar and wrap around`() {
         let order = SidebarOrder(layout(favorites: [0], pinned: [1], today: [2, 3]))
@@ -73,7 +73,7 @@ struct SidebarOrderTests {
         let order = SidebarOrder(layout(pinned: [0], today: [1, 2]))
         #expect(next(order, after: nil) == 0)
         #expect(next(order, after: nil, forward: false) == 2)
-        // Onglet inconnu (déjà retiré) : pareil.
+        // Unknown tab (already removed): same.
         #expect(next(order, after: 9) == 0)
     }
 
@@ -97,7 +97,7 @@ struct SidebarOrderTests {
         #expect(items(order.today) == [[3], [5, 4]])
         #expect(order.numberedItem(1) == [ids[0], ids[1]])
         #expect(order.lastItem == [ids[5], ids[4]])
-        // Panneaux de gauche à droite, puis la ligne suivante.
+        // Panes from left to right, then the next row.
         #expect(indices(order.tabIDs) == [0, 1, 2, 3, 5, 4])
         #expect(next(order, after: 0) == 1)
         #expect(next(order, after: 1) == 2)
@@ -107,9 +107,9 @@ struct SidebarOrderTests {
         #expect(next(order, after: 4, forward: false) == 5)
     }
 
-    // MARK: Dossiers
+    // MARK: Folders
 
-    /// Épinglés : 0, dossier `folder` [1, sous-dossier `subfolder` [2], 3], 4 ; onglet du jour 5.
+    /// Pinned: 0, folder `folder` [1, subfolder `subfolder` [2], 3], 4; today tab 5.
     func folderLayout() -> SidebarLayout {
         var layout = layout(pinned: [0, 4], today: [5])
         layout.addFolder(id: folder, named: "Dossier", at: 1)

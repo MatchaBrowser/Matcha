@@ -1,15 +1,15 @@
 import Foundation
 
-/// Lecture des réponses de suggestions au format OpenSearch : `["texte", ["suggestion", …], …]`.
-/// Google ajoute des éléments après le 2e, ignorés.
+/// Reading of suggestion responses in the OpenSearch format: `["text", ["suggestion", …], …]`.
+/// Google adds elements after the 2nd, ignored.
 nonisolated enum SearchSuggestionParser {
     static let maximumCount = 8
-    /// Longueur gardée d'une suggestion.
+    /// Kept length of a suggestion.
     static let maximumLength = 200
 
-    /// Suggestions sans espaces aux bords, non vides, coupées à 200 caractères, sans doublon (au texte
-    /// replié près), dans l'ordre du moteur, 8 au plus. Lance `SearchSuggestionError.malformed` si la
-    /// réponse n'a pas cette forme ou ne se décode pas.
+    /// Suggestions trimmed of surrounding whitespace, non-empty, cut at 200 characters, without duplicates (up to
+    /// the folded text), in the engine's order, 8 at most. Throws `SearchSuggestionError.malformed` if the response
+    /// does not have this shape or does not decode.
     static func parse(_ data: Data, textEncodingName: String?) throws -> [String] {
         let json = try utf8Data(data, textEncodingName: textEncodingName)
         guard let response = try? JSONSerialization.jsonObject(with: json) as? [Any],
@@ -29,8 +29,8 @@ nonisolated enum SearchSuggestionParser {
         return suggestions
     }
 
-    /// `data` en UTF-8 quand la réponse déclare un autre jeu de caractères (ISO-8859-1…) ; JSON
-    /// reconnaît seul l'UTF-8, l'UTF-16 et l'UTF-32.
+    /// `data` in UTF-8 when the response declares another character set (ISO-8859-1…); JSON only recognizes UTF-8,
+    /// UTF-16 and UTF-32.
     private static func utf8Data(_ data: Data, textEncodingName: String?) throws -> Data {
         guard let textEncodingName else {
             return data

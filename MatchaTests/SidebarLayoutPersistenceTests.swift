@@ -11,7 +11,7 @@ struct SidebarLayoutPersistenceTests {
         let client: UUID
     }
 
-    /// Favoris 0 et 1 ; épinglés : 2, dossier Travail (3, sous-dossier Client replié (4)), 5 ; du jour : 6, 7.
+    /// Favorites 0 and 1; pinned: 2, folder Travail (3, collapsed subfolder Client (4)), 5; today: 6, 7.
     private func richLayout() -> RichLayout {
         var layout = SidebarLayout()
         for id in ids {
@@ -52,7 +52,7 @@ struct SidebarLayoutPersistenceTests {
         #expect(rebuilt == layout)
     }
 
-    /// Icône et couleurs de chaque dossier, sous-dossiers compris, passent par les entrées enregistrées.
+    /// Icon and colors of each folder, subfolders included, go through the stored entries.
     @Test func `folder appearances survive the round trip`() {
         var rich = richLayout()
         let work = FolderAppearance(icon: .symbol("briefcase"), textColor: ThemeColor(rgb: 0x007AFF))
@@ -103,7 +103,7 @@ struct SidebarLayoutPersistenceTests {
     @Test func `split groups survive the round trip`() throws {
         var rich = richLayout()
         let todayGroup = rich.layout.joinSplit(ids[7], anchor: ids[6], at: 0)
-        // Épinglé de la racine qui rejoint celui du dossier Travail.
+        // A pinned tab from the root that joins the one in the Travail folder.
         let joined = rich.layout.joinSplit(ids[5], anchor: ids[3], at: 1)
         try #require(todayGroup != nil)
         let pinnedGroup = try #require(joined)
@@ -123,10 +123,10 @@ struct SidebarLayoutPersistenceTests {
         let scattered = UUID()
         let folder = FolderEntry(id: UUID(), name: "Travail", isCollapsed: false, parentID: nil, order: 0)
         var positions: [UUID: SidebarPosition] = [:]
-        // Groupe d'un seul onglet : abandonné.
+        // Group of a single tab: dropped.
         positions[ids[0]] = SidebarPosition(place: .today, order: 0, splitGroupID: single, splitFraction: 1)
-        // Un favori et deux conteneurs : seuls les membres du conteneur du premier restent (le dossier),
-        // et la part 0 donne des parts égales.
+        // A favorite and two containers: only the members in the first one's container remain (the folder),
+        // and share 0 gives equal shares.
         positions[ids[1]] = SidebarPosition(place: .favorite, order: 0, splitGroupID: mixed, splitFraction: 0.5)
         positions[ids[2]] = SidebarPosition(place: .pinned, order: 0, folderID: folder.id, splitGroupID: mixed, splitFraction: 0)
         positions[ids[3]] = SidebarPosition(place: .pinned, order: 1, folderID: folder.id, splitGroupID: mixed, splitFraction: 0.5)
@@ -137,7 +137,7 @@ struct SidebarLayoutPersistenceTests {
         #expect(rebuilt.split(withID: mixed)?.tabIDs == [ids[2], ids[3]])
         #expect(rebuilt.split(withID: mixed)?.fractions == [0.5, 0.5])
 
-        // Cinq membres, pas voisins : les quatre premiers, regroupés après le premier.
+        // Five members, not adjacent: the first four, grouped after the first.
         var crowd: [UUID: SidebarPosition] = [:]
         for (order, id) in ids.enumerated() {
             let member = order.isMultiple(of: 2) || order == 7

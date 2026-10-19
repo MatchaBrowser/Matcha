@@ -1,18 +1,18 @@
 import SwiftUI
 
-/// Ligne « Zoom » des réglages du site (tâche 5.4) : zoom arrière, le zoom du site (un clic revient à 100 %), zoom
-/// avant. Elle montre le zoom retenu pour le site de l'onglet affiché et suit les changements faits au clavier ; un
-/// changement gagne toutes les pages ouvertes du site.
+/// “Zoom” row of the site settings (task 5.4): zoom out, the site's zoom (a click goes back to 100%), zoom in. It
+/// shows the zoom remembered for the displayed tab's site and follows changes made with the keyboard; a change
+/// spreads to all open pages of the site.
 struct SiteZoomRow: View {
     let tab: BrowserTab
-    /// Zoom par site de la fenêtre ; nil : celui de la page seule.
+    /// Per-site zoom of the window; nil: that of the page alone.
     let siteZooms: SiteZoomStore?
 
     private var site: String? {
         SiteZoomKey.key(for: tab.url)
     }
 
-    /// Zoom du site (il peut différer un instant de celui de la page, le temps qu'elle charge son document).
+    /// Zoom of the site (it may differ briefly from the page's, while the page loads its document).
     private var level: Double {
         if let siteZooms, let site {
             return siteZooms.level(forSite: site)
@@ -30,8 +30,8 @@ struct SiteZoomRow: View {
             }
             .lineLimit(1)
             Spacer(minLength: 8)
-            // Trois boutons séparés plutôt qu'un `ControlGroup`, qui en ferait les segments d'un seul contrôle : chacun
-            // garde son état, sa bulle d'aide et son identifiant.
+            // Three separate buttons rather than a `ControlGroup`, which would make them segments of a single
+            // control: each keeps its state, its help tag and its identifier.
             HStack(spacing: 4) {
                 Button { apply(.zoomOut, from: level) } label: {
                     Label { Text("Zoom Out") } icon: { Image(systemName: "minus") }

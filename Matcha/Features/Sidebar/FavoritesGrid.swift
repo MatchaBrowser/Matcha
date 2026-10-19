@@ -1,6 +1,6 @@
 import SwiftUI
 
-/// Favoris : grille de tuiles d'icônes, quatre par ligne, suivie d'une zone de dépôt.
+/// Favorites: a grid of icon tiles, four per row, followed by a drop zone.
 struct FavoritesGrid: View {
     let tabManager: TabManager
 
@@ -27,8 +27,8 @@ struct FavoritesGrid: View {
     }
 }
 
-/// Tuile d'un favori, avec une pastille haut-parleur pendant que sa page joue du son (tâche 5.10) ; un onglet déposé
-/// dessus s'insère avant elle.
+/// Tile of a favorite, with a speaker badge while its page plays sound (task 5.10); a tab dropped on it is inserted
+/// before it.
 private struct FavoriteTile: View {
     let tab: BrowserTab
     let tabManager: TabManager

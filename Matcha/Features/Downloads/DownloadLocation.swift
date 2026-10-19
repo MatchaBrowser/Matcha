@@ -1,26 +1,24 @@
 import Foundation
 import OSLog
 
-/// Dossier où vont les téléchargements : Téléchargements de l'utilisateur. Pour les tests d'interface, un sous-dossier
-/// nommé par un argument de lancement, vidé au lancement si demandé : le lanceur des tests, sandboxé en lecture seule,
-/// ne peut pas effacer ce que l'app y écrit.
+/// Folder where downloads go: the user's Downloads. For UI tests, a subfolder named by a launch argument, emptied
+/// at launch if requested: the test runner, sandboxed read-only, cannot delete what the app writes there.
 nonisolated enum DownloadLocation {
-    /// Argument de lancement : nom du sous-dossier de Téléchargements où écrire (tests d'interface).
+    /// Launch argument: name of the Downloads subfolder to write to (UI tests).
     static let testSubfolderKey = "downloadsSubfolder"
-    /// Argument de lancement : efface ce sous-dossier au lancement ; jamais Téléchargements lui-même.
+    /// Launch argument: deletes this subfolder at launch; never Downloads itself.
     static let resetTestSubfolderKey = "resetDownloadsSubfolder"
-    /// Seuls les noms qui commencent ainsi sont acceptés : un argument mal tapé ne vise jamais un dossier de
-    /// l'utilisateur.
+    /// Only names starting with this are accepted: a mistyped argument never targets a folder of the user.
     static let testSubfolderPrefix = "MatchaUITests"
 
-    /// Dossier Téléchargements de l'utilisateur. Dans la sandbox, `FileManager` donne le dossier `Downloads` du
-    /// conteneur de l'app, un lien symbolique vers ~/Downloads (droit « Downloads Folder ») : il est résolu, pour que
-    /// WebKit écrive et que le Finder montre le vrai dossier.
+    /// The user's Downloads folder. In the sandbox, `FileManager` gives the `Downloads` folder of the app's
+    /// container, a symbolic link to ~/Downloads (“Downloads Folder” entitlement): it is resolved, so that WebKit
+    /// writes to the real folder and the Finder shows it.
     static func userDownloadsDirectory() -> URL? {
         FileManager.default.urls(for: .downloadsDirectory, in: .userDomainMask).first?.resolvingSymlinksInPath()
     }
 
-    /// Dossier des téléchargements de ce lancement.
+    /// Downloads folder for this launch.
     static func directory(defaults: UserDefaults = .standard) -> URL? {
         guard let downloads = userDownloadsDirectory() else {
             return nil
@@ -31,7 +29,7 @@ nonisolated enum DownloadLocation {
         return downloads.appendingPathComponent(name, isDirectory: true)
     }
 
-    /// Sous-dossier de test demandé au lancement, s'il est valide : un seul composant, préfixe `testSubfolderPrefix`.
+    /// Test subfolder requested at launch, if valid: a single component, prefix `testSubfolderPrefix`.
     static func testSubfolderName(defaults: UserDefaults) -> String? {
         guard let name = defaults.string(forKey: testSubfolderKey), name.hasPrefix(testSubfolderPrefix),
               DownloadFileName.sanitized(name) == name
@@ -41,7 +39,7 @@ nonisolated enum DownloadLocation {
         return name
     }
 
-    /// Au lancement de l'app : efface le sous-dossier de test si `resetDownloadsSubfolder` le demande.
+    /// At app launch: deletes the test subfolder if `resetDownloadsSubfolder` asks for it.
     static func resetTestSubfolderIfRequested(defaults: UserDefaults = .standard) {
         guard defaults.bool(forKey: resetTestSubfolderKey), let name = testSubfolderName(defaults: defaults),
               let downloads = userDownloadsDirectory()

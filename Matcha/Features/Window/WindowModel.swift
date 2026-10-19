@@ -4,9 +4,8 @@ import Observation
 import OSLog
 import SwiftUI
 
-/// État d'une fenêtre : le Space affiché, le bord par lequel arrive le Space choisi (animation), la
-/// confirmation « URL copiée », la liste des téléchargements, le panneau des réglages du site et celui de la
-/// personnalisation d'un dossier.
+/// State of a window: the displayed Space, the edge from which the chosen Space arrives (animation), the “URL Copied”
+/// confirmation, the downloads list, the site settings panel and the folder customization panel.
 @MainActor
 @Observable
 final class WindowModel {
@@ -15,24 +14,25 @@ final class WindowModel {
     let session: BrowserSession
     private(set) var currentSpaceID: UUID?
     private(set) var transitionEdge = Edge.trailing
-    /// Confirmation montrée à chaque adresse copiée depuis cette fenêtre.
+    /// Confirmation shown for each address copied from this window.
     let copyConfirmation = CopyConfirmationModel()
-    /// Panneau des téléchargements ouvert (tâche 5.1), par le bouton du pied de la barre ou ⌥⌘L ; seul l'utilisateur
-    /// l'ouvre et le ferme. Barre masquée, il réapparaît avec la barre flottante.
+    /// Downloads panel open (task 5.1), through the sidebar footer button or ⌥⌘L; only the user opens and closes it.
+    /// With the sidebar hidden, it reappears with the floating sidebar.
     var isDownloadsPresented = false
-    /// Panneau des réglages du site ouvert (tâche 5.2), pour l'onglet affiché ; seul l'utilisateur l'ouvre et le ferme.
+    /// Site settings panel open (task 5.2), for the displayed tab; only the user opens and closes it.
     var isSiteSettingsPresented = false
-    /// Effacement des données d'un site en attente de confirmation (alerte de la fenêtre).
+    /// Deletion of a site's data awaiting confirmation (window alert).
     var siteDataClearRequest: SiteDataClearRequest?
-    /// Dossier d'épinglés dont le panneau de personnalisation est ouvert, sous sa ligne : un seul par fenêtre. Seul
-    /// l'utilisateur l'ouvre et le ferme (menu du dossier, ×, Échap) ; il ne se voit que dans le Space du dossier.
+    /// Pinned folder whose customization panel is open, under its row: only one per window. Only the user opens and
+    /// closes it (folder menu, ×, Escape); it is visible only in the folder's Space.
     var customizedFolderID: UUID?
-    /// Space dont l'éditeur (bulle de son icône, au pied de la barre) est ouvert. Tenu ici et non par la vue : changer
-    /// de Space recrée la barre latérale (`.id` du Space), qui perdrait son état avant d'ouvrir la bulle.
+    /// Space whose editor (popover of its icon, at the bottom of the sidebar) is open. Held here and not by the view:
+    /// changing Space recreates the sidebar (`.id` of the Space), which would lose its state before opening the
+    /// popover.
     var editedSpaceID: UUID?
-    /// Import depuis Arc lancé de cette fenêtre (tâche 7.1).
+    /// Import from Arc started from this window (task 7.1).
     let arcImport = ArcImportModel()
-    /// Où retenir le Space affiché d'un lancement à l'autre ; nil pour ne rien retenir (tests).
+    /// Where to remember the displayed Space from one launch to the next; nil to remember nothing (tests).
     @ObservationIgnored private let defaults: UserDefaults?
 
     init(session: BrowserSession, defaults: UserDefaults?) {
@@ -41,7 +41,7 @@ final class WindowModel {
         currentSpaceID = defaults?.string(forKey: Self.currentSpaceKey).flatMap(UUID.init(uuidString:))
     }
 
-    /// Space affiché : celui choisi, sinon le premier.
+    /// Displayed Space: the chosen one, otherwise the first.
     var space: SpaceSession {
         session.spaces.first { $0.id == currentSpaceID } ?? session.spaces[0]
     }
@@ -50,7 +50,7 @@ final class WindowModel {
         session.spaces.firstIndex { $0 === space } ?? 0
     }
 
-    /// Onglet de `reference` et son Space, s'ils existent encore.
+    /// Tab of `reference` and its Space, if they still exist.
     func locate(_ reference: TabReference) -> (space: SpaceSession, tab: BrowserTab)? {
         guard let space = session.spaces.first(where: { $0.id == reference.spaceID }),
               let tab = space.tabManager.tab(withID: reference.tabID)
@@ -60,20 +60,20 @@ final class WindowModel {
         return (space, tab)
     }
 
-    /// Affiche `target`, qui reprend et tient désormais les favoris de son profil.
+    /// Shows `target`, which takes back and now holds the favorites of its profile.
     func select(_ target: SpaceSession) {
         let current = space
         guard target !== current, let targetIndex = session.spaces.firstIndex(where: { $0 === target }) else {
             return
         }
-        // Les onglets affichés (tout le split) quittent l'écran : ils retiennent leur état de navigation ; leur
-        // aperçu se ferme.
+        // The displayed tabs (the whole split) leave the screen: they remember their navigation state; their peek
+        // closes.
         current.tabManager.displayedTabs.forEach { $0.captureInteractionState() }
         current.tabManager.closePeek()
-        // Il reprend les favoris de son profil, tenus jusque-là par un autre Space.
+        // It takes back the favorites of its profile, held until then by another Space.
         session.showFavorites(in: target)
         transitionEdge = targetIndex > spaceIndex ? .trailing : .leading
-        // La bulle d'un Space ne survit pas à un changement de Space (sauf `editSpace`, qui la rouvre).
+        // A Space's popover does not survive a Space change (except `editSpace`, which reopens it).
         editedSpaceID = nil
         currentSpaceID = target.id
         defaults?.set(target.id.uuidString, forKey: Self.currentSpaceKey)
@@ -87,19 +87,19 @@ final class WindowModel {
         select(session.spaces[index])
     }
 
-    /// « Changer l'icône… » et « Modifier le thème… » du menu d'un Space : l'affiche et ouvre son éditeur.
+    /// “Change Icon…” and “Edit Theme…” in a Space's menu: shows it and opens its editor.
     func editSpace(_ target: SpaceSession) {
         select(target)
         editedSpaceID = target.id
     }
 
-    /// Space voisin (glissement à deux doigts), sans boucler.
+    /// Neighboring Space (two-finger swipe), without wrapping.
     func selectAdjacentSpace(_ direction: SpaceSwipeTracker.Direction) {
         selectSpace(at: spaceIndex + (direction == .next ? 1 : -1))
     }
 
-    /// Envoie l'onglet du Space affiché dans `target`. Même profil : l'onglet garde sa page et son
-    /// historique. Autre profil : il est recréé à partir de son adresse, avec les cookies de ce profil.
+    /// Sends the tab of the displayed Space to `target`. Same profile: the tab keeps its page and its history. Other
+    /// profile: it is recreated from its address, with the cookies of that profile.
     func move(_ tab: BrowserTab, to target: SpaceSession) {
         let source = space
         guard target !== source else {
@@ -116,12 +116,12 @@ final class WindowModel {
         }
     }
 
-    /// Crée un Space dans le profil du Space affiché et l'affiche.
+    /// Creates a Space in the profile of the displayed Space and shows it.
     func newSpace() {
         select(session.addSpace(inProfileOf: space))
     }
 
-    /// Supprime `target` ; s'il était affiché, son voisin prend sa place.
+    /// Deletes `target`; if it was displayed, its neighbor takes its place.
     func deleteSpace(_ target: SpaceSession) {
         guard session.spaces.count > 1 else {
             return
@@ -132,22 +132,22 @@ final class WindowModel {
         session.deleteSpace(target)
     }
 
-    /// « Personnaliser… » du menu d'un dossier : ouvre son panneau (fermant celui d'un autre dossier), ou le ferme s'il
-    /// est déjà ouvert.
+    /// “Customize…” in a folder's menu: opens its panel (closing that of another folder), or closes it if it is
+    /// already open.
     func toggleFolderCustomization(_ folderID: UUID) {
         customizedFolderID = customizedFolderID == folderID ? nil : folderID
     }
 
-    /// Copie `url` (menu contextuel d'un onglet) et confirme « URL copiée » dans cette fenêtre.
+    /// Copies `url` (context menu of a tab) and confirms “URL Copied” in this window.
     func copyLink(_ url: URL, to pasteboard: NSPasteboard = .general) {
         TabLinkCopier.copy(url, to: pasteboard)
         copyConfirmation.show()
-        // Jamais l'adresse elle-même.
+        // Never the address itself.
         Logger.browser.info("Adresse copiée")
     }
 
-    /// ⇧⌘C et l'action « Copier l'URL » de la barre de commande : l'adresse de la page au premier plan
-    /// (l'aperçu s'il est ouvert, sinon l'onglet affiché). Sans adresse, rien n'est copié ni confirmé.
+    /// ⇧⌘C and the “Copy URL” action of the command bar: the address of the frontmost page (the peek if it is open,
+    /// otherwise the displayed tab). Without an address, nothing is copied or confirmed.
     @discardableResult
     func copySelectedTabURL(to pasteboard: NSPasteboard = .general) -> Bool {
         guard let url = space.tabManager.frontTab?.url else {

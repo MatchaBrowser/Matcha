@@ -1,26 +1,26 @@
 import Foundation
 
-/// Échec d'une demande de suggestions, journalisé sans le texte cherché.
+/// Failure of a suggestion request, logged without the searched text.
 nonisolated enum SearchSuggestionError: Error, Equatable {
-    /// Réponse HTTP hors 2xx.
+    /// HTTP response outside 2xx.
     case status(Int)
-    /// Réponse de plus de `SearchSuggestionClient.maximumSize` octets.
+    /// Response of more than `SearchSuggestionClient.maximumSize` bytes.
     case tooLarge
-    /// Réponse qui n'a pas la forme OpenSearch.
+    /// Response that does not have the OpenSearch shape.
     case malformed
 }
 
-/// Demande de suggestions au moteur de recherche, sans cookies, cache ni identifiants.
+/// Suggestion request to the search engine, without cookies, cache or credentials.
 nonisolated struct SearchSuggestionClient: Sendable {
     typealias Load = @Sendable (URLRequest) async throws -> (Data, URLResponse)
 
     static let shared = SearchSuggestionClient()
-    /// Taille maximale acceptée d'une réponse, en octets.
+    /// Maximum accepted size of a response, in bytes.
     static let maximumSize = 65536
 
     private let load: Load
 
-    /// `load` nil : une URLSession de `makeConfiguration()` (tests : réponse factice).
+    /// `load` nil: a URLSession from `makeConfiguration()` (tests: fake response).
     init(load: Load? = nil) {
         if let load {
             self.load = load
@@ -30,8 +30,8 @@ nonisolated struct SearchSuggestionClient: Sendable {
         }
     }
 
-    /// Session éphémère : ni cookies (Google et Bing en posent), ni cache, ni identifiants ; délais
-    /// courts, sans attendre le réseau.
+    /// Ephemeral session: no cookies (Google and Bing set some), no cache, no credentials; short timeouts, without
+    /// waiting for connectivity.
     static func makeConfiguration() -> URLSessionConfiguration {
         let configuration = URLSessionConfiguration.ephemeral
         configuration.httpCookieAcceptPolicy = .never
@@ -54,7 +54,7 @@ nonisolated struct SearchSuggestionClient: Sendable {
         return request
     }
 
-    /// Suggestions du moteur pour `query`. Annuler la tâche Swift annule la requête.
+    /// Engine suggestions for `query`. Cancelling the Swift task cancels the request.
     func suggestions(for query: String, engine: SearchEngine) async throws -> [String] {
         guard let url = engine.suggestionsURL(for: query) else {
             return []

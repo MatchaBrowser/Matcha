@@ -1,8 +1,8 @@
 import Foundation
 
-/// Clé de secours d'un compte (`SYNC.md` § 3.2) : 20 octets aléatoires, montrés en base 32 de Crockford (32 caractères
-/// en 8 groupes de 4, « 7KQ2-M9XD-… »). À la saisie, espaces et tirets sont ignorés, la casse aussi ; `O` vaut `0`,
-/// `I` et `L` valent `1`. Type pur.
+/// An account's recovery key (`SYNC.md` § 3.2): 20 random bytes, shown in Crockford's base 32 (32 characters in
+/// 8 groups of 4, “7KQ2-M9XD-…”). When typed, spaces and hyphens are ignored, and so is case; `O` counts as `0`,
+/// `I` and `L` count as `1`. Pure type.
 nonisolated struct SyncRecoveryKey: Equatable, Sendable {
     static let byteCount = 20
     private static let alphabet = Array("0123456789ABCDEFGHJKMNPQRSTVWXYZ")
@@ -24,7 +24,7 @@ nonisolated struct SyncRecoveryKey: Equatable, Sendable {
         bytes = checkedBytes
     }
 
-    /// Clé lue dans ce que l'utilisateur a saisi ; nil si elle n'a pas 32 caractères valides.
+    /// Key read from what the user typed; nil if it does not have 32 valid characters.
     init?(text: String) {
         var value: [UInt8] = []
         var accumulator = 0
@@ -51,7 +51,7 @@ nonisolated struct SyncRecoveryKey: Equatable, Sendable {
         bytes = Data(value)
     }
 
-    /// « 810M-4GT4-… » : 32 caractères en 8 groupes de 4.
+    /// “810M-4GT4-…”: 32 characters in 8 groups of 4.
     var displayed: String {
         var characters: [Character] = []
         var accumulator = 0

@@ -2,7 +2,7 @@ import Foundation
 @testable import Matcha
 import WebKit
 
-/// Fenêtre principale factice : elle compte les mises au premier plan.
+/// Fake main window: it counts the times it is brought to the front.
 @MainActor
 final class FakeMainWindowLink: MainWindowLink {
     let windowModel: WindowModel?
@@ -20,8 +20,8 @@ final class FakeMainWindowLink: MainWindowLink {
 }
 
 extension MiniWindowManager {
-    /// Gestionnaire de test : rien de retenu, pages locales `obtest:`, aucun panneau à l'écran, aucun raccourci
-    /// global (`start()` n'est jamais appelé), suggestions coupées.
+    /// Test manager: nothing remembered, local `obtest:` pages, no panel on screen, no global shortcut (`start()`
+    /// is never called), suggestions turned off.
     static func forTests(session: BrowserSession) -> MiniWindowManager {
         let manager = MiniWindowManager(session: session, defaults: nil)
         manager.makeConfiguration = { _ in TestPages.configuration() }
@@ -35,13 +35,13 @@ extension MiniWindowManager {
 }
 
 extension BrowserSession {
-    /// Vrai si aucun Space n'a d'onglet (une mini-fenêtre n'en ajoute aucun).
+    /// True if no Space has a tab (a mini window adds none).
     var hasNoTabs: Bool {
         spaces.allSatisfy(\.tabManager.tabs.isEmpty)
     }
 }
 
-/// Deux cadres égaux au demi-point près : AppKit aligne les fenêtres sur les pixels.
+/// Two frames equal to within half a point: AppKit aligns windows on pixels.
 func roughlyEqual(_ lhs: CGRect, _ rhs: CGRect) -> Bool {
     abs(lhs.minX - rhs.minX) <= 0.5 && abs(lhs.minY - rhs.minY) <= 0.5
         && abs(lhs.width - rhs.width) <= 0.5 && abs(lhs.height - rhs.height) <= 0.5

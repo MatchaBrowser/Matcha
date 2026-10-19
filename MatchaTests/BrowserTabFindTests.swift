@@ -3,11 +3,11 @@ import Foundation
 import Testing
 import WebKit
 
-/// Recherche dans une vraie page (tâche 5.3) : ce que fait `WKWebView.find(_:configuration:)` derrière
-/// `BrowserTab.search`, et la recherche de l'onglet (désélection, page déchargée ou changée).
+/// Search in a real page (task 5.3): what `WKWebView.find(_:configuration:)` does behind
+/// `BrowserTab.search`, and the tab's search (deselection, page unloaded or changed).
 @MainActor
 struct BrowserTabFindTests {
-    /// Onglet sur une page locale dont le corps est `body`.
+    /// Tab on a local page whose body is `body`.
     private func page(_ body: String) async throws -> BrowserTab {
         let tab = BrowserTab(configuration: TestPages.configuration())
         tab.load(TestPages.url("find", body: body))
@@ -15,7 +15,7 @@ struct BrowserTabFindTests {
         return tab
     }
 
-    /// Texte sélectionné dans la page et sa position dans son nœud.
+    /// Text selected in the page and its offset in its node.
     private func selection(in tab: BrowserTab) async throws -> String {
         let script = "(() => { const s = window.getSelection(); return s.rangeCount ? String(s) + '@' + s.anchorOffset : '' })()"
         let value = try await tab.loadedWebView.evaluateJavaScript(script, contentWorld: .defaultClient)
@@ -28,7 +28,7 @@ struct BrowserTabFindTests {
         #expect(try await selection(in: tab) == "Postfix@0")
         #expect(await tab.search("POSTFIX", direction: .forward) == true)
         #expect(try await selection(in: tab) == "postfix@25")
-        // Au bout, la recherche repart du début, et à rebours de la fin.
+        // At the end, the search wraps around to the beginning, and backwards to the end.
         #expect(await tab.search("POSTFIX", direction: .forward) == true)
         #expect(try await selection(in: tab) == "Postfix@0")
         #expect(await tab.search("POSTFIX", direction: .backward) == true)
@@ -45,8 +45,8 @@ struct BrowserTabFindTests {
         #expect(try await selection(in: tab) == "pos@6")
     }
 
-    /// Comportement de WebKit, noté dans `DECISIONS.md` : une lettre sans accent trouve aussi ses formes accentuées,
-    /// une lettre accentuée ne trouve qu'elle-même.
+    /// WebKit behavior, noted in `DECISIONS.md`: a letter without an accent also finds its accented forms,
+    /// an accented letter only finds itself.
     @Test func `unaccented letters also find accented ones, not the reverse`() async throws {
         let accented = try await page("<p>Un été au café. Straße, œuvre.</p>")
         for query in ["ete", "éte", "ÉTÉ", "cafe", "strasse", "oeuvre"] {

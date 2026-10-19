@@ -4,12 +4,12 @@ import Observation
 import Testing
 import WebKit
 
-/// Apparence des dossiers par `TabManager`, et panneau de personnalisation d'une fenêtre (`WindowModel`).
+/// Folder appearance through `TabManager`, and a window's customization panel (`WindowModel`).
 @MainActor
 struct FolderCustomizationTests {
     private let manager = TabManager(websiteDataStore: .nonPersistent())
 
-    /// Marque posée par le framework Observation quand le rangement change.
+    /// Mark set by the Observation framework when the layout changes.
     private final class ChangeFlag: @unchecked Sendable {
         var isSet = false
     }
@@ -28,7 +28,7 @@ struct FolderCustomizationTests {
         #expect(appearance?.textColor == ThemeColor(hexString: "#1F80FC"))
         #expect(appearance?.backgroundColor == nil)
 
-        // Un emoji invalide donne l'icône par défaut.
+        // An invalid emoji gives the default icon.
         manager.setFolderAppearance(folder, FolderAppearance(icon: .emoji("ab")))
         #expect(manager.layout.pinned.folder(folder)?.appearance == .default)
     }
@@ -42,7 +42,7 @@ struct FolderCustomizationTests {
         #expect(manager.layout.pinned.folder(child)?.appearance == FolderAppearance(icon: .emoji("🌿"), backgroundColor: green))
         #expect(manager.layout.pinned.folder(parent)?.appearance == .default)
 
-        // « Réinitialiser ».
+        // “Reset”.
         manager.setFolderAppearance(child, .default)
         #expect(manager.layout.pinned.folder(child)?.appearance == .default)
     }
@@ -70,7 +70,7 @@ struct FolderCustomizationTests {
         manager.setFolderAppearance(first, FolderAppearance(icon: .symbol("flame")))
         manager.moveFolder(first, to: .pinned(folder: second, index: 0))
         #expect(manager.layout.pinned.folder(first)?.appearance.icon == .symbol("flame"))
-        // Supprimer le parent garde le sous-dossier et son apparence.
+        // Deleting the parent keeps the subfolder and its appearance.
         manager.deleteFolder(second)
         #expect(manager.layout.pinned.folder(first)?.appearance.icon == .symbol("flame"))
     }
@@ -83,10 +83,10 @@ struct FolderCustomizationTests {
         #expect(model.customizedFolderID == nil)
         model.toggleFolderCustomization(first)
         #expect(model.customizedFolderID == first)
-        // Ouvrir celui d'un autre dossier déplace le panneau.
+        // Opening the panel of another folder moves the panel.
         model.toggleFolderCustomization(second)
         #expect(model.customizedFolderID == second)
-        // Le même élément du menu le ferme.
+        // The same menu item closes it.
         model.toggleFolderCustomization(second)
         #expect(model.customizedFolderID == nil)
     }

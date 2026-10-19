@@ -2,15 +2,15 @@ import Foundation
 @testable import Matcha
 import WebKit
 
-/// Pages locales de `TestPages` qui comptent les requêtes reçues, par nom de page : un rechargement (tâche 5.7) en
-/// refait une. Aucune API privée ne permet d'arrêter le processus d'une page : les tests appellent directement
-/// `webViewWebContentProcessDidTerminate(_:)` du délégué sur une vraie vue web.
+/// Local pages of `TestPages` that count the requests they receive, per page name: a reload (task 5.7) makes one
+/// more. Only a private API could stop a page's process: the tests call the delegate's
+/// `webViewWebContentProcessDidTerminate(_:)` directly on a real web view.
 @MainActor
 final class CountingTestPages: NSObject, WKURLSchemeHandler {
     private(set) var requests: [String: Int] = [:]
     private let pages = TestPages()
 
-    /// Configuration de l'app, avec ces pages sous le schéma `obtest:`.
+    /// App configuration, with these pages under the `obtest:` scheme.
     func configuration() -> WKWebViewConfiguration {
         let configuration = WebConfigurationFactory.makeConfiguration(websiteDataStore: .nonPersistent())
         configuration.setURLSchemeHandler(self, forURLScheme: TestPages.scheme)

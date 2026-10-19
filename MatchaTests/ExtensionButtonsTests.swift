@@ -4,11 +4,11 @@ import Foundation
 import Testing
 import WebKit
 
-/// Boutons des extensions (tâche 6.5) : lesquels montrer, bouton masqué retenu, action (titre, badge, bulle) et ancre
-/// de la bulle.
+/// Extension buttons (task 6.5): which ones to show, hidden button remembered, action (title, badge, popover) and
+/// popover anchor.
 @MainActor
 struct ExtensionButtonsTests {
-    /// Extension d'essai avec une action (titre, popup) et un arrière-plan qui pose un badge « 7 ».
+    /// Test extension with an action (title, popup) and a background that sets a “7” badge.
     private func loadExtensionWithAction(in manager: ExtensionManager) async throws -> (identifier: String, folder: URL) {
         let folder = try TestExtension.makeFolder()
         let manifestURL = folder.appendingPathComponent("manifest.json")
@@ -39,7 +39,7 @@ struct ExtensionButtonsTests {
         #expect(manager.buttonsRevision != revision)
         #expect(!manager.showsButton(identifier))
         #expect(manager.buttonExtensions(isPrivate: false).isEmpty)
-        // Retenu, même quand WebKit change les décisions ou au rechargement.
+        // Remembered, even when WebKit changes the decisions or on reload.
         manager.saveAllStates()
         manager.unload(identifier: identifier)
         #expect(manager.store.state(for: identifier)?.showsButton == false)
@@ -86,7 +86,7 @@ struct ExtensionButtonsTests {
         #expect(anchor.view === button)
         #expect(anchor.rect == button.bounds)
 
-        // Sans bouton (masqué) : coin haut droit de la fenêtre.
+        // Without a button (hidden): top right corner of the window.
         manager.buttonAnchors.unregister(button)
         #expect(manager.popups.anchor(action, window)?.view === window.contentView)
         manager.unload(identifier: identifier)
@@ -114,18 +114,18 @@ struct ExtensionButtonsTests {
         #expect(anchors.view(for: "ext", tabID: tab, in: first) === left)
     }
 
-    // MARK: Messages natifs
+    // MARK: Native messages
 
     @Test func `native message replies are spaced per extension`() {
         var throttle = NativeMessageThrottle()
         let start = ContinuousClock.now
         #expect(throttle.delay(for: "bitwarden", at: start) == .zero)
-        // Boucle : le message suivant, aussitôt, attend une seconde, puis encore une.
+        // Loop: the next message, right away, waits one second, then one more.
         #expect(throttle.delay(for: "bitwarden", at: start) == .seconds(1))
         #expect(throttle.delay(for: "bitwarden", at: start + .milliseconds(500)) == .milliseconds(1500))
-        // Une autre extension n'attend pas.
+        // Another extension does not wait.
         #expect(throttle.delay(for: "proton", at: start) == .zero)
-        // Longtemps après : de nouveau tout de suite.
+        // Long afterwards: immediate again.
         #expect(throttle.delay(for: "bitwarden", at: start + .seconds(10)) == .zero)
     }
 

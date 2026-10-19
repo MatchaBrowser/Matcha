@@ -3,27 +3,27 @@ import Observation
 import OSLog
 import SwiftData
 
-/// Historique de navigation (tâche 5.5) : les visites enregistrées (`HistoryRecord`) et leur index en mémoire, un par
-/// profil (`HistoryIndex`), que lisent la barre de commande et la fenêtre de l'historique. L'index est lu une seule
-/// fois, hors du fil principal (`HistoryLoader`), après l'effacement des visites de plus d'un an ; ce qui change
-/// pendant cette lecture est rejoué ensuite. Une fenêtre privée n'a pas de magasin : rien n'est retenu.
+/// Browsing history (task 5.5): the saved visits (`HistoryRecord`) and their in-memory index, one per profile
+/// (`HistoryIndex`), read by the command bar and the history window. The index is read only once, off the main
+/// thread (`HistoryLoader`), after visits older than a year are erased; whatever changes during that read is
+/// replayed afterwards. A private window has no store: nothing is kept.
 @MainActor
 @Observable
 final class HistoryStore {
-    /// Change à chaque modification de l'historique lu : les vues qui le montrent se mettent à jour.
+    /// Changes on every modification of the loaded history: the views that show it update.
     private(set) var revision = 0
     private(set) var isLoaded = false
 
-    /// Horloge des visites (remplacée dans les tests).
+    /// Clock of the visits (replaced in tests).
     @ObservationIgnored let now: () -> Date
-    /// Calendrier des périodes effacées et de la durée de conservation.
+    /// Calendar of the erased periods and of the retention period.
     @ObservationIgnored let calendar: Calendar
     @ObservationIgnored private let container: ModelContainer
     @ObservationIgnored private var indexes: [UUID?: HistoryIndex] = [:]
     @ObservationIgnored private var loadTask: Task<Void, Never>?
-    /// Changements faits pendant la lecture, rejoués ensuite.
+    /// Changes made during the read, replayed afterwards.
     @ObservationIgnored private var pendingChanges: [HistoryChange] = []
-    /// Dernières visites écrites, pour leur titre et leur rafraîchissement sans parcourir la base.
+    /// Last visits written, for their title and their refresh without going through the database.
     @ObservationIgnored private var recentRecords: [(id: UUID, record: HistoryRecord)] = []
 
     init(container: ModelContainer, now: @escaping () -> Date = { .now }, calendar: Calendar = .autoupdatingCurrent) {
@@ -36,9 +36,9 @@ final class HistoryStore {
         container.mainContext
     }
 
-    // MARK: Lecture
+    // MARK: Reading
 
-    /// Lit l'historique (une seule fois, lancée au démarrage de l'app) et attend la fin de la lecture.
+    /// Reads the history (only once, started at app launch) and waits for the read to finish.
     func load() async {
         if loadTask == nil {
             let container = container
@@ -51,13 +51,13 @@ final class HistoryStore {
         await loadTask?.value
     }
 
-    /// Historique du profil, nil tant qu'il n'est pas lu.
+    /// The profile's history, nil until it has been read.
     func index(for profileID: UUID?) -> HistoryIndex? {
         isLoaded ? indexes[profileID] ?? HistoryIndex() : nil
     }
 
-    /// Adresses du profil qui correspondent à `query`, pour la barre de commande (`HistoryIndex.entries`) : cherchées
-    /// hors du fil principal, dans une copie de l'index ; une frappe plus récente (tâche annulée) arrête la recherche.
+    /// The profile's addresses that match `query`, for the command bar (`HistoryIndex.entries`): searched off the
+    /// main thread, in a copy of the index; a more recent keystroke (cancelled task) stops the search.
     func entries(profileID: UUID?, matching query: CommandQuery, limit: Int) async -> [HistoryEntry] {
         await load()
         guard let index = indexes[profileID] else {
@@ -74,9 +74,9 @@ final class HistoryStore {
         revision += 1
     }
 
-    // MARK: Visites
+    // MARK: Visits
 
-    /// Enregistre une visite de `url` (déjà retenue par `HistoryRecordingPolicy.storedURL`) maintenant.
+    /// Records a visit to `url` (already kept by `HistoryRecordingPolicy.storedURL`) now.
     @discardableResult
     func recordVisit(url: URL, title: String?, profileID: UUID?, spaceID: UUID?) -> HistoryVisit {
         let visit = HistoryVisit(url: url, title: title, date: now())
@@ -100,8 +100,8 @@ final class HistoryStore {
         return visit
     }
 
-    /// Prolonge la visite `id` (même page rechargée peu après) : date de maintenant, et `title` s'il n'est pas vide.
-    /// Faux si elle n'existe plus (historique effacé entre-temps).
+    /// Extends visit `id` (same page reloaded shortly after): the current date, and `title` if it is not empty.
+    /// False if it no longer exists (history erased in the meantime).
     func refreshVisit(_ id: UUID, title: String?, profileID: UUID?) -> Bool {
         guard let record = record(id) else {
             return false
@@ -116,7 +116,7 @@ final class HistoryStore {
         return true
     }
 
-    /// Titre arrivé après la visite `id` ; sans effet si elle n'existe plus.
+    /// Title that arrived after visit `id`; no effect if it no longer exists.
     func setTitle(_ title: String?, ofVisit id: UUID, profileID: UUID?) {
         guard let record = record(id) else {
             return
@@ -126,11 +126,11 @@ final class HistoryStore {
         apply(.setTitle(title, visitID: id, profileID: profileID))
     }
 
-    // MARK: Primitives de `+Deletion`
+    // MARK: Primitives for `+Deletion`
 
     func apply(_ change: HistoryChange) {
         guard isLoaded else {
-            // Pas encore lu : la lecture trouvera la base à jour ; en cours de lecture, le changement sera rejoué.
+            // Not read yet: the read will find the database up to date; while reading, the change will be replayed.
             if loadTask != nil {
                 pendingChanges.append(change)
             }
@@ -140,7 +140,7 @@ final class HistoryStore {
         revision += 1
     }
 
-    /// Visites supprimées de la base : celles gardées de côté ne servent plus.
+    /// Visits deleted from the database: those kept aside are no longer needed.
     func forgetRecentRecords() {
         recentRecords = []
     }

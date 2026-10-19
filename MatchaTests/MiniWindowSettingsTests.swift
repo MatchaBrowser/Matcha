@@ -9,7 +9,7 @@ struct MiniWindowSettingsTests {
         #expect(MiniWindowSettings.current(defaults).showsSearchSuggestions)
         #expect(MiniWindowSettings.current(defaults).searchEngine == BrowserSettings.searchEngine)
 
-        // « -showsSearchSuggestions NO » arrive en texte.
+        // “-showsSearchSuggestions NO” arrives as text.
         defaults.set("NO", forKey: BrowserSettings.Key.showsSearchSuggestions)
         defaults.set("bing", forKey: BrowserSettings.Key.searchEngine)
         #expect(!MiniWindowSettings.current(defaults).showsSearchSuggestions)

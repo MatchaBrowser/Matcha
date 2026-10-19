@@ -1,8 +1,8 @@
 import Foundation
 
-/// Textes et symboles des actions de la barre de commande.
+/// Texts and symbols of the command bar actions.
 nonisolated extension CommandActionID {
-    /// Titre affiché, traduit.
+    /// Displayed title, localized.
     var title: String {
         switch self {
         case .newSpace: String(localized: "New Space")
@@ -11,13 +11,13 @@ nonisolated extension CommandActionID {
         }
     }
 
-    /// Mots cherchés en plus du titre, jamais affichés : ceux de la langue de l'app, puis les mots
-    /// anglais, gardés par chaque traduction.
+    /// Words searched in addition to the title, never displayed: those of the app's language, then the English
+    /// words, kept by each translation.
     var keywords: [String] {
         keywordList.split(separator: " ").map(String.init)
     }
 
-    /// Symbole SF de la ligne.
+    /// SF Symbol of the row.
     var symbolName: String {
         switch self {
         case .newSpace: "rectangle.stack.badge.plus"

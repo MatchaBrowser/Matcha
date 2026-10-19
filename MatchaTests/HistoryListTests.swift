@@ -3,7 +3,7 @@ import Foundation
 @testable import Matcha
 import Testing
 
-/// Fenêtre de l'historique (tâche 5.5), sans interface : périodes effacées, jours, lignes et recherche.
+/// History window (task 5.5), without UI: cleared periods, days, rows and search.
 struct HistoryListTests {
     private let calendar: Calendar = {
         var calendar = Calendar(identifier: .gregorian)
@@ -19,7 +19,7 @@ struct HistoryListTests {
         HistoryVisit(url: URL(string: address)!, title: title, date: date)
     }
 
-    // MARK: Périodes
+    // MARK: Periods
 
     @Test func `clear periods start at the expected time`() {
         let now = date(18, 9, 30)
@@ -38,16 +38,16 @@ struct HistoryListTests {
     }
 
     @Test func `clear periods follow daylight saving changes`() {
-        // Le 25 octobre 2026, la journée dure 25 heures à Paris ; le 29 mars, 23 heures.
+        // On October 25, 2026, the day lasts 25 hours in Paris; on March 29, 23 hours.
         #expect(HistoryPeriod.todayAndYesterday.start(now: date(26, 0, 30), calendar: calendar) == date(25, 0))
         #expect(HistoryPeriod.today.start(now: date(25, 23, 59), calendar: calendar) == date(25, 0))
         let march = date(30, 1, month: 3)
         #expect(HistoryPeriod.todayAndYesterday.start(now: march, calendar: calendar) == date(29, 0, month: 3))
-        // Une heure avant 3 h 30 le jour du passage à l'heure d'été : 1 h 30 (2 h n'existe pas).
+        // One hour before 3:30 on the day of the switch to summer time: 1:30 (2:00 does not exist).
         #expect(HistoryPeriod.lastHour.start(now: date(29, 3, 30, month: 3), calendar: calendar) == date(29, 1, 30, month: 3))
     }
 
-    // MARK: Jours et lignes
+    // MARK: Days and rows
 
     @Test func `visits are grouped by day then by address`() throws {
         let now = date(18, 12)
@@ -57,7 +57,7 @@ struct HistoryListTests {
             visit("https://apple.com/", title: "Apple", at: date(18, 10)),
             visit("https://example.com/", title: "Exemple", at: date(17, 23, 59)),
             visit("https://swift.org/", at: date(15, 0)),
-            // Minuit pile : le jour qui commence.
+            // Exactly midnight: the day that starts.
             visit("https://minuit.example/", at: date(16, 0)),
         ])
         let sections = HistoryList.sections(from: index, search: "", now: now, calendar: calendar)
@@ -71,9 +71,9 @@ struct HistoryListTests {
         #expect(example.visitIDs.count == 2)
         #expect(example.host == "example.com")
         #expect(sections[1].rows.map(\.visitIDs.count) == [1])
-        // Sans titre : l'adresse lisible.
+        // Without a title: the readable address.
         #expect(sections[3].rows.map(\.title) == ["swift.org"])
-        // Identifiants uniques d'un jour à l'autre.
+        // Identifiers unique from one day to the next.
         let ids = sections.flatMap { $0.rows.map(\.id) }
         #expect(Set(ids).count == ids.count)
     }

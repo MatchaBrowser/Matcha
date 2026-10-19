@@ -1,10 +1,10 @@
 import OSLog
 import WebKit
 
-/// Arrêt du processus d'une page (tâche 5.7) : plantage, ou processus arrêté par le système (mémoire). Page visible
-/// (onglet sélectionné ou panneau de son split dans le Space affiché d'une fenêtre ouverte, aperçu, mini-fenêtre) :
-/// rechargée tout de suite ; cachée : rechargée quand on l'affiche ; arrêts répétés : un message dans la page, qui
-/// n'est rechargée que par l'utilisateur. Règles : `PageCrashPolicy` ; ce que fait l'onglet : `BrowserTab+Crash`.
+/// Termination of a page's process (task 5.7): crash, or process stopped by the system (memory). Visible page
+/// (selected tab or pane of its split in the displayed Space of an open window, Peek, mini window): reloaded right
+/// away; hidden: reloaded when it is shown; repeated terminations: a message in the page, which is only reloaded by
+/// the user. Rules: `PageCrashPolicy`; what the tab does: `BrowserTab+Crash`.
 extension NavigationCoordinator {
     func webViewWebContentProcessDidTerminate(_ webView: WKWebView) {
         guard let tabHost, let page = tabHost.page(for: webView) else {
@@ -13,7 +13,7 @@ extension NavigationCoordinator {
         }
         let terminations = page.crash.processDidTerminate(at: now())
         let action = PageCrashPolicy.action(isVisible: tabHost.isVisible(page), recentTerminations: terminations)
-        // Jamais l'adresse : l'hôte seulement.
+        // Never the address: only the host.
         let host = page.url?.host() ?? "?"
         let window = Int(PageCrashCounter.window)
         Logger.browser.error("""

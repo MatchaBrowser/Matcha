@@ -2,11 +2,11 @@ import AppKit
 import SwiftUI
 import WebKit
 
-/// Posée derrière les panneaux d'un split : un clic (gauche, droit ou autre bouton) dans la page d'un
-/// panneau appelle `onPageClick` avec son onglet, puis atteint la page (le clic n'est jamais retenu).
-/// Barre de commande, barre flottante, séparateurs et barres d'adresse ne sont jamais pris pour une page.
+/// Placed behind the panes of a split: a click (left, right or another button) in the page of a pane calls
+/// `onPageClick` with its tab, then reaches the page (the click is never held back).
+/// Command bar, floating sidebar, dividers and address bars are never taken for a page.
 struct PaneClickMonitor: NSViewRepresentable {
-    /// Onglets affichés.
+    /// Displayed tabs.
     let tabs: [BrowserTab]
     let onPageClick: (BrowserTab) -> Void
 
@@ -22,7 +22,7 @@ struct PaneClickMonitor: NSViewRepresentable {
         view.onPageClick = onPageClick
     }
 
-    /// Lit les clics de la fenêtre avant leur cible, sans en recevoir aucun.
+    /// Reads the window's clicks before their target, without receiving any.
     final class MonitorView: NSView {
         var tabs: [BrowserTab] = []
         var onPageClick: ((BrowserTab) -> Void)?
@@ -47,7 +47,7 @@ struct PaneClickMonitor: NSViewRepresentable {
             }
         }
 
-        /// La vue qui recevra le clic est-elle (dans) la vue web d'un panneau affiché ?
+        /// Is the view that will receive the click (inside) the web view of a displayed pane?
         private func handle(_ event: NSEvent) {
             guard event.window === window, let contentView = window?.contentView else {
                 return

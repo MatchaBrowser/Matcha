@@ -1,24 +1,24 @@
 import AppKit
 import Foundation
 
-/// Réglages > Extensions, extensions proposées par vos autres Mac (tâche 7.4, `SYNC.md` § 2.5) : jamais installées sans
-/// passer par l'écran des permissions.
+/// Settings > Extensions, extensions offered by your other Macs (task 7.4, `SYNC.md` § 2.5): never installed without
+/// going through the permissions screen.
 extension ExtensionsSettingsModel {
-    /// Peut-on ajouter l'extension proposée maintenant ?
+    /// Can the offered extension be added now?
     enum OfferAvailability: Equatable {
         case ready
-        /// Extension Safari dont l'app n'est pas sur ce Mac.
+        /// Safari extension whose app is not on this Mac.
         case appMissing
-        /// Paquet absent : trop gros, ou synchro arrêtée.
+        /// Package missing: too large, or sync stopped.
         case packageUnavailable
     }
 
-    /// Extensions des autres Mac en attente, par nom.
+    /// Pending extensions from the other Macs, by name.
     var offers: [SyncExtensionFields] {
         syncAdapter.synced.sortedOffers
     }
 
-    /// Déjà installée ici : une mise à jour qui demande une permission ou un site de plus.
+    /// Already installed here: an update that asks for one more permission or site.
     func isUpdate(_ offer: SyncExtensionFields) -> Bool {
         _ = revision
         return manager.installedIdentifiers.contains(offer.identifier)
@@ -34,7 +34,7 @@ extension ExtensionsSettingsModel {
         }
     }
 
-    /// Prépare l'extension proposée pour l'écran des permissions.
+    /// Prepares the offered extension for the permissions screen.
     func addOffer(_ offer: SyncExtensionFields) {
         installingOffer = offer
         Task { [syncAdapter] in
@@ -42,12 +42,12 @@ extension ExtensionsSettingsModel {
         }
     }
 
-    /// N'est plus proposée sur ce Mac.
+    /// No longer offered on this Mac.
     func ignoreOffer(_ offer: SyncExtensionFields) {
         syncAdapter.ignore(offer.identifier)
     }
 
-    /// Page de l'app de l'extension dans l'App Store, sinon la page des extensions Safari.
+    /// App Store page of the extension's app, otherwise the Safari extensions page.
     func openAppStore(for offer: SyncExtensionFields) {
         Task {
             if let url = await appStoreURL(of: offer), NSWorkspace.shared.open(url) {

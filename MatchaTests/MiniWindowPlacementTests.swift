@@ -3,7 +3,7 @@ import CoreGraphics
 import Testing
 
 struct MiniWindowPlacementTests {
-    /// Zone utile d'un écran de 1440 × 900 sous la barre des menus.
+    /// Usable area of a 1440 × 900 screen below the menu bar.
     private let screen = CGRect(x: 0, y: 25, width: 1440, height: 875)
 
     @Test func `first mini window is centered on the screen`() {

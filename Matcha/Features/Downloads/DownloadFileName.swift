@@ -1,25 +1,25 @@
 import Foundation
 import UniformTypeIdentifiers
 
-/// Nom du fichier d'un téléchargement, sans dépendance à l'interface : nom proposé rendu sûr, puis rendu unique
-/// dans le dossier (« rapport.pdf », « rapport 2.pdf », « rapport 3.pdf »…).
+/// File name of a download, without UI dependency: proposed name made safe, then made unique in the folder
+/// (“report.pdf”, “report 2.pdf”, “report 3.pdf”…).
 nonisolated enum DownloadFileName {
-    /// Nom de repli quand ni la page ni l'adresse n'en donnent un (comme Chrome), jamais traduit : c'est un nom
-    /// de fichier.
+    /// Fallback name when neither the page nor the address provides one (like Chrome), never translated: it is a
+    /// file name.
     static let fallback = "download"
-    /// Longueur maximale d'un nom de fichier (APFS), en octets UTF-8.
+    /// Maximum length of a file name (APFS), in UTF-8 bytes.
     static let maximumLength = 255
-    /// Au-delà, ce qui suit le dernier point n'est pas une extension (« Notes v1.2 version longue »).
+    /// Beyond this, what follows the last dot is not an extension (“Notes v1.2 long version”).
     static let maximumExtensionLength = 20
-    /// Doubles extensions gardées ensemble : « archive 2.tar.gz », pas « archive.tar 2.gz ».
+    /// Double extensions kept together: “archive 2.tar.gz”, not “archive.tar 2.gz”.
     static let compoundExtensions = ["tar.gz", "tar.bz2", "tar.xz", "tar.zst", "tar.lz", "tar.lzma", "tar.lz4", "tar.z", "tar.bz"]
-    /// Contrôles bidirectionnels : ils permettent de déguiser une extension (« photo », U+202E puis « gpj.app »
-    /// s'affiche « photoppa.jpg »).
+    /// Bidirectional controls: they make it possible to disguise an extension (“photo”, U+202E then “gpj.app”
+    /// displays as “photoppa.jpg”).
     private static let bidiControls = Set<UInt32>([0x061C, 0x200E, 0x200F]).union(0x202A ... 0x202E).union(0x2066 ... 0x2069)
 
-    /// Nom proposé par la page ou WebKit, rendu sûr ; sinon le dernier composant de `url` (adresse à chemin : web ou
-    /// fichier, pas `data:` ni `blob:`), sinon `fallback`. Un nom sans extension reçoit celle du type MIME s'il en a
-    /// une (« README » envoyé en `text/plain` : « README.txt »).
+    /// Name proposed by the page or WebKit, made safe; otherwise the last component of `url` (address with a path:
+    /// web or file, not `data:` or `blob:`), otherwise `fallback`. A name without an extension gets the one of the
+    /// MIME type if it has one (“README” sent as `text/plain`: “README.txt”).
     static func make(suggested: String?, url: URL?, mimeType: String?) -> String {
         let component = url.flatMap { $0.isFileURL || $0.host() != nil ? $0.lastPathComponent : nil }
         let name = [suggested, component].lazy.compactMap { $0.map(sanitized) }.first { !$0.isEmpty } ?? fallback
@@ -31,13 +31,13 @@ nonisolated enum DownloadFileName {
         return fitted(name, suffix: "", extension: "." + preferred)
     }
 
-    /// Dernier composant d'un chemin (`/` ou `\`), sans caractère de contrôle ni contrôle bidirectionnel, `:`
-    /// remplacé par `-` (le Finder l'affiche comme `/`), sans point ni espace au début (pas de fichier caché), sans
-    /// espace à la fin, et 255 octets au plus, extension comprise. Vide s'il ne reste rien.
+    /// Last component of a path (`/` or `\`), without control characters or bidirectional controls, `:` replaced
+    /// by `-` (the Finder shows it as `/`), without a dot or space at the start (no hidden file), without a space at
+    /// the end, and 255 bytes at most, extension included. Empty if nothing is left.
     static func sanitized(_ suggested: String) -> String {
         let component = suggested.split { $0 == "/" || $0 == "\\" }.last.map(String.init) ?? ""
         var scalars = String.UnicodeScalarView()
-        // Caractères de contrôle C0 et C1 (retour à la ligne, tabulation, NUL…) et contrôles bidirectionnels.
+        // C0 and C1 control characters (line feed, tab, NUL…) and bidirectional controls.
         for scalar in component.unicodeScalars where scalar.properties.generalCategory != .control && !bidiControls.contains(scalar.value) {
             scalars.append(scalar == ":" ? "-" : scalar)
         }
@@ -52,8 +52,8 @@ nonisolated enum DownloadFileName {
         return fitted(base, suffix: "", extension: pathExtension)
     }
 
-    /// Premier nom libre parmi `name`, « base 2.ext », « base 3.ext »… `isTaken` dit si un nom est déjà pris
-    /// (fichier existant, ou téléchargement en cours qui ne l'a pas encore créé).
+    /// First free name among `name`, “base 2.ext”, “base 3.ext”… `isTaken` tells whether a name is already taken
+    /// (existing file, or a download in progress that has not created it yet).
     static func unique(_ name: String, isTaken: (String) -> Bool) -> String {
         guard isTaken(name) else {
             return name
@@ -68,7 +68,7 @@ nonisolated enum DownloadFileName {
         return fitted(base, suffix: " \(UUID().uuidString)", extension: pathExtension)
     }
 
-    /// Nom et extension, point compris (« .pdf », « .tar.gz ») ; extension vide si le nom n'en a pas.
+    /// Name and extension, dot included (“.pdf”, “.tar.gz”); empty extension if the name has none.
     static func split(_ name: String) -> (base: String, extension: String) {
         let lowercased = name.lowercased()
         if let compound = compoundExtensions.first(where: { lowercased.hasSuffix("." + $0) && lowercased.count > $0.count + 1 }) {
@@ -85,7 +85,7 @@ nonisolated enum DownloadFileName {
         return (String(name[..<dot]), String(name[dot...]))
     }
 
-    /// `base` + `suffix` + `pathExtension`, en raccourcissant `base` pour tenir en `maximumLength` octets.
+    /// `base` + `suffix` + `pathExtension`, shortening `base` to fit in `maximumLength` bytes.
     private static func fitted(_ base: String, suffix: String, extension pathExtension: String) -> String {
         var base = Substring(base)
         while !base.isEmpty, base.utf8.count + suffix.utf8.count + pathExtension.utf8.count > maximumLength {

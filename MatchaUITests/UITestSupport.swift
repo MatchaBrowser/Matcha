@@ -1,10 +1,10 @@
 import AppKit
 import XCTest
 
-/// Outils partagés des tests d'interface. Tout est synchrone : les appels à XCUIApplication depuis
-/// du code asynchrone peuvent bloquer.
+/// Shared helpers for the UI tests. Everything is synchronous: calls to XCUIApplication from
+/// asynchronous code can block.
 extension XCTestCase {
-    /// Attend que la valeur de `element` vérifie `condition`.
+    /// Waits for the value of `element` to satisfy `condition`.
     @MainActor
     func waitForValue(of element: XCUIElement, timeout: TimeInterval = 20, _ condition: @escaping (String) -> Bool) -> Bool {
         let predicate = NSPredicate { object, _ in
@@ -16,15 +16,15 @@ extension XCTestCase {
         return XCTWaiter().wait(for: [XCTNSPredicateExpectation(predicate: predicate, object: element)], timeout: timeout) == .completed
     }
 
-    /// Attend que `query` compte `expected` éléments : les changements animés ne sont pas instantanés.
+    /// Waits for `query` to count `expected` elements: animated changes aren't instantaneous.
     @MainActor
     func waitForCount(_ query: XCUIElementQuery, _ expected: Int, timeout: TimeInterval = 3) -> Bool {
         let predicate = NSPredicate(format: "count == %d", expected)
         return XCTWaiter().wait(for: [XCTNSPredicateExpectation(predicate: predicate, object: query)], timeout: timeout) == .completed
     }
 
-    /// Clique `element` une fois sa position stable : juste après un glisser-déposer ou une ouverture animée,
-    /// la vue bouge encore et un clic immédiat viserait l'ancienne place de l'élément.
+    /// Clicks `element` once its position is stable: right after a drag and drop or an animated opening,
+    /// the view is still moving and an immediate click would target the element's old spot.
     @MainActor
     func clickWhenSettled(_ element: XCUIElement, timeout: TimeInterval = 3) {
         var previous = element.frame
@@ -37,12 +37,12 @@ extension XCTestCase {
             }
             previous = current
         }
-        // Au centre, par coordonnées : un lien de page est entièrement couvert par son texte, et XCTest refuse
-        // alors de cliquer l'élément lui-même.
+        // At the center, by coordinates: a page link is entirely covered by its text, and XCTest then refuses
+        // to click the element itself.
         element.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.5)).click()
     }
 
-    /// Place le pointeur au milieu de la page, loin du bord qui fait apparaître la barre masquée.
+    /// Puts the pointer in the middle of the page, far from the edge that reveals the hidden sidebar.
     @MainActor
     func moveAwayFromLeftEdge(in window: XCUIElement) {
         window.coordinate(withNormalizedOffset: CGVector(dx: 0.6, dy: 0.5)).hover()
@@ -56,20 +56,19 @@ extension XCTestCase {
         return XCTWaiter().wait(for: [XCTNSPredicateExpectation(predicate: predicate, object: element)], timeout: timeout) == .completed
     }
 
-    /// Fait glisser `element` horizontalement depuis son centre.
+    /// Drags `element` horizontally from its center.
     @MainActor
     func drag(_ element: XCUIElement, by distance: CGFloat) {
         let start = element.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.5))
         start.press(forDuration: 0.2, thenDragTo: start.withOffset(CGVector(dx: distance, dy: 0)))
     }
 
-    /// Réglages imposés à chaque lancement : les valeurs par défaut de l'app (les réglages réels de
-    /// l'utilisateur ne doivent pas changer le résultat des tests), sans alerte avant de quitter (elle
-    /// bloquerait les relances). La largeur de la barre latérale n'est pas imposée : le test de
-    /// redimensionnement doit pouvoir la modifier.
+    /// Settings forced at each launch: the app's default values (the user's real settings must not
+    /// change the test results), without the alert before quitting (it would block relaunches). The
+    /// sidebar width isn't forced: the resize test must be able to change it.
     static let defaultSettings = [
         "ApplePersistenceIgnoreState": "YES",
-        // Base en mémoire : les tests ne lisent ni ne modifient les onglets de l'utilisateur.
+        // In-memory store: the tests neither read nor change the user's tabs.
         "inMemoryStore": "YES",
         "confirmBeforeQuitting": "NO",
         "searchEngine": "google",
@@ -79,25 +78,25 @@ extension XCTestCase {
         "showsHomeButton": "NO",
         "addressBarPosition": "sidebar",
         "showsNavigationButtons": "YES",
-        // Jamais de requête au moteur de recherche pendant les tests.
+        // Never any request to the search engine during the tests.
         "showsSearchSuggestions": "NO",
-        // Les liens des favoris et des épinglés restent dans leur onglet (valeur par défaut de l'app).
+        // Links of Favorites and pinned tabs stay in their tab (the app's default value).
         "opensPinnedLinksInPeek": "NO",
-        // Pas de raccourci global pour la mini-fenêtre (texte « NO » : aucun raccourci, rien n'est écrit) : ⌥⌘N
-        // reste à la Matcha de l'utilisateur. Le test du raccourci en impose un autre.
+        // No global shortcut for the mini window (text “NO”: no shortcut, nothing is written): ⌥⌘N
+        // stays with the user's Matcha. The shortcut test sets another one.
         "KeyboardShortcuts_openMiniWindow": "NO",
-        // Aucune mise en veille des onglets cachés (« Jamais ») : un test lent ne voit pas ses pages se recharger. Le test
-        // de la mise en veille donne un délai court (`tabSuspensionDelaySeconds`, Debug seulement).
+        // No sleeping of hidden tabs (“Never”): a slow test doesn't see its pages reload. The sleep test gives a
+        // short delay (`tabSuspensionDelaySeconds`, Debug only).
         "tabSuspensionDelay": "0",
     ]
 
-    /// Langue imposée à chaque lancement : les tests cherchent les éléments par leurs textes français,
-    /// quelle que soit la langue du Mac.
+    /// Language forced at each launch: the tests look up elements by their French texts,
+    /// whatever the Mac's language.
     static let languageArguments = ["-AppleLanguages", "(fr)", "-AppleLocale", "fr_FR"]
 
-    /// Fenêtre de navigation imposée à chaque lancement : 1400 × 900 pt en haut à gauche de l'écran principal.
-    /// La position retenue par l'app (« NSWindow Frame browser », peut-être sur un autre écran, éteint ou
-    /// occupé) ne joue plus sur les tests ; celle de l'utilisateur n'est pas modifiée.
+    /// Browser window forced at each launch: 1400 × 900 pt at the top left of the main screen.
+    /// The position remembered by the app (“NSWindow Frame browser”, maybe on another screen, turned off or
+    /// busy) no longer affects the tests; the user's one isn't changed.
     @MainActor
     static var windowFrameArguments: [String] {
         guard let screen = NSScreen.screens.first?.visibleFrame else {
@@ -110,9 +109,9 @@ extension XCTestCase {
         return ["-NSWindow Frame browser", values.joined(separator: " ")]
     }
 
-    /// Lance l'app en français, sans restaurer les fenêtres d'un lancement précédent, avec les réglages
-    /// par défaut et `settings` en plus, pour ce lancement seulement (« -clé valeur »), sans toucher à
-    /// ceux de l'utilisateur. La fenêtre s'ouvre sur l'écran principal.
+    /// Launches the app in French, without restoring the windows of a previous launch, with the default
+    /// settings plus `settings`, for this launch only (“-key value”), without touching the user's
+    /// ones. The window opens on the main screen.
     @MainActor
     func launchApp(settings: [String: String] = [:]) -> XCUIApplication {
         let app = XCUIApplication()
@@ -126,32 +125,32 @@ extension XCTestCase {
         return app
     }
 
-    /// Fenêtre de navigation prête : son bouton « Nouvel onglet » est affiché. La barre de commande ne
-    /// s'ouvre jamais d'elle-même, au lancement comme dans une nouvelle fenêtre.
+    /// Browser window ready: its “New Tab” button is shown. The command bar never
+    /// opens by itself, at launch or in a new window.
     @MainActor
     func waitForBrowserWindow(of app: XCUIApplication, timeout: TimeInterval = 5) -> Bool {
         app.buttons["newTabButton"].waitForExistence(timeout: timeout)
     }
 
-    /// Nouvelle fenêtre privée (⇧⌘N), sans barre de commande. Aucun clic ensuite : le raccourci
-    /// suivant (⌘T) doit l'atteindre aussitôt, comme pour l'utilisateur.
+    /// New private window (⇧⌘N), without the command bar. No click afterwards: the next shortcut
+    /// (⌘T) must reach it right away, as for the user.
     @MainActor
     func openPrivateWindow(in app: XCUIApplication) -> XCUIElement {
         app.typeKey("n", modifierFlags: [.command, .shift])
         let window = app.windows.matching(NSPredicate(format: "title == %@", "Navigation privée")).firstMatch
         XCTAssertTrue(window.waitForExistence(timeout: 5))
-        // La barre ne s'ouvre jamais d'elle-même (vérifié avant tout clic, qui la fermerait).
+        // The bar never opens by itself (checked before any click, which would close it).
         XCTAssertFalse(addressField(in: window).waitForExistence(timeout: 1))
         return window
     }
 
-    /// Champ de la barre de commande ; `scope` : l'app, ou une fenêtre précise (fenêtre privée).
+    /// Field of the command bar; `scope`: the app, or a specific window (private window).
     @MainActor
     func addressField(in scope: XCUIElement) -> XCUIElement {
         scope.textFields["addressField"]
     }
 
-    /// Pastille d'adresse (bouton) : sa valeur est le domaine affiché.
+    /// Address pill (button): its value is the displayed domain.
     @MainActor
     func addressPill(in scope: XCUIElement) -> XCUIElement {
         scope.descendants(matching: .any).matching(identifier: "addressPill").firstMatch
@@ -162,8 +161,8 @@ extension XCTestCase {
         scope.descendants(matching: .any).matching(identifier: "commandBarRow")
     }
 
-    /// ⌘T (nouvel onglet) ou ⌘L (onglet affiché) : la barre de commande s'ouvre et son champ prend le
-    /// clavier. `window` : la fenêtre où elle doit s'ouvrir (fenêtre privée).
+    /// ⌘T (new tab) or ⌘L (displayed tab): the command bar opens and its field takes keyboard
+    /// focus. `window`: the window where it must open (private window).
     @MainActor
     @discardableResult
     func openCommandBar(in app: XCUIApplication, window: XCUIElement? = nil, newTab: Bool = true) -> XCUIElement {
@@ -174,8 +173,8 @@ extension XCTestCase {
         return field
     }
 
-    /// ⌘T puis Entrée sans texte : un onglet vide, comme l'ancien ⌘T. `window` : la fenêtre visée
-    /// (fenêtre privée).
+    /// ⌘T then Return without text: an empty tab, like the old ⌘T. `window`: the target window
+    /// (private window).
     @MainActor
     func openEmptyTab(in app: XCUIApplication, window: XCUIElement? = nil) {
         let field = openCommandBar(in: app, window: window)
@@ -183,7 +182,7 @@ extension XCTestCase {
         XCTAssertTrue(field.waitForNonExistence(timeout: 3))
     }
 
-    /// ⌘T (nouvel onglet) ou ⌘L (onglet affiché), puis `text` et Entrée.
+    /// ⌘T (new tab) or ⌘L (displayed tab), then `text` and Return.
     @MainActor
     func openAddress(_ text: String, in app: XCUIApplication, newTab: Bool = true) {
         let field = openCommandBar(in: app, newTab: newTab)
@@ -196,7 +195,7 @@ extension XCTestCase {
         app.descendants(matching: .any).matching(identifier: "tabRow")
     }
 
-    /// Ligne d'onglet dont le titre contient `title`.
+    /// Tab row whose title contains `title`.
     @MainActor
     func tabRow(titled title: String, in app: XCUIApplication) -> XCUIElement {
         tabRows(in: app).matching(NSPredicate(format: "label CONTAINS %@", title)).firstMatch
@@ -204,13 +203,13 @@ extension XCTestCase {
 
     // MARK: Split view
 
-    /// Cartes des panneaux affichés (une seule hors split, même sans onglet).
+    /// Cards of the displayed panes (a single one outside a split, even without a tab).
     @MainActor
     func pagePanes(in app: XCUIApplication) -> XCUIElementQuery {
         app.descendants(matching: .any).matching(identifier: "pagePane")
     }
 
-    /// Cartes des panneaux de gauche à droite.
+    /// Cards of the panes from left to right.
     @MainActor
     func orderedPagePanes(in app: XCUIApplication) -> [XCUIElement] {
         pagePanes(in: app).allElementsBoundByIndex.sorted { $0.frame.minX < $1.frame.minX }
@@ -226,34 +225,34 @@ extension XCTestCase {
         app.descendants(matching: .any).matching(identifier: "splitSegment")
     }
 
-    /// Morceau de la ligne d'un split dont le titre contient `title`.
+    /// Piece of a split's row whose title contains `title`.
     @MainActor
     func splitSegment(titled title: String, in app: XCUIApplication) -> XCUIElement {
         splitSegments(in: app).matching(NSPredicate(format: "label CONTAINS %@", title)).firstMatch
     }
 
-    /// Poignée entre les deux premiers panneaux.
+    /// Handle between the first two panes.
     @MainActor
     func splitDivider(in app: XCUIApplication) -> XCUIElement {
         app.descendants(matching: .any).matching(identifier: "splitDivider").firstMatch
     }
 
-    /// « Ouvrir en split » dans le menu de la ligne d'onglet `title`.
+    /// “Open in Split View” in the menu of the tab row `title`.
     @MainActor
     func openInSplit(_ title: String, in app: XCUIApplication) {
         tabRow(titled: title, in: app).rightClick()
         app.menuItems["Ouvrir en split"].click()
     }
 
-    /// Glisse la ligne d'onglet `title` jusqu'à `target`, lentement, avec une pause à l'arrivée : la zone de
-    /// dépôt de la carte a le temps de choisir son bord.
+    /// Drags the tab row `title` to `target`, slowly, with a pause on arrival: the card's drop zone has
+    /// time to pick its edge.
     @MainActor
     func dragTab(titled title: String, to target: XCUICoordinate, in app: XCUIApplication) {
         tabRow(titled: title, in: app).coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.5))
             .press(forDuration: 0.5, thenDragTo: target, withVelocity: .slow, thenHoldForDuration: 0.5)
     }
 
-    /// Les tests qui chargent une vraie page sont ignorés sans accès à Internet.
+    /// Tests that load a real page are skipped without Internet access.
     func skipIfOffline() throws {
         let reachable = expectation(description: "example.com répond")
         var request = URLRequest(url: URL(string: "https://example.com/")!)

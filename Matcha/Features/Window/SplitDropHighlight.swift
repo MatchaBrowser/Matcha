@@ -1,9 +1,9 @@
 import SwiftUI
 
-/// Moitié de panneau colorée pendant un glisser : l'onglet lâché ici se placera de ce côté du panneau.
+/// Half of a pane colored during a drag: the tab dropped here will be placed on this side of the pane.
 struct SplitDropHighlight: View {
     let target: SplitDropTarget?
-    /// Largeurs des panneaux affichés, de gauche à droite.
+    /// Widths of the displayed panes, from left to right.
     let widths: [Double]
 
     var body: some View {

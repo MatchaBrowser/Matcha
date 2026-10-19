@@ -1,9 +1,9 @@
 import Foundation
 import OSLog
 
-/// Lecture des changements des autres Mac et application sur ce Mac (`SYNC.md` § 5, étape 2).
+/// Reading the other Macs' changes and applying them on this Mac (`SYNC.md` § 5, step 2).
 extension SyncEngine {
-    /// Lit les changements depuis le curseur ; s'il a expiré, relit tout.
+    /// Reads the changes since the cursor; if it expired, reads everything again.
     func pull() async throws {
         do {
             try await readChanges(from: state.cursor)
@@ -13,7 +13,7 @@ extension SyncEngine {
         }
     }
 
-    /// Lit les pages depuis `cursor` en appliquant chacune ; renvoie les identifiants lus.
+    /// Reads the pages since `cursor`, applying each one; returns the identifiers read.
     @discardableResult
     func readChanges(from cursor: String?) async throws -> Set<UUID> {
         var cursor = cursor
@@ -37,8 +37,8 @@ extension SyncEngine {
         }
     }
 
-    /// Retient `record` ; vrai s'il faut l'appliquer sur ce Mac (pas un écho de ce Mac ni une version déjà dépassée,
-    /// pas plus ancien que son changement en attente).
+    /// Remembers `record`; true if it must be applied on this Mac (not an echo of this Mac nor an outdated version,
+    /// not older than its pending change).
     private func receive(_ record: SyncRemoteRecord) -> Bool {
         var entry = state.entries[record.id] ?? SyncEntry(type: record.content?.type ?? "")
         if let known = entry.version, record.version <= known {
@@ -56,7 +56,7 @@ extension SyncEngine {
         state.entries[record.id] = entry
         if let pending = state.pending[record.id] {
             guard content.isNewer(than: pending.content) || content.isFromNewerVersion else {
-                // Le changement de ce Mac est plus récent : il repartira sur cette version.
+                // This Mac's change is newer: it will be sent again on top of this version.
                 return false
             }
             state.pending[record.id] = nil
@@ -64,8 +64,8 @@ extension SyncEngine {
         return true
     }
 
-    /// Curseur expiré : relit tout ; un enregistrement de ce Mac absent du serveur et sans changement en attente est
-    /// supprimé ici.
+    /// Expired cursor: reads everything again; a record of this Mac that is missing from the server and has no pending
+    /// change is deleted here.
     private func rereadEverything() async throws {
         state.cursor = nil
         let seen = try await readChanges(from: nil)
@@ -84,8 +84,8 @@ extension SyncEngine {
         report.received += deletions.count
     }
 
-    /// Applique sur ce Mac le contenu du serveur de `ids`, et retente ce qui attendait son parent. Les champs de ce Mac
-    /// après application deviennent la référence des changements suivants : rien ne repart en écho.
+    /// Applies the server's content of `ids` on this Mac, and retries what was waiting for its parent. This Mac's
+    /// fields after applying become the reference for the next changes: nothing is sent back as an echo.
     func applyRemote(_ ids: [UUID]) {
         let retried = state.entries.compactMap { $0.value.isWaiting ? $0.key : nil }
         var changes: [SyncLocalChange] = []
@@ -100,7 +100,7 @@ extension SyncEngine {
             } else if let fields = remote.readableFields {
                 changes.append(.upsert(id, fields))
             } else {
-                // Type, format ou valeur inconnus : ignoré, sans écraser ce qu'a ce Mac.
+                // Unknown type, format or value: ignored, without overwriting what this Mac has.
                 Logger.sync.notice("Enregistrement d'un format inconnu ignoré")
             }
         }

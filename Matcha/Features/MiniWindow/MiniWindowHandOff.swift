@@ -1,13 +1,13 @@
 import Foundation
 
-/// Passage de la page d'une mini-fenêtre dans un Space (« Ouvrir dans le Space »).
+/// Moving a mini window's page into a Space (“Open in Space”).
 @MainActor
 enum MiniWindowHandOff {
-    /// Met la page en tête des onglets du jour de `space`, seule, et la sélectionne ; renvoie l'onglet du Space.
-    /// Même profil : c'est le même onglet, avec sa vue web (rien n'est rechargé, l'historique
-    /// précédent/suivant et l'état de la page restent). Autre profil : un nouvel onglet charge l'adresse
-    /// avec les cookies de ce profil, et la page de la mini-fenêtre est libérée.
-    /// Nil si la page n'a pas d'adresse (rien à ouvrir).
+    /// Puts the page at the top of the today tabs of `space`, on its own, and selects it; returns the Space's tab.
+    /// Same profile: it is the same tab, with its web view (nothing is reloaded, the back/forward
+    /// history and the page's state remain). Other profile: a new tab loads the address
+    /// with that profile's cookies, and the mini window's page is released.
+    /// Nil if the page has no address (nothing to open).
     @discardableResult
     static func move(_ tab: BrowserTab, profileID: UUID?, to space: SpaceSession) -> BrowserTab? {
         guard let url = tab.url else {
@@ -18,7 +18,7 @@ enum MiniWindowHandOff {
             tab.unload(resettingTo: nil, title: nil)
             return tabManager.newTab(url: url)
         }
-        // Même rangement qu'un aperçu ouvert en onglet (tâche 4.4) : en tête, hors de tout split, sélectionné.
+        // Same placement as a Peek opened as a tab (task 4.4): at the top, outside any split, selected.
         tabManager.insert(tab, after: nil, select: true)
         return tab
     }

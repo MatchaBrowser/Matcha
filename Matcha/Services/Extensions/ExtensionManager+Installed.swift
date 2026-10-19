@@ -2,16 +2,16 @@ import Foundation
 import OSLog
 import WebKit
 
-/// Extensions installées (tâches 6.3 et 6.4) : celles du dossier des extensions et les extensions Safari d'apps, lues
-/// au lancement, chargées si elles sont actives ; activer, désactiver, désinstaller, page d'options.
+/// Installed extensions (tasks 6.3 and 6.4): those of the extensions folder and the Safari extensions of apps, read at
+/// launch, loaded if they are enabled; enabling, disabling, uninstalling, options page.
 extension ExtensionManager {
-    /// Identifiants des extensions installées : dossiers de `directory`, puis extensions Safari d'apps retenues.
+    /// Identifiers of the installed extensions: folders of `directory`, then the remembered Safari extensions of apps.
     var installedIdentifiers: [String] {
         let folders = directory.map { ExtensionInstallDirectory.installedExtensions(in: $0).map(\.identifier) } ?? []
         return folders + store.appExtensions.map(\.identifier).filter { !folders.contains($0) }
     }
 
-    /// Lit en tâche de fond les extensions installées et charge celles qui sont actives. Sans effet au second appel.
+    /// Reads the installed extensions in the background and loads the enabled ones. No effect on a second call.
     func start() {
         guard !isStarted, directory != nil else {
             return
@@ -32,8 +32,7 @@ extension ExtensionManager {
         }
     }
 
-    /// Active ou désactive l'extension installée `identifier` : chargée, ou déchargée ; retenu pour les prochains
-    /// lancements.
+    /// Enables or disables the installed extension `identifier`: loaded, or unloaded; remembered for the next launches.
     func setEnabled(_ isEnabled: Bool, identifier: String) async throws {
         if isEnabled, contexts[identifier] == nil {
             let webExtension = if let installed = installed[identifier] {
@@ -50,13 +49,13 @@ extension ExtensionManager {
         store.setState(state, for: identifier)
     }
 
-    /// Vrai si l'extension `identifier` est active (chargée au lancement).
+    /// True if extension `identifier` is enabled (loaded at launch).
     func isEnabled(_ identifier: String) -> Bool {
         store.state(for: identifier)?.isEnabled ?? true
     }
 
-    /// Désinstalle l'extension `identifier` : déchargée, ses données (stockage) effacées, son dossier supprimé (une
-    /// extension Safari reste dans son app), ses décisions oubliées.
+    /// Uninstalls extension `identifier`: unloaded, its data (storage) erased, its folder deleted (a Safari extension
+    /// stays in its app), its decisions forgotten.
     func uninstall(identifier: String) async {
         unload(identifier: identifier)
         let webExtensionIdentifier = webExtensionIdentifier(for: identifier)
@@ -81,8 +80,8 @@ extension ExtensionManager {
         Logger.extensions.info("Extension désinstallée (\(identifier, privacy: .public))")
     }
 
-    /// Ouvre `url` dans un nouvel onglet de la fenêtre de navigation (jamais privée) et l'amène devant : liens des
-    /// réglages vers les boutiques d'extensions. Faux sans fenêtre de navigation ouverte.
+    /// Opens `url` in a new tab of the browser window (never private) and brings it to the front: links from the
+    /// settings to the extension stores. False with no browser window open.
     @discardableResult
     func openInBrowser(_ url: URL) -> Bool {
         guard let model = windows.browserWindows.compactMap(\.model).first(where: { !$0.session.isPrivate }) else {
@@ -93,8 +92,8 @@ extension ExtensionManager {
         return true
     }
 
-    /// Ouvre la page d'options de l'extension chargée `identifier` dans un nouvel onglet ; faux sans page d'options ou
-    /// sans fenêtre de navigation.
+    /// Opens the options page of the loaded extension `identifier` in a new tab; false without an options page or
+    /// without a browser window.
     @discardableResult
     func openOptionsPage(identifier: String) -> Bool {
         guard let context = contexts[identifier], let url = context.optionsPageURL,

@@ -2,11 +2,10 @@ import Foundation
 @testable import Matcha
 import Testing
 
-/// Types purs de l'installation des extensions (tâche 6.4) : identifiants, résumé des permissions, extensions Safari
-/// des apps.
+/// Pure types of extension installation (task 6.4): identifiers, permission summary, Safari extensions of apps.
 @MainActor
 struct ExtensionInstallSupportTests {
-    // MARK: Identifiants
+    // MARK: Identifiers
 
     @Test func `slugs are lowercase ASCII with dashes`() {
         #expect(ExtensionIdentifier.slug("Dark Reader") == "dark-reader")
@@ -43,7 +42,7 @@ struct ExtensionInstallSupportTests {
             == "safari-me-proton-pass-catalyst-safari-extension")
     }
 
-    // MARK: Résumé des permissions
+    // MARK: Permission summary
 
     @Test func `sensitive permissions only, once each, websites last`() {
         let lines = ExtensionPermissionSummary.lines(
@@ -59,9 +58,9 @@ struct ExtensionInstallSupportTests {
         #expect(ExtensionPermissionSummary.lines(permissions: ["storage", "scripting"], hosts: []).isEmpty)
     }
 
-    // MARK: Extensions Safari des apps
+    // MARK: Safari extensions of apps
 
-    /// Crée `name.app` avec une extension au point `point` (et son manifeste si `hasManifest`).
+    /// Creates `name.app` with an extension at the extension point `point` (and its manifest if `hasManifest`).
     private func makeApp(
         in folder: URL,
         name: String,
@@ -95,7 +94,7 @@ struct ExtensionInstallSupportTests {
         try makeApp(in: folder.appendingPathComponent("Utilities"), name: "Alpha", extensionIdentifier: "com.example.alpha.extension")
         try makeApp(in: folder, name: "Widget", extensionIdentifier: "com.example.widget", point: "com.apple.widgetkit-extension")
         try makeApp(in: folder, name: "Broken", extensionIdentifier: "com.example.broken", hasManifest: false)
-        // Même extension dans un second dossier d'apps : une seule fois.
+        // Same extension in a second apps folder: listed only once.
         let other = folder.appendingPathComponent("Other", isDirectory: true)
         try makeApp(in: other, name: "Zeta", extensionIdentifier: "com.example.zeta.extension")
 

@@ -1,12 +1,11 @@
 import Foundation
 
-/// Réglages de la mise en veille lus à chaque vérification : délai (nil : jamais) et intervalle entre deux
-/// vérifications.
+/// Suspension settings read at each check: delay (nil: never) and interval between two checks.
 nonisolated struct TabSuspensionSettings: Equatable, Sendable {
-    /// Une vérification par minute : un onglet est mis en veille au plus une minute après son délai.
+    /// One check per minute: a tab is suspended at most one minute after its delay.
     static let defaultCheckInterval = Duration.seconds(60)
-    /// Argument de lancement des tests d'interface, en Debug seulement : délai en secondes (il l'emporte sur le
-    /// réglage, « Jamais » compris), vérifié chaque seconde.
+    /// UI test launch argument, in Debug only: delay in seconds (it overrides the setting, “Never” included),
+    /// checked every second.
     static let testDelayKey = "tabSuspensionDelaySeconds"
 
     let delay: Duration?

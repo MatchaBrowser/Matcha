@@ -2,13 +2,13 @@ import Foundation
 @testable import Matcha
 import Testing
 
-/// Origine d'une page, clé des décisions de permission (tâche 5.2).
+/// Origin of a page, the key of permission decisions (task 5.2).
 struct SiteOriginTests {
     @Test func `scheme and host are lowercased and the default port is dropped`() throws {
         let origin = try #require(SiteOrigin(scheme: "HTTPS", host: "Meet.Example.COM.", port: 443))
         #expect(origin.key == "https://meet.example.com")
         #expect(origin.port == nil)
-        // WebKit donne 0 pour le port par défaut.
+        // WebKit gives 0 for the default port.
         #expect(SiteOrigin(scheme: "https", host: "meet.example.com", port: 0) == origin)
         #expect(SiteOrigin(scheme: "http", host: "example.com", port: 80)?.key == "http://example.com")
     }
@@ -17,7 +17,7 @@ struct SiteOriginTests {
         let origin = try #require(SiteOrigin(scheme: "http", host: "localhost", port: 8080))
         #expect(origin.key == "http://localhost:8080")
         #expect(origin.displayHost == "localhost:8080")
-        // Hors https, le schéma est montré : deux origines du même hôte restent distinctes.
+        // Outside https, the scheme is shown: two origins of the same host stay distinct.
         #expect(origin.displayName == "http://localhost:8080")
         #expect(origin != SiteOrigin(scheme: "https", host: "localhost", port: 8080))
         #expect(SiteOrigin(scheme: "https", host: "example.com", port: 443) != SiteOrigin(scheme: "https", host: "example.com", port: 8443))

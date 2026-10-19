@@ -1,8 +1,8 @@
 import SwiftUI
 
-/// Pied de la barre latérale : une icône par Space et le bouton pour en créer un. Un clic affiche le
-/// Space ; sur le Space affiché, il ouvre son éditeur (icône et thème). Menu contextuel : renommer,
-/// thème, icône, supprimer.
+/// Footer of the sidebar: one icon per Space and the button to create one. A click displays the
+/// Space; on the displayed Space, it opens its editor (icon and theme). Context menu: rename,
+/// theme, icon, delete.
 struct SpaceSwitcher: View {
     let model: WindowModel
 
@@ -17,7 +17,7 @@ struct SpaceSwitcher: View {
         }
     }
 
-    /// Fenêtre privée : pas de Spaces, un rappel qu'on navigue en privé.
+    /// Private window: no Spaces, a reminder that browsing is private.
     private var privateBadge: some View {
         Label("Private Browsing", systemImage: "eyeglasses")
             .font(.caption.weight(.medium))
@@ -90,9 +90,9 @@ struct SpaceSwitcher: View {
         }
     }
 
-    /// Symbole gris (plus grand et au premier plan pour le Space affiché), ou emoji, qui garde ses couleurs et
-    /// s'atténue pour un autre Space. Un seul `Text` (`SidebarIconView.text`) : la bulle de l'éditeur reste dans l'arbre
-    /// d'accessibilité quand un emoji remplace le symbole.
+    /// Gray symbol (larger and in the foreground for the displayed Space), or emoji, which keeps its colors and is
+    /// dimmed for another Space. A single `Text` (`SidebarIconView.text`): the editor's popover stays in the
+    /// accessibility tree when an emoji replaces the symbol.
     private func icon(of space: SpaceSession, isCurrent: Bool) -> some View {
         SidebarIconView.text(
             space.icon,
@@ -104,7 +104,7 @@ struct SpaceSwitcher: View {
         .opacity(isCurrent || space.icon.emoji == nil ? 1 : 0.6)
     }
 
-    /// En Debug, l'icône sous sa forme enregistrée (« symbol:star.fill », « emoji:🌿 »), pour les tests d'interface.
+    /// In Debug, the icon in its saved form (“symbol:star.fill”, “emoji:🌿”), for the UI tests.
     private func iconSummary(of space: SpaceSession) -> Text {
         #if DEBUG
             return Text(verbatim: space.icon.storedValue ?? "")

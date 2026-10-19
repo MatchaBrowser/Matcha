@@ -1,27 +1,26 @@
 import SwiftUI
 
-/// Carte aux coins arrondis d'un panneau : la page de l'onglet, avec la barre d'adresse au-dessus si les
-/// réglages la placent là (et dessous, le panneau des réglages du site), puis la barre de recherche et le bandeau des
-/// demandes de permission de la page. Un onglet qui n'a encore rien chargé, ou l'absence d'onglet, affiche un accueil ;
-/// un onglet sorti de veille montre sa capture le temps du rechargement ; une page plantée plusieurs fois de suite, un
-/// message pour la recharger.
+/// Rounded-corner card of a pane: the tab's page, with the address bar above if the settings place it there (and
+/// below it, the site settings panel), then the find bar and the page's permission request banner. A tab that has not
+/// loaded anything yet, or the absence of a tab, shows a welcome view; a tab woken from sleep shows its snapshot while
+/// it reloads; a page that crashed several times in a row, a message to reload it.
 struct PageCard: View {
     let tab: BrowserTab?
-    /// Panneau actif d'un split : bordure de la couleur d'accentuation.
+    /// Active pane of a split: border in the accent color.
     let isMarked: Bool
-    /// Onglet sélectionné (seul panneau, ou panneau actif d'un split) : il porte le panneau des réglages du site.
+    /// Selected tab (only pane, or active pane of a split): it carries the site settings panel.
     var isActive = true
     let addressBarPosition: AddressBarPosition
     let showsNavigationButtons: Bool
-    /// Action du bouton Accueil ; nil pour ne pas l'afficher.
+    /// Action of the Home button; nil to hide it.
     var goHome: (() -> Void)?
-    /// Ouvre la barre de commande sur l'adresse de l'onglet affiché.
+    /// Opens the command bar on the address of the displayed tab.
     let editAddress: () -> Void
-    /// Rend ce panneau actif (clic dans sa barre d'adresse ou sur son accueil).
+    /// Makes this pane active (click in its address bar or on its welcome view).
     let activate: () -> Void
-    /// Destinataire des éléments de la barre lâchés sur la page.
+    /// Receiver of sidebar items dropped on the page.
     var sidebarDropTarget: (any SidebarItemDropTarget)?
-    /// Zoom par site de la fenêtre (badge du zoom de la barre d'adresse au-dessus de la page).
+    /// Per-site zoom of the window (zoom badge of the address bar above the page).
     var siteZooms: SiteZoomStore?
 
     @Environment(WindowModel.self) private var windowModel: WindowModel?
@@ -29,7 +28,7 @@ struct PageCard: View {
     var body: some View {
         VStack(spacing: 0) {
             if addressBarPosition == .top {
-                // Pastille et Accueil visent l'onglet sélectionné : ce panneau devient actif d'abord.
+                // Pill and Home target the selected tab: this pane becomes active first.
                 AddressToolbar(
                     tab: tab,
                     editAddress: {
@@ -57,14 +56,14 @@ struct PageCard: View {
                     Divider()
                 }
             }
-            // Recherche dans la page (tâche 5.3), puis demandes de permission (tâche 5.2) : barre et bandeau poussent
-            // la page. La barre reste en haut : un bandeau qui arrive ne déplace pas le champ où l'on tape.
+            // Find in page (task 5.3), then permission requests (task 5.2): bar and banner push the page down. The
+            // bar stays at the top: an incoming banner does not move the field being typed in.
             if let tab {
                 FindBar(page: tab, activate: activate)
                 PermissionBanner(prompts: tab.permissionPrompts)
             }
             page
-                // Zone que l'aperçu (Maj+clic) voile, sous la barre d'adresse (tâche 4.4).
+                // Area that the peek (Shift-click) dims, below the address bar (task 4.4).
                 .anchorPreference(key: PeekPageAreas.self, value: .bounds) { [$0] }
         }
         .background(.background)
@@ -81,30 +80,30 @@ struct PageCard: View {
         .accessibilityIdentifier("pagePane")
     }
 
-    /// Panneau des réglages du site ouvert dans la fenêtre, montré sur la carte de l'onglet sélectionné.
+    /// Site settings panel open in the window, shown on the card of the selected tab.
     private var showsSiteSettings: Bool {
         isActive && windowModel?.isSiteSettingsPresented == true
     }
 
-    /// Sur le panneau actif, ouvre ou ferme le panneau ; sur un autre panneau d'un split, le rend actif et l'y ouvre.
+    /// On the active pane, opens or closes the panel; on another pane of a split, makes it active and opens it there.
     private func toggleSiteSettings() {
         let isPresented = isActive ? !(windowModel?.isSiteSettingsPresented ?? false) : true
         activate()
         withAnimation(.easeOut(duration: 0.2)) { windowModel?.isSiteSettingsPresented = isPresented }
     }
 
-    /// « Panneau actif » sur le panneau actif d'un split.
+    /// “Active Pane” on the active pane of a split.
     private var accessibilityValue: Text {
         isMarked ? Text("Active Pane", comment: "Accessibility value of the active page in a split view") : Text(verbatim: "")
     }
 
-    /// Page de l'onglet, ou l'accueil.
+    /// Page of the tab, or the welcome view.
     @ViewBuilder private var page: some View {
         if let tab, tab.url != nil, let webView = tab.webView {
             WebView(webView: webView, sidebarDropTarget: sidebarDropTarget)
                 .id(ObjectIdentifier(webView))
-                // Onglet sorti de veille (tâche 5.6) : sa capture, le temps que la page se recharge. Elle est là dès
-                // l'affichage (pas de page blanche) et s'efface en fondu.
+                // Tab woken from sleep (task 5.6): its snapshot, while the page reloads. It is there from the first
+                // render (no blank page) and fades out.
                 .overlay {
                     if let cover = tab.suspension.cover {
                         SuspendedPageCover(cover: cover)
@@ -112,7 +111,7 @@ struct PageCard: View {
                     }
                 }
                 .animation(.easeOut(duration: 0.2), value: tab.suspension.cover == nil)
-                // Processus de la page arrêté plusieurs fois de suite (tâche 5.7) : le message, jusqu'au rechargement.
+                // Page process stopped several times in a row (task 5.7): the message, until the reload.
                 .overlay {
                     if tab.crash.isShowingProblem {
                         PageProblemView(page: tab, activate: activate)
@@ -120,19 +119,19 @@ struct PageCard: View {
                 }
         } else {
             ContentUnavailableView(emptyPageTitle, systemImage: "globe", description: Text(emptyPageDescription))
-                // Occupe toute la hauteur, comme la vue web : sinon la colonne entière est centrée verticalement.
+                // Takes the full height, like the web view: otherwise the whole column is centered vertically.
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
                 .contentShape(Rectangle())
                 .onTapGesture(perform: activate)
         }
     }
 
-    /// Titre de l'accueil : aucun onglet, ou onglet qui n'a encore rien chargé.
+    /// Title of the welcome view: no tab, or a tab that has not loaded anything yet.
     private var emptyPageTitle: LocalizedStringKey {
         tab == nil ? "No Tabs" : "New Tab"
     }
 
-    /// Sans onglet, ⌘T en ouvre un ; un onglet vide se remplit avec ⌘L.
+    /// Without a tab, ⌘T opens one; an empty tab is filled with ⌘L.
     private var emptyPageDescription: LocalizedStringKey {
         tab == nil ? "Press ⌘T to search or enter an address." : "Press ⌘L to search or enter an address."
     }

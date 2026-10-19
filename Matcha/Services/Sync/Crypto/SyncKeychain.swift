@@ -1,15 +1,14 @@
 import Foundation
 import Security
 
-/// Trousseau de la synchro (`SYNC.md` § 3.8) : clé de compte, jetons et identifiant de l'appareil, en mots de passe
-/// génériques du service `com.matchabrowser.matcha.sync`, dans le trousseau de session de ce Mac (jamais synchronisé par
-/// iCloud ; dans le bac à sable, réservé à Matcha). Le trousseau protégé par l'appareil demanderait un identifiant
-/// d'app signé (profil de provisionnement, `DECISIONS.md`). Le mot de passe maître, la clé maître et la clé de secours
-/// n'y vont jamais.
+/// Sync keychain (`SYNC.md` § 3.8): account key, tokens and device identifier, as generic passwords of the
+/// `com.matchabrowser.matcha.sync` service, in this Mac's login keychain (never synced by iCloud; in the sandbox,
+/// reserved for Matcha). The data protection keychain would require a signed app identifier (provisioning profile,
+/// `DECISIONS.md`). The master password, the master key and the recovery key never go there.
 nonisolated struct SyncKeychain: Sendable {
     static let service = "com.matchabrowser.matcha.sync"
 
-    /// Éléments retenus.
+    /// Stored items.
     enum Item: String, CaseIterable, Sendable {
         case accountKey
         case accessToken
@@ -17,7 +16,7 @@ nonisolated struct SyncKeychain: Sendable {
         case deviceID
     }
 
-    /// Service des éléments (un autre pour les tests).
+    /// Service of the items (a different one for tests).
     var service = Self.service
 
     func set(_ data: Data, for item: Item) throws {
@@ -45,7 +44,7 @@ nonisolated struct SyncKeychain: Sendable {
         return result as? Data
     }
 
-    /// Retire `items` (tous par défaut : déconnexion, appareil révoqué).
+    /// Removes `items` (all by default: sign-out, revoked device).
     func remove(_ items: [Item] = Item.allCases) {
         for item in items {
             SecItemDelete(baseQuery(for: item) as CFDictionary)

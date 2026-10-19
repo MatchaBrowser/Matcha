@@ -2,27 +2,27 @@ import AppKit
 import OSLog
 import SwiftUI
 
-/// Effets des lignes de la barre de commande sur la fenêtre :
-/// - adresse, recherche, suggestion, historique : dans l'onglet visé (⌘L, qui garde sa place même
-///   épinglé ou favori), sinon dans un nouvel onglet du Space affiché ;
-/// - onglet ouvert : sélection dans son Space, puis ce Space s'affiche (animé) s'il ne l'était pas ;
-/// - actions : nouveau Space (animé), copie de l'URL (comme ⇧⌘C), Réglages ;
-/// - Entrée sans texte en mode nouvel onglet : un onglet vide.
-/// La page de l'onglet ouvert ou choisi prend ensuite le clavier.
+/// Effects of the command bar rows on the window:
+/// - address, search, suggestion, history: in the target tab (⌘L, which keeps its place even when pinned or a
+///   favorite), otherwise in a new tab of the displayed Space;
+/// - open tab: selected in its Space, then that Space is shown (animated) if it was not;
+/// - actions: new Space (animated), URL copy (like ⇧⌘C), Settings;
+/// - Return with no text in new tab mode: an empty tab.
+/// The page of the opened or chosen tab then takes the keyboard.
 @MainActor
 struct CommandBarExecutor {
     let model: CommandBarModel
     let window: NSWindow?
     let openSettings: () -> Void
     var pasteboard: NSPasteboard = .general
-    /// Changement de Space animé (les tests l'appliquent tel quel).
+    /// Animated Space change (tests apply it as is).
     var animate: (() -> Void) -> Void = { change in withAnimation(.easeInOut(duration: 0.3), change) }
 
     private var windowModel: WindowModel {
         model.windowModel
     }
 
-    /// ⏎ ou clic : ferme la barre, rend le clavier à la fenêtre, exécute, puis donne le clavier à la page.
+    /// ⏎ or click: closes the bar, gives the keyboard back to the window, runs, then gives the keyboard to the page.
     func submit(_ rowID: CommandRow.ID?) {
         let submission = model.submission(for: rowID)
         guard submission != .ignore else {
@@ -35,7 +35,7 @@ struct CommandBarExecutor {
         }
     }
 
-    /// ⎋ et ⌘W : ferme la barre et rend le clavier à la page affichée.
+    /// ⎋ and ⌘W: closes the bar and gives the keyboard back to the displayed page.
     func cancel() {
         model.dismiss()
         window?.makeFirstResponder(nil)
@@ -44,7 +44,7 @@ struct CommandBarExecutor {
         }
     }
 
-    /// Exécute ; renvoie l'onglet dont la page doit prendre le clavier (nil : ne rien toucher).
+    /// Runs; returns the tab whose page should take the keyboard (nil: touch nothing).
     @discardableResult
     func perform(_ submission: CommandBarSubmission) -> BrowserTab? {
         switch submission {
@@ -63,7 +63,7 @@ struct CommandBarExecutor {
         }
     }
 
-    /// Dans l'onglet visé (qui garde sa place, même épinglé ou favori), sinon dans un nouvel onglet.
+    /// In the target tab (which keeps its place, even when pinned or a favorite), otherwise in a new tab.
     private func open(_ url: URL, mode: CommandBarMode) -> BrowserTab {
         log("open")
         let tabManager = windowModel.space.tabManager
@@ -75,7 +75,7 @@ struct CommandBarExecutor {
         return tabManager.newTab(url: url)
     }
 
-    /// Sélectionne l'onglet dans son Space, puis affiche ce Space s'il ne l'est pas.
+    /// Selects the tab in its Space, then shows that Space if it is not shown.
     private func switchToTab(_ reference: TabReference) -> BrowserTab? {
         guard let (space, tab) = windowModel.locate(reference) else {
             Logger.commandBar.notice("Onglet introuvable")
@@ -100,7 +100,7 @@ struct CommandBarExecutor {
             return nil
         case .copyURL:
             log("copyURL")
-            // Même action que ⇧⌘C : copie et confirmation « URL copiée ».
+            // Same action as ⇧⌘C: copy and “URL Copied” confirmation.
             windowModel.copySelectedTabURL(to: pasteboard)
             return tabManager.selectedTab
         case .settings:
@@ -110,7 +110,7 @@ struct CommandBarExecutor {
         }
     }
 
-    /// Nature de la ligne exécutée, jamais son adresse.
+    /// Kind of the executed row, never its address.
     private func log(_ kind: String) {
         Logger.commandBar.info("Ligne exécutée : \(kind, privacy: .public)")
     }

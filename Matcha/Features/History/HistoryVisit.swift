@@ -1,14 +1,14 @@
 import Foundation
 
-/// Visite gardée en mémoire par `HistoryIndex` : la copie d'un `HistoryRecord`, sans son profil (l'index est celui
-/// d'un profil).
+/// A visit kept in memory by `HistoryIndex`: the copy of a `HistoryRecord`, without its profile (the index belongs
+/// to one profile).
 nonisolated struct HistoryVisit: Equatable, Sendable {
     let id: UUID
-    /// Adresse retenue (`HistoryRecordingPolicy.storedURL`).
+    /// Kept address (`HistoryRecordingPolicy.storedURL`).
     let url: URL
-    /// `CommandText.urlKey(url)` : les visites de même clé sont la même page.
+    /// `CommandText.urlKey(url)`: visits with the same key are the same page.
     let urlKey: String
-    /// Titre non vide, ou nil (`HistoryRecordingPolicy.normalizedTitle`).
+    /// Non-empty title, or nil (`HistoryRecordingPolicy.normalizedTitle`).
     var title: String?
     var date: Date
 

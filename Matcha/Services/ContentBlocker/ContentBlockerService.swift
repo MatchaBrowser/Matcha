@@ -3,31 +3,31 @@ import Observation
 import OSLog
 import WebKit
 
-/// Bloqueur de publicités et de traqueurs (tâche 6.2), un pour toute l'app : tous les profils, les mini-fenêtres et les
-/// fenêtres privées. Au lancement, les listes livrées (`BlocklistBundle`) sont relues ou compilées dans le magasin de
-/// WebKit (`BlocklistLoader`) sans bloquer l'interface : les pages se chargent sans bloqueur jusque-là, puis les listes
-/// sont posées sur chaque page suivie et sur les suivantes. Chaque page a son propre contrôleur de contenu ; avant chaque
-/// navigation de son document principal, ses listes y sont posées, ou retirées si son site est en exception
-/// (`ContentBlockerScope`). Une règle `ignore-previous-rules` ne passe pas d'une liste à l'autre dans WebKit : une
-/// liste d'exceptions à part n'aurait aucun effet (`DECISIONS.md`). Réglage global « Bloquer les publicités et les
-/// traqueurs » (actif par défaut) ; le changer vaut pour les prochains chargements, sans recharger les pages.
+/// Ad and tracker blocker (task 6.2), one for the whole app: all profiles, mini windows and private windows. At
+/// launch, the shipped lists (`BlocklistBundle`) are looked up or compiled in WebKit's store (`BlocklistLoader`)
+/// without blocking the interface: pages load without the blocker until then, then the lists are added to each
+/// tracked page and to the following ones. Each page has its own content controller; before each navigation of its
+/// main document, its lists are added to it, or removed if its website has an exception (`ContentBlockerScope`). An
+/// `ignore-previous-rules` rule does not carry over from one list to another in WebKit: a separate exception list
+/// would have no effect (`DECISIONS.md`). Global setting “Block ads and trackers” (on by default); changing it
+/// applies to the next loads, without reloading the pages.
 @MainActor
 @Observable
 final class ContentBlockerService {
     static let shared = ContentBlockerService(defaults: .standard)
-    /// Faux tant que le bloqueur est mis de côté (`FEATURES.md`) : il n'est pas lancé et ses réglages sont cachés
-    /// (Confidentialité, réglages du site) ; son code et ses tests restent. Une extension (uBlock Origin Lite) en tient
-    /// lieu en attendant.
+    /// False while the blocker is set aside (`FEATURES.md`): it is not started and its settings are hidden
+    /// (Privacy, site settings); its code and tests remain. An extension (uBlock Origin Lite) stands in for it in the
+    /// meantime.
     static let isAvailable = false
 
     enum State: Equatable {
-        /// Pas lancé (app hôte des tests unitaires, tests).
+        /// Not started (host app of the unit tests, tests).
         case idle
         case loading
         case ready
     }
 
-    /// Une liste prête, pour les réglages.
+    /// A ready list, for the settings.
     struct InstalledList: Identifiable, Equatable {
         let entry: BlocklistEntry
         let record: CompiledBlocklist
@@ -38,9 +38,9 @@ final class ContentBlockerService {
     }
 
     private(set) var state = State.idle
-    /// Listes prêtes, dans l'ordre du manifeste.
+    /// Ready lists, in manifest order.
     private(set) var installedLists: [InstalledList] = []
-    /// Réglage « Bloquer les publicités et les traqueurs ».
+    /// “Block ads and trackers” setting.
     var isEnabled: Bool {
         didSet {
             guard isEnabled != oldValue else {
@@ -53,32 +53,32 @@ final class ContentBlockerService {
         }
     }
 
-    /// Sites où le bloqueur est désactivé, enregistrés.
+    /// Websites where the blocker is turned off, saved.
     @ObservationIgnored let exceptions: ContentBlockerExceptions
     @ObservationIgnored private let defaults: UserDefaults?
     @ObservationIgnored private var ruleLists: [WKContentRuleList] = []
     @ObservationIgnored private var pages = ContentBlockerPages()
-    /// Site d'une adresse pour les exceptions (remplacé dans les tests : leurs pages `obtest:` n'ont pas de site web).
+    /// Website of an address for exceptions (replaced in tests: their `obtest:` pages have no website).
     @ObservationIgnored var siteOfURL: (URL?) -> String? = ContentBlockerExceptions.site(for:)
 
-    /// `defaults` : réglages et listes compilées retenues ; nil (tests) : rien n'est lu ni écrit.
+    /// `defaults`: settings and remembered compiled lists; nil (tests): nothing is read or written.
     init(defaults: UserDefaults?) {
         self.defaults = defaults
         exceptions = ContentBlockerExceptions(defaults: defaults)
         isEnabled = BrowserSettings.blocksAdsAndTrackers(in: defaults)
     }
 
-    /// Vrai quand au moins une liste est prête.
+    /// True when at least one list is ready.
     var hasLists: Bool {
         !installedLists.isEmpty
     }
 
-    /// Pages suivies encore ouvertes (tests).
+    /// Tracked pages that are still open (tests).
     var trackedPageCount: Int {
         pages.count
     }
 
-    /// Au lancement de l'app : prépare les listes livrées, en tâche de fond. Sans effet s'il est déjà lancé.
+    /// At app launch: prepares the shipped lists, in the background. No effect if it is already started.
     func start() {
         guard state == .idle else {
             return
@@ -89,8 +89,8 @@ final class ContentBlockerService {
         }
     }
 
-    /// Prépare les listes de `source` dans `store`, puis les pose sur les pages suivies. Les tests donnent leurs listes et
-    /// un magasin temporaire, jamais celui de l'app.
+    /// Prepares the lists of `source` in `store`, then adds them to the tracked pages. Tests pass their own lists and a
+    /// temporary store, never the app's.
     func load(from source: BlocklistBundle, store: WKContentRuleListStore) async {
         state = .loading
         let clock = ContinuousClock()
@@ -99,7 +99,7 @@ final class ContentBlockerService {
         let loader = BlocklistLoader(store: store, readRules: { try await source.rules(of: $0) })
         let loaded = await loader.load(entries, previous: CompiledBlocklist.load(from: defaults))
         CompiledBlocklist.save(loaded.map(\.record), to: defaults)
-        // Listes d'un chargement précédent retirées des pages avant de poser les nouvelles.
+        // Lists from a previous load are removed from the pages before adding the new ones.
         pages.apply(ruleLists) { _ in false }
         ruleLists = loaded.flatMap(\.ruleLists)
         installedLists = loaded.map { InstalledList(entry: $0.entry, record: $0.record) }
@@ -112,14 +112,14 @@ final class ContentBlockerService {
         applyToPages(reloadingSite: nil)
     }
 
-    /// Le document principal de `webView` va être `url` (navigation autorisée, ou document affiché) : les listes y
-    /// sont posées, ou retirées si son site est en exception pour `scope`.
+    /// The main document of `webView` is about to be `url` (navigation allowed, or document shown): the lists are
+    /// added to it, or removed if its website has an exception for `scope`.
     func prepare(_ webView: WKWebView, for url: URL?, scope: ContentBlockerScope?) {
         let key = pages.track(webView, site: siteOfURL(url), scope: scope)
         pages.apply(ruleLists, only: key, blocks: blocks)
     }
 
-    /// Désactive (`isExcepted`) ou réactive le bloqueur sur `site`, enregistré ; ses pages ouvertes se rechargent.
+    /// Turns the blocker off (`isExcepted`) or back on for `site`, saved; its open pages reload.
     func setException(_ isExcepted: Bool, forSite site: String) {
         guard let site = ContentBlockerExceptions.normalized(site), exceptions.set(isExcepted, forSite: site) else {
             return
@@ -128,13 +128,13 @@ final class ContentBlockerService {
         exceptionsDidChange(forSite: site)
     }
 
-    /// L'exception de `site` a changé (enregistrée, ou dans une fenêtre privée) : les pages de ce site dont l'état
-    /// change se rechargent.
+    /// The exception for `site` changed (saved, or in a private window): the pages of that website whose state
+    /// changes reload.
     func exceptionsDidChange(forSite site: String) {
         applyToPages(reloadingSite: site)
     }
 
-    /// Pose ou retire les listes sur toutes les pages ; recharge celles de `site` qui ont changé.
+    /// Adds or removes the lists on all pages; reloads those of `site` that changed.
     private func applyToPages(reloadingSite site: String?) {
         let changed = pages.apply(ruleLists, blocks: blocks)
         guard let site else {
@@ -145,7 +145,7 @@ final class ContentBlockerService {
         }
     }
 
-    /// Vrai si les listes doivent être sur `page` : bloqueur actif, listes prêtes, site sans exception.
+    /// True if the lists must be on `page`: blocker on, lists ready, website without an exception.
     private func blocks(_ page: ContentBlockerPages.Page) -> Bool {
         guard isEnabled, !ruleLists.isEmpty else {
             return false

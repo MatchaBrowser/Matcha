@@ -2,7 +2,7 @@ import AppKit
 import SwiftUI
 
 nonisolated extension SpaceTheme {
-    /// Couleurs de la variante adaptée à l'apparence.
+    /// Colors of the variant suited to the appearance.
     func swiftUIColors(for colorScheme: ColorScheme) -> [Color] {
         (colorScheme == .dark ? darkColors : lightColors).map(\.color)
     }
@@ -23,7 +23,7 @@ extension ThemeColor {
         Color(.sRGB, red: red, green: green, blue: blue)
     }
 
-    /// Couleur choisie dans un sélecteur, convertie en sRGB.
+    /// Color chosen in a picker, converted to sRGB.
     init(_ color: Color) {
         let srgb = NSColor(color).usingColorSpace(.sRGB) ?? .gray
         self.init(red: srgb.redComponent, green: srgb.greenComponent, blue: srgb.blueComponent)

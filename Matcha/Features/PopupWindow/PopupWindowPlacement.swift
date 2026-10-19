@@ -1,16 +1,16 @@
 import CoreGraphics
 import Foundation
 
-/// Taille et place d'une fenêtre de connexion (tâche 5.8), en coordonnées d'écran d'AppKit (origine en bas à gauche),
-/// sans dépendance à l'interface.
+/// Size and position of a sign-in window (task 5.8), in AppKit screen coordinates (origin at the bottom left),
+/// without UI dependency.
 nonisolated enum PopupWindowPlacement {
-    /// Taille de la page quand la page ne donne qu'une des deux dimensions.
+    /// Page size when the page gives only one of the two dimensions.
     static let defaultPageSize = CGSize(width: 600, height: 600)
-    /// Plus petite page : une fenêtre minuscule (1 × 1) resterait utilisable.
+    /// Smallest page: so that a tiny window (1 × 1) stays usable.
     static let minimumPageSize = CGSize(width: 320, height: 300)
 
-    /// Taille de la page : celle demandée (la dimension absente prend la valeur par défaut), au moins la taille
-    /// minimale, arrondie au point.
+    /// Page size: the requested one (the missing dimension takes the default value), at least the minimum size,
+    /// rounded to the point.
     static func pageSize(for features: PopupWindowFeatures) -> CGSize {
         CGSize(
             width: max(minimumPageSize.width, (features.width ?? defaultPageSize.width).rounded()),
@@ -18,10 +18,10 @@ nonisolated enum PopupWindowPlacement {
         )
     }
 
-    /// Cadre d'une fenêtre de taille `size` (barre de titre comprise) dans `visible`, la zone utile de l'écran :
-    /// - la taille est ramenée à la zone ;
-    /// - la fenêtre est centrée sur `opener`, le cadre de la fenêtre d'origine, ou à défaut sur la zone ;
-    /// - puis glissée pour tenir entièrement dans la zone.
+    /// Frame of a window of size `size` (title bar included) in `visible`, the usable area of the screen:
+    /// - the size is reduced to fit the area;
+    /// - the window is centered on `opener`, the frame of the originating window, or failing that on the area;
+    /// - then slid to fit entirely within the area.
     static func frame(size requested: CGSize, opener: CGRect?, in visible: CGRect) -> CGRect {
         let size = CGSize(width: min(requested.width, visible.width), height: min(requested.height, visible.height))
         let center = opener.map { CGPoint(x: $0.midX, y: $0.midY) } ?? CGPoint(x: visible.midX, y: visible.midY)

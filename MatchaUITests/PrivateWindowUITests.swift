@@ -1,6 +1,6 @@
 import XCTest
 
-/// Fenêtre de navigation privée (⇧⌘N).
+/// Private browsing window (⇧⌘N).
 final class PrivateWindowUITests: XCTestCase {
     override func setUpWithError() throws {
         continueAfterFailure = false
@@ -16,20 +16,20 @@ final class PrivateWindowUITests: XCTestCase {
         let privateWindow = openPrivateWindow(in: app)
         XCTAssertTrue(badge.waitForExistence(timeout: 5))
         XCTAssertEqual(app.windows.count, 2)
-        // La fenêtre privée s'ouvre sans barre de commande, sur la page vide ; ⌘T l'ouvre dans cette
-        // fenêtre, sans clic préalable.
+        // The private window opens without the command bar, on the empty page; ⌘T opens the bar in this
+        // window, without a prior click.
         let hint = privateWindow.staticTexts.matching(NSPredicate(format: "value CONTAINS %@", "Appuyez sur ⌘T")).firstMatch
         XCTAssertTrue(hint.waitForExistence(timeout: 3))
         openEmptyTab(in: app, window: privateWindow)
         XCTAssertTrue(waitForCount(tabRows(in: app), 1))
         openEmptyTab(in: app, window: privateWindow)
         XCTAssertTrue(waitForCount(tabRows(in: app), 2))
-        // ⌘W ferme un onglet, pas la fenêtre.
+        // ⌘W closes a tab, not the window.
         app.typeKey("w", modifierFlags: .command)
         XCTAssertTrue(waitForCount(tabRows(in: app), 1))
         XCTAssertTrue(badge.exists)
 
-        // Fermer la fenêtre privée oublie ses onglets ; la suivante repart de zéro.
+        // Closing the private window forgets its tabs; the next one starts from scratch.
         app.typeKey("w", modifierFlags: [.command, .shift])
         XCTAssertTrue(badge.waitForNonExistence(timeout: 5))
         XCTAssertTrue(waitForCount(tabRows(in: app), 0))

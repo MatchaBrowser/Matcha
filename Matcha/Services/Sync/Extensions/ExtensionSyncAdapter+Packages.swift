@@ -3,15 +3,16 @@ import Foundation
 import OSLog
 import WebKit
 
-/// Paquets des extensions installées depuis un fichier (`SYNC.md` § 2.5 et § 4.7) : l'archive du dossier installé,
-/// chiffrée par sa propre clé, envoyée avant l'enregistrement qui la cite ; une nouvelle version a un nouveau paquet,
-/// l'ancien est supprimé ensuite.
+/// Packages of extensions installed from a file (`SYNC.md` § 2.5 and § 4.7): the archive of the installed folder,
+/// encrypted with its own key, uploaded before the record that references it; a new version has a new package, the
+/// old one is deleted afterwards.
 extension ExtensionSyncAdapter {
-    /// 20 Mio au plus : au-delà, l'extension voyage sans son paquet (l'autre Mac la montre « à réinstaller »).
+    /// 20 MiB at most: beyond that, the extension travels without its package (the other Mac shows it as “to
+    /// reinstall”).
     nonisolated static let maximumPackageSize = 20 * 1024 * 1024
 
-    /// Avant une synchro : envoie le paquet des extensions installées depuis un fichier qui n'en ont pas pour leur
-    /// version, puis installe les mises à jour reçues qui ne demandent ni permission ni site de plus.
+    /// Before a sync: uploads the package of extensions installed from a file that have none for their version, then
+    /// installs the received updates that ask for no additional permission or website.
     func preparePackages(using transport: any SyncTransport) async {
         guard transport.supportsBlobs, let directory = manager.directory else {
             return
@@ -39,7 +40,7 @@ extension ExtensionSyncAdapter {
         await installUpdates(using: transport)
     }
 
-    /// Après une synchro : supprime du serveur les paquets remplacés ou ceux des extensions désinstallées.
+    /// After a sync: deletes from the server the replaced packages or those of uninstalled extensions.
     func deleteObsoletePackages(using transport: any SyncTransport) async {
         let installed = Set(manager.installedIdentifiers)
         for (identifier, package) in synced.packages where !installed.contains(identifier) {
@@ -57,7 +58,7 @@ extension ExtensionSyncAdapter {
         }
     }
 
-    /// Paquet téléchargé, déchiffré et vérifié (empreinte, taille), écrit sous son nom dans un dossier temporaire.
+    /// Package downloaded, decrypted and verified (digest, size), written under its name in a temporary folder.
     func downloadPackage(_ package: SyncedPackage, using transport: any SyncTransport) async throws -> URL {
         let sealed = try await transport.blob(id: package.blobID)
         let data = try SyncCrypto.decryptBlob(sealed, id: package.blobID, key: SymmetricKey(data: package.blobKey))
@@ -75,8 +76,8 @@ extension ExtensionSyncAdapter {
         return file
     }
 
-    /// Mises à jour reçues d'extensions installées ici (`apply`) : installées si elles ne demandent ni permission ni site
-    /// de plus ; sinon elles restent proposées, et l'écran des permissions reviendra.
+    /// Received updates of extensions installed here (`apply`): installed if they ask for no additional permission or
+    /// website; otherwise they stay offered, and the permissions screen will come back.
     private func installUpdates(using transport: any SyncTransport) async {
         let installed = Set(manager.installedIdentifiers)
         for (identifier, fields) in synced.offers where installed.contains(identifier) {
@@ -96,7 +97,7 @@ extension ExtensionSyncAdapter {
                 synced.packages[identifier] = package
                 synced.offers[identifier] = nil
             } catch SyncTransportError.blobNotFound {
-                // Pas encore arrivé : à la prochaine synchro.
+                // Not arrived yet: at the next sync.
                 continue
             } catch {
                 Logger.sync.error("Mise à jour d'extension reçue non installée : \(error.localizedDescription, privacy: .public)")
@@ -104,7 +105,7 @@ extension ExtensionSyncAdapter {
         }
     }
 
-    /// Vrai si `candidate` demande une permission ou un site que la version installée ne demandait pas.
+    /// True if `candidate` asks for a permission or a website that the installed version did not ask for.
     func asksForMore(_ candidate: ExtensionInstallCandidate, than identifier: String) -> Bool {
         guard let current = manager.installed[identifier] else {
             return true
@@ -115,7 +116,7 @@ extension ExtensionSyncAdapter {
         return !permissions.isEmpty || !patterns.isEmpty
     }
 
-    /// Archive du dossier, chiffrée par une nouvelle clé, hors du fil principal ; nil au-delà de 20 Mio.
+    /// Archive of the folder, encrypted with a new key, off the main thread; nil beyond 20 MiB.
     nonisolated static func sealPackage(of folder: URL, version: String?, fileName: String) async throws -> (SyncedPackage, Data)? {
         try await Task.detached(priority: .utility) {
             let archive = try ZipWriter.archive(folder: folder)

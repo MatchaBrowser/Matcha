@@ -2,11 +2,11 @@ import Foundation
 @testable import Matcha
 import Testing
 
-/// Règles de la mise en veille (tâche 5.6) : quels onglets, dans quel ordre, selon la raison.
+/// Suspension rules (task 5.6): which tabs, in which order, depending on the reason.
 struct TabSuspensionPolicyTests {
     private static let thirtyMinutes: TimeInterval = 30 * 60
 
-    /// Onglet chargé et sans activité, caché depuis `minutes` minutes avant `fixedNow` (nil : affiché).
+    /// Loaded, idle tab, hidden for `minutes` minutes before `fixedNow` (nil: shown).
     private func candidate(
         _ id: UUID = UUID(),
         hiddenFor minutes: Double?,
@@ -41,9 +41,9 @@ struct TabSuspensionPolicyTests {
         #expect(!TabSuspensionPolicy.isEligible(candidate(hiddenFor: 40, isLoaded: false)))
         #expect(!TabSuspensionPolicy.isEligible(candidate(hiddenFor: 40, prompt: true)))
         #expect(!TabSuspensionPolicy.isEligible(candidate(hiddenFor: 40, capture: true)))
-        // Tâche 5.10 : l'icône haut-parleur suffit, sans demander à WebKit.
+        // Task 5.10: the speaker icon is enough, without asking WebKit.
         #expect(!TabSuspensionPolicy.isEligible(candidate(hiddenFor: 40, audio: true)))
-        // Tâche 5.8 : la page d'origine d'une fenêtre de connexion ouverte garde son lien `window.opener`.
+        // Task 5.8: the originating page of an open sign-in window keeps its `window.opener` link.
         #expect(!TabSuspensionPolicy.isEligible(candidate(hiddenFor: 40, popup: true)))
     }
 
@@ -78,10 +78,10 @@ struct TabSuspensionPolicyTests {
     @Test func `memory warning takes the oldest half of tabs hidden for a minute`() {
         let tabs = [10.0, 0.5, 3, 25, 2].map { candidate(hiddenFor: $0) }
         let examined = pool(tabs, .memoryWarning)
-        // Ni le délai réglé ni l'onglet quitté il y a 30 s.
+        // Neither the set delay nor the tab left 30 s ago.
         #expect(examined == [tabs[3].id, tabs[0].id, tabs[2].id, tabs[4].id])
         #expect(TabSuspensionPolicy.limit(examined, reason: .memoryWarning) == [tabs[3].id, tabs[0].id])
-        // Moitié arrondie au-dessus : un seul onglet part.
+        // Half rounded up: only one tab goes.
         #expect(TabSuspensionPolicy.limit([tabs[3].id], reason: .memoryWarning) == [tabs[3].id])
         #expect(TabSuspensionPolicy.limit([], reason: .memoryWarning).isEmpty)
     }

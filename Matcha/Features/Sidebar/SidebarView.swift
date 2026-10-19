@@ -1,22 +1,21 @@
 import SwiftUI
 
-/// Barre latérale, de haut en bas : navigation, adresse (badge du zoom, bouton des réglages du site), boutons des
-/// extensions, panneau des réglages du site s'il est ouvert, favoris, épinglés, nouvel onglet, onglets du jour, panneau des téléchargements
-/// s'il est ouvert,
-/// Spaces (et à gauche, le bouton des téléchargements, toujours là).
+/// Sidebar, from top to bottom: navigation, address (zoom badge, site settings button), extension buttons, site
+/// settings panel if it is open, favorites, pinned, new tab, today tabs, downloads panel if it is open, Spaces
+/// (and on the left, the downloads button, always there).
 struct SidebarView: View {
     let model: WindowModel
     let tabManager: TabManager
-    /// Ouvre la barre de commande sur l'adresse de l'onglet affiché (clic sur la pastille).
+    /// Opens the command bar on the address of the displayed tab (click on the pill).
     let editAddress: () -> Void
     let newTab: () -> Void
-    /// Faux quand la barre d'adresse est au-dessus de la page : la barre latérale n'a plus ni adresse
-    /// ni boutons de navigation.
+    /// False when the address bar is above the page: the sidebar then has neither an address
+    /// nor navigation buttons.
     var showsAddressBar = true
     var showsNavigationButtons = true
-    /// Action du bouton Accueil ; nil pour ne pas l'afficher.
+    /// Action of the Home button; nil to not display it.
     var goHome: (() -> Void)?
-    /// Bouton qui masque ou affiche la barre, à côté des boutons de la fenêtre.
+    /// Button that hides or shows the sidebar, next to the window's buttons.
     var sidebarToggle: SidebarToggle?
 
     @Environment(DownloadManager.self) private var downloads
@@ -30,7 +29,7 @@ struct SidebarView: View {
                     goHome: goHome,
                     sidebarToggle: sidebarToggle,
                 )
-                // Badge du zoom de l'onglet sélectionné, même quand un aperçu est ouvert (il a le sien).
+                // Zoom badge of the selected tab, even when a Peek is open (it has its own).
                 HStack(spacing: 4) {
                     AddressPill(tab: tabManager.selectedTab, edit: editAddress)
                     ZoomBadge(page: tabManager.selectedTab, siteZooms: tabManager.siteZooms)
@@ -39,7 +38,7 @@ struct SidebarView: View {
                     }
                 }
                 .animatesZoomBadge(of: tabManager.selectedTab)
-                // Boutons des extensions (tâche 6.5) : ils visent la page au premier plan (l'aperçu s'il est ouvert).
+                // Extension buttons (task 6.5): they target the page in front (the Peek if it is open).
                 ExtensionButtonsRow(tab: tabManager.frontTab, isPrivate: model.session.isPrivate)
                 if model.isSiteSettingsPresented {
                     VStack(spacing: 0) {
@@ -59,11 +58,11 @@ struct SidebarView: View {
                 }
             }
             .scrollIndicators(.never)
-            // Clic droit sur le fond de la barre ; les lignes ont leur propre menu.
+            // Right click on the sidebar's background; the rows have their own menu.
             .contextMenu {
                 Button("New Folder") { tabManager.newFolder() }
             }
-            // Ouvert même vide : il le dit, et mène au dossier Téléchargements.
+            // Opened even when empty: it says so, and leads to the Downloads folder.
             if model.isDownloadsPresented {
                 DownloadsPanel(downloads: downloads, scope: model.session.downloadScope) {
                     withAnimation(.easeOut(duration: 0.2)) { model.isDownloadsPresented = false }
@@ -79,7 +78,7 @@ struct SidebarView: View {
         .padding(.bottom, 8)
     }
 
-    /// Le panneau des réglages du site glisse sous la pastille et pousse les onglets.
+    /// The site settings panel slides below the pill and pushes the tabs down.
     private func setSiteSettingsPresented(_ isPresented: Bool) {
         withAnimation(.easeOut(duration: 0.2)) { model.isSiteSettingsPresented = isPresented }
     }

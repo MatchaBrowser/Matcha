@@ -1,14 +1,14 @@
 import Foundation
 
-/// Code source d'une page (« Afficher le code source » du menu d'une page), sans dépendance à l'interface : adresse du
-/// visualiseur (`matcha-source:https://…`, qui retrouve sa page après un relancement, comme `view-source:` dans Chrome),
-/// texte lu dans l'encodage de la réponse, et page HTML qui le montre, ligne par ligne et numérotée, sans aucun script.
+/// Source code of a page (“View Page Source” in a page's menu), with no dependency on the UI: address of the viewer
+/// (`matcha-source:https://…`, which finds its page again after a relaunch, like `view-source:` in Chrome), text read
+/// in the response's encoding, and HTML page that shows it, line by line and numbered, without any script.
 nonisolated enum PageSource {
     static let scheme = "matcha-source"
-    /// Pages dont on peut afficher le code source.
+    /// Pages whose source code can be shown.
     static let sourceSchemes: Set<String> = ["http", "https", "file"]
 
-    /// Adresse du visualiseur du code source de `page` ; nil pour une page qui n'en a pas (about:, data:…).
+    /// Address of the source code viewer of `page`; nil for a page that has none (about:, data:…).
     static func viewerURL(for page: URL?) -> URL? {
         guard let page, let scheme = page.scheme?.lowercased(), sourceSchemes.contains(scheme) else {
             return nil
@@ -16,7 +16,7 @@ nonisolated enum PageSource {
         return URL(string: "\(Self.scheme):\(page.absoluteString)")
     }
 
-    /// Page dont `viewer` montre le code source.
+    /// Page whose source code `viewer` shows.
     static func pageURL(fromViewer viewer: URL) -> URL? {
         guard viewer.scheme?.lowercased() == scheme else {
             return nil
@@ -28,7 +28,8 @@ nonisolated enum PageSource {
         return page
     }
 
-    /// Texte de `data`, dans l'encodage annoncé par la réponse (`charset`), sinon UTF-8, sinon Latin-1 (qui lit tout).
+    /// Text of `data`, in the encoding announced by the response (`charset`), otherwise UTF-8, otherwise Latin-1
+    /// (which reads everything).
     static func text(of data: Data, textEncodingName: String?) -> String {
         if let encoding = encoding(named: textEncodingName), let text = String(bytes: data, encoding: encoding) {
             return text
@@ -47,14 +48,14 @@ nonisolated enum PageSource {
         return String.Encoding(rawValue: CFStringConvertEncodingToNSStringEncoding(encoding))
     }
 
-    /// Page qui montre `source` : une ligne numérotée par ligne du texte, échappée ; aucun script ne peut s'y exécuter.
+    /// Page that shows `source`: one numbered line per line of the text, escaped; no script can run in it.
     static func viewerHTML(source: String, title: String) -> String {
         let lines = source.split(omittingEmptySubsequences: false, whereSeparator: \.isNewline)
             .map { "<li>\($0.isEmpty ? " " : escaped(String($0)))</li>" }
         return document(title: title, body: "<ol>\(lines.joined(separator: "\n"))</ol>")
     }
 
-    /// Page d'erreur du visualiseur.
+    /// Error page of the viewer.
     static func errorHTML(title: String, message: String, detail: String) -> String {
         document(title: title, body: "<p class=\"error\">\(escaped(message))</p><p class=\"detail\">\(escaped(detail))</p>")
     }

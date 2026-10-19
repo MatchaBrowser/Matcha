@@ -1,12 +1,12 @@
 import Foundation
 
-/// Site d'une adresse web, pour savoir si un lien quitte le site de la page : le domaine enregistrable,
-/// approché sans la liste publique des suffixes (aucune API publique d'Apple ne la donne). Ce sont les deux
-/// dernières étiquettes de l'hôte (« mail.google.com » → « google.com »), ou les trois dernières sous un
-/// suffixe connu à deux étiquettes (« news.bbc.co.uk » → « bbc.co.uk », « moi.github.io »). Une adresse IP,
-/// `localhost` ou un nom sans point est pris en entier. Le port et le schéma (http ou https) ne comptent pas.
+/// Site of a web address, to know whether a link leaves the page's site: the registrable domain, approximated without
+/// the public suffix list (no public Apple API provides it). It is the last two labels of the host
+/// (“mail.google.com” → “google.com”), or the last three under a known two-label suffix (“news.bbc.co.uk” →
+/// “bbc.co.uk”, “me.github.io”). An IP address, `localhost` or a name without a dot is taken whole. The port and the
+/// scheme (http or https) do not count.
 nonisolated enum SiteDomain {
-    /// Suffixes publics à deux étiquettes les plus courants (registres nationaux, hébergeurs de pages).
+    /// Most common two-label public suffixes (national registries, page hosts).
     static let twoLabelSuffixes: Set<String> = [
         "co.uk", "org.uk", "ac.uk", "gov.uk", "me.uk", "net.uk", "ltd.uk", "plc.uk", "sch.uk", "nhs.uk",
         "com.au", "net.au", "org.au", "edu.au", "gov.au", "asn.au", "id.au",
@@ -28,7 +28,7 @@ nonisolated enum SiteDomain {
         "cloudfront.net", "notion.site", "substack.com", "wordpress.com",
     ]
 
-    /// Site de `url`, ou nil hors du web (`file:`, `about:`…) ou sans hôte.
+    /// Site of `url`, or nil outside the web (`file:`, `about:`…) or without a host.
     static func site(of url: URL) -> String? {
         guard let scheme = url.scheme?.lowercased(), scheme == "http" || scheme == "https",
               var host = url.host(percentEncoded: false)?.lowercased(), !host.isEmpty
@@ -49,7 +49,7 @@ nonisolated enum SiteDomain {
         return lastTwo
     }
 
-    /// Vrai si `link` mène à un autre site que `page` ; faux si l'une des deux n'a pas de site.
+    /// True if `link` leads to a site other than that of `page`; false if either one has no site.
     static func isCrossSite(from page: URL, to link: URL) -> Bool {
         guard let pageSite = site(of: page), let linkSite = site(of: link) else {
             return false

@@ -1,18 +1,18 @@
 import Foundation
 import OSLog
 
-/// Split view : onglets affichés côte à côte. Le panneau actif est l'onglet sélectionné.
+/// Split view: tabs shown side by side. The active pane is the selected tab.
 extension TabManager {
     var displayedTabIDs: [BrowserTab.ID] {
         layout.displayedTabIDs(selected: selectedTabID)
     }
 
-    /// Onglets affichés dans la carte, de gauche à droite : le split de l'onglet sélectionné, sinon lui seul.
+    /// Tabs shown in the card, from left to right: the selected tab's split, otherwise the tab alone.
     var displayedTabs: [BrowserTab] {
         displayedTabIDs.compactMap(tab(withID:))
     }
 
-    /// Split affiché : celui de l'onglet sélectionné.
+    /// Displayed split: the selected tab's.
     var displayedSplit: SplitGroup? {
         selectedTabID.flatMap(layout.split(containing:))
     }
@@ -21,7 +21,7 @@ extension TabManager {
         layout.split(containing: tab.id)
     }
 
-    /// `.unavailable` pour un onglet d'un autre gestionnaire ; sinon face à l'onglet sélectionné.
+    /// `.unavailable` for a tab of another manager; otherwise against the selected tab.
     func splitAvailability(for tabID: BrowserTab.ID) -> SplitAvailability {
         guard tab(withID: tabID) != nil else {
             return .unavailable
@@ -29,14 +29,14 @@ extension TabManager {
         return layout.splitAvailability(of: tabID, anchor: selectedTabID)
     }
 
-    /// « Ouvrir en split » : à droite du panneau actif.
+    /// “Open in Split View”: to the right of the active pane.
     @discardableResult
     func openInSplit(_ tab: BrowserTab) -> Bool {
         let active = selectedTabID.flatMap { displayedTabIDs.firstIndex(of: $0) } ?? 0
         return openInSplit(tab, at: active + 1)
     }
 
-    /// Au rang `paneIndex` des panneaux affichés ; l'onglet devient le panneau actif. Faux si refusé.
+    /// At position `paneIndex` among the displayed panes; the tab becomes the active pane. False if refused.
     @discardableResult
     func openInSplit(_ tab: BrowserTab, at paneIndex: Int) -> Bool {
         guard let selected = selectedTabID, splitAvailability(for: tab.id) == .allowed else {
@@ -53,20 +53,20 @@ extension TabManager {
         return true
     }
 
-    /// « Retirer du split » : l'onglet reste ouvert, juste après le split.
+    /// “Remove from Split View”: the tab stays open, right after the split.
     func removeFromSplit(_ tab: BrowserTab) {
         keepingPanesOnScreen(leaving: tab) {
             updateLayout { $0.removeFromSplit(tab.id) }
         }
     }
 
-    /// « Séparer les onglets » : les onglets gardent leur place ; la sélection ne change pas.
+    /// “Separate Tabs”: the tabs keep their place; the selection does not change.
     func separateSplit(_ groupID: UUID) {
         updateLayout { $0.separateSplit(groupID) }
     }
 
-    /// Split du jour : ses onglets sont fermés ; épinglé : ils se déchargent et le split reste.
-    /// La sélection passe hors du split.
+    /// Today split: its tabs are closed; pinned: they unload and the split remains.
+    /// The selection moves out of the split.
     func closeSplit(_ groupID: UUID) {
         guard let group = layout.split(withID: groupID), let first = group.tabIDs.first else {
             return
@@ -82,7 +82,7 @@ extension TabManager {
         Logger.browser.info("Split fermé : \(members.count, privacy: .public) panneaux")
     }
 
-    /// Déplace tout le split (glisser-déposer de sa ligne).
+    /// Moves the whole split (drag and drop of its row).
     func moveSplit(_ groupID: UUID, to destination: SidebarDestination) {
         guard let group = layout.split(withID: groupID) else {
             return
@@ -90,7 +90,7 @@ extension TabManager {
         changingPlaces(of: group.tabIDs) { $0.moveSplit(groupID, to: destination) }
     }
 
-    /// « Épingler le split » et « Désépingler le split ».
+    /// “Pin Split View” and “Unpin Split View”.
     func setSplitPlace(_ groupID: UUID, to place: TabPlace) {
         guard let group = layout.split(withID: groupID) else {
             return
@@ -98,18 +98,18 @@ extension TabManager {
         changingPlaces(of: group.tabIDs) { $0.setSplitPlace(groupID, to: place) }
     }
 
-    /// Parts de largeur des panneaux, retenues à la fin d'un glissement du séparateur.
+    /// Width shares of the panes, kept at the end of a divider drag.
     func setSplitFractions(_ groupID: UUID, _ fractions: [Double]) {
         updateLayout { $0.setSplitFractions(groupID, fractions) }
     }
 
-    /// Un onglet du split est chargé, ou en veille (tâche 5.6) : le split peut se fermer.
+    /// A tab of the split is loaded, or asleep (task 5.6): the split can be closed.
     func hasLoadedTab(inSplit groupID: UUID) -> Bool {
         layout.split(withID: groupID)?.tabIDs.contains { tab(withID: $0)?.appearsLoaded == true } ?? false
     }
 
-    /// Applique `change` ; si `tab`, panneau actif, a quitté son split, son voisin devient actif : le reste du
-    /// split reste affiché.
+    /// Applies `change`; if `tab`, the active pane, has left its split, its neighbor becomes active: the rest of
+    /// the split stays displayed.
     func keepingPanesOnScreen(leaving tab: BrowserTab, during change: () -> Void) {
         let neighbor = selectedTabID == tab.id ? layout.split(containing: tab.id)?.neighbor(of: tab.id) : nil
         change()
@@ -119,7 +119,7 @@ extension TabManager {
         setSelection(neighbor)
     }
 
-    /// Applique `change` puis met à jour l'adresse d'origine des onglets de `ids` qui ont changé de place.
+    /// Applies `change`, then updates the original address of the tabs of `ids` that changed place.
     private func changingPlaces(of ids: [UUID], _ change: (inout SidebarLayout) -> Void) {
         let previous = Dictionary(ids.map { ($0, layout.place(of: $0)) }) { first, _ in first }
         updateLayout(change)

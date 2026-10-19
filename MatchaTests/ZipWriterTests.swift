@@ -2,7 +2,7 @@ import Foundation
 @testable import Matcha
 import Testing
 
-/// Archive zip du dossier d'une extension (tâche 7.4), relue par `ZipArchive`.
+/// Zip archive of an extension's folder (task 7.4), read back by `ZipArchive`.
 struct ZipWriterTests {
     @Test func `a folder goes into an archive and comes back`() throws {
         let folder = FileManager.default.temporaryDirectory.appending(path: "zip-writer-\(UUID().uuidString)", directoryHint: .isDirectory)
@@ -25,7 +25,7 @@ struct ZipWriterTests {
         for entry in archive.entries {
             #expect(try archive.contents(of: entry) == files[entry.path])
         }
-        // Le script répété se compresse, l'image pas.
+        // The repeated script compresses, the image does not.
         #expect(archive.entries.first { $0.path == "scripts/fond.js" }?.method == 8)
 
         let extracted = folder.appending(path: "copie", directoryHint: .isDirectory)

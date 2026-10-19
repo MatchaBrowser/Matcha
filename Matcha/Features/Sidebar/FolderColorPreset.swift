@@ -1,9 +1,9 @@
 import Foundation
 
-/// Couleur du nuancier d'un dossier (texte et fond) : les couleurs du système d'Apple, en sRGB 8 bits exacts (elles
-/// sont identiques après un aller-retour par la base, `ThemeColor.hexString`).
+/// Color of a folder's swatches (text and background): Apple's system colors, in exact 8-bit sRGB (they are
+/// identical after a round trip through the database, `ThemeColor.hexString`).
 nonisolated struct FolderColorPreset: Identifiable, Sendable {
-    /// Identifiant stable (tests d'interface), jamais affiché.
+    /// Stable identifier (UI tests), never displayed.
     let id: String
     let color: ThemeColor
     let title: LocalizedStringResource

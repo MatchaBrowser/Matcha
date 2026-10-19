@@ -1,33 +1,33 @@
 import Foundation
 
-/// Jour d'une section de la fenêtre de l'historique.
+/// Day of a section in the history window.
 nonisolated enum HistoryDay: Hashable, Sendable {
     case today
     case yesterday
-    /// Début du jour.
+    /// Start of the day.
     case date(Date)
 }
 
-/// Ligne de la fenêtre de l'historique : une adresse visitée un jour donné, toutes ses visites de ce jour réunies.
+/// Row of the history window: an address visited on a given day, with all its visits of that day merged.
 nonisolated struct HistoryRow: Identifiable, Hashable, Sendable {
-    /// « <début du jour>|<clé d'adresse> ».
+    /// “<start of day>|<address key>”.
     let id: String
     let url: URL
-    /// Dernier titre de l'adresse, sinon son adresse lisible.
+    /// Last title of the address, otherwise its readable address.
     let title: String
-    /// Domaine sans « www. », ou nom du fichier (`AddressDisplay.short`).
+    /// Domain without “www.”, or file name (`AddressDisplay.short`).
     let host: String
-    /// Dernière visite de ce jour.
+    /// Last visit of that day.
     let lastVisit: Date
-    /// Visites de ce jour, supprimées avec la ligne.
+    /// Visits of that day, deleted with the row.
     let visitIDs: [UUID]
 }
 
 nonisolated struct HistorySection: Identifiable, Hashable, Sendable {
     let day: HistoryDay
-    /// Début du jour.
+    /// Start of the day.
     let start: Date
-    /// De la plus récente à la plus ancienne.
+    /// From the most recent to the oldest.
     let rows: [HistoryRow]
 
     var id: Date {
@@ -35,11 +35,11 @@ nonisolated struct HistorySection: Identifiable, Hashable, Sendable {
     }
 }
 
-/// Contenu de la fenêtre de l'historique, pur : visites d'un profil regroupées par jour (le plus récent d'abord) et
-/// par adresse, filtrées par le texte cherché.
+/// Content of the history window, pure: a profile's visits grouped by day (most recent first) and by address,
+/// filtered by the searched text.
 nonisolated enum HistoryList {
-    /// `search` : chaque mot doit se trouver dans le titre ou l'adresse, sans tenir compte de la casse, des accents
-    /// ni de la largeur ; vide : tout.
+    /// `search`: each word must be found in the title or the address, ignoring case, accents and width; empty:
+    /// everything.
     static func sections(from index: HistoryIndex, search: String, now: Date, calendar: Calendar) -> [HistorySection] {
         let tokens = CommandText.fold(search).split(separator: " ").map(String.init)
         let entries = tokens.isEmpty ? index.entries : index.entries.filter { matches($0.value, tokens: tokens) }
@@ -72,7 +72,7 @@ nonisolated enum HistoryList {
                 order = []
             }
             if rows[visit.urlKey] == nil {
-                // Visites de la plus récente à la plus ancienne : la première est la dernière du jour.
+                // Visits from the most recent to the oldest: the first is the day's last.
                 rows[visit.urlKey] = (visit.date, [])
                 order.append(visit.urlKey)
             }
@@ -82,13 +82,13 @@ nonisolated enum HistoryList {
         return sections
     }
 
-    /// `sections(from:search:now:calendar:)` hors du fil principal (fenêtre de l'historique).
+    /// `sections(from:search:now:calendar:)` off the main thread (history window).
     @concurrent
     static func build(from index: HistoryIndex, search: String, now: Date, calendar: Calendar) async -> [HistorySection] {
         sections(from: index, search: search, now: now, calendar: calendar)
     }
 
-    /// Chaque mot de `tokens` (repliés) se trouve dans le titre affiché ou l'adresse lisible.
+    /// Each word of `tokens` (folded) is found in the displayed title or the readable address.
     static func matches(_ entry: HistoryIndexEntry, tokens: [String]) -> Bool {
         let fields = entry.fields.titles + [entry.fields.address].compactMap(\.self)
         return tokens.allSatisfy { token in fields.contains { $0.contains(token) } }

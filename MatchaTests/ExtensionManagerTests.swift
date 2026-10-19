@@ -3,7 +3,7 @@ import Foundation
 import Testing
 import WebKit
 
-/// Chargement d'extensions et WebKit (tâche 6.3), avec l'extension d'essai (`TestExtension`).
+/// Loading extensions and WebKit (task 6.3), with the test extension (`TestExtension`).
 @MainActor
 struct ExtensionManagerTests {
     @Test func `the test extension loads under a stable identifier`() async throws {
@@ -56,7 +56,7 @@ struct ExtensionManagerTests {
 
     // MARK: Pages
 
-    /// Page `obtest:` dans un onglet branché sur `manager`, avec le magasin de données `store`.
+    /// `obtest:` page in a tab attached to `manager`, with the data store `store`.
     private func page(_ url: URL, store: WKWebsiteDataStore, manager: ExtensionManager) async throws -> BrowserTab {
         let configuration = TestPages.configuration()
         configuration.websiteDataStore = store
@@ -67,7 +67,7 @@ struct ExtensionManagerTests {
         return tab
     }
 
-    /// Attend la marque du script de contenu (« 1 ») ; renvoie la dernière lue.
+    /// Waits for the content script's mark (“1”); returns the last one read.
     private func marker(of tab: BrowserTab, expecting expected: String, attempts: Int = 100) async throws -> String? {
         var value: String?
         for _ in 0 ..< attempts {
@@ -80,8 +80,8 @@ struct ExtensionManagerTests {
         return value
     }
 
-    /// Magasin persistant à identifiant neuf (les pages d'un profil), effacé après `body` (sinon au lancement suivant de
-    /// l'app, qui supprime les magasins sans profil).
+    /// Persistent store with a new identifier (a profile's pages), deleted after `body` (otherwise at the next launch
+    /// of the app, which removes the stores without a profile).
     private func withProfileStore(_ body: (WKWebsiteDataStore) async throws -> Void) async throws {
         let identifier = UUID()
         try await body(WKWebsiteDataStore(forIdentifier: identifier))
@@ -105,7 +105,7 @@ struct ExtensionManagerTests {
         let (context, folder) = try await TestExtension.load(in: manager)
         defer { try? FileManager.default.removeItem(at: folder) }
         try await TestExtension.waitForBackground(of: context)
-        // Magasin non persistant : une page privée pour WebKit.
+        // Non-persistent store: a private page for WebKit.
         let tab = try await page(TestPages.url("page"), store: .nonPersistent(), manager: manager)
         #expect(try await marker(of: tab, expecting: "1", attempts: 10) == "none")
         manager.setAccessToPrivateData(true, identifier: context.uniqueIdentifier)
@@ -125,7 +125,7 @@ struct ExtensionManagerTests {
         defer { try? FileManager.default.removeItem(at: folder) }
         try await TestExtension.waitForBackground(of: context)
         try await withProfileStore { store in
-            // La page qui demande doit être un onglet connu de l'extension : WebKit refuse sinon ses messages.
+            // The requesting page must be a tab known to the extension: otherwise WebKit rejects its messages.
             let configuration = TestPages.configuration()
             configuration.websiteDataStore = store
             manager.attach(to: configuration)
@@ -135,7 +135,7 @@ struct ExtensionManagerTests {
             var components = try #require(URLComponents(url: TestPages.url("opener"), resolvingAgainstBaseURL: false))
             components.fragment = "matcha-open-tab"
             try opener.load(#require(components.url))
-            // Réponse du service worker, que le script de contenu écrit dans la page (« created <id> » ou l'erreur).
+            // Service worker's reply, which the content script writes into the page (“created <id>” or the error).
             var reply = ""
             for _ in 0 ..< 600 {
                 reply = await (try? opener.loadedWebView.evaluateJavaScript("document.body?.dataset.reply ?? ''") as? String) ?? ""
@@ -155,7 +155,7 @@ struct ExtensionManagerTests {
         }
     }
 
-    // MARK: Décisions
+    // MARK: Decisions
 
     @Test func `permission requests ask the user and grant nothing on refusal`() async throws {
         let prompter = FakePermissionPrompter(answer: false)

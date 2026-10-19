@@ -3,8 +3,8 @@ import Foundation
 import SwiftData
 import Testing
 
-/// Import d'une barre d'Arc dans une session en mémoire (tâche 7.1) : Spaces, dossiers, épinglés, onglets ouverts,
-/// profils, favoris.
+/// Import of an Arc sidebar into an in-memory session (task 7.1): Spaces, folders, pinned tabs, open tabs,
+/// profiles, favorites.
 @MainActor
 struct ArcImporterTests {
     private let session: BrowserSession
@@ -47,11 +47,11 @@ struct ArcImporterTests {
         #expect(inner.parent === outer)
         #expect(pinned.first { $0.pinnedTitle == "Renommé" }?.folder === outer)
         #expect(pinned.first { $0.pinnedTitle == "example.com" }?.folder === inner)
-        // Le Space ouvert a repris son contenu enregistré.
+        // The open Space got its saved content back.
         #expect(perso.tabManager.tabs.count(where: { $0.pinnedURL != nil && $0.pinnedTitle != "Mail" && $0.pinnedTitle != "Agenda" }) == 3)
-        // Rien ne se charge de lui-même : aucun onglet importé n'est sélectionné.
+        // Nothing loads by itself: no imported tab is selected.
         #expect(perso.tabManager.selectedTab == nil)
-        // Onglets ouverts : pas par défaut.
+        // Open tabs: not by default.
         #expect((perso.record.tabs ?? []).filter { $0.place == .today }.isEmpty)
     }
 
@@ -76,11 +76,11 @@ struct ArcImporterTests {
         let displayed = try #require(session.spaces.first)
         let (_, spaces) = importer().importSidebar(sidebar, options: ArcImportOptions())
         #expect(displayed.tabManager.favoriteTabs.map(\.title) == ["Mail", "Agenda"])
-        // Un Space importé du même profil reprend les mêmes onglets en s'affichant.
+        // An imported Space of the same profile shows the same tabs once displayed.
         session.showFavorites(in: spaces[0])
         #expect(spaces[0].tabManager.favoriteTabs.map(\.id) == displayed.tabManager.favoriteTabs.map(\.id))
 
-        // Un second import n'ajoute pas les adresses déjà en favori, et reprend le profil de même nom.
+        // A second import does not add the addresses already in favorites, and reuses the profile with the same name.
         let profiles = session.profiles.count
         let (summary, again) = importer().importSidebar(sidebar, options: ArcImportOptions())
         #expect(displayed.tabManager.favoriteTabs.count == 2)
@@ -97,7 +97,7 @@ struct ArcImporterTests {
         let (_, spaces) = importer().importSidebar(sidebar, options: ArcImportOptions(profileID: profile.id))
         #expect(spaces[0].record.profile === profile)
         #expect(spaces[2].record.profile === profile)
-        // Les favoris rejoignent ce profil, dont un Space n'est pas affiché : le premier les tient.
+        // The favorites join this profile, one of whose Spaces is not shown: the first one holds them.
         #expect(other.tabManager.favoriteTabs.map(\.title) == ["Mail", "Agenda"])
     }
 }

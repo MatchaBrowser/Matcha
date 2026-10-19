@@ -1,11 +1,11 @@
-"""Ajoute des textes traduits au catalogue Localizable.xcstrings, dans le format et l'ordre qu'écrit Xcode (clés
-triées par `localizedStandardCompare`, séparateurs « : »), pour que les différences restent petites.
+"""Adds translated texts to the Localizable.xcstrings catalog, in the format and order that Xcode writes (keys
+sorted by `localizedStandardCompare`, “ : ” separators), so that diffs stay small.
 
-    python3 -I scripts/add-strings.py nouveaux.json
-    python3 -I scripts/add-strings.py --check     # le catalogue est-il dans l'ordre de Xcode ?
+    python3 -I scripts/add-strings.py new.json
+    python3 -I scripts/add-strings.py --check     # is the catalog in Xcode's order?
 
-`nouveaux.json` : {"Clé anglaise": {"comment": "…", "fr": "…", "de": "…", "es": "…", "it": "…"}} ; pour un pluriel,
-chaque langue (anglais compris) vaut {"one": "…", "other": "…"}. Une clé déjà présente est refusée.
+`new.json`: {"English key": {"comment": "…", "fr": "…", "de": "…", "es": "…", "it": "…"}}; for a plural,
+each language (English included) is {"one": "…", "other": "…"}. A key that is already present is rejected.
 """
 
 import json
@@ -28,7 +28,7 @@ FileHandle.standardOutput.write(try! JSONEncoder().encode(sorted))
 
 
 def xcode_order(keys):
-    """Clés dans l'ordre de Xcode (`localizedStandardCompare`, calculé par Swift)."""
+    """Keys in Xcode's order (`localizedStandardCompare`, computed by Swift)."""
     folder = tempfile.mkdtemp()
     try:
         program = os.path.join(folder, "sort.swift")

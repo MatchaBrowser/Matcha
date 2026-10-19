@@ -1,21 +1,21 @@
 import Foundation
 import SwiftData
 
-/// Dossier d'épinglés enregistré. Son ordre se range avec celui des onglets du même conteneur.
+/// Saved folder of pinned tabs. Its order is sorted together with that of the tabs in the same container.
 @Model
 final class FolderRecord {
     var id = UUID()
     var name = ""
     var order = 0
     var isCollapsed = false
-    /// Icône choisie (`SidebarIcon.storedValue`) : « symbol:<nom du symbole SF> » ou « emoji:<emoji> » ; nil : l'icône
-    /// par défaut.
+    /// Chosen icon (`SidebarIcon.storedValue`): “symbol:<SF Symbol name>” or “emoji:<emoji>”; nil: the default
+    /// icon.
     var iconValue: String?
-    /// Couleurs du nom et du fond de la ligne, « #RRGGBB » (sRGB) ; nil : celles du système.
+    /// Colors of the row's name and background, “#RRGGBB” (sRGB); nil: the system's.
     var textColorHex: String?
     var backgroundColorHex: String?
     var space: SpaceRecord?
-    /// Dossier parent ; nil à la racine des épinglés.
+    /// Parent folder; nil at the root of the pinned tabs.
     var parent: FolderRecord?
     @Relationship(deleteRule: .cascade, inverse: \FolderRecord.parent) var children: [FolderRecord]? = []
     @Relationship(deleteRule: .nullify, inverse: \TabRecord.folder) var tabs: [TabRecord]? = []
@@ -27,7 +27,7 @@ final class FolderRecord {
         self.isCollapsed = isCollapsed
     }
 
-    /// Apparence lue dans les champs enregistrés (illisible : valeurs par défaut) ; l'écrire les remplace.
+    /// Appearance read from the saved fields (unreadable: default values); writing it replaces them.
     var appearance: FolderAppearance {
         get { FolderAppearance(storedIcon: iconValue, textColorHex: textColorHex, backgroundColorHex: backgroundColorHex) }
         set {

@@ -3,15 +3,15 @@ import Foundation
 import OSLog
 import SwiftData
 
-/// Options choisies dans l'aperçu de l'import d'Arc (tâche 7.1).
+/// Options chosen in the preview of the Arc import (task 7.1).
 struct ArcImportOptions: Equatable {
-    /// Profil de Matcha qui reçoit le profil par défaut d'Arc ; nil : le premier profil.
+    /// Matcha profile that receives Arc's default profile; nil: the first profile.
     var profileID: UUID?
-    /// Onglets ouverts d'Arc ajoutés aux onglets du jour de leur Space.
+    /// Arc's open tabs added to the Today tabs of their Space.
     var includesOpenTabs = false
 }
 
-/// Ce qu'un import a ajouté.
+/// What an import added.
 struct ImportSummary: Equatable {
     var profiles = 0
     var spaces = 0
@@ -20,27 +20,27 @@ struct ImportSummary: Equatable {
     var favorites = 0
 }
 
-/// Importe une barre d'Arc (tâche 7.1) : chaque Space d'Arc devient un nouveau Space (nom, icône, couleurs, épinglés et
-/// dossiers, et ses onglets ouverts si on le demande), les profils ajoutés dans Arc deviennent des profils, les favoris
-/// rejoignent ceux de leur profil (sans doublon d'adresse). Les nouveaux Spaces sont enregistrés avec leur contenu,
-/// puis ouverts ; les favoris d'un profil déjà ouvert rejoignent le Space qui les tient (`favoritesHolder`), et les
-/// autres Spaces du profil les reprennent en s'affichant.
+/// Imports an Arc sidebar (task 7.1): each Arc Space becomes a new Space (name, icon, colors, pinned tabs and folders,
+/// and its open tabs if requested), the profiles added in Arc become profiles, the favorites join those of their
+/// profile (without duplicate addresses). The new Spaces are saved with their content, then opened; the favorites of an
+/// already open profile join the Space that holds them (`favoritesHolder`), and the other Spaces of the profile take
+/// them back when they are displayed.
 @MainActor
 struct ArcImporter {
     let session: BrowserSession
-    /// Vrai si le symbole SF existe sur ce Mac (remplacé dans les tests).
+    /// True if the SF symbol exists on this Mac (replaced in the tests).
     var symbolExists: (String) -> Bool = { NSImage(systemSymbolName: $0, accessibilityDescription: nil) != nil }
 
-    /// Importe `sidebar` ; renvoie le bilan et les Spaces créés, dans l'ordre.
+    /// Imports `sidebar`; returns the summary and the created Spaces, in order.
     func importSidebar(_ sidebar: ArcSidebar, options: ArcImportOptions) -> (summary: ImportSummary, spaces: [SpaceSession]) {
         let context = session.container.mainContext
         var summary = ImportSummary()
         let target = session.profiles.first { $0.id == options.profileID } ?? session.profiles.first
         let (profiles, created) = resolveProfiles(of: sidebar, defaultProfile: target, context: context)
         summary.profiles = created.count
-        // Favoris des profils créés : enregistrés avant l'ouverture de leurs Spaces, qui les liront.
+        // Favorites of the created profiles: saved before their Spaces open, which will read them.
         summary.favorites = insertFavorites(sidebar.favorites, profiles: profiles, only: created, context: context)
-        // Spaces : un par Space d'Arc, et un Space vide pour un profil créé qui n'en a pas.
+        // Spaces: one per Arc Space, and an empty Space for a created profile that has none.
         var records: [SpaceRecord] = []
         for arcSpace in sidebar.spaces {
             let record = insertSpace(named: arcSpace.name, in: profiles[arcSpace.profile] ?? target, at: records.count, context: context)
@@ -73,10 +73,10 @@ struct ArcImporter {
         return (summary, opened)
     }
 
-    // MARK: Profils
+    // MARK: Profiles
 
-    /// Profil de Matcha de chaque profil d'Arc : `defaultProfile` pour celui par défaut, le profil de même nom s'il
-    /// existe (un nouvel import ne le double pas), sinon un profil créé. Renvoie aussi les profils créés.
+    /// Matcha profile for each Arc profile: `defaultProfile` for the default one, the profile with the same name if it
+    /// exists (a new import does not duplicate it), otherwise a created profile. Also returns the created profiles.
     private func resolveProfiles(
         of sidebar: ArcSidebar,
         defaultProfile: ProfileRecord?,
@@ -99,9 +99,9 @@ struct ArcImporter {
         return (profiles, created)
     }
 
-    // MARK: Enregistrements
+    // MARK: Records
 
-    /// Favoris des profils `only`, enregistrés directement (leurs Spaces ne sont pas encore ouverts). Renvoie leur nombre.
+    /// Favorites of the `only` profiles, saved directly (their Spaces are not open yet). Returns their number.
     private func insertFavorites(
         _ favorites: [ArcSidebar.Profile: [ImportedTab]],
         profiles: [ArcSidebar.Profile: ProfileRecord],
@@ -126,7 +126,7 @@ struct ArcImporter {
         return count
     }
 
-    /// Onglets ouverts d'Arc, parmi les onglets du jour du Space.
+    /// Arc's open tabs, among the Today tabs of the Space.
     private func insertOpenTabs(_ tabs: [ImportedTab], in space: SpaceRecord, context: ModelContext) {
         for (order, tab) in tabs.enumerated() {
             let record = TabRecord(url: tab.url, title: tab.title, place: .today, order: order)
@@ -136,8 +136,8 @@ struct ArcImporter {
         }
     }
 
-    /// Nouveau Space à la fin, avec l'icône et le thème qu'aurait un Space ajouté à la main (remplacés ensuite par ceux
-    /// d'Arc s'il en a) ; sans nom, « Space N ».
+    /// New Space at the end, with the icon and theme a Space added by hand would have (then replaced by Arc's if it has
+    /// them); without a name, “Space N”.
     private func insertSpace(named name: String, in profile: ProfileRecord?, at offset: Int, context: ModelContext) -> SpaceRecord {
         let index = session.spaces.count + offset
         let trimmed = name.trimmingCharacters(in: .whitespacesAndNewlines)
@@ -152,7 +152,7 @@ struct ArcImporter {
         return record
     }
 
-    /// Épinglés et dossiers, dans l'ordre (onglets et dossiers d'un même conteneur partagent leur rang).
+    /// Pinned tabs and folders, in order (tabs and folders of the same container share their index).
     private func insert(
         _ nodes: [ImportNode],
         in space: SpaceRecord,
@@ -183,8 +183,8 @@ struct ArcImporter {
         }
     }
 
-    /// Favoris des profils déjà là : à la fin de ceux du Space qui les tient, sans les adresses déjà en favori. Renvoie
-    /// le nombre de favoris ajoutés.
+    /// Favorites of the profiles already there: at the end of those of the Space that holds them, without the addresses
+    /// already in favorites. Returns the number of favorites added.
     private func importFavorites(
         _ favorites: [ArcSidebar.Profile: [ImportedTab]],
         profiles: [ArcSidebar.Profile: ProfileRecord],
@@ -216,7 +216,7 @@ struct ArcImporter {
         return added
     }
 
-    /// Une seule fois chaque adresse, dans l'ordre.
+    /// Each address only once, in order.
     static func withoutDuplicates(_ tabs: [ImportedTab]) -> [ImportedTab] {
         var seen: Set<URL> = []
         return tabs.filter { seen.insert($0.url).inserted }

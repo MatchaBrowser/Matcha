@@ -2,14 +2,14 @@ import Foundation
 @testable import Matcha
 import WebKit
 
-/// Réponses de WebKit simulées pour la mise en veille : pages qui jouent du son, captures demandées.
+/// Simulated WebKit answers for suspension: pages that play sound, requested snapshots.
 @MainActor
 final class FakeTabProbes {
     var playing: Set<ObjectIdentifier> = []
-    /// Questions posées à WebKit sur le son (tâche 5.10 : jamais pour un onglet dont l'icône montre qu'il en joue).
+    /// Questions asked to WebKit about sound (task 5.10: never for a tab whose icon shows it is playing some).
     var mediaRequests = 0
     var snapshotRequests = 0
-    /// Appelé pendant chaque capture (l'utilisateur affiche l'onglet pendant ce temps…).
+    /// Called during each snapshot (the user shows the tab in the meantime…).
     var duringSnapshot: (() -> Void)?
 
     func probes() -> TabLifecycleProbes {

@@ -2,7 +2,7 @@ import Foundation
 @testable import Matcha
 import Testing
 
-/// Source des suggestions du moteur : attente, annulation, politique et erreurs.
+/// Source of the search engine's suggestions: delay, cancellation, policy and errors.
 @MainActor
 struct SearchSuggestionsProviderTests {
     private let engine = FakeSuggestionEngine()
@@ -47,7 +47,7 @@ struct SearchSuggestionsProviderTests {
         #expect(await provider.candidates(for: query("pain"), context: context).isEmpty)
         #expect(engine.requests.isEmpty)
 
-        // Avec la vraie attente : une tâche annulée pendant les 150 ms n'envoie rien.
+        // With the real delay: a task cancelled during the 150 ms sends nothing.
         let realWait = engine.provider(sleep: nil)
         let task = Task { await realWait.candidates(for: query("pain"), context: context) }
         task.cancel()

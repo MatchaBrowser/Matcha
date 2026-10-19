@@ -1,19 +1,19 @@
 import Foundation
 import SwiftData
 
-/// Décision retenue d'un profil pour un site et une permission (tâche 5.2) : « Toujours autoriser » ou « Refuser »
-/// dans le bandeau, ou le choix fait dans les réglages du site. « Autoriser une fois » n'est jamais enregistré, une
-/// fenêtre privée non plus (ses décisions restent en mémoire, `SitePermissionStore`). Reste sur le Mac (`SYNC.md`).
+/// A profile's remembered decision for a website and a permission (task 5.2): “Always Allow” or “Don't Allow” in
+/// the banner, or the choice made in the site settings. “Allow Once” is never saved, nor is a private window
+/// (its decisions stay in memory, `SitePermissionStore`). Stays on the Mac (`SYNC.md`).
 @Model
 final class SitePermissionRecord {
     var id = UUID()
-    /// Profil dont les pages sont concernées.
+    /// Profile whose pages are concerned.
     var profileID: UUID?
-    /// Origine de la page principale (`SiteOrigin.key`) : « https://meet.google.com », « http://localhost:8080 ».
+    /// Origin of the main page (`SiteOrigin.key`): “https://meet.google.com”, “http://localhost:8080”.
     var originKey = ""
-    /// Permission, en texte (`SitePermissionKind`) : `camera`, `microphone`.
+    /// Permission, as text (`SitePermissionKind`): `camera`, `microphone`.
     var kindValue = ""
-    /// Décision, en texte (`SitePermissionDecision`) : `allow`, `deny`.
+    /// Decision, as text (`SitePermissionDecision`): `allow`, `deny`.
     var decisionValue = ""
     var date = Date.now
 

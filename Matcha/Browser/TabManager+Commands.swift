@@ -1,10 +1,10 @@
 import Foundation
 import WebKit
 
-/// Actions groupées sur les onglets : « Effacer » des onglets du jour, « Dupliquer », « Fermer les autres onglets ».
+/// Bulk actions on tabs: “Clear” for the today tabs, “Duplicate Tab”, “Close Other Tabs”.
 extension TabManager {
-    /// Ferme tous les onglets du jour (bouton « Effacer »). Si l'onglet sélectionné en faisait partie,
-    /// la sélection passe au dernier onglet restant de la barre.
+    /// Closes all today tabs (“Clear” button). If the selected tab was one of them, the selection moves
+    /// to the last remaining tab of the sidebar.
     func clearToday() {
         let cleared = todayTabs
         let selectionCleared = cleared.contains { $0.id == selectedTabID }
@@ -14,11 +14,11 @@ extension TabManager {
         }
     }
 
-    /// Ouvre une copie de l'onglet juste après lui, avec son historique, et la sélectionne.
+    /// Opens a copy of the tab right after it, with its history, and selects it.
     @discardableResult
     func duplicate(_ tab: BrowserTab) -> BrowserTab {
-        // Même configuration : même profil. L'état d'interaction emporte l'historique précédent/suivant ; celui d'un
-        // onglet en veille (tâche 5.6) est son état retenu.
+        // Same configuration: same profile. The interaction state carries the back/forward history; that of a
+        // sleeping tab (task 5.6) is its kept state.
         let copy = insertTab(configuration: tab.configuration, after: tab, select: true)
         let suspendedState = tab.suspension.isSuspended ? tab.savedInteractionState : nil
         if let state = tab.webView?.interactionState ?? suspendedState {
@@ -29,7 +29,7 @@ extension TabManager {
         return copy
     }
 
-    /// Ferme tous les onglets du jour sauf `tab` et son split ; `tab` est sélectionné, épinglés et favoris restent.
+    /// Closes all today tabs except `tab` and its split; `tab` is selected, pinned tabs and favorites remain.
     func closeOtherTabs(than tab: BrowserTab) {
         select(tab)
         let kept = Set(layout.split(containing: tab.id)?.tabIDs ?? [tab.id])

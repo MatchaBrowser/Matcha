@@ -1,7 +1,7 @@
 @testable import Matcha
 import Testing
 
-/// Menu d'une page (clic droit hors d'un lien, d'une image ou d'un texte), comme dans Chrome : `PageMenuPlan.pageLayout`.
+/// Page menu (right-click outside a link, an image or text), as in Chrome: `PageMenuPlan.pageLayout`.
 struct PageMenuPageLayoutTests {
     private let reload = "WKMenuItemIdentifierReload"
     private let inspect = "WKMenuItemIdentifierInspectElement"

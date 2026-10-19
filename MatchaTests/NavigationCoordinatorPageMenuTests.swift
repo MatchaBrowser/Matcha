@@ -3,14 +3,14 @@ import Foundation
 import Testing
 import WebKit
 
-/// Fenêtre ouverte pour un choix du menu contextuel (tâche 5.9), par le délégué de navigation des onglets d'un
-/// Space, avec de vraies vues web et les pages de `TestPages`. La fenêtre est demandée au délégué comme le fait
-/// WebKit pour « … dans une nouvelle fenêtre » (vérifié : `.other`, sans bouton ni touche, sans taille).
+/// Window opened for a context menu choice (task 5.9), by the navigation delegate of a Space's tabs, with real web
+/// views and the pages of `TestPages`. The window is requested from the delegate the way WebKit does for “… in New
+/// Window” (checked: `.other`, without button or key, without size).
 @MainActor
 struct NavigationCoordinatorPageMenuTests {
     private let manager = TabManager(websiteDataStore: .nonPersistent())
 
-    /// Onglet sélectionné sur une page locale, en tête, suivi d'un autre onglet vide.
+    /// Selected tab on a local page, at the top, followed by another empty tab.
     private func openPage() async throws -> (page: BrowserTab, other: BrowserTab) {
         let other = manager.newTab()
         let page = manager.insertTab(configuration: TestPages.configuration(), after: nil, select: true)
@@ -19,7 +19,7 @@ struct NavigationCoordinatorPageMenuTests {
         return (page, other)
     }
 
-    /// Retient dans la vue web de `tab` le choix `destination`, comme un élément du menu.
+    /// Remembers the choice `destination` in the web view of `tab`, like a menu item.
     private func choose(_ destination: PageMenuDestination, in tab: BrowserTab) throws {
         let webView = try #require(tab.loadedWebView as? BrowserWebView)
         webView.pageMenuIntent.choose(destination, openingPoint: PeekLayout.center, at: .now)
@@ -29,7 +29,7 @@ struct NavigationCoordinatorPageMenuTests {
         (tab.webView as? BrowserWebView)?.pageMenuIntent.intent
     }
 
-    /// Fenêtre que la page de `tab` demande pour `url`.
+    /// Window that the page of `tab` requests for `url`.
     private func requestWindow(
         _ url: URL,
         from tab: BrowserTab,
@@ -57,7 +57,7 @@ struct NavigationCoordinatorPageMenuTests {
         #expect(manager.selectedTab === page)
         #expect(pendingIntent(of: page) == nil)
 
-        // La fenêtre suivante vient de la page (`window.open`) : un onglet au premier plan, comme avant.
+        // The next window comes from the page (`window.open`): a tab in the foreground, as before.
         let next = requestWindow(TestPages.url("popup"), from: page)
         #expect(manager.tabs.count == 4)
         #expect(manager.selectedTab?.webView === next)
@@ -74,8 +74,8 @@ struct NavigationCoordinatorPageMenuTests {
         #expect(pendingIntent(of: page) == nil)
     }
 
-    /// Un choix fait dans une autre page ne vaut pas pour celle-ci (vrai `window.open`) ; un lien `target=_blank` ne
-    /// le prend jamais.
+    /// A choice made in another page does not apply to this one (real `window.open`); a `target=_blank` link never
+    /// takes it.
     @Test func `page windows are never taken for a menu choice`() async throws {
         let (page, other) = try await openPage()
         try choose(.backgroundTab, in: other)
@@ -124,11 +124,11 @@ struct NavigationCoordinatorPageMenuTests {
         #expect(manager.selectedTab === page)
     }
 
-    /// Aperçu refusé (onglet qui n'est pas affiché, adresse `data:`) : un onglet en arrière-plan plutôt que rien.
+    /// Peek refused (tab that is not displayed, `data:` address): a background tab rather than nothing.
     @Test func `open in Peek falls back to a background tab`() async throws {
         let (page, other) = try await openPage()
         try choose(.peek, in: other)
-        // Configuration de l'app, sans le schéma des pages de test : un lien web (jamais chargé ici).
+        // App configuration, without the scheme of the test pages: a web link (never loaded here).
         let link = try #require(URL(string: "https://example.org/cible"))
         let hidden = requestWindow(link, from: other)
         #expect(hidden != nil && manager.tabs.last?.webView === hidden)
@@ -158,7 +158,7 @@ struct NavigationCoordinatorPageMenuTests {
         #expect(manager.tabs.count == 2)
     }
 
-    /// Une fenêtre de connexion (taille donnée) n'est jamais celle du menu : le choix attend encore la sienne.
+    /// A sign-in window (given size) is never the one for the menu: the choice still waits for its own window.
     @Test func `a sign-in window is never taken for the choice`() async throws {
         let (page, _) = try await openPage()
         let popups = PopupWindowManager.forTests()

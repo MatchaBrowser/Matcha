@@ -1,14 +1,14 @@
 import SwiftUI
 
-/// Menu Historique : page d'accueil, précédent et suivant de la page au premier plan, et la fenêtre de l'historique
-/// (⌘Y, tâche 5.5), grisée quand une fenêtre privée est active (elle n'a pas d'historique).
+/// History menu: homepage, back and forward for the front page, and the history window (⌘Y, task 5.5), disabled
+/// when a private window is active (it has no history).
 struct HistoryCommands: Commands {
     let miniWindows: MiniWindowManager
     @FocusedValue(\.tabManager) private var tabManager
     @FocusedValue(\.windowActions) private var windowActions
     @Environment(\.openWindow) private var openWindow
 
-    /// Page au premier plan : celle de la mini-fenêtre active, l'aperçu s'il est ouvert, sinon l'onglet sélectionné.
+    /// Front page: the active mini window's, the peek if it is open, otherwise the selected tab.
     private var frontTab: BrowserTab? {
         _ = miniWindows.keyWindowID
         return miniWindows.keyWindow?.tab ?? tabManager?.frontTab

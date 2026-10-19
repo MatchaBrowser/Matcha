@@ -2,7 +2,7 @@ import Foundation
 @testable import Matcha
 import Testing
 
-/// Dossier des téléchargements (tâche 5.1) : le vrai ~/Downloads, ou le sous-dossier des tests d'interface.
+/// Downloads folder (task 5.1): the real ~/Downloads, or the UI tests' subfolder.
 struct DownloadLocationTests {
     private func defaults(_ values: [String: Any]) throws -> UserDefaults {
         let name = "DownloadLocationTests-\(UUID().uuidString)"
@@ -14,10 +14,10 @@ struct DownloadLocationTests {
         return defaults
     }
 
-    /// Dans la sandbox (les tests tournent dans l'app), `FileManager` donne le dossier `Downloads` du conteneur, un
-    /// lien vers le vrai ~/Downloads (droit « Downloads Folder ») : Matcha écrit dans le vrai dossier.
+    /// In the sandbox (the tests run in the app), `FileManager` gives the container's `Downloads` folder, a link to
+    /// the real ~/Downloads (“Downloads Folder” entitlement): Matcha writes into the real folder.
     @Test func `downloads go to the user's real Downloads folder`() throws {
-        // Vrai dossier personnel : dans la sandbox, `NSHomeDirectory()` est le conteneur de l'app.
+        // Real home folder: in the sandbox, `NSHomeDirectory()` is the app's container.
         let home = try String(cString: #require(getpwuid(getuid())).pointee.pw_dir)
         let directory = try #require(DownloadLocation.userDownloadsDirectory())
         #expect(directory.standardizedFileURL.path == URL(fileURLWithPath: home).appendingPathComponent("Downloads").standardizedFileURL
@@ -40,7 +40,7 @@ struct DownloadLocationTests {
     }
 
     @Test func `reset without a valid subfolder touches nothing`() throws {
-        // Sans sous-dossier valide, rien n'est effacé (et surtout pas Téléchargements).
+        // Without a valid subfolder, nothing is deleted (and above all not Downloads).
         try DownloadLocation.resetTestSubfolderIfRequested(defaults: defaults([DownloadLocation.resetTestSubfolderKey: true]))
         try DownloadLocation.resetTestSubfolderIfRequested(defaults: defaults([
             DownloadLocation.resetTestSubfolderKey: true,
@@ -49,7 +49,7 @@ struct DownloadLocationTests {
         #expect(try FileManager.default.fileExists(atPath: #require(DownloadLocation.userDownloadsDirectory()).path))
     }
 
-    /// Crée un vrai dossier dans ~/Downloads le temps du test.
+    /// Creates a real folder in ~/Downloads for the duration of the test.
     @Test func `reset removes the UI tests subfolder`() throws {
         let name = "MatchaUITests-\(UUID().uuidString)"
         let folder = try #require(DownloadLocation.userDownloadsDirectory()).appendingPathComponent(name, isDirectory: true)

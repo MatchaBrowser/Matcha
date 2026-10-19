@@ -9,7 +9,7 @@ struct AddressResolverTests {
         "https://www.google.com/search?q=\(encodedQuery)"
     }
 
-    // MARK: Cas imposés par le plan
+    // MARK: Cases required by the plan
 
     @Test func `domain gets https`() {
         #expect(resolver.resolve("apple.com")?.absoluteString == "https://apple.com")
@@ -35,7 +35,7 @@ struct AddressResolverTests {
         #expect(resolver.resolve("swift 6.4")?.absoluteString == search("swift%206.4"))
     }
 
-    // MARK: Schémas
+    // MARK: Schemes
 
     @Test(arguments: [
         "http://example.com/a?b=c#d",
@@ -51,7 +51,7 @@ struct AddressResolverTests {
         #expect(resolver.resolve("mailto:moi@example.com")?.absoluteString == search("mailto%3Amoi%40example.com"))
     }
 
-    // MARK: Hôtes
+    // MARK: Hosts
 
     @Test(arguments: [
         ("www.apple.com", "https://www.apple.com"),
@@ -88,7 +88,7 @@ struct AddressResolverTests {
         #expect(url?.absoluteString.hasPrefix("https://www.google.com/search?q=") == true)
     }
 
-    // MARK: Divers
+    // MARK: Miscellaneous
 
     @Test func `surrounding whitespace is trimmed`() {
         #expect(resolver.resolve("  apple.com \n")?.absoluteString == "https://apple.com")
@@ -103,7 +103,7 @@ struct AddressResolverTests {
         #expect(resolver.resolve("c++ & café #1")?.absoluteString == search("c%2B%2B%20%26%20caf%C3%A9%20%231"))
     }
 
-    // MARK: Interprétation
+    // MARK: Interpretation
 
     @Test(arguments: [
         ("apple.com", AddressInterpretation.address(URL(string: "https://apple.com")!)),

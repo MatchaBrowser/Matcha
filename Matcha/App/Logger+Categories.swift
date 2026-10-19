@@ -1,36 +1,36 @@
 import Foundation
 import OSLog
 
-/// Catégories de journalisation, une par module.
+/// Logging categories, one per module.
 nonisolated extension Logger {
     private static let subsystem = Bundle.main.bundleIdentifier ?? "com.matchabrowser.matcha"
 
-    /// Application, réglages.
+    /// App, settings.
     static let app = Logger(subsystem: subsystem, category: "App")
-    /// Onglets, navigation et WebKit.
+    /// Tabs, navigation and WebKit.
     static let browser = Logger(subsystem: subsystem, category: "Browser")
-    /// Icônes des sites.
+    /// Site icons.
     static let favicons = Logger(subsystem: subsystem, category: "Favicons")
-    /// Barre de commande et suggestions de recherche.
+    /// Command bar and search suggestions.
     static let commandBar = Logger(subsystem: subsystem, category: "CommandBar")
-    /// Aperçu des liens (Maj+clic).
+    /// Link peek (Shift-click).
     static let peek = Logger(subsystem: subsystem, category: "Peek")
-    /// Mini-fenêtres et leur raccourci global ; jamais d'adresse ni de texte tapé.
+    /// Mini windows and their global shortcut; never an address or typed text.
     static let miniWindow = Logger(subsystem: subsystem, category: "MiniWindow")
-    /// Téléchargements ; jamais d'adresse complète ni de nom de fichier, seulement l'hôte.
+    /// Downloads; never a full address or a file name, only the host.
     static let downloads = Logger(subsystem: subsystem, category: "Downloads")
-    /// Permissions des sites (caméra, micro) et données d'un site ; jamais d'adresse complète, seulement l'hôte.
+    /// Site permissions (camera, microphone) and site data; never a full address, only the host.
     static let permissions = Logger(subsystem: subsystem, category: "Permissions")
-    /// Historique de navigation ; jamais d'adresse ni de titre, seulement des nombres.
+    /// Browsing history; never an address or a title, only numbers.
     static let history = Logger(subsystem: subsystem, category: "History")
-    /// Mémoire des onglets (mise en veille des onglets cachés) ; jamais d'adresse, seulement des nombres.
+    /// Tab memory (suspension of hidden tabs); never an address, only numbers.
     static let tabLifecycle = Logger(subsystem: subsystem, category: "TabLifecycle")
-    /// Bloqueur de publicités et de traqueurs : listes, durées, nombres ; jamais d'adresse ni de site.
+    /// Ad and tracker blocker: lists, durations, counts; never an address or a site.
     static let contentBlocker = Logger(subsystem: subsystem, category: "ContentBlocker")
-    /// Extensions web : chargement, fenêtres et onglets ouverts pour elles, demandes de permissions ; jamais d'adresse.
+    /// Web extensions: loading, windows and tabs opened for them, permission requests; never an address.
     static let extensions = Logger(subsystem: subsystem, category: "Extensions")
-    /// Import depuis d'autres navigateurs : des nombres seulement ; jamais d'adresse, de titre ni de nom.
+    /// Import from other browsers: numbers only; never an address, a title or a name.
     static let imports = Logger(subsystem: subsystem, category: "Import")
-    /// Synchronisation : des nombres et des états seulement ; jamais de contenu, d'adresse ni de nom.
+    /// Sync: numbers and states only; never content, an address or a name.
     static let sync = Logger(subsystem: subsystem, category: "Sync")
 }

@@ -1,8 +1,8 @@
 import SwiftUI
 
-/// Aperçu de l'import d'Arc (tâche 7.1) : les Spaces et ce qu'ils contiennent, les favoris, ce qui sera laissé de côté,
-/// le profil qui reçoit le profil principal d'Arc et le choix des onglets ouverts (non par défaut). Rien n'est importé
-/// sans « Importer ».
+/// Arc import preview (task 7.1): the Spaces and what they contain, the favorites, what will be left out, the profile
+/// that receives Arc's main profile, and the choice of open tabs (off by default). Nothing is imported without
+/// “Import”.
 struct ArcImportSheet: View {
     let sidebar: ArcSidebar
     let profiles: [ProfileRecord]
@@ -45,7 +45,7 @@ struct ArcImportSheet: View {
         .interactiveDismissDisabled()
     }
 
-    /// Les Spaces d'Arc, dans l'ordre.
+    /// Arc's Spaces, in order.
     private var spaces: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 10) {
@@ -101,7 +101,7 @@ struct ArcImportSheet: View {
         }
     }
 
-    /// Favoris, une seule fois chaque adresse par profil.
+    /// Favorites, each address only once per profile.
     private var favoriteCount: Int {
         sidebar.favorites.values.reduce(0) { $0 + ArcImporter.withoutDuplicates($1).count }
     }

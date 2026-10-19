@@ -1,6 +1,6 @@
 import AppKit
 
-/// Icône d'un site, avec son allure (pour l'afficher lisiblement sur la barre latérale).
+/// A website's icon, with its look (to display it legibly on the sidebar).
 @MainActor
 final class Favicon {
     let image: NSImage
@@ -11,7 +11,7 @@ final class Favicon {
         self.tone = tone
     }
 
-    /// Icône lue depuis les données téléchargées ; nil si ce n'est pas une image valide.
+    /// Icon read from the downloaded data; nil if it is not a valid image.
     convenience init?(data: Data) {
         guard let image = NSImage(data: data), image.isValid, image.size.width > 0 else {
             return nil
@@ -19,7 +19,7 @@ final class Favicon {
         self.init(image: image, tone: Self.tone(of: image))
     }
 
-    /// Allure de l'image, analysée sur une réduction de 32 × 32 pixels.
+    /// Look of the image, analyzed on a 32 × 32 pixel reduction.
     static func tone(of image: NSImage) -> FaviconTone {
         let side = 32
         guard let bitmap = NSBitmapImageRep(

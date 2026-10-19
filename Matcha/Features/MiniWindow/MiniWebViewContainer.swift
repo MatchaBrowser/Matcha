@@ -2,14 +2,13 @@ import AppKit
 import SwiftUI
 import WebKit
 
-/// Vue AppKit qui porte la vue web d'une mini-fenêtre. Elle seule l'ajoute et la retire : SwiftUI ne manipule
-/// jamais la vue web, qui peut ainsi passer dans un Space sans rechargement (« Ouvrir dans le Space ») : elle est
-/// retirée ici avant que la carte de la fenêtre principale ne l'affiche, et n'a jamais deux parents. Les fenêtres de
-/// connexion (tâche 5.8) s'en servent aussi.
+/// AppKit view that holds a mini window's web view. It alone adds and removes it: SwiftUI never manipulates the
+/// web view, which can thus move into a Space without reloading (“Open in Space”): it is removed here before the
+/// main window's card displays it, and never has two parents. The sign-in windows (task 5.8) use it too.
 final class MiniWebViewContainer: NSView {
     private(set) weak var webView: WKWebView?
 
-    /// Montre `webView`, à la taille du conteneur.
+    /// Shows `webView`, at the container's size.
     func attach(_ webView: WKWebView) {
         guard webView.superview !== self else {
             return
@@ -21,7 +20,7 @@ final class MiniWebViewContainer: NSView {
         self.webView = webView
     }
 
-    /// Retire la vue web (remise à un Space, fermeture).
+    /// Removes the web view (handed to a Space, closing).
     func detach() {
         guard let webView else {
             return
@@ -32,8 +31,8 @@ final class MiniWebViewContainer: NSView {
         self.webView = nil
     }
 
-    /// La vue web suit la taille du conteneur tant qu'elle y est, sans toucher à son `autoresizingMask`, que
-    /// la carte gère une fois qu'elle l'a reçue (même règle que l'aperçu, tâche 4.4).
+    /// The web view follows the container's size while it is inside it, without touching its `autoresizingMask`,
+    /// which the card manages once it has received it (same rule as Peek, task 4.4).
     override func setFrameSize(_ newSize: NSSize) {
         super.setFrameSize(newSize)
         fitWebView()
@@ -51,7 +50,7 @@ final class MiniWebViewContainer: NSView {
     }
 }
 
-/// Le conteneur dans SwiftUI : toujours le même, jamais recréé.
+/// The container in SwiftUI: always the same one, never recreated.
 struct MiniWebViewContainerView: NSViewRepresentable {
     let container: MiniWebViewContainer
 

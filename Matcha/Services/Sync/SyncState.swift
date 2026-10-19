@@ -1,19 +1,18 @@
 import Foundation
 
-/// État de la synchro de ce Mac (tâche 7.4), conservé d'un lancement à l'autre : identifiant de l'appareil, curseur de
-/// lecture, horloge, ce que le serveur a de chaque enregistrement et ce que ce Mac en avait alors, changements en
-/// attente d'envoi. Type pur.
+/// This Mac's sync state (task 7.4), kept from one launch to the next: device identifier, read cursor, clock, what
+/// the server has of each record and what this Mac had of it then, changes waiting to be sent. Pure type.
 nonisolated struct SyncState: Codable, Equatable, Sendable {
     var deviceID = UUID()
     var cursor: String?
     var clock = SyncClock()
     var entries: [UUID: SyncEntry] = [:]
     var pending: [UUID: SyncPendingChange] = [:]
-    /// Champs refusés par le serveur (trop gros…) : pas renvoyés tant qu'ils ne changent pas.
+    /// Fields rejected by the server (too big…): not sent again as long as they do not change.
     var rejected: [UUID: SyncJSON] = [:]
     var hasCompletedFirstSync = false
 
-    /// Ce que ce Mac avait de `id` à sa dernière synchro, ou ce qu'il s'apprête à envoyer ; nil : rien (absent).
+    /// What this Mac had of `id` at its last sync, or what it is about to send; nil: nothing (absent).
     func baseline(of id: UUID) -> SyncJSON? {
         if let pending = pending[id] {
             return pending.local
@@ -21,32 +20,32 @@ nonisolated struct SyncState: Codable, Equatable, Sendable {
         return entries[id]?.local
     }
 
-    /// Type connu de `id`.
+    /// Known type of `id`.
     func type(of id: UUID) -> String? {
         pending[id]?.content.type ?? entries[id]?.type
     }
 }
 
-/// Un enregistrement connu de la synchro.
+/// A record known to sync.
 nonisolated struct SyncEntry: Codable, Equatable, Sendable {
     var type: String
-    /// Version sur le serveur ; nil s'il n'y est pas encore.
+    /// Version on the server; nil if it is not there yet.
     var version: Int?
-    /// Dernier contenu connu du serveur.
+    /// Last known content from the server.
     var remote: SyncContent?
-    /// Champs de ce Mac à la dernière synchro de l'enregistrement ; nil s'il n'était pas sur ce Mac.
+    /// This Mac's fields at the record's last sync; nil if it was not on this Mac.
     var local: SyncJSON?
-    /// Reçu mais pas encore appliqué : son parent manque.
+    /// Received but not applied yet: its parent is missing.
     var isWaiting = false
 }
 
-/// Changement de ce Mac en attente d'envoi : le contenu, et les champs de ce Mac qu'il porte (nil : suppression).
+/// Change on this Mac waiting to be sent: the content, and the fields of this Mac it carries (nil: deletion).
 nonisolated struct SyncPendingChange: Codable, Equatable, Sendable {
     var content: SyncContent
     var local: SyncJSON?
 }
 
-/// Fichier de l'état de la synchro (JSON) ; sans adresse (tests), rien n'est écrit.
+/// File of the sync state (JSON); without a URL (tests), nothing is written.
 nonisolated struct SyncStateFile: Sendable {
     let url: URL?
 

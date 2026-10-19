@@ -1,25 +1,25 @@
 import SwiftUI
 
-/// Zone de contenu : la carte de l'onglet sélectionné, ou les cartes de son split côte à côte, séparées par
-/// des poignées réglables. Un onglet glissé depuis la barre et lâché sur le bord d'un panneau rejoint le split.
-/// L'aperçu (Peek) s'ouvre par-dessus les pages de tous les panneaux.
+/// Content area: the card of the selected tab, or the cards of its split side by side, separated by adjustable
+/// handles. A tab dragged from the sidebar and dropped on the edge of a pane joins the split.
+/// The peek opens over the pages of all panes.
 struct ContentCard: View {
     let tabManager: TabManager
     let addressBarPosition: AddressBarPosition
     let showsNavigationButtons: Bool
-    /// Action du bouton Accueil ; nil pour ne pas l'afficher.
+    /// Action of the Home button; nil to hide it.
     var goHome: (() -> Void)?
-    /// Ouvre la barre de commande sur l'adresse de l'onglet affiché.
+    /// Opens the command bar on the address of the displayed tab.
     let editAddress: () -> Void
-    /// Largeur cachée par la barre flottante à gauche des panneaux : pas de dépôt sur la carte dessous.
+    /// Width hidden by the floating sidebar to the left of the panes: no drop on the card underneath.
     var dropInset = 0.0
 
-    /// Parts pendant un glissement du séparateur : état de la vue seulement, retenues à la fin.
+    /// Fractions during a drag of the divider: view state only, kept at the end.
     @State private var liveFractions: [Double]?
-    /// Largeurs au début du glissement en cours.
+    /// Widths at the start of the current drag.
     @State private var dragStartWidths: [Double]?
     @State private var dropTarget: SplitDropTarget?
-    /// Destinataire des onglets lâchés sur les pages, reconfiguré à chaque affichage.
+    /// Receiver of tabs dropped on the pages, reconfigured on each render.
     @State private var dropController = SplitDropController()
 
     var body: some View {
@@ -31,7 +31,7 @@ struct ContentCard: View {
                 count: max(panes.count, 1),
                 totalWidth: proxy.size.width,
             )
-            // `_ =` n'est pas permis dans un constructeur de vue.
+            // `_ =` is not allowed in a view builder.
             // swiftlint:disable:next redundant_discardable_let
             let _ = configureDropController(panes: panes, widths: widths)
             HStack(spacing: 0) {
@@ -48,7 +48,7 @@ struct ContentCard: View {
                     }
                 }
             }
-            // Panneaux ajoutés ou retirés sans animation : une vue web ne change jamais d'hôte.
+            // Panes added or removed without animation: a web view never changes host.
             .transaction { $0.animation = nil }
             .background {
                 if panes.count > 1 {
@@ -59,7 +59,7 @@ struct ContentCard: View {
                 SplitDropHighlight(target: dropTarget, widths: widths)
                     .allowsHitTesting(false)
             }
-            // L'aperçu (Maj+clic) couvre les pages de tous les panneaux, pas leur barre d'adresse (tâche 4.4).
+            // The peek (Shift-click) covers the pages of all panes, not their address bar (task 4.4).
             .overlayPreferenceValue(PeekPageAreas.self) { anchors in
                 GeometryReader { overlay in
                     PeekOverlay(tabManager: tabManager, pages: anchors.map { overlay[$0] }, pageCorners: pageCorners)
@@ -70,8 +70,8 @@ struct ContentCard: View {
             liveFractions = nil
             dragStartWidths = nil
         }
-        // ⌘W, menus, split formé ou défait, autre Space : la page sélectionnée reprend le clavier si
-        // personne ne l'a.
+        // ⌘W, menus, split formed or undone, other Space: the selected page takes the keyboard back if nobody has
+        // it.
         .onChange(of: panes.map(\.id)) {
             if let tab = tabManager.selectedTab {
                 TabActivation.focusPage(of: tab)
@@ -94,8 +94,7 @@ struct ContentCard: View {
         )
     }
 
-    /// Poignée entre les panneaux `index` et `index + 1` : parts suivies pendant le glissement, écrites une
-    /// fois à la fin.
+    /// Handle between panes `index` and `index + 1`: fractions followed during the drag, written once at the end.
     private func divider(after index: Int, in split: SplitGroup, widths: [Double]) -> SplitDivider {
         SplitDivider(
             onDrag: { translation in
@@ -118,7 +117,7 @@ struct ContentCard: View {
         )
     }
 
-    /// Le contrôleur n'est pas observé : le reconfigurer pendant l'affichage ne redessine rien.
+    /// The controller is not observed: reconfiguring it during rendering redraws nothing.
     private func configureDropController(panes: [BrowserTab], widths: [Double]) {
         dropController.panes = panes
         dropController.widths = widths
@@ -133,8 +132,8 @@ struct ContentCard: View {
         }
     }
 
-    /// Un onglet sélectionné, hors des favoris, dont le split n'est pas plein. L'onglet glissé lui-même n'est
-    /// vérifié qu'au dépôt (`openInSplit` refuse un onglet déjà affiché ou un favori).
+    /// A selected tab, outside the favorites, whose split is not full. The dragged tab itself is checked only on drop
+    /// (`openInSplit` refuses a tab already displayed or a favorite).
     private var canTakeTab: Bool {
         guard let selected = tabManager.selectedTab, tabManager.place(of: selected) != .favorite else {
             return false
@@ -142,14 +141,14 @@ struct ContentCard: View {
         return tabManager.displayedSplit?.isFull != true
     }
 
-    /// Coins d'une page : ceux de la carte, droits en haut sous la barre d'adresse.
+    /// Corners of a page: those of the card, square at the top under the address bar.
     private var pageCorners: RectangleCornerRadii {
         let radius = BrowserWindowView.cardCornerRadius
         let top = addressBarPosition == .top ? 0 : radius
         return RectangleCornerRadii(topLeading: top, bottomLeading: radius, bottomTrailing: radius, topTrailing: top)
     }
 
-    /// Rend `tab` panneau actif.
+    /// Makes `tab` the active pane.
     private func activate(_ tab: BrowserTab) {
         if tabManager.selectedTabID != tab.id {
             tabManager.select(tab)

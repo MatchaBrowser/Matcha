@@ -1,14 +1,14 @@
 import Foundation
 import SwiftData
 
-/// Space enregistré : ses onglets épinglés et du jour, ses dossiers, son thème.
+/// Saved Space: its pinned and today tabs, its folders, its theme.
 @Model
 final class SpaceRecord {
     var id = UUID()
     var name = ""
-    /// Icône du Space (`SidebarIcon.spaceSymbol`) : nom d'un symbole SF, ou « emoji:<emoji> ».
+    /// The Space's icon (`SidebarIcon.spaceSymbol`): an SF Symbol name, or “emoji:<emoji>”.
     var symbol = "circle.fill"
-    /// Thème encodé (`SpaceTheme`, tâche 3.4) ; nil pour le thème par défaut.
+    /// Encoded theme (`SpaceTheme`, task 3.4); nil for the default theme.
     var themeData: Data?
     var order = 0
     var profile: ProfileRecord?
@@ -23,7 +23,7 @@ final class SpaceRecord {
         self.profile = profile
     }
 
-    /// Icône lue dans `symbol` (illisible : le cercle) ; l'écrire la remplace.
+    /// Icon read from `symbol` (unreadable: the circle); writing it replaces it.
     var icon: SidebarIcon {
         get { SidebarIcon(spaceSymbol: symbol) }
         set { symbol = newValue.spaceSymbol }

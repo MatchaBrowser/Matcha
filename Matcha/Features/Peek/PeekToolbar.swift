@@ -1,6 +1,6 @@
 import SwiftUI
 
-/// Barre flottante au-dessus de l'aperçu : site et zoom de sa page à gauche, « Ouvrir en onglet » et × à droite.
+/// Floating bar above the peek: site and zoom of its page on the left, “Open as Tab” and × on the right.
 struct PeekToolbar: View {
     let page: BrowserTab
     let tabManager: TabManager
@@ -16,8 +16,9 @@ struct PeekToolbar: View {
             .help(openAsTabTitle)
             .accessibilityLabel(openAsTabTitle)
             .accessibilityIdentifier("peekOpenAsTabButton")
-            // ⎋ quand la page n'a pas le clavier ; sinon la page passe d'abord (PeekWebContainer). Barre de recherche
-            // ouverte, ⎋ revient à son champ (qui la ferme) : le raccourci passerait avant lui et fermerait l'aperçu.
+            // ⎋ when the page does not have keyboard focus; otherwise the page goes first (PeekWebContainer). With
+            // the find bar open, ⎋ is left to its field (which closes the bar): the shortcut would otherwise take
+            // precedence and close the peek.
             Button { PeekActions.close(in: tabManager) } label: {
                 Image(systemName: "xmark")
             }
@@ -55,7 +56,7 @@ struct PeekToolbar: View {
         .overlay { Capsule().strokeBorder(Color.primary.opacity(0.12), lineWidth: 1) }
         .contentShape(Capsule())
         .help(Text(verbatim: page.url?.absoluteString ?? ""))
-        // Texte statique : sous macOS, un simple groupe n'expose pas sa valeur (l'adresse).
+        // Static text: on macOS, a plain group does not expose its value (the address).
         .accessibilityElement(children: .ignore)
         .accessibilityAddTraits(.isStaticText)
         .accessibilityLabel(Text("Address", comment: "Accessibility label of the address pill"))
@@ -64,7 +65,7 @@ struct PeekToolbar: View {
     }
 }
 
-/// Bouton rond de la barre de l'aperçu, surligné au survol.
+/// Round button of the peek's bar, highlighted on hover.
 private struct PeekRoundButtonStyle: ButtonStyle {
     func makeBody(configuration: Configuration) -> some View {
         PeekRoundButton(configuration: configuration)

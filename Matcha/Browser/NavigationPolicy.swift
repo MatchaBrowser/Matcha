@@ -1,62 +1,62 @@
 import AppKit
 import WebKit
 
-/// Ce qu'il faut savoir d'une demande de navigation pour décider quoi en faire.
+/// What needs to be known about a navigation request to decide what to do with it.
 nonisolated struct NavigationRequest: Sendable {
     var url: URL?
     var navigationType: WKNavigationType
     var modifierFlags: NSEvent.ModifierFlags
-    /// Boutons de la souris, en masque (vérifié avec WebKit) : 1 gauche (et Entrée sur un lien), 2 droit,
-    /// 4 milieu, 0 aucun (clic simulé par la page).
+    /// Mouse buttons, as a mask (checked with WebKit): 1 left (and Return on a link), 2 right,
+    /// 4 middle, 0 none (click simulated by the page).
     var buttonNumber: Int
-    /// Vrai si la navigation vise le cadre principal ou une nouvelle fenêtre, faux pour un cadre secondaire.
+    /// True if the navigation targets the main frame or a new window, false for a subframe.
     var targetsMainFrame: Bool
-    /// Vrai si la vue web sait charger ce schéma (http, https, about, data, blob, schéma enregistré…).
+    /// True if the web view can load this scheme (http, https, about, data, blob, registered scheme…).
     var isSchemeHandledByWebView: Bool
-    /// Vrai si la navigation demande une nouvelle fenêtre (`target=_blank`, `window.open`) : pas de cadre cible.
+    /// True if the navigation asks for a new window (`target=_blank`, `window.open`): no target frame.
     var opensNewWindow = false
-    /// Adresse de la page affichée par la vue web : ancre de la même page, lien vers un autre site.
+    /// Address of the page displayed by the web view: anchor in the same page, link to another site.
     var pageURL: URL?
-    /// Vrai si la page demande le téléchargement (lien `download`) : la navigation devient un téléchargement.
+    /// True if the page asks for a download (`download` link): the navigation becomes a download.
     var shouldPerformDownload = false
-    /// Vue web d'où part la navigation.
+    /// Web view the navigation starts from.
     var source = NavigationSource.tab
-    /// Vrai si les liens vers un autre site s'ouvrent dans l'aperçu : favori ou épinglé, réglage activé.
+    /// True if links to another site open in Peek: favorite or pinned tab, setting enabled.
     var opensOtherSitesInPeek = false
 }
 
-/// Vue web d'où part une navigation.
+/// Web view a navigation starts from.
 nonisolated enum NavigationSource: Sendable {
-    /// Un onglet de la barre latérale.
+    /// A tab of the sidebar.
     case tab
-    /// L'aperçu (Peek, tâche 4.4).
+    /// Peek (task 4.4).
     case peek
-    /// Une vue web que ce gestionnaire d'onglets n'affiche pas, ou la page d'une mini-fenêtre (tâche 4.5) : un
-    /// Maj+clic y reste un clic.
+    /// A web view this tab manager does not display, or the page of a mini window (task 4.5): a Shift-click stays a
+    /// click there.
     case other
 }
 
-/// Issue d'une demande de navigation.
+/// Outcome of a navigation request.
 nonisolated enum NavigationDecision: Equatable, Sendable {
-    /// WebKit poursuit la navigation.
+    /// WebKit carries on with the navigation.
     case allow
-    /// La navigation est annulée sans autre effet.
+    /// The navigation is cancelled with no other effect.
     case cancel
-    /// Annulée, puis l'URL est confiée à l'app qui la gère (Mail, Téléphone, Zoom…).
+    /// Cancelled, then the URL is handed to the app that handles it (Mail, Phone, Zoom…).
     case openExternally(URL)
-    /// Annulée, puis l'URL est ouverte dans un nouvel onglet.
+    /// Cancelled, then the URL is opened in a new tab.
     case openInNewTab(URL, inBackground: Bool)
-    /// Annulée, puis l'URL est ouverte dans l'aperçu ; depuis l'aperçu, elle s'y charge (tâche 4.4).
+    /// Cancelled, then the URL is opened in Peek; from Peek, it loads there (task 4.4).
     case openInPeek(URL)
-    /// La navigation devient un téléchargement (tâche 5.1).
+    /// The navigation becomes a download (task 5.1).
     case download
 }
 
-/// Règles de navigation des vues web, sans dépendance à l'interface.
+/// Navigation rules of the web views, with no dependency on the UI.
 nonisolated enum NavigationPolicy {
     static let leftMouseButton = 1
     static let middleMouseButton = 4
-    /// Schémas jamais ouverts en aperçu : leur contenu dépend de la page qui les contient.
+    /// Schemes never opened in Peek: their content depends on the page that contains them.
     static let schemesKeptInPlace: Set<String> = ["about", "blob", "data", "javascript"]
     private static let linkModifiers: NSEvent.ModifierFlags = [.shift, .command, .option, .control]
 
@@ -65,10 +65,10 @@ nonisolated enum NavigationPolicy {
             return .allow
         }
         if !request.isSchemeHandledByWebView {
-            // Un cadre secondaire (publicité…) n'a pas le droit de lancer une autre app.
+            // A subframe (ad…) is not allowed to launch another app.
             return request.targetsMainFrame ? .openExternally(url) : .cancel
         }
-        // Lien `download` : téléchargé quel que soit le clic (⌘-clic, Maj+clic) ; un onglet ou un aperçu resterait vide.
+        // `download` link: downloaded whatever the click (⌘-click, Shift-click); a tab or Peek would stay empty.
         if request.shouldPerformDownload {
             return .download
         }
@@ -84,7 +84,7 @@ nonisolated enum NavigationPolicy {
         }
         switch request.source {
         case .peek:
-            // Dans l'aperçu, on parcourt sur place, même un lien qui ouvrirait une fenêtre.
+            // In Peek, browsing happens in place, even for a link that would open a window.
             return request.opensNewWindow ? .openInPeek(url) : .allow
         case .other:
             return .allow
@@ -93,8 +93,8 @@ nonisolated enum NavigationPolicy {
         }
     }
 
-    /// Maj+clic (sauf ancre de la page affichée), et lien d'un favori ou d'un épinglé vers un autre site si le
-    /// réglage le demande (clic gauche sans touche : jamais un clic simulé par la page).
+    /// Shift-click (except an anchor of the displayed page), and a link from a favorite or pinned tab to another site
+    /// if the setting asks for it (left click without a key: never a click simulated by the page).
     private static func peekDecision(for request: NavigationRequest, url: URL, modifiers: NSEvent.ModifierFlags) -> NavigationDecision {
         if modifiers == .shift {
             return isAnchorOfShownPage(url, request) ? .allow : .openInPeek(url)

@@ -1,12 +1,12 @@
 import Foundation
 
-/// Onglets ouverts de tous les Spaces de la fenêtre, celui affiché d'abord. Le texte est ignoré :
-/// le classement fait la correspondance.
+/// Open tabs of all the window's Spaces, the displayed one first. The text is ignored: the ranking does the
+/// matching.
 ///
-/// Les favoris d'un profil sont communs à ses Spaces, mais chaque Space en garde sa propre copie
-/// jusqu'à ce qu'on y passe (`adoptFavorites`) : ceux du profil affiché ne viennent que du Space
-/// affiché, ceux d'un autre profil du premier de ses Spaces. Une fenêtre privée a sa propre session,
-/// avec un seul Space : elle ne voit que ses onglets.
+/// A profile's favorites are shared by its Spaces, but each Space keeps its own copy of them until one switches to
+/// it (`adoptFavorites`): those of the displayed profile come only from the displayed Space, those of another
+/// profile from the first of its Spaces. A private window has its own session, with a single Space: it sees only
+/// its own tabs.
 @MainActor
 final class OpenTabsProvider: CommandProvider {
     private let windowModel: WindowModel
@@ -19,8 +19,8 @@ final class OpenTabsProvider: CommandProvider {
         openTabs()
     }
 
-    /// Favoris, épinglés (dossiers fermés compris) puis onglets du jour de chaque Space, sans l'onglet
-    /// affiché, sans onglet vide et sans doublon d'identifiant.
+    /// Favorites, pinned tabs (closed folders included), then today tabs of each Space, without the displayed tab,
+    /// without empty tabs and without duplicate identifiers.
     func openTabs() -> [CommandCandidate] {
         let current = windowModel.space
         let spaces = [current] + windowModel.session.spaces.filter { $0 !== current }
@@ -47,7 +47,7 @@ final class OpenTabsProvider: CommandProvider {
             guard let place = tabManager.place(of: tab),
                   place != .favorite || listsFavorites,
                   !isCurrent || tab.id != tabManager.selectedTabID,
-                  // Un épinglé déchargé montre son adresse d'origine.
+                  // An unloaded pinned tab shows its original address.
                   let url = tab.url ?? tab.pinnedURL,
                   seen.insert(tab.id).inserted
             else {

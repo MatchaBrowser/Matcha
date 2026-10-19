@@ -2,11 +2,11 @@ import Foundation
 import OSLog
 import WebKit
 
-/// Enregistrements de données de WebKit qui appartiennent à un site, sans la liste publique des suffixes.
+/// WebKit data records that belong to a website, without the Public Suffix List.
 nonisolated enum WebsiteDataMatcher {
-    /// Vrai si l'enregistrement `recordName` (son `displayName` : en général le domaine enregistrable, « google.com »,
-    /// ou un hôte entier, « localhost ») couvre `host` (« mail.google.com ») : même hôte, ou hôte sous ce domaine.
-    /// Un autre site qui partage seulement un suffixe (« notgoogle.com ») n'est jamais visé.
+    /// True if record `recordName` (its `displayName`: usually the registrable domain, “google.com”, or a whole host,
+    /// “localhost”) covers `host` (“mail.google.com”): same host, or a host under this domain. Another website that
+    /// only shares a suffix (“notgoogle.com”) is never targeted.
     static func matches(recordName: String, host: String) -> Bool {
         let name = normalized(recordName)
         let host = normalized(host)
@@ -25,11 +25,11 @@ nonisolated enum WebsiteDataMatcher {
     }
 }
 
-/// « Effacer les cookies et les données du site » (réglages du site, tâche 5.2) : cookies, stockage, caches et autres
-/// données du site dans le magasin d'un profil, sans toucher aux autres sites.
+/// “Clear cookies and website data” (site settings, task 5.2): cookies, storage, caches and other data of the website
+/// in a profile's data store, without touching other websites.
 @MainActor
 enum WebsiteDataCleaner {
-    /// Efface les données de `host` dans `store` ; renvoie le nombre d'enregistrements effacés.
+    /// Erases the data of `host` in `store`; returns the number of records erased.
     @discardableResult
     static func removeData(forHost host: String, in store: WKWebsiteDataStore) async -> Int {
         let types = WKWebsiteDataStore.allWebsiteDataTypes()

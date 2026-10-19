@@ -3,17 +3,17 @@ import CryptoKit
 import Foundation
 import Security
 
-/// Chiffrement de la synchro par un serveur (tâche 7.5, `SYNC.md` § 3) : dérivation du mot de passe maître
-/// (PBKDF2-HMAC-SHA256), sous-clés (HKDF-SHA256, sel vide), AES-256-GCM (nonce aléatoire de 12 octets), complément
-/// ISO/IEC 7816-4 qui cache la taille exacte. Un contenu modifié, déplacé ou d'un autre format est refusé. Type pur.
+/// Encryption for sync through a server (task 7.5, `SYNC.md` § 3): master password derivation
+/// (PBKDF2-HMAC-SHA256), subkeys (HKDF-SHA256, empty salt), AES-256-GCM (random 12-byte nonce), ISO/IEC 7816-4
+/// padding that hides the exact size. Content that was modified, moved or is in another format is rejected. Pure type.
 nonisolated enum SyncCrypto {
-    /// Octet de version en tête d'un contenu ou d'un paquet chiffré.
+    /// Version byte at the start of an encrypted content or package.
     static let formatVersion: UInt8 = 1
-    /// Un contenu d'enregistrement est complété jusqu'à un multiple de 256 octets, un paquet d'extension de 64 Kio.
+    /// A record's content is padded to a multiple of 256 bytes, an extension package to a multiple of 64 KiB.
     static let recordPadding = 256
     static let blobPadding = 65536
 
-    // MARK: Clés
+    // MARK: Keys
 
     /// PBKDF2-HMAC-SHA256 (`CCKeyDerivationPBKDF`).
     static func pbkdf2(password: Data, salt: Data, iterations: Int, length: Int = 32) throws -> Data {
@@ -41,12 +41,12 @@ nonisolated enum SyncCrypto {
         return derived
     }
 
-    /// Sous-clé de 32 octets : HKDF-SHA256 de `key`, sel vide, `info` en UTF-8.
+    /// 32-byte subkey: HKDF-SHA256 of `key`, empty salt, `info` in UTF-8.
     static func subkey(of key: SymmetricKey, info: String) -> SymmetricKey {
         HKDF<SHA256>.deriveKey(inputKeyMaterial: key, salt: Data(), info: Data(info.utf8), outputByteCount: 32)
     }
 
-    /// Octets du générateur du système.
+    /// Bytes from the system's generator.
     static func randomBytes(_ count: Int) -> Data {
         var data = Data(count: count)
         let status = data.withUnsafeMutableBytes { buffer in
@@ -56,9 +56,9 @@ nonisolated enum SyncCrypto {
         return data
     }
 
-    // MARK: Chiffrement
+    // MARK: Encryption
 
-    /// `nonce ‖ chiffré ‖ étiquette` ; `nonce` n'est donné que par les tests (vecteurs fixes).
+    /// `nonce ‖ ciphertext ‖ tag`; `nonce` is only passed by tests (fixed vectors).
     static func seal(_ plaintext: Data, key: SymmetricKey, aad: Data, nonce: AES.GCM.Nonce? = nil) throws -> Data {
         guard let combined = try AES.GCM.seal(plaintext, using: key, nonce: nonce ?? AES.GCM.Nonce(), authenticating: aad).combined else {
             throw SyncCryptoError.unreadable
@@ -74,7 +74,7 @@ nonisolated enum SyncCrypto {
         }
     }
 
-    /// Complément : `0x80`, puis des `0x00` jusqu'à un multiple de `block`.
+    /// Padding: `0x80`, then `0x00` bytes up to a multiple of `block`.
     static func pad(_ data: Data, toMultipleOf block: Int) -> Data {
         var padded = data
         padded.append(0x80)
@@ -92,9 +92,9 @@ nonisolated enum SyncCrypto {
         return data[data.startIndex ..< marker]
     }
 
-    // MARK: Enregistrements et paquets
+    // MARK: Records and packages
 
-    /// Contenu d'un enregistrement chiffré (`SYNC.md` § 3.5), en base 64 : lié à son identifiant et à `keyVersion`.
+    /// Encrypted content of a record (`SYNC.md` § 3.5), in base 64: bound to its identifier and to `keyVersion`.
     static func encryptRecord(
         _ content: Data,
         id: UUID,
@@ -118,7 +118,7 @@ nonisolated enum SyncCrypto {
         return try unpad(open(versioned(data), key: dataKey, aad: recordAAD(id: id, keyVersion: keyVersion)))
     }
 
-    /// Paquet d'extension chiffré par sa propre clé, lié à son identifiant (`SYNC.md` § 3.5).
+    /// Extension package encrypted with its own key, bound to its identifier (`SYNC.md` § 3.5).
     static func encryptBlob(_ package: Data, id: UUID, key: SymmetricKey, nonce: AES.GCM.Nonce? = nil) throws -> Data {
         try Data([formatVersion]) + seal(pad(package, toMultipleOf: blobPadding), key: key, aad: blobAAD(id: id), nonce: nonce)
     }
@@ -135,7 +135,7 @@ nonisolated enum SyncCrypto {
         Data("matcha.blob.v1|\(id.uuidString.lowercased())".utf8)
     }
 
-    /// Ce qui suit l'octet de version, s'il est connu.
+    /// What follows the version byte, if it is known.
     private static func versioned(_ data: Data) throws -> Data {
         guard data.first == formatVersion else {
             throw SyncCryptoError.unreadable
@@ -145,12 +145,12 @@ nonisolated enum SyncCrypto {
 }
 
 nonisolated enum SyncCryptoError: Error, Equatable {
-    /// Moins de `SyncPassword.minimumLength` caractères.
+    /// Fewer than `SyncPassword.minimumLength` characters.
     case passwordTooShort
-    /// Paramètres de dérivation plus faibles que le minimum de ce Matcha.
+    /// Derivation parameters weaker than this Matcha's minimum.
     case weakKDF
     case keyDerivationFailed
-    /// Contenu altéré, déplacé, d'une autre clé ou d'un format inconnu.
+    /// Content tampered with, moved, from another key or in an unknown format.
     case unreadable
     case invalidRecoveryKey
 }

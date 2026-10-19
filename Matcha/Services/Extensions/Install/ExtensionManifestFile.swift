@@ -1,12 +1,12 @@
 import Foundation
 
-/// `manifest.json` d'une extension décompressée, et les textes de sa langue par défaut
-/// (`_locales/<default_locale>/messages.json`) pour les noms en `__MSG_cle__` (tâche 6.4). Type pur.
+/// `manifest.json` of an unpacked extension, and the texts of its default language
+/// (`_locales/<default_locale>/messages.json`) for `__MSG_cle__` names (task 6.4). Pure type.
 nonisolated struct ExtensionManifestFile {
     let manifest: [String: Any]
     let messages: [String: Any]?
 
-    /// Lit le manifeste du dossier `folder` ; nil s'il manque ou n'est pas un objet JSON.
+    /// Reads the manifest of folder `folder`; nil if it is missing or is not a JSON object.
     init?(folder: URL) {
         let manifestURL = folder.appendingPathComponent(ExtensionInstallDirectory.manifestName)
         guard let data = try? Data(contentsOf: manifestURL),
@@ -24,18 +24,18 @@ nonisolated struct ExtensionManifestFile {
         }
     }
 
-    /// Nom de l'extension dans sa langue par défaut.
+    /// Name of the extension in its default language.
     var name: String? {
         ExtensionIdentifier.name(in: manifest, messages: messages)
     }
 
-    /// Identifiant de l'extension de Firefox (`browser_specific_settings.gecko.id`), s'il est donné.
+    /// Firefox identifier of the extension (`browser_specific_settings.gecko.id`), if given.
     var geckoIdentifier: String? {
         let settings = (manifest["browser_specific_settings"] ?? manifest["applications"]) as? [String: Any]
         return (settings?["gecko"] as? [String: Any])?["id"] as? String
     }
 
-    /// Certains manifestes commencent par une marque d'ordre des octets, que `JSONSerialization` refuse.
+    /// Some manifests start with a byte order mark, which `JSONSerialization` rejects.
     private static func removingByteOrderMark(_ data: Data) -> Data {
         data.starts(with: [0xEF, 0xBB, 0xBF]) ? data.dropFirst(3) : data
     }

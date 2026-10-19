@@ -1,16 +1,16 @@
 import Foundation
 
-/// Événements qui mènent les extensions d'un état des fenêtres et des onglets au suivant (tâche 6.3). Type pur.
+/// Events that take extensions from one state of the windows and tabs to the next (task 6.3). Pure type.
 ///
-/// Ordre, pour que WebKit connaisse toujours les onglets et fenêtres qu'on lui nomme :
-/// 1. fenêtres ouvertes (WebKit ouvre leurs onglets, `tabs.onCreated` compris) ;
-/// 2. onglets ouverts dans une fenêtre déjà connue ;
-/// 3. onglets déplacés d'une fenêtre à l'autre, puis réordonnés dans leur fenêtre ;
-/// 4. propriétés changées (titre, adresse, chargement, son, épinglé, zoom) ;
-/// 5. onglet actif changé (l'ancien est encore ouvert à ce moment), sinon onglets sélectionnés changés ;
-/// 6. onglets fermés dans une fenêtre qui reste ouverte ;
-/// 7. fenêtres fermées, chacune après ses onglets (`windowIsClosing`) ;
-/// 8. fenêtre active, si elle change ou si une fenêtre s'est ouverte (WebKit tient la nouvelle fenêtre pour active).
+/// Order, so that WebKit always knows the tabs and windows it is given:
+/// 1. windows opened (WebKit opens their tabs, `tabs.onCreated` included);
+/// 2. tabs opened in an already known window;
+/// 3. tabs moved from one window to another, then reordered within their window;
+/// 4. properties changed (title, address, loading, sound, pinned, zoom);
+/// 5. active tab changed (the old one is still open at that point), otherwise selected tabs changed;
+/// 6. tabs closed in a window that stays open;
+/// 7. windows closed, each one after its tabs (`windowIsClosing`);
+/// 8. active window, if it changes or if a window opened (WebKit considers the new window active).
 nonisolated enum ExtensionEventPlanner {
     static func events(from old: ExtensionBrowserState, to new: ExtensionBrowserState) -> [ExtensionEvent] {
         let oldLocations = old.locations()
@@ -45,13 +45,13 @@ nonisolated enum ExtensionEventPlanner {
         return events
     }
 
-    /// Onglets de `window` qui y ont leur place (sans les doublons d'une autre fenêtre).
+    /// Tabs of `window` that belong there (without the duplicates of another window).
     private static func tabs(of window: ExtensionBrowserState.Window, in locations: [UUID: ExtensionBrowserState.Location]) -> [UUID] {
         window.tabIDs.filter { locations[$0]?.windowID == window.id }
     }
 
-    /// Changements de fenêtre, puis changements d'ordre dans une même fenêtre : seuls les onglets réellement déplacés
-    /// (pas ceux décalés par une ouverture, une fermeture ou le déplacement d'un autre).
+    /// Window changes, then order changes within the same window: only the tabs actually moved (not those shifted by an
+    /// opening, a closing or the move of another one).
     private static func moves(
         from old: ExtensionBrowserState,
         to new: ExtensionBrowserState,
@@ -81,8 +81,8 @@ nonisolated enum ExtensionEventPlanner {
         return events
     }
 
-    /// Éléments déplacés de `before` à `after` (mêmes éléments, uniques) : ceux que la plus petite différence retire
-    /// puis réinsère.
+    /// Elements moved from `before` to `after` (same elements, unique): those that the smallest difference removes and
+    /// then reinserts.
     static func movedElements(from before: [UUID], to after: [UUID]) -> Set<UUID> {
         var moved = Set<UUID>()
         for change in after.difference(from: before).inferringMoves() {
@@ -114,8 +114,8 @@ nonisolated enum ExtensionEventPlanner {
         return events
     }
 
-    /// Nouvel onglet actif de chaque fenêtre (WebKit relit alors sa sélection) ; sinon, onglets sélectionnés ajoutés et
-    /// retirés (ceux qui restent ouverts), dans l'ordre de la fenêtre.
+    /// New active tab of each window (WebKit then reads its selection again); otherwise, selected tabs added and
+    /// removed (those that stay open), in the window's order.
     private static func activations(
         from old: ExtensionBrowserState,
         to new: ExtensionBrowserState,

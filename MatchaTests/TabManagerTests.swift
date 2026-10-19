@@ -8,7 +8,7 @@ import WebKit
 struct TabManagerTests {
     private let manager = TabManager(websiteDataStore: .nonPersistent())
 
-    /// Ouvre `count` onglets vides ; le dernier ouvert est en tête de la barre.
+    /// Opens `count` empty tabs; the last one opened is at the top of the sidebar.
     private func openTabs(_ count: Int) -> [BrowserTab] {
         (0 ..< count).map { _ in manager.newTab() }
     }
@@ -17,7 +17,7 @@ struct TabManagerTests {
         tabs.map(\.id)
     }
 
-    // MARK: Ouverture
+    // MARK: Opening
 
     @Test func `starts without tabs`() {
         #expect(manager.tabs.isEmpty)
@@ -55,7 +55,7 @@ struct TabManagerTests {
     }
 
     @Test func `inserted tab goes after its opener and its previous children`() {
-        let tabs = openTabs(3) // du jour : 2, 1, 0
+        let tabs = openTabs(3) // today: 2, 1, 0
         let configuration = WebConfigurationFactory.makeConfiguration(websiteDataStore: manager.websiteDataStore)
         let child1 = manager.insertTab(configuration: configuration, after: tabs[1], select: false)
         let child2 = manager.insertTab(configuration: configuration, after: tabs[1], select: false)
@@ -80,7 +80,7 @@ struct TabManagerTests {
         #expect(manager.tab(withID: tabs[0].id) === tabs[0])
     }
 
-    // MARK: Sélection et fermeture
+    // MARK: Selection and closing
 
     @Test func `select changes the selected tab`() {
         let tabs = openTabs(3)
@@ -96,7 +96,7 @@ struct TabManagerTests {
     }
 
     @Test func `closing the selected tab selects the next one`() {
-        let tabs = openTabs(3) // ordre : 2, 1, 0
+        let tabs = openTabs(3) // order: 2, 1, 0
         manager.select(tabs[1])
         manager.close(tabs[1])
         #expect(ids(manager.tabs) == [tabs[2].id, tabs[0].id])
@@ -104,14 +104,14 @@ struct TabManagerTests {
     }
 
     @Test func `closing the selected last tab selects the previous one`() {
-        let tabs = openTabs(3) // ordre : 2, 1, 0
+        let tabs = openTabs(3) // order: 2, 1, 0
         manager.select(tabs[0])
         manager.close(tabs[0])
         #expect(manager.selectedTab === tabs[1])
     }
 
     @Test func `closing the selected first tab selects the new first one`() {
-        let tabs = openTabs(3) // ordre : 2, 1, 0
+        let tabs = openTabs(3) // order: 2, 1, 0
         manager.close(tabs[2])
         #expect(manager.selectedTab === tabs[1])
     }
@@ -139,7 +139,7 @@ struct TabManagerTests {
     }
 
     @Test func `closing a selected pinned tab moves to its neighbor across sections`() {
-        let tabs = openTabs(2) // du jour : 1, 0
+        let tabs = openTabs(2) // today: 1, 0
         manager.setPlace(tabs[0], to: .pinned)
         manager.select(tabs[0])
         manager.close(tabs[0])
@@ -149,7 +149,7 @@ struct TabManagerTests {
     // MARK: Places
 
     @Test func `tabs are ordered favorites then pinned then today`() {
-        let tabs = openTabs(4) // du jour : 3, 2, 1, 0
+        let tabs = openTabs(4) // today: 3, 2, 1, 0
         manager.setPlace(tabs[0], to: .pinned)
         manager.setPlace(tabs[1], to: .favorite)
         #expect(ids(manager.tabs) == [tabs[1].id, tabs[0].id, tabs[3].id, tabs[2].id])
@@ -183,7 +183,7 @@ struct TabManagerTests {
         #expect(manager.selectedTab == nil)
     }
 
-    // MARK: Dossiers
+    // MARK: Folders
 
     @Test func `new folder opens its renaming and expands its parent`() {
         let parent = manager.newFolder()
@@ -215,7 +215,7 @@ struct TabManagerTests {
         #expect(manager.tabs.count == 2)
     }
 
-    // MARK: Menu contextuel
+    // MARK: Context menu
 
     @Test func `duplicate opens a copy right after the tab with its history`() async throws {
         let other = manager.newTab()
@@ -257,9 +257,9 @@ struct TabManagerTests {
         pasteboard.releaseGlobally()
     }
 
-    // MARK: Épinglés façon Arc
+    // MARK: Arc-style pinned tabs
 
-    /// Onglet chargé avec la page locale `name`, rangé à `place`, et un autre onglet du jour.
+    /// Tab loaded with the local page `name`, placed at `place`, and another today tab.
     private func loadedTab(_ name: String, place: TabPlace) async throws -> (tab: BrowserTab, other: BrowserTab) {
         let other = manager.newTab()
         let tab = manager.insertTab(configuration: TestPages.configuration(), after: nil, select: true)

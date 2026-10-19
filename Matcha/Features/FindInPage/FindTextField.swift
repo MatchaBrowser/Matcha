@@ -1,19 +1,19 @@
 import AppKit
 import SwiftUI
 
-/// Champ de la barre de recherche dans la page (`NSTextField`, comme la barre de commande, sans correction ni
-/// remplacements) : chaque modification va à la recherche de la page, ⏎ ⇧⏎ ⎋ vont à `onCommand`. Pendant une
-/// composition (japonais, touches mortes), rien n'est cherché et ces touches restent à la méthode de saisie.
+/// Field of the find-in-page bar (`NSTextField`, like the command bar, without correction or replacements): each
+/// change goes to the page's search, ⏎ ⇧⏎ ⎋ go to `onCommand`. During a composition (Japanese, dead keys), nothing
+/// is searched and these keys stay with the input method.
 struct FindTextField: NSViewRepresentable {
     let session: FindSession
-    /// Page de la barre : sert à retrouver le champ qui a le clavier (`FindActions`).
+    /// Page of the bar: used to find the field that has keyboard focus (`FindActions`).
     let pageID: BrowserTab.ID
-    /// Texte cherché : un champ recréé (retour sur l'onglet) le reprend.
+    /// Searched text: a recreated field (back on the tab) picks it up again.
     let text: String
-    /// Change à chaque ⌘F : le champ reprend le clavier et sélectionne son texte.
+    /// Changes at each ⌘F: the field takes keyboard focus again and selects its text.
     let focusRequest: Int
     let onCommand: (FindKeyCommand) -> Void
-    /// Le champ prend le clavier (clic) : la carte rend actif le panneau de sa page.
+    /// The field takes keyboard focus (click): the card makes its page's pane active.
     var onFocus: (() -> Void)?
 
     func makeCoordinator() -> Coordinator {
@@ -41,7 +41,7 @@ struct FindTextField: NSViewRepresentable {
         field.setContentCompressionResistancePriority(.defaultLow, for: .horizontal)
         field.onBecomeFirstResponder = onFocus
         context.coordinator.lastFocusRequest = focusRequest
-        // Seulement après ⌘F : un champ recréé en revenant sur l'onglet laisse le clavier à la page.
+        // Only after ⌘F: a field recreated when coming back to the tab leaves keyboard focus to the page.
         field.wantsFocus = session.takeFocusRequest()
         return field
     }
@@ -49,7 +49,7 @@ struct FindTextField: NSViewRepresentable {
     func updateNSView(_ field: CommandBarNSTextField, context: Context) {
         context.coordinator.parent = self
         field.onBecomeFirstResponder = onFocus
-        // Pendant l'édition, le champ fait foi : jamais stringValue (NSControl abandonnerait l'édition).
+        // During editing, the field is authoritative: never stringValue (NSControl would abandon editing).
         if field.currentEditor() == nil, field.stringValue != text {
             field.stringValue = text
         }
@@ -66,7 +66,7 @@ struct FindTextField: NSViewRepresentable {
         return CGSize(width: width, height: 18)
     }
 
-    /// Délégué du champ ; il dit à quelle page le champ appartient.
+    /// Delegate of the field; it tells which page the field belongs to.
     final class Coordinator: NSObject, NSTextFieldDelegate {
         var parent: FindTextField
         var lastFocusRequest = 0
@@ -79,7 +79,7 @@ struct FindTextField: NSViewRepresentable {
             guard let field = notification.object as? NSTextField else {
                 return
             }
-            // Composition en cours (touche morte, méthode de saisie) : le texte n'est pas encore tapé.
+            // Composition in progress (dead key, input method): the text is not typed yet.
             if let editor = field.currentEditor() as? NSTextView, editor.hasMarkedText() {
                 return
             }
@@ -88,7 +88,7 @@ struct FindTextField: NSViewRepresentable {
 
         func control(_: NSControl, textView: NSTextView, doCommandBy commandSelector: Selector) -> Bool {
             let isShiftDown = NSApp.currentEvent?.modifierFlags.contains(.shift) == true
-            // Pendant une composition, ⏎ et ⎋ appartiennent à la méthode de saisie.
+            // During a composition, ⏎ and ⎋ belong to the input method.
             guard !textView.hasMarkedText(),
                   let command = FindKeyCommand(selectorName: NSStringFromSelector(commandSelector), isShiftDown: isShiftDown)
             else {

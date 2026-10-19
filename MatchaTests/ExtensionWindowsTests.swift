@@ -3,7 +3,7 @@ import Foundation
 import Testing
 import WebKit
 
-/// Événements donnés au contrôleur des extensions quand les onglets, les Spaces et les fenêtres changent (tâche 6.3).
+/// Events given to the extension controller when tabs, Spaces and windows change (task 6.3).
 @MainActor
 struct ExtensionWindowsTests {
     private let session: BrowserSession
@@ -25,14 +25,14 @@ struct ExtensionWindowsTests {
         model.space.tabManager
     }
 
-    /// Événements produits par `change`.
+    /// Events produced by `change`.
     private func events(after change: () -> Void) -> [FakeExtensionSink.Event] {
         _ = sink.take()
         change()
         return flush()
     }
 
-    /// Événements des changements faits depuis la dernière lecture.
+    /// Events of the changes made since the last read.
     private func flush() -> [FakeExtensionSink.Event] {
         windows.update()
         return sink.take()
@@ -109,7 +109,7 @@ struct ExtensionWindowsTests {
         let right = tabManager.newTab(select: false)
         windows.update()
         _ = sink.take()
-        // Nouvel onglet en tête des onglets du jour : il passe à droite de l'autre.
+        // New tab at the top of today tabs: it moves to the right of the other one.
         #expect(events { tabManager.openInSplit(right) } == [
             .moveTab(right.id, from: 0, window: windowID),
             .activateTab(right.id, previous: left.id),
@@ -157,7 +157,7 @@ struct ExtensionWindowsTests {
         ])
         let kept = try #require(tabManager.openPeek(url, from: source))
         _ = flush()
-        // Ouvert en onglet, il garde sa place et reste actif ; son onglet d'origine n'est plus sélectionné.
+        // Opened as a tab, it keeps its place and stays active; its original tab is no longer selected.
         #expect(events { tabManager.openPeekAsTab() } == [.deselectTabs([source.id])])
         #expect(windows.tabs(inWindow: windowID).map(\.tabID) == [source.id, kept.tab.id])
     }

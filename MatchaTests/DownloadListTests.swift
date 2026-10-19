@@ -2,8 +2,8 @@ import Foundation
 @testable import Matcha
 import Testing
 
-/// Liste des téléchargements retenue d'un lancement à l'autre : fenêtres ordinaires seulement, jusqu'à « Effacer » ;
-/// fichier effacé ou déplacé signalé introuvable.
+/// Download list kept from one launch to the next: ordinary windows only, until “Clear”; deleted or moved file
+/// reported as missing.
 @MainActor
 struct DownloadListTests {
     private let folder: TemporaryDownloadsFolder
@@ -16,7 +16,7 @@ struct DownloadListTests {
         defaults.removePersistentDomain(forName: name)
     }
 
-    /// Gestionnaire « lancé » sur les réglages du test : il reprend la liste retenue.
+    /// Manager “launched” on the test's settings: it picks up the saved list.
     private func launch() -> DownloadManager {
         let downloads = folder.makeManager()
         downloads.restoreList(from: defaults)
@@ -29,7 +29,7 @@ struct DownloadListTests {
         return item
     }
 
-    /// Téléchargement terminé, avec son fichier de `size` octets dans le dossier du test.
+    /// Finished download, with its file of `size` bytes in the test folder.
     private func finishedItem(_ name: String, in downloads: DownloadManager, scope: DownloadScope = .regular) throws -> DownloadItem {
         let item = item(name, in: downloads, scope: scope)
         let destination = folder.url.appendingPathComponent(name)
@@ -43,7 +43,7 @@ struct DownloadListTests {
         SavedDownload(id: id, fileName: "\(id).zip", fileURL: nil, outcome: outcome, byteCount: 1, failureReason: nil)
     }
 
-    // MARK: Liste retenue (type pur)
+    // MARK: Saved list (pure type)
 
     @Test func `the saved list keeps its order and its most recent entries`() {
         let entries = (0 ..< SavedDownloadList.limit + 5).map { _ in saved(UUID()) }
@@ -63,7 +63,7 @@ struct DownloadListTests {
         #expect(SavedDownloadList.load(from: defaults).isEmpty)
     }
 
-    // MARK: D'un lancement à l'autre
+    // MARK: From one launch to the next
 
     @Test func `downloads of regular windows that are over come back at the next launch`() throws {
         let downloads = launch()
@@ -90,7 +90,7 @@ struct DownloadListTests {
         #expect(relaunched.items[1].state == .failed)
         #expect(relaunched.items[1].failureReason == "Connexion perdue")
         #expect(relaunched.items[0].state == .cancelled)
-        // Rien ne fait rebondir le bouton au lancement.
+        // Nothing makes the button bounce at launch.
         #expect(relaunched.finishedCount(in: .regular) == 0)
     }
 
@@ -126,7 +126,7 @@ struct DownloadListTests {
         #expect(launch().items.isEmpty)
     }
 
-    // MARK: Fichier introuvable
+    // MARK: Missing file
 
     @Test func `a deleted or moved file is missing`() throws {
         let downloads = launch()

@@ -1,29 +1,29 @@
 import Foundation
 import Observation
 
-/// Confirmation « URL copiée » d'une fenêtre : visible 1,5 s après chaque copie. Une nouvelle copie
-/// pendant l'affichage relance l'attente ; la fermeture de la fenêtre l'annule.
+/// “URL Copied” confirmation of a window: visible for 1.5 s after each copy. A new copy while it is displayed
+/// restarts the wait; closing the window cancels it.
 @MainActor
 @Observable
 final class CopyConfirmationModel {
     typealias Sleep = @MainActor (Duration) async throws -> Void
 
-    /// Durée d'affichage, fondus non compris.
+    /// Display duration, fades not included.
     nonisolated static let displayDuration = Duration.milliseconds(1500)
 
     private(set) var isVisible = false
-    /// Copies confirmées : chacune est annoncée à VoiceOver, même confirmation déjà visible.
+    /// Confirmed copies: each one is announced to VoiceOver, even when the confirmation is already visible.
     private(set) var presentationCount = 0
 
     @ObservationIgnored private let sleep: Sleep
     @ObservationIgnored private var hideTask: Task<Void, Never>?
 
-    /// `sleep` est remplacé dans les tests.
+    /// `sleep` is replaced in tests.
     init(sleep: @escaping Sleep = { try await Task.sleep(for: $0) }) {
         self.sleep = sleep
     }
 
-    /// Affiche la confirmation et relance l'attente avant de la masquer.
+    /// Shows the confirmation and restarts the wait before hiding it.
     func show() {
         hideTask?.cancel()
         isVisible = true
@@ -33,10 +33,10 @@ final class CopyConfirmationModel {
             do {
                 try await sleep(Self.displayDuration)
             } catch {
-                // Annulée : copie plus récente ou fenêtre fermée.
+                // Cancelled: more recent copy or window closed.
                 return
             }
-            // Une attente qui ignore l'annulation ne doit pas masquer la confirmation suivante.
+            // A wait that ignores cancellation must not hide the next confirmation.
             guard !Task.isCancelled, let self else {
                 return
             }
@@ -45,7 +45,7 @@ final class CopyConfirmationModel {
         }
     }
 
-    /// Fenêtre fermée : masque aussitôt et arrête l'attente.
+    /// Window closed: hides immediately and stops the wait.
     func cancel() {
         hideTask?.cancel()
         hideTask = nil

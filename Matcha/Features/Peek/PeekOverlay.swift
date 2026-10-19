@@ -1,20 +1,20 @@
 import SwiftUI
 import WebKit
 
-/// Couche de l'aperçu sur les pages affichées (tous les panneaux d'un split) : voile sur chaque page, barre
-/// (adresse, « Ouvrir en onglet », ×) et panneau à 85 % de la zone des pages. Les barres d'adresse au-dessus des
-/// pages, la barre latérale et les intervalles restent hors du voile. Un clic de la fenêtre hors du panneau et
-/// de sa barre ferme l'aperçu ; sur le voile, il s'arrête là. Le panneau grandit depuis le lien cliqué ; il
-/// disparaît sans animation, pour qu'aucun panneau vide ne reste à l'écran quand la page passe dans la carte.
+/// Peek layer over the displayed pages (all panes of a split): scrim over each page, bar (address, “Open as Tab”,
+/// ×) and panel at 85% of the pages area. The address bars above the pages, the sidebar and the gaps stay outside
+/// the scrim. A click in the window outside the panel and its bar closes the peek; on the scrim, it stops there.
+/// The panel grows from the clicked link; it disappears without animation, so that no empty panel stays on screen
+/// when the page moves into the card.
 struct PeekOverlay: View {
     static let opening = Animation.spring(duration: 0.32, bounce: 0.1)
     static let reducedOpening = Animation.easeOut(duration: 0.15)
     static let initialScale = 0.5
 
     let tabManager: TabManager
-    /// Pages des panneaux affichés, dans le repère de la couche ; l'aperçu se place dans leur réunion.
+    /// Pages of the displayed panes, in the layer's coordinate space; the peek is placed in their union.
     let pages: [CGRect]
-    /// Coins de chaque page : ceux de la carte, droits en haut sous une barre d'adresse.
+    /// Corners of each page: those of the card, square at the top under an address bar.
     let pageCorners: RectangleCornerRadii
 
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
@@ -39,7 +39,7 @@ struct PeekOverlay: View {
         .accessibilityLabel(Text("Peek", comment: "Accessibility label of the floating preview opened by Shift-clicking a link"))
         .accessibilityIdentifier("peek")
         .accessibilityHidden(tabManager.peek == nil)
-        // Ouverture animée ; fermeture et passage en onglet sans animation.
+        // Animated opening; closing and turning into a tab without animation.
         .animation(openingAnimation, value: tabManager.peek?.id)
         .position(x: area.midX, y: area.midY)
     }
@@ -51,8 +51,8 @@ struct PeekOverlay: View {
         return reduceMotion ? Self.reducedOpening : Self.opening
     }
 
-    /// Voile sur chaque page : arrête les clics et le défilement destinés à la page dessous ; un clic dessus
-    /// ferme l'aperçu.
+    /// Scrim over each page: stops the clicks and scrolling meant for the page below; a click on it closes the
+    /// peek.
     private func scrim(in area: CGRect) -> some View {
         ZStack(alignment: .topLeading) {
             ForEach(Array(pages.enumerated()), id: \.offset) { _, page in
@@ -70,11 +70,11 @@ struct PeekOverlay: View {
 
     private func panel(_ webView: WKWebView, of peek: Peek, layout: PeekLayout, area: CGSize) -> some View {
         VStack(spacing: 0) {
-            // Recherche dans la page (tâche 5.3) et demandes de permission (tâche 5.2) de la page de l'aperçu.
+            // Find in page (task 5.3) and permission requests (task 5.2) of the peek's page.
             FindBar(page: peek.tab)
             PermissionBanner(prompts: peek.tab.permissionPrompts)
             PeekWebHost(webView: webView) { PeekActions.close(in: tabManager) }
-                // Page plantée plusieurs fois de suite (tâche 5.7) : le message, jusqu'au rechargement.
+                // Page crashed several times in a row (task 5.7): the message, until reload.
                 .overlay {
                     if peek.tab.crash.isShowingProblem {
                         PageProblemView(page: peek.tab)
@@ -91,9 +91,9 @@ struct PeekOverlay: View {
         .shadow(color: .black.opacity(0.35), radius: 30, y: 12)
         .frame(width: layout.pane.width, height: layout.pane.height)
         .position(x: layout.pane.midX, y: layout.pane.midY)
-        // Toute la zone : le point d'ancrage de l'agrandissement s'y rapporte.
+        // The whole area: the anchor point of the scaling refers to it.
         .frame(width: area.width, height: area.height)
-        // Un nouvel aperçu = un nouveau conteneur (la vue web n'y est ajoutée qu'à la création).
+        // A new peek = a new container (the web view is only added to it at creation).
         .id(peek.id)
         .transition(.asymmetric(insertion: insertion(from: peek.openingPoint), removal: .identity))
     }
@@ -102,7 +102,7 @@ struct PeekOverlay: View {
         reduceMotion ? .opacity : .scale(scale: Self.initialScale, anchor: UnitPoint(x: point.x, y: point.y)).combined(with: .opacity)
     }
 
-    /// Hors du panneau et de sa barre, un clic de la fenêtre ferme l'aperçu puis atteint sa cible.
+    /// Outside the panel and its bar, a click in the window closes the peek then reaches its target.
     private func outsideClickArea(_ layout: PeekLayout) -> some View {
         let bounds = layout.pane.union(layout.toolbar)
         return Color.clear

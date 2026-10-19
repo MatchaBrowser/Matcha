@@ -1,7 +1,7 @@
 import XCTest
 
-/// Enregistrement des onglets d'un lancement à l'autre, dans une base de test à part (« uitest »), que
-/// l'app vide au premier lancement du test : le lanceur des tests, sandboxé, ne peut pas la supprimer.
+/// Saving tabs from one launch to the next, in a separate test store (“uitest”), which the app empties on the
+/// test's first launch: the sandboxed test runner can't delete it.
 final class PersistenceUITests: XCTestCase {
     private let settings = ["inMemoryStore": "NO", "storeName": "uitest"]
 
@@ -20,7 +20,7 @@ final class PersistenceUITests: XCTestCase {
         app.menuItems["Épingler"].click()
         openEmptyTab(in: app)
         XCTAssertTrue(waitForCount(tabRows(in: app), 2))
-        // Enregistrement groupé une seconde après le dernier changement.
+        // Batched save one second after the last change.
         sleep(3)
         app.terminate()
 
@@ -31,7 +31,7 @@ final class PersistenceUITests: XCTestCase {
         app.terminate()
     }
 
-    /// Part de largeur du panneau de gauche d'un split de deux panneaux.
+    /// Width share of the left pane of a two-pane split.
     @MainActor
     private func leftShare(in app: XCUIApplication) -> Double {
         let panes = orderedPagePanes(in: app)
@@ -52,7 +52,7 @@ final class PersistenceUITests: XCTestCase {
         XCTAssertTrue(divider.waitForExistence(timeout: 2))
         drag(divider, by: -80)
         let share = leftShare(in: app)
-        // Enregistrement groupé une seconde après le dernier changement.
+        // Batched save one second after the last change.
         sleep(3)
         app.terminate()
 

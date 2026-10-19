@@ -1,8 +1,8 @@
 import XCTest
 
-/// Mini-fenêtre (équivalent de Little Arc). Ouverte par le menu Fichier : le raccourci global est coupé par les
-/// réglages de lancement (`defaultSettings`), sauf dans le test qui le vérifie, qui en choisit un que personne
-/// n'utilise (⌃⌥⌘F18). Ces tests activent le Finder et utilisent la vraie souris.
+/// Mini window (equivalent of Little Arc). Opened from the File menu: the global shortcut is turned off by the
+/// launch settings (`defaultSettings`), except in the test that checks it, which picks one that nobody uses
+/// (⌃⌥⌘F18). These tests activate the Finder and use the real mouse.
 final class MiniWindowUITests: XCTestCase {
     override func setUpWithError() throws {
         continueAfterFailure = false
@@ -15,7 +15,7 @@ final class MiniWindowUITests: XCTestCase {
         let mini = openMiniWindow(in: app)
         load("about:blank?one", in: mini, app: app)
 
-        // La page reste dans la mini-fenêtre : aucun onglet dans la barre latérale.
+        // The page stays in the mini window: no tab in the sidebar.
         XCTAssertEqual(tabRows(in: app).count, 0)
         XCTAssertFalse(addressField(in: browserWindow(in: app)).exists)
     }
@@ -68,7 +68,7 @@ final class MiniWindowUITests: XCTestCase {
         load("about:blank?mini", in: mini, app: app)
 
         uncoveredPoint(of: browserWindow(in: app), avoiding: mini).click()
-        // Fenêtre de navigation active : la mini-fenêtre reste devant elle.
+        // Browser window active: the mini window stays in front of it.
         XCTAssertTrue(addressPill(in: mini).isHittable)
     }
 
@@ -87,7 +87,7 @@ final class MiniWindowUITests: XCTestCase {
         XCTAssertTrue(waitForCount(miniWindows(in: app), 0))
         XCTAssertTrue(waitForCount(tabRows(in: app), 1))
         XCTAssertTrue(tabRow(titled: "about:blank?two", in: app).exists)
-        // Même vue web : l'historique a suivi (un onglet recréé depuis l'adresse n'en aurait pas).
+        // Same web view: the history came along (a tab recreated from the address wouldn't have it).
         XCTAssertTrue(app.buttons["Précédent"].isEnabled)
     }
 
@@ -123,14 +123,14 @@ final class MiniWindowUITests: XCTestCase {
         XCTAssertEqual(browserWindow(in: app).descendants(matching: .any).matching(identifier: "tabRow").count, 1)
     }
 
-    /// Le raccourci global ouvre une mini-fenêtre depuis une autre app, une seule par appui, et Matcha au premier
-    /// plan. ⌃⌥⌘F18 plutôt que ⌥⌘N : il ne gêne ni la Matcha de l'utilisateur ni une autre app. Si le raccourci
-    /// n'arrive jamais (touches simulées par XCTest), ne pas affaiblir le test : le signaler.
+    /// The global shortcut opens a mini window from another app, only one per press, with Matcha in front.
+    /// ⌃⌥⌘F18 rather than ⌥⌘N: it gets in the way of neither the user's Matcha nor another app. If the shortcut
+    /// never arrives (keys simulated by XCTest), don't weaken the test: report it.
     @MainActor
     func testGlobalShortcutOpensAMiniWindowFromAnotherApp() throws {
-        // Constaté le 2026-10-17 : les touches simulées par XCTest vont droit à l'app visée et ne passent pas par
-        // les raccourcis globaux du système ; le raccourci est vérifié à la main (TESTS_MANUELS.md, 4.5). Test gardé
-        // pour un essai : MATCHA_TEST_GLOBAL_SHORTCUT=1.
+        // Observed on 2026-10-17: keys simulated by XCTest go straight to the target app and don't go through the
+        // system's global shortcuts; the shortcut is checked by hand (TESTS_MANUELS.md, 4.5). Test kept for a trial:
+        // MATCHA_TEST_GLOBAL_SHORTCUT=1.
         try XCTSkipUnless(
             ProcessInfo.processInfo.environment["MATCHA_TEST_GLOBAL_SHORTCUT"] != nil,
             "Touches simulées sans effet sur les raccourcis globaux",
@@ -147,7 +147,7 @@ final class MiniWindowUITests: XCTestCase {
         XCTAssertTrue(app.wait(for: .runningForeground, timeout: 5))
         XCTAssertTrue(waitForKeyboardFocus(of: addressField(in: miniWindows(in: app).firstMatch)))
 
-        // Matcha au premier plan : un appui, une seule mini-fenêtre de plus.
+        // Matcha in front: one press, exactly one more mini window.
         app.typeKey(.F18, modifierFlags: [.control, .option, .command])
         XCTAssertTrue(waitForCount(miniWindows(in: app), 2, timeout: 5))
         sleep(1)

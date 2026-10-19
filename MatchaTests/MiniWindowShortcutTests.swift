@@ -2,8 +2,8 @@ import Carbon.HIToolbox
 @testable import Matcha
 import Testing
 
-/// Sans jamais toucher à `KeyboardShortcuts.Name.openMiniWindow` : son premier accès écrirait ⌥⌘N dans les
-/// réglages de l'utilisateur (l'app hôte des tests a le même identifiant que l'app).
+/// Without ever touching `KeyboardShortcuts.Name.openMiniWindow`: its first access would write ⌥⌘N into the
+/// user's settings (the tests' host app has the same identifier as the app).
 struct MiniWindowShortcutTests {
     @Test func `default shortcut is option command N`() {
         #expect(MiniWindowShortcut.defaultCarbonKeyCode == kVK_ANSI_N)

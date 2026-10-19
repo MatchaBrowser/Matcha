@@ -1,13 +1,13 @@
 import SwiftUI
 
-/// Ligne de résultat de la barre de commande : icône, titre, sous-titre, puis les capsules d'un
-/// onglet et ⏎ sur la ligne sélectionnée. Le survol ne fait que surligner ; un clic exécute.
+/// Result row of the command bar: icon, title, subtitle, then a tab's capsules and ⏎ on the selected row. Hovering
+/// only highlights; a click runs.
 struct CommandBarRowView: View {
     let row: CommandRow
     let isSelected: Bool
-    /// Nom du moteur de l'ouverture en cours (« Rechercher sur … »).
+    /// Name of the engine of the current opening (“Search …”).
     let searchEngineName: String
-    /// Couleur du Space affiché, qui teinte la ligne sélectionnée.
+    /// Color of the displayed Space, which tints the selected row.
     let tint: Color
     let icons: CommandRowIcons
     let action: () -> Void
@@ -48,7 +48,7 @@ struct CommandBarRowView: View {
         .accessibilityIdentifier("commandBarRow")
     }
 
-    /// Sous-titre affiché : l'adresse de la ligne, ou le moteur pour une recherche.
+    /// Displayed subtitle: the row's address, or the engine for a search.
     private var subtitle: String? {
         switch row.style {
         case .search, .searchAlternative:

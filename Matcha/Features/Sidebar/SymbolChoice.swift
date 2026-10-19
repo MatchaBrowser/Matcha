@@ -1,9 +1,9 @@
 import Foundation
 
-/// Symbole SF proposé dans une grille d'icônes (`SymbolPickerGrid`), avec son nom lu par VoiceOver et affiché en
-/// bulle d'aide. Ceux des dossiers existent tous depuis macOS 11, ceux des Spaces depuis macOS 13 au plus tard
-/// (`name_availability.plist` de CoreGlyphs) ; un test vérifie qu'ils existent. Un même nom se traduit une fois pour
-/// les deux listes (même clé, même commentaire).
+/// SF Symbol offered in an icon grid (`SymbolPickerGrid`), with its name read by VoiceOver and shown as a tooltip.
+/// The folders' symbols all exist since macOS 11, the Spaces' since macOS 13 at the latest
+/// (`name_availability.plist` of CoreGlyphs); a test checks that they exist. The same name is translated once for
+/// both lists (same key, same comment).
 nonisolated struct SymbolChoice: Identifiable, Sendable {
     let name: String
     let title: LocalizedStringResource
@@ -12,7 +12,7 @@ nonisolated struct SymbolChoice: Identifiable, Sendable {
         name
     }
 
-    /// Icônes proposées pour un dossier d'épinglés ; « folder », en premier, est l'icône par défaut.
+    /// Icons offered for a pinned folder; “folder”, first, is the default icon.
     static let folderIcons = [
         SymbolChoice(name: "folder", title: LocalizedStringResource("Folder", comment: "Icon choice (SF Symbol)")),
         SymbolChoice(name: "folder.fill", title: LocalizedStringResource("Filled Folder", comment: "Icon choice (SF Symbol)")),

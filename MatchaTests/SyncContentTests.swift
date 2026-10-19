@@ -2,8 +2,8 @@ import Foundation
 @testable import Matcha
 import Testing
 
-/// Contenu d'un enregistrement synchronisé (tâche 7.4, `SYNC.md` § 2.2) : format JSON, dates, règle des conflits,
-/// identifiants tirés d'une clé, horloge hybride.
+/// Content of a synced record (task 7.4, `SYNC.md` § 2.2): JSON format, dates, conflict rule, identifiers derived from
+/// a key, hybrid clock.
 struct SyncContentTests {
     private let device = UUID(uuidString: "3F2A8C1E-6B0D-4C5E-9F1A-2B7D8E4C6A10") ?? UUID()
 
@@ -72,7 +72,7 @@ struct SyncContentTests {
     }
 
     @Test func `derived identifiers are UUID version 5`() throws {
-        // RFC 9562, annexe A.4 : « www.example.com » dans l'espace de noms DNS.
+        // RFC 9562, appendix A.4: “www.example.com” in the DNS namespace.
         let dns = try #require(UUID(uuidString: "6BA7B810-9DAD-11D1-80B4-00C04FD430C8"))
         #expect(SyncIdentifier.derived(from: "www.example.com", in: dns) == UUID(uuidString: "2ED6657D-E927-568B-95E1-2665A8AEA6A2"))
         #expect(SyncIdentifier.namespace == UUID(uuidString: "393070D0-1478-44F6-82BF-07476B17D5F5"))
@@ -91,13 +91,13 @@ struct SyncContentTests {
         var clock = SyncClock()
         let now = try date("2026-10-17T08:30:12.345Z")
         #expect(clock.next(now: now) == now)
-        // Même milliseconde, puis horloge du Mac en retard : toujours 1 ms de plus.
+        // Same millisecond, then the Mac's clock running late: always 1 ms more.
         #expect(try clock.next(now: now) == date("2026-10-17T08:30:12.346Z"))
         #expect(try clock.next(now: now.addingTimeInterval(-60)) == date("2026-10-17T08:30:12.347Z"))
-        // Une modification reçue d'un Mac en avance : la suivante écrite ici vient après elle.
+        // A change received from a Mac running ahead: the next one written here comes after it.
         try clock.observe(date("2026-10-17T09:00:00.000Z"))
         #expect(try clock.next(now: now) == date("2026-10-17T09:00:00.001Z"))
-        // L'heure du Mac reprend la main quand elle dépasse.
+        // The Mac's time takes over again when it gets ahead.
         #expect(try clock.next(now: date("2026-10-17T10:00:00.000Z")) == date("2026-10-17T10:00:00.000Z"))
     }
 }

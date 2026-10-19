@@ -6,11 +6,11 @@ import Synchronization
 import Testing
 import WebKit
 
-/// Impression et export en PDF d'une vraie page (tâche 5.4) : opération d'impression réglée (titre, cadre de la vue),
-/// impression dans un fichier PDF qui n'est pas blanc, PDF d'un seul tenant de toute la page, nom et écriture du fichier.
+/// Printing and PDF export of a real page (task 5.4): print operation set up (title, view frame), printing to a PDF
+/// file that is not blank, single-page PDF of the whole page, file name and writing.
 @MainActor
 struct PagePrintingTests {
-    /// Page locale `name` dont le corps est `body`, dans une vue web de 800 × 600 pt jamais affichée.
+    /// Local page `name` whose body is `body`, in an 800 × 600 pt web view that is never shown.
     private func page(_ name: String, body: String) async throws -> BrowserTab {
         let tab = BrowserTab(configuration: TestPages.configuration())
         tab.loadedWebView.frame = CGRect(x: 0, y: 0, width: 800, height: 600)
@@ -31,14 +31,14 @@ struct PagePrintingTests {
         #expect(operation.printPanel.options.contains(.showsPreview))
         #expect(operation.view?.frame.isEmpty == false)
 
-        // Vue web sans taille (jamais affichée) : la vue d'impression en reçoit une quand même.
+        // Web view without a size (never shown): the print view gets one anyway.
         tab.loadedWebView.frame = .zero
         let fallback = PagePrinter.operation(for: tab.loadedWebView, title: "x", printInfo: NSPrintInfo())
         #expect(fallback.view?.frame.size == PagePrinter.fallbackViewSize)
     }
 
-    /// Imprime `tab` dans un fichier PDF comme l'app : en feuille sur une fenêtre (jamais affichée), sans zone
-    /// d'impression. Une opération lancée par `run()` ne s'arrête jamais avec WebKit (pages sans fin, constaté).
+    /// Prints `tab` to a PDF file as the app does: as a sheet on a window (never shown), without a print panel. An
+    /// operation started by `run()` never ends with WebKit (endless pages, observed).
     private func printToPDF(_ tab: BrowserTab) async throws -> PDFDocument {
         let window = NSWindow(contentRect: tab.loadedWebView.frame, styleMask: [.titled], backing: .buffered, defer: false)
         window.isReleasedWhenClosed = false
@@ -121,8 +121,8 @@ struct PagePrintingTests {
     }
 }
 
-/// Reçoit la fin d'une impression lancée par `runModal(for:delegate:didRun:contextInfo:)`, appelée sur le fil de
-/// l'impression (AppKit l'imprime à part).
+/// Receives the end of a print job started by `runModal(for:delegate:didRun:contextInfo:)`, called on the printing
+/// thread (AppKit prints separately).
 private final nonisolated class PrintCompletion: NSObject, Sendable {
     private let result = Mutex<Bool?>(nil)
 

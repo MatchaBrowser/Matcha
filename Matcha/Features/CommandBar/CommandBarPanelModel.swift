@@ -1,7 +1,7 @@
 import Foundation
 
-/// Ce que le panneau de la barre de commande lit et modifie : la barre d'une fenêtre de navigation
-/// (`CommandBarModel`) ou celle d'une mini-fenêtre (`MiniCommandBarModel`).
+/// What the command bar panel reads and modifies: the bar of a browser window (`CommandBarModel`) or that of a
+/// mini window (`MiniCommandBarModel`).
 @MainActor
 protocol CommandBarPanelModel: AnyObject {
     var isPresented: Bool { get }
@@ -9,32 +9,32 @@ protocol CommandBarPanelModel: AnyObject {
     var rows: [CommandRow] { get }
     var selectedRowID: CommandRow.ID? { get }
     var selectedRow: CommandRow? { get }
-    /// Change à chaque demande d'ouverture : le champ reprend le clavier et sélectionne tout.
+    /// Changes on each open request: the field takes the keyboard back and selects all.
     var focusRequest: Int { get }
-    /// Moteur de l'ouverture en cours (« Rechercher sur … »).
+    /// Engine of the current opening (“Search …”).
     var searchEngine: SearchEngine { get }
-    /// Onglet dont l'adresse est modifiée (icône du champ) ; nil pour une saisie neuve.
+    /// Tab whose address is being modified (field icon); nil for a fresh entry.
     var editedTab: BrowserTab? { get }
-    /// Icônes des lignes.
+    /// Row icons.
     var rowIcons: CommandRowIcons { get }
     func updateText(_ newText: String)
     func moveSelection(by delta: Int)
     func dismiss()
 }
 
-/// Ce dont une ligne a besoin pour son icône.
+/// What a row needs for its icon.
 @MainActor
 struct CommandRowIcons {
     let faviconService: FaviconService
-    /// Onglet vivant d'une ligne d'onglet ; nil s'il n'existe plus (ou si la barre ne propose pas d'onglets).
+    /// Live tab of a tab row; nil if it no longer exists (or if the bar does not offer tabs).
     let tab: (TabReference) -> BrowserTab?
 }
 
-/// Place du panneau dans sa fenêtre.
+/// Place of the panel in its window.
 nonisolated enum CommandBarPlacement: Equatable, Sendable {
-    /// Fenêtre de navigation : centré, 640 pt au plus, haut à 18 % de la hauteur (52 pt au moins).
+    /// Browser window: centered, 640 pt at most, top at 18% of the height (52 pt at least).
     case window
-    /// Mini-fenêtre : toute la largeur moins 10 pt de chaque côté, `top` pt sous le haut de la fenêtre.
+    /// Mini window: full width minus 10 pt on each side, `top` pt below the top of the window.
     case belowToolbar(top: Double)
 
     func top(inHeight height: Double) -> Double {

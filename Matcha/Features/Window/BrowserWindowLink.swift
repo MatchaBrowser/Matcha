@@ -1,17 +1,17 @@
 import AppKit
 
-/// Ce que la fenêtre principale offre aux mini-fenêtres (une fausse version dans les tests).
+/// What the main window offers mini windows (a fake version in tests).
 @MainActor
 protocol MainWindowLink: AnyObject {
-    /// Space affiché ; nil si la fenêtre a disparu.
+    /// Displayed Space; nil if the window has disappeared.
     var windowModel: WindowModel? { get }
-    /// La fenêtre est à l'écran ou dans le Dock.
+    /// The window is on screen or in the Dock.
     var isShown: Bool { get }
-    /// Ferme sa barre de commande, la met au premier plan (en la sortant du Dock) et libère son clavier.
+    /// Closes its command bar, brings it to the front (taking it out of the Dock) and frees its keyboard.
     func bringToFront()
 }
 
-/// Lien réel, tenu par `MiniWindowManager` ; il ne retient ni la fenêtre ni son état.
+/// Real link, held by `MiniWindowManager`; it retains neither the window nor its state.
 @MainActor
 final class BrowserWindowLink: MainWindowLink {
     private(set) weak var windowModel: WindowModel?

@@ -1,10 +1,10 @@
 import Foundation
 
-/// Adresse courte d'une page : texte de la pastille d'adresse et sous-titre des onglets dans la barre
-/// de commande.
+/// Short address of a page: text of the address pill and subtitle of the tabs in the command
+/// bar.
 nonisolated enum AddressDisplay {
-    /// Le domaine sans « www. » (avec le port s'il y en a un), le nom du fichier pour une adresse
-    /// `file:`, sinon l'adresse entière (`about:blank`).
+    /// The domain without “www.” (with the port if there is one), the file name for a `file:`
+    /// address, otherwise the whole address (`about:blank`).
     static func short(for url: URL?) -> String {
         guard let url else {
             return ""

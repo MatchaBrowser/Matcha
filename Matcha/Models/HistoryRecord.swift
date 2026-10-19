@@ -1,21 +1,21 @@
 import Foundation
 import SwiftData
 
-/// Visite d'une page (tâche 5.5) : une page principale chargée, ou une adresse changée par la page elle-même
-/// (`HistoryRecordingPolicy`). Jamais pour une fenêtre privée. Reste sur le Mac (`SYNC.md`), gardée un an.
+/// Visit to a page (task 5.5): a main page that loaded, or an address changed by the page itself
+/// (`HistoryRecordingPolicy`). Never for a private window. Stays on the Mac (`SYNC.md`), kept for one year.
 @Model
 final class HistoryRecord {
     var id = UUID()
-    /// Adresse sans fragment ni identifiants (`HistoryRecordingPolicy.storedURL`).
+    /// Address without fragment or credentials (`HistoryRecordingPolicy.storedURL`).
     var url: URL?
-    /// Clé de l'adresse (`CommandText.urlKey`), calculée une fois à l'écriture : les visites d'une même page se
-    /// regroupent sans relire chaque adresse au chargement de l'historique.
+    /// Key of the address (`CommandText.urlKey`), computed once on write: visits to the same page are grouped
+    /// without re-reading each address when the history loads.
     var urlKey = ""
     var title: String?
     var visitDate = Date.now
-    /// Profil de la page (pas de relation : supprimé explicitement avec le profil, comme `SitePermissionRecord`).
+    /// The page's profile (no relationship: deleted explicitly with the profile, like `SitePermissionRecord`).
     var profileID: UUID?
-    /// Space de l'onglet ou de l'aperçu ; nil pour une mini-fenêtre.
+    /// Space of the tab or the peek; nil for a mini window.
     var spaceID: UUID?
 
     init(id: UUID = UUID(), url: URL, urlKey: String, title: String?, visitDate: Date, profileID: UUID?, spaceID: UUID?) {

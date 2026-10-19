@@ -1,6 +1,6 @@
 import SwiftUI
 
-/// Barre latérale affichée par-dessus la page quand elle est masquée : carte à fond de thème, ombrée.
+/// Sidebar displayed over the page when it is hidden: card with a theme background, with a shadow.
 struct FloatingSidebar<Content: View>: View {
     let theme: SpaceTheme
     let width: Double

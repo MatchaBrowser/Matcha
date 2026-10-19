@@ -1,38 +1,38 @@
 import Foundation
 
-/// Demande d'une extension en cours d'exécution (`permissions.request()`, tâche 6.3) : des permissions (« tabs »,
-/// « cookies »…), des sites (motifs d'adresses ou adresses) ou l'accès à tous les sites. Type pur, décrit pour l'alerte
-/// de `ExtensionPermissionAlert` ; l'écran des permissions de la tâche 6.4 pourra s'en servir.
+/// Request from a running extension (`permissions.request()`, task 6.3): permissions (“tabs”, “cookies”…), websites
+/// (address patterns or addresses) or access to all websites. Pure type, described for the alert of
+/// `ExtensionPermissionAlert`; the permissions screen of task 6.4 can use it.
 nonisolated struct ExtensionPermissionRequest: Equatable, Sendable {
-    /// Nom de l'extension (son nom affiché, sinon son identifiant).
+    /// Name of the extension (its display name, otherwise its identifier).
     var extensionName: String
-    /// Permissions demandées, triées.
+    /// Requested permissions, sorted.
     var permissions: [String] = []
-    /// Sites demandés (hôte ou motif), triés, sans doublon.
+    /// Requested websites (host or pattern), sorted, without duplicates.
     var websites: [String] = []
-    /// La demande couvre tous les sites (`<all_urls>`, `*://*/*`).
+    /// The request covers all websites (`<all_urls>`, `*://*/*`).
     var allWebsites = false
 
-    /// Demande de permissions.
+    /// Permission request.
     init(extensionName: String, permissions: some Sequence<String>) {
         self.extensionName = extensionName
         self.permissions = Set(permissions).sorted()
     }
 
-    /// Demande de sites : motifs (`string` de chaque motif) et l'indication que l'un d'eux couvre tous les sites.
+    /// Website request: patterns (`string` of each pattern) and whether one of them covers all websites.
     init(extensionName: String, matchPatterns: some Sequence<String>, includesAllWebsites: Bool) {
         self.extensionName = extensionName
         websites = Set(matchPatterns).sorted()
         allWebsites = includesAllWebsites
     }
 
-    /// Demande d'accès à des adresses : leurs hôtes (sinon l'adresse entière, pour un fichier local).
+    /// Request for access to addresses: their hosts (otherwise the whole address, for a local file).
     init(extensionName: String, urls: some Sequence<URL>) {
         self.extensionName = extensionName
         websites = Set(urls.map { $0.host() ?? $0.absoluteString }).sorted()
     }
 
-    /// Rien à demander : la réponse est vide, sans rien montrer.
+    /// Nothing to request: the answer is empty, without showing anything.
     var isEmpty: Bool {
         permissions.isEmpty && websites.isEmpty && !allWebsites
     }

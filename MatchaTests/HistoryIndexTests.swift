@@ -2,12 +2,12 @@ import Foundation
 @testable import Matcha
 import Testing
 
-/// Visite de test : `minutesAgo` avant `fixedNow`.
+/// Test visit: `minutesAgo` before `fixedNow`.
 func historyVisit(_ address: String, title: String? = nil, minutesAgo: Double = 0, id: UUID = UUID()) -> HistoryVisit {
     HistoryVisit(id: id, url: URL(string: address)!, title: title, date: fixedNow.addingTimeInterval(-minutesAgo * 60))
 }
 
-/// Historique d'un profil en mémoire (tâche 5.5) : regroupement par adresse, titres, suppressions.
+/// In-memory history of a profile (task 5.5): grouping by address, titles, deletions.
 struct HistoryIndexTests {
     @Test func `visits of the same page are grouped by address key`() throws {
         let index = HistoryIndex(visits: [
@@ -20,7 +20,7 @@ struct HistoryIndexTests {
         let entry = try #require(index.entries["example.com"])
         #expect(entry.visitCount == 2)
         #expect(entry.lastVisit == fixedNow.addingTimeInterval(-600))
-        // Adresse de la dernière visite ; titre de la dernière visite qui en a un.
+        // Address of the last visit; title of the last visit that has one.
         #expect(entry.url.absoluteString == "http://example.com")
         #expect(entry.title == "Example")
         #expect(entry.historyEntry == HistoryEntry(url: entry.url, title: "Example", visitCount: 2, lastVisit: entry.lastVisit))
@@ -32,13 +32,13 @@ struct HistoryIndexTests {
         index.insert(newer)
         #expect(index.entries["example.com"]?.title == "Nouveau")
 
-        // Le titre d'une visite change (titre arrivé tard) ; vide, il ne compte plus.
+        // The title of a visit changes (title arriving late); when empty, it no longer counts.
         index.setTitle("Renommé", ofVisit: newer.id)
         #expect(index.entries["example.com"]?.title == "Renommé")
         index.setTitle("  ", ofVisit: newer.id)
         #expect(index.visits[newer.id]?.title == nil)
         #expect(index.entries["example.com"]?.title == "Ancien")
-        // Visite inconnue : rien.
+        // Unknown visit: nothing.
         index.setTitle("Fantôme", ofVisit: UUID())
         #expect(index.entries["example.com"]?.title == "Ancien")
     }
@@ -89,7 +89,7 @@ struct HistoryIndexTests {
             historyVisit("https://example.com/", minutesAgo: 120),
             historyVisit("https://example.com/", minutesAgo: 59),
             historyVisit("https://apple.com/", minutesAgo: 60),
-            // Datée dans le futur (heure du Mac changée) : effacée aussi.
+            // Dated in the future (Mac clock changed): deleted too.
             historyVisit("https://future.example/", minutesAgo: -30),
         ])
         index.remove(since: fixedNow.addingTimeInterval(-3600))
@@ -105,12 +105,12 @@ struct HistoryIndexTests {
             .setTitle("Exemple", visitID: visit.id, profileID: profile),
             .refresh(visitID: visit.id, date: fixedNow, title: nil, profileID: profile),
         ]
-        // Lecture qui a déjà vu la visite et son titre, puis les changements rejoués.
+        // A read that has already seen the visit and its title, then the changes replayed.
         var loaded: [UUID?: HistoryIndex] = [profile: HistoryIndex(visits: [historyVisit(
             "https://example.com/", title: "Exemple", minutesAgo: 1, id: visit.id,
         )])]
         changes.forEach { $0.apply(to: &loaded) }
-        // Lecture qui ne l'a pas vue.
+        // A read that has not seen it.
         var empty: [UUID?: HistoryIndex] = [:]
         changes.forEach { $0.apply(to: &empty) }
         for indexes in [loaded, empty] {
@@ -140,11 +140,11 @@ struct HistoryIndexTests {
     }
 
     @Test func `character mask only tells what cannot match`() {
-        // Textes déjà repliés, comme ceux de la barre de commande.
+        // Texts already folded, like those of the command bar.
         let mask = HistoryCharacterMask(["ecole 42", "node.js"])
         #expect(mask.contains(HistoryCharacterMask(["ecole"])))
         #expect(mask.contains(HistoryCharacterMask(["42 node"])))
-        // Ponctuation et espaces ne comptent pas.
+        // Punctuation and spaces do not count.
         #expect(mask.contains(HistoryCharacterMask(["n.o-d e/"])))
         #expect(!mask.contains(HistoryCharacterMask(["z"])))
         #expect(!mask.contains(HistoryCharacterMask(["école"])))

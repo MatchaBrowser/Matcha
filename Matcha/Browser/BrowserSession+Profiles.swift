@@ -3,9 +3,9 @@ import OSLog
 import SwiftData
 import WebKit
 
-/// Création, renommage et suppression des profils.
+/// Creating, renaming and deleting profiles.
 extension BrowserSession {
-    /// Crée un profil et son premier Space ; renvoie le Space.
+    /// Creates a profile and its first Space; returns the Space.
     @discardableResult
     func addProfile(named name: String) -> SpaceSession {
         let context = container.mainContext
@@ -21,7 +21,7 @@ extension BrowserSession {
         return addSpace(in: profile)
     }
 
-    /// Renomme le profil ; un nom vide garde l'ancien.
+    /// Renames the profile; an empty name keeps the old one.
     func renameProfile(_ profile: ProfileRecord, to name: String) {
         let trimmed = name.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !trimmed.isEmpty else {
@@ -31,14 +31,14 @@ extension BrowserSession {
         save(container.mainContext)
     }
 
-    /// Spaces du profil, dans l'ordre de la barre.
+    /// The profile's Spaces, in the bar's order.
     func spaces(of profile: ProfileRecord) -> [SpaceSession] {
         spaces.filter { $0.record.profile?.id == profile.id }
     }
 
-    /// Supprime le profil, ses Spaces, ses favoris, ses données de sites (cookies, stockage), ses décisions de
-    /// permission et son historique.
-    /// Le dernier profil ne peut pas être supprimé.
+    /// Deletes the profile, its Spaces, its favorites, its website data (cookies, storage), its permission decisions
+    /// and its history.
+    /// The last profile cannot be deleted.
     func deleteProfile(_ profile: ProfileRecord) async {
         guard let identifier = removeProfile(profile) else {
             return
@@ -46,13 +46,13 @@ extension BrowserSession {
         await removeWebsiteData(ofProfile: identifier)
     }
 
-    /// Supprime le profil, ses Spaces, ses favoris, ses décisions de permission et son historique ; renvoie son
-    /// identifiant, ou nil si c'est le dernier profil. Ses données de sites restent à effacer (`removeWebsiteData`).
+    /// Deletes the profile, its Spaces, its favorites, its permission decisions and its history; returns its
+    /// identifier, or nil if it is the last profile. Its website data still has to be erased (`removeWebsiteData`).
     func removeProfile(_ profile: ProfileRecord) -> UUID? {
         guard profiles.count > 1, profiles.contains(where: { $0.id == profile.id }) else {
             return nil
         }
-        // Ses fenêtres de connexion (tâche 5.8) se ferment d'abord : leurs pages n'utilisent plus ses données.
+        // Its sign-in windows (task 5.8) close first, so their pages stop using its data.
         popupWindows.closeWindows(using: dataStore(for: profile))
         for space in spaces(of: profile) {
             space.close()
@@ -70,7 +70,7 @@ extension BrowserSession {
         return identifier
     }
 
-    /// Efface les données de sites (cookies, stockage) d'un profil supprimé.
+    /// Erases the website data (cookies, storage) of a deleted profile.
     func removeWebsiteData(ofProfile identifier: UUID) async {
         guard !isInMemory else {
             return
@@ -78,7 +78,7 @@ extension BrowserSession {
         do {
             try await WKWebsiteDataStore.remove(forIdentifier: identifier)
         } catch {
-            // Une vue web l'utilisait encore : il sera supprimé au prochain lancement.
+            // A web view was still using it: it will be deleted at the next launch.
             Logger.app
                 .notice("Données du profil supprimé gardées jusqu'au prochain lancement : \(error.localizedDescription, privacy: .public)")
         }

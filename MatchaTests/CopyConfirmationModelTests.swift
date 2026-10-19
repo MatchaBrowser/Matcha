@@ -2,14 +2,14 @@ import Foundation
 @testable import Matcha
 import Testing
 
-/// Attente factice : chaque appel dure jusqu'à ce que le test le termine, dans l'ordre des appels.
-/// Une tâche annulée entre-temps lève alors `CancellationError`, sauf avec `ignoresCancellation`.
+/// Fake sleep: each call lasts until the test finishes it, in call order.
+/// A task cancelled in the meantime then throws `CancellationError`, except with `ignoresCancellation`.
 @MainActor
 private final class SteppedSleep {
-    /// Imite une attente qui ignore l'annulation : elle se termine normalement.
+    /// Mimics a sleep that ignores cancellation: it finishes normally.
     var ignoresCancellation = false
     private(set) var durations: [Duration] = []
-    /// Attentes terminées, et parmi elles celles dont la tâche avait été annulée.
+    /// Finished sleeps, and among them those whose task had been cancelled.
     private(set) var finished = 0
     private(set) var cancelled = 0
     private var waiting: [CheckedContinuation<Void, Never>] = []
@@ -30,7 +30,7 @@ private final class SteppedSleep {
         }
     }
 
-    /// Termine la plus ancienne attente encore en cours.
+    /// Finishes the oldest sleep still in progress.
     func finishOldest() {
         guard !waiting.isEmpty else {
             return
@@ -45,7 +45,7 @@ private final class SteppedSleep {
     }
 }
 
-/// Confirmation « URL copiée » : affichage, durée, relance et annulation.
+/// “URL Copied” confirmation: display, duration, restart and cancellation.
 @MainActor
 struct CopyConfirmationModelTests {
     private let sleeper = SteppedSleep()
@@ -80,13 +80,13 @@ struct CopyConfirmationModelTests {
         #expect(model.presentationCount == 2)
         try await waitUntil { sleeper.waitingCount == 2 }
 
-        // La première attente se termine : annulée, elle ne masque rien.
+        // The first sleep finishes: cancelled, it hides nothing.
         sleeper.finishOldest()
         try await waitUntil { sleeper.finished == 1 }
         #expect(sleeper.cancelled == 1)
         #expect(model.isVisible)
 
-        // La seconde, complète, masque la confirmation.
+        // The second one, complete, hides the confirmation.
         sleeper.finishOldest()
         try await waitUntil { !model.isVisible }
         #expect(sleeper.durations == [.milliseconds(1500), .milliseconds(1500)])
@@ -99,7 +99,7 @@ struct CopyConfirmationModelTests {
         model.show()
         try await waitUntil { sleeper.waitingCount == 2 }
 
-        // La première attente se termine sans erreur malgré l'annulation : la confirmation reste.
+        // The first sleep finishes without error despite the cancellation: the confirmation stays.
         sleeper.finishOldest()
         try await waitUntil { sleeper.finished == 1 }
         #expect(sleeper.cancelled == 1)

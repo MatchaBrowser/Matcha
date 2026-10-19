@@ -4,49 +4,49 @@ import Observation
 import OSLog
 import WebKit
 
-/// Les mini-fenêtres de l'app (équivalent de Little Arc) : raccourci global, création, fenêtre active, niveau
-/// flottant, et lien avec la fenêtre principale pour « Ouvrir dans le Space » (`+HandOff`). Une seule instance,
-/// créée par `MatchaApp` ; les mini-fenêtres ne sont jamais privées, enregistrées ni restaurées.
+/// The app's mini windows (equivalent of Little Arc): global shortcut, creation, active window, floating level, and
+/// link with the main window for “Open in Space” (`+HandOff`). A single instance, created by `MatchaApp`; mini
+/// windows are never private, saved or restored.
 @MainActor
 @Observable
 final class MiniWindowManager {
-    /// D'où vient une ouverture (journal seulement).
+    /// Where an opening comes from (log only).
     enum Source: String {
         case shortcut, menu, page, link
     }
 
     @ObservationIgnored let session: BrowserSession
-    /// Où retenir la taille choisie à la souris ; nil avec une base de test (rien n'est retenu).
+    /// Where to remember the size chosen with the mouse; nil with a test database (nothing is remembered).
     @ObservationIgnored let defaults: UserDefaults?
-    /// Délégué de navigation des pages des mini-fenêtres (hôte : ce gestionnaire).
+    /// Navigation delegate of the mini windows' pages (host: this manager).
     @ObservationIgnored let coordinator = NavigationCoordinator()
-    /// Mini-fenêtres ouvertes, de la plus ancienne à la plus récente.
+    /// Open mini windows, from the oldest to the most recent.
     @ObservationIgnored private(set) var windows: [MiniWindowController] = []
-    /// Mini-fenêtre active, suivie pour que les menus se mettent à jour ; l'action relit `keyWindow`.
+    /// Active mini window, tracked so the menus update; the action reads `keyWindow` again.
     private(set) var keyWindowID: MiniWindowController.ID?
-    /// Fenêtre de navigation principale (jamais une fenêtre privée) ; le bouton « Ouvrir dans … » la suit.
+    /// Main browsing window (never a private window); the “Open in …” button follows it.
     private(set) var mainWindow: (any MainWindowLink)?
-    /// Space affiché par la fenêtre principale quand elle s'est fermée (au lancement : celui retenu).
+    /// Space displayed by the main window when it closed (at launch: the remembered one).
     @ObservationIgnored var lastMainSpaceID: UUID?
-    /// Page à montrer dès que la fenêtre principale rouvre.
+    /// Page to show as soon as the main window reopens.
     @ObservationIgnored var pendingReveal: (spaceID: UUID, tab: BrowserTab)?
-    /// Rouvre la fenêtre principale fermée ; donné par elle à son apparition.
+    /// Reopens the closed main window; provided by it when it appears.
     @ObservationIgnored var openMainWindow: (@MainActor () -> Void)?
 
-    /// Configuration WebKit d'une nouvelle page, pour le magasin de son profil (remplacée dans les tests).
+    /// WebKit configuration of a new page, for its profile's store (replaced in tests).
     @ObservationIgnored var makeConfiguration: @MainActor (WKWebsiteDataStore) -> WKWebViewConfiguration =
         WebConfigurationFactory.makeConfiguration(websiteDataStore:)
-    /// Montre un panneau et active l'app (remplacé dans les tests : aucun panneau à l'écran).
+    /// Shows a panel and activates the app (replaced in tests: no panel on screen).
     @ObservationIgnored var present: @MainActor (MiniWindowPanel) -> Void = MiniWindowManager.presentOnScreen
-    /// Zone utile de l'écran où ouvrir une mini-fenêtre : celui du pointeur.
+    /// Usable area of the screen where to open a mini window: that of the pointer.
     @ObservationIgnored var visibleScreenFrame: @MainActor () -> CGRect? = MiniWindowManager.screenUnderPointer
-    /// Moteur et suggestions, lus à chaque ouverture de la barre.
+    /// Engine and suggestions, read each time the bar opens.
     @ObservationIgnored var commandBarSettings: @MainActor () -> CommandBarSettings = { MiniWindowSettings.current() }
 
     @ObservationIgnored private var shortcutTask: Task<Void, Never>?
     @ObservationIgnored private var observers: [any NSObjectProtocol] = []
 
-    /// Sans effet de bord : `start()` branche le raccourci global et l'activation de l'app.
+    /// Free of side effects: `start()` hooks up the global shortcut and the app's activation.
     init(session: BrowserSession, defaults: UserDefaults?) {
         self.session = session
         self.defaults = defaults
@@ -54,8 +54,8 @@ final class MiniWindowManager {
         coordinator.tabHost = self
     }
 
-    /// Écoute le raccourci global (même quand Matcha n'est pas au premier plan) et l'activation de l'app.
-    /// Sans effet au second appel ; jamais appelé dans l'app hôte des tests unitaires.
+    /// Listens to the global shortcut (even when Matcha is not in the foreground) and to the app's activation.
+    /// No effect on a second call; never called in the unit tests' host app.
     func start() {
         guard shortcutTask == nil else {
             return
@@ -65,7 +65,7 @@ final class MiniWindowManager {
                 guard let self else {
                     return
                 }
-                // Pendant une alerte modale (« Quitter Matcha ? »), aucune fenêtre ne prendrait le clavier.
+                // During a modal alert (“Quit Matcha?”), no window would take the keyboard.
                 guard NSApp.modalWindow == nil else {
                     Logger.miniWindow.notice("Raccourci de la mini-fenêtre ignoré pendant une alerte")
                     continue
@@ -77,9 +77,9 @@ final class MiniWindowManager {
         observe(NSApplication.didBecomeActiveNotification) { MiniWindowLevels.raise($0.windows.map(\.panel)) }
     }
 
-    // MARK: Fenêtres
+    // MARK: Windows
 
-    /// Mini-fenêtre active, lue au moment de l'action.
+    /// Active mini window, read at the time of the action.
     var keyWindow: MiniWindowController? {
         windows.first { $0.panel.isKeyWindow }
     }
@@ -92,10 +92,10 @@ final class MiniWindowManager {
         windows.first { $0.tab.webView === webView }
     }
 
-    // MARK: Ouverture
+    // MARK: Opening
 
-    /// ⌥⌘N, menu Fichier : une mini-fenêtre vide, barre ouverte, dans le profil du Space affiché (jamais privée).
-    /// `url` (tâche 8.2 : liens venus d'autres apps) : la page se charge, la barre reste fermée.
+    /// ⌥⌘N, File menu: an empty mini window, bar open, in the profile of the displayed Space (never private).
+    /// `url` (task 8.2: links coming from other apps): the page loads, the bar stays closed.
     @discardableResult
     func openNew(loading url: URL? = nil, source: Source) -> MiniWindowController {
         let profile = displayedSpace.record.profile
@@ -111,7 +111,7 @@ final class MiniWindowManager {
         return controller
     }
 
-    /// Crée le panneau de `tab`, décalé de la dernière mini-fenêtre ouverte, et le montre au premier plan.
+    /// Creates the panel of `tab`, offset from the last opened mini window, and shows it in the foreground.
     @discardableResult
     func show(_ tab: BrowserTab, profileID: UUID?) -> MiniWindowController {
         tab.delegate = coordinator
@@ -124,7 +124,7 @@ final class MiniWindowManager {
         return controller
     }
 
-    // MARK: Suivi
+    // MARK: Tracking
 
     func keyChanged(_ controller: MiniWindowController, isKey: Bool) {
         if isKey {
@@ -141,30 +141,30 @@ final class MiniWindowManager {
         }
     }
 
-    /// Taille choisie à la souris : la prochaine mini-fenêtre la reprend (jamais avec une base de test).
+    /// Size chosen with the mouse: the next mini window reuses it (never with a test database).
     func rememberSize(_ size: CGSize) {
         defaults?.set(NSStringFromSize(size), forKey: MiniWindowPlacement.sizeKey)
     }
 
-    /// Primitive de `+HandOff` : fenêtre principale signalée ou disparue.
+    /// Primitive for `+HandOff`: main window reported or gone.
     func setMainWindow(_ link: (any MainWindowLink)?) {
         mainWindow = link
     }
 
-    /// Profil supprimé : ses mini-fenêtres se ferment avant que ses données ne le soient.
+    /// Deleted profile: its mini windows close before its data is deleted.
     func closeWindows(ofProfile profileID: UUID) {
         for controller in windows where controller.profileID == profileID {
             controller.close()
         }
     }
 
-    // MARK: Écran
+    // MARK: Screen
 
     static func presentOnScreen(_ panel: MiniWindowPanel) {
         panel.makeKeyAndOrderFront(nil)
-        // Raccourci pressé dans une autre app : l'activation coopérative (`NSApp.activate()`) y est refusée et
-        // la mini-fenêtre n'aurait pas le clavier. `activate(ignoringOtherApps:)` est marquée
-        // `API_TO_BE_DEPRECATED` dans le SDK, sans avertissement à la compilation.
+        // Shortcut pressed in another app: cooperative activation (`NSApp.activate()`) is refused there and the
+        // mini window would not get the keyboard. `activate(ignoringOtherApps:)` is marked
+        // `API_TO_BE_DEPRECATED` in the SDK, with no warning at compile time.
         NSApp.activate(ignoringOtherApps: true)
     }
 

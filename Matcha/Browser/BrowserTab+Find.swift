@@ -2,12 +2,12 @@ import Foundation
 import OSLog
 import WebKit
 
-/// Recherche dans la page de l'onglet (tâche 5.3), par l'API publique de WebKit : `find(_:configuration:)` dit
-/// seulement si une occurrence existe (`WKFindResult.matchFound`), sans leur nombre ; l'occurrence trouvée devient
-/// la sélection de la page, qui défile jusqu'à elle.
+/// Find in the tab's page (task 5.3), through WebKit's public API: `find(_:configuration:)` only tells whether a match
+/// exists (`WKFindResult.matchFound`), not how many; the match found becomes the page's selection, and the page
+/// scrolls to it.
 extension BrowserTab: FindPerformer {
-    /// Désélectionne, dans un monde JavaScript séparé que la page ne peut pas modifier. Cadre principal seulement :
-    /// une occurrence trouvée dans un cadre intégré reste sélectionnée.
+    /// Deselects, in a separate JavaScript world that the page cannot modify. Main frame only: a match found in an
+    /// embedded frame stays selected.
     static let deselectScript = "window.getSelection().removeAllRanges(); true"
 
     func search(_ query: String, direction: FindDirection) async -> Bool? {
@@ -21,7 +21,7 @@ extension BrowserTab: FindPerformer {
         do {
             return try await webView.find(query, configuration: configuration).matchFound
         } catch {
-            // Jamais le texte cherché.
+            // Never the searched text.
             Logger.browser.error("Recherche dans la page impossible : \(String(describing: type(of: error)), privacy: .public)")
             return nil
         }

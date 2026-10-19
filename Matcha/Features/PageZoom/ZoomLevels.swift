@@ -1,12 +1,11 @@
 import Foundation
 
-/// Niveaux de zoom des pages (tâche 5.4), ceux de Safari : de 50 % à 300 %. ⌘+ et ⌘- passent au niveau suivant ou
-/// précédent depuis n'importe quel zoom (un zoom hors de la liste rejoint le niveau le plus proche dans le sens
-/// demandé) ; ⌘0 revient à 100 %.
+/// Page zoom levels (task 5.4), Safari's: from 50% to 300%. ⌘+ and ⌘- move to the next or previous level from any
+/// zoom (a zoom outside the list joins the nearest level in the requested direction); ⌘0 goes back to 100%.
 nonisolated enum ZoomLevels {
     static let steps: [Double] = [0.5, 0.75, 0.85, 1, 1.15, 1.25, 1.5, 1.75, 2, 2.5, 3]
     static let actualSize = 1.0
-    /// Écart en dessous duquel deux zooms sont égaux (`pageZoom` est un `CGFloat` qui peut avoir été arrondi).
+    /// Difference below which two zooms are equal (`pageZoom` is a `CGFloat` that may have been rounded).
     static let tolerance = 0.001
 
     static var minimum: Double {
@@ -17,11 +16,11 @@ nonisolated enum ZoomLevels {
         steps[steps.count - 1]
     }
 
-    /// Ce que demande une commande de zoom.
+    /// What a zoom command asks for.
     enum Change: Sendable {
         case zoomIn, zoomOut, actualSize
 
-        /// Zoom après la commande, depuis `current` ; nil si elle ne change rien (bout de la liste, déjà à 100 %).
+        /// Zoom after the command, from `current`; nil if it changes nothing (end of the list, already at 100%).
         func level(from current: Double) -> Double? {
             switch self {
             case .zoomIn:
@@ -34,12 +33,12 @@ nonisolated enum ZoomLevels {
         }
     }
 
-    /// Premier niveau au-dessus de `current` ; nil au maximum ou au-delà.
+    /// First level above `current`; nil at the maximum or beyond.
     static func step(after current: Double) -> Double? {
         steps.first { $0 > current + tolerance }
     }
 
-    /// Dernier niveau au-dessous de `current` ; nil au minimum ou en deçà.
+    /// Last level below `current`; nil at the minimum or below.
     static func step(before current: Double) -> Double? {
         steps.last { $0 < current - tolerance }
     }
@@ -48,12 +47,12 @@ nonisolated enum ZoomLevels {
         abs(level - actualSize) <= tolerance
     }
 
-    /// `level` ramené entre le minimum et le maximum ; 100 % s'il n'est pas un nombre fini.
+    /// `level` clamped between the minimum and the maximum; 100% if it is not a finite number.
     static func clamped(_ level: Double) -> Double {
         level.isFinite ? min(max(level, minimum), maximum) : actualSize
     }
 
-    /// Zoom affiché : « 125 % » (selon la langue : « 125% » en anglais).
+    /// Displayed zoom: “125 %” (depending on the language: “125%” in English).
     static func percentText(_ level: Double, locale: Locale = .autoupdatingCurrent) -> String {
         level.formatted(.percent.precision(.fractionLength(0)).locale(locale))
     }

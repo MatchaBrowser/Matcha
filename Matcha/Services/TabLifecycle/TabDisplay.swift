@@ -1,5 +1,4 @@
-/// Une fenêtre de navigation, vue par la mise en veille (tâche 5.6) : les onglets affichés par son Space affiché sont
-/// visibles.
+/// A browser window, as tab sleeping sees it (task 5.6): the tabs displayed by its displayed Space are visible.
 @MainActor
 protocol TabDisplay: AnyObject {
     var displayedTabManager: TabManager { get }

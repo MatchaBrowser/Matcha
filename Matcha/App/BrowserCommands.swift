@@ -1,16 +1,15 @@
 import AppKit
 import SwiftUI
 
-/// Commandes de menu et raccourcis clavier du navigateur, appliqués à la fenêtre active : une mini-fenêtre
-/// (toujours regardée d'abord : les valeurs de fenêtre sont nil quand un panneau est actif), sinon la fenêtre
-/// de navigation.
+/// The browser's menu commands and keyboard shortcuts, applied to the active window: a mini window (always checked
+/// first: the window values are nil when a panel is active), otherwise the browsing window.
 struct BrowserCommands: Commands {
     let miniWindows: MiniWindowManager
     @FocusedValue(\.tabManager) private var tabManager
     @FocusedValue(\.windowActions) private var windowActions
     @Environment(\.openWindow) private var openWindow
 
-    /// Mini-fenêtre active : `keyWindowID` est lu pour que le menu suive, la fenêtre est relue à chaque action.
+    /// Active mini window: `keyWindowID` is read so the menu follows along, the window is read again on each action.
     private var miniWindow: MiniWindowController? {
         _ = miniWindows.keyWindowID
         return miniWindows.keyWindow
@@ -20,12 +19,12 @@ struct BrowserCommands: Commands {
         tabManager?.selectedTab
     }
 
-    /// Page au premier plan : celle de la mini-fenêtre active, l'aperçu s'il est ouvert, sinon l'onglet sélectionné.
+    /// Front page: the active mini window's, the peek if it is open, otherwise the selected tab.
     private var frontTab: BrowserTab? {
         miniWindow?.tab ?? tabManager?.frontTab
     }
 
-    /// Aperçu ouvert (et pas de barre de commande) : ⌘W le ferme.
+    /// Peek open (and no command bar): ⌘W closes it.
     private var isPeekOpen: Bool {
         tabManager?.peek != nil && windowActions?.isCommandBarPresented != true
     }
@@ -52,7 +51,7 @@ struct BrowserCommands: Commands {
         CommandGroup(replacing: .newItem) {
             Button("New Tab") {
                 if let mini = miniWindow {
-                    // Une mini-fenêtre n'a qu'une page : une nouvelle recherche la remplace.
+                    // A mini window has only one page: a new search replaces it.
                     mini.showCommandBar(.newSearch)
                 } else {
                     windowActions?.newTab()
@@ -66,8 +65,8 @@ struct BrowserCommands: Commands {
             }
             .keyboardShortcut("n", modifiers: [.command, .shift])
 
-            // Sans équivalent clavier : le raccourci global (réglable) l'est déjà, et un raccourci affiché ici
-            // se déclencherait deux fois, menu ouvert.
+            // No key equivalent: the global (configurable) shortcut already is one, and a shortcut shown here
+            // would fire twice while the menu is open.
             Button("New Mini Window") {
                 miniWindows.openNew(source: .menu)
             }
@@ -91,8 +90,8 @@ struct BrowserCommands: Commands {
             .disabled(miniWindow?.tab.hasURL != true)
         }
 
-        // Remplace « Fermer » (⌘W) : ⌘W ferme l'onglet (ou l'aperçu, ou la mini-fenêtre), ⇧⌘W la fenêtre,
-        // comme dans Safari.
+        // Replaces “Close” (⌘W): ⌘W closes the tab (or the peek, or the mini window), ⇧⌘W the window,
+        // as in Safari.
         CommandGroup(replacing: .saveItem) {
             Button(action: closeCommand) {
                 closeTitle
@@ -110,9 +109,9 @@ struct BrowserCommands: Commands {
             .keyboardShortcut("w", modifiers: [.command, .shift])
         }
 
-        // Dans le menu Édition, juste après Copier, Coller, etc.
+        // In the Edit menu, right after Copy, Paste, etc.
         CommandGroup(after: .pasteboard) {
-            // Même titre que l'action de la barre de commande.
+            // Same title as the command bar action.
             Button(CommandActionID.copyURL.title) {
                 if let mini = miniWindow {
                     mini.copyURL()
@@ -124,7 +123,7 @@ struct BrowserCommands: Commands {
             .disabled(miniWindow.map { !$0.tab.hasURL } ?? (windowActions?.copyURL == nil))
         }
 
-        // Édition > Rechercher (⌘F, ⌘G, ⇧⌘G).
+        // Edit > Find (⌘F, ⌘G, ⇧⌘G).
         FindCommands(miniWindows: miniWindows)
 
         CommandGroup(replacing: .sidebar) {
@@ -134,8 +133,8 @@ struct BrowserCommands: Commands {
             .keyboardShortcut("s")
             .disabled(windowActions == nil)
 
-            // Présentation > « Afficher les téléchargements » (⌥⌘L), comme dans Safari. Grisé hors d'une fenêtre de
-            // navigation (Réglages, historique) et quand une mini-fenêtre est active : elle n'a pas de barre latérale.
+            // View > “Show Downloads” (⌥⌘L), as in Safari. Disabled outside a browsing window (Settings, history)
+            // and when a mini window is active: it has no sidebar.
             Button(downloadsToggleTitle) {
                 windowActions?.toggleDownloads()
             }
@@ -149,10 +148,10 @@ struct BrowserCommands: Commands {
                 .disabled(frontTab?.hasURL != true)
         }
 
-        // Fichier > Importer depuis (tâche 7.1).
+        // File > Import From (task 7.1).
         ImportCommands()
 
-        // Fichier > Exporter en PDF…, Imprimer… ; Présentation > zoom (tâche 5.4), après « Recharger la page ».
+        // File > Export as PDF…, Print…; View > zoom (task 5.4), after “Reload Page”.
         PageCommands(miniWindows: miniWindows)
 
         CommandMenu("Spaces") {
@@ -166,23 +165,23 @@ struct BrowserCommands: Commands {
             }
         }
 
-        // Menu Onglets : juste après Spaces.
+        // Tabs menu: right after Spaces.
         TabCommands(miniWindows: miniWindows)
 
-        // Menu Historique : Accueil, Précédent, Suivant, « Afficher tout l'historique » (tâche 5.5).
+        // History menu: Homepage, Back, Forward, “Show All History” (task 5.5).
         HistoryCommands(miniWindows: miniWindows)
     }
 
-    /// ⌘W : la mini-fenêtre active (sa barre d'abord), sinon la barre de commande, l'aperçu, l'onglet, ou la
-    /// fenêtre sans onglets (réglages).
+    /// ⌘W: the active mini window (its bar first), otherwise the command bar, the peek, the tab, or the window
+    /// without tabs (settings).
     private func closeCommand() {
         if let mini = miniWindow {
             mini.closeCommand()
         } else if let windowActions, windowActions.isCommandBarPresented {
-            // Barre de commande ouverte : ⌘W ne ferme qu'elle, jamais l'onglet par réflexe.
+            // Command bar open: ⌘W closes only the bar, never the tab by reflex.
             windowActions.closeCommandBar()
         } else if let tabManager, tabManager.peek != nil {
-            // Aperçu ouvert : ⌘W ne ferme que lui.
+            // Peek open: ⌘W closes only the peek.
             PeekActions.close(in: tabManager)
         } else if let tabManager {
             if let tab = tabManager.selectedTab {

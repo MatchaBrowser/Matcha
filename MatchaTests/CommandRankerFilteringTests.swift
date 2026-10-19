@@ -2,7 +2,7 @@ import Foundation
 @testable import Matcha
 import Testing
 
-/// Dédoublonnage, plafonds et suggestions de la barre de commande.
+/// Deduplication, caps and suggestions of the command bar.
 struct CommandRankerFilteringTests {
     private let ranker = CommandRanker()
 
@@ -10,7 +10,7 @@ struct CommandRankerFilteringTests {
         ranker.rank(query(text), candidates: candidates, now: fixedNow)
     }
 
-    /// Lignes qui suivent les lignes du texte tapé.
+    /// Rows that follow the rows of the typed text.
     private func resultRows(_ rows: [CommandRow]) -> [CommandRow] {
         rows.filter { !$0.id.hasPrefix(CommandPrimaryRows.id) }
     }
@@ -73,8 +73,8 @@ struct CommandRankerFilteringTests {
         #expect(historyOnly.count == 4)
         #expect(historyOnly.allSatisfy { $0.style == .history })
 
-        // Trois actions correspondent à « c a » (la troisième, factice, par ses mots-clés) : le plafond
-        // des actions (2) garde les deux premières de l'ordre sans plafond.
+        // Three actions match “c a” (the third one, a fake, through its keywords): the cap
+        // on actions (2) keeps the first two of the uncapped order.
         let closeAll = CommandCandidate(kind: .action(.settings, keywords: ["close", "all"]), title: "Settings", url: nil)
         let actions = [action(.newSpace), action(.copyURL), closeAll]
         var uncapped = CommandRanker()

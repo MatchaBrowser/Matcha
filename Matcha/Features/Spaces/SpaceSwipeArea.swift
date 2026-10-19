@@ -1,8 +1,8 @@
 import AppKit
 import SwiftUI
 
-/// Zone de la barre latérale où un glissement horizontal à deux doigts change de Space.
-/// Les défilements restent transmis à la barre (le défilement vertical continue de fonctionner).
+/// Area of the sidebar where a horizontal two-finger swipe switches Space.
+/// Scrolls are still passed on to the sidebar (vertical scrolling keeps working).
 struct SpaceSwipeArea: NSViewRepresentable {
     let onSwipe: (SpaceSwipeTracker.Direction) -> Void
 
@@ -16,13 +16,13 @@ struct SpaceSwipeArea: NSViewRepresentable {
         view.onSwipe = onSwipe
     }
 
-    /// Lit les défilements qui passent au-dessus d'elle, même quand une vue de la barre les reçoit.
+    /// Reads the scrolls that pass over it, even when a view of the sidebar receives them.
     final class SwipeView: NSView {
         var onSwipe: ((SpaceSwipeTracker.Direction) -> Void)?
         private var tracker = SpaceSwipeTracker()
         private var monitor: Any?
 
-        /// Transparente aux clics : ils atteignent le fond (déplacement de la fenêtre) et les autres vues.
+        /// Transparent to clicks: they reach the background (moving the window) and the other views.
         override func hitTest(_: NSPoint) -> NSView? {
             nil
         }
@@ -54,7 +54,7 @@ struct SpaceSwipeArea: NSViewRepresentable {
             case .cancelled: phase = .cancelled
             default: return
             }
-            // Sens des doigts, quel que soit le réglage du défilement naturel.
+            // Direction of the fingers, whatever the natural scrolling setting.
             let fingerDeltaX = event.isDirectionInvertedFromDevice ? event.scrollingDeltaX : -event.scrollingDeltaX
             if let direction = tracker.handle(phase: phase, fingerDeltaX: fingerDeltaX, deltaY: event.scrollingDeltaY) {
                 onSwipe?(direction)

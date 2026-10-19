@@ -1,28 +1,28 @@
 import Foundation
 
-/// Éléments du menu contextuel de WebKit que Matcha remplace (tâche 5.9). Leurs identifiants (`NSMenuItem.identifier`)
-/// ne sont pas documentés : aucun en-tête public du SDK de macOS 27 ne les déclare. Valeurs relevées sur un vrai menu
-/// de WebKit (`PageMenuIntegrationTests`) ; si WebKit les change, son élément reste tel quel.
+/// Items of WebKit's context menu that Matcha replaces (task 5.9). Their identifiers (`NSMenuItem.identifier`) are
+/// not documented: no public header of the macOS 27 SDK declares them. Values taken from a real WebKit menu
+/// (`PageMenuIntegrationTests`); if WebKit changes them, its item stays as is.
 nonisolated enum WebKitMenuItem: String, CaseIterable, Sendable {
     case openLinkInNewWindow = "WKMenuItemIdentifierOpenLinkInNewWindow"
     case openImageInNewWindow = "WKMenuItemIdentifierOpenImageInNewWindow"
 }
 
-/// Élément de Matcha dans le menu contextuel des pages.
+/// Matcha item in the context menu of pages.
 nonisolated enum PageMenuItem: String, Equatable, Sendable {
-    /// « Ouvrir le lien dans un nouvel onglet », à la place de « … dans une nouvelle fenêtre ».
+    /// “Open Link in New Tab”, in place of “… in New Window”.
     case openLinkInNewTab = "OpenLinkInNewTab"
-    /// « Ouvrir dans un aperçu », juste après.
+    /// “Open Link in Peek”, right after.
     case openLinkInPeek = "OpenLinkInPeek"
-    /// « Ouvrir l'image dans un nouvel onglet », à la place de « … dans une nouvelle fenêtre ».
+    /// “Open Image in New Tab”, in place of “… in New Window”.
     case openImageInNewTab = "OpenImageInNewTab"
 
-    /// Identifiant de l'élément de menu, sur le modèle de ceux de WebKit (sans lui, AppKit donne le nom de l'action).
+    /// Identifier of the menu item, modeled on WebKit's (without it, AppKit gives the name of the action).
     var identifier: String {
         "MatchaMenuItemIdentifier" + rawValue
     }
 
-    /// Ce que devient la fenêtre que WebKit ouvre pour ce choix.
+    /// What the window WebKit opens for this choice becomes.
     var destination: PageMenuDestination {
         switch self {
         case .openLinkInNewTab, .openImageInNewTab:
@@ -33,26 +33,26 @@ nonisolated enum PageMenuItem: String, Equatable, Sendable {
     }
 }
 
-/// Où va la page qu'un choix du menu contextuel fait ouvrir.
+/// Where the page that a context menu choice opens goes.
 nonisolated enum PageMenuDestination: Equatable, Sendable {
-    /// Un onglet en arrière-plan, après l'onglet d'origine (comme ⌘-clic).
+    /// A background tab, after the originating tab (like ⌘-click).
     case backgroundTab
-    /// L'aperçu (Peek, tâche 4.4).
+    /// Peek (task 4.4).
     case peek
 }
 
-/// Un élément de WebKit (par sa place dans le menu d'origine) et les éléments de Matcha qui le remplacent, dans
-/// l'ordre. Chacun d'eux déclenche l'élément de WebKit remplacé.
+/// A WebKit item (by its position in the original menu) and the Matcha items that replace it, in order. Each of
+/// them triggers the replaced WebKit item.
 nonisolated struct PageMenuReplacement: Equatable, Sendable {
     let index: Int
     let items: [PageMenuItem]
 }
 
-/// Réécriture du menu contextuel des pages, sans dépendance à l'interface : seuls les identifiants comptent.
+/// Rewriting of the context menu of pages, with no dependency on the UI: only the identifiers matter.
 nonisolated enum PageMenuPlan {
-    /// Remplacements à faire dans un menu dont les éléments ont ces identifiants (nil : sans identifiant), dans
-    /// l'ordre du menu. Un identifiant absent : rien ne change pour lui. Seule sa première occurrence compte.
-    /// `offersPeek` : « Ouvrir dans un aperçu » a un sens ici (onglet de la barre, ni aperçu ni autre fenêtre).
+    /// Replacements to make in a menu whose items have these identifiers (nil: no identifier), in menu order. An
+    /// absent identifier: nothing changes for it. Only its first occurrence counts.
+    /// `offersPeek`: “Open Link in Peek” makes sense here (tab of the sidebar, neither Peek nor another window).
     static func replacements(for identifiers: [String?], offersPeek: Bool) -> [PageMenuReplacement] {
         WebKitMenuItem.allCases.compactMap { original in
             identifiers.firstIndex(of: original.rawValue).map { index in

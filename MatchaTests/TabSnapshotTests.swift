@@ -5,10 +5,10 @@ import ImageIO
 import Testing
 import WebKit
 
-/// Capture d'une page avant sa mise en veille (tâche 5.6) : taille réduite, JPEG, capture d'une vue hors fenêtre.
+/// Snapshot of a page before its suspension (task 5.6): reduced size, JPEG, snapshot of a view outside any window.
 @MainActor
 struct TabSnapshotTests {
-    /// Image unie de `width` × `height` pixels.
+    /// Solid image of `width` × `height` pixels.
     private func image(width: Int, height: Int) throws -> CGImage {
         let space = try #require(CGColorSpace(name: CGColorSpace.sRGB))
         let context = try #require(CGContext(
@@ -25,14 +25,14 @@ struct TabSnapshotTests {
         return try #require(context.makeImage())
     }
 
-    /// Taille en pixels d'une image JPEG : [largeur, hauteur].
+    /// Size in pixels of a JPEG image: [width, height].
     private func pixelSize(of data: Data) throws -> [Int] {
         let source = try #require(CGImageSourceCreateWithData(data as CFData, nil))
         let image = try #require(CGImageSourceCreateImageAtIndex(source, 0, nil))
         return [image.width, image.height]
     }
 
-    /// Taille gardée pour une capture : [largeur, hauteur].
+    /// Size kept for a snapshot: [width, height].
     private func reduced(_ width: Int, _ height: Int, maximumWidth: Int = TabSnapshot.maximumPixelWidth) -> [Int] {
         let size = TabSnapshot.pixelSize(width: width, height: height, maximumWidth: maximumWidth)
         return [size.width, size.height]
@@ -53,19 +53,19 @@ struct TabSnapshotTests {
     @Test func `jpeg data is small and has the reduced size`() throws {
         let data = try #require(TabSnapshot.jpegData(from: image(width: 2400, height: 1600)))
         #expect(try pixelSize(of: data) == [1200, 800])
-        // Une image unie se compresse très bien ; une vraie page pèse quelques dizaines de kilo-octets.
+        // A solid image compresses very well; a real page weighs a few tens of kilobytes.
         #expect(data.count < 100_000)
         #expect(data.starts(with: [0xFF, 0xD8]))
     }
 
-    /// La vue d'un onglet caché n'est dans aucune fenêtre : WebKit la capture quand même.
+    /// The view of a hidden tab is in no window: WebKit snapshots it anyway.
     @Test func `a web view outside any window can be captured`() async throws {
         let tab = BrowserTab(configuration: TestPages.configuration())
         tab.load(TestPages.url("capture", body: "<div style='background:red;height:2000px'>Bonjour</div>"))
         try await waitUntil { tab.title == "capture" && !tab.isLoading }
         let webView = tab.loadedWebView
         #expect(webView.window == nil)
-        // Jamais affichée : pas de taille, pas de capture.
+        // Never shown: no size, no snapshot.
         #expect(await TabLifecycleProbes.snapshot(of: webView, url: tab.url) == nil)
 
         webView.frame = CGRect(x: 0, y: 0, width: 800, height: 600)
@@ -77,7 +77,7 @@ struct TabSnapshotTests {
         #expect(size[0] * 600 == size[1] * 800)
     }
 
-    /// Une page affichée à une autre largeur est mise en page autrement : sa capture ne la couvre pas.
+    /// A page shown at another width is laid out differently: its snapshot does not cover it.
     @Test func `the cover only fits a page of about the same width`() {
         #expect(SuspendedPageCover.fits(pageWidth: 800, in: 800))
         #expect(SuspendedPageCover.fits(pageWidth: 760, in: 800))

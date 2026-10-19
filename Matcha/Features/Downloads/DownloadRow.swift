@@ -2,9 +2,9 @@ import AppKit
 import SwiftUI
 import UniformTypeIdentifiers
 
-/// Ligne de la liste des téléchargements : icône, nom, progression ou état, et ses boutons (annuler pendant le
-/// téléchargement, afficher dans le Finder ensuite). Un double-clic sur un fichier terminé l'ouvre : seul geste qui
-/// ouvre un fichier téléchargé. Un fichier effacé ou déplacé depuis est « introuvable » : ni bouton ni double-clic.
+/// Row of the downloads list: icon, name, progress or state, and its buttons (cancel during the download, show in
+/// the Finder afterwards). A double-click on a finished file opens it: the only gesture that opens a downloaded
+/// file. A file deleted or moved since is “not found”: no button and no double-click.
 struct DownloadRow: View {
     static let height = 58.0
 
@@ -80,8 +80,7 @@ struct DownloadRow: View {
         }
     }
 
-    /// « 12 Mo sur 40 Mo » pendant le téléchargement, la taille une fois terminé (ou « Fichier introuvable »), sinon
-    /// l'état.
+    /// “12 MB of 40 MB” during the download, the size once finished (or “File not found”), otherwise the state.
     private var status: String {
         switch item.state {
         case .downloading:
@@ -106,7 +105,7 @@ struct DownloadRow: View {
         }
     }
 
-    /// Icône du fichier terminé (celle d'une app pour une app), sinon celle de son type.
+    /// Icon of the finished file (an app's own icon for an app), otherwise that of its type.
     private var icon: NSImage {
         if item.state == .finished, let url = item.destinationURL, FileManager.default.fileExists(atPath: url.path) {
             return NSWorkspace.shared.icon(forFile: url.path)
@@ -117,7 +116,7 @@ struct DownloadRow: View {
 }
 
 private extension View {
-    /// Bouton rond de la ligne, icône seule.
+    /// Round button of the row, icon only.
     func rowIconButton() -> some View {
         labelStyle(.iconOnly)
             .buttonStyle(.borderless)

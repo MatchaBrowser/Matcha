@@ -1,16 +1,16 @@
 import Foundation
 
-/// Message du script de son (`PageAudioScript`, tâche 5.10) pour un document de la page : le cadre principal ou une
-/// iframe. Corps attendu : `{frame: String, audible: Bool, gone: Bool?}` ; tout autre corps est ignoré.
+/// Message from the sound script (`PageAudioScript`, task 5.10) for a document of the page: the main frame or an
+/// iframe. Expected body: `{frame: String, audible: Bool, gone: Bool?}`; any other body is ignored.
 nonisolated struct PageAudioReport: Equatable, Sendable {
-    /// Longueur maximale de l'identifiant d'un document (le script en tire un court, au hasard).
+    /// Maximum length of a document's identifier (the script draws a short one at random).
     static let maximumFrameLength = 64
 
-    /// Identifiant du document, tiré au hasard par le script à son chargement.
+    /// Identifier of the document, drawn at random by the script when it loads.
     let frame: String
-    /// Un élément audio ou vidéo du document joue avec du son (ni coupé, ni à volume nul).
+    /// An audio or video element of the document plays with sound (neither muted nor at zero volume).
     let isAudible: Bool
-    /// Le document s'en va (`pagehide`) : son son s'arrête avec lui.
+    /// The document goes away (`pagehide`): its sound stops with it.
     let isGone: Bool
 
     init(frame: String, isAudible: Bool, isGone: Bool = false) {
@@ -19,7 +19,7 @@ nonisolated struct PageAudioReport: Equatable, Sendable {
         self.isGone = isGone
     }
 
-    /// Lit le corps d'un `WKScriptMessage` ; nil s'il est mal formé.
+    /// Reads the body of a `WKScriptMessage`; nil if it is malformed.
     init?(messageBody body: Any) {
         guard let fields = body as? [String: Any],
               let frame = fields["frame"] as? String,

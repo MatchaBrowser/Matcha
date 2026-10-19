@@ -2,12 +2,12 @@ import Foundation
 @testable import Matcha
 import Testing
 
-/// Moteur de synchro (tâche 7.4) : deux Mac simulés et un serveur en mémoire.
+/// Sync engine (task 7.4): two simulated Macs and an in-memory server.
 @MainActor
 struct SyncEngineTests {
     private let server = InMemorySyncServer()
 
-    /// Deux Mac synchronisés qui partagent un profil et un Space.
+    /// Two synced Macs sharing a profile and a Space.
     private struct Pair {
         let macA: SimulatedMac
         let macB: SimulatedMac
@@ -44,7 +44,7 @@ struct SyncEngineTests {
         #expect(macA.store.items[tab] == nil)
         #expect(await server.content(of: tab)?.deleted == true)
 
-        // Rien ne repart en écho.
+        // Nothing echoes back.
         #expect(try await macA.sync()?.sent == 0)
         #expect(try await macB.sync()?.sent == 0)
         #expect(macA.store.items == macB.store.items)
@@ -53,7 +53,7 @@ struct SyncEngineTests {
     @Test func `the latest change wins a conflict`() async throws {
         let setup = try await pair()
         let (macA, macB, space) = (setup.macA, setup.macB, setup.space)
-        // B écrit après A, mais envoie après lui : son changement repart sur la version de A et gagne.
+        // B writes after A, but sends after it: its change is resent on A's version and wins.
         macA.rename(space, to: "A")
         macB.rename(space, to: "B")
         macB.time = macA.time + 20
@@ -64,7 +64,7 @@ struct SyncEngineTests {
         #expect(macA.name(of: space) == "B")
         #expect(macB.name(of: space) == "B")
 
-        // A écrit plus tard et envoie d'abord : le changement plus ancien de B est abandonné.
+        // A writes later and sends first: B's older change is dropped.
         macA.time = macB.time + 60
         macA.rename(space, to: "A2")
         macB.rename(space, to: "B2")
@@ -90,13 +90,13 @@ struct SyncEngineTests {
     @Test func `a record waits for its missing parent`() async throws {
         let setup = try await pair()
         let (macA, macB, profile) = (setup.macA, setup.macB, setup.profile)
-        // A envoie un onglet dont le Space n'est pas encore parti.
+        // A sends a tab whose Space has not been sent yet.
         let later = UUID()
         let tab = macA.addTodayTab(in: later, url: "https://example.com")
         try await macA.sync()
         try await macB.sync()
         #expect(macB.store.items[tab] == nil)
-        // L'onglet en attente n'est pas pris pour une suppression.
+        // The pending tab is not taken for a deletion.
         #expect(try await macB.sync()?.sent == 0)
         #expect(await server.content(of: tab)?.deleted == false)
 
@@ -127,7 +127,7 @@ struct SyncEngineTests {
         try await macB.sync()
         #expect(macB.url(of: tab)?.absoluteString == "https://example.com/2")
 
-        // Une page qui change sans cesse part au bout de 30 secondes.
+        // A page that keeps changing is sent after 30 seconds.
         var sent = 0
         for step in 3 ... 12 {
             macA.store.items[tab] = .tab(macA.todayTab(in: space, url: "https://example.com/\(step)"))
@@ -135,7 +135,7 @@ struct SyncEngineTests {
         }
         #expect(sent == 1)
 
-        // Déplacer l'onglet part tout de suite.
+        // Moving the tab is sent right away.
         try await macA.sync(after: 10)
         macA.store.items[tab] = .tab(macA.todayTab(in: space, url: "https://example.com/12", order: 5))
         #expect(try await macA.sync(after: 1)?.sent == 1)

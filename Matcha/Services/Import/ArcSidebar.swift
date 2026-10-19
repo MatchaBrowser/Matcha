@@ -1,15 +1,15 @@
 import Foundation
 
-/// Barre latérale d'Arc lue dans `StorableSidebar.json` (tâche 7.1) : ses Spaces, avec leurs épinglés et leurs
-/// onglets ouverts, et les favoris de chaque profil. Type pur.
+/// Arc's sidebar read from `StorableSidebar.json` (task 7.1): its Spaces, with their pinned and open tabs, and the
+/// favorites of each profile. Pure type.
 nonisolated struct ArcSidebar: Equatable, Sendable {
-    /// Profil d'Arc : celui par défaut, ou un profil ajouté (nom de son dossier, comme « Profile 1 »).
+    /// Arc profile: the default one, or an added profile (name of its folder, like “Profile 1”).
     enum Profile: Hashable, Sendable {
         case `default`
         case custom(String)
     }
 
-    /// Icône d'un Space d'Arc : un nom de son jeu d'icônes (`skull`, `grid`…), ou un emoji.
+    /// Icon of an Arc Space: a name from its icon set (`skull`, `grid`…), or an emoji.
     enum Icon: Equatable, Sendable {
         case named(String)
         case emoji(String)
@@ -18,26 +18,26 @@ nonisolated struct ArcSidebar: Equatable, Sendable {
     struct Space: Equatable, Sendable {
         var name: String
         var icon: Icon?
-        /// Couleurs du thème d'Arc (de 0 à 3, dans l'ordre), sans transparence.
+        /// Colors of the Arc theme (from 0 to 3, in order), without transparency.
         var colors: [ThemeColor]
         var profile: Profile
-        /// Épinglés, dossiers compris.
+        /// Pinned tabs, folders included.
         var pinned: [ImportNode]
-        /// Onglets ouverts (non épinglés).
+        /// Open tabs (not pinned).
         var openTabs: [ImportNode]
     }
 
     var spaces: [Space]
-    /// Favoris (« Top Apps » d'Arc) de chaque profil, dans l'ordre.
+    /// Favorites (Arc's “Top Apps”) of each profile, in order.
     var favorites: [Profile: [ImportedTab]]
-    /// Notes d'Arc et éléments sans adresse reconnue, laissés de côté.
+    /// Arc notes and items without a recognized address, left out.
     var skippedItems: Int
 
     var favoriteCount: Int {
         favorites.values.reduce(0) { $0 + $1.count }
     }
 
-    /// Profils ajoutés dans Arc (autres que celui par défaut), dans l'ordre de leur première apparition.
+    /// Profiles added in Arc (other than the default one), in the order of their first appearance.
     var customProfiles: [String] {
         var names: [String] = []
         for profile in spaces.map(\.profile) {

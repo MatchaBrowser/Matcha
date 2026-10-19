@@ -1,15 +1,15 @@
 import Foundation
 
-/// Allure d'une icône de site, pour la rendre lisible sur un fond clair comme sombre.
+/// Look of a website icon, to make it legible on a light background as well as a dark one.
 nonisolated enum FaviconTone: Equatable, Sendable {
-    /// Dessin sombre et sans couleur sur fond transparent (GitHub, X, Notion…) : invisible sur fond sombre.
+    /// Dark, colorless drawing on a transparent background (GitHub, X, Notion…): invisible on a dark background.
     case dark
-    /// Dessin clair et sans couleur sur fond transparent : invisible sur fond clair.
+    /// Light, colorless drawing on a transparent background: invisible on a light background.
     case light
-    /// Icône colorée ou qui porte son propre fond : lisible partout.
+    /// Colored icon or one with its own background: legible everywhere.
     case neutral
 
-    /// Analyse des pixels RGBA (8 bits, alpha prémultiplié, comme `NSBitmapImageRep`).
+    /// Analysis of RGBA pixels (8 bits, premultiplied alpha, like `NSBitmapImageRep`).
     static func analyze(rgba pixels: [UInt8]) -> FaviconTone {
         var transparent = 0
         var opaque = 0
@@ -25,7 +25,7 @@ nonisolated enum FaviconTone: Equatable, Sendable {
             guard alpha >= 128 else {
                 continue
             }
-            // Retire la prémultiplication pour retrouver la vraie couleur.
+            // Removes the premultiplication to get back the true color.
             let red = Double(pixels[index * 4]) / alpha
             let green = Double(pixels[index * 4 + 1]) / alpha
             let blue = Double(pixels[index * 4 + 2]) / alpha
@@ -33,7 +33,7 @@ nonisolated enum FaviconTone: Equatable, Sendable {
             saturation += max(red, green, blue) - min(red, green, blue)
             opaque += 1
         }
-        // Une icône sans transparence porte son propre fond.
+        // An icon without transparency carries its own background.
         guard opaque > 0, count > 0, Double(transparent) / Double(count) >= 0.15 else {
             return .neutral
         }

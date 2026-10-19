@@ -1,34 +1,33 @@
 import Foundation
 
-/// Découpe d'une liste de règles au format de blocage de WebKit (un tableau JSON) en parts d'au plus `maximumRuleCount`
-/// règles, dans l'ordre (tâche 6.2) : WebKit refuse de compiler une liste trop grosse. Chaque part devient une liste à
-/// part dans le magasin ; une règle `ignore-previous-rules` n'agit que dans sa propre part (comme dans sa liste,
-/// `DECISIONS.md`).
+/// Splits a rule list in WebKit's content blocking format (a JSON array) into parts of at most `maximumRuleCount`
+/// rules, in order (task 6.2): WebKit refuses to compile a list that is too big. Each part becomes a separate list in
+/// the store; an `ignore-previous-rules` rule only acts within its own part (as within its list, `DECISIONS.md`).
 nonisolated enum RuleListSplitter {
-    /// Nombre de règles au-delà duquel WebKit refuse une liste (« Too many rules in JSON array. », vérifié sur
-    /// macOS 27 : 150 000 règles passent, 150 001 non).
+    /// Number of rules beyond which WebKit refuses a list (“Too many rules in JSON array.”, checked on macOS 27:
+    /// 150,000 rules pass, 150,001 do not).
     static let webKitMaximumRuleCount = 150_000
 
     enum Error: Swift.Error, Equatable {
-        /// Le JSON n'est pas un tableau de règles.
+        /// The JSON is not an array of rules.
         case notAnArray
-        /// Une part ne se relit pas en UTF-8 (n'arrive pas : `JSONSerialization` écrit de l'UTF-8).
+        /// A part cannot be read back as UTF-8 (does not happen: `JSONSerialization` writes UTF-8).
         case notUTF8
     }
 
-    /// Nombre de règles de la liste et ses parts (JSON) ; une liste assez petite reste telle quelle, en une part.
+    /// Number of rules in the list, and its parts (JSON); a small enough list stays as is, in one part.
     struct Parts: Equatable, Sendable {
         let ruleCount: Int
         let parts: [String]
     }
 
-    /// Découpe `rules` (JSON) ; lève une erreur si le JSON est illisible ou n'est pas un tableau.
+    /// Splits `rules` (JSON); throws if the JSON is unreadable or is not an array.
     static func parts(of rules: Data, maximumRuleCount: Int) throws -> Parts {
         guard let array = try JSONSerialization.jsonObject(with: rules) as? [Any] else {
             throw Error.notAnArray
         }
         let size = max(1, maximumRuleCount)
-        // Assez petite et en UTF-8 : telle quelle, sans la réécrire.
+        // Small enough and in UTF-8: as is, without rewriting it.
         if array.count <= size, let text = String(bytes: rules, encoding: .utf8) {
             return Parts(ruleCount: array.count, parts: [text])
         }
@@ -47,7 +46,7 @@ nonisolated enum RuleListSplitter {
         return text
     }
 
-    /// Même découpe, hors du fil principal (une grosse liste se lit en quelques dixièmes de seconde).
+    /// Same split, off the main thread (a big list takes a few tenths of a second to read).
     @concurrent
     static func partsInBackground(of rules: Data, maximumRuleCount: Int) async throws -> Parts {
         try parts(of: rules, maximumRuleCount: maximumRuleCount)

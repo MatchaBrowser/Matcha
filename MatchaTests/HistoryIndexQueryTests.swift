@@ -2,8 +2,8 @@ import Foundation
 @testable import Matcha
 import Testing
 
-/// Historique lu par la barre de commande (`HistorySource`, tâche 5.5) : un sur-ensemble de ce que le classement
-/// garde, au plus `limit`, les meilleures d'abord.
+/// History read by the command bar (`HistorySource`, task 5.5): a superset of what the ranking keeps, at most
+/// `limit`, the best ones first.
 @MainActor
 struct HistoryIndexQueryTests {
     private let sample = HistoryIndex(visits: [
@@ -17,7 +17,7 @@ struct HistoryIndexQueryTests {
         historyVisit("http://localhost:3000/admin", title: "Admin", minutesAgo: 80),
     ])
 
-    /// Adresses que `CommandMatcher` accepte, une par une, avec le titre que la barre leur donne.
+    /// Addresses that `CommandMatcher` accepts, one by one, with the title the bar gives them.
     private func bruteForce(_ text: String, in index: HistoryIndex) -> Set<String> {
         let query = CommandQuery(text: text, searchEngine: .google)
         return Set(index.entries.values.filter { entry in
@@ -61,7 +61,7 @@ struct HistoryIndexQueryTests {
             historyVisit("https://developer.apple.com/swift/", title: "Apple Developer: Swift", minutesAgo: 3),
             historyVisit("https://taylorswift.com/", title: "Taylor Swift", minutesAgo: 4),
         ])
-        // Préfixe d'abord (le plus fréquent et récent en tête), puis début de mot, puis sous-chaîne.
+        // Prefix first (the most frequent and recent at the top), then start of a word, then substring.
         let titles = found("swift", in: index).map(\.title)
         #expect(titles == ["Swift Forums", "Swift.org", "Apple Developer: Swift", "Taylor Swift"])
         #expect(found("swift", in: index, limit: 2).map(\.title) == ["Swift Forums", "Swift.org"])

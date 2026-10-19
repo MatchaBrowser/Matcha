@@ -1,8 +1,8 @@
 import SwiftUI
 
-/// Réglages > Confidentialité : le bloqueur de publicités et de traqueurs (tâche 6.2). Le réglage global (grisé tant
-/// qu'aucune liste n'est prête), puis chaque liste installée : nom, version, nombre de règles, date de compilation.
-/// Les sites en exception et les crédits des listes suivent dans leurs propres sections.
+/// Settings > Privacy: the ad and tracker blocker (task 6.2). The global setting (disabled as long as no list is
+/// ready), then each installed list: name, version, rule count, compilation date. The excepted sites and the list
+/// credits follow in their own sections.
 struct ContentBlockerSettingsSection: View {
     @Bindable var service: ContentBlockerService
 

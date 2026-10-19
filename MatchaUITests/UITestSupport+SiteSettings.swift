@@ -1,8 +1,8 @@
 import XCTest
 
-/// Réglages du site (tâche 5.2) : bouton, panneau et menus des permissions.
+/// Site settings (task 5.2): button, panel and permission menus.
 extension XCTestCase {
-    /// Bouton des réglages du site, à droite de la pastille d'adresse.
+    /// Site settings button, right of the address pill.
     @MainActor
     func siteSettingsButton(in app: XCUIApplication) -> XCUIElement {
         app.buttons["siteSettingsButton"].firstMatch
@@ -17,7 +17,7 @@ extension XCTestCase {
         case camera, microphone
     }
 
-    /// Menu « Demander / Autoriser / Refuser » d'une permission ; sa valeur est le choix affiché.
+    /// “Ask / Allow / Deny” menu of a permission; its value is the displayed choice.
     @MainActor
     func permissionPicker(_ kind: SitePermissionPickerKind, in app: XCUIApplication) -> XCUIElement {
         app.popUpButtons["sitePermissionPicker-\(kind.rawValue)"].firstMatch

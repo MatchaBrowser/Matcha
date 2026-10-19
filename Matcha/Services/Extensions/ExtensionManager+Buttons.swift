@@ -1,16 +1,16 @@
 import Foundation
 import WebKit
 
-/// Boutons des extensions près de l'adresse (tâche 6.5) : lesquels montrer, les masquer ou les afficher, et l'action
-/// d'un clic (bulle ou `action.onClicked` de l'extension).
+/// Extension buttons next to the address (task 6.5): which ones to show, hiding or showing them, and the action of a
+/// click (popover or the extension's `action.onClicked`).
 extension ExtensionManager {
-    /// Identifiant de Matcha de `context` (réglages, dossier), s'il est chargé.
+    /// Matcha's identifier for `context` (settings, folder), if it is loaded.
     func identifier(of context: WKWebExtensionContext) -> String? {
         contexts.first { $0.value === context }?.key
     }
 
-    /// Extensions dont le bouton s'affiche, par nom : chargées, bouton non masqué ; dans une fenêtre privée, seulement
-    /// celles qui y ont accès.
+    /// Extensions whose button is displayed, by name: loaded, button not hidden; in a private window, only those that
+    /// have access to it.
     func buttonExtensions(isPrivate: Bool) -> [(identifier: String, context: WKWebExtensionContext)] {
         _ = buttonsRevision
         return contexts
@@ -19,12 +19,12 @@ extension ExtensionManager {
             .sorted { Self.name(of: $0.context).localizedStandardCompare(Self.name(of: $1.context)) == .orderedAscending }
     }
 
-    /// Vrai si le bouton de l'extension `identifier` s'affiche près de l'adresse (oui par défaut).
+    /// True if the button of extension `identifier` is displayed next to the address (yes by default).
     func showsButton(_ identifier: String) -> Bool {
         store.state(for: identifier)?.showsButton ?? true
     }
 
-    /// Affiche ou masque le bouton de l'extension `identifier` ; retenu. Masqué, l'extension continue d'agir sur les
+    /// Shows or hides the button of extension `identifier`; remembered. When hidden, the extension keeps acting on
     /// pages.
     func setShowsButton(_ shows: Bool, identifier: String) {
         var state = store.state(for: identifier) ?? ExtensionState()
@@ -33,26 +33,26 @@ extension ExtensionManager {
         buttonsDidChange()
     }
 
-    /// Action de l'extension `identifier` pour l'onglet `tab` (icône, titre, badge, popup), si elle est chargée.
+    /// Action of extension `identifier` for tab `tab` (icon, title, badge, popup), if it is loaded.
     func action(of identifier: String, for tab: BrowserTab?) -> WKWebExtension.Action? {
         _ = actionRevision
         return contexts[identifier]?.action(for: tab.flatMap(windows.adapter(for:)))
     }
 
-    /// Clic sur le bouton de l'extension `identifier` pour l'onglet `tab` : sa bulle s'ouvre sous le bouton, ou
-    /// l'extension reçoit le clic (`action.onClicked`) ; elle a alors accès à la page (`activeTab`).
+    /// Click on the button of extension `identifier` for tab `tab`: its popover opens below the button, or the
+    /// extension receives the click (`action.onClicked`); it then has access to the page (`activeTab`).
     func performAction(of identifier: String, for tab: BrowserTab?) {
         guard let context = contexts[identifier] else {
             return
         }
-        // WebKit relit l'onglet visé : l'état doit être à jour.
+        // WebKit reads the targeted tab again: the state must be up to date.
         windows.update()
         let extensionTab = tab.flatMap(windows.adapter(for:))
         context.action(for: extensionTab)?.hasUnreadBadgeText = false
         context.performAction(for: extensionTab)
     }
 
-    /// Nom affiché d'une extension.
+    /// Displayed name of an extension.
     static func name(of context: WKWebExtensionContext) -> String {
         context.webExtension.displayShortName ?? context.webExtension.displayName ?? context.uniqueIdentifier
     }

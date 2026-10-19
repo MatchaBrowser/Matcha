@@ -1,17 +1,17 @@
 import Foundation
 
-/// Dossier des extensions installées (tâche 6.3) : `Application Support/Extensions/<identifiant>/`, un dossier
-/// décompressé par extension, avec son `manifest.json`. Le nom du dossier est l'identifiant de l'extension : il donne
-/// son adresse (`webkit-extension://<identifiant>/`) et son stockage, qui doivent rester les mêmes d'un lancement à
-/// l'autre. La tâche 6.4 y copiera les extensions installées. Type pur.
+/// Folder of the installed extensions (task 6.3): `Application Support/Extensions/<identifier>/`, one unpacked folder
+/// per extension, with its `manifest.json`. The folder name is the extension's identifier: it gives its address
+/// (`webkit-extension://<identifier>/`) and its storage, which must stay the same from one launch to the next. Task 6.4
+/// will copy the installed extensions there. Pure type.
 nonisolated enum ExtensionInstallDirectory {
     static let folderName = "Extensions"
     static let manifestName = "manifest.json"
-    /// Longueur maximale d'un identifiant (une étiquette d'hôte).
+    /// Maximum length of an identifier (a host label).
     static let maximumIdentifierLength = 63
 
-    /// Vrai si `identifier` peut servir d'identifiant : minuscules ASCII, chiffres et tirets, sans tiret au début ni à
-    /// la fin, 63 caractères au plus (il devient l'hôte de l'adresse des pages de l'extension).
+    /// True if `identifier` can be used as an identifier: ASCII lowercase letters, digits and hyphens, no hyphen at the
+    /// start or the end, 63 characters at most (it becomes the host of the address of the extension's pages).
     static func isValidIdentifier(_ identifier: String) -> Bool {
         guard !identifier.isEmpty, identifier.count <= maximumIdentifierLength,
               identifier.first != "-", identifier.last != "-"
@@ -21,13 +21,13 @@ nonisolated enum ExtensionInstallDirectory {
         return identifier.unicodeScalars.allSatisfy { ("a" ... "z").contains($0) || ("0" ... "9").contains($0) || $0 == "-" }
     }
 
-    /// Dossier des extensions dans `applicationSupport`.
+    /// Extensions folder in `applicationSupport`.
     static func directory(in applicationSupport: URL) -> URL {
         applicationSupport.appendingPathComponent(folderName, isDirectory: true)
     }
 
-    /// Extensions présentes dans `directory` : (identifiant, dossier), triées par identifiant. Un dossier au nom invalide
-    /// ou sans `manifest.json`, un fichier ou un dossier caché est ignoré. Dossier absent : aucune.
+    /// Extensions present in `directory`: (identifier, folder), sorted by identifier. A folder with an invalid name or
+    /// without `manifest.json`, a file or a hidden folder is ignored. Missing folder: none.
     static func installedExtensions(in directory: URL, fileManager: FileManager = .default) -> [(identifier: String, url: URL)] {
         let contents = (try? fileManager.contentsOfDirectory(
             at: directory,

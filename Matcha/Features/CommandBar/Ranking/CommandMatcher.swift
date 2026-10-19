@@ -1,6 +1,6 @@
 import Foundation
 
-/// Palier de correspondance entre le texte tapé et un résultat, du plus lâche au plus strict.
+/// Match tier between the typed text and a result, from loosest to strictest.
 nonisolated enum MatchTier: Int, Comparable, Sendable {
     case fuzzy = 1
     case substring
@@ -13,14 +13,14 @@ nonisolated enum MatchTier: Int, Comparable, Sendable {
     }
 }
 
-/// Champs d'un résultat comparés au texte tapé, repliés une fois pour toutes : titres, adresse lisible et clé
-/// d'adresse. L'historique (tâche 5.5) les prépare à son chargement plutôt qu'à chaque frappe.
+/// Fields of a result compared with the typed text, folded once and for all: titles, readable address and address
+/// key. History (task 5.5) prepares them when it loads rather than on each keystroke.
 nonisolated struct CommandMatchFields: Equatable, Sendable {
-    /// Titres repliés.
+    /// Folded titles.
     let titles: [String]
-    /// Adresse lisible repliée.
+    /// Folded readable address.
     let address: String?
-    /// Clé de l'adresse (`CommandText.urlKey`).
+    /// Key of the address (`CommandText.urlKey`).
     let urlKey: String?
 
     init(titles: [String], url: URL?) {
@@ -29,21 +29,20 @@ nonisolated struct CommandMatchFields: Equatable, Sendable {
         urlKey = url.map(CommandText.urlKey)
     }
 
-    /// Même page que l'adresse tapée (`CommandText.urlKey`) : une adresse collée telle quelle
-    /// (« https://www.apple.com/ », fragment, « %20 ») désigne l'onglet ouvert dessus.
+    /// Same page as the typed address (`CommandText.urlKey`): an address pasted as is
+    /// (“https://www.apple.com/”, fragment, “%20”) designates the tab open on it.
     func isSamePage(as typedKey: String?) -> Bool {
         typedKey != nil && urlKey == typedKey
     }
 }
 
-/// Correspondance trouvée par `CommandMatcher`.
+/// Match found by `CommandMatcher`.
 nonisolated struct CommandMatch: Equatable, Sendable {
     let tier: MatchTier
-    /// 100 hors palier approximatif ; sinon la compacité des lettres trouvées (`fuzzyQuality`).
+    /// 100 outside the fuzzy tier; otherwise the compactness of the letters found (`fuzzyQuality`).
     let quality: Int
 
-    /// Tranche de qualité d'une correspondance approximative (3 : ≥ 75, 2 : ≥ 50, 1 : en dessous) ;
-    /// 0 pour les autres paliers.
+    /// Quality band of a fuzzy match (3: ≥ 75, 2: ≥ 50, 1: below); 0 for the other tiers.
     var fuzzyBucket: Int {
         guard tier == .fuzzy else {
             return 0
@@ -56,26 +55,25 @@ nonisolated struct CommandMatch: Equatable, Sendable {
     }
 }
 
-/// Correspondance du texte tapé avec les titres et l'adresse d'un résultat. Paliers, du plus strict au
-/// plus lâche (le premier atteint l'emporte) : exact (un titre, l'adresse lisible ou la même page),
-/// préfixe d'un titre ou de l'adresse, début de mot pour chaque mot tapé, sous-chaîne (2 caractères au
-/// moins), puis approximatif (3 à 32 caractères, lettres dans l'ordre depuis un début de mot, qualité
-/// d'au moins 30). Textes repliés (`CommandText.fold`), adresses sans schéma ni « www. ».
+/// Match of the typed text against the titles and address of a result. Tiers, from strictest to loosest (the first
+/// reached wins): exact (a title, the readable address or the same page), prefix of a title or of the address, word
+/// start for each typed word, substring (2 characters at least), then fuzzy (3 to 32 characters, letters in order
+/// from a word start, quality of at least 30). Folded texts (`CommandText.fold`), addresses without scheme or “www.”.
 nonisolated enum CommandMatcher {
-    /// En dessous, une correspondance approximative est trop dispersée pour être proposée.
+    /// Below this, a fuzzy match is too scattered to be offered.
     static let minimumFuzzyQuality = 30
-    /// Au-delà, le texte n'est plus cherché de façon approximative.
+    /// Beyond this, the text is no longer searched fuzzily.
     static let maximumFuzzyLength = 32
-    /// Longueur lue dans chaque champ pour la correspondance approximative.
+    /// Length read in each field for fuzzy matching.
     static let fuzzyFieldLength = 200
 
-    /// Meilleur palier atteint par `query` sur `titles` et `url`, ou nil s'il n'y en a aucun ou
-    /// s'il est sous `minimumTier`.
+    /// Best tier reached by `query` on `titles` and `url`, or nil if there is none or if it is below
+    /// `minimumTier`.
     static func match(_ query: CommandQuery, titles: [String], url: URL?, minimumTier: MatchTier = .fuzzy) -> CommandMatch? {
         match(query, fields: CommandMatchFields(titles: titles, url: url), minimumTier: minimumTier)
     }
 
-    /// Comme `match(_:titles:url:minimumTier:)`, avec des champs déjà repliés (historique, tâche 5.5).
+    /// Like `match(_:titles:url:minimumTier:)`, with fields already folded (history, task 5.5).
     static func match(_ query: CommandQuery, fields: CommandMatchFields, minimumTier: MatchTier = .fuzzy) -> CommandMatch? {
         guard !query.folded.isEmpty else {
             return nil
@@ -89,9 +87,9 @@ nonisolated enum CommandMatcher {
         return CommandMatch(tier: .fuzzy, quality: quality)
     }
 
-    /// Compacité (0 à 100) des lettres de `needle` trouvées dans l'ordre dans `haystack`, la première
-    /// au début d'un mot : longueur de `needle` sur la longueur de la plus courte fenêtre trouvée
-    /// en avançant au plus tôt. Nil si aucun début de mot ne permet de tout trouver.
+    /// Compactness (0 to 100) of the letters of `needle` found in order in `haystack`, the first at the start of a
+    /// word: length of `needle` over the length of the shortest window found by advancing as early as possible. Nil
+    /// if no word start allows finding everything.
     static func fuzzyQuality(of needle: String, in haystack: String) -> Int? {
         let needle = Array(needle)
         let haystack = Array(haystack)
@@ -100,7 +98,7 @@ nonisolated enum CommandMatcher {
         }
         var best: Int?
         for start in haystack.indices where haystack[start] == first && startsWord(haystack, at: start) {
-            // Si les lettres manquent depuis ce début, elles manquent aussi depuis les suivants.
+            // If the letters are missing from this start, they are also missing from the following ones.
             guard let end = greedyEnd(of: needle, in: haystack, from: start) else {
                 break
             }
@@ -110,7 +108,7 @@ nonisolated enum CommandMatcher {
         return best
     }
 
-    // MARK: Paliers
+    // MARK: Tiers
 
     private static func strictTier(_ query: CommandQuery, _ fields: CommandMatchFields) -> MatchTier? {
         let folded = query.folded
@@ -131,9 +129,9 @@ nonisolated enum CommandMatcher {
         return nil
     }
 
-    /// Chaque mot tapé commence un mot des titres ou de l'adresse, dans n'importe quel ordre. Un mot
-    /// tapé coupé par une ponctuation (« node.js », « 6.4 ») compte pour ses morceaux ; « c++ », d'un
-    /// seul morceau, reste entier pour ne pas se réduire à « c » (et ne commence donc aucun mot).
+    /// Each typed word starts a word of the titles or of the address, in any order. A typed word split by
+    /// punctuation (“node.js”, “6.4”) counts as its pieces; “c++”, a single piece, stays whole so as not to be
+    /// reduced to “c” (and therefore starts no word).
     private static func isWordPrefixMatch(_ query: CommandQuery, _ fields: CommandMatchFields) -> Bool {
         let haystacks = fields.titles + [fields.address].compactMap(\.self)
         return !query.wordParts.isEmpty && query.wordParts.allSatisfy { parts in
@@ -141,8 +139,8 @@ nonisolated enum CommandMatcher {
         }
     }
 
-    /// Vrai si un mot de `text` (suite de lettres et de chiffres, comme `CommandText.words`) commence par `part`,
-    /// sans découper le texte : l'historique (tâche 5.5) passe des milliers d'adresses à chaque frappe.
+    /// True if a word of `text` (run of letters and digits, like `CommandText.words`) starts with `part`, without
+    /// splitting the text: history (task 5.5) passes thousands of addresses on each keystroke.
     private static func hasWord(startingWith part: String, in text: String) -> Bool {
         guard let first = part.first, part.allSatisfy(isWordCharacter) else {
             return false
@@ -173,7 +171,7 @@ nonisolated enum CommandMatcher {
         return haystacks.compactMap { fuzzyQuality(of: compact, in: $0) }.max()
     }
 
-    // MARK: Approximatif
+    // MARK: Fuzzy
 
     private static func startsWord(_ characters: [Character], at index: Int) -> Bool {
         guard index > 0 else {
@@ -183,8 +181,8 @@ nonisolated enum CommandMatcher {
         return !previous.isLetter && !previous.isNumber
     }
 
-    /// Indice de la dernière lettre de `needle` trouvée en avançant au plus tôt depuis `start`
-    /// (où se trouve sa première lettre), nil s'il en manque.
+    /// Index of the last letter of `needle` found by advancing as early as possible from `start` (where its first
+    /// letter is), nil if one is missing.
     private static func greedyEnd(of needle: [Character], in haystack: [Character], from start: Int) -> Int? {
         var position = start
         for character in needle.dropFirst() {

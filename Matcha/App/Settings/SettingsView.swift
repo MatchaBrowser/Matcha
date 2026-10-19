@@ -1,6 +1,6 @@
 import SwiftUI
 
-/// Fenêtre des réglages (⌘,). L'onglet affiché suit `SettingsSelection` (« Gérer les extensions… » ouvre Extensions).
+/// Settings window (⌘,). The tab shown follows `SettingsSelection` (“Manage Extensions…” opens Extensions).
 struct SettingsView: View {
     @Bindable private var selection = SettingsSelection.shared
 

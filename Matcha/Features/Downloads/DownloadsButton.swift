@@ -1,8 +1,8 @@
 import SwiftUI
 
-/// Bouton « Téléchargements » du pied de la barre latérale, toujours là, même sans téléchargement : anneau de
-/// progression pendant qu'un fichier arrive, petit rebond à chaque fichier terminé. Un clic ouvre ou ferme le panneau
-/// des téléchargements, en bas de la barre (comme ⌥⌘L) ; rien ne l'ouvre de soi-même.
+/// “Downloads” button at the bottom of the sidebar, always there, even without downloads: progress ring while a
+/// file is arriving, small bounce at each finished file. A click opens or closes the downloads panel, at the bottom
+/// of the sidebar (like ⌥⌘L); nothing opens it by itself.
 struct DownloadsButton: View {
     @Bindable var model: WindowModel
     let downloads: DownloadManager
@@ -29,8 +29,7 @@ struct DownloadsButton: View {
     }
 }
 
-/// Flèche de téléchargement ; pendant un téléchargement, entourée d'un anneau de progression (pulsation si la taille
-/// est inconnue).
+/// Download arrow; during a download, surrounded by a progress ring (pulsing if the size is unknown).
 private struct DownloadsIcon: View {
     static let size = 18.0
 

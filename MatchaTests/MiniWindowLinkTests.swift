@@ -4,8 +4,8 @@ import SwiftData
 import Testing
 import WebKit
 
-/// Liens dans une mini-fenêtre, par le délégué de navigation commun (`NavigationCoordinator`, hôte
-/// `MiniWindowManager`), avec de vraies vues web et les pages de `TestPages`.
+/// Links in a mini window, through the common navigation delegate (`NavigationCoordinator`, host
+/// `MiniWindowManager`), with real web views and the pages of `TestPages`.
 @MainActor
 struct MiniWindowLinkTests {
     private let session: BrowserSession
@@ -18,14 +18,14 @@ struct MiniWindowLinkTests {
         manager = .forTests(session: session)
     }
 
-    /// Mini-fenêtre ouverte sur la page locale `name` contenant `body`, une fois chargée.
+    /// Mini window opened on the local page `name` containing `body`, once loaded.
     private func openPage(_ name: String, body: String = "") async throws -> MiniWindowController {
         let mini = manager.openNew(loading: TestPages.url(name, body: body), source: .link)
         try await waitUntil { mini.tab.title == name && !mini.tab.isLoading }
         return mini
     }
 
-    /// Envoie au délégué un clic sur `url` dans la page de `mini` et rend les décisions prises.
+    /// Sends the delegate a click on `url` in the page of `mini` and returns the decisions made.
     private func click(
         _ url: URL,
         in mini: MiniWindowController,
@@ -84,7 +84,7 @@ struct MiniWindowLinkTests {
         let mini = try await openPage("ouvrant")
 
         #expect(click(blankPage("milieu"), in: mini, modifiers: [], button: 4) == [.cancel])
-        // ⇧⌘-clic ouvrirait l'onglet au premier plan dans la fenêtre : depuis une mini-fenêtre, il reste derrière.
+        // ⇧⌘-click would open the tab in the foreground in the window: from a mini window, it stays behind.
         #expect(click(blankPage("devant"), in: mini, modifiers: [.command, .shift]) == [.cancel])
 
         #expect(tabManager.todayTabs.count == 3)
@@ -112,8 +112,7 @@ struct MiniWindowLinkTests {
         #expect(mini.tab.isLoaded)
     }
 
-    /// Tâche 5.1 : une mini-fenêtre n'a pas de barre latérale, ses téléchargements vont dans la liste de la fenêtre
-    /// principale.
+    /// Task 5.1: a mini window has no sidebar, its downloads go into the list of the main window.
     @Test func `downloads of a mini window go to the main window's list`() async throws {
         let folder = try TemporaryDownloadsFolder()
         let downloads = folder.makeManager()

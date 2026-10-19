@@ -1,17 +1,17 @@
 import AppKit
 import SwiftUI
 
-/// Emoji d'une icône de dossier ou de Space : un champ qui n'accepte qu'un emoji (le dernier tapé ou choisi remplace
-/// l'ancien, une lettre est refusée, le vider rend l'icône par défaut) et « Emoji et symboles… », qui ouvre le
-/// visualiseur de caractères du système sur ce champ.
+/// Emoji of a folder or Space icon: a field that accepts only an emoji (the last one typed or chosen replaces the
+/// old one, a letter is refused, emptying it restores the default icon) and “Emoji & Symbols…”, which opens the
+/// system's Character Viewer on this field.
 struct IconEmojiField: View {
-    /// Emoji de l'icône actuelle, nil si elle n'en est pas un.
+    /// Emoji of the current icon, nil if it is not one.
     let emoji: String?
-    /// Préfixe des identifiants d'accessibilité : « <préfixe>Field » et « <préfixe>PaletteButton ».
+    /// Prefix of the accessibility identifiers: “<prefix>Field” and “<prefix>PaletteButton”.
     let identifierPrefix: String
-    /// Échap dans le champ : ferme le panneau ou la bulle qui le contient.
+    /// Esc in the field: closes the panel or the popover that contains it.
     let close: () -> Void
-    /// Nouvel emoji, ou nil pour revenir à l'icône par défaut.
+    /// New emoji, or nil to go back to the default icon.
     let choose: (String?) -> Void
 
     @State private var draft = ""
@@ -42,7 +42,7 @@ struct IconEmojiField: View {
 
     private func accept(_ text: String) {
         if text.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
-            // Champ vidé : l'icône par défaut ; des espaces seuls sont effacés.
+            // Field emptied: the default icon; whitespace alone is erased.
             if !text.isEmpty {
                 draft = ""
             }
@@ -57,12 +57,12 @@ struct IconEmojiField: View {
                 choose(latest)
             }
         } else {
-            // Pas un emoji : le champ revient à l'icône actuelle.
+            // Not an emoji: the field goes back to the current icon.
             draft = emoji ?? ""
         }
     }
 
-    /// Le visualiseur insère l'emoji choisi dans le champ qui a le clavier : le champ le prend d'abord.
+    /// The viewer inserts the chosen emoji into the field that has the keyboard: the field takes it first.
     private func showCharacterViewer() {
         isFocused = true
         Task {

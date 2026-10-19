@@ -1,17 +1,17 @@
 import Foundation
 
-/// Origine d'une page : schéma, hôte et port, clé des décisions de permission (tâche 5.2). Schéma et hôte sont en
-/// minuscules ; le port n'est gardé que s'il diffère de celui du schéma (WebKit donne 0 pour le port par défaut).
-/// Pas d'origine sans hôte (fichier local, `about:`, `data:`) : rien n'y est retenu.
+/// Origin of a page: scheme, host and port, key of the permission decisions (task 5.2). Scheme and host are lowercase;
+/// the port is kept only if it differs from the scheme's (WebKit gives 0 for the default port). No origin without a
+/// host (local file, `about:`, `data:`): nothing is remembered there.
 nonisolated struct SiteOrigin: Hashable, Sendable {
     let scheme: String
     let host: String
-    /// Port explicite ; nil pour le port par défaut du schéma.
+    /// Explicit port; nil for the scheme's default port.
     let port: Int?
 
     init?(scheme: String, host: String, port: Int?) {
         var host = host.lowercased()
-        // IPv6 : gardé sans crochets, remis dans la clé.
+        // IPv6: kept without brackets, put back in the key.
         if host.hasPrefix("["), host.hasSuffix("]") {
             host = String(host.dropFirst().dropLast())
         }
@@ -34,7 +34,7 @@ nonisolated struct SiteOrigin: Hashable, Sendable {
         self.init(scheme: scheme, host: host, port: url.port)
     }
 
-    /// Relit une clé enregistrée (`key`).
+    /// Reads a saved key (`key`) back.
     init?(key: String) {
         guard let url = URL(string: key) else {
             return nil
@@ -42,7 +42,7 @@ nonisolated struct SiteOrigin: Hashable, Sendable {
         self.init(url: url)
     }
 
-    /// Origine d'un site web (http ou https) ; nil pour toute autre page.
+    /// Origin of a website (http or https); nil for any other page.
     static func web(of url: URL?) -> SiteOrigin? {
         guard let origin = url.flatMap(SiteOrigin.init(url:)), origin.isWeb else {
             return nil
@@ -54,7 +54,7 @@ nonisolated struct SiteOrigin: Hashable, Sendable {
         ["http": 80, "https": 443][scheme]
     }
 
-    /// Clé enregistrée : « https://example.com », « http://localhost:8080 », « http://[::1]:3000 ».
+    /// Saved key: “https://example.com”, “http://localhost:8080”, “http://[::1]:3000”.
     var key: String {
         "\(scheme)://\(hostForAddress)\(port.map { ":\($0)" } ?? "")"
     }
@@ -63,15 +63,15 @@ nonisolated struct SiteOrigin: Hashable, Sendable {
         scheme == "http" || scheme == "https"
     }
 
-    /// Hôte affiché : sans « www. », avec le port s'il n'est pas celui par défaut.
+    /// Displayed host: without “www.”, with the port if it is not the default one.
     var displayHost: String {
         let domain = host.hasPrefix("www.") ? String(host.dropFirst(4)) : host
         let shown = domain.contains(":") ? "[\(domain)]" : domain
         return port.map { "\(shown):\($0)" } ?? shown
     }
 
-    /// Nom montré dans le bandeau, le panneau et les réglages : l'hôte, précédé du schéma s'il n'est pas https
-    /// (« http://localhost:8080 ») pour distinguer deux origines du même hôte.
+    /// Name shown in the banner, the panel and the settings: the host, preceded by the scheme if it is not https
+    /// (“http://localhost:8080”) to tell apart two origins of the same host.
     var displayName: String {
         scheme == "https" ? displayHost : "\(scheme)://\(displayHost)"
     }

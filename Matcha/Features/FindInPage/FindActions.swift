@@ -1,17 +1,17 @@
 import AppKit
 
-/// Fermer la barre de recherche d'une page ; le clavier suit.
+/// Closing a page's find bar; keyboard focus follows.
 @MainActor
 enum FindActions {
-    /// ⎋ dans le champ et × : la barre se ferme, puis la page reprend le clavier si son champ l'avait (ou si
-    /// personne ne l'a) ; jamais pris à un autre champ.
+    /// ⎋ in the field and ×: the bar closes, then the page takes keyboard focus back if its field had it (or if
+    /// nobody has it); never taken from another field.
     static func close(_ page: BrowserTab) {
         releaseKeyboard(from: page)
         page.find.close()
         TabActivation.focusPage(of: page)
     }
 
-    /// Rend le clavier à la fenêtre s'il est dans le champ de recherche de `page` (pas celui d'un autre panneau).
+    /// Gives keyboard focus back to the window if it is in the find field of `page` (not that of another pane).
     private static func releaseKeyboard(from page: BrowserTab) {
         guard let window = page.webView?.window,
               let editor = window.firstResponder as? NSTextView, editor.isFieldEditor,

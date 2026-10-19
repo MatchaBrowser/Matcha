@@ -3,7 +3,7 @@ import Foundation
 import Testing
 import WebKit
 
-/// Historique dans la barre de commande (tâche 5.5) : celui du profil du Space affiché, ou de la mini-fenêtre.
+/// History in the command bar (task 5.5): that of the profile of the displayed Space, or of the mini window.
 @MainActor
 struct HistoryCommandBarTests {
     private let session: BrowserSession
@@ -57,7 +57,7 @@ struct HistoryCommandBarTests {
         let url = try #require(URL(string: "https://www.example.com/"))
         tab.loadedWebView.loadSimulatedRequest(URLRequest(url: url), responseHTML: "<title>Exemple</title>")
         try await waitUntil { tab.url == url && !tab.isLoading }
-        // Une autre page ouverte, pour que l'onglet sur example.com ne soit pas l'onglet affiché (exclu de la barre).
+        // Another page open, so that the tab on example.com is not the displayed tab (excluded from the bar).
         space.tabManager.newTab()
         let model = CommandBarModel(
             windowModel: windowModel,
@@ -95,7 +95,7 @@ struct HistoryCommandBarTests {
         #expect(model.rows.last?.title == "Exemple docs")
         #expect(try model.submission(for: model.rows.last?.id) == .load(#require(URL(string: "https://example.com/docs"))))
 
-        // Autre profil : rien.
+        // Other profile: nothing.
         let other = MiniCommandBarModel(
             tab: tab,
             faviconService: FaviconService(directory: nil),

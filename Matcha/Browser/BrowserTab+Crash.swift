@@ -1,25 +1,25 @@
 import Foundation
 
-/// Arrêt du processus de la page (tâche 5.7) : ce qu'en fait l'onglet, d'après la décision de `PageCrashPolicy`.
+/// Termination of the page's process (task 5.7): what the tab does about it, per the decision of `PageCrashPolicy`.
 extension BrowserTab {
-    /// Sortie de veille (tâche 5.6) ou reprise après un arrêt du processus (5.7) : un titre vide ou une adresse absente
-    /// de la vue web ne remplacent pas ceux de l'onglet.
+    /// Waking from sleep (task 5.6) or recovering after the process terminated (5.7): an empty title or a missing
+    /// address in the web view does not replace the tab's.
     var keepsTitleAndAddress: Bool {
         suspension.isRestoring || crash.isRecovering
     }
 
-    /// Appelé pendant que WebKit prévient le délégué : la vue web a encore son adresse, son titre et son état de
-    /// navigation. Les demandes de permission en attente sont refusées, la recherche dans la page oubliée et l'icône du
-    /// son éteinte (il n'y a plus de page) ; zoom, icône, titre et adresse restent.
+    /// Called while WebKit notifies the delegate: the web view still has its address, title and navigation state.
+    /// Pending permission requests are denied, find in page is forgotten and the sound icon is turned off (there is no
+    /// page anymore); zoom, icon, title and address remain.
     func webContentProcessDidTerminate(_ action: PageCrashAction) {
         permissionPrompts.denyAll()
         find.pageDidTerminate()
         audio.reset()
         switch action {
         case .reload:
-            // Au tour suivant de la boucle principale : WebKit finit d'abord de traiter l'arrêt (il efface l'adresse et
-            // le titre de la vue). Vérifié : `reload()` relance un processus et recharge la page en cours de la même
-            // vue web, historique précédent/suivant et zoom compris.
+            // On the next turn of the main loop: WebKit first finishes handling the termination (it clears the view's
+            // address and title). Verified: `reload()` starts a new process and reloads the current page of the same
+            // web view, back/forward history and zoom included.
             let terminated = webView
             Task { [weak self] in
                 guard let self, let terminated, webView === terminated, crash.isRecovering else {
@@ -28,8 +28,8 @@ extension BrowserTab {
                 reload()
             }
         case .reloadWhenShown:
-            // Comme une mise en veille (tâche 5.6), sans capture : l'état de navigation est encore lisible, la vue
-            // morte est libérée et la page revient, avec son historique, quand on affiche l'onglet.
+            // Like putting to sleep (task 5.6), without a snapshot: the navigation state can still be read, the dead
+            // view is released and the page comes back, with its history, when the tab is shown.
             suspend(snapshot: nil)
         case .showProblem:
             crash.showProblem()

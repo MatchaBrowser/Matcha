@@ -1,7 +1,7 @@
 import Foundation
 
-/// Actions de la barre de commande offertes dans l'état actuel de la fenêtre, dans l'ordre de
-/// `CommandActionID.allCases`. Le texte est ignoré : le classement fait la correspondance.
+/// Command bar actions offered in the current state of the window, in the order of `CommandActionID.allCases`. The
+/// text is ignored: the ranking does the matching.
 @MainActor
 final class ActionsProvider: CommandProvider {
     private let windowModel: WindowModel
@@ -14,7 +14,7 @@ final class ActionsProvider: CommandProvider {
         available(in: context)
     }
 
-    /// Actions offertes ; lu aussi tout de suite pour les lignes de ⌘L non modifié.
+    /// Actions offered; also read right away for the rows of an unmodified ⌘L.
     func available(in context: CommandContext) -> [CommandCandidate] {
         CommandActionID.allCases.filter { isOffered($0, in: context) }.map { action in
             CommandCandidate(kind: .action(action, keywords: action.keywords), title: action.title, url: nil)
@@ -24,7 +24,7 @@ final class ActionsProvider: CommandProvider {
     private func isOffered(_ action: CommandActionID, in context: CommandContext) -> Bool {
         switch action {
         case .newSpace:
-            // Une fenêtre privée n'a qu'un Space.
+            // A private window has only one Space.
             !context.isPrivate
         case .copyURL:
             windowModel.space.tabManager.selectedTab?.url != nil

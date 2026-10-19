@@ -1,6 +1,6 @@
 import SwiftUI
 
-/// Séparateur avec « Effacer », bouton « Nouvel onglet », puis les onglets du jour.
+/// Separator with “Clear”, “New Tab” button, then the today tabs.
 struct TodaySection: View {
     let tabManager: TabManager
     let newTab: () -> Void
@@ -22,7 +22,7 @@ struct TodaySection: View {
         }
         .frame(height: 24)
         NewTabRow(action: newTab)
-        // Un split tient sur une ligne, à la place de son premier onglet.
+        // A split fits on one row, in place of its first tab.
         ForEach(tabManager.layout.todayRows) { row in
             switch row {
             case let .tab(id, index):
@@ -35,7 +35,7 @@ struct TodaySection: View {
                 EmptyView()
             }
         }
-        // Grande zone sous les onglets du jour, pour les déposer en fin de liste.
+        // Large area below the today tabs, to drop them at the end of the list.
         SidebarDropZone(tabManager: tabManager, destination: .today(index: tabManager.layout.today.count), restingHeight: 60)
             .accessibilityIdentifier("todayDropZone")
     }
@@ -63,7 +63,7 @@ private struct NewTabRow: View {
     }
 }
 
-/// Icône à la largeur d'une icône de site, pour aligner le texte sur les titres des onglets.
+/// Icon at the width of a site icon, to align the text with the tabs' titles.
 private struct NewTabLabelStyle: LabelStyle {
     func makeBody(configuration: Configuration) -> some View {
         HStack(spacing: 8) {

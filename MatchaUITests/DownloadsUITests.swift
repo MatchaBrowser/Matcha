@@ -1,14 +1,14 @@
 import XCTest
 
-/// Téléchargements (tâche 5.1) : liste, vrai fichier en quarantaine, fenêtre privée, barre masquée. Sans réseau ;
-/// fichiers écrits dans ~/Downloads/MatchaUITests puis effacés (voir `UITestSupport+Downloads`). Bouton toujours
-/// visible, panneau vide et ⌥⌘L : `DownloadsPanelUITests`.
+/// Downloads (task 5.1): list, real quarantined file, private window, hidden sidebar. Without network; files
+/// written to ~/Downloads/MatchaUITests then deleted (see `UITestSupport+Downloads`). Button always visible,
+/// empty panel and ⌥⌘L: `DownloadsPanelUITests`.
 final class DownloadsUITests: XCTestCase {
     override func setUpWithError() throws {
         continueAfterFailure = false
     }
 
-    /// Lance l'app sur le dossier de test ; il est effacé à la fin du test, même en échec.
+    /// Launches the app on the test folder; it is deleted at the end of the test, even on failure.
     @MainActor
     private func launchForDownloads() -> XCUIApplication {
         addTeardownBlock { @MainActor in
@@ -30,7 +30,7 @@ final class DownloadsUITests: XCTestCase {
 
         download(source, in: app)
         XCTAssertTrue(waitForFile(file))
-        // Rien ne s'ouvre de soi-même : ni la liste, ni le fichier.
+        // Nothing opens by itself: neither the list nor the file.
         XCTAssertFalse(downloadsPanel(in: app).waitForExistence(timeout: 1))
 
         button.click()
@@ -40,18 +40,18 @@ final class DownloadsUITests: XCTestCase {
         XCTAssertFalse(downloadsEmptyState(in: app).exists)
         XCTAssertEqual(downloadRows(in: app).count, 1)
         XCTAssertEqual(row.label, name)
-        // Terminé : « Afficher dans le Finder » remplace « Annuler ».
+        // Finished: “Show in Finder” replaces “Cancel”.
         XCTAssertTrue(row.buttons["downloadShowInFinderButton"].waitForExistence(timeout: 20))
         XCTAssertFalse(row.buttons["downloadCancelButton"].exists)
 
-        // Hors de l'app : le vrai fichier, complet, en quarantaine au nom de Matcha.
+        // Outside the app: the real file, complete, quarantined in Matcha's name.
         let size = try FileManager.default.attributesOfItem(atPath: file.path)[.size] as? Int
         XCTAssertEqual(size, try FileManager.default.attributesOfItem(atPath: source)[.size] as? Int)
         let quarantine = try XCTUnwrap(quarantineAttribute(of: file), "Fichier sans attribut de quarantaine")
         XCTAssertTrue(quarantine.contains(";Matcha;"), quarantine)
 
-        // « Effacer » vide la liste sans toucher au fichier : le panneau reste ouvert, vide, et « Effacer » se grise ;
-        // le bouton reste.
+        // “Clear” empties the list without touching the file: the panel stays open, empty, and “Clear” is grayed out;
+        // the button stays.
         let clear = app.buttons["downloadsClearButton"]
         XCTAssertTrue(clear.waitForExistence(timeout: 3))
         XCTAssertTrue(clear.isEnabled)
@@ -65,7 +65,7 @@ final class DownloadsUITests: XCTestCase {
         app.terminate()
     }
 
-    /// Le même fichier deux fois : « nom.ext » puis « nom 2.ext », le plus récent en tête ; rien n'est écrasé.
+    /// The same file twice: “name.ext” then “name 2.ext”, the most recent first; nothing is overwritten.
     @MainActor
     func testSameFileTwiceGetsANumberedName() throws {
         let source = try undisplayableFile()
@@ -86,13 +86,13 @@ final class DownloadsUITests: XCTestCase {
         app.terminate()
     }
 
-    /// Une fenêtre privée a sa propre liste, que la fenêtre principale ne montre pas ; à sa fermeture, le fichier
-    /// reste dans le dossier et la liste est oubliée (vérifié aussi par `DownloadManagerTests`).
+    /// A private window has its own list, which the main window doesn't show; when it closes, the file stays in the
+    /// folder and the list is forgotten (also checked by `DownloadManagerTests`).
     @MainActor
     func testPrivateWindowHasItsOwnDownloadsList() throws {
         let source = try undisplayableFile()
         let app = launchForDownloads()
-        // Panneau de la fenêtre principale ouvert d'abord : il reste visible derrière la fenêtre privée.
+        // Main window panel opened first: it stays visible behind the private window.
         let mainWindow = app.windows.matching(NSPredicate(format: "title != %@", "Navigation privée")).firstMatch
         downloadsButton(in: mainWindow).click()
         XCTAssertTrue(downloadsEmptyState(in: mainWindow).waitForExistence(timeout: 3))
@@ -104,7 +104,7 @@ final class DownloadsUITests: XCTestCase {
         XCTAssertTrue(waitForFile(file))
         downloadsButton(in: privateWindow).click()
         XCTAssertTrue(waitForCount(downloadRows(in: privateWindow), 1))
-        // La fenêtre principale ne montre pas les téléchargements privés.
+        // The main window doesn't show the private downloads.
         XCTAssertEqual(downloadRows(in: mainWindow).count, 0)
         XCTAssertTrue(downloadsEmptyState(in: mainWindow).exists)
 
@@ -112,7 +112,7 @@ final class DownloadsUITests: XCTestCase {
         XCTAssertTrue(privateWindow.waitForNonExistence(timeout: 5))
         XCTAssertTrue(downloadsButton(in: app).exists)
         XCTAssertTrue(FileManager.default.fileExists(atPath: file.path))
-        // Une nouvelle fenêtre privée repart sans liste : bouton présent, panneau fermé, vide une fois ouvert.
+        // A new private window starts without a list: button present, panel closed, empty once opened.
         let newPrivateWindow = openPrivateWindow(in: app)
         let newButton = downloadsButton(in: newPrivateWindow)
         XCTAssertTrue(newButton.waitForExistence(timeout: 3))
@@ -123,8 +123,8 @@ final class DownloadsUITests: XCTestCase {
         app.terminate()
     }
 
-    /// Barre masquée : le panneau monte dans la barre flottante, se cache avec elle quand le pointeur s'éloigne,
-    /// réapparaît ouvert avec elle ; la croix le ferme.
+    /// Hidden sidebar: the panel moves up into the floating sidebar, hides with it when the pointer moves away,
+    /// reappears open with it; the cross closes it.
     @MainActor
     func testDownloadsPanelFollowsTheHiddenSidebar() throws {
         let source = try undisplayableFile()
@@ -145,11 +145,11 @@ final class DownloadsUITests: XCTestCase {
         let row = downloadRows(in: app).firstMatch
         XCTAssertTrue(row.waitForExistence(timeout: 3))
 
-        // Loin du bord : la barre se cache, panneau compris.
+        // Far from the edge: the sidebar hides, panel included.
         moveAwayFromLeftEdge(in: window)
         XCTAssertTrue(button.waitForNonExistence(timeout: 3))
         XCTAssertFalse(row.exists)
-        // De retour au bord : le panneau est toujours ouvert.
+        // Back at the edge: the panel is still open.
         edge.hover()
         XCTAssertTrue(row.waitForExistence(timeout: 3))
         clickWhenSettled(app.buttons["downloadsCloseButton"])
@@ -158,13 +158,13 @@ final class DownloadsUITests: XCTestCase {
         app.terminate()
     }
 
-    /// Le lanceur ne fait que lire : il attend que l'app ait écrit le fichier.
+    /// The runner only reads: it waits for the app to have written the file.
     private func waitForFile(_ file: URL, timeout: TimeInterval = 10) -> Bool {
         let predicate = NSPredicate { _, _ in FileManager.default.fileExists(atPath: file.path) }
         return XCTWaiter().wait(for: [XCTNSPredicateExpectation(predicate: predicate, object: nil)], timeout: timeout) == .completed
     }
 
-    /// « less.1.gz » → (« less.1 », « .gz ») : comme l'app, pour une extension simple.
+    /// “less.1.gz” → (“less.1”, “.gz”): like the app, for a simple extension.
     private func splitName(_ name: String) -> (String, String) {
         let url = URL(fileURLWithPath: name)
         let pathExtension = url.pathExtension

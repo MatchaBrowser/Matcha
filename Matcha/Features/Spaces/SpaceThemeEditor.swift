@@ -1,7 +1,7 @@
 import SwiftUI
 
-/// Thème d'un Space, section de son éditeur (`SpaceEditor`) : thèmes prédéfinis, couleurs libres (2 ou 3) et angle du
-/// dégradé.
+/// Theme of a Space, a section of its editor (`SpaceEditor`): predefined themes, free colors (2 or 3) and the
+/// gradient's angle.
 struct SpaceThemeEditor: View {
     @Binding var theme: SpaceTheme
 
@@ -40,7 +40,7 @@ struct SpaceThemeEditor: View {
             theme = SpaceTheme(name: preset.name, colors: preset.colors, angle: theme.angle)
         } label: {
             Circle()
-                // Couleurs de base, vives : les variantes sombres se distinguent mal en petit.
+                // Base colors, vivid: the dark variants are hard to tell apart at small size.
                 .fill(LinearGradient(colors: preset.colors.map(\.color), startPoint: .topLeading, endPoint: .bottomTrailing))
                 .overlay(Circle().strokeBorder(Color.primary.opacity(theme.name == preset.name ? 0.9 : 0.15), lineWidth: 2))
                 .frame(width: 28, height: 28)

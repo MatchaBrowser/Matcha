@@ -1,7 +1,7 @@
 import Foundation
 
-/// Historique d'un profil vu par la barre de commande (`HistorySource`). Le profil est relu à chaque frappe : celui
-/// du Space affiché par la fenêtre, ou celui d'une mini-fenêtre.
+/// A profile's history as seen by the command bar (`HistorySource`). The profile is read again on each keystroke:
+/// that of the Space displayed by the window, or that of a mini window.
 @MainActor
 final class ProfileHistory: HistorySource {
     private let store: HistoryStore

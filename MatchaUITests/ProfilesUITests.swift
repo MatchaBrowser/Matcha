@@ -1,6 +1,6 @@
 import XCTest
 
-/// Profils (réglages) et déplacement d'onglets entre Spaces.
+/// Profiles (settings) and moving tabs between Spaces.
 final class ProfilesUITests: XCTestCase {
     override func setUpWithError() throws {
         continueAfterFailure = false
@@ -27,7 +27,7 @@ final class ProfilesUITests: XCTestCase {
         XCTAssertTrue(waitForCount(spaceButtons(in: app), 2))
 
         app.buttons.matching(NSPredicate(format: "label == %@", "Supprimer le profil")).element(boundBy: 1).click()
-        // Le bouton de la feuille de confirmation (un double existe dans la Touch Bar).
+        // The button of the confirmation sheet (a duplicate exists in the Touch Bar).
         let sheetConfirm = app.sheets.buttons["Supprimer"].firstMatch
         let confirm = sheetConfirm.waitForExistence(timeout: 3) ? sheetConfirm : app.dialogs.buttons["Supprimer"].firstMatch
         XCTAssertTrue(confirm.waitForExistence(timeout: 3))
@@ -49,7 +49,7 @@ final class ProfilesUITests: XCTestCase {
         tabRows(in: app).firstMatch.rightClick()
         let moveMenu = app.menuItems["Déplacer vers"]
         moveMenu.hover()
-        // « Space 2 » existe aussi dans le menu Spaces de la barre des menus.
+        // “Space 2” also exists in the Spaces menu of the menu bar.
         moveMenu.menuItems["Space 2"].click()
         XCTAssertTrue(waitForCount(tabRows(in: app), 0))
         app.typeKey("2", modifierFlags: .control)

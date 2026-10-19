@@ -2,9 +2,9 @@ import Foundation
 @testable import Matcha
 import Testing
 
-/// Nom du fichier d'un téléchargement : nom proposé rendu sûr, puis rendu unique (tâche 5.1).
+/// File name of a download: suggested name made safe, then made unique (task 5.1).
 struct DownloadFileNameTests {
-    // MARK: Nom sûr
+    // MARK: Safe name
 
     @Test(arguments: [
         ("rapport.pdf", "rapport.pdf"),
@@ -46,7 +46,7 @@ struct DownloadFileNameTests {
         #expect(DownloadFileName.make(suggested: nil, url: URL(fileURLWithPath: "/usr/share/a.bin"), mimeType: nil) == "a.bin")
     }
 
-    /// Le « chemin » d'une adresse `data:` ou `blob:` n'est pas un nom de fichier.
+    /// The “path” of a `data:` or `blob:` address is not a file name.
     @Test func `data and blob addresses give no name`() {
         #expect(DownloadFileName
             .make(suggested: nil, url: URL(string: "data:text/plain,bonjour"), mimeType: "text/plain") == "download.txt")
@@ -78,7 +78,7 @@ struct DownloadFileNameTests {
         #expect(DownloadFileName.split(name) == (base, pathExtension))
     }
 
-    // MARK: Nom unique
+    // MARK: Unique name
 
     @Test func `a free name is kept`() {
         #expect(DownloadFileName.unique("rapport.pdf") { _ in false } == "rapport.pdf")

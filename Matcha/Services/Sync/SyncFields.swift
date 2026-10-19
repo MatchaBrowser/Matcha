@@ -1,7 +1,7 @@
 import Foundation
 
-/// Champs d'un enregistrement synchronisé, par type (tâche 7.4, `SYNC.md` § 2.1) : ce que ce Mac a, ou ce qu'il a lu
-/// d'un contenu reçu. Un champ absent vaut `null`. Type pur.
+/// Fields of a synced record, by type (task 7.4, `SYNC.md` § 2.1): what this Mac has, or what it read from a
+/// received content. A missing field counts as `null`. Pure type.
 nonisolated enum SyncFields: Equatable, Sendable {
     case profile(SyncProfileFields)
     case space(SyncSpaceFields)
@@ -25,7 +25,7 @@ nonisolated enum SyncFields: Equatable, Sendable {
         }
     }
 
-    /// Champs en JSON (objet).
+    /// Fields as JSON (object).
     var json: SyncJSON {
         let value: SyncJSON? = switch self {
         case let .profile(fields): try? .encoding(fields)
@@ -40,8 +40,8 @@ nonisolated enum SyncFields: Equatable, Sendable {
         return value ?? .emptyObject
     }
 
-    /// Champs de type `type` lus dans `json` ; nil si une valeur manque ou sort des valeurs connues (place, réglage,
-    /// permission, zoom…). Les champs inconnus sont ignorés.
+    /// Fields of type `type` read from `json`; nil if a value is missing or outside the known values (placement,
+    /// setting, permission, zoom…). Unknown fields are ignored.
     init?(json: SyncJSON, type: SyncRecordType) {
         let fields: SyncFields? = switch type {
         case .profile: (try? json.decoded(as: SyncProfileFields.self)).map(SyncFields.profile)
@@ -59,7 +59,7 @@ nonisolated enum SyncFields: Equatable, Sendable {
         self = fields
     }
 
-    /// Parent dont l'enregistrement a besoin (profil, Space, dossier), s'il en a un.
+    /// Parent the record needs (profile, Space, folder), if it has one.
     var parentIDs: [UUID] {
         switch self {
         case .profile, .webExtension, .setting, .siteZoom: []

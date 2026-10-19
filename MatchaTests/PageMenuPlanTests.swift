@@ -1,10 +1,10 @@
 @testable import Matcha
 import Testing
 
-/// Réécriture du menu contextuel des pages (tâche 5.9), sur les identifiants des éléments de WebKit relevés sur
-/// macOS 27 (`PageMenuIntegrationTests` les vérifie sur un vrai menu).
+/// Rewrite of the page context menu (task 5.9), on the WebKit item identifiers captured on macOS 27
+/// (`PageMenuIntegrationTests` checks them on a real menu).
 struct PageMenuPlanTests {
-    /// Menu d'un lien, dans l'ordre de WebKit.
+    /// Link menu, in WebKit's order.
     static let linkMenu: [String?] = [
         "WKMenuItemIdentifierOpenLink",
         "WKMenuItemIdentifierOpenLinkInNewWindow",
@@ -14,7 +14,7 @@ struct PageMenuPlanTests {
         "WKMenuItemIdentifierShareMenu",
     ]
 
-    /// Menu d'une image.
+    /// Image menu.
     static let imageMenu: [String?] = [
         "WKMenuItemIdentifierOpenImageInNewWindow",
         "WKMenuItemIdentifierDownloadImage",
@@ -41,7 +41,7 @@ struct PageMenuPlanTests {
         )])
     }
 
-    /// Image dans un lien : le menu du lien, puis celui de l'image ; remplacements dans l'ordre du menu.
+    /// Image inside a link: the link menu, then the image menu; replacements in menu order.
     @Test func `a linked image gets both replacements in menu order`() {
         let menu = Array(Self.linkMenu.prefix(5)) + Self.imageMenu + [Self.linkMenu[5]]
         let replacements = PageMenuPlan.replacements(for: menu, offersPeek: true)

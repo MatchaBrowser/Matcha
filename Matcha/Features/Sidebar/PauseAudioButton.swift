@@ -1,8 +1,8 @@
 import SwiftUI
 
-/// Icône haut-parleur d'un onglet qui joue du son (tâche 5.10) : un clic met en pause tous les médias de sa page, sans
-/// sélectionner l'onglet ; l'icône disparaît quand la pause est faite. Sur une ligne d'onglet (`row`), un morceau de split
-/// (`segment`, plus petit) ou en pastille sur une tuile de favori (`badge`).
+/// Speaker icon of a tab that plays sound (task 5.10): a click pauses all the media of its page, without selecting
+/// the tab; the icon disappears once paused. On a tab row (`row`), a split segment (`segment`, smaller) or as a
+/// badge on a favorite tile (`badge`).
 struct PauseAudioButton: View {
     enum Style {
         case row
@@ -46,8 +46,8 @@ struct PauseAudioButton: View {
 }
 
 extension View {
-    /// Pour VoiceOver, sur une ligne, un morceau de split ou une tuile dont les boutons sont masqués : « Lecture audio »
-    /// en valeur et l'action « Mettre le son en pause » pendant que `tab` joue du son.
+    /// For VoiceOver, on a row, a split segment or a tile whose buttons are hidden: “Playing Audio” as the value and
+    /// the “Pause Audio” action while `tab` plays sound.
     func tabAudioAccessibility(_ tab: BrowserTab) -> some View {
         modifier(TabAudioAccessibility(tab: tab))
     }
@@ -66,7 +66,7 @@ private struct TabAudioAccessibility: ViewModifier {
             }
     }
 
-    /// En Debug, un onglet en veille (tâche 5.6) vaut « suspended » pour les tests d'interface.
+    /// In Debug, a sleeping tab (task 5.6) is worth “suspended” for the UI tests.
     private var value: Text {
         #if DEBUG
             if tab.suspension.isSuspended {

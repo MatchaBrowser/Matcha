@@ -1,7 +1,7 @@
 import SwiftUI
 
-/// Réglages > Confidentialité : les sites où le bloqueur est désactivé (tâche 6.2), chacun avec un bouton pour l'y
-/// réactiver (ses pages ouvertes se rechargent). Les changements faits dans une fenêtre privée n'y figurent pas.
+/// Settings > Privacy: the sites where the blocker is turned off (task 6.2), each with a button to turn it back on
+/// there (its open pages reload). Changes made in a private window are not listed.
 struct ContentBlockerExceptionsSection: View {
     let service: ContentBlockerService
 
@@ -19,7 +19,7 @@ struct ContentBlockerExceptionsSection: View {
                         }
                     }
                 }
-                // Comme la liste des autorisations : elle défile au-delà de quelques lignes.
+                // Like the permissions list: it scrolls beyond a few rows.
                 .scrollDisabled(false)
                 .frame(height: min(Double(sites.count) * SitePermissionsSection.rowHeight, SitePermissionsSection.maximumListHeight))
             }

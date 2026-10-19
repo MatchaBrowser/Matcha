@@ -29,7 +29,7 @@ struct SplitGeometryTests {
         let widths = SplitGeometry.paneWidths(fractions: [0.6, 0.2, 0.2], count: 3, totalWidth: 500)
         #expect(widths.reduce(0, +) == 484)
         #expect(widths.allSatisfy { abs($0 - 484 / 3.0) <= 1 })
-        // Rien ne déborde, même sans place du tout.
+        // Nothing overflows, even with no room at all.
         #expect(SplitGeometry.paneWidths(fractions: [], count: 2, totalWidth: 4) == [0, 0])
         #expect(SplitGeometry.paneWidths(fractions: [0.5], count: 0, totalWidth: 500).isEmpty)
     }
@@ -50,7 +50,7 @@ struct SplitGeometryTests {
     @Test func `dragging stops at the minimum width on both sides`() {
         #expect(SplitGeometry.fractions(draggingDivider: 0, by: 1000, startWidths: [300, 300]) == [400 / 600.0, 200 / 600.0])
         #expect(SplitGeometry.fractions(draggingDivider: 0, by: -1000, startWidths: [300, 300]) == [200 / 600.0, 400 / 600.0])
-        // Deux panneaux déjà trop étroits : ils restent égaux.
+        // Two panes already too narrow: they stay equal.
         #expect(SplitGeometry.fractions(draggingDivider: 0, by: 40, startWidths: [150, 150]) == [0.5, 0.5])
     }
 

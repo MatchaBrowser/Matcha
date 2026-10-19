@@ -2,15 +2,15 @@ import AppKit
 import OSLog
 import WebKit
 
-/// Délégué du contrôleur des extensions (tâche 6.3) : fenêtres, nouveaux onglets et fenêtres, page d'options, demandes
-/// de permissions et bulle d'une action. Matcha n'a qu'une fenêtre de navigation principale (`DECISIONS.md`) :
-/// - un nouvel onglet va en tête des onglets du jour du Space affiché (après son onglet parent s'il est de ce Space),
-///   dans la fenêtre demandée, sinon la fenêtre active, sinon la fenêtre principale ; jamais dans une fenêtre privée
-///   pour une extension qui n'y a pas accès ; le rang demandé est ignoré ;
-/// - une nouvelle fenêtre « popup » est une mini-fenêtre (sa première adresse) ; une fenêtre « normal » donne des onglets
-///   dans la fenêtre de navigation ; une fenêtre privée est refusée ; les onglets à déplacer sont ignorés ;
-/// - une page d'extension (options, `webkit-extension:`) s'ouvre dans un onglet créé avec la configuration de son
-///   extension, comme l'exige WebKit.
+/// Delegate of the extension controller (task 6.3): windows, new tabs and windows, options page, permission requests
+/// and an action's popover. Matcha has only one main browser window (`DECISIONS.md`):
+/// - a new tab goes to the top of the Today tabs of the displayed Space (after its parent tab if it belongs to this
+///   Space), in the requested window, otherwise the active window, otherwise the main window; never in a private window
+///   for an extension that has no access to it; the requested index is ignored;
+/// - a new “popup” window is a mini window (its first address); a “normal” window gives tabs in the browser window; a
+///   private window is refused; the tabs to move are ignored;
+/// - an extension page (options, `webkit-extension:`) opens in a tab created with its extension's configuration, as
+///   WebKit requires.
 extension ExtensionManager: WKWebExtensionControllerDelegate {
     func webExtensionController(_: WKWebExtensionController, openWindowsFor _: WKWebExtensionContext) -> [any WKWebExtensionWindow] {
         windows.orderedWindows
@@ -59,7 +59,7 @@ extension ExtensionManager: WKWebExtensionControllerDelegate {
             completionHandler(nil, ExtensionError.noBrowserWindow)
             return
         }
-        // En tête des onglets du jour, dans l'ordre demandé (ouverts du dernier au premier) ; le premier est actif.
+        // At the top of the Today tabs, in the requested order (opened from last to first); the first one is active.
         let urls: [URL?] = configuration.tabURLs.isEmpty ? [nil] : configuration.tabURLs
         let first = urls.reversed().map { openTab($0, in: model, after: nil, isActive: false, isPinned: false) }.last
         if let first {
@@ -91,8 +91,8 @@ extension ExtensionManager: WKWebExtensionControllerDelegate {
 
     // MARK: Permissions
 
-    /// Tout ou rien : la demande entière est accordée si l'utilisateur accepte, sinon rien (rien n'est retenu comme
-    /// refusé : l'extension pourra redemander).
+    /// All or nothing: the whole request is granted if the user accepts, otherwise nothing (nothing is remembered as
+    /// denied: the extension can ask again).
     func webExtensionController(
         _: WKWebExtensionController,
         promptForPermissions permissions: Set<WKWebExtension.Permission>,
@@ -130,11 +130,11 @@ extension ExtensionManager: WKWebExtensionControllerDelegate {
         ask(request) { completionHandler($0 ? urls : [], nil) }
     }
 
-    // MARK: Messages natifs
+    // MARK: Native Messages
 
-    /// Messages vers une app (`runtime.sendNativeMessage`) : refusés, comme WebKit le ferait (le passage vers l'app d'une
-    /// extension Safari est réservé à Safari), mais par Matcha, sans essai d'ouvrir l'app, et avec des réponses
-    /// espacées (`NativeMessageThrottle`) : une extension qui en envoie en boucle n'occupe plus le processeur.
+    /// Messages to an app (`runtime.sendNativeMessage`): refused, as WebKit would do (the channel to a Safari
+    /// extension's app is reserved for Safari), but by Matcha, without trying to open the app, and with spaced-out
+    /// answers (`NativeMessageThrottle`): an extension that sends them in a loop no longer keeps the processor busy.
     func webExtensionController(
         _: WKWebExtensionController,
         sendMessage _: Any,
@@ -153,7 +153,7 @@ extension ExtensionManager: WKWebExtensionControllerDelegate {
         }
     }
 
-    /// Connexion durable vers une app (`runtime.connectNative`) : refusée.
+    /// Long-lived connection to an app (`runtime.connectNative`): refused.
     func webExtensionController(
         _: WKWebExtensionController,
         connectUsing _: WKWebExtension.MessagePort,
@@ -165,7 +165,7 @@ extension ExtensionManager: WKWebExtensionControllerDelegate {
 
     // MARK: Actions
 
-    /// Bulle de l'action, dans la fenêtre de son onglet, sinon la fenêtre active.
+    /// The action's popover, in the window of its tab, otherwise the active window.
     func webExtensionController(
         _: WKWebExtensionController,
         presentActionPopup action: WKWebExtension.Action,

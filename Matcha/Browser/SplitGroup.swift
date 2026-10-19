@@ -1,29 +1,29 @@
 import Foundation
 
-/// Côté d'un panneau où placer l'onglet déposé.
+/// Side of a pane where the dropped tab goes.
 nonisolated enum SplitSide: Equatable, Sendable {
     case leading
     case trailing
 }
 
-/// Un onglet face au contenu affiché : il peut le rejoindre, le split est plein, ou c'est impossible.
+/// A tab facing the displayed content: it can join it, the split is full, or it is impossible.
 nonisolated enum SplitAvailability: Equatable, Sendable {
     case allowed
     case full
     case unavailable
 }
 
-/// Split view : 2 à 4 onglets côte à côte, de gauche à droite (leur ordre dans la barre), avec la part
-/// de largeur de chacun. Type pur.
+/// Split view: 2 to 4 tabs side by side, from left to right (their order in the sidebar), with the width share
+/// of each one. Pure type.
 nonisolated struct SplitGroup: Equatable, Sendable, Identifiable {
     static let paneCount = 2 ... 4
 
     let id: UUID
     private(set) var tabIDs: [UUID]
-    /// Part de largeur de chaque panneau, dans l'ordre de `tabIDs` ; somme 1.
+    /// Width share of each pane, in the order of `tabIDs`; they sum to 1.
     private(set) var fractions: [Double]
 
-    /// Un onglet en double n'est gardé qu'une fois ; des parts invalides deviennent des parts égales.
+    /// A duplicated tab is kept only once; invalid shares become equal shares.
     init(id: UUID = UUID(), tabIDs: [UUID], fractions: [Double] = []) {
         self.id = id
         var seen: Set<UUID> = []
@@ -45,7 +45,7 @@ nonisolated struct SplitGroup: Equatable, Sendable, Identifiable {
         tabIDs.firstIndex(of: tabID)
     }
 
-    /// Panneau voisin : à droite, sinon à gauche ; nil hors du groupe ou seul.
+    /// Neighboring pane: on the right, otherwise on the left; nil outside the group or when alone.
     func neighbor(of tabID: UUID) -> UUID? {
         guard let index = index(of: tabID), tabIDs.count > 1 else {
             return nil
@@ -53,8 +53,8 @@ nonisolated struct SplitGroup: Equatable, Sendable, Identifiable {
         return index + 1 < tabIDs.count ? tabIDs[index + 1] : tabIDs[index - 1]
     }
 
-    /// Insère au rang `index` (borné) ; le nouveau panneau reçoit 1/(n+1), les autres × n/(n+1).
-    /// Sans effet s'il y est.
+    /// Inserts at position `index` (clamped); the new pane gets 1/(n+1), the others × n/(n+1).
+    /// No effect if it is already there.
     mutating func insert(_ tabID: UUID, at index: Int) {
         guard !contains(tabID) else {
             return
@@ -67,7 +67,7 @@ nonisolated struct SplitGroup: Equatable, Sendable, Identifiable {
         fractions = Self.normalizedFractions(shares, count: tabIDs.count)
     }
 
-    /// Retire le panneau ; les autres parts sont ramenées à une somme de 1.
+    /// Removes the pane; the other shares are brought back to a sum of 1.
     mutating func remove(_ tabID: UUID) {
         guard let index = index(of: tabID) else {
             return
@@ -78,7 +78,7 @@ nonisolated struct SplitGroup: Equatable, Sendable, Identifiable {
         fractions = Self.normalizedFractions(shares, count: tabIDs.count)
     }
 
-    /// Garde `ids` (membres actuels ; les autres sont ignorés) dans cet ordre ; chaque part suit son onglet.
+    /// Keeps `ids` (current members; the others are ignored) in that order; each share follows its tab.
     mutating func setMembers(_ ids: [UUID]) {
         let shares = Dictionary(zip(tabIDs, fractions)) { first, _ in first }
         var seen: Set<UUID> = []
@@ -95,8 +95,8 @@ nonisolated struct SplitGroup: Equatable, Sendable, Identifiable {
         count > 0 ? Array(repeating: 1 / Double(count), count: count) : []
     }
 
-    /// `count` nombres finis > 0 : inchangés si leur somme vaut 1 à 1e-9 près, sinon divisés par leur somme ;
-    /// autre chose (NaN, ≤ 0, mauvais nombre) : parts égales. `count` ≤ 0 : [].
+    /// `count` finite numbers > 0: unchanged if their sum is 1 within 1e-9, otherwise divided by their sum;
+    /// anything else (NaN, ≤ 0, wrong count): equal shares. `count` ≤ 0: [].
     static func normalizedFractions(_ fractions: [Double], count: Int) -> [Double] {
         guard count > 0 else {
             return []

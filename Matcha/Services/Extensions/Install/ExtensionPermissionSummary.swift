@@ -1,12 +1,12 @@
 import Foundation
 
-/// Ce qu'une extension pourra faire, en phrases pour l'écran d'installation (tâche 6.4) : comme les avertissements de
-/// Chrome, seules les permissions sensibles sont nommées (« storage », « alarms »… ne disent rien à l'utilisateur), une
-/// fois chacune, dans un ordre fixe ; les sites en dernier. Type pur.
+/// What an extension will be able to do, as sentences for the installation screen (task 6.4): like Chrome's warnings,
+/// only sensitive permissions are named (“storage”, “alarms”… mean nothing to the user), once each, in a fixed order;
+/// websites last. Pure type.
 nonisolated enum ExtensionPermissionSummary {
     enum Line: Equatable {
         case allWebsites
-        /// Hôtes des sites, sans doublon, dans l'ordre alphabétique.
+        /// Hosts of the websites, without duplicates, in alphabetical order.
         case websites([String])
         case browsingHistory
         case cookies
@@ -20,7 +20,7 @@ nonisolated enum ExtensionPermissionSummary {
         case location
     }
 
-    /// Permissions sensibles, dans l'ordre affiché.
+    /// Sensitive permissions, in display order.
     private static let permissionLines: [(Line, Set<String>)] = [
         (.browsingHistory, ["tabs", "webNavigation", "history", "declarativeNetRequestFeedback", "topSites"]),
         (.cookies, ["cookies"]),
@@ -34,8 +34,8 @@ nonisolated enum ExtensionPermissionSummary {
         (.location, ["geolocation"]),
     ]
 
-    /// `permissions` : noms des permissions (« tabs ») ; `hosts` : hôte de chaque motif d'adresses, nil pour un motif qui
-    /// vise tous les sites (`<all_urls>`, `*://*/*`).
+    /// `permissions`: names of the permissions (“tabs”); `hosts`: host of each address pattern, nil for a pattern that
+    /// targets all websites (`<all_urls>`, `*://*/*`).
     static func lines(permissions: Set<String>, hosts: [String?]) -> [Line] {
         var lines = permissionLines.filter { !$0.1.isDisjoint(with: permissions) }.map(\.0)
         if hosts.contains(where: { $0 == nil || $0 == "*" }) {
@@ -49,7 +49,8 @@ nonisolated enum ExtensionPermissionSummary {
         return lines
     }
 
-    /// Hôte affiché : `*.example.com` devient « example.com et ses sous-domaines » côté interface ; ici, sans l'étoile.
+    /// Displayed host: `*.example.com` becomes “example.com and its subdomains” in the interface; here, without the
+    /// asterisk.
     static func displayHost(_ host: String) -> String {
         host.hasPrefix("*.") ? String(host.dropFirst(2)) : host
     }

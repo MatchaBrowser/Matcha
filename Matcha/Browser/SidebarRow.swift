@@ -1,13 +1,13 @@
 import Foundation
 
-/// Ligne de la barre : un onglet, un split (une seule ligne pour tous ses onglets) ou un dossier.
-/// `index` : rang de l'onglet, du premier membre ou du dossier dans son conteneur (dépôt « avant la ligne »).
+/// Row of the sidebar: a tab, a split (a single row for all its tabs) or a folder.
+/// `index`: position of the tab, of the first member or of the folder in its container (drop “before the row”).
 nonisolated enum SidebarRow: Equatable, Sendable, Identifiable {
     case tab(UUID, index: Int)
     case split(SplitGroup, index: Int)
     case folder(PinnedFolder, index: Int)
 
-    /// Onglet, groupe ou dossier.
+    /// Tab, group or folder.
     var id: UUID {
         switch self {
         case let .tab(id, _): id
@@ -23,14 +23,14 @@ nonisolated enum SidebarRow: Equatable, Sendable, Identifiable {
     }
 }
 
-/// Lignes affichées par la barre : un membre de split donne la ligne de son split s'il en est le premier,
-/// et rien sinon.
+/// Rows displayed by the sidebar: a split member gives the row of its split if it is the first member,
+/// and nothing otherwise.
 nonisolated extension SidebarLayout {
     var todayRows: [SidebarRow] {
         today.enumerated().compactMap { index, id in row(forTab: id, index: index) }
     }
 
-    /// Lignes d'un niveau des épinglés (`items` : la racine ou le contenu d'un dossier).
+    /// Rows of one level of the pinned tabs (`items`: the root or the content of a folder).
     func pinnedRows(_ items: [PinnedItem]) -> [SidebarRow] {
         items.enumerated().compactMap { index, item in
             switch item {

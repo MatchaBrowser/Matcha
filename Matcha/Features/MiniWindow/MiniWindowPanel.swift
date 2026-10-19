@@ -1,12 +1,12 @@
 import AppKit
 
-/// Fenêtre d'une mini-fenêtre : panneau flottant (au-dessus des fenêtres de Matcha tant que l'app est active,
-/// voir `MiniWindowLevels`), barre de titre invisible : la barre d'outils SwiftUI la remplace, avec son propre
-/// bouton de fermeture. Jamais restaurée au lancement suivant.
+/// Window of a mini window: a floating panel (above Matcha's windows while the app is active, see
+/// `MiniWindowLevels`), invisible title bar: the SwiftUI toolbar replaces it, with its own close button. Never
+/// restored at the next launch.
 final class MiniWindowPanel: NSPanel {
     static let accessibilityID = "miniWindow"
 
-    /// ⎋ (ou ⌘.) que ni la page ni la barre de commande n'ont gardé. Un `NSPanel` se ferme sinon tout seul.
+    /// ⎋ (or ⌘.) that neither the page nor the command bar kept. Otherwise an `NSPanel` closes on its own.
     var cancelHandler: (() -> Void)?
 
     init(frame: CGRect) {
@@ -17,14 +17,14 @@ final class MiniWindowPanel: NSPanel {
             defer: false,
         )
         isFloatingPanel = true
-        // Un panneau se cache par défaut quand l'app passe en arrière-plan : la mini-fenêtre reste
-        // (elle redescend alors au niveau normal).
+        // A panel hides by default when the app goes to the background: the mini window stays
+        // (it then goes back down to the normal level).
         hidesOnDeactivate = false
         becomesKeyOnlyIfNeeded = false
         isReleasedWhenClosed = false
         isRestorable = false
         tabbingMode = .disallowed
-        // Par-dessus une app en plein écran ; dans Mission Control, ⌘` et le menu Fenêtre.
+        // Over a full-screen app; in Mission Control, ⌘` and the Window menu.
         collectionBehavior = [.fullScreenAuxiliary, .managed, .participatesInCycle]
         isExcludedFromWindowsMenu = false
         titleVisibility = .hidden
@@ -42,14 +42,13 @@ final class MiniWindowPanel: NSPanel {
         true
     }
 
-    /// Un panneau ne devient pas fenêtre principale par défaut : à l'activation de l'app, macOS ne fait passer
-    /// devant que les fenêtres clé et principale, et la fenêtre du navigateur passerait alors par-dessus l'app
-    /// d'où vient le raccourci.
+    /// A panel does not become the main window by default: when the app is activated, macOS only brings the key and
+    /// main windows to the front, and the browser window would then go over the app the shortcut came from.
     override var canBecomeMain: Bool {
         true
     }
 
-    /// Sans cette surcharge, ⎋ fermerait le panneau (comportement de `NSPanel`) et la page avec lui.
+    /// Without this override, ⎋ would close the panel (`NSPanel` behavior) and the page with it.
     override func cancelOperation(_: Any?) {
         cancelHandler?()
     }

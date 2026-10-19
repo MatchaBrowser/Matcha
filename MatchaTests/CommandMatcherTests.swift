@@ -41,11 +41,11 @@ struct CommandMatcherTests {
         #expect(found?.tier == .wordPrefix)
         #expect(match("for swi", titles: ["Swift Forums"])?.tier == .wordPrefix)
         #expect(match("swift banana", titles: ["Swift Forums"], url: "https://forums.apple.com") == nil)
-        // Un mot tapé coupé par une ponctuation compte pour ses morceaux.
+        // A typed word split by punctuation counts as its pieces.
         #expect(match("node.js docs", titles: ["Docs | Node.js"], url: "https://nodejs.org/en/docs")?.tier == .wordPrefix)
         #expect(match("6.4 swift", titles: ["What's new in Swift 6.4"])?.tier == .wordPrefix)
         #expect(match("react-native docs", titles: ["Docs", "React Native"])?.tier == .wordPrefix)
-        // D'un seul morceau, il reste entier : « c++ » ne se réduit pas à « c ».
+        // When it is a single piece, it stays whole: “c++” is not reduced to “c”.
         #expect(match("c++ docs", titles: ["Docs", "Calendar"]) == nil)
     }
 

@@ -1,13 +1,13 @@
 import Foundation
 import WebKit
 
-/// Icône déclarée par une page (`<link rel="icon">`, `apple-touch-icon`…).
+/// Icon declared by a page (`<link rel="icon">`, `apple-touch-icon`…).
 nonisolated struct FaviconCandidate: Equatable, Sendable {
     var url: URL
     var rel: String
-    /// Valeur de l'attribut `sizes` : « 32x32 », « 16x16 32x32 », « any »…
+    /// Value of the `sizes` attribute: “32x32”, “16x16 32x32”, “any”…
     var sizes: String
-    /// Type MIME déclaré : « image/png », « image/svg+xml »…
+    /// Declared MIME type: “image/png”, “image/svg+xml”…
     var type: String
 
     init(url: URL, rel: String, sizes: String = "", type: String = "") {
@@ -17,7 +17,7 @@ nonisolated struct FaviconCandidate: Equatable, Sendable {
         self.type = type
     }
 
-    /// Lit un élément du tableau renvoyé par `extractionScript`.
+    /// Reads an element of the array returned by `extractionScript`.
     init?(dictionary: [String: Any]) {
         guard let href = dictionary["href"] as? String, let url = URL(string: href) else {
             return nil
@@ -30,7 +30,7 @@ nonisolated struct FaviconCandidate: Equatable, Sendable {
         )
     }
 
-    /// Corps de fonction JavaScript qui liste les icônes déclarées, avec leurs adresses absolues.
+    /// JavaScript function body that lists the declared icons, with their absolute addresses.
     static let extractionScript = """
     const selector = 'link[rel~="icon" i], link[rel~="apple-touch-icon" i], link[rel~="apple-touch-icon-precomposed" i]';
     return Array.from(document.querySelectorAll(selector)).map(link => ({
@@ -41,8 +41,8 @@ nonisolated struct FaviconCandidate: Equatable, Sendable {
     }));
     """
 
-    /// Icônes déclarées par la page affichée dans `webView`. Le script tourne dans un monde JavaScript
-    /// séparé, que la page ne peut pas modifier.
+    /// Icons declared by the page displayed in `webView`. The script runs in a separate JavaScript world, which the
+    /// page cannot modify.
     @MainActor
     static func extract(from webView: WKWebView) async -> [FaviconCandidate] {
         let result = try? await webView.callAsyncJavaScript(extractionScript, contentWorld: .defaultClient)

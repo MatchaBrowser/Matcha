@@ -2,7 +2,7 @@ import Foundation
 @testable import Matcha
 import Testing
 
-/// Requêtes envoyées par le client de suggestions.
+/// Requests sent by the suggestions client.
 private actor RequestRecorder {
     private(set) var requests: [URLRequest] = []
 

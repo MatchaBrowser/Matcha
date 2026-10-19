@@ -1,40 +1,40 @@
 import Foundation
 
-/// Un onglet ouvert, tel que le voit la mise en veille.
+/// An open tab, as tab sleeping sees it.
 nonisolated struct TabLifecycleCandidate: Equatable, Sendable {
     let id: UUID
-    /// Moment où l'onglet a quitté l'écran ; nil s'il est affiché.
+    /// Moment the tab left the screen; nil if it is displayed.
     let hiddenSince: Date?
-    /// Vue web présente : sinon il n'y a rien à libérer (onglet jamais affiché depuis le lancement, déjà en veille).
+    /// Web view present: otherwise there is nothing to release (tab never displayed since launch, already asleep).
     let isLoaded: Bool
-    /// Bandeau de permission en attente d'une réponse (tâche 5.2).
+    /// Permission banner waiting for an answer (task 5.2).
     let hasPendingPermissionPrompt: Bool
-    /// Caméra ou micro en cours d'utilisation (même coupés).
+    /// Camera or microphone in use (even muted).
     let isCapturingMedia: Bool
-    /// Son en cours d'après le script de la page (icône haut-parleur, tâche 5.10) : occupé, sans attendre WebKit.
+    /// Sound playing according to the page's script (speaker icon, task 5.10): busy, without waiting for WebKit.
     let isPlayingAudio: Bool
-    /// Fenêtre de connexion ouverte par la page, encore ouverte (tâche 5.8) : en veille, la page ne serait plus son
-    /// `window.opener`, et la connexion échouerait.
+    /// Sign-in window opened by the page, still open (task 5.8): asleep, the page would no longer be its
+    /// `window.opener`, and the sign-in would fail.
     let hasOpenPopupWindow: Bool
 }
 
-/// Ce qui déclenche une vérification.
+/// What triggers a check.
 nonisolated enum TabSuspensionReason: String, Sendable {
-    /// Vérification régulière : onglets cachés depuis plus que le délai réglé.
+    /// Regular check: tabs hidden for longer than the configured delay.
     case inactivity
-    /// Alerte mémoire du système : la moitié la plus ancienne des onglets cachés.
+    /// System memory warning: the oldest half of the hidden tabs.
     case memoryWarning
-    /// Alerte mémoire critique : tous les onglets cachés.
+    /// Critical memory warning: all hidden tabs.
     case memoryCritical
 }
 
-/// Règles de la mise en veille (tâche 5.6). Jamais : un onglet affiché (tous les panneaux d'un split, l'onglet d'origine
-/// d'un aperçu), sans vue web, qui attend une réponse de permission, qui utilise la caméra ou le micro, qui a ouvert
-/// une fenêtre de connexion encore ouverte (tâche 5.8), ou qui joue du son : d'après son icône haut-parleur (tâche
-/// 5.10), sinon vérifié ensuite auprès de WebKit. « Jamais » dans les réglages : rien, même pendant une alerte mémoire.
+/// Rules of tab sleeping (task 5.6). Never: a displayed tab (all the panes of a split, the originating tab of a Peek),
+/// one without a web view, one waiting for a permission answer, one using the camera or the microphone, one that opened
+/// a sign-in window that is still open (task 5.8), or one playing sound: according to its speaker icon (task 5.10),
+/// otherwise checked afterwards with WebKit. “Never” in the settings: nothing, even during a memory warning.
 nonisolated enum TabSuspensionPolicy {
-    /// Pendant une alerte simple, un onglet caché depuis moins longtemps est épargné : on revient souvent à l'onglet
-    /// qu'on vient de quitter.
+    /// During a simple warning, a tab hidden for a shorter time is spared: people often go back to the tab they just
+    /// left.
     static let warningMinimumHiddenTime: TimeInterval = 60
 
     static func isEligible(_ candidate: TabLifecycleCandidate) -> Bool {
@@ -42,8 +42,8 @@ nonisolated enum TabSuspensionPolicy {
             && !candidate.isPlayingAudio && !candidate.hasOpenPopupWindow
     }
 
-    /// Onglets à examiner, du plus anciennement caché au plus récent ; `delay` nil (« Jamais ») : aucun. Le son que
-    /// l'icône ne montre pas (Web Audio, élément hors de la page) se vérifie ensuite, sur ces onglets seulement.
+    /// Tabs to examine, from the one hidden longest ago to the most recent; `delay` nil (“Never”): none. Sound that the
+    /// icon does not show (Web Audio, element outside the page) is checked afterwards, on these tabs only.
     static func pool(_ candidates: [TabLifecycleCandidate], reason: TabSuspensionReason, delay: TimeInterval?, now: Date) -> [UUID] {
         guard let delay else {
             return []
@@ -67,15 +67,15 @@ nonisolated enum TabSuspensionPolicy {
             .map(\.id)
     }
 
-    /// Parmi les onglets examinés qui ne jouent pas de son (dans l'ordre de `pool`), ceux à mettre en veille : la
-    /// moitié la plus ancienne (arrondie au-dessus) pendant une alerte simple, sinon tous.
+    /// Among the examined tabs that are not playing sound (in the order of `pool`), those to put to sleep: the oldest
+    /// half (rounded up) during a simple warning, otherwise all of them.
     static func limit(_ idle: [UUID], reason: TabSuspensionReason) -> [UUID] {
         reason == .memoryWarning ? Array(idle.prefix((idle.count + 1) / 2)) : idle
     }
 }
 
 nonisolated extension Duration {
-    /// Durée en secondes, pour les comparaisons de dates.
+    /// Duration in seconds, for date comparisons.
     var timeInterval: TimeInterval {
         Double(components.seconds) + Double(components.attoseconds) / 1e18
     }

@@ -4,8 +4,8 @@ import SwiftData
 import Testing
 import WebKit
 
-/// Visites retenues par le délégué de navigation commun (tâche 5.5), avec de vraies vues web : pages web simulées
-/// (`loadSimulatedRequest`), sans réseau.
+/// Visits recorded by the common navigation delegate (task 5.5), with real web views: simulated web pages
+/// (`loadSimulatedRequest`), without network.
 @MainActor
 struct HistoryRecordingTests {
     private let container: ModelContainer
@@ -26,7 +26,7 @@ struct HistoryRecordingTests {
         return (try? container.mainContext.fetch(descriptor)) ?? []
     }
 
-    /// Onglet sélectionné, en tête des onglets du jour, sur la page simulée `address`.
+    /// Selected tab, at the top of today tabs, on the simulated page `address`.
     private func open(_ address: String, title: String = "", in manager: TabManager? = nil) async throws -> BrowserTab {
         let tab = (manager ?? self.manager).insertTab(configuration: TestPages.configuration(), after: nil, select: true)
         tab.history.sameDocumentDelay = .milliseconds(50)
@@ -34,12 +34,12 @@ struct HistoryRecordingTests {
         return tab
     }
 
-    /// Charge une page simulée et attend la fin de son chargement (le délégué a reçu `didFinish`).
+    /// Loads a simulated page and waits until it has finished loading (the delegate has received `didFinish`).
     private func load(_ address: String, title: String, in tab: BrowserTab) async throws {
         let url = try #require(URL(string: address))
         tab.loadedWebView.loadSimulatedRequest(URLRequest(url: url), responseHTML: "<title>\(title)</title><p>page</p>")
         try await waitUntil { tab.url == url && !tab.isLoading }
-        // `didFinish` arrive avec la fin du chargement ; un tour de plus pour le délégué.
+        // `didFinish` arrives with the end of the load; one more turn for the delegate.
         try await Task.sleep(for: .milliseconds(50))
     }
 
@@ -67,7 +67,7 @@ struct HistoryRecordingTests {
         clock.advance(61)
         try await load("https://example.com/", title: "Exemple", in: tab)
         try await waitUntil { records.count == 2 }
-        // Une autre adresse est toujours une nouvelle visite.
+        // Another address is always a new visit.
         try await load("https://example.com/autre", title: "Autre", in: tab)
         try await waitUntil { records.count == 3 }
     }
@@ -83,7 +83,7 @@ struct HistoryRecordingTests {
     }
 
     @Test func `a page without history scope records nothing`() async throws {
-        // Fenêtre privée : le Space n'a pas d'historique.
+        // Private window: the Space has no history.
         let privateManager = TabManager(websiteDataStore: .nonPersistent())
         let tab = try await open("https://example.com/", title: "Privé", in: privateManager)
         try await Task.sleep(for: .milliseconds(100))
@@ -95,7 +95,7 @@ struct HistoryRecordingTests {
         let tab = try await open("https://app.example/", title: "Accueil")
         try await waitUntil { records.count == 1 }
 
-        // Une rafale de `replaceState` ne retient que la dernière adresse.
+        // A burst of `replaceState` only records the last address.
         clock.advance(5)
         _ = try await tab.loadedWebView.evaluateJavaScript("""
         for (let i = 0; i < 5; i++) { history.replaceState({}, '', '/recherche?q=' + i); }
@@ -106,7 +106,7 @@ struct HistoryRecordingTests {
         #expect(records.map(\.urlKey) == ["app.example", "app.example/recherche?q=4"])
         #expect(records.last?.title == "Recherche")
 
-        // Un fragment seul n'est pas une nouvelle page.
+        // A fragment alone is not a new page.
         clock.advance(120)
         _ = try await tab.loadedWebView.evaluateJavaScript("location.hash = 'section'; true")
         try await waitUntil { tab.url?.fragment == "section" }

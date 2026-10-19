@@ -1,8 +1,8 @@
 import CoreGraphics
 import Foundation
 
-/// Géométrie de l'aperçu dans la zone des pages (origine en haut à gauche) : panneau à 85 %, centré, et sa
-/// barre juste au-dessus.
+/// Geometry of the peek in the pages area (origin at the top left): panel at 85%, centered, and its bar just
+/// above it.
 nonisolated struct PeekLayout: Equatable, Sendable {
     static let sizeRatio = 0.85
     static let minimumMargin = 12.0
@@ -23,7 +23,7 @@ nonisolated struct PeekLayout: Equatable, Sendable {
         toolbar = CGRect(x: left, y: top - Self.toolbarGap - Self.toolbarHeight, width: width, height: Self.toolbarHeight)
     }
 
-    /// `point` en fractions de `size`, bornées à 0…1, origine en haut à gauche ; le centre pour une taille nulle.
+    /// `point` as fractions of `size`, clamped to 0…1, origin at the top left; the center for a zero size.
     static func fraction(of point: CGPoint, in size: CGSize, flipped: Bool) -> CGPoint {
         guard size.width > 0, size.height > 0 else {
             return center

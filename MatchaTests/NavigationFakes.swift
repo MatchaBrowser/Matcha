@@ -2,7 +2,7 @@ import AppKit
 import Foundation
 import WebKit
 
-/// Garde les décisions passées au `decisionHandler` de WebKit.
+/// Keeps the decisions passed to WebKit's `decisionHandler`.
 @MainActor
 final class PolicyRecorder {
     private(set) var policies: [WKNavigationActionPolicy] = []
@@ -12,13 +12,13 @@ final class PolicyRecorder {
     }
 }
 
-/// Clic sur un lien, avec les modificateurs et le bouton voulus (masque de WebKit : 1 gauche, 2 droit, 4 milieu,
-/// 0 clic simulé par la page).
+/// Click on a link, with the chosen modifiers and button (WebKit mask: 1 left, 2 right, 4 middle, 0 click simulated by
+/// the page).
 ///
-/// Toute propriété que le coordinateur lit doit être redéfinie ici : lire une propriété non redéfinie d'un
-/// `WKNavigationAction` créé à la main fait planter le test. `targetFrame` est nil : le faux ressemble
-/// toujours à un lien qui ouvre une nouvelle fenêtre. `navigationType` : `.other` pour `window.open` ou la fenêtre
-/// d'un élément du menu contextuel (vérifié, tâche 5.9 : sans bouton ni touche).
+/// Every property the coordinator reads must be overridden here: reading a property that is not overridden on a
+/// hand-made `WKNavigationAction` crashes the test. `targetFrame` is nil: the fake always looks like a link that opens
+/// a new window. `navigationType`: `.other` for `window.open` or the window of a context menu item (verified, task
+/// 5.9: no button and no key).
 @MainActor
 final class FakeNavigationAction: WKNavigationAction {
     private let fakeRequest: URLRequest

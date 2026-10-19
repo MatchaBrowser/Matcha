@@ -1,11 +1,10 @@
 import AppKit
 import WebKit
 
-/// Une fenêtre telle que la voient les extensions (tâche 6.3) : adaptateur `WKWebExtensionWindow` d'une fenêtre de
-/// navigation, d'une mini-fenêtre ou d'une fenêtre de connexion, désignée par son identifiant et relue dans
-/// `ExtensionWindows`. Un objet par fenêtre, toujours le même tant qu'elle est ouverte. Son type et le fait qu'elle soit
-/// privée ne changent pas (WebKit les garde dès la première lecture). Non pris en charge : changer sa taille ou son
-/// état (réduite, plein écran).
+/// A window as extensions see it (task 6.3): `WKWebExtensionWindow` adapter of a browser window, a mini window or a
+/// sign-in window, designated by its identifier and looked up again in `ExtensionWindows`. One object per window,
+/// always the same while it is open. Its type and whether it is private do not change (WebKit keeps them from the first
+/// read). Not supported: changing its size or its state (minimized, full screen).
 @MainActor
 final class ExtensionWindow: NSObject, WKWebExtensionWindow {
     let windowID: UUID
@@ -58,7 +57,7 @@ final class ExtensionWindow: NSObject, WKWebExtensionWindow {
         owner?.nsWindow?.frame ?? .null
     }
 
-    /// Met la fenêtre au premier plan (sortie du Dock comprise) et active l'app.
+    /// Brings the window to the front (out of the Dock included) and activates the app.
     func focus(for _: WKWebExtensionContext, completionHandler: @escaping @Sendable ((any Error)?) -> Void) {
         guard let window = owner?.nsWindow else {
             completionHandler(ExtensionError.notFound)
@@ -72,8 +71,8 @@ final class ExtensionWindow: NSObject, WKWebExtensionWindow {
         completionHandler(nil)
     }
 
-    /// Une mini-fenêtre ou une fenêtre de connexion se ferme ; une fenêtre de navigation, non : elle porte tous les
-    /// Spaces (et une fenêtre privée, toute sa navigation).
+    /// A mini window or a sign-in window closes; a browser window does not: it carries all the Spaces (and a private
+    /// window, all its browsing).
     func close(for _: WKWebExtensionContext, completionHandler: @escaping @Sendable ((any Error)?) -> Void) {
         switch owner {
         case let .miniWindow(controller):

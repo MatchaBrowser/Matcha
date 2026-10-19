@@ -1,7 +1,7 @@
 import SwiftUI
 
-/// Pastille d'adresse : le domaine de l'onglet affiché (ou du panneau, barre au-dessus de la page). Un clic
-/// (ou ⌘L) ouvre la barre de commande sur l'adresse complète.
+/// Address pill: the domain of the displayed tab (or of the pane, in the bar above the page). A click (or ⌘L)
+/// opens the command bar on the full address.
 struct AddressPill: View {
     let tab: BrowserTab?
     let edit: () -> Void
@@ -24,7 +24,7 @@ struct AddressPill: View {
             .overlay(alignment: .bottomLeading) { progressLine }
             .contentShape(.rect)
         }
-        // Le conteneur (barre au-dessus de la page) impose un style de bouton-icône.
+        // The container (bar above the page) imposes an icon-button style.
         .buttonStyle(.plain)
         .onHover { isHovered = $0 }
         .help(Text("Edit Address", comment: "Tooltip of the address pill"))
@@ -33,7 +33,7 @@ struct AddressPill: View {
         .accessibilityIdentifier("addressPill")
     }
 
-    /// Icône du site, ou une loupe sans page.
+    /// The site's icon, or a magnifying glass without a page.
     @ViewBuilder private var leadingIcon: some View {
         if let tab, tab.url != nil {
             FaviconView(tab: tab)
@@ -45,7 +45,7 @@ struct AddressPill: View {
         }
     }
 
-    /// Domaine affiché, ou l'invite de saisie sans page.
+    /// Displayed domain, or the input prompt without a page.
     @ViewBuilder private var text: some View {
         if let url = tab?.url {
             Text(verbatim: AddressDisplay.short(for: url))
@@ -58,7 +58,7 @@ struct AddressPill: View {
         }
     }
 
-    /// Fine barre de chargement en bas de la pastille.
+    /// Thin loading bar at the bottom of the pill.
     @ViewBuilder private var progressLine: some View {
         if let tab, tab.isLoading {
             GeometryReader { geometry in

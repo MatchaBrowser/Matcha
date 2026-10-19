@@ -1,15 +1,15 @@
 import XCTest
 
-/// Split view (4.3) : création par le menu et par dépôt sur le bord d'un panneau, panneau actif, retrait,
-/// séparation, ligne glissée dans les épinglés, séparateur, barre masquée. Hors ligne : `about:blank?…`.
-/// Ces tests déplacent la vraie souris.
+/// Split view (4.3): creation from the menu and by dropping on the edge of a pane, active pane, removal,
+/// separation, row dragged into the pinned tabs, divider, hidden sidebar. Offline: `about:blank?…`.
+/// These tests move the real mouse.
 final class SplitViewUITests: XCTestCase {
     override func setUpWithError() throws {
         continueAfterFailure = false
     }
 
-    /// Lance l'app et ouvre un onglet `about:blank?<nom>` par nom, dans l'ordre : le dernier est en tête et
-    /// affiché.
+    /// Launches the app and opens one `about:blank?<name>` tab per name, in order: the last one is on top and
+    /// displayed.
     @MainActor
     private func launch(opening names: [String]) -> XCUIApplication {
         let app = launchApp()
@@ -25,7 +25,7 @@ final class SplitViewUITests: XCTestCase {
         "about:blank?\(name)"
     }
 
-    /// Titres des panneaux, de gauche à droite.
+    /// Titles of the panes, from left to right.
     @MainActor
     private func paneTitles(in app: XCUIApplication) -> [String] {
         orderedPagePanes(in: app).map(\.label)
@@ -42,13 +42,13 @@ final class SplitViewUITests: XCTestCase {
         XCTAssertTrue(splitSegment(titled: address("one"), in: app).isSelected)
         XCTAssertEqual(paneTitles(in: app), [address("two"), address("one")])
 
-        // Un clic dans la page de gauche en fait le panneau actif ; la pastille le suit.
+        // A click in the left page makes it the active pane; the pill follows it.
         let left = orderedPagePanes(in: app)[0]
         left.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.5)).click()
         XCTAssertTrue(waitForValue(of: addressPill(in: app)) { $0 == self.address("two") })
         XCTAssertTrue(splitSegment(titled: address("two"), in: app).isSelected)
 
-        // ⌘W ferme le panneau actif ; à un onglet, le split disparaît.
+        // ⌘W closes the active pane; down to one tab, the split goes away.
         app.typeKey("w", modifierFlags: .command)
         XCTAssertTrue(waitForCount(pagePanes(in: app), 1))
         XCTAssertTrue(waitForCount(splitRows(in: app), 0))
@@ -56,7 +56,7 @@ final class SplitViewUITests: XCTestCase {
         XCTAssertTrue(waitForValue(of: addressPill(in: app)) { $0 == self.address("one") })
     }
 
-    /// Porte S1 et S3 : un onglet lâché sur le bord d'un panneau rejoint le split de ce côté.
+    /// Gate S1 and S3: a tab dropped on the edge of a pane joins the split on that side.
     @MainActor
     func testDroppingTabsOnPaneEdgesBuildsASplit() {
         let app = launch(opening: ["one", "two", "three"])
@@ -78,7 +78,7 @@ final class SplitViewUITests: XCTestCase {
         let app = launch(opening: ["one", "two"])
         let pane = orderedPagePanes(in: app)[0]
         dragTab(titled: address("one"), to: pane.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.5)), in: app)
-        // XCTest ne vérifie une attente qu'au bout d'environ 1 s : 2 s au moins, sinon l'attente ne peut pas réussir.
+        // XCTest only checks a wait after about 1 s: 2 s at least, otherwise the wait can't succeed.
         XCTAssertFalse(waitForCount(pagePanes(in: app), 2, timeout: 2))
         XCTAssertEqual(pagePanes(in: app).count, 1)
         XCTAssertEqual(tabRows(in: app).count, 2)
@@ -92,7 +92,7 @@ final class SplitViewUITests: XCTestCase {
             openInSplit(address(name), in: app)
         }
         XCTAssertTrue(waitForCount(pagePanes(in: app), 4))
-        // Split plein : l'élément est grisé, pas absent.
+        // Full split: the item is grayed out, not missing.
         tabRow(titled: address("one"), in: app).rightClick()
         let item = app.menuItems["Ouvrir en split"]
         XCTAssertTrue(item.waitForExistence(timeout: 2))
@@ -119,7 +119,7 @@ final class SplitViewUITests: XCTestCase {
         XCTAssertEqual(pagePanes(in: app).count, 1)
     }
 
-    /// Porte S2 pour l'élément `.split` : la ligne se glisse en entier.
+    /// Gate S2 for the `.split` item: the row is dragged as a whole.
     @MainActor
     func testDraggingASplitRowToPinnedKeepsItTogether() {
         let app = launch(opening: ["one", "two", "three"])
@@ -127,13 +127,13 @@ final class SplitViewUITests: XCTestCase {
         XCTAssertTrue(waitForCount(splitRows(in: app), 1))
         let pinnedZone = app.descendants(matching: .any).matching(identifier: "pinnedDropZone").firstMatch
         splitRows(in: app).firstMatch.press(forDuration: 0.5, thenDragTo: pinnedZone)
-        // Le split épinglé survit à « Effacer », qui ne ferme que les onglets du jour.
+        // The pinned split survives “Clear”, which only closes Today tabs.
         clickWhenSettled(app.buttons["Effacer"])
         XCTAssertTrue(waitForCount(tabRows(in: app), 0))
         XCTAssertEqual(splitRows(in: app).count, 1)
         XCTAssertEqual(splitSegments(in: app).count, 2)
 
-        // ⌘W décharge tout le split épinglé, qui reste dans la barre.
+        // ⌘W unloads the whole pinned split, which stays in the sidebar.
         app.typeKey("w", modifierFlags: .command)
         XCTAssertTrue(waitForCount(pagePanes(in: app), 1))
         XCTAssertTrue(app.staticTexts["Aucun onglet"].waitForExistence(timeout: 2))

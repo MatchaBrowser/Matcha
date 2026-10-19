@@ -2,18 +2,18 @@ import AppKit
 import OSLog
 import WebKit
 
-/// Menu d'une page (clic droit hors d'un lien, d'une image ou d'un texte sélectionné), comme dans Chrome : Précédent,
-/// Suivant, Recharger ; Enregistrer sous…, Imprimer… ; Afficher le code source (et « Inspecter l'élément » avec les
-/// outils pour développeurs). Voir `PageMenuPlan.pageLayout`.
+/// Menu of a page (right-click outside a link, an image or selected text), as in Chrome: Back, Forward, Reload;
+/// Save As…, Print…; View Page Source (and “Inspect Element” with the developer tools). See
+/// `PageMenuPlan.pageLayout`.
 extension BrowserWebView {
-    /// Réécrit `menu` s'il est celui d'une page ; faux sinon.
+    /// Rewrites `menu` if it is the menu of a page; false otherwise.
     func addPageCommands(to menu: NSMenu) -> Bool {
         let originals = menu.items
         let separators = Set(originals.indices.filter { originals[$0].isSeparatorItem })
         guard let layout = PageMenuPlan.pageLayout(for: originals.map { $0.identifier?.rawValue }, separators: separators) else {
             return false
         }
-        // Icônes des menus (macOS 26 et plus) : seulement si WebKit en met aux siens.
+        // Menu icons (macOS 26 and later): only if WebKit puts some on its own items.
         let showsImages = originals.contains { $0.image != nil }
         menu.removeAllItems()
         for entry in layout {
@@ -34,7 +34,7 @@ extension BrowserWebView {
         item.identifier = NSUserInterfaceItemIdentifier(command.identifier)
         item.target = self
         item.representedObject = command.rawValue
-        // WebKit ne laisse pas AppKit activer les éléments de son menu (`autoenablesItems` faux).
+        // WebKit does not let AppKit enable the items of its menu (`autoenablesItems` false).
         item.isEnabled = switch command {
         case .goBack: canGoBack
         case .goForward: canGoForward

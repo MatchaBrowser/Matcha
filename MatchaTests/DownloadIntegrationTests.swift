@@ -4,12 +4,12 @@ import Foundation
 import Testing
 import WebKit
 
-/// Téléchargements de bout en bout avec de vraies vues web, sans réseau (tâche 5.1) : lien `download` vers une
-/// adresse `data:`, fichier local que WebKit ne sait pas afficher. Les fichiers vont dans un dossier temporaire.
+/// End-to-end downloads with real web views, without network (task 5.1): `download` link to a `data:` address,
+/// local file that WebKit cannot display. The files go into a temporary folder.
 @MainActor
 struct DownloadIntegrationTests {
-    /// Fichiers livrés avec macOS que WebKit n'affiche pas (le premier présent sert) ; le test d'interface utilise les
-    /// mêmes.
+    /// Files shipped with macOS that WebKit does not display (the first one present is used); the UI test uses the
+    /// same ones.
     static let undisplayableFiles = [
         "/usr/share/firmware/bluetooth/20702_8289.dfu",
         "/usr/share/man/man1/less.1.gz",
@@ -59,12 +59,12 @@ struct DownloadIntegrationTests {
         #expect(item.scope == .regular)
         #expect(folder.contents() == ["notes.txt"])
         #expect(try String(contentsOf: folder.url.appendingPathComponent("notes.txt"), encoding: .utf8) == "bonjour")
-        // La page reste affichée ; rien d'autre ne s'ouvre.
+        // The page stays displayed; nothing else opens.
         #expect(page.title == "page")
         #expect(manager.tabs.count == 1)
     }
 
-    /// La sandbox met le fichier écrit par WebKit en quarantaine au nom de Matcha.
+    /// The sandbox quarantines the file written by WebKit on behalf of Matcha.
     @Test func `downloaded file is quarantined`() async throws {
         let page = try await openPage(body: "<a id='l' download='script.command' href='data:text/plain,echo'>script</a>")
 
@@ -90,7 +90,7 @@ struct DownloadIntegrationTests {
         #expect(folder.contents() == ["notes 2.txt", "notes.txt"])
     }
 
-    /// Réponse que WebKit ne sait pas afficher (`canShowMIMEType` faux) : téléchargée par la politique de réponse.
+    /// Response that WebKit cannot display (`canShowMIMEType` false): downloaded through the response policy.
     @Test func `file WebKit cannot show is downloaded`() async throws {
         let path = try #require(Self.undisplayableFiles.first(where: FileManager.default.isReadableFile(atPath:)))
         let size = try #require(try FileManager.default.attributesOfItem(atPath: path)[.size] as? Int)
@@ -122,9 +122,9 @@ struct DownloadIntegrationTests {
 
     @Test func `failed download keeps no file`() async throws {
         let page = try await openPage(body: "")
-        // Port 1 de la machine : connexion refusée aussitôt, sans réseau.
+        // Port 1 of the local machine: connection refused immediately, without network.
         let request = try URLRequest(url: #require(URL(string: "http://127.0.0.1:1/archive.zip")))
-        // Délégué branché dès la création, comme le fait le coordinateur : l'échec peut arriver aussitôt après.
+        // Delegate attached at creation, as the coordinator does: the failure can come right after.
         let item = await withCheckedContinuation { continuation in
             page.loadedWebView.startDownload(using: request) { download in
                 continuation.resume(returning: downloads.track(download, scope: .regular, pageURL: nil))

@@ -1,13 +1,13 @@
 import SwiftUI
 import WebKit
 
-/// Effacement des cookies et données d'un site, demandé depuis le panneau des réglages du site (tâche 5.2) : l'onglet
-/// et son site au moment du clic.
+/// Clearing a site's cookies and data, requested from the site settings panel (task 5.2): the tab and its site at
+/// the time of the click.
 struct SiteDataClearRequest {
     let tab: BrowserTab
     let origin: SiteOrigin
 
-    /// Efface les données du site dans le magasin du profil de l'onglet (fenêtre privée : le sien), puis recharge la
+    /// Clears the site's data in the data store of the tab's profile (private window: its own), then reloads the
     /// page.
     func perform() async {
         let store = tab.webView?.configuration.websiteDataStore ?? tab.configuration.websiteDataStore
@@ -16,8 +16,9 @@ struct SiteDataClearRequest {
     }
 }
 
-/// Confirmation de l'effacement, posée sur la fenêtre et non sur le panneau : la barre latérale flottante (barre
-/// masquée), qui porte le panneau, disparaît dès que le pointeur la quitte pour aller vers l'alerte, et l'alerte avec.
+/// Confirmation of the clearing, attached to the window and not to the panel: the floating sidebar (sidebar
+/// hidden), which holds the panel, disappears as soon as the pointer leaves it to go to the alert, and the alert
+/// with it.
 struct SiteDataClearConfirmation: ViewModifier {
     let model: WindowModel
 

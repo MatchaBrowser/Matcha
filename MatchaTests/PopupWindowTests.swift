@@ -4,11 +4,11 @@ import Foundation
 import Testing
 import WebKit
 
-/// Fenêtres de connexion (tâche 5.8) ouvertes depuis les onglets d'un Space et leur aperçu, par le délégué de
-/// navigation, avec de vraies vues web, les pages de `TestPages` et de vraies fenêtres (jamais affichées). Une classe :
-/// les fenêtres restées ouvertes sont fermées à la fin de chaque test (leur vue SwiftUI retient leur contrôleur
-/// jusqu'à la fermeture : leurs pages tourneraient jusqu'à la fin des tests). Un test à la fois : moins de vues web en
-/// même temps, les attentes des autres suites (10 s) ne sont pas dépassées.
+/// Sign-in windows (task 5.8) opened from the tabs of a Space and their Peek, by the navigation delegate, with real web
+/// views, the pages of `TestPages` and real windows (never shown). A class: windows left open are closed at the end of
+/// each test (their SwiftUI view retains their controller until they close: their pages would keep running until the
+/// end of the tests). One test at a time: fewer web views at once, so the waits of the other suites (10 s) are not
+/// exceeded.
 @MainActor
 @Suite(.serialized)
 final class PopupWindowTests {
@@ -24,7 +24,7 @@ final class PopupWindowTests {
         popups.closeAll()
     }
 
-    /// Onglet sélectionné sur une page locale, en tête, suivi d'un autre onglet vide.
+    /// Selected tab on a local page, at the top, followed by another empty tab.
     private func openPage() async throws -> (page: BrowserTab, other: BrowserTab) {
         let other = manager.newTab()
         let page = manager.insertTab(configuration: pages.configuration(), after: nil, select: true)
@@ -33,7 +33,7 @@ final class PopupWindowTests {
         return (page, other)
     }
 
-    /// Fenêtre de connexion de la page locale `name`, ouverte par `webView` avec une taille, une fois chargée.
+    /// Sign-in window of the local page `name`, opened by `webView` with a size, once loaded.
     private func openPopup(_ name: String = "connexion", from webView: WKWebView, count: Int = 1) async throws -> PopupWindowController {
         try await webView.openWindow(TestPages.url(name), features: "width=500,height=600")
         try await waitUntil { popups.windows.count == count }
@@ -52,16 +52,16 @@ final class PopupWindowTests {
         #expect(popup.tab.openerID == page.id)
         #expect(popup.container.webView === popup.tab.webView)
         #expect(popup.tab.loadedWebView.uiDelegate === popups.coordinator)
-        // Créée avec la configuration fournie par WebKit : la page d'origine reste joignable.
+        // Created with the configuration provided by WebKit: the originating page remains reachable.
         #expect(try await popup.tab.loadedWebView.hasOpener())
-        // La page à la taille demandée, sous la barre d'adresse ; sans fenêtre d'origine, au centre de l'écran.
+        // The page at the requested size, below the address bar; without an originating window, centered on screen.
         let content = popup.window.contentRect(forFrameRect: popup.window.frame)
         #expect(content.size == CGSize(width: 500, height: 600 + PopupAddressBar.height))
         #expect(abs(popup.window.frame.midX - PopupWindowManager.testScreen.midX) <= 0.5)
         #expect(abs(popup.window.frame.midY - PopupWindowManager.testScreen.midY) <= 0.5)
     }
 
-    /// Barres masquées sans taille : un onglet aussi (seule la taille compte, comme dans Safari).
+    /// Bars hidden without a size: a tab too (only the size matters, as in Safari).
     @Test func `window open without a size still opens a tab`() async throws {
         let (page, _) = try await openPage()
         try await page.loadedWebView.openWindow(TestPages.url("onglet"), features: "toolbar=no,menubar=no")
@@ -115,7 +115,7 @@ final class PopupWindowTests {
         #expect(try await popup.tab.loadedWebView.hasOpener())
     }
 
-    /// ⌘-clic et fenêtre sans taille dans la fenêtre de connexion : comme depuis la page d'origine.
+    /// ⌘-click and window without a size in the sign-in window: as from the originating page.
     @Test func `links of a sign-in window open in the opener's window`() async throws {
         let (page, other) = try await openPage()
         let popup = try await openPopup(from: page.loadedWebView)
@@ -136,7 +136,7 @@ final class PopupWindowTests {
         #expect(popups.windows.count == 1)
     }
 
-    /// Page d'origine fermée : une fenêtre sans taille ouverte par la fenêtre de connexion en devient une autre.
+    /// Originating page closed: a window without a size opened by the sign-in window becomes another one.
     @Test func `without its opener a sign-in window opens another one`() async throws {
         let (page, _) = try await openPage()
         let first = try await openPopup(from: page.loadedWebView)
@@ -170,7 +170,7 @@ final class PopupWindowTests {
         #expect(manager.peek == nil)
     }
 
-    /// Tâche 5.7 : la page d'une fenêtre de connexion est visible, elle se recharge aussitôt.
+    /// Task 5.7: the page of a sign-in window is visible, so it reloads at once.
     @Test func `a crashed sign-in page reloads at once`() async throws {
         let (page, _) = try await openPage()
         let popup = try await openPopup(from: page.loadedWebView)
@@ -179,9 +179,8 @@ final class PopupWindowTests {
         #expect(popups.windows.count == 1)
     }
 
-    /// Tâche 5.1 : une fenêtre qui ne fait que télécharger se ferme ; le téléchargement va au bout. Un fichier `blob:` :
-    /// constaté, ni une réponse d'un gestionnaire de schéma de test ni une adresse `data:` ouvertes dans une nouvelle
-    /// fenêtre ne deviennent un téléchargement.
+    /// Task 5.1: a window that only downloads closes; the download completes. A `blob:` file: observed, neither a
+    /// response from a test scheme handler nor a `data:` address opened in a new window becomes a download.
     @Test func `a sign-in window that only downloads closes`() async throws {
         let folder = try TemporaryDownloadsFolder()
         let downloads = folder.makeManager()
@@ -200,7 +199,7 @@ final class PopupWindowTests {
         #expect(manager.tabs.count == 2)
     }
 
-    /// Une fenêtre qui affiche une page reste ouverte quand elle télécharge.
+    /// A window that shows a page stays open when it downloads.
     @Test func `a sign-in window that shows a page stays open when it downloads`() async throws {
         let (page, _) = try await openPage()
         let popup = try await openPopup(from: page.loadedWebView)
@@ -208,7 +207,7 @@ final class PopupWindowTests {
         #expect(popups.windows.count == 1)
     }
 
-    /// La fenêtre de connexion reste au-dessus de sa fenêtre d'origine ; celle-ci fermée, elle reste ouverte, seule.
+    /// The sign-in window stays above its originating window; once that one is closed, it stays open, alone.
     @Test func `the sign-in window follows its opener window until it closes`() async throws {
         let (page, _) = try await openPage()
         let popup = try await openPopup(from: page.loadedWebView)

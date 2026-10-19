@@ -11,7 +11,7 @@ struct PrivateSessionTests {
         #expect(session.isInMemory)
         let space = try #require(session.spaces.first)
         #expect(!space.tabManager.websiteDataStore.isPersistent)
-        // Icônes en mémoire seulement : aucune trace des sites visités dans le cache disque.
+        // Icons in memory only: no trace of the visited sites in the disk cache.
         #expect(space.tabManager.faviconService !== FaviconService.shared)
         #expect(session.faviconService === space.tabManager.faviconService)
     }

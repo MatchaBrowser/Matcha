@@ -1,8 +1,8 @@
 import SwiftUI
 
-/// « Depuis vos autres Mac » (tâche 7.4) : les extensions installées sur vos autres Mac et pas sur celui-ci, ou dont la
-/// mise à jour demande votre accord. « Ajouter… » passe par l'écran des permissions ; « Ignorer » la retire de la liste
-/// sur ce Mac seulement. Absente tant qu'il n'y a rien à proposer.
+/// “From Your Other Macs” (task 7.4): the extensions installed on your other Macs and not on this one, or whose
+/// update needs your approval. “Add…” goes through the permissions screen; “Ignore” removes it from the list on
+/// this Mac only. Absent as long as there is nothing to offer.
 struct SyncedExtensionsSection: View {
     let model: ExtensionsSettingsModel
 
@@ -24,8 +24,8 @@ struct SyncedExtensionsSection: View {
     }
 }
 
-/// Une extension proposée : nom, origine et version, puis « Ajouter… » (ou « Mettre à jour… »), « Obtenir l'app »
-/// quand son app manque, et « Ignorer ».
+/// An offered extension: name, origin and version, then “Add…” (or “Update…”), “Get the App” when its app is
+/// missing, and “Ignore”.
 private struct SyncedExtensionRow: View {
     let offer: SyncExtensionFields
     let model: ExtensionsSettingsModel
@@ -66,7 +66,7 @@ private struct SyncedExtensionRow: View {
         .accessibilityIdentifier("syncedExtensionRow")
     }
 
-    /// « Dans Proton Pass » ou « Version 4.9 · darkreader.xpi ».
+    /// “In Proton Pass” or “Version 4.9 · darkreader.xpi”.
     private var caption: String {
         let origin = switch offer.source.kind {
         case .appExtension:

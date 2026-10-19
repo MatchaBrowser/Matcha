@@ -1,8 +1,8 @@
 import SwiftUI
 
-/// Ligne d'une extension installée (tâche 6.4) : icône, nom, version et origine, menu (options, bouton près de
-/// l'adresse, fenêtres privées, supprimer) et interrupteur. Une extension introuvable (app supprimée) n'a que
-/// « Supprimer ».
+/// Row of an installed extension (task 6.4): icon, name, version and origin, menu (options, button next to the
+/// address, private windows, remove) and switch. An extension that cannot be found (app deleted) only has
+/// “Remove…”.
 struct InstalledExtensionRow: View {
     let item: ExtensionsSettingsModel.Installed
     let model: ExtensionsSettingsModel
@@ -71,7 +71,7 @@ struct InstalledExtensionRow: View {
         }
     }
 
-    /// « Version 1.2 · Dans Proton Pass for Safari », « Version 1.2 · Depuis un fichier », ou « Introuvable ».
+    /// “Version 1.2 · In Proton Pass for Safari”, “Version 1.2 · From a file”, or “Not found”.
     private var caption: String {
         if item.isMissing {
             return String(localized: "Not found. Its app may have been deleted.", comment: "Installed extension whose files are missing")

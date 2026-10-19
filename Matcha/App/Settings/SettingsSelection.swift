@@ -1,7 +1,7 @@
 import Observation
 
-/// Onglet affiché par les réglages (⌘,), le temps de la session de l'app : « Gérer les extensions… » (bouton d'une
-/// extension, tâche 6.5) ouvre directement l'onglet Extensions.
+/// Tab shown by the settings (⌘,), for the duration of the app session: “Manage Extensions…” (an extension's
+/// button, task 6.5) opens the Extensions tab directly.
 @MainActor
 @Observable
 final class SettingsSelection {
