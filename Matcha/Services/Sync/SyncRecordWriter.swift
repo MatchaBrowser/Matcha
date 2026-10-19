@@ -57,8 +57,7 @@ final class SyncRecordWriter {
 
     private func upsertProfile(_ id: UUID, _ fields: SyncProfileFields) {
         let record = profiles[id] ?? inserted(ProfileRecord(id: id, name: fields.name)) { profiles[id] = $0 }
-        record.name = fields.name
-        record.order = fields.order
+        record.apply(fields)
         changes.profiles = true
     }
 
@@ -68,11 +67,7 @@ final class SyncRecordWriter {
             return false
         }
         let record = spaces[id] ?? inserted(SpaceRecord(id: id, name: fields.name)) { spaces[id] = $0 }
-        record.name = fields.name
-        record.symbol = SidebarIcon(spaceSymbol: fields.symbol).spaceSymbol
-        record.themeData = fields.theme.flatMap { SpaceTheme(name: $0.name, colors: $0.colors, angle: $0.angle).encoded() }
-        record.order = fields.order
-        record.profile = profile
+        record.apply(fields, profile: profile)
         changes.spaces = true
         return true
     }
@@ -84,30 +79,16 @@ final class SyncRecordWriter {
         }
         let record = folders[id] ?? inserted(FolderRecord(id: id, name: fields.name)) { folders[id] = $0 }
         touch(record.space)
-        record.name = fields.name
-        record.order = fields.order
-        record.isCollapsed = fields.isCollapsed
-        record.appearance = FolderAppearance(
-            storedIcon: fields.icon,
-            textColorHex: fields.textColor,
-            backgroundColorHex: fields.backgroundColor,
-        )
-        record.space = space
-        record.parent = parent
+        record.apply(fields, space: space, parent: parent)
         touch(space)
         return true
     }
 
     // MARK: Tabs
 
-    /// Favorite and pinned tab: their original address changes; their current address follows it if they had not left
-    /// the old one. Today tab: its current address. An arriving tab will not select itself.
+    /// The tab is written once its profile (favorite) or its Space, and its folder, are found (`TabRecord.apply`).
     private func upsertTab(_ id: UUID, _ fields: SyncTabFields) -> Bool {
-        let place: TabPlace = switch fields.place {
-        case .favorite: .favorite
-        case .pinned: .pinned
-        case .today: .today
-        }
+        let place = fields.place.tabPlace
         let profile = place == .favorite ? fields.profileId.flatMap { profiles[$0] } : nil
         let space = place == .favorite ? nil : fields.spaceId.flatMap { spaces[$0] }
         let folder = place == .pinned ? fields.folderId.flatMap { folders[$0] } : nil
@@ -117,33 +98,7 @@ final class SyncRecordWriter {
         let existing = tabs[id]
         let record = existing ?? inserted(TabRecord(id: id, url: fields.url, title: fields.title, place: place)) { tabs[id] = $0 }
         touch(record)
-        if place == .today {
-            record.pinnedURL = nil
-            record.pinnedTitle = nil
-            record.url = fields.url
-            record.title = fields.title
-            record.lastActivity = fields.lastActivity ?? record.lastActivity
-        } else {
-            let followsOrigin = existing == nil || record.place == .today || record.url == record.pinnedURL
-            record.pinnedURL = fields.url
-            record.pinnedTitle = fields.title
-            if followsOrigin {
-                record.url = fields.url
-                record.title = fields.title
-            }
-            if existing == nil {
-                record.lastActivity = .distantPast
-            }
-        }
-        if record.place != place {
-            record.splitGroupID = nil
-            record.splitFraction = 0
-        }
-        record.place = place
-        record.order = fields.order
-        record.folder = folder
-        record.profile = profile
-        record.space = space
+        record.apply(fields, isNew: existing == nil, folder: folder, profile: profile, space: space)
         touch(record)
         return true
     }

@@ -20,33 +20,19 @@ nonisolated enum MiniCommandBarSubmission: Equatable, Sendable {
     case ignore
 }
 
-/// Command bar of a mini window: the typed text (address or search), the history and the
-/// engine's suggestions, never tabs or actions (the mini window has only one page). Same
-/// flow as `CommandBarModel`: rows rebuilt on each keystroke, then a task queries
-/// the history, then the suggestions.
+/// Command bar of a mini window: the typed text (address or search), the history and the engine's suggestions, never
+/// tabs or actions (the mini window has only one page). Same flow as `CommandBarModel`, through `CommandBarResults`.
 @MainActor
 @Observable
 final class MiniCommandBarModel: CommandBarPanelModel {
     private(set) var isPresented = false
     private(set) var mode = MiniCommandBarMode.newSearch
-    private(set) var text = ""
-    private(set) var rows: [CommandRow] = []
-    private(set) var selectedRowID: CommandRow.ID?
     private(set) var focusRequest = 0
-    private(set) var searchEngine = SearchEngine.defaultEngine
 
     /// The mini window's page.
     @ObservationIgnored let tab: BrowserTab
     @ObservationIgnored private let faviconService: FaviconService
-    /// History, then suggestions (always last).
-    @ObservationIgnored private let providers: [any CommandProvider]
-    @ObservationIgnored private let ranker: CommandRanker
-    @ObservationIgnored private let now: () -> Date
-    @ObservationIgnored private var context = CommandContext()
-    @ObservationIgnored private var candidates: [[CommandCandidate]]
-    /// Address from ⌘L as long as the text has not been edited.
-    @ObservationIgnored private var pristineURL: URL?
-    @ObservationIgnored private var queryTask: Task<Void, Never>?
+    @ObservationIgnored let results: CommandBarResults
 
     /// Free of side effects: nothing is started before the first opening.
     init(
@@ -59,14 +45,33 @@ final class MiniCommandBarModel: CommandBarPanelModel {
     ) {
         self.tab = tab
         self.faviconService = faviconService
-        providers = [HistoryProvider(source: history), suggestions]
-        self.ranker = ranker
-        self.now = now
-        candidates = Array(repeating: [], count: providers.count)
+        // History, then suggestions; “Copy URL”, the only action, under an unmodified ⌘L address.
+        results = CommandBarResults(
+            providers: [HistoryProvider(source: history), suggestions],
+            ranker: ranker,
+            now: now,
+            pristineActions: { _ in [Self.copyURLCandidate] },
+        )
+    }
+
+    var text: String {
+        results.text
+    }
+
+    var rows: [CommandRow] {
+        results.rows
+    }
+
+    var selectedRowID: CommandRow.ID? {
+        results.selectedRowID
     }
 
     var selectedRow: CommandRow? {
-        rows.first { $0.id == selectedRowID }
+        results.selectedRow
+    }
+
+    var searchEngine: SearchEngine {
+        results.searchEngine
     }
 
     /// Icon of the field: the site's icon when editing the page's address.
@@ -90,69 +95,46 @@ final class MiniCommandBarModel: CommandBarPanelModel {
             apply(settings)
             return
         }
-        cancelQuery()
         mode = newMode
-        pristineURL = newMode == .editAddress ? tab.url : nil
-        text = pristineURL?.absoluteString ?? ""
-        searchEngine = settings.searchEngine
-        context = makeContext(settings)
-        candidates = Array(repeating: [], count: providers.count)
+        let pristineURL = newMode == .editAddress ? tab.url : nil
+        results.start(
+            text: pristineURL?.absoluteString ?? "",
+            pristineURL: pristineURL,
+            searchEngine: settings.searchEngine,
+            context: Self.context(settings),
+        )
         isPresented = true
-        refresh(resetSelection: true)
         Logger.miniWindow.debug("Mini window bar opened")
     }
 
     /// Settings changed while the bar is open: engine and suggestions follow immediately.
     func apply(_ settings: CommandBarSettings) {
-        let newContext = makeContext(settings)
-        guard isPresented, settings.searchEngine != searchEngine || newContext != context else {
+        guard isPresented else {
             return
         }
-        searchEngine = settings.searchEngine
-        context = newContext
-        cancelQuery()
-        if let last = candidates.indices.last {
-            candidates[last] = []
-        }
-        refresh(resetSelection: false)
-        startQuery(CommandQuery(text: text, searchEngine: searchEngine))
+        results.apply(searchEngine: settings.searchEngine, context: Self.context(settings))
+    }
+
+    /// Never private: a mini window always uses the profile of a Space.
+    private static func context(_ settings: CommandBarSettings) -> CommandContext {
+        CommandContext(isPrivate: false, showsSearchSuggestions: settings.showsSearchSuggestions)
     }
 
     // MARK: Input and selection
 
     func updateText(_ newText: String) {
-        guard isPresented, newText != text else {
-            return
+        if isPresented {
+            results.updateText(newText)
         }
-        text = newText
-        pristineURL = nil
-        cancelQuery()
-        let query = CommandQuery(text: newText, searchEngine: searchEngine)
-        if let last = candidates.indices.last {
-            candidates[last] = CommandRanker.carriedOver(candidates[last], to: query)
-        }
-        refresh(resetSelection: true)
-        startQuery(query)
     }
 
     func moveSelection(by delta: Int) {
-        guard !rows.isEmpty else {
-            return
-        }
-        let current = rows.firstIndex { $0.id == selectedRowID } ?? 0
-        selectedRowID = rows[min(max(current + delta, 0), rows.count - 1)].id
+        results.moveSelection(by: delta)
     }
 
     /// What follows Return (`rowID` nil: the selected row) or a click on a row.
     func submission(for rowID: CommandRow.ID?) -> MiniCommandBarSubmission {
-        guard isPresented else {
-            return .ignore
-        }
-        if text.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty, pristineURL == nil {
-            return .ignore
-        }
-        let id = rowID ?? selectedRowID
-        guard let row = rows.first(where: { $0.id == id }) ?? rows.first else {
+        guard isPresented, !results.isBlank, let row = results.row(for: rowID) else {
             return .ignore
         }
         switch row.target {
@@ -166,71 +148,14 @@ final class MiniCommandBarModel: CommandBarPanelModel {
         guard isPresented else {
             return
         }
-        cancelQuery()
+        results.reset()
         isPresented = false
-        text = ""
-        rows = []
-        selectedRowID = nil
-        pristineURL = nil
-        candidates = Array(repeating: [], count: providers.count)
         mode = .newSearch
     }
 
     /// Tests: waits for the current search to finish.
     func waitForPendingResults() async {
-        await queryTask?.value
-    }
-
-    // MARK: Results
-
-    /// Never private: a mini window always uses the profile of a Space.
-    private func makeContext(_ settings: CommandBarSettings) -> CommandContext {
-        CommandContext(isPrivate: false, showsSearchSuggestions: settings.showsSearchSuggestions)
-    }
-
-    private func startQuery(_ query: CommandQuery) {
-        guard pristineURL == nil, !query.isEmpty else {
-            return
-        }
-        let context = context
-        queryTask = Task { [weak self] in
-            await self?.gather(query, context: context)
-        }
-    }
-
-    private func gather(_ query: CommandQuery, context: CommandContext) async {
-        for index in providers.indices {
-            let found = await providers[index].candidates(for: query, context: context)
-            guard !Task.isCancelled else {
-                return
-            }
-            candidates[index] = found
-            refresh(resetSelection: false)
-        }
-    }
-
-    private func refresh(resetSelection: Bool) {
-        let query = CommandQuery(text: text, searchEngine: searchEngine)
-        let newRows = if let pristineURL {
-            ranker.pristineRows(currentURL: pristineURL, actions: [Self.copyURLCandidate])
-        } else if query.isEmpty {
-            [CommandRow]()
-        } else {
-            ranker.rank(query, candidates: candidates.flatMap(\.self), now: now())
-        }
-        if newRows != rows {
-            rows = newRows
-        }
-        let keepsSelection = !resetSelection && rows.contains { $0.id == selectedRowID }
-        let newSelection = keepsSelection ? selectedRowID : rows.first?.id
-        if newSelection != selectedRowID {
-            selectedRowID = newSelection
-        }
-    }
-
-    private func cancelQuery() {
-        queryTask?.cancel()
-        queryTask = nil
+        await results.waitForPendingResults()
     }
 
     /// “Copy URL”, the only action of a mini window's bar (rows of an unedited ⌘L).

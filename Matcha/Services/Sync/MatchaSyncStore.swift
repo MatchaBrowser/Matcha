@@ -20,24 +20,18 @@ final class MatchaSyncStore: SyncLocalStore {
     func snapshot() -> [UUID: SyncFields] {
         var result: [UUID: SyncFields] = [:]
         for profile in fetch(ProfileRecord.self) {
-            result[profile.id] = .profile(SyncProfileFields(name: profile.name, order: profile.order))
+            result[profile.id] = .profile(profile.syncFields)
         }
         for space in fetch(SpaceRecord.self) {
-            result[space.id] = .space(SyncSpaceFields(
-                name: space.name,
-                symbol: space.symbol,
-                theme: SpaceTheme.decoded(from: space.themeData),
-                order: space.order,
-                profileId: space.profile?.id,
-            ))
+            result[space.id] = .space(space.syncFields)
         }
         for folder in fetch(FolderRecord.self) {
-            if let fields = Self.fields(of: folder) {
+            if let fields = folder.syncFields {
                 result[folder.id] = .folder(fields)
             }
         }
         for tab in fetch(TabRecord.self) {
-            if let fields = Self.fields(of: tab) {
+            if let fields = tab.syncFields {
                 result[tab.id] = .tab(fields)
             }
         }
@@ -113,67 +107,6 @@ final class MatchaSyncStore: SyncLocalStore {
         }
         let tabs = fetch(TabRecord.self).filter { $0.place != nil }
         return tabs.count <= 1 && tabs.allSatisfy { $0.place == .today && $0.url == nil }
-    }
-
-    // MARK: Fields
-
-    private static func fields(of folder: FolderRecord) -> SyncFolderFields? {
-        guard let spaceID = folder.space?.id else {
-            return nil
-        }
-        return SyncFolderFields(
-            name: folder.name,
-            order: folder.order,
-            isCollapsed: folder.isCollapsed,
-            spaceId: spaceID,
-            parentId: folder.parent?.id,
-            icon: folder.iconValue,
-            textColor: folder.textColorHex,
-            backgroundColor: folder.backgroundColorHex,
-        )
-    }
-
-    /// Favorite and pinned tab: original address and title; today tab: address, title and last use.
-    private static func fields(of tab: TabRecord) -> SyncTabFields? {
-        switch tab.place {
-        case .favorite:
-            guard let profileID = tab.profile?.id else {
-                return nil
-            }
-            return SyncTabFields(
-                place: .favorite,
-                url: tab.pinnedURL ?? tab.url,
-                title: tab.pinnedTitle ?? tab.title,
-                order: tab.order,
-                profileId: profileID,
-            )
-        case .pinned:
-            guard let spaceID = tab.space?.id else {
-                return nil
-            }
-            return SyncTabFields(
-                place: .pinned,
-                url: tab.pinnedURL ?? tab.url,
-                title: tab.pinnedTitle ?? tab.title,
-                order: tab.order,
-                spaceId: spaceID,
-                folderId: tab.folder?.id,
-            )
-        case .today:
-            guard let spaceID = tab.space?.id else {
-                return nil
-            }
-            return SyncTabFields(
-                place: .today,
-                url: tab.url,
-                title: tab.title,
-                order: tab.order,
-                spaceId: spaceID,
-                lastActivity: tab.lastActivity,
-            )
-        case nil:
-            return nil
-        }
     }
 
     private func fetch<Model: PersistentModel>(_: Model.Type) -> [Model] {

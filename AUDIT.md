@@ -468,7 +468,7 @@ Rien n'est branché : il n'y a pas de transport, et seuls les tests créent `Syn
   - `ExtensionWindows` calcule des différences même sans extension.
 - **Correction** : `contentBlocking` à `nil` quand le bloqueur n'est pas disponible, et ne suivre les fenêtres que si une extension écoute.
 
-**C6. Doublons**
+**✅ C6. Doublons** — corrigé : `CommandBarResults` commun aux deux barres ; conversions de synchro des deux sens côte à côte, testées par aller-retour.
 - `MiniCommandBarModel` et `CommandBarModel`.
 - Les conversions entre modèle et champs de synchro, écrites dans les deux sens.
 
