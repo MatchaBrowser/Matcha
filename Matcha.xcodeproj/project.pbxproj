@@ -421,6 +421,7 @@
 				ENABLE_RESOURCE_ACCESS_USB = NO;
 				ENABLE_USER_SELECTED_FILES = readwrite;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = Config/Info.plist;
 				INFOPLIST_KEY_NSCameraUsageDescription = "A website is requesting access to the camera.";
 				INFOPLIST_KEY_NSLocalNetworkUsageDescription = "A website is requesting access to devices on your local network.";
 				INFOPLIST_KEY_NSMicrophoneUsageDescription = "A website is requesting access to the microphone.";
@@ -484,6 +485,7 @@
 				ENABLE_RESOURCE_ACCESS_USB = NO;
 				ENABLE_USER_SELECTED_FILES = readwrite;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = Config/Info.plist;
 				INFOPLIST_KEY_NSCameraUsageDescription = "A website is requesting access to the camera.";
 				INFOPLIST_KEY_NSLocalNetworkUsageDescription = "A website is requesting access to devices on your local network.";
 				INFOPLIST_KEY_NSMicrophoneUsageDescription = "A website is requesting access to the microphone.";

@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<!-- Keys Xcode can't generate (INFOPLIST_KEY_…), merged with the generated ones (GENERATE_INFOPLIST_FILE).
+	     Websites in http: web views are exempt from App Transport Security (audit K4); the app's own requests (sync,
+	     suggestions, icons) stay under it. -->
+	<key>NSAppTransportSecurity</key>
+	<dict>
+		<key>NSAllowsArbitraryLoadsInWebContent</key>
+		<true/>
+	</dict>
+</dict>
+</plist>

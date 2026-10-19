@@ -145,7 +145,7 @@ Toutes sont vérifiées. Les en-têtes du SDK disent ce que fait WebKit quand la
   - Une feuille identifiant et mot de passe, qui montre l'hôte et le realm.
   - `.performDefaultHandling` pour la confiance serveur.
 
-**K4. Sites en `http://` bloqués** (Élevé, vérifié par un test)
+**✅ K4. Sites en `http://` bloqués** (Élevé, vérifié par un test) — corrigé : `Config/Info.plist` avec `NSAllowsArbitraryLoadsInWebContent`, branché sur la cible Matcha.
 - **Problème** : sans `NSAppTransportSecurity`, App Transport Security s'applique aux `WKWebView`. `http://neverssl.com` échoue avec l'erreur `NSURLErrorDomain -1022`. Seuls les adresses IP, `.local` et localhost passent.
 - **Correction** : `NSAllowsArbitraryLoadsInWebContent = YES` dans un vrai Info.plist (voir A5). Les requêtes `URLSession` (synchro, suggestions) restent sous ATS.
 
