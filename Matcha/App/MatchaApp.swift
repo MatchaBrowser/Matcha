@@ -64,6 +64,10 @@ struct MatchaApp: App {
                 .environment(DownloadManager.shared)
         }
         .windowStyle(.hiddenTitleBar)
+        // First opening: most of the screen, up to a comfortable size (audit H5); then the size the user chose.
+        .defaultWindowPlacement { _, context in
+            WindowPlacement(size: BrowserWindowSize.defaultSize(visible: context.defaultDisplay.visibleRect.size))
+        }
         // Links from other apps go through the delegate (`IncomingLinks`): no window is created for them.
         .handlesExternalEvents(matching: [])
         .commands {
@@ -78,6 +82,9 @@ struct MatchaApp: App {
                 .environment(DownloadManager.shared)
         }
         .windowStyle(.hiddenTitleBar)
+        .defaultWindowPlacement { _, context in
+            WindowPlacement(size: BrowserWindowSize.defaultSize(visible: context.defaultDisplay.visibleRect.size))
+        }
         .restorationBehavior(.disabled)
         .handlesExternalEvents(matching: [])
         // Without its default commands (“Close”, “Close All”), which would override ⌘W and ⇧⌘W.

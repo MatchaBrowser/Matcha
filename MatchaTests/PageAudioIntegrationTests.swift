@@ -12,7 +12,10 @@ struct PageAudioIntegrationTests {
 
     /// Selected tab, in the window, once `url` is loaded (title `title`).
     private func show(_ url: URL, title: String) async throws -> BrowserTab {
-        let tab = manager.insertTab(configuration: TestPages.configuration(), after: nil, select: true)
+        let configuration = TestPages.configuration()
+        // These pages play on their own: no click, which Matcha waits for before media with sound (audit H5).
+        configuration.mediaTypesRequiringUserActionForPlayback = []
+        let tab = manager.insertTab(configuration: configuration, after: nil, select: true)
         window.show(tab.loadedWebView)
         tab.load(url)
         try await waitUntil { tab.title == title && !tab.isLoading }

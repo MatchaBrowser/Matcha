@@ -6,9 +6,11 @@ import WebKit
 /// there page by page; WebKit injects the extensions' scripts into it.
 @MainActor
 enum WebConfigurationFactory {
-    /// Safari version announced to sites, so that they treat the app as Safari.
-    /// To keep up to date with the Safari version shipped with macOS.
-    static let safariVersion = "26.6"
+    /// Safari version announced to sites, so that they treat the app as Safari: the installed Safari's (audit H5).
+    static let safariVersion = SafariVersion.announced(
+        installed: SafariVersion.installed(),
+        system: ProcessInfo.processInfo.operatingSystemVersion,
+    )
 
     /// Content controllers already given to a page (`BrowserTab`).
     private static let pageControllers = NSHashTable<WKUserContentController>.weakObjects()
@@ -28,6 +30,8 @@ enum WebConfigurationFactory {
         // An http address is tried in https first, then in http if that fails (audit W5; WebKit keeps the address as
         // requested by default).
         configuration.defaultWebpagePreferences.preferredHTTPSNavigationPolicy = .automaticFallbackToHTTP
+        // Media with sound waits for a click, as with Safari's “Stop Media with Sound” (audit H5); silent media plays.
+        configuration.mediaTypesRequiringUserActionForPlayback = .audio
         WebInspection.apply(to: configuration.preferences)
         configuration.applicationNameForUserAgent = applicationNameForUserAgent
         configuration.userContentController = makeUserContentController()

@@ -117,10 +117,12 @@ struct BrowserWindowView: View {
         }
         // Engine or suggestions changed in Settings while the bar stays open.
         .onChange(of: commandBarSettings) { _, settings in commandBar.apply(settings) }
-        .navigationTitle(session.isPrivate ? String(localized: "Private Browsing") : tabManager.selectedTab?.displayTitle ?? "Matcha")
+        // The title is read by a view of its own: a new page title no longer recomputes the whole window, nor the menus
+        // that follow its actions (audit H4).
+        .background { WindowTitle(session: session, tabManager: tabManager) }
         // A private window is always dark, so that it can be recognized.
         .preferredColorScheme(session.isPrivate ? .dark : nil)
-        .frame(minWidth: 700, minHeight: 450)
+        .frame(minWidth: BrowserWindowSize.minimum.width, minHeight: BrowserWindowSize.minimum.height)
         // No `.defaultFocus`: SwiftUI would give the keyboard back to a field as soon as nothing has focus, and
         // would take it away from the name field of a new folder.
         // With no selected tab, the empty page invites ⌘T: the bar never opens by itself.

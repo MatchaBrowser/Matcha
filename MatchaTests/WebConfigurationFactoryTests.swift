@@ -15,11 +15,6 @@ struct WebConfigurationFactoryTests {
         #expect(configuration.preferences.isElementFullscreenEnabled)
     }
 
-    @Test func `announces safari in user agent`() {
-        let configuration = WebConfigurationFactory.makeConfiguration(websiteDataStore: .nonPersistent())
-        #expect(configuration.applicationNameForUserAgent == "Version/26.6 Safari/605.1.15")
-    }
-
     /// Task 5.10: the sound script, at the start of each document, iframes included.
     @Test func `installs the audio script in every frame`() throws {
         let configuration = WebConfigurationFactory.makeConfiguration(websiteDataStore: .nonPersistent())

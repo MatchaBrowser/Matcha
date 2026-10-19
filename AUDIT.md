@@ -418,11 +418,11 @@ Rien n'est branché : il n'y a pas de transport, et seuls les tests créent `Syn
 - On ne peut réorganiser que par glisser.
 - 33 tailles de police sont fixes.
 
-**H4. Performance**
+**✅ H4. Performance** — corrigé : titre isolé (plus de reconstruction des menus), instantanés encodés hors du fil principal.
 - Un changement de titre de page réévalue toute la fenêtre et reconstruit la barre de menus : `windowActions` est une structure de closures publiée par `focusedSceneValue`, et `.navigationTitle` est lu dans `body`.
 - Les instantanés JPEG sont encodés sur le fil principal.
 
-**H5. Divers**
+**✅ H5. Divers** — corrigé, sauf les boutons de la fenêtre masqués avec la barre (gardé comme Arc, voir `DECISIONS.md`).
 - ⌥⌘N est réservé pour toutes les apps dès le premier lancement.
 - L'agent utilisateur est figé sur « Safari 26.6 ».
 - La lecture automatique avec son est autorisée.

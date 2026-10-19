@@ -37,11 +37,15 @@ struct TabLifecycleProbes {
         }
         let configuration = WKSnapshotConfiguration()
         configuration.afterScreenUpdates = false
-        let data = await CallbackTimeout.value(timeout: timeout, fallback: nil as Data?) { done in
+        let image = await CallbackTimeout.value(timeout: timeout, fallback: nil as CGImage?) { done in
             webView.takeSnapshot(with: configuration) { image, _ in
-                done(image?.cgImage(forProposedRect: nil, context: nil, hints: nil).flatMap { TabSnapshot.jpegData(from: $0) })
+                done(image?.cgImage(forProposedRect: nil, context: nil, hints: nil))
             }
         }
-        return data.map { TabSnapshot(data: $0, url: url, pageWidth: width) }
+        // Scaling and JPEG encoding off the main thread (audit H4).
+        guard let image, let data = await TabSnapshot.encode(image) else {
+            return nil
+        }
+        return TabSnapshot(data: data, url: url, pageWidth: width)
     }
 }

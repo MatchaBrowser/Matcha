@@ -27,6 +27,12 @@ nonisolated struct TabSnapshot: Sendable {
         return (maximumWidth, max(Int(scaledHeight), 1))
     }
 
+    /// `jpegData` off the main thread.
+    @concurrent
+    static func encode(_ image: CGImage) async -> Data? {
+        jpegData(from: image)
+    }
+
     /// Image scaled down (`pixelSize`) then compressed as JPEG; nil if the image cannot be drawn or encoded.
     static func jpegData(from image: CGImage, maximumWidth: Int = maximumPixelWidth, quality: Double = jpegQuality) -> Data? {
         let size = pixelSize(width: image.width, height: image.height, maximumWidth: maximumWidth)
