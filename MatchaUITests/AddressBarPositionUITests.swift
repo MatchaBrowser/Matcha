@@ -34,7 +34,7 @@ final class AddressBarPositionUITests: XCTestCase {
         let field = addressField(in: app)
         XCTAssertTrue(waitForBrowserWindow(of: app))
         moveAwayFromLeftEdge(in: window)
-        app.typeKey("s", modifierFlags: .command)
+        app.typeKey("s", modifierFlags: [.command, .control])
         XCTAssertTrue(app.buttons["newTabButton"].waitForNonExistence(timeout: 3))
         XCTAssertTrue(addressPill(in: app).exists)
 

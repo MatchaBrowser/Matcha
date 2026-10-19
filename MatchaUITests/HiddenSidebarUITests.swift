@@ -1,6 +1,6 @@
 import XCTest
 
-/// Hidden sidebar (⌘S) and its appearance when hovering the left edge.
+/// Hidden sidebar (⌃⌘S) and its appearance when hovering the left edge.
 final class HiddenSidebarUITests: XCTestCase {
     override func setUpWithError() throws {
         continueAfterFailure = false
@@ -14,11 +14,11 @@ final class HiddenSidebarUITests: XCTestCase {
         XCTAssertTrue(newTabButton.waitForExistence(timeout: 5))
         moveAwayFromLeftEdge(in: window)
 
-        app.typeKey("s", modifierFlags: .command)
+        app.typeKey("s", modifierFlags: [.command, .control])
         XCTAssertTrue(newTabButton.waitForNonExistence(timeout: 3))
         XCTAssertFalse(window.buttons[XCUIIdentifierCloseWindow].exists)
 
-        app.typeKey("s", modifierFlags: .command)
+        app.typeKey("s", modifierFlags: [.command, .control])
         XCTAssertTrue(newTabButton.waitForExistence(timeout: 3))
         XCTAssertTrue(window.buttons[XCUIIdentifierCloseWindow].exists)
     }
@@ -53,7 +53,7 @@ final class HiddenSidebarUITests: XCTestCase {
         let newTabButton = app.buttons["newTabButton"]
         XCTAssertTrue(newTabButton.waitForExistence(timeout: 5))
         moveAwayFromLeftEdge(in: window)
-        app.typeKey("s", modifierFlags: .command)
+        app.typeKey("s", modifierFlags: [.command, .control])
         XCTAssertTrue(newTabButton.waitForNonExistence(timeout: 3))
 
         window.coordinate(withNormalizedOffset: CGVector(dx: 0, dy: 0.5)).withOffset(CGVector(dx: 3, dy: 0)).hover()
@@ -71,7 +71,7 @@ final class HiddenSidebarUITests: XCTestCase {
         let field = addressField(in: app)
         XCTAssertTrue(waitForBrowserWindow(of: app))
         moveAwayFromLeftEdge(in: window)
-        app.typeKey("s", modifierFlags: .command)
+        app.typeKey("s", modifierFlags: [.command, .control])
         XCTAssertTrue(addressPill(in: app).waitForNonExistence(timeout: 3))
 
         app.typeKey("l", modifierFlags: .command)

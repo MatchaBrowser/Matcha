@@ -8,7 +8,7 @@ nonisolated enum MiniWindowTarget {
         let profileID: UUID?
     }
 
-    /// Target Space (“Open in …” button, ⌘O, ⌘-click) for a page of profile `profileID`:
+    /// Target Space (“Open in …” button, ⇧⌘O, ⌘-click) for a page of profile `profileID`:
     /// 1. the Space displayed by the main window, if it belongs to that profile (Arc's “most recent”);
     /// 2. otherwise the first Space of that profile, in the sidebar's order;
     /// 3. otherwise (no Space of that profile left) the displayed Space, then the first Space.

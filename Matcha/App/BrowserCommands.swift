@@ -5,6 +5,8 @@ import SwiftUI
 /// first: the window values are nil when a panel is active), otherwise the browsing window.
 struct BrowserCommands: Commands {
     let miniWindows: MiniWindowManager
+    /// Shortcuts chosen in Settings > Shortcuts.
+    private let shortcuts = MenuShortcutStore.shared
     @FocusedValue(\.tabManager) private var tabManager
     @FocusedValue(\.windowActions) private var windowActions
     @Environment(\.openWindow) private var openWindow
@@ -57,19 +59,19 @@ struct BrowserCommands: Commands {
                     windowActions?.newTab()
                 }
             }
-            .keyboardShortcut("t")
+            .keyboardShortcut(shortcuts.keyboardShortcut(for: .newTab))
             .disabled(windowActions == nil && miniWindow == nil)
 
             Button("New Private Window") {
                 openWindow(id: MatchaApp.privateWindowID)
             }
-            .keyboardShortcut("n", modifiers: [.command, .shift])
+            .keyboardShortcut(shortcuts.keyboardShortcut(for: .newPrivateWindow))
 
-            // No key equivalent: the global (configurable) shortcut already is one, and a shortcut shown here
-            // would fire twice while the menu is open.
+            // Without its shortcut when the global one is the same: it would fire twice while the menu is open.
             Button("New Mini Window") {
                 miniWindows.openNew(source: .menu)
             }
+            .keyboardShortcut(shortcuts.keyboardShortcut(for: .newMiniWindow))
 
             Button("Open Location…") {
                 if let mini = miniWindow {
@@ -78,15 +80,18 @@ struct BrowserCommands: Commands {
                     windowActions?.editAddress()
                 }
             }
-            .keyboardShortcut("l")
+            .keyboardShortcut(shortcuts.keyboardShortcut(for: .openLocation))
             .disabled(windowActions == nil && miniWindow == nil)
+
+            Button(MenuShortcut.openFile.title, action: openFile)
+                .keyboardShortcut(shortcuts.keyboardShortcut(for: .openFile))
 
             Button("Open in Space") {
                 if let mini = miniWindow {
                     miniWindows.openInSpace(mini) { openWindow(id: MatchaApp.browserWindowID) }
                 }
             }
-            .keyboardShortcut("o")
+            .keyboardShortcut(shortcuts.keyboardShortcut(for: .openInSpace))
             .disabled(miniWindow?.tab.hasURL != true)
         }
 
@@ -96,7 +101,7 @@ struct BrowserCommands: Commands {
             Button(action: closeCommand) {
                 closeTitle
             }
-            .keyboardShortcut("w")
+            .keyboardShortcut(shortcuts.keyboardShortcut(for: .closeTab))
             .disabled(miniWindow == nil && tabManager != nil && selectedTab == nil && windowActions?.isCommandBarPresented != true)
 
             Button("Close Window") {
@@ -106,7 +111,7 @@ struct BrowserCommands: Commands {
                     NSApp.keyWindow?.performClose(nil)
                 }
             }
-            .keyboardShortcut("w", modifiers: [.command, .shift])
+            .keyboardShortcut(shortcuts.keyboardShortcut(for: .closeWindow))
         }
 
         // In the Edit menu, right after Copy, Paste, etc.
@@ -119,18 +124,19 @@ struct BrowserCommands: Commands {
                     windowActions?.copyURL?()
                 }
             }
-            .keyboardShortcut("c", modifiers: [.command, .shift])
+            .keyboardShortcut(shortcuts.keyboardShortcut(for: .copyURL))
             .disabled(miniWindow.map { !$0.tab.hasURL } ?? (windowActions?.copyURL == nil))
         }
 
-        // Edit > Find (⌘F, ⌘G, ⇧⌘G).
-        FindCommands(miniWindows: miniWindows)
+        // Edit > Find, Spelling and Grammar, Substitutions, Transformations, Speech: macOS's standard commands
+        // (audit H1). Find goes to the page's find bar (`PageFindResponder`).
+        TextEditingCommands()
 
         CommandGroup(replacing: .sidebar) {
             Button(sidebarToggleTitle) {
                 windowActions?.toggleSidebar()
             }
-            .keyboardShortcut("s")
+            .keyboardShortcut(shortcuts.keyboardShortcut(for: .toggleSidebar))
             .disabled(windowActions == nil)
 
             // View > “Show Downloads” (⌥⌘L), as in Safari. Disabled outside a browsing window (Settings, history)
@@ -138,13 +144,20 @@ struct BrowserCommands: Commands {
             Button(downloadsToggleTitle) {
                 windowActions?.toggleDownloads()
             }
-            .keyboardShortcut("l", modifiers: [.command, .option])
+            .keyboardShortcut(shortcuts.keyboardShortcut(for: .toggleDownloads))
             .disabled(windowActions == nil || miniWindow != nil)
         }
 
         CommandGroup(after: .toolbar) {
-            Button("Reload Page") { frontTab?.reload() }
-                .keyboardShortcut("r")
+            let frontTab = frontTab
+            Button(MenuShortcut.stopLoading.title) { self.frontTab?.stop() }
+                .keyboardShortcut(shortcuts.keyboardShortcut(for: .stopLoading))
+                .disabled(frontTab?.isLoading != true)
+            Button("Reload Page") { self.frontTab?.reload() }
+                .keyboardShortcut(shortcuts.keyboardShortcut(for: .reloadPage))
+                .disabled(frontTab?.hasURL != true)
+            Button(MenuShortcut.reloadFromOrigin.title) { self.frontTab?.reloadFromOrigin() }
+                .keyboardShortcut(shortcuts.keyboardShortcut(for: .reloadFromOrigin))
                 .disabled(frontTab?.hasURL != true)
         }
 
@@ -162,6 +175,7 @@ struct BrowserCommands: Commands {
                 }
                 Divider()
                 Button("New Space") { windowActions.newSpace() }
+                    .keyboardShortcut(shortcuts.keyboardShortcut(for: .newSpace))
             }
         }
 
@@ -170,6 +184,23 @@ struct BrowserCommands: Commands {
 
         // History menu: Homepage, Back, Forward, “Show All History” (task 5.5).
         HistoryCommands(miniWindows: miniWindows)
+
+        // Help menu: Matcha's site and a problem report (audit H1).
+        HelpCommands(miniWindows: miniWindows)
+    }
+
+    /// ⌘O: the chosen files open in new tabs of the active window, or of the main window from a mini window.
+    private func openFile() {
+        let tabManager = miniWindow == nil ? tabManager : nil
+        let windowActions = windowActions
+        OpenFilePanel.choose { urls in
+            if let tabManager, let windowActions {
+                let tabs = urls.map { tabManager.newTab(url: $0) }
+                tabs.last.map(windowActions.showTab)
+            } else {
+                miniWindows.openFromOtherApp(urls, destination: .space)
+            }
+        }
     }
 
     /// ⌘W: the active mini window (its bar first), otherwise the command bar, the peek, the tab, or the window

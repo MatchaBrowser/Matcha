@@ -51,6 +51,19 @@ extension BrowserTab {
         }
     }
 
+    /// ⌥⌘R: reloads without the cache. A failed load or a crashed page reloads as with ⌘R.
+    func reloadFromOrigin() {
+        guard let webView, !crash.isRecovering else {
+            reload()
+            return
+        }
+        if retryFailedLoad() {
+            return
+        }
+        suspension.endRestoring()
+        webView.reloadFromOrigin()
+    }
+
     func stop() {
         webView?.stopLoading()
     }

@@ -136,7 +136,7 @@ final class DownloadsUITests: XCTestCase {
         XCTAssertTrue(button.exists)
 
         moveAwayFromLeftEdge(in: window)
-        app.typeKey("s", modifierFlags: .command)
+        app.typeKey("s", modifierFlags: [.command, .control])
         XCTAssertTrue(button.waitForNonExistence(timeout: 3))
         let edge = window.coordinate(withNormalizedOffset: CGVector(dx: 0, dy: 0.5)).withOffset(CGVector(dx: 3, dy: 0))
         edge.hover()

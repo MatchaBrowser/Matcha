@@ -167,7 +167,7 @@ final class SplitViewUITests: XCTestCase {
         XCTAssertTrue(waitForCount(pagePanes(in: app), 2))
         let window = app.windows.firstMatch
         moveAwayFromLeftEdge(in: window)
-        app.typeKey("s", modifierFlags: .command)
+        app.typeKey("s", modifierFlags: [.command, .control])
         XCTAssertTrue(app.buttons["newTabButton"].waitForNonExistence(timeout: 3))
         XCTAssertEqual(pagePanes(in: app).count, 2)
         XCTAssertLessThanOrEqual(orderedPagePanes(in: app)[0].frame.minX - window.frame.minX, 12)

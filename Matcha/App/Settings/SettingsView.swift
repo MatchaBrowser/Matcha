@@ -9,6 +9,9 @@ struct SettingsView: View {
             GeneralSettingsView()
                 .tabItem { Label("General", systemImage: "gearshape") }
                 .tag(SettingsSelection.Tab.general)
+            ShortcutsSettingsView()
+                .tabItem { Label("Shortcuts", systemImage: "keyboard") }
+                .tag(SettingsSelection.Tab.shortcuts)
             AppearanceSettingsView()
                 .tabItem { Label("Appearance", systemImage: "paintbrush") }
                 .tag(SettingsSelection.Tab.appearance)

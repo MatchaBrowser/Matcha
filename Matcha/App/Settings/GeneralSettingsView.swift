@@ -1,9 +1,8 @@
 import AppKit
-import KeyboardShortcuts
 import SwiftUI
 
 /// General settings: default browser and links from other apps, homepage, new tabs, search and suggestions, link
-/// peek, memory of inactive tabs, mini window shortcut, quitting the app, language.
+/// peek, memory of inactive tabs, quitting the app, language.
 struct GeneralSettingsView: View {
     @AppStorage(BrowserSettings.Key.homePage) private var homePage = BrowserSettings.homePage
     @AppStorage(BrowserSettings.Key.newTabPage) private var newTabPage = BrowserSettings.newTabPage
@@ -64,20 +63,6 @@ struct GeneralSettingsView: View {
                 They stay in the sidebar and reload when you show them; text typed in a page may be lost. \
                 Tabs playing sound or using the camera or microphone are never affected.
                 """, comment: "Settings > General: note under “Free memory of inactive tabs after”")
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
-            }
-            Section {
-                LabeledContent("Mini Window Shortcut") {
-                    // Its own texts (clear, rejected shortcut) are translated by KeyboardShortcuts.
-                    KeyboardShortcuts.Recorder(for: .openMiniWindow)
-                        .accessibilityIdentifier("miniWindowShortcutRecorder")
-                }
-            } footer: {
-                Text("""
-                Press this shortcut in any app to open a mini window, even when Matcha is in the background. \
-                It uses the profile of the Space shown.
-                """, comment: "Settings > General: note under the mini window shortcut")
                     .font(.caption)
                     .foregroundStyle(.secondary)
             }

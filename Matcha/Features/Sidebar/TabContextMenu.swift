@@ -65,11 +65,11 @@ struct TabContextMenu: View {
         } else if let group {
             Button("Close Split View") { tabManager.closeSplit(group.id) }
                 .disabled(!tabManager.hasLoadedTab(inSplit: group.id))
-            Button("Delete Tab") { tabManager.delete(tab) }
+            Button("Delete Tab") { tabManager.delete(tab, reopenable: true) }
         } else {
             Button("Close Tab") { tabManager.close(tab) }
                 .disabled(!tab.appearsLoaded)
-            Button("Delete Tab") { tabManager.delete(tab) }
+            Button("Delete Tab") { tabManager.delete(tab, reopenable: true) }
         }
     }
 

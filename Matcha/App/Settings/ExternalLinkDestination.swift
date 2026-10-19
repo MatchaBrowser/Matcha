@@ -2,7 +2,7 @@ import Foundation
 
 /// Where links clicked in other apps open (task 8.2).
 nonisolated enum ExternalLinkDestination: String, CaseIterable, Identifiable, Sendable {
-    /// One mini window per link, like Little Arc: you read, then keep the page (⌘O) or close it.
+    /// One mini window per link, like Little Arc: you read, then keep the page (⇧⌘O) or close it.
     case miniWindow
     /// A new tab in the Space shown by the main window.
     case space

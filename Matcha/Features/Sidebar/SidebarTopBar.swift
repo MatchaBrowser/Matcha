@@ -1,6 +1,6 @@
 import SwiftUI
 
-/// Top row of the sidebar: room for the window's buttons, a button that hides or shows the sidebar (like ⌘S),
+/// Top row of the sidebar: room for the window's buttons, a button that hides or shows the sidebar (like ⌃⌘S),
 /// then, depending on the settings, back, forward, reload and Home.
 struct SidebarTopBar: View {
     static let height = 32.0

@@ -1,13 +1,15 @@
 import SwiftUI
 
-/// Commands of the front page (`FrontPage`, task 5.4): File > “Export as PDF…” and “Print…” (⌘P), in place of the
-/// standard print commands (absent until now: nothing is duplicated); View > “Actual Size” (⌘0), “Zoom In” (⌘+, and
+/// Commands of the front page (`FrontPage`, task 5.4): File > “Save As…” (⌘S, audit H1), “Export as PDF…” and “Print…”
+/// (⌘P), in place of the standard print commands (absent until now: nothing is duplicated); View > “Actual Size” (⌘0),
+/// “Zoom In” (⌘+, and
 /// ⌘= through `BrowserWebView`), “Zoom Out” (⌘-), after “Reload Page”. The zoom is remembered for the page's site,
 /// shown next to its address pill (`ZoomBadge`) and announced to VoiceOver. A page that keeps these shortcuts for
 /// itself comes first, as in Safari: WebKit sends it the shortcuts first.
 struct PageCommands: Commands {
     let miniWindows: MiniWindowManager
     @FocusedValue(\.tabManager) private var tabManager
+    private let shortcuts = MenuShortcutStore.shared
 
     /// Active mini window: `keyWindowID` is read so the menu follows along, the window is read again on each action.
     private var miniWindow: MiniWindowController? {
@@ -27,11 +29,15 @@ struct PageCommands: Commands {
     var body: some Commands {
         CommandGroup(replacing: .printItem) {
             let page = page
-            // No shortcut, as in Safari; ⇧⌘P is used by some pages (command palette).
+            Button(MenuShortcut.saveAs.title) { self.page.map(PageSaver.start(for:)) }
+                .keyboardShortcut(shortcuts.keyboardShortcut(for: .saveAs))
+                .disabled(page == nil)
+            // No shortcut by default, as in Safari; ⇧⌘P is used by some pages (command palette).
             Button("Export as PDF…") { self.page.map(PDFExport.start(for:)) }
+                .keyboardShortcut(shortcuts.keyboardShortcut(for: .exportPDF))
                 .disabled(page == nil)
             Button("Print…") { self.page.map(PagePrinter.print) }
-                .keyboardShortcut("p")
+                .keyboardShortcut(shortcuts.keyboardShortcut(for: .print))
                 .disabled(page == nil)
         }
 
@@ -39,13 +45,13 @@ struct PageCommands: Commands {
             let page = page
             Divider()
             Button("Actual Size") { zoom(.actualSize) }
-                .keyboardShortcut("0")
+                .keyboardShortcut(shortcuts.keyboardShortcut(for: .actualSize))
                 .disabled(page.map { !PageZoom.canApply(.actualSize, to: $0) } ?? true)
             Button("Zoom In") { zoom(.zoomIn) }
-                .keyboardShortcut("+")
+                .keyboardShortcut(shortcuts.keyboardShortcut(for: .zoomIn))
                 .disabled(page.map { !PageZoom.canApply(.zoomIn, to: $0) } ?? true)
             Button("Zoom Out") { zoom(.zoomOut) }
-                .keyboardShortcut("-")
+                .keyboardShortcut(shortcuts.keyboardShortcut(for: .zoomOut))
                 .disabled(page.map { !PageZoom.canApply(.zoomOut, to: $0) } ?? true)
         }
     }

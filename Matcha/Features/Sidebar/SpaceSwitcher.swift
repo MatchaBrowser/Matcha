@@ -7,6 +7,7 @@ struct SpaceSwitcher: View {
     let model: WindowModel
 
     @State private var renamedSpace: SpaceSession?
+    @State private var deletedSpace: SpaceSession?
     @State private var newName = ""
 
     var body: some View {
@@ -58,6 +59,7 @@ struct SpaceSwitcher: View {
             }
             Button("Cancel", role: .cancel) {}
         }
+        .modifier(SpaceDeletionAlert(model: model, space: $deletedSpace))
     }
 
     private func spaceButton(_ space: SpaceSession) -> some View {
@@ -122,7 +124,11 @@ struct SpaceSwitcher: View {
         Button("Change Icon…") { model.editSpace(space) }
         Divider()
         Button("Delete Space") {
-            withAnimation(.easeInOut(duration: 0.3)) { model.deleteSpace(space) }
+            if SpaceDeletionAlert.closingTabCount(of: space) > 0 {
+                deletedSpace = space
+            } else {
+                withAnimation(.easeInOut(duration: 0.3)) { model.deleteSpace(space) }
+            }
         }
         .disabled(model.session.spaces.count <= 1)
     }

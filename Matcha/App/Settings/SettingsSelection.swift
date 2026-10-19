@@ -7,6 +7,7 @@ import Observation
 final class SettingsSelection {
     enum Tab: Hashable {
         case general
+        case shortcuts
         case appearance
         case profiles
         case privacy

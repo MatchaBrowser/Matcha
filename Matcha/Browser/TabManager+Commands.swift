@@ -7,6 +7,8 @@ extension TabManager {
     /// to the last remaining tab of the sidebar.
     func clearToday() {
         let cleared = todayTabs
+        // ⇧⌘T brings them all back (audit H2).
+        rememberClosed(cleared)
         let selectionCleared = cleared.contains { $0.id == selectedTabID }
         cleared.forEach(discard)
         if selectionCleared {
@@ -29,12 +31,13 @@ extension TabManager {
         return copy
     }
 
-    /// Closes all today tabs except `tab` and its split; `tab` is selected, pinned tabs and favorites remain.
+    /// Closes all today tabs except `tab` and its split; `tab` is selected, pinned tabs and favorites remain. ⇧⌘T
+    /// brings them all back.
     func closeOtherTabs(than tab: BrowserTab) {
         select(tab)
         let kept = Set(layout.split(containing: tab.id)?.tabIDs ?? [tab.id])
-        for other in todayTabs where !kept.contains(other.id) {
-            close(other)
-        }
+        let others = todayTabs.filter { !kept.contains($0.id) }
+        rememberClosed(others)
+        others.forEach { delete($0) }
     }
 }

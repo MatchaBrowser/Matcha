@@ -148,6 +148,17 @@ final class FindSession {
         }
     }
 
+    /// ⌘E: the text selected in the page becomes the searched text, without searching (⌘G then finds the next one);
+    /// an open bar shows it.
+    func useSelection(_ text: String) {
+        guard !text.isEmpty else {
+            return
+        }
+        cancelSearch()
+        setQuery(text)
+        status = .idle
+    }
+
     /// Return, ⌘G, ⌄ button: next match.
     func findNext() {
         search(.forward)

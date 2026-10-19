@@ -6,7 +6,7 @@ struct MiniWindowToolbar: View {
     static let height = 40.0
 
     let tab: BrowserTab
-    /// Space targeted by the button (and by ⌘O); follows the Space displayed by the main window.
+    /// Space targeted by the button (and by ⇧⌘O); follows the Space displayed by the main window.
     let target: SpaceSession
     /// Per-site zoom of the main session, reset to 100 % by a click on the zoom badge (task 5.4).
     let siteZooms: SiteZoomStore?

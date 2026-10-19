@@ -100,7 +100,7 @@ final class MiniWindowUITests: XCTestCase {
         let mini = openMiniWindow(in: app)
         load("about:blank?one", in: mini, app: app)
 
-        app.typeKey("o", modifierFlags: .command)
+        app.typeKey("o", modifierFlags: [.command, .shift])
         XCTAssertTrue(waitForBrowserWindow(of: app))
         XCTAssertTrue(waitForCount(miniWindows(in: app), 0))
         XCTAssertTrue(waitForCount(tabRows(in: app), 1))

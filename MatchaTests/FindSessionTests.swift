@@ -244,4 +244,21 @@ struct FindSessionTests {
             #expect(FindKeyCommand(selectorName: selector, isShiftDown: false) == nil)
         }
     }
+
+    @Test func `the selected text becomes the searched text without a search`() async {
+        let session = makeSession()
+        page.matches = ["thé"]
+        session.useSelection("thé")
+        await session.waitForPendingSearch()
+        #expect(session.query == "thé")
+        #expect(session.hasQuery)
+        #expect(!session.isPresented)
+        #expect(page.searches.isEmpty)
+        // ⌘G then finds the next one, the bar opening without the keyboard.
+        session.findNext()
+        await session.waitForPendingSearch()
+        #expect(page.searches == [search("thé")])
+        session.useSelection("")
+        #expect(session.query == "thé")
+    }
 }

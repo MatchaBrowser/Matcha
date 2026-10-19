@@ -74,7 +74,7 @@ final class DownloadsPanelUITests: XCTestCase {
         app.terminate()
     }
 
-    /// Hidden sidebar (⌘S): ⌥⌘L shows it first, then opens the panel in it.
+    /// Hidden sidebar (⌃⌘S): ⌥⌘L shows it first, then opens the panel in it.
     @MainActor
     func testCommandOptionLShowsTheHiddenSidebarAndThePanel() {
         let app = launchApp()
@@ -82,7 +82,7 @@ final class DownloadsPanelUITests: XCTestCase {
         let newTabButton = app.buttons["newTabButton"]
         XCTAssertTrue(newTabButton.waitForExistence(timeout: 5))
         moveAwayFromLeftEdge(in: window)
-        app.typeKey("s", modifierFlags: .command)
+        app.typeKey("s", modifierFlags: [.command, .control])
         XCTAssertTrue(newTabButton.waitForNonExistence(timeout: 3))
         XCTAssertFalse(downloadsButton(in: app).exists)
 

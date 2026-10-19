@@ -19,7 +19,7 @@ extension ScreenshotUITests {
         attach(XCUIScreen.main.screenshot(), as: "22-mini-flottante")
         // ⌘O targets the active mini window: a click in its page makes it active first.
         mini.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.6)).click()
-        app.typeKey("o", modifierFlags: .command)
+        app.typeKey("o", modifierFlags: [.command, .shift])
         XCTAssertTrue(waitForCount(miniWindows(in: app), 0, timeout: 5))
         sleep(1)
         attach(browser.screenshot(), as: "23-mini-remise")

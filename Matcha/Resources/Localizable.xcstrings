@@ -1734,6 +1734,35 @@
         }
       }
     },
+    "Already used by “%@”." : {
+      "comment" : "Settings > Shortcuts: refused shortcut; a menu command",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wird bereits von „%@“ verwendet."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ya lo usa «%@»."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Déjà utilisé par « %@ »."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Già usata da “%@”."
+          }
+        }
+      }
+    },
     "Also import open tabs" : {
       "comment" : "Arc import preview: option, off by default",
       "localizations" : {
@@ -3052,6 +3081,35 @@
         }
       }
     },
+    "Click a shortcut, then type the new one: ⌫ removes it, ⎋ cancels. Find, spelling and the other standard commands follow macOS: change them in System Settings > Keyboard." : {
+      "comment" : "Settings > Shortcuts: note at the bottom",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Klicke auf einen Kurzbefehl und drücke dann den neuen: ⌫ entfernt ihn, ⎋ bricht ab. Suchen, Rechtschreibung und die anderen Standardbefehle folgen macOS: Ändere sie in den Systemeinstellungen > Tastatur."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Haz clic en un atajo y pulsa el nuevo: ⌫ lo elimina, ⎋ cancela. Buscar, la ortografía y los demás comandos estándar siguen a macOS: cámbialos en Ajustes del Sistema > Teclado."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cliquez sur un raccourci, puis tapez le nouveau : ⌫ le retire, ⎋ annule. Rechercher, l'orthographe et les autres commandes standard suivent macOS : modifiez-les dans Réglages Système > Clavier."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fai clic su una scorciatoia, poi premi quella nuova: ⌫ la rimuove, ⎋ annulla. Trova, l'ortografia e gli altri comandi standard seguono macOS: modificali in Impostazioni di Sistema > Tastiera."
+          }
+        }
+      }
+    },
     "Close all Today tabs" : {
       "comment" : "Help tag of the Clear button above the Today tabs",
       "localizations" : {
@@ -4082,6 +4140,35 @@
         }
       }
     },
+    "Delete “%@”?" : {
+      "comment" : "Alert title before deleting a Space; %@ is its name",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "„%@“ löschen?"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "¿Eliminar «%@»?"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Supprimer « %@ » ?"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Eliminare “%@”?"
+          }
+        }
+      }
+    },
     "Delete Folder" : {
       "comment" : "Pinned folder context menu",
       "localizations" : {
@@ -4746,6 +4833,35 @@
         }
       }
     },
+    "Edit" : {
+      "comment" : "Settings > Shortcuts: commands of the Edit menu",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bearbeiten"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Edición"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Édition"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Modifica"
+          }
+        }
+      }
+    },
     "Edit Address" : {
       "comment" : "Tooltip of the address pill",
       "localizations" : {
@@ -5163,6 +5279,35 @@
         }
       }
     },
+    "File" : {
+      "comment" : "Settings > Shortcuts: commands of the File menu",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ablage"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Archivo"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fichier"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "File"
+          }
+        }
+      }
+    },
     "File not found" : {
       "comment" : "State of a finished download whose file was deleted or moved",
       "localizations" : {
@@ -5250,35 +5395,6 @@
         }
       }
     },
-    "Find" : {
-      "comment" : "Edit menu: submenu with Find…, Find Next and Find Previous",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Suchen"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Buscar"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Rechercher"
-          }
-        },
-        "it" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Trova"
-          }
-        }
-      }
-    },
     "Find in Page" : {
       "comment" : "Find bar: placeholder of the search field, accessibility label of the bar and of its field",
       "localizations" : {
@@ -5304,93 +5420,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Trova nella pagina"
-          }
-        }
-      }
-    },
-    "Find Next" : {
-      "comment" : "Edit > Find menu: selects the next match in the page (⌘G)",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Weitersuchen"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Buscar siguiente"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Rechercher le suivant"
-          }
-        },
-        "it" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Trova successivo"
-          }
-        }
-      }
-    },
-    "Find Previous" : {
-      "comment" : "Edit > Find menu: selects the previous match in the page (⇧⌘G)",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Rückwärts suchen"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Buscar anterior"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Rechercher le précédent"
-          }
-        },
-        "it" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Trova precedente"
-          }
-        }
-      }
-    },
-    "Find…" : {
-      "comment" : "Edit > Find menu: opens the find bar of the page (⌘F)",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Suchen …"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Buscar…"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Rechercher…"
-          }
-        },
-        "it" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Trova…"
           }
         }
       }
@@ -6557,6 +6586,35 @@
         }
       }
     },
+    "In All Apps" : {
+      "comment" : "Settings > Shortcuts: section of the global shortcut",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "In allen Apps"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "En todas las apps"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dans toutes les apps"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "In tutte le app"
+          }
+        }
+      }
+    },
     "In the Sidebar" : {
       "comment" : "Address bar position option",
       "localizations" : {
@@ -6839,6 +6897,34 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "I suoi Space, pannelli, Preferiti, cookie e accessi verranno eliminati."
+          }
+        }
+      }
+    },
+    "Keyboard Shortcuts" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tastaturkurzbefehle"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Atajos de teclado"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Raccourcis clavier"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Scorciatoie da tastiera"
           }
         }
       }
@@ -7162,6 +7248,35 @@
         }
       }
     },
+    "macOS uses this shortcut." : {
+      "comment" : "Settings > Shortcuts: refused shortcut",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "macOS verwendet diesen Kurzbefehl."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "macOS usa este atajo."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "macOS utilise ce raccourci."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "macOS usa questa scorciatoia."
+          }
+        }
+      }
+    },
     "Make Default…" : {
       "comment" : "Settings > General: makes Matcha the default browser (macOS asks to confirm)",
       "localizations" : {
@@ -7421,6 +7536,34 @@
         }
       }
     },
+    "Matcha Help" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Matcha-Hilfe"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ayuda de Matcha"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aide Matcha"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aiuto Matcha"
+          }
+        }
+      }
+    },
     "Matcha is using an encrypted connection to “%@”." : {
       "comment" : "Certificate panel of an encrypted page; %@ is the website",
       "localizations" : {
@@ -7504,6 +7647,35 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Matcha è stato chiuso prima del termine del download."
+          }
+        }
+      }
+    },
+    "Matcha uses this shortcut for another command." : {
+      "comment" : "Settings > Shortcuts: refused shortcut",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Matcha verwendet diesen Kurzbefehl für einen anderen Befehl."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Matcha usa este atajo para otro comando."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Matcha utilise ce raccourci pour une autre commande."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Matcha usa questa scorciatoia per un altro comando."
           }
         }
       }
@@ -8426,6 +8598,35 @@
         }
       }
     },
+    "None" : {
+      "comment" : "Settings > Shortcuts: a command without shortcut",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Keiner"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ninguno"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aucun"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nessuna"
+          }
+        }
+      }
+    },
     "Not Found" : {
       "comment" : "Find bar: the last search found nothing in the page",
       "localizations" : {
@@ -8653,6 +8854,34 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Apri come pannello"
+          }
+        }
+      }
+    },
+    "Open File…" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Datei öffnen …"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Abrir archivo…"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ouvrir un fichier…"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Apri file…"
           }
         }
       }
@@ -10503,6 +10732,35 @@
         }
       }
     },
+    "Records a new shortcut." : {
+      "comment" : "Settings > Shortcuts: VoiceOver hint of a shortcut button",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nimmt einen neuen Kurzbefehl auf."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Graba un nuevo atajo."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Enregistre un nouveau raccourci."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Registra una nuova scorciatoia."
+          }
+        }
+      }
+    },
     "Red" : {
       "comment" : "Folder color swatch",
       "localizations" : {
@@ -10586,6 +10844,35 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Ricarica pagina"
+          }
+        }
+      }
+    },
+    "Reload Page From Origin" : {
+      "comment" : "View menu: reloads without the cache (⌥⌘R)",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Seite ohne Cache neu laden"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Volver a cargar la página sin caché"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Recharger la page sans le cache"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ricarica pagina senza cache"
           }
         }
       }
@@ -10934,6 +11221,64 @@
         }
       }
     },
+    "Reopen Closed Tab" : {
+      "comment" : "History menu (⇧⌘T)",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Geschlossenen Tab wieder öffnen"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Volver a abrir la pestaña cerrada"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rouvrir l'onglet fermé"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Riapri il pannello chiuso"
+          }
+        }
+      }
+    },
+    "Reopen Closed Tabs" : {
+      "comment" : "History menu (⇧⌘T), after closing several tabs at once",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Geschlossene Tabs wieder öffnen"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Volver a abrir las pestañas cerradas"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rouvrir les onglets fermés"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Riapri i pannelli chiusi"
+          }
+        }
+      }
+    },
     "Replace “%@”?" : {
       "comment" : "Extension install sheet: replaces an installed extension with the same name",
       "localizations" : {
@@ -10988,6 +11333,34 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Sostituisci estensione"
+          }
+        }
+      }
+    },
+    "Report a Problem…" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Problem melden …"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Informar de un problema…"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Signaler un problème…"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Segnala un problema…"
           }
         }
       }
@@ -11075,6 +11448,62 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Ripristina"
+          }
+        }
+      }
+    },
+    "Restore Default Shortcut" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Standardkurzbefehl wiederherstellen"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Restaurar el atajo por omisión"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rétablir le raccourci par défaut"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ripristina la scorciatoia predefinita"
+          }
+        }
+      }
+    },
+    "Restore Defaults" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Standards wiederherstellen"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Restaurar valores por omisión"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rétablir les réglages par défaut"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ripristina predefiniti"
           }
         }
       }
@@ -11570,6 +11999,34 @@
         }
       }
     },
+    "Shortcuts" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kurzbefehle"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Atajos"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Raccourcis"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Scorciatoie"
+          }
+        }
+      }
+    },
     "Show All History" : {
       "comment" : "History menu item (⌘Y)",
       "localizations" : {
@@ -11909,6 +12366,64 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Mostrare notifiche"
+          }
+        }
+      }
+    },
+    "Show or Hide Downloads" : {
+      "comment" : "Settings > Shortcuts: the View menu item",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Downloads ein- oder ausblenden"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mostrar u ocultar descargas"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Afficher ou masquer les téléchargements"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mostra o nascondi download"
+          }
+        }
+      }
+    },
+    "Show or Hide Sidebar" : {
+      "comment" : "Settings > Shortcuts: the View menu item",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Seitenleiste ein- oder ausblenden"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mostrar u ocultar barra lateral"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Afficher ou masquer la barre latérale"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mostra o nascondi barra laterale"
           }
         }
       }
@@ -12547,6 +13062,101 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Testo"
+          }
+        }
+      }
+    },
+    "The %lld tabs of this Space will close. You can't undo this action." : {
+      "comment" : "Alert before deleting a Space; the number of pinned and Today tabs",
+      "localizations" : {
+        "de" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Der Tab dieses Space wird geschlossen. Du kannst diese Aktion nicht widerrufen."
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Die %lld Tabs dieses Space werden geschlossen. Du kannst diese Aktion nicht widerrufen."
+                }
+              }
+            }
+          }
+        },
+        "en" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "The tab of this Space will close. You can't undo this action."
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "The %lld tabs of this Space will close. You can't undo this action."
+                }
+              }
+            }
+          }
+        },
+        "es" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "La pestaña de este Space se cerrará. No podrás deshacer esta acción."
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Las %lld pestañas de este Space se cerrarán. No podrás deshacer esta acción."
+                }
+              }
+            }
+          }
+        },
+        "fr" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "L'onglet de ce Space sera fermé. Cette action est irréversible."
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Les %lld onglets de ce Space seront fermés. Cette action est irréversible."
+                }
+              }
+            }
+          }
+        },
+        "it" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Il pannello di questo Space verrà chiuso. Non potrai annullare questa azione."
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "I %lld pannelli di questo Space verranno chiusi. Non potrai annullare questa azione."
+                }
+              }
+            }
           }
         }
       }
@@ -13416,6 +14026,35 @@
         }
       }
     },
+    "This shortcut opens a mini window from any app." : {
+      "comment" : "Settings > Shortcuts: refused shortcut",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dieser Kurzbefehl öffnet ein Mini-Fenster aus jeder App."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Este atajo abre una miniventana desde cualquier app."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ce raccourci ouvre une mini-fenêtre depuis n'importe quelle app."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Questa scorciatoia apre una minifinestra da qualsiasi app."
+          }
+        }
+      }
+    },
     "This version doesn't ask for any new permission." : {
       "comment" : "Extension update sheet: no permission added",
       "localizations" : {
@@ -13793,6 +14432,35 @@
         }
       }
     },
+    "Type Shortcut" : {
+      "comment" : "Settings > Shortcuts: waiting for the new shortcut",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kurzbefehl drücken"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pulsa el atajo"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tapez le raccourci"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Premi la scorciatoia"
+          }
+        }
+      }
+    },
     "Unavailable" : {
       "comment" : "An extension from another Mac whose package can't be downloaded",
       "localizations" : {
@@ -14023,6 +14691,35 @@
         }
       }
     },
+    "Use ⌘ or ⌃ in the shortcut." : {
+      "comment" : "Settings > Shortcuts: refused shortcut",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Verwende ⌘ oder ⌃ im Kurzbefehl."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Usa ⌘ o ⌃ en el atajo."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Utilisez ⌘ ou ⌃ dans le raccourci."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Usa ⌘ o ⌃ nella scorciatoia."
+          }
+        }
+      }
+    },
     "User Name" : {
       "comment" : "Field of the sheet where a website asks for a user name and password",
       "localizations" : {
@@ -14135,6 +14832,35 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Versione %1$@, compilata il %2$@"
+          }
+        }
+      }
+    },
+    "View" : {
+      "comment" : "Settings > Shortcuts: commands of the View menu",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Darstellung"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Visualización"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Présentation"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vista"
           }
         }
       }

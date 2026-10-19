@@ -13,6 +13,8 @@ final class TabManager {
     var renamingFolderID: UUID?
     /// Peek opened on top of the displayed pages (Shift-click, task 4.4): a page outside the sidebar.
     private(set) var peek: Peek?
+    /// Tabs closed by the user, that ⇧⌘T brings back (audit H2); in memory only.
+    var closedTabs = ClosedTabGroups()
     private var tabsByID: [BrowserTab.ID: BrowserTab] = [:]
 
     /// Data store (cookies, storage) of this window's tabs.
@@ -116,7 +118,7 @@ final class TabManager {
             return
         }
         if place == .today {
-            delete(tab)
+            delete(tab, reopenable: true)
         } else if place == .pinned, let group = layout.split(containing: tab.id) {
             // A pinned split closes as a whole, like a pinned tab: it unloads and stays in the sidebar.
             closeSplit(group.id)
@@ -127,10 +129,14 @@ final class TabManager {
         }
     }
 
-    /// Removes the tab from the sidebar, wherever it is, and releases its web view.
-    func delete(_ tab: BrowserTab) {
+    /// Removes the tab from the sidebar, wherever it is, and releases its web view. `reopenable`: closed by the user,
+    /// ⇧⌘T can bring it back (not a tab that moves to another Space).
+    func delete(_ tab: BrowserTab, reopenable: Bool = false) {
         guard tabsByID[tab.id] != nil else {
             return
+        }
+        if reopenable {
+            rememberClosed([tab])
         }
         moveSelection(awayFrom: tab) { discard(tab) }
     }

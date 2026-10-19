@@ -14,7 +14,7 @@ extension MiniWindowManager {
         return session.spaces.first { $0.id == lastMainSpaceID } ?? session.spaces[0]
     }
 
-    /// Space where the page of a mini window of profile `profileID` goes (button, ⌘O, ⌘-click): see `MiniWindowTarget`.
+    /// Space where the page of a mini window of profile `profileID` goes (button, ⇧⌘O, ⌘-click): see `MiniWindowTarget`.
     func defaultTarget(profileID: UUID?) -> SpaceSession {
         let spaces = session.spaces.map { MiniWindowTarget.Space(id: $0.id, profileID: $0.record.profile?.id) }
         let id = MiniWindowTarget.defaultSpaceID(profileID: profileID, displayedSpaceID: displayedSpace.id, spaces: spaces)
@@ -50,7 +50,7 @@ extension MiniWindowManager {
     /// main window displays that Space and the page takes the keyboard. `openMainWindow` reopens the main window if
     /// it is closed.
     func openInSpace(_ controller: MiniWindowController, openMainWindow: () -> Void) {
-        // One page to hand off, and only once (double click, repeated ⌘O).
+        // One page to hand off, and only once (double click, repeated ⇧⌘O).
         guard controller.tab.url != nil, windows.contains(where: { $0 === controller }) else {
             return
         }

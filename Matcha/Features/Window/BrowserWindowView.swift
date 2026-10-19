@@ -3,7 +3,7 @@ import SwiftUI
 import WebKit
 
 /// Browser window: Space background, sidebar on the left, page in a card on the right, and the command bar on top.
-/// The sidebar can be hidden (⌘S); it then reappears over the page when hovering the left edge.
+/// The sidebar can be hidden (⌃⌘S); it then reappears over the page when hovering the left edge.
 struct BrowserWindowView: View {
     /// Margin around the content card, except on the sidebar's side.
     static let cardMargin = 8.0
@@ -150,6 +150,8 @@ struct BrowserWindowView: View {
         .linkedToMiniWindows(session: session, model: model, window: window) { [commandBar] in commandBar.dismiss() }
         // Window and tabs as seen by extensions (task 6.3).
         .seenByExtensions(model: model, window: window)
+        // Edit > Find on the front page (audit H1).
+        .findsInPages(model: model, window: window) { [commandBar] in commandBar.dismiss() }
         .environment(model)
         .focusedSceneValue(\.tabManager, tabManager)
         .focusedSceneValue(\.windowActions, windowActions)

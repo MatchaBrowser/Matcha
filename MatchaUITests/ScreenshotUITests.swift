@@ -274,7 +274,7 @@ final class ScreenshotUITests: XCTestCase {
     @MainActor
     private func captureHiddenSidebar(in app: XCUIApplication, window: XCUIElement) {
         window.coordinate(withNormalizedOffset: CGVector(dx: 0.6, dy: 0.5)).hover()
-        app.typeKey("s", modifierFlags: .command)
+        app.typeKey("s", modifierFlags: [.command, .control])
         sleep(1)
         attach(window.screenshot(), as: "4-barre-masquee")
         window.coordinate(withNormalizedOffset: CGVector(dx: 0, dy: 0.5)).withOffset(CGVector(dx: 3, dy: 0)).hover()

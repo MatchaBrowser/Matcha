@@ -400,14 +400,14 @@ Rien n'est branché : il n'y a pas de transport, et seuls les tests créent `Syn
 
 ## 7. Recommandations Apple (HIG, accessibilité, performance)
 
-**H1. Raccourcis et menus**
+**✅ H1. Raccourcis et menus** — corrigé : ⌃⌘S, ⌘S, ⌘O/⇧⌘O, commandes d'édition standard, menu Aide, ⌘., ⌥⌘R, ⌘E ; et Réglages > Raccourcis.
 - ⌘S masque la barre latérale. Le raccourci standard est ⌃⌘S, et ⌘S veut dire « Enregistrer ».
 - ⌘O ouvre dans le Space, et il n'y a pas de Fichier > Ouvrir un fichier….
 - `CommandGroup(replacing: .textEditing)` retire probablement Orthographe, Substitutions, Transformations et Parole du menu Édition (à vérifier dans l'app).
 - Le menu Aide est vide.
 - Il manque ⌘. (Arrêter), ⌥⌘R et ⌘E.
 
-**H2. Annulation**
+**✅ H2. Annulation** — corrigé : ⇧⌘T (onglets fermés, « Effacer » d'un coup), confirmation avant de supprimer un Space qui a des onglets ; un dossier supprimé garde ses onglets.
 - Il n'y a ni annulation, ni « Rouvrir l'onglet fermé » (⇧⌘T).
 - Supprimer un Space ou un dossier, et « Effacer » les onglets du jour, se font sans confirmation et sans annulation.
 
