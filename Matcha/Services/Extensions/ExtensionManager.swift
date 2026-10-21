@@ -46,7 +46,8 @@ final class ExtensionManager: NSObject {
     /// Extensions that already had a native message refused (one log line each).
     @ObservationIgnored var nativeMessageSenders: Set<String> = []
     @ObservationIgnored var isStarted = false
-    @ObservationIgnored var observers: [any NSObjectProtocol] = []
+    /// Removed with the manager (tests), without `deinit` (`NotificationObservation`).
+    @ObservationIgnored var observers: [NotificationObservation] = []
 
     init(configuration: WKWebExtensionController.Configuration, store: ExtensionStateStore, directory: URL?) {
         // Extension pages (popup, options, background): presented to websites as Safari, like the tabs.
@@ -62,17 +63,11 @@ final class ExtensionManager: NSObject {
         controller.delegate = controllerDelegate
         observeContexts()
         // Developer tools: extension pages inspectable (Safari > Develop) depending on the setting.
-        observers
-            .append(NotificationCenter.default.addObserver(forName: WebInspection.didChange, object: nil, queue: .main) { [weak self] _ in
-                MainActor.assumeIsolated {
-                    self?.contexts.values.forEach { $0.isInspectable = WebInspection.isEnabled() }
-                }
-            })
-    }
-
-    /// A manager that goes away (tests) takes its observers with it (audit C7).
-    isolated deinit {
-        observers.forEach(NotificationCenter.default.removeObserver)
+        observers.append(NotificationObservation(of: WebInspection.didChange) { [weak self] _ in
+            MainActor.assumeIsolated {
+                self?.contexts.values.forEach { $0.isInspectable = WebInspection.isEnabled() }
+            }
+        })
     }
 
     /// True for the address of an extension page.

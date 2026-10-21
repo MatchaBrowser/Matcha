@@ -23,7 +23,8 @@ final class DownloadManager: NSObject {
     /// Names chosen for downloads whose file does not exist yet, or is not deleted yet (compared case-insensitively,
     /// like the disk).
     @ObservationIgnored private var reservedNames: Set<String> = []
-    @ObservationIgnored private var terminationObserver: (any NSObjectProtocol)?
+    /// Removed with the manager (tests), without `deinit` (`NotificationObservation`).
+    @ObservationIgnored private var terminationObserver: NotificationObservation?
     /// Settings where the list is kept; nil (tests, test store): nothing is read or written.
     @ObservationIgnored private var defaults: UserDefaults?
 
@@ -31,22 +32,11 @@ final class DownloadManager: NSObject {
     init(directory: @escaping @MainActor () -> URL? = { DownloadLocation.directory() }) {
         self.directory = directory
         super.init()
-        terminationObserver = NotificationCenter.default.addObserver(
-            forName: NSApplication.willTerminateNotification,
-            object: nil,
-            queue: .main,
-        ) { [weak self] _ in
+        terminationObserver = NotificationObservation(of: NSApplication.willTerminateNotification) { [weak self] _ in
             MainActor.assumeIsolated {
                 self?.removePartialFiles()
                 self?.saveList(includingActive: true)
             }
-        }
-    }
-
-    /// A manager that goes away (tests) takes its observer with it (audit C7).
-    isolated deinit {
-        if let terminationObserver {
-            NotificationCenter.default.removeObserver(terminationObserver)
         }
     }
 

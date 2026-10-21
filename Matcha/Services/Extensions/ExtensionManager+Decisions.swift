@@ -72,7 +72,7 @@ extension ExtensionManager {
         // All loaded extensions are read again (nothing is written for those that have not changed): the notification
         // does not cross the isolation boundary.
         for name in names + [NSApplication.willTerminateNotification] {
-            observers.append(NotificationCenter.default.addObserver(forName: name, object: nil, queue: .main) { [weak self] _ in
+            observers.append(NotificationObservation(of: name) { [weak self] _ in
                 MainActor.assumeIsolated {
                     self?.saveAllStates()
                 }
