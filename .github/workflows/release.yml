@@ -1,0 +1,69 @@
+# Version tags (v1.2.0, or v1.2.0-beta.1 for a pre-release): the checks of check.yml, then a universal disk image
+# signed ad hoc (scripts/package.sh), published as a GitHub release. Neither signed by Apple nor notarized: macOS asks
+# to confirm the first opening, the release notes say how. The signed and notarized path, with Developer ID, is
+# scripts/release.sh, run on a Mac that has the certificate.
+name: Publication
+
+on:
+  push:
+    tags: ["v*"]
+
+jobs:
+  check:
+    uses: ./.github/workflows/check.yml
+
+  release:
+    needs: check
+    runs-on: macos-26
+    timeout-minutes: 60
+    permissions:
+      # Creating the release.
+      contents: write
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          # The build number counts the commits.
+          fetch-depth: 0
+
+      - name: Xcode le plus récent de la machine
+        run: |
+          xcode="$(ls -d /Applications/Xcode*.app | sort -V | tail -1)"
+          sudo xcode-select -s "$xcode"
+          xcodebuild -version
+
+      - name: Image disque
+        run: scripts/package.sh "${GITHUB_REF_NAME#v}"
+
+      - name: Release GitHub
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          version="${GITHUB_REF_NAME#v}"
+          dmg="build/package/$version/Matcha-$version.dmg"
+          cat > "$RUNNER_TEMP/notes.md" <<NOTES
+          Version de test, **sans signature d'Apple** : macOS bloque sa première ouverture.
+
+          1. Ouvrez \`Matcha-$version.dmg\` et glissez Matcha dans Applications (remplacez l'ancienne version).
+          2. Ouvrez Matcha : macOS refuse de l'ouvrir. Fermez le message.
+          3. Réglages Système > Confidentialité et sécurité, tout en bas : « Ouvrir quand même » à côté de Matcha, puis confirmez.
+
+          Ou, dans le Terminal : \`xattr -dr com.apple.quarantine /Applications/Matcha.app\`
+
+          SHA-256 de l'image disque : \`$(cat "$dmg.sha256")\`
+
+          NOTES
+          # A tag with a suffix (v1.2.0-beta.1) is a pre-release.
+          prerelease=()
+          [[ "$version" == *-* ]] && prerelease=(--prerelease)
+          # These notes come before those GitHub writes (the changes since the previous tag).
+          gh release create "$GITHUB_REF_NAME" "$dmg" "$dmg.sha256" --title "Matcha $version" \
+            --notes "$(cat "$RUNNER_TEMP/notes.md")" --generate-notes ${prerelease[@]+"${prerelease[@]}"}
+
+      - name: Journaux
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: journaux-publication
+          path: |
+            build/package/*/build.log
+            build/package/*/hdiutil.log

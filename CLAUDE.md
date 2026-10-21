@@ -41,6 +41,10 @@ scripts/strings.sh fr
 # Tout vérifier d'un coup, comme la CI (GitHub Actions) : format, style, compilation sans avertissement,
 # traductions, tests unitaires ; --fix formate d'abord
 scripts/check.sh
+
+# Image disque universelle signée ad hoc, sans Apple (build/package/<version>/) ; la CI la publie pour chaque
+# étiquette vX.Y.Z poussée (.github/workflows/release.yml)
+scripts/package.sh 1.2.0
 ```
 
 `xcbeautify` s'installe avec `brew install xcbeautify`. S'il manque, retire `| xcbeautify` et `set -o pipefail &&`.

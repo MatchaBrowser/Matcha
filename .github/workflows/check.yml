@@ -4,7 +4,10 @@ name: Vérifications
 
 on:
   push:
+    # Branches only: a version tag runs these checks through release.yml, before building the app.
+    branches: ["**"]
   pull_request:
+  workflow_call:
 
 jobs:
   check:
