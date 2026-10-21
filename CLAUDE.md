@@ -42,8 +42,8 @@ scripts/strings.sh fr
 # traductions, tests unitaires ; --fix formate d'abord
 scripts/check.sh
 
-# Image disque universelle signée ad hoc, sans Apple (build/package/<version>/) ; la CI la publie pour chaque
-# étiquette vX.Y.Z poussée (.github/workflows/release.yml)
+# Image disque universelle signée ad hoc, sans Apple (build/package/<version>/) ; la CI la joint à chaque Release
+# publiée sur GitHub (.github/workflows/release.yml)
 scripts/package.sh 1.2.0
 ```
 
