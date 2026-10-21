@@ -20,7 +20,9 @@ struct SplitGroupTests {
     @Test func `valid fractions are kept exactly`() {
         let fractions = [0.1, 0.2, 0.3, 0.4]
         #expect(SplitGroup.normalizedFractions(fractions, count: 4) == fractions)
-        #expect(SplitGroup.normalizedFractions([1 / 3.0, 2 / 3.0], count: 2) == [1 / 3.0, 2 / 3.0])
+        // Typed apart: inside `#expect`, Xcode 26's compiler gives up on this literal (CI).
+        let thirds: [Double] = [1 / 3.0, 2 / 3.0]
+        #expect(SplitGroup.normalizedFractions(thirds, count: 2) == thirds)
         #expect(SplitGroup.normalizedFractions([], count: 0).isEmpty)
         #expect(SplitGroup.equalFractions(count: 0).isEmpty)
     }

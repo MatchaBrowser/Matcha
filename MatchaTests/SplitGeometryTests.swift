@@ -48,8 +48,11 @@ struct SplitGeometryTests {
     }
 
     @Test func `dragging stops at the minimum width on both sides`() {
-        #expect(SplitGeometry.fractions(draggingDivider: 0, by: 1000, startWidths: [300, 300]) == [400 / 600.0, 200 / 600.0])
-        #expect(SplitGeometry.fractions(draggingDivider: 0, by: -1000, startWidths: [300, 300]) == [200 / 600.0, 400 / 600.0])
+        // Typed apart: inside `#expect`, Xcode 26's compiler gives up on these literals (CI).
+        let wider: [Double] = [400 / 600.0, 200 / 600.0]
+        let narrower: [Double] = [200 / 600.0, 400 / 600.0]
+        #expect(SplitGeometry.fractions(draggingDivider: 0, by: 1000, startWidths: [300, 300]) == wider)
+        #expect(SplitGeometry.fractions(draggingDivider: 0, by: -1000, startWidths: [300, 300]) == narrower)
         // Two panes already too narrow: they stay equal.
         #expect(SplitGeometry.fractions(draggingDivider: 0, by: 40, startWidths: [150, 150]) == [0.5, 0.5])
     }
