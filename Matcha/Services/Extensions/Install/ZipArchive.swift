@@ -144,10 +144,7 @@ nonisolated struct ZipArchive {
         let extraLength = try Int(uint16(data, at: position + 30))
         let commentLength = try Int(uint16(data, at: position + 32))
         let localOffset = try uint32(data, at: position + 42)
-        guard flags & 0x1 == 0 else {
-            throw Failure.unsupported
-        }
-        guard compressedSize != 0xFFFF_FFFF, uncompressedSize != 0xFFFF_FFFF, localOffset != 0xFFFF_FFFF else {
+        guard flags & 0x1 == 0, compressedSize != 0xFFFF_FFFF, uncompressedSize != 0xFFFF_FFFF, localOffset != 0xFFFF_FFFF else {
             throw Failure.unsupported
         }
         let nameStart = position + 46

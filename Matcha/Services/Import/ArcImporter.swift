@@ -192,10 +192,9 @@ struct ArcImporter {
     ) -> Int {
         var added = 0
         for (key, tabs) in favorites {
-            guard let profile = profiles[key], !created.contains(where: { $0 === profile }) else {
-                continue
-            }
-            guard let holder = session.favoritesHolder(of: profile.id) else {
+            guard let profile = profiles[key], !created.contains(where: { $0 === profile }),
+                  let holder = session.favoritesHolder(of: profile.id)
+            else {
                 continue
             }
             let present = Set(holder.favoriteTabs.compactMap { $0.pinnedURL ?? $0.url })

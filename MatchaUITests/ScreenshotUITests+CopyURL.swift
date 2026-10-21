@@ -1,10 +1,10 @@
 import XCTest
 
 /// Screenshot of the “URL Copied” confirmation (task 4.6, `MATCHA_SCREENSHOT_COPY_URL`, see `ScreenshotUITests`).
+@MainActor
 extension ScreenshotUITests {
     /// “URL Copied” confirmation (⇧⌘C), captured once the fade-in is over, then waited on until it goes away so it
     /// doesn't get in the way of the next screenshots.
-    @MainActor
     func captureCopyConfirmation(in app: XCUIApplication, window: XCUIElement) {
         if ProcessInfo.processInfo.environment["MATCHA_SCREENSHOT_URLS"] == nil {
             openAddress("about:blank?copy", in: app)

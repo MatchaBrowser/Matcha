@@ -27,9 +27,9 @@ nonisolated struct PopupWindowFeatures: Equatable, Sendable {
     }
 }
 
+@MainActor
 extension PopupWindowFeatures {
     /// What WebKit passes on from the `window.open` string (verified: each value is given only if the page writes it).
-    @MainActor
     init(_ features: WKWindowFeatures) {
         self.init(width: features.width?.doubleValue, height: features.height?.doubleValue)
     }

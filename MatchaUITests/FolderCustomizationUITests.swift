@@ -107,15 +107,14 @@ final class FolderCustomizationUITests: XCTestCase {
     }
 }
 
+@MainActor
 extension XCTestCase {
     /// First folder row of the sidebar.
-    @MainActor
     func folderRow(in app: XCUIApplication) -> XCUIElement {
         app.descendants(matching: .any).matching(identifier: "folderRow").firstMatch
     }
 
     /// Customization panel of a folder.
-    @MainActor
     func customizationPanel(in app: XCUIApplication) -> XCUIElement {
         app.descendants(matching: .any).matching(identifier: "folderCustomizationPanel").firstMatch
     }

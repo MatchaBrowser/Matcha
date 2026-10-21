@@ -1,12 +1,12 @@
 import XCTest
 
 /// Screenshots of the history window (task 5.5, `MATCHA_SCREENSHOT_HISTORY`, see `ScreenshotUITests`).
+@MainActor
 extension ScreenshotUITests {
     /// If `MATCHA_SCREENSHOT_HISTORY` is set: without `MATCHA_SCREENSHOT_URLS`, two pages of the Postfix
     /// documentation are visited first (no network); then ⌘Y, the history window (`33-historique`); with a value other
     /// than “1”, this text searched (`34-historique-recherche`); finally the “Clear History…” dialog
     /// (`35-historique-effacer`), cancelled, and the window closed (⌘W).
-    @MainActor
     func captureHistory(in app: XCUIApplication) throws {
         let environment = ProcessInfo.processInfo.environment
         guard let search = environment["MATCHA_SCREENSHOT_HISTORY"] else {

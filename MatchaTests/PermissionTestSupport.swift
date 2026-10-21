@@ -18,9 +18,9 @@ nonisolated enum TestOrigins {
     static let local = SiteOrigin(scheme: "http", host: "localhost", port: 8080)!
 }
 
+@MainActor
 extension SitePermissionRequest {
     /// Test request: `asked` defaults to `requested`.
-    @MainActor
     static func test(
         _ requested: Set<SitePermissionKind>,
         origin: SiteOrigin? = TestOrigins.meet,

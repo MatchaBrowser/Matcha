@@ -1,13 +1,13 @@
 import XCTest
 
 /// Screenshots of page zoom (task 5.4, `MATCHA_SCREENSHOT_ZOOM`, see `ScreenshotUITests`).
+@MainActor
 extension ScreenshotUITests {
     /// If `MATCHA_SCREENSHOT_ZOOM` is set: ⌘+ twice on the displayed tab, “125 %” badge next to the address pill
     /// captured once its animations are over (`31-zoom-badge`); without `MATCHA_SCREENSHOT_URLS`, the Postfix
     /// documentation is opened first (no network). Then, if `MATCHA_SCREENSHOT_ZOOM=site`, https://example.com
     /// (network) in a new tab, ⌘+ and the site settings panel opened on its “Zoom” row, “115 %” badge included
     /// (`32-zoom-reglages-site`). The zoom goes back to 100 % (⌘0) at the end.
-    @MainActor
     func captureZoom(in app: XCUIApplication, window: XCUIElement) throws {
         let environment = ProcessInfo.processInfo.environment
         guard let mode = environment["MATCHA_SCREENSHOT_ZOOM"] else {

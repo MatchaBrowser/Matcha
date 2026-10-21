@@ -1,13 +1,13 @@
 import XCTest
 
 /// Screenshots of the downloads (`MATCHA_SCREENSHOT_DOWNLOADS`, see `ScreenshotUITests`).
+@MainActor
 extension ScreenshotUITests {
     /// If `MATCHA_SCREENSHOT_DOWNLOADS` is set: the empty panel, opened by the button in the sidebar footer
     /// (`36-telechargements-vide`); then downloads this file (path of a local file that WebKit doesn't display, or
     /// “1” for the one of the tests) and captures the button (`24-telechargement-bouton`) and the open list
     /// (`25-telechargements-liste`), then closed with its cross. The test folder is deleted at the end
     /// (`removeDownloadsTestFolder`).
-    @MainActor
     func captureDownloads(in app: XCUIApplication, window: XCUIElement) throws {
         guard let value = ProcessInfo.processInfo.environment["MATCHA_SCREENSHOT_DOWNLOADS"] else {
             return

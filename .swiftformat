@@ -1,5 +1,9 @@
---swift-version 6.4
+# Lowest compiler that must build the code: the CI's (GitHub's macos-26 machines, Xcode 26). With 6.4, SwiftFormat
+# writes `any P?`, which Swift 6.3 and earlier refuse.
+--swift-version 6.2
 --language-mode 6
 --indent 4
 --max-width 140
 --exclude build,DerivedData
+# Same version as the CI (.github/workflows/check.yml): a newer one brings new rules.
+--minversion 0.64.0

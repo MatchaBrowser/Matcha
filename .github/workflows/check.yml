@@ -20,7 +20,24 @@ jobs:
           xcodebuild -version
 
       - name: SwiftFormat et SwiftLint
-        run: brew install swiftformat swiftlint
+        # Fixed versions, from their GitHub releases: a new version brings new rules, which would fail unchanged code.
+        # Same SwiftFormat as `--minversion` in .swiftformat.
+        env:
+          SWIFTFORMAT_VERSION: 0.64.0
+          SWIFTLINT_VERSION: 0.65.1
+        run: |
+          tools="$RUNNER_TEMP/tools"
+          mkdir -p "$tools"
+          curl -fsSL -o "$RUNNER_TEMP/swiftformat.zip" \
+            "https://github.com/nicklockwood/SwiftFormat/releases/download/$SWIFTFORMAT_VERSION/swiftformat.zip"
+          curl -fsSL -o "$RUNNER_TEMP/swiftlint.zip" \
+            "https://github.com/realm/SwiftLint/releases/download/$SWIFTLINT_VERSION/portable_swiftlint.zip"
+          unzip -q -o "$RUNNER_TEMP/swiftformat.zip" swiftformat -d "$tools"
+          unzip -q -o "$RUNNER_TEMP/swiftlint.zip" swiftlint -d "$tools"
+          chmod +x "$tools/swiftformat" "$tools/swiftlint"
+          echo "$tools" >> "$GITHUB_PATH"
+          "$tools/swiftformat" --version
+          "$tools/swiftlint" version
 
       - name: Vérifications
         # No signing team on GitHub's machines: signed to run locally only.

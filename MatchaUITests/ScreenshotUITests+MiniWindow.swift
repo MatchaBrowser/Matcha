@@ -1,10 +1,10 @@
 import XCTest
 
 /// Screenshots of the mini window (`MATCHA_SCREENSHOT_MINI`, see `ScreenshotUITests`).
+@MainActor
 extension ScreenshotUITests {
     /// Empty mini window (bar open), then the typed page, then the whole screen once the browser window is activated
     /// (the mini window stays in front), finally the page moved into the Space (⌘O).
-    @MainActor
     func captureMiniWindow(typing text: String, in app: XCUIApplication) {
         // Not `app.windows.firstMatch`: the mini window, in front, would be found first.
         let browser = browserWindow(in: app)

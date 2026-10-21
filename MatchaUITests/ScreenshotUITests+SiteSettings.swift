@@ -1,11 +1,11 @@
 import XCTest
 
 /// Screenshots of the site settings and the permission banner (task 5.2, see `ScreenshotUITests`).
+@MainActor
 extension ScreenshotUITests {
     /// If `MATCHA_SCREENSHOT_SITE_SETTINGS` is set: site settings panel opened on the displayed tab
     /// (`26-reglages-site`), then the data clearing confirmation (`27-reglages-site-effacer`), cancelled.
     /// Without `MATCHA_SCREENSHOT_URLS`, https://example.com is opened first (network needed).
-    @MainActor
     func captureSiteSettings(in app: XCUIApplication, window: XCUIElement) {
         let environment = ProcessInfo.processInfo.environment
         guard environment["MATCHA_SCREENSHOT_SITE_SETTINGS"] != nil else {
@@ -34,7 +34,6 @@ extension ScreenshotUITests {
     /// `MATCHA_SCREENSHOT_PERMISSION_BUTTON` is clicked if it is set, then the camera or microphone request banner is
     /// captured (`28-permission-bandeau`), without answering. Network needed; if macOS hasn't given Matcha access to
     /// the camera yet, its own access request may appear and block the screenshot.
-    @MainActor
     func capturePermissionBanner(in app: XCUIApplication, window: XCUIElement) {
         let environment = ProcessInfo.processInfo.environment
         guard let address = environment["MATCHA_SCREENSHOT_PERMISSION_URL"] else {
