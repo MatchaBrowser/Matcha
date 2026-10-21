@@ -26,6 +26,52 @@ step() {
     printf '\n▸ %s\n' "$1"
 }
 
+# Why the unit tests failed. When the host app crashes or quits, every unfinished test fails in 0 s: its crash comes
+# first, then the issues the tests recorded, then the failed tests. `awk` rather than `head`: it reads to the end, so
+# that `grep` never writes into a closed pipe.
+report_test_failures() {
+    local log="$LOGS/tests.log"
+    grep -E "error:" "$log" | grep -v "appintents" | sort -u | awk 'NR <= 20' || true
+    grep -E "encountered an error|Crash:|crashed|unexpected exit|exited with code|Fatal error" "$log" | sort -u | awk 'NR <= 20' || true
+    report_crashes
+    grep -E "recorded an issue" "$log" | sort -u | awk 'NR <= 30' || true
+    local failed
+    failed=$(grep -E "^Test case .* failed" "$log" | sort -u || true)
+    if [[ -n "$failed" ]]; then
+        printf '%s\n' "$failed" | awk 'NR <= 30'
+        echo "  … $(printf '%s\n' "$failed" | wc -l | tr -d ' ') tests en échec en tout"
+    fi
+}
+
+# Exception and first frames of the crashed thread of each Matcha crash report written during the tests (macOS keeps
+# them in ~/Library/Logs/DiagnosticReports, as JSON after a header line).
+report_crashes() {
+    local reports
+    reports=$(find "$HOME/Library/Logs/DiagnosticReports" -name 'Matcha*.ips' -newer "$LOGS/tests-started" 2>/dev/null || true)
+    [[ -z "$reports" ]] && return 0
+    mkdir -p "$LOGS/crashes"
+    while IFS= read -r report; do
+        cp "$report" "$LOGS/crashes/"
+        echo "Plantage de Matcha : $report"
+        python3 - "$report" <<'EOF' || true
+import json, sys
+
+body = json.loads(open(sys.argv[1]).read().split("\n", 1)[1])
+exception = body.get("exception", {})
+print("  ", exception.get("type"), exception.get("signal"), exception.get("subtype", ""))
+for messages in (body.get("asi") or {}).values():
+    for message in messages:
+        print("  ", message.strip())
+images = body.get("usedImages", [])
+thread = body["threads"][body["faultingThread"]]
+for frame in thread["frames"][:20]:
+    image = images[frame["imageIndex"]].get("name", "?") if frame.get("imageIndex") is not None else "?"
+    place = f" ({frame['sourceFile']}:{frame.get('sourceLine')})" if frame.get("sourceFile") else ""
+    print(f"     {image}  {frame.get('symbol', '?')}{place}")
+EOF
+    done <<< "$reports"
+}
+
 step "Mise en forme (SwiftFormat)"
 if $FIX; then
     swiftformat .
@@ -54,9 +100,11 @@ step "Traductions"
 scripts/check-localizations.sh
 
 step "Tests unitaires"
+# Crash reports written from now on are this run's (`report_crashes`).
+touch "$LOGS/tests-started"
 xcodebuild -project Matcha.xcodeproj -scheme Matcha -destination "$DESTINATION" -derivedDataPath build \
     ${FLAGS[@]+"${FLAGS[@]}"} test -only-testing:MatchaTests > "$LOGS/tests.log" 2>&1 || {
-    grep -E "error:|✘|failed" "$LOGS/tests.log" | head -40
+    report_test_failures
     echo "✗ tests en échec (journal : $LOGS/tests.log ; détail : xcrun xcresulttool, build/Logs/Test)"
     exit 1
 }
