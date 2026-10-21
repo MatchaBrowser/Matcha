@@ -41,8 +41,11 @@ jobs:
 
       - name: Vérifications
         # No signing team on GitHub's machines: signed to run locally only.
+        # One test at a time: in parallel, hundreds of WebKit tests and their page processes overload the 3 cores and
+        # 7 GB of GitHub's machines, and waits time out (CI of 2026-10-21). In series, about a minute on a Mac.
         env:
           MATCHA_XCODEBUILD_FLAGS: CODE_SIGN_IDENTITY=- CODE_SIGN_STYLE=Manual DEVELOPMENT_TEAM= CODE_SIGNING_REQUIRED=NO
+          MATCHA_TEST_FLAGS: -parallel-testing-enabled NO
         run: scripts/check.sh
 
       - name: Journaux

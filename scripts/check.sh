@@ -7,7 +7,8 @@
 #   scripts/check.sh --fix      formats the code first (swiftformat), then checks
 #
 # Needs SwiftFormat and SwiftLint (brew install swiftformat swiftlint). Extra xcodebuild settings can be given in
-# MATCHA_XCODEBUILD_FLAGS (GitHub Actions: no signing team on its machines).
+# MATCHA_XCODEBUILD_FLAGS (GitHub Actions: no signing team on its machines), and options of the unit tests alone in
+# MATCHA_TEST_FLAGS (GitHub Actions: one test at a time).
 set -euo pipefail
 
 cd "$(dirname "$0")/.."
@@ -18,6 +19,8 @@ FIX=false
 # Word splitting wanted: several settings in one variable.
 # shellcheck disable=SC2206
 FLAGS=(${MATCHA_XCODEBUILD_FLAGS:-})
+# shellcheck disable=SC2206
+TEST_FLAGS=(${MATCHA_TEST_FLAGS:-})
 DESTINATION="platform=macOS,arch=arm64"
 LOGS="build/check"
 mkdir -p "$LOGS"
@@ -26,21 +29,32 @@ step() {
     printf '\n▸ %s\n' "$1"
 }
 
-# Why the unit tests failed. When the host app crashes or quits, every unfinished test fails in 0 s: its crash comes
-# first, then the issues the tests recorded, then the failed tests. `awk` rather than `head`: it reads to the end, so
-# that `grep` never writes into a closed pipe.
+# Why the unit tests failed. When the host app crashes or quits, every unfinished test fails: its crash comes first,
+# then each failed test with its message, read from the test results (the log's format depends on parallel or serial
+# runs). `awk` rather than `head`: it reads to the end, so that `grep` never writes into a closed pipe.
 report_test_failures() {
     local log="$LOGS/tests.log"
     grep -E "error:" "$log" | grep -v "appintents" | sort -u | awk 'NR <= 20' || true
-    grep -E "encountered an error|Crash:|crashed|unexpected exit|exited with code|Fatal error" "$log" | sort -u | awk 'NR <= 20' || true
+    grep -E "encountered an error|Crash: |unexpected exit|exited with code|Fatal error:" "$log" | sort -u | awk 'NR <= 20' || true
     report_crashes
-    grep -E "recorded an issue" "$log" | sort -u | awk 'NR <= 30' || true
-    local failed
-    failed=$(grep -E "^Test case .* failed" "$log" | sort -u || true)
-    if [[ -n "$failed" ]]; then
-        printf '%s\n' "$failed" | awk 'NR <= 30'
-        echo "  … $(printf '%s\n' "$failed" | wc -l | tr -d ' ') tests en échec en tout"
-    fi
+    local result
+    result=$(find build/Logs/Test -maxdepth 1 -name '*.xcresult' -newer "$LOGS/tests-started" 2>/dev/null | sort | awk 'END { print }' || true)
+    [[ -z "$result" ]] && return 0
+    xcrun xcresulttool get test-results summary --path "$result" 2>/dev/null | python3 -c '
+import json, sys
+
+try:
+    summary = json.load(sys.stdin)
+except ValueError:
+    sys.exit("  (résultats des tests illisibles)")
+failures = summary.get("testFailures", [])
+for failure in failures[:40]:
+    name = failure.get("testIdentifierString") or failure.get("testName", "?")
+    text = " ".join(failure.get("failureText", "").split())
+    print(f"✘ {name} : {text[:400]}")
+passed, total = summary.get("passedTests"), summary.get("totalTestCount")
+print(f"  … {len(failures)} échecs ; {passed} tests passés sur {total}")
+' || true
 }
 
 # Exception and first frames of the crashed thread of each Matcha crash report written during the tests (macOS keeps
@@ -100,10 +114,10 @@ step "Traductions"
 scripts/check-localizations.sh
 
 step "Tests unitaires"
-# Crash reports written from now on are this run's (`report_crashes`).
+# Crash reports and test results written from now on are this run's (`report_test_failures`).
 touch "$LOGS/tests-started"
 xcodebuild -project Matcha.xcodeproj -scheme Matcha -destination "$DESTINATION" -derivedDataPath build \
-    ${FLAGS[@]+"${FLAGS[@]}"} test -only-testing:MatchaTests > "$LOGS/tests.log" 2>&1 || {
+    ${FLAGS[@]+"${FLAGS[@]}"} ${TEST_FLAGS[@]+"${TEST_FLAGS[@]}"} test -only-testing:MatchaTests > "$LOGS/tests.log" 2>&1 || {
     report_test_failures
     echo "✗ tests en échec (journal : $LOGS/tests.log ; détail : xcrun xcresulttool, build/Logs/Test)"
     exit 1
