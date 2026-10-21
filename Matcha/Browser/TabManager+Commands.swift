@@ -3,8 +3,8 @@ import WebKit
 
 /// Bulk actions on tabs: “Clear” for the today tabs, “Duplicate Tab”, “Close Other Tabs”.
 extension TabManager {
-    /// Closes all today tabs (“Clear” button). If the selected tab was one of them, the selection moves
-    /// to the last remaining tab of the sidebar.
+    /// Closes all today tabs (“Clear” button). If the selected tab was one of them, the window shows its empty page:
+    /// no pinned tab or favorite gets selected, it would load a page by itself.
     func clearToday() {
         let cleared = todayTabs
         // ⇧⌘T brings them all back (audit H2).
@@ -12,7 +12,7 @@ extension TabManager {
         let selectionCleared = cleared.contains { $0.id == selectedTabID }
         cleared.forEach(discard)
         if selectionCleared {
-            setSelection(layout.orderedTabIDs.last)
+            setSelection(nil)
         }
     }
 

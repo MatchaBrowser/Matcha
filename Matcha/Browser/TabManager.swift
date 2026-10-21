@@ -116,8 +116,8 @@ final class TabManager {
 
     /// Closes `tab` (⌘W, ×). A today tab goes away. A pinned tab or a favorite stays in the sidebar,
     /// as in Arc: it goes back to its original address and unloads; a pinned split closes as a whole.
-    /// If it was selected, its neighbor in the split takes the selection, otherwise its next neighbor in the
-    /// sidebar, or the previous one.
+    /// If it was selected, its neighbor in the split takes the selection, otherwise the next today tab, or the previous
+    /// one; with none, or for a pinned tab or a favorite, the window shows its empty page (`moveSelection`).
     func close(_ tab: BrowserTab) {
         guard let place = layout.place(of: tab.id) else {
             return
@@ -239,31 +239,37 @@ final class TabManager {
         shown.forEach { $0.makeWebViewIfNeeded() }
     }
 
-    /// Applies `change` to `tab`; if it was selected, the selection moves to its neighbor in the split,
-    /// otherwise to its next neighbor in the sidebar, or to the previous one if it was the last.
+    /// Applies `change` to `tab`; if it was selected, the selection moves to its neighbor in the split, otherwise
+    /// (today tab) to the next today tab, or to the previous one if it was the last.
     func moveSelection(awayFrom tab: BrowserTab, during change: () -> Void) {
         moveSelection(awayFrom: [tab.id], preferring: layout.split(containing: tab.id)?.neighbor(of: tab.id), during: change)
     }
 
-    /// Applies `change`; if the selected tab is part of `ids`, the selection moves to `preferred` if it is still
-    /// placed, otherwise to the first tab outside `ids` that followed it in the sidebar, otherwise to the last one
-    /// that preceded it.
+    /// Applies `change`; if the selected tab is part of `ids`, the selection moves to `preferred` (its neighbor in a
+    /// split, already on screen) if it is still placed. Otherwise, from a today tab, to the first today tab outside
+    /// `ids` that followed it, otherwise to the last one that preceded it. Never to another pinned tab or favorite,
+    /// which would load a page by itself: with no today tab left, or from a pinned tab or a favorite, the window
+    /// shows its empty page.
     func moveSelection(awayFrom ids: Set<BrowserTab.ID>, preferring preferred: BrowserTab.ID? = nil, during change: () -> Void) {
-        let ordered = layout.orderedTabIDs
-        let index = selectedTabID.flatMap { ordered.firstIndex(of: $0) }
+        let today = layout.today
+        let index = selectedTabID.flatMap { today.firstIndex(of: $0) }
         let wasSelected = selectedTabID.map(ids.contains) ?? false
         change()
-        guard wasSelected, let index else {
+        guard wasSelected else {
             return
         }
         if let preferred, !ids.contains(preferred), layout.place(of: preferred) != nil {
             setSelection(preferred)
             return
         }
-        func remains(_ id: UUID) -> Bool {
-            !ids.contains(id) && layout.place(of: id) != nil
+        guard let index else {
+            setSelection(nil)
+            return
         }
-        setSelection(ordered[index...].first(where: remains) ?? ordered[..<index].last(where: remains))
+        func remains(_ id: UUID) -> Bool {
+            !ids.contains(id) && layout.place(of: id) == .today
+        }
+        setSelection(today[index...].first(where: remains) ?? today[..<index].last(where: remains))
     }
 
     func discard(_ tab: BrowserTab) {

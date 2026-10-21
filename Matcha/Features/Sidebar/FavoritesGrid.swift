@@ -1,16 +1,14 @@
 import SwiftUI
 
-/// Favorites: a grid of icon tiles, four per row, followed by a drop zone.
+/// Favorites: a grid of icon tiles that share the sidebar's width (`FavoritesGridLayout`), followed by a drop zone.
 struct FavoritesGrid: View {
     let tabManager: TabManager
-
-    private let columns = Array(repeating: GridItem(.flexible(), spacing: 6), count: 4)
 
     var body: some View {
         let favorites = tabManager.favoriteTabs
         VStack(spacing: 0) {
             if !favorites.isEmpty {
-                LazyVGrid(columns: columns, spacing: 6) {
+                FavoritesGridLayout {
                     ForEach(Array(favorites.enumerated()), id: \.element.id) { index, tab in
                         FavoriteTile(tab: tab, tabManager: tabManager, dropDestination: .favorites(index: index))
                     }

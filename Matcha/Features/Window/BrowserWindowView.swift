@@ -96,10 +96,14 @@ struct BrowserWindowView: View {
         }
         .ignoresSafeArea()
         .background {
-            // Dragging the background (empty areas) moves the window.
+            // Dragging the background (empty areas) moves the window; at the top, a double click zooms it.
             SpaceBackground(theme: theme)
                 .gesture(WindowDragGesture())
                 .allowsWindowActivationEvents(true)
+                .overlay(alignment: .top) {
+                    TitleBarArea()
+                        .frame(height: SidebarTopBar.height)
+                }
         }
         .background {
             WindowAccessor { window in

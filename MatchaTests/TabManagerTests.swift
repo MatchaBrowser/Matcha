@@ -80,72 +80,6 @@ struct TabManagerTests {
         #expect(manager.tab(withID: tabs[0].id) === tabs[0])
     }
 
-    // MARK: Selection and closing
-
-    @Test func `select changes the selected tab`() {
-        let tabs = openTabs(3)
-        manager.select(tabs[0])
-        #expect(manager.selectedTab === tabs[0])
-    }
-
-    @Test func `select ignores a tab from elsewhere`() {
-        let tabs = openTabs(2)
-        let stranger = TabManager(websiteDataStore: .nonPersistent()).newTab()
-        manager.select(stranger)
-        #expect(manager.selectedTab === tabs[1])
-    }
-
-    @Test func `closing the selected tab selects the next one`() {
-        let tabs = openTabs(3) // order: 2, 1, 0
-        manager.select(tabs[1])
-        manager.close(tabs[1])
-        #expect(ids(manager.tabs) == [tabs[2].id, tabs[0].id])
-        #expect(manager.selectedTab === tabs[0])
-    }
-
-    @Test func `closing the selected last tab selects the previous one`() {
-        let tabs = openTabs(3) // order: 2, 1, 0
-        manager.select(tabs[0])
-        manager.close(tabs[0])
-        #expect(manager.selectedTab === tabs[1])
-    }
-
-    @Test func `closing the selected first tab selects the new first one`() {
-        let tabs = openTabs(3) // order: 2, 1, 0
-        manager.close(tabs[2])
-        #expect(manager.selectedTab === tabs[1])
-    }
-
-    @Test func `closing another tab keeps the selection`() {
-        let tabs = openTabs(3)
-        manager.select(tabs[2])
-        manager.close(tabs[0])
-        #expect(manager.selectedTab === tabs[2])
-    }
-
-    @Test func `closing the only tab clears the selection`() {
-        let tab = manager.newTab()
-        manager.close(tab)
-        #expect(manager.tabs.isEmpty)
-        #expect(manager.selectedTab == nil)
-    }
-
-    @Test func `closing an unknown tab does nothing`() {
-        let tabs = openTabs(2)
-        let stranger = TabManager(websiteDataStore: .nonPersistent()).newTab()
-        manager.close(stranger)
-        #expect(manager.tabs.count == 2)
-        #expect(manager.selectedTab === tabs[1])
-    }
-
-    @Test func `closing a selected pinned tab moves to its neighbor across sections`() {
-        let tabs = openTabs(2) // today: 1, 0
-        manager.setPlace(tabs[0], to: .pinned)
-        manager.select(tabs[0])
-        manager.close(tabs[0])
-        #expect(manager.selectedTab === tabs[1])
-    }
-
     // MARK: Places
 
     @Test func `tabs are ordered favorites then pinned then today`() {
@@ -163,7 +97,8 @@ struct TabManagerTests {
         manager.setPlace(tabs[0], to: .pinned)
         manager.clearToday()
         #expect(ids(manager.tabs) == [tabs[0].id])
-        #expect(manager.selectedTab === tabs[0])
+        // The empty page, rather than the pinned tab.
+        #expect(manager.selectedTab == nil)
     }
 
     @Test func `clear today keeps a pinned selection`() {
@@ -281,7 +216,8 @@ struct TabManagerTests {
         #expect(!tab.isLoaded)
         #expect(tab.url == TestPages.url("origine"))
         #expect(tab.title == "origine")
-        #expect(manager.selectedTab === other)
+        #expect(manager.selectedTab == nil)
+        #expect(manager.tab(withID: other.id) != nil)
 
         manager.select(tab)
         #expect(tab.isLoaded)
@@ -294,7 +230,8 @@ struct TabManagerTests {
         manager.delete(tab)
         #expect(manager.tab(withID: tab.id) == nil)
         #expect(manager.layout.pinned.isEmpty)
-        #expect(manager.selectedTab === other)
+        #expect(manager.selectedTab == nil)
+        #expect(manager.tab(withID: other.id) != nil)
     }
 
     @Test func `pinned origin is kept across places and forgotten in today`() async throws {

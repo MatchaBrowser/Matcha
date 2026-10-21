@@ -134,7 +134,7 @@ struct TabManagerSplitTests {
         #expect(!tabs[2].isLoaded)
         #expect(!manager.hasLoadedTab(inSplit: group.id))
         #expect(manager.layout.split(withID: group.id)?.tabIDs == ids([tabs[2], tabs[1]]))
-        #expect(manager.selectedTab === tabs[0])
+        #expect(manager.selectedTab == nil)
 
         manager.select(tabs[2])
         #expect(ids(manager.displayedTabs) == ids([tabs[2], tabs[1]]))
@@ -219,7 +219,7 @@ struct TabManagerSplitTests {
         manager.clearToday()
         #expect(manager.layout.splits.isEmpty)
         #expect(ids(manager.tabs) == [tabs[0].id])
-        #expect(manager.selectedTab === tabs[0])
+        #expect(manager.selectedTab == nil)
     }
 
     @Test func `links from a pane open after the split`() async throws {
