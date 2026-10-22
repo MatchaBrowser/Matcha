@@ -1,24 +1,26 @@
-# Version tags (v1.2.0, or v1.2.0-beta.1 for a pre-release): the checks of check.yml, then a universal disk image
-# signed ad hoc (scripts/package.sh), published as a GitHub release. Neither signed by Apple nor notarized: macOS asks
-# to confirm the first opening, the release notes say how. The signed and notarized path, with Developer ID, is
-# scripts/release.sh, run on a Mac that has the certificate.
-name: Publication
+# A GitHub release published (by hand, its tag v1.2.0 or v1.2.0-beta.1): the checks of check.yml, then a universal
+# disk image signed ad hoc (scripts/package.sh), added with its SHA-256 to that release. The release itself (title,
+# notes) is left as it is. Neither signed by Apple nor notarized: macOS asks to confirm the first opening. The signed
+# and notarized path, with Developer ID, is scripts/release.sh, run on a Mac that has the certificate.
+name: Image disque
 
 on:
-  push:
-    tags: ["v*"]
+  release:
+    types: [published]
 
 jobs:
   check:
     uses: ./.github/workflows/check.yml
 
-  release:
+  package:
     needs: check
     runs-on: macos-26
     timeout-minutes: 60
     permissions:
-      # Creating the release.
+      # Adding the files to the release.
       contents: write
+    env:
+      TAG: ${{ github.event.release.tag_name }}
     steps:
       - uses: actions/checkout@v7
         with:
@@ -32,38 +34,22 @@ jobs:
           xcodebuild -version
 
       - name: Image disque
-        run: scripts/package.sh "${GITHUB_REF_NAME#v}"
+        run: scripts/package.sh "${TAG#v}"
 
-      - name: Release GitHub
+      - name: Ajout à la release
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          version="${GITHUB_REF_NAME#v}"
+          version="${TAG#v}"
           dmg="build/package/$version/Matcha-$version.dmg"
-          cat > "$RUNNER_TEMP/notes.md" <<NOTES
-          Version de test, **sans signature d'Apple** : macOS bloque sa première ouverture.
-
-          1. Ouvrez \`Matcha-$version.dmg\` et glissez Matcha dans Applications (remplacez l'ancienne version).
-          2. Ouvrez Matcha : macOS refuse de l'ouvrir. Fermez le message.
-          3. Réglages Système > Confidentialité et sécurité, tout en bas : « Ouvrir quand même » à côté de Matcha, puis confirmez.
-
-          Ou, dans le Terminal : \`xattr -dr com.apple.quarantine /Applications/Matcha.app\`
-
-          SHA-256 de l'image disque : \`$(cat "$dmg.sha256")\`
-
-          NOTES
-          # A tag with a suffix (v1.2.0-beta.1) is a pre-release.
-          prerelease=()
-          [[ "$version" == *-* ]] && prerelease=(--prerelease)
-          # These notes come before those GitHub writes (the changes since the previous tag).
-          gh release create "$GITHUB_REF_NAME" "$dmg" "$dmg.sha256" --title "Matcha $version" \
-            --notes "$(cat "$RUNNER_TEMP/notes.md")" --generate-notes ${prerelease[@]+"${prerelease[@]}"}
+          # --clobber: a release published again gets the new image in place of the old one.
+          gh release upload "$TAG" "$dmg" "$dmg.sha256" --clobber
 
       - name: Journaux
         if: failure()
         uses: actions/upload-artifact@v4
         with:
-          name: journaux-publication
+          name: journaux-image-disque
           path: |
             build/package/*/build.log
             build/package/*/hdiutil.log

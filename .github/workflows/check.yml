@@ -4,7 +4,7 @@ name: Vérifications
 
 on:
   push:
-    # Branches only: a version tag runs these checks through release.yml, before building the app.
+    # Branches only: a published release runs these checks through release.yml, before building its disk image.
     branches: ["**"]
   pull_request:
   workflow_call:

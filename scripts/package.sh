@@ -1,19 +1,21 @@
 #!/bin/bash
 # Builds a Matcha disk image to install by hand, without Apple's signature: universal Release build (Apple silicon and
 # Intel) signed ad hoc, with its entitlements (sandbox, network, camera…); the version and build numbers are given to
-# xcodebuild (the project isn't modified). Run by GitHub Actions for each version tag (.github/workflows/release.yml).
+# xcodebuild (the project isn't modified). Run by GitHub Actions for each published release, to which it adds the
+# image (.github/workflows/release.yml).
 # The signed and notarized path, with Developer ID, is scripts/release.sh.
 #
 #   scripts/package.sh 1.2.0          →  build/package/1.2.0/Matcha-1.2.0.dmg and its SHA-256
 #   scripts/package.sh 1.2.0-beta.1   →  same, the app says 1.2.0
 #
-# macOS blocks the first opening of an app downloaded without Apple's signature: the release notes say what to do.
+# macOS blocks the first opening of an app downloaded without Apple's signature (System Settings > Privacy & Security
+# > Open Anyway, or `xattr -dr com.apple.quarantine /Applications/Matcha.app`).
 set -euo pipefail
 
 cd "$(dirname "$0")/.."
 
 if [[ $# -ne 1 || ! "$1" =~ ^[0-9]+\.[0-9]+(\.[0-9]+)?(-[0-9A-Za-z.]+)?$ ]]; then
-    sed -n '2,10p' "$0" | sed 's/^# \{0,1\}//'
+    sed -n '2,12p' "$0" | sed 's/^# \{0,1\}//'
     exit 1
 fi
 
