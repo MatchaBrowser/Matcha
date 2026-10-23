@@ -10,5 +10,9 @@
 		<key>NSAllowsArbitraryLoadsInWebContent</key>
 		<true/>
 	</dict>
+	<!-- Full version of a published build (“1.0.0-beta.1”), shown by About Matcha (AboutVersion): given by
+	     scripts/package.sh and scripts/release.sh, empty otherwise. -->
+	<key>MatchaReleaseVersion</key>
+	<string>$(MATCHA_RELEASE_VERSION)</string>
 </dict>
 </plist>

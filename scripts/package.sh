@@ -44,6 +44,7 @@ step "Compilation Release universelle $SHORT_VERSION ($BUILD), signée ad hoc"
 # “Sign to Run Locally”: no team, the entitlements stay.
 xcodebuild -project Matcha.xcodeproj -scheme Matcha -configuration Release -destination 'generic/platform=macOS' \
     -derivedDataPath "$WORK/DerivedData" MARKETING_VERSION="$SHORT_VERSION" CURRENT_PROJECT_VERSION="$BUILD" \
+    MATCHA_RELEASE_VERSION="$VERSION" \
     CODE_SIGN_IDENTITY=- CODE_SIGN_STYLE=Manual DEVELOPMENT_TEAM= build > "$WORK/build.log" 2>&1 || {
     grep -E "error:" "$WORK/build.log" | sort -u || true
     fail "compilation en échec (journal : $WORK/build.log)"

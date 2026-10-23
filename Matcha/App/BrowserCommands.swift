@@ -52,6 +52,9 @@ struct BrowserCommands: Commands {
     }
 
     var body: some Commands {
+        // Matcha > About Matcha, with the version of this build.
+        AboutCommands()
+
         CommandGroup(replacing: .newItem) {
             Button("New Tab") {
                 if let mini = miniWindow {

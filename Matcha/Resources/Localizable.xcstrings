@@ -1129,6 +1129,35 @@
         }
       }
     },
+    "About Matcha" : {
+      "comment" : "Matcha menu: opens the About panel, with the version of this build",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Über Matcha"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Acerca de Matcha"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "À propos de Matcha"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Informazioni su Matcha"
+          }
+        }
+      }
+    },
     "Above the Page" : {
       "comment" : "Address bar position option",
       "localizations" : {
