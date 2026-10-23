@@ -59,7 +59,7 @@ rm -rf "$WORK"
 mkdir -p "$WORK"
 xcodebuild -project Matcha.xcodeproj -scheme Matcha -configuration Release -destination 'generic/platform=macOS' \
     -derivedDataPath build -archivePath "$ARCHIVE" \
-    MARKETING_VERSION="$VERSION" CURRENT_PROJECT_VERSION="$BUILD" archive | xcbeautify --quiet
+    MARKETING_VERSION="$VERSION" CURRENT_PROJECT_VERSION="$BUILD" MATCHA_RELEASE_VERSION="$VERSION" archive | xcbeautify --quiet
 
 step "Export Developer ID"
 cat > "$WORK/ExportOptions.plist" <<PLIST
