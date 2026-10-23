@@ -3,9 +3,10 @@
 name: Vérifications
 
 on:
+  # main only: another branch is checked once, by its pull request, not a second time by its pushes. Tags aren't
+  # either: a published release runs these checks through release.yml, before building its disk image.
   push:
-    # Branches only: a published release runs these checks through release.yml, before building its disk image.
-    branches: ["**"]
+    branches: [main]
   pull_request:
   workflow_call:
 
