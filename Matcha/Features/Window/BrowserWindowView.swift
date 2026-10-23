@@ -104,6 +104,8 @@ struct BrowserWindowView: View {
                     TitleBarArea()
                         .frame(height: SidebarTopBar.height)
                 }
+                // Up to the top edge: otherwise the strip starts below the hidden title bar's safe area.
+                .ignoresSafeArea()
         }
         .background {
             WindowAccessor { window in
