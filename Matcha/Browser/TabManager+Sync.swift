@@ -41,5 +41,6 @@ extension TabManager {
             return
         }
         tab.unload(resettingTo: entry.url, title: entry.title)
+        faviconService.showCachedIcon(on: tab, host: entry.url?.host())
     }
 }
