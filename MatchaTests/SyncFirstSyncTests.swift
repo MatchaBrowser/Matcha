@@ -7,8 +7,8 @@ import Testing
 @MainActor
 struct SyncFirstSyncTests {
     private let server = InMemorySyncServer()
-    private let searchEngine = SyncIdentifier.setting("searchEngine")
-    private let appearance = SyncIdentifier.setting("appearance")
+    private let searchEngine = SyncIdentifiers.testAccount.setting("searchEngine")
+    private let appearance = SyncIdentifiers.testAccount.setting("appearance")
 
     private func setting(_ key: String, _ value: String) -> SyncFields {
         .setting(SyncSettingFields(key: key, value: .string(value)))
@@ -100,7 +100,7 @@ struct SyncFirstSyncTests {
         let first = try await firstMac().mac
         let own = secondMac()
         let (second, ownProfile, ownSpace) = (own.mac, own.profile, own.space)
-        let zoom = SyncIdentifier.siteZoom("example.com")
+        let zoom = SyncIdentifiers.testAccount.siteZoom("example.com")
         second.store.items[zoom] = .siteZoom(SyncSiteZoomFields(site: "example.com", level: 1.5))
         second.store.items[appearance] = setting("appearance", "dark")
         second.engine.chooseFirstSync = { .replaceLocal }

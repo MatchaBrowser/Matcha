@@ -1,36 +1,40 @@
 import Foundation
 import SwiftData
 
-/// Matcha's data as seen by sync (task 7.4, `SYNC.md` § 2.1): profiles, Spaces, folders and tabs (SwiftData
-/// records), site decisions, synced settings and site zoom. Received changes are written to the records
-/// (`SyncRecordWriter`), then the session picks them up (`BrowserSession.reload`).
+/// Matcha's data as seen by sync (`SYNC.md` § 2.1): profiles, Spaces, folders and tabs (SwiftData records), site
+/// decisions, synced settings, site zoom and extensions. Received changes are written to the records
+/// (`SyncRecordWriter`), then the session picks them up (`BrowserSession.reload`). A read failure throws.
 @MainActor
 final class MatchaSyncStore: SyncLocalStore {
     let session: BrowserSession
     let defaults: UserDefaults
+    let identifiers: SyncIdentifiers
     /// Installed and offered extensions; nil: they do not travel (tests).
     let extensions: ExtensionSyncAdapter?
 
-    init(session: BrowserSession, defaults: UserDefaults, extensions: ExtensionSyncAdapter? = nil) {
+    init(session: BrowserSession, defaults: UserDefaults, identifiers: SyncIdentifiers, extensions: ExtensionSyncAdapter? = nil) {
         self.session = session
         self.defaults = defaults
+        self.identifiers = identifiers
         self.extensions = extensions
     }
 
-    func snapshot() -> [UUID: SyncFields] {
+    func snapshot() throws -> [UUID: SyncFields] {
         var result: [UUID: SyncFields] = [:]
-        for profile in fetch(ProfileRecord.self) {
+        for profile in try fetch(ProfileRecord.self) {
             result[profile.id] = .profile(profile.syncFields)
         }
-        for space in fetch(SpaceRecord.self) {
-            result[space.id] = .space(space.syncFields)
+        for space in try fetch(SpaceRecord.self) {
+            if let fields = space.syncFields {
+                result[space.id] = .space(fields)
+            }
         }
-        for folder in fetch(FolderRecord.self) {
+        for folder in try fetch(FolderRecord.self) {
             if let fields = folder.syncFields {
                 result[folder.id] = .folder(fields)
             }
         }
-        for tab in fetch(TabRecord.self) {
+        for tab in try fetch(TabRecord.self) where !tab.isLocalOnly {
             if let fields = tab.syncFields {
                 result[tab.id] = .tab(fields)
             }
@@ -39,28 +43,45 @@ final class MatchaSyncStore: SyncLocalStore {
         return result
     }
 
+    /// Favorites and pinned tabs whose original address isn't a web address stay on this Mac; today tabs showing such a
+    /// page keep the last address sent (`SYNC.md` § 2.4).
+    func exceptions() throws -> SyncLocalExceptions {
+        var exceptions = SyncLocalExceptions()
+        for tab in try fetch(TabRecord.self) {
+            if tab.isLocalOnly {
+                exceptions.localRecords.insert(tab.id)
+            } else if tab.place == .today, tab.showsNonWebPage {
+                exceptions.nonWebPages.insert(tab.id)
+            }
+        }
+        return exceptions
+    }
+
     /// Site decisions, settings, zoom levels and extensions.
     private func addPreferences(to result: inout [UUID: SyncFields]) {
-        for entry in session.sitePermissions.entries {
+        for entry in session.sitePermissions.entries where entry.key.origin.isWeb {
             let key = entry.key
-            let id = SyncIdentifier.sitePermission(profileID: key.profileID, origin: key.origin.key, kind: key.kind.rawValue)
+            guard let profileID = key.profileID else {
+                continue
+            }
+            let id = identifiers.sitePermission(profileID: profileID, origin: key.origin.key, kind: key.kind.rawValue)
             result[id] = .sitePermission(SyncSitePermissionFields(
                 origin: key.origin.key,
                 kind: key.kind.rawValue,
                 decision: entry.decision.rawValue,
-                profileId: key.profileID,
+                profileId: profileID,
             ))
         }
         for key in SyncedSettings.keys {
             if let object = defaults.object(forKey: key), let value = SyncedSettings.value(object, for: key) {
-                result[SyncIdentifier.setting(key)] = .setting(SyncSettingFields(key: key, value: value))
+                result[identifiers.setting(key)] = .setting(SyncSettingFields(key: key, value: value))
             }
         }
         for (site, level) in session.siteZooms.levels {
-            result[SyncIdentifier.siteZoom(site)] = .siteZoom(SyncSiteZoomFields(site: site, level: level))
+            result[identifiers.siteZoom(site)] = .siteZoom(SyncSiteZoomFields(site: site, level: level))
         }
-        for (identifier, fields) in extensions?.fields() ?? [:] {
-            result[SyncIdentifier.webExtension(identifier)] = .webExtension(fields)
+        for fields in (extensions?.fields() ?? [:]).values {
+            result[identifiers.webExtension(fields)] = .webExtension(fields)
         }
     }
 
@@ -73,10 +94,10 @@ final class MatchaSyncStore: SyncLocalStore {
         await extensions?.deleteObsoletePackages(using: transport)
     }
 
-    func apply(_ changes: [SyncLocalChange]) -> Set<UUID> {
+    func apply(_ changes: [SyncLocalChange]) throws -> Set<UUID> {
         // What is not saved yet (less than a second old) is saved first: nothing is lost when reloading.
         session.saveAll()
-        let writer = SyncRecordWriter(session: session, defaults: defaults, extensions: extensions)
+        let writer = try SyncRecordWriter(session: session, defaults: defaults, identifiers: identifiers, extensions: extensions)
         var waiting: Set<UUID> = []
         for change in changes {
             switch change {
@@ -88,6 +109,7 @@ final class MatchaSyncStore: SyncLocalStore {
                 writer.delete(id, type)
             }
         }
+        writer.repair()
         session.save(session.container.mainContext)
         session.reload(after: writer.changes)
         // The displayed tabs that sync did not change are saved as they are: they are not sent again.
@@ -98,18 +120,18 @@ final class MatchaSyncStore: SyncLocalStore {
     /// “Personal” profile and “Home” Space from the first launch, with no folder, favorite or pinned tab, and at most
     /// one empty today tab.
     var hasOnlyFirstLaunchData: Bool {
-        let profiles = fetch(ProfileRecord.self)
-        let spaces = fetch(SpaceRecord.self)
-        guard profiles.count == 1, spaces.count == 1, fetch(FolderRecord.self).isEmpty,
+        guard let profiles = try? fetch(ProfileRecord.self), let spaces = try? fetch(SpaceRecord.self),
+              let folders = try? fetch(FolderRecord.self), let tabs = try? fetch(TabRecord.self), profiles.count == 1, spaces.count == 1,
+              folders.isEmpty,
               profiles[0].name == BrowserSession.defaultProfileName, spaces[0].name == BrowserSession.defaultSpaceName
         else {
             return false
         }
-        let tabs = fetch(TabRecord.self).filter { $0.place != nil }
-        return tabs.count <= 1 && tabs.allSatisfy { $0.place == .today && $0.url == nil }
+        let placed = tabs.filter { $0.place != nil }
+        return placed.count <= 1 && placed.allSatisfy { $0.place == .today && $0.url == nil }
     }
 
-    private func fetch<Model: PersistentModel>(_: Model.Type) -> [Model] {
-        (try? session.container.mainContext.fetch(FetchDescriptor<Model>())) ?? []
+    private func fetch<Model: PersistentModel>(_: Model.Type) throws -> [Model] {
+        try session.container.mainContext.fetch(FetchDescriptor<Model>())
     }
 }

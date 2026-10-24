@@ -1,5 +1,11 @@
+import CryptoKit
 import Foundation
 @testable import Matcha
+
+extension SyncIdentifiers {
+    /// Identifiers of the test account: the same for all the simulated Macs.
+    static let testAccount = SyncIdentifiers(idKey: SymmetricKey(data: Data(repeating: 7, count: 32)))
+}
 
 /// In-memory sync server, with the API rules (`SYNC.md` § 4.6): one counter per account, a change applied only on the
 /// current version, pages by increasing version, cursor expired after a purge. The contents stay in clear text (the
@@ -11,31 +17,50 @@ actor InMemorySyncServer {
     var pageSize = 500
     /// Cursors older than this version: expired.
     private var oldestCursor = 0
-    /// Rejected changes (`payload_too_large`).
-    var refused: Set<UUID> = []
+    /// Rejected changes, with their code (`payload_too_large` by default).
+    var refused: [UUID: String] = [:]
+    /// Answers already given, by `Idempotency-Key`: a batch sent again gets the same answer, without being written.
+    private var answers: [UUID: [SyncPushResult]] = [:]
+    /// Number of batches actually written.
+    private(set) var writtenBatches = 0
 
     func setPageSize(_ size: Int) {
         pageSize = size
     }
 
-    func refuse(_ id: UUID) {
-        refused.insert(id)
+    func refuse(_ id: UUID, code: String = SyncRejectionCode.payloadTooLarge) {
+        refused[id] = code
     }
 
     func unrefuse(_ id: UUID) {
-        refused.remove(id)
+        refused[id] = nil
     }
 
-    func push(_ changes: [SyncOutgoingChange]) -> [SyncPushResult] {
-        changes.map { change in
-            if refused.contains(change.id) {
-                return .rejected(code: "payload_too_large")
+    func push(_ batch: SyncPreparedBatch) -> [SyncPushResult] {
+        if let answer = answers[batch.key] {
+            return answer
+        }
+        writtenBatches += 1
+        let answer = batch.changes.map { change -> SyncPushResult in
+            if let code = refused[change.id] {
+                return .rejected(code: code)
             }
-            if let current = records[change.id], current.version != change.baseVersion {
+            guard let current = records[change.id] else {
+                // Unknown identifier: a creation, or a conflict with nothing if the change was based on a version.
+                return change.baseVersion == nil ? .applied(version: write(change.id, change.content)) : .conflict(current: nil)
+            }
+            if current.version != change.baseVersion {
                 return .conflict(current: current)
             }
             return .applied(version: write(change.id, change.content))
         }
+        answers[batch.key] = answer
+        return answer
+    }
+
+    /// Forgets `id` entirely, as after a purge or a restored backup.
+    func forget(_ id: UUID) {
+        records[id] = nil
     }
 
     func changes(since cursor: String?) throws -> SyncChangePage {
@@ -101,8 +126,8 @@ struct InMemorySyncTransport: SyncTransport {
     let server: InMemorySyncServer
     var maxChangesPerPush = 500
 
-    func push(_ changes: [SyncOutgoingChange]) async throws -> [SyncPushResult] {
-        await server.push(changes)
+    func push(_ batch: SyncPreparedBatch) async throws -> [SyncPushResult] {
+        await server.push(batch)
     }
 
     func changes(since cursor: String?) async throws -> SyncChangePage {
@@ -124,6 +149,86 @@ struct InMemorySyncTransport: SyncTransport {
     func deleteBlob(id: UUID) async throws {
         await server.deleteBlob(id: id)
     }
+}
+
+/// Transport whose next pushes reach the server but lose their answer (network cut after sending).
+struct LossyTransport: SyncTransport {
+    actor Losses {
+        var remaining: Int
+
+        init(_ count: Int) {
+            remaining = count
+        }
+
+        func take() -> Bool {
+            guard remaining > 0 else {
+                return false
+            }
+            remaining -= 1
+            return true
+        }
+    }
+
+    let server: InMemorySyncServer
+    let losses: Losses
+    var maxChangesPerPush = 500
+
+    func push(_ batch: SyncPreparedBatch) async throws -> [SyncPushResult] {
+        let answer = await server.push(batch)
+        if await losses.take() {
+            throw URLError(.networkConnectionLost)
+        }
+        return answer
+    }
+
+    func changes(since cursor: String?) async throws -> SyncChangePage {
+        try await server.changes(since: cursor)
+    }
+
+    var supportsBlobs: Bool {
+        false
+    }
+
+    func putBlob(_: Data, id _: UUID) async throws {}
+
+    func blob(id _: UUID) async throws -> Data {
+        throw SyncTransportError.blobNotFound
+    }
+
+    func deleteBlob(id _: UUID) async throws {}
+}
+
+/// Transport that refuses to prepare a batch of more than one change, as a server whose request limit is tiny.
+struct TinyRequestTransport: SyncTransport {
+    let server: InMemorySyncServer
+    var maxChangesPerPush = 500
+
+    func prepare(_ changes: [SyncOutgoingChange]) throws -> SyncPreparedBatch {
+        guard changes.count <= 1 else {
+            throw SyncTransportError.batchTooLarge
+        }
+        return SyncPreparedBatch(key: UUID(), changes: changes, body: Data())
+    }
+
+    func push(_ batch: SyncPreparedBatch) async throws -> [SyncPushResult] {
+        await server.push(batch)
+    }
+
+    func changes(since cursor: String?) async throws -> SyncChangePage {
+        try await server.changes(since: cursor)
+    }
+
+    var supportsBlobs: Bool {
+        false
+    }
+
+    func putBlob(_: Data, id _: UUID) async throws {}
+
+    func blob(id _: UUID) async throws -> Data {
+        throw SyncTransportError.blobNotFound
+    }
+
+    func deleteBlob(id _: UUID) async throws {}
 }
 
 /// A Mac's data in memory: a record waits as long as one of its parents is missing.
@@ -164,10 +269,16 @@ final class SimulatedMac {
     let engine: SyncEngine
     var time: Date
 
-    init(server: InMemorySyncServer, time: Date = Date(timeIntervalSince1970: 1_800_000_000), maxChangesPerPush: Int = 500) {
+    init(
+        server: InMemorySyncServer,
+        time: Date = Date(timeIntervalSince1970: 1_800_000_000),
+        maxChangesPerPush: Int = 500,
+        transport: (any SyncTransport)? = nil,
+    ) {
         engine = SyncEngine(
             store: store,
-            transport: InMemorySyncTransport(server: server, maxChangesPerPush: maxChangesPerPush),
+            transport: transport ?? InMemorySyncTransport(server: server, maxChangesPerPush: maxChangesPerPush),
+            identifiers: .testAccount,
             file: SyncStateFile(url: nil),
         )
         self.time = time
@@ -182,26 +293,26 @@ final class SimulatedMac {
 
     // MARK: Data
 
-    func addProfile(_ name: String, order: Int = 0) -> UUID {
+    func addProfile(_ name: String, order: Double = 0) -> UUID {
         let id = UUID()
         store.items[id] = .profile(SyncProfileFields(name: name, order: order))
         return id
     }
 
-    func addSpace(_ name: String, profile: UUID, order: Int = 0) -> UUID {
+    func addSpace(_ name: String, profile: UUID, order: Double = 0) -> UUID {
         let id = UUID()
         store.items[id] = .space(SyncSpaceFields(name: name, symbol: "circle.fill", theme: nil, order: order, profileId: profile))
         return id
     }
 
     @discardableResult
-    func addTodayTab(in space: UUID, url: String? = nil, order: Int = 0) -> UUID {
+    func addTodayTab(in space: UUID, url: String? = nil, order: Double = 0) -> UUID {
         let id = UUID()
         store.items[id] = .tab(todayTab(in: space, url: url, order: order))
         return id
     }
 
-    func todayTab(in space: UUID, url: String?, order: Int = 0) -> SyncTabFields {
+    func todayTab(in space: UUID, url: String?, order: Double = 0) -> SyncTabFields {
         SyncTabFields(
             place: .today,
             url: url.flatMap(URL.init(string:)),

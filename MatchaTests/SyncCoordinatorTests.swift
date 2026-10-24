@@ -23,13 +23,14 @@ struct SyncCoordinatorTests {
         let session = try BrowserSession(container: BrowserSchema.makeContainer(inMemory: true))
         let defaults = try #require(UserDefaults(suiteName: "SyncCoordinatorTests-\(UUID().uuidString)"))
         let engine = SyncEngine(
-            store: MatchaSyncStore(session: session, defaults: defaults),
+            store: MatchaSyncStore(session: session, defaults: defaults, identifiers: .testAccount),
             transport: InMemorySyncTransport(server: server),
+            identifiers: .testAccount,
             file: SyncStateFile(url: nil),
         )
         let coordinator = SyncCoordinator(engine: engine, debounce: .milliseconds(50))
         defer { coordinator.stop() }
-        coordinator.start(observing: session.container.mainContext, defaults: defaults)
+        coordinator.start(observing: session.container.mainContext, defaults: defaults, watchedKeys: SyncedSettings.keys)
         let space = try #require(session.spaces.first)
         #expect(try await eventually { await server.content(of: space.id) != nil })
         #expect(coordinator.lastSyncDate != nil)
@@ -43,7 +44,7 @@ struct SyncCoordinatorTests {
         })
 
         defaults.set("bing", forKey: BrowserSettings.Key.searchEngine)
-        #expect(try await eventually { await server.content(of: SyncIdentifier.setting("searchEngine")) != nil })
+        #expect(try await eventually { await server.content(of: SyncIdentifiers.testAccount.setting("searchEngine")) != nil })
         // A cycle may still be running (the setting's own save triggers one): it ends idle.
         #expect(try await eventually { coordinator.status == .idle })
     }

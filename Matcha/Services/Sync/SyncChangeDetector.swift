@@ -1,8 +1,9 @@
 import Foundation
 
-/// This Mac's changes (task 7.4, `SYNC.md` § 5): the current state compared, record by record, with what this Mac
-/// had at its last sync (or with what it is about to send). A today tab that only changed page waits until it has
-/// been stable for 5 seconds, 30 at most if it keeps changing (§ 2.4). Pure type.
+/// This Mac's changes (`SYNC.md` § 5): the current state compared, record by record, with what this Mac had at its
+/// last sync (or with what it is about to send). A today tab that only changed page waits until it has been stable
+/// for 5 seconds, 30 at most if it keeps changing; a change of its last use alone doesn't leave (§ 2.4). Records kept
+/// as they are (unreadable, newer format) and this Mac's local records are never sent. Pure type.
 nonisolated struct SyncChangeDetector: Sendable {
     static let stability: TimeInterval = 5
     static let maximumWait: TimeInterval = 30
@@ -24,25 +25,34 @@ nonisolated struct SyncChangeDetector: Sendable {
 
     /// Changes in `snapshot` compared with `state`, sorted by type then by identifier, and the date at which to look
     /// at a waiting page again (nil if there is none).
-    mutating func changes(in snapshot: [UUID: SyncFields], state: SyncState, now: Date) -> (changes: [Change], nextCheck: Date?) {
+    mutating func changes(
+        in snapshot: [UUID: SyncFields],
+        exceptions: SyncLocalExceptions = SyncLocalExceptions(),
+        state: SyncState,
+        now: Date,
+    ) -> (changes: [Change], nextCheck: Date?) {
         var ids = Set(snapshot.keys)
         ids.formUnion(state.entries.compactMap { $0.value.local == nil ? nil : $0.key })
         ids.formUnion(state.pending.compactMap { $0.value.local == nil ? nil : $0.key })
+        ids.subtract(exceptions.localRecords)
         var changes: [Change] = []
         var nextCheck: Date?
         for id in ids {
-            // Written by a newer version of Matcha: never modified here.
-            if state.entries[id]?.remote?.isFromNewerVersion == true {
+            // Unreadable, or written by a newer version of Matcha: never modified here.
+            if state.entries[id]?.isIgnored == true {
                 continue
             }
-            let current = snapshot[id]
-            let currentJSON = current?.json
             let baseline = state.baseline(of: id)
-            guard currentJSON != baseline else {
+            var current = snapshot[id]
+            if exceptions.nonWebPages.contains(id) {
+                current = current.map { Self.keepingPage(of: $0, from: baseline, remote: state.entries[id]?.remote) }
+            }
+            let currentJSON = current?.json
+            guard currentJSON != baseline, !Self.differsOnlyByLastActivity(current, from: baseline) else {
                 held[id] = nil
                 continue
             }
-            if let rejected = state.rejected[id], rejected == currentJSON ?? .null {
+            if let rejected = state.rejected[id], rejected.local == currentJSON ?? .null {
                 continue
             }
             if let currentJSON, isPageChange(current, from: baseline) {
@@ -70,6 +80,30 @@ nonisolated struct SyncChangeDetector: Sendable {
             return false
         }
         return now.differsOnlyByPage(from: before)
+    }
+
+    private static func differsOnlyByLastActivity(_ current: SyncFields?, from baseline: SyncJSON?) -> Bool {
+        guard case let .tab(now) = current, let baseline, case let .tab(before) = SyncFields(json: baseline, type: .tab) else {
+            return false
+        }
+        return now.differsOnlyByLastActivity(from: before)
+    }
+
+    /// Today tab showing a page that isn't a web address: its address and title stay the last ones this Mac had in
+    /// sync, or that it received.
+    private static func keepingPage(of fields: SyncFields, from baseline: SyncJSON?, remote: SyncContent?) -> SyncFields {
+        guard case var .tab(tab) = fields else {
+            return fields
+        }
+        let previous = baseline.flatMap { SyncFields(json: $0, type: .tab) } ?? remote?.readableFields
+        if case let .tab(before) = previous {
+            tab.url = before.url
+            tab.title = before.title
+        } else {
+            tab.url = nil
+            tab.title = nil
+        }
+        return .tab(tab)
     }
 
     private mutating func hold(_ id: UUID, fields: SyncJSON, now: Date) -> HoldDecision {

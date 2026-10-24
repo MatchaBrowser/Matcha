@@ -11,8 +11,8 @@ extension ExtensionSyncAdapter {
     /// reinstall”).
     nonisolated static let maximumPackageSize = 20 * 1024 * 1024
 
-    /// Before a sync: uploads the package of extensions installed from a file that have none for their version, then
-    /// installs the received updates that ask for no additional permission or website.
+    /// Before a sync: uploads the package of extensions installed from a file that have none for their version. A
+    /// received update is never installed here: it waits for the user's click (`SYNC.md` § 2.5).
     func preparePackages(using transport: any SyncTransport) async {
         guard transport.supportsBlobs, let directory = manager.directory else {
             return
@@ -37,7 +37,6 @@ extension ExtensionSyncAdapter {
                 Logger.sync.error("Extension package not sent: \(error.logSummary, privacy: .public)")
             }
         }
-        await installUpdates(using: transport)
     }
 
     /// After a sync: deletes from the server the replaced packages or those of uninstalled extensions.
@@ -80,46 +79,6 @@ extension ExtensionSyncAdapter {
         let file = folder.appendingPathComponent(name.isEmpty || name.hasPrefix(".") ? "extension.zip" : name)
         try data.write(to: file)
         return file
-    }
-
-    /// Received updates of extensions installed here (`apply`): installed if they ask for no additional permission or
-    /// website; otherwise they stay offered, and the permissions screen will come back.
-    private func installUpdates(using transport: any SyncTransport) async {
-        let installed = Set(manager.installedIdentifiers)
-        for (identifier, fields) in synced.offers where installed.contains(identifier) {
-            guard let package = SyncedPackage(source: fields.source, version: fields.version) else {
-                continue
-            }
-            do {
-                let file = try await downloadPackage(package, using: transport)
-                defer { try? FileManager.default.removeItem(at: file.deletingLastPathComponent()) }
-                let candidate = try await installer.prepare(fileAt: file)
-                guard candidate.identifier == identifier, !asksForMore(candidate, than: identifier) else {
-                    installer.discard(candidate)
-                    continue
-                }
-                let allowsPrivateWindows = manager.store.state(for: identifier)?.hasAccessToPrivateData ?? false
-                try await installer.install(candidate, allowsPrivateWindows: allowsPrivateWindows)
-                synced.packages[identifier] = package
-                synced.offers[identifier] = nil
-            } catch SyncTransportError.blobNotFound {
-                // Not arrived yet: at the next sync.
-                continue
-            } catch {
-                Logger.sync.error("Received extension update not installed: \(error.logSummary, privacy: .public)")
-            }
-        }
-    }
-
-    /// True if `candidate` asks for a permission or a website that the installed version did not ask for.
-    func asksForMore(_ candidate: ExtensionInstallCandidate, than identifier: String) -> Bool {
-        guard let current = manager.installed[identifier] else {
-            return true
-        }
-        let permissions = Set(candidate.webExtension.requestedPermissions).subtracting(current.requestedPermissions)
-        let patterns = Set(candidate.webExtension.requestedPermissionMatchPatterns.map(\.string))
-            .subtracting(current.requestedPermissionMatchPatterns.map(\.string))
-        return !permissions.isEmpty || !patterns.isEmpty
     }
 
     /// Archive of the folder, encrypted with a new key, off the main thread; nil beyond 20 MiB.

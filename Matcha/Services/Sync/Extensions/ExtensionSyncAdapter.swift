@@ -2,9 +2,10 @@ import Foundation
 import OSLog
 import WebKit
 
-/// Matcha's extensions as seen by sync (task 7.4, `SYNC.md` § 2.5). An extension installed here follows the received
-/// settings (enabled, private windows, button, permissions); a received extension that is not installed is never
-/// installed automatically: it waits under “From Your Other Macs” (`SyncedExtensions.offers`). Uninstalled on one
+/// Matcha's extensions as seen by sync (`SYNC.md` § 2.5). An extension installed here follows the received settings
+/// (enabled, button), but received permissions can only reduce this Mac's, and access to private windows can only be
+/// removed. No code is ever installed without a click here: a received extension that is not installed, or a new
+/// package of an installed one, waits under “From Your Other Macs” (`SyncedExtensions.offers`). Uninstalled on one
 /// Mac, it is uninstalled everywhere.
 @MainActor
 final class ExtensionSyncAdapter {
@@ -60,9 +61,14 @@ final class ExtensionSyncAdapter {
             return
         }
         applySettings(fields)
-        // New package of an extension installed here: installed at the next sync if it asks for nothing more.
-        let package = SyncedPackage(source: fields.source, version: fields.version)
-        if let package, let known = synced.packages[identifier], known.blobID != package.blobID {
+        // New package of an extension installed here: offered, never installed by itself, unless this version was
+        // ignored.
+        guard let package = SyncedPackage(source: fields.source, version: fields.version),
+              let known = synced.packages[identifier], known.blobID != package.blobID
+        else {
+            return
+        }
+        if synced.ignoredUpdates[identifier] != package.sha256 {
             synced.offers[identifier] = fields
         }
     }
@@ -78,32 +84,49 @@ final class ExtensionSyncAdapter {
         }
     }
 
-    /// No longer offered on this Mac.
+    /// No longer offered on this Mac; for an update of an installed extension, only this version (“Ignore This
+    /// Version”): a later one is offered again.
     func ignore(_ identifier: String) {
-        synced.offers[identifier] = nil
-        synced.ignored.insert(identifier)
+        let offer = synced.offers.removeValue(forKey: identifier)
+        if manager.installedIdentifiers.contains(identifier) {
+            if let sha256 = offer?.source.sha256 {
+                synced.ignoredUpdates[identifier] = sha256
+            }
+        } else {
+            synced.ignored.insert(identifier)
+        }
     }
 
     // MARK: Settings
 
+    /// Enabled and button follow; permissions and sites only lose what the received record doesn't grant, and gain its
+    /// refusals; access to private windows can be removed, never granted (`SYNC.md` § 2.5).
     private func applySettings(_ fields: SyncExtensionFields) {
         let identifier = fields.identifier
-        var state = manager.store.state(for: identifier) ?? ExtensionState()
+        var state = currentState(of: identifier)
         let wasEnabled = state.isEnabled
         let hadPrivateAccess = state.hasAccessToPrivateData
         state.isEnabled = fields.isEnabled
-        state.hasAccessToPrivateData = fields.allowsPrivateWindows
+        state.hasAccessToPrivateData = hadPrivateAccess && fields.allowsPrivateWindows
         state.showsButton = fields.showsButton ? nil : false
-        state.grantedPermissions = Self.dates(fields.grantedPermissions)
-        state.deniedPermissions = Self.dates(fields.deniedPermissions)
-        state.grantedMatchPatterns = Self.dates(fields.grantedMatchPatterns)
-        state.deniedMatchPatterns = Self.dates(fields.deniedMatchPatterns)
+        (state.grantedPermissions, state.deniedPermissions) = Self.reduced(
+            granted: state.grantedPermissions,
+            denied: state.deniedPermissions,
+            receivedGranted: fields.grantedPermissions,
+            receivedDenied: fields.deniedPermissions,
+        )
+        (state.grantedMatchPatterns, state.deniedMatchPatterns) = Self.reduced(
+            granted: state.grantedMatchPatterns,
+            denied: state.deniedMatchPatterns,
+            receivedGranted: fields.grantedMatchPatterns,
+            receivedDenied: fields.deniedMatchPatterns,
+        )
         manager.store.setState(state, for: identifier)
         if let context = manager.contexts[identifier] {
             state.apply(to: context)
         }
-        if hadPrivateAccess != fields.allowsPrivateWindows {
-            manager.setAccessToPrivateData(fields.allowsPrivateWindows, identifier: identifier)
+        if hadPrivateAccess != state.hasAccessToPrivateData {
+            manager.setAccessToPrivateData(state.hasAccessToPrivateData, identifier: identifier)
         }
         manager.toolbar.buttonsDidChange()
         if wasEnabled != fields.isEnabled {
@@ -115,6 +138,22 @@ final class ExtensionSyncAdapter {
                 }
             }
         }
+    }
+
+    /// This Mac's grants that the received record also grants, and its refusals plus the received ones: a grant made
+    /// elsewhere is never added here (the extension asks again on this Mac). Pure.
+    nonisolated static func reduced(
+        granted: [String: Date],
+        denied: [String: Date],
+        receivedGranted: [String: Date?],
+        receivedDenied: [String: Date?],
+    ) -> (granted: [String: Date], denied: [String: Date]) {
+        var newDenied = denied
+        for (name, expiration) in receivedDenied where newDenied[name] == nil {
+            newDenied[name] = expiration ?? .distantFuture
+        }
+        let newGranted = granted.filter { receivedGranted.keys.contains($0.key) && newDenied[$0.key] == nil }
+        return (newGranted, newDenied)
     }
 
     /// Current decisions: those of the loaded context, otherwise the remembered ones.

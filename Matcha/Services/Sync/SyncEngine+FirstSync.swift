@@ -8,54 +8,71 @@ extension SyncEngine {
     static let replaceableTypes: Set<SyncRecordType> = [.profile, .space, .folder, .tab, .sitePermission, .siteZoom]
 
     /// Reads everything, chooses (nothing synced: send everything; this Mac only has its first-launch data: take the
-    /// synced data; otherwise: ask), applies, then collects what remains to be sent.
+    /// synced data; unreadable state file: merge; otherwise: ask), applies, then collects what remains to be sent.
     func firstSync() async throws {
-        var remote: [UUID: SyncRemoteRecord] = [:]
-        var cursor: String?
-        while true {
-            let page = try await transport.changes(since: cursor)
-            for record in page.records {
-                remote[record.id] = record
+        let (records, cursor) = try await readEverything()
+        for record in records.values {
+            var entry = SyncEntry(type: record.content?.type ?? "", version: record.version)
+            if let content = verified(record) {
+                observe(content)
+                entry.type = content.type
+                entry.remote = content
+            } else {
+                entry.isUnreadable = true
             }
-            cursor = page.cursor
-            if !page.hasMore {
-                break
-            }
+            state.entries[record.id] = entry
         }
-        for record in remote.values {
-            state.entries[record.id] = SyncEntry(type: record.content?.type ?? "", version: record.version, remote: record.content)
-            if let content = record.content {
-                state.clock.observe(content.modifiedAt)
-            }
+        let liveIDs = state.entries.compactMap { id, entry in
+            !entry.isUnreadable && entry.remote?.deleted == false ? id : nil
         }
-        let liveIDs = remote.values.compactMap { $0.content?.deleted == false ? $0.id : nil }
         let choice: FirstSyncChoice = if liveIDs.isEmpty {
             .replaceRemote
         } else if store.hasOnlyFirstLaunchData {
             .replaceLocal
+        } else if state.mergesWithoutAsking {
+            .merge
         } else {
             await chooseFirstSync()
         }
         Logger.sync.notice("First sync: \(String(describing: choice), privacy: .public)")
         switch choice {
         case .merge:
-            applyRemote(liveIDs)
+            try applyRemote(liveIDs)
         case .replaceLocal:
-            replaceLocalData(keeping: Set(liveIDs))
+            try replaceLocalData(keeping: Set(liveIDs))
         case .replaceRemote:
-            replaceRemoteData(liveIDs: liveIDs)
+            try replaceRemoteData(liveIDs: liveIDs)
         }
+        try retryWaiting()
         state.cursor = cursor
         state.hasCompletedFirstSync = true
+        state.mergesWithoutAsking = false
         save()
         // What this Mac has in addition: creations (on the server's version for an identifier derived from a key).
-        detectLocalChanges()
+        try detectLocalChanges()
     }
 
-    /// Applies the synced data and removes from this Mac what it does not have.
-    private func replaceLocalData(keeping liveIDs: Set<UUID>) {
-        let before = store.snapshot()
-        applyRemote(Array(liveIDs))
+    /// Every record of the account, and the cursor that follows them.
+    private func readEverything() async throws -> (records: [UUID: SyncRemoteRecord], cursor: String?) {
+        var records: [UUID: SyncRemoteRecord] = [:]
+        var cursor: String?
+        while true {
+            let page = try await transport.changes(since: cursor)
+            for record in page.records {
+                records[record.id] = record
+            }
+            cursor = page.cursor
+            if !page.hasMore {
+                return (records, cursor)
+            }
+        }
+    }
+
+    /// Applies the synced data and removes from this Mac what it does not have; this Mac's local records (favorites
+    /// and pinned tabs that aren't web addresses) aren't in the snapshot: they stay.
+    func replaceLocalData(keeping liveIDs: Set<UUID>) throws {
+        let before = try store.snapshot()
+        try applyRemote(Array(liveIDs))
         var deletions: [SyncLocalChange] = []
         for (id, fields) in before where !liveIDs.contains(id) {
             if Self.replaceableTypes.contains(fields.type) {
@@ -67,22 +84,22 @@ extension SyncEngine {
                 state.entries[id] = entry
             }
         }
-        _ = store.apply(SyncLocalChange.ordered(deletions))
+        _ = try store.apply(SyncLocalChange.ordered(deletions))
     }
 
-    /// Queues the deletion of what is synced but not on this Mac; the rest of this Mac will be sent as creations,
-    /// newer than everything that was read (`detectLocalChanges`).
-    private func replaceRemoteData(liveIDs: [UUID]) {
-        let local = store.snapshot()
+    /// Queues the deletion of what is synced but not on this Mac, except the records it must never touch (unreadable,
+    /// unknown type, newer format); the rest of this Mac will be sent as creations, newer than everything that was read
+    /// (`detectLocalChanges`).
+    private func replaceRemoteData(liveIDs: [UUID]) throws {
+        let local = try store.snapshot()
         for id in liveIDs where local[id] == nil {
-            guard let entry = state.entries[id] else {
+            guard let entry = state.entries[id], !entry.isIgnored, let type = entry.remote?.recordType else {
                 continue
             }
-            let schema = SyncRecordType(rawValue: entry.type)?.schema ?? 1
             let deletion = SyncContent.deletion(
-                of: entry.type,
-                schema: schema,
-                modifiedAt: state.clock.next(now: now()),
+                of: type.rawValue,
+                schema: type.schema,
+                modifiedAt: state.clock.next(now: now(), after: entry.remote?.modifiedAt),
                 modifiedBy: state.deviceID,
             )
             state.pending[id] = SyncPendingChange(content: deletion, local: nil)

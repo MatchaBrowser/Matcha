@@ -138,7 +138,7 @@ final class CommandBarUITests: XCTestCase {
     @MainActor
     func testSwitchingSpaceClosesTheBar() {
         let app = launch()
-        app.buttons["newSpaceButton"].click()
+        createSpace(in: app)
         XCTAssertTrue(waitForCount(spaceButtons(in: app), 2))
         let field = openCommandBar(in: app)
         app.typeText("swift")

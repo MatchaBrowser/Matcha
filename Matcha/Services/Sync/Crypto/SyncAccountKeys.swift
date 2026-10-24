@@ -4,8 +4,11 @@ import Foundation
 /// Derivation parameters of the master password (`kdf`, `SYNC.md` § 3.1): PBKDF2-SHA256, 16-byte salt.
 nonisolated struct SyncKDF: Codable, Equatable, Sendable {
     static let algorithmName = "pbkdf2-sha256"
-    /// This Matcha's minimum: a server cannot lower it to guess the password faster.
+    /// This Matcha's bounds: a server can neither lower the work to guess the password faster, nor raise it to freeze
+    /// this Mac in an endless computation.
     static let minimumIterations = 600_000
+    static let maximumIterations = 10_000_000
+    static let saltLength = 16
 
     var algorithm: String
     var iterations: Int
@@ -13,11 +16,12 @@ nonisolated struct SyncKDF: Codable, Equatable, Sendable {
 
     /// New random salt.
     static func random(iterations: Int = minimumIterations) -> SyncKDF {
-        SyncKDF(algorithm: algorithmName, iterations: iterations, salt: SyncCrypto.randomBytes(16))
+        SyncKDF(algorithm: algorithmName, iterations: iterations, salt: SyncCrypto.randomBytes(saltLength))
     }
 
     var isAcceptable: Bool {
-        algorithm == Self.algorithmName && iterations >= Self.minimumIterations && salt.count >= 16
+        algorithm == Self.algorithmName && (Self.minimumIterations ... Self.maximumIterations).contains(iterations)
+            && salt.count == Self.saltLength
     }
 }
 
@@ -77,6 +81,11 @@ nonisolated enum SyncAccountKeys {
     /// Key for the records.
     static func dataKey(accountKey: SymmetricKey) -> SymmetricKey {
         SyncCrypto.subkey(of: accountKey, info: "matcha.data.v1")
+    }
+
+    /// Key of the identifiers derived from a name (`SyncIdentifiers`).
+    static func idKey(accountKey: SymmetricKey) -> SymmetricKey {
+        SyncCrypto.subkey(of: accountKey, info: "matcha.id.v1")
     }
 
     static func wrap(_ accountKey: SymmetricKey, with wrapKey: SymmetricKey) throws -> Data {

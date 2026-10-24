@@ -154,6 +154,8 @@ struct BrowserWindowView: View {
         // “Clear…” in the site settings (task 5.2): the alert belongs to the window.
         .modifier(SiteDataClearConfirmation(model: model))
         .modifier(ArcImportPresenter(model: model))
+        // Questions of sync (first sync, mass deletion…), answered in the main window.
+        .asksSyncQuestions()
         // Mini windows send their pages to this window (task 4.5).
         .linkedToMiniWindows(session: session, model: model, window: window) { [commandBar] in commandBar.dismiss() }
         // Window and tabs as seen by extensions (task 6.3).

@@ -48,8 +48,10 @@ extension BrowserSession {
 
     /// Deletes the profile, its Spaces, its favorites, its permission decisions and its history; returns its
     /// identifier, or nil if it is the last profile. Its website data still has to be erased (`removeWebsiteData`).
-    func removeProfile(_ profile: ProfileRecord) -> UUID? {
-        guard profiles.count > 1, profiles.contains(where: { $0.id == profile.id }) else {
+    /// `allowingLast`: a deletion received by sync, which can remove the last profile; the first-launch one comes back
+    /// afterwards (`ensureSyncDefaults`).
+    func removeProfile(_ profile: ProfileRecord, allowingLast: Bool = false) -> UUID? {
+        guard allowingLast || profiles.count > 1, profiles.contains(where: { $0.id == profile.id }) else {
             return nil
         }
         // Its sign-in windows (task 5.8) close first, so their pages stop using its data.
@@ -64,7 +66,9 @@ extension BrowserSession {
         save(container.mainContext)
         refreshProfiles()
         // Its Spaces were the last ones (the others' Spaces were deleted before): the window needs one (audit R1).
-        ensureOneSpace()
+        if !profiles.isEmpty {
+            ensureOneSpace()
+        }
         forgetDataStore(of: identifier)
         favoritesHolders[identifier] = nil
         sitePermissions.removeAll(profileID: identifier)

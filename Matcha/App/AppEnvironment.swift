@@ -20,6 +20,8 @@ final class AppEnvironment {
     let extensionWindows: ExtensionWindows
     /// Sync of the extensions installed from a file.
     let extensionSync: ExtensionSyncAdapter
+    /// Sync through a private server (tasks 7.7 and 7.9).
+    let sync: SyncService
     /// Tab shown by the Settings window.
     let settingsSelection = SettingsSelection()
     /// Shortcuts of the menu commands, and their recording (Settings > Shortcuts).
@@ -36,7 +38,16 @@ final class AppEnvironment {
         extensions.host = extensionWindows
         extensions.permissionPrompter = ExtensionPermissionAlert()
         extensionSync = Self.makeExtensionSync(manager: extensions)
+        sync = SyncService(defaults: .standard, extensions: extensionSync, directory: Self.syncDirectory)
         pages = WebConfigurationFactory { extensions.attach(to: $0) }
+    }
+
+    /// `Application Support/Sync`; nil during tests (unit tests and test store): nothing is written.
+    private static var syncDirectory: URL? {
+        guard !TestEnvironment.usesInMemoryStore() else {
+            return nil
+        }
+        return FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask).first?.appendingPathComponent("Sync")
     }
 
     /// Settings in `Application Support/Sync/extensions.json`; during tests (unit tests and test store), in memory.

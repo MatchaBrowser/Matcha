@@ -4,6 +4,7 @@ import SwiftUI
 struct ProfilesSettingsView: View {
     @Environment(BrowserSession.self) private var session
     @Environment(MiniWindowManager.self) private var miniWindows: MiniWindowManager?
+    @Environment(SyncService.self) private var sync
     @State private var profileToDelete: ProfileRecord?
 
     var body: some View {
@@ -40,7 +41,12 @@ struct ProfilesSettingsView: View {
                 }
             }
         } message: {
-            Text("Its Spaces, tabs, Favorites, cookies, and sign-ins will be deleted.")
+            // With sync, the deletion reaches the other Macs, which erase the profile's website data too (SYNC.md § 2.3).
+            if sync.isActive {
+                Text("This profile, its cookies and sign-ins will be deleted on all your Macs.")
+            } else {
+                Text("Its Spaces, tabs, Favorites, cookies, and sign-ins will be deleted.")
+            }
         }
     }
 }

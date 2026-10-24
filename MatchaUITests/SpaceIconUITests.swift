@@ -58,7 +58,7 @@ final class SpaceIconUITests: XCTestCase {
     func testContextMenuOpensTheEditorOfThatSpace() {
         let app = launchApp()
         XCTAssertTrue(waitForBrowserWindow(of: app))
-        app.buttons["newSpaceButton"].click()
+        createSpace(in: app)
         XCTAssertTrue(waitForCount(spaceButtons(in: app), 2))
         let first = spaceButtons(in: app).element(boundBy: 0)
         let second = spaceButtons(in: app).element(boundBy: 1)

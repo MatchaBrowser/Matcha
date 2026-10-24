@@ -40,7 +40,7 @@ final class ProfilesUITests: XCTestCase {
     func testMoveATabToAnotherSpace() {
         let app = launchApp()
         XCTAssertTrue(waitForBrowserWindow(of: app))
-        app.buttons["newSpaceButton"].click()
+        createSpace(in: app)
         XCTAssertTrue(waitForCount(spaceButtons(in: app), 2))
         app.typeKey("1", modifierFlags: .control)
         openEmptyTab(in: app)

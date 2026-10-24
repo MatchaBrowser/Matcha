@@ -58,10 +58,4 @@ nonisolated enum SyncJSON: Codable, Hashable, Sendable {
         }
         return [:]
     }
-
-    /// This object completed with the keys of `base` it does not have: fields unknown to this version of Matcha,
-    /// received from a newer one, are sent back along with a modification.
-    func keepingUnknownKeys(of base: SyncJSON) -> SyncJSON {
-        .object(objectValue.merging(base.objectValue) { mine, _ in mine })
-    }
 }

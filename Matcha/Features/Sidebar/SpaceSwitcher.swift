@@ -1,8 +1,7 @@
 import SwiftUI
 
-/// Footer of the sidebar: one icon per Space and the button to create one. A click displays the
-/// Space; on the displayed Space, it opens its editor (icon and theme). Context menu: rename,
-/// theme, icon, delete.
+/// Footer of the sidebar: one icon per Space, and the account's circle, whose menu creates a Space. A click displays
+/// the Space; on the displayed Space, it opens its editor (icon and theme). Context menu: rename, theme, icon, delete.
 struct SpaceSwitcher: View {
     let model: WindowModel
 
@@ -36,14 +35,11 @@ struct SpaceSwitcher: View {
             }
             Spacer(minLength: 0)
         }
+        // The account's circle (task 7.9): its menu creates a Space and shows the state of sync.
         .overlay(alignment: .trailing) {
-            Button("New Space", systemImage: "plus") {
+            AccountButton {
                 withMotion(.easeInOut(duration: 0.3)) { model.newSpace() }
             }
-            .labelStyle(.iconOnly)
-            .buttonStyle(SidebarIconButtonStyle())
-            .help("New Space")
-            .accessibilityIdentifier("newSpaceButton")
         }
         .frame(height: 28)
         .alert("Rename Space", isPresented: Binding { renamedSpace != nil } set: {

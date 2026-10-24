@@ -25,8 +25,9 @@ struct MatchaSyncTests {
         let session = try BrowserSession(container: BrowserSchema.makeContainer(inMemory: true))
         let defaults = try #require(UserDefaults(suiteName: "MatchaSyncTests-\(UUID().uuidString)"))
         let engine = SyncEngine(
-            store: MatchaSyncStore(session: session, defaults: defaults),
+            store: MatchaSyncStore(session: session, defaults: defaults, identifiers: .testAccount),
             transport: InMemorySyncTransport(server: server),
+            identifiers: .testAccount,
             file: SyncStateFile(url: nil),
         )
         if let home = session.spaces.first {
@@ -40,14 +41,14 @@ struct MatchaSyncTests {
         let home = try #require(first.home)
         first.session.renameSpace(home, to: "Maison")
         let work = first.session.addSpace(inProfileOf: home)
-        let pinned = home.tabManager.newTab(url: URL(string: "about:blank#epingle"), select: false)
+        let pinned = home.tabManager.newTab(url: URL(string: "https://example.com/epingle"), select: false)
         home.tabManager.setPlace(pinned, to: .pinned)
         let folder = home.tabManager.newFolder()
         home.tabManager.renameFolder(folder, to: "Projets")
         home.tabManager.move(pinned, to: .pinned(folder: folder, index: 0))
-        let favorite = home.tabManager.newTab(url: URL(string: "about:blank#favori"), select: false)
+        let favorite = home.tabManager.newTab(url: URL(string: "https://example.com/favori"), select: false)
         home.tabManager.setPlace(favorite, to: .favorite)
-        let today = work.tabManager.newTab(url: URL(string: "about:blank#jour"), select: false)
+        let today = work.tabManager.newTab(url: URL(string: "https://example.com/jour"), select: false)
         first.defaults.set("duckDuckGo", forKey: BrowserSettings.Key.searchEngine)
         first.session.saveAll()
         try await first.engine.sync()

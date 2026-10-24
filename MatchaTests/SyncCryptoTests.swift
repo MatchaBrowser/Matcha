@@ -182,14 +182,43 @@ struct SyncCryptoTests {
         #expect(throws: SyncCryptoError.unreadable) { try SyncAccountKeys.unwrap(creation.wrappedAccountKey, with: wrongPassword.wrapKey) }
     }
 
-    @Test func `the keychain keeps the account key on this Mac only`() throws {
+    @Test func `the account's avatar is sealed to the account, as the server's client does`() throws {
+        let dataKey = SymmetricKey(data: bytes(0 ..< 32))
+        let account = try #require(UUID(uuidString: "5D0C7A3E-2B1F-4E8D-9A6C-0F3B7E1D2C54"))
+        let picture = Data([0x89, 0x50, 0x4E, 0x47]) + bytes(0 ..< 255) + Data([255])
+        let sealed = try SyncCrypto.encryptAvatar(picture, accountID: account, keyVersion: 1, dataKey: dataKey, nonce: nonce(200 ..< 212))
+        // Computed by the reference server's test client (`internal/testclient`, EncryptAvatar).
+        #expect(sealed.count == 4125)
+        #expect(SHA256.hash(data: sealed).map { String(format: "%02x", $0) }.joined()
+            == "f38d815522dc01acc145c303107dac400055c33c14ef3453279a09aaf19ca36e")
+        #expect(try SyncCrypto.decryptAvatar(sealed, accountID: account, keyVersion: 1, dataKey: dataKey) == picture)
+        #expect(throws: SyncCryptoError.unreadable) {
+            try SyncCrypto.decryptAvatar(sealed, accountID: UUID(), keyVersion: 1, dataKey: dataKey)
+        }
+    }
+
+    @Test func `the keychain keeps the account key by server and by account`() throws {
         let keychain = SyncKeychain(service: "com.matchabrowser.matcha.sync.tests.\(UUID().uuidString)")
-        defer { keychain.remove() }
-        #expect(keychain.data(for: .accountKey) == nil)
-        try keychain.set(Data([1, 2, 3]), for: .accountKey)
-        try keychain.set(Data([4, 5, 6]), for: .accountKey)
-        #expect(keychain.data(for: .accountKey) == Data([4, 5, 6]))
-        keychain.remove([.accountKey])
-        #expect(keychain.data(for: .accountKey) == nil)
+        let server = SyncServerAddress(normalized: "https://sync.example.com/api")
+        let other = SyncServerAddress(normalized: "https://other.example.com")
+        let account = UUID()
+        defer {
+            keychain.removeAccount(server: server, accountID: account)
+            keychain.removeAccount(server: other, accountID: account)
+        }
+        #expect(try keychain.data(for: .accountKey, server: server, accountID: account) == nil)
+        try keychain.set(Data([1, 2, 3]), for: .accountKey, server: server, accountID: account)
+        try keychain.set(Data([4, 5, 6]), for: .accountKey, server: server, accountID: account)
+        #expect(try keychain.data(for: .accountKey, server: server, accountID: account) == Data([4, 5, 6]))
+        #expect(try keychain.data(for: .accountKey, server: other, accountID: account) == nil)
+        keychain.removeAccount(server: server, accountID: account, items: [.accountKey])
+        #expect(try keychain.data(for: .accountKey, server: server, accountID: account) == nil)
+        #expect(SyncKeychain.name(of: .refreshToken, server: server, accountID: account).hasPrefix("https://sync.example.com/api|"))
+    }
+
+    @Test func `this machine has a mark, read in the sandbox`() {
+        let mark = SyncMachineMark.current()
+        #expect(mark?.count == 64)
+        #expect(mark == SyncMachineMark.current())
     }
 }

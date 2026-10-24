@@ -128,7 +128,7 @@ final class ScreenshotUITests: XCTestCase {
             return
         }
         for _ in 0 ..< count {
-            app.buttons["newSpaceButton"].click()
+            createSpace(in: app)
             sleep(1)
         }
         attach(window.screenshot(), as: "9-spaces")

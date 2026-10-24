@@ -33,6 +33,36 @@ extension BrowserSession {
         }
     }
 
+    /// Received deletion of a Space (`SYNC.md` § 2.3), even the last one: `ensureSyncDefaults` restores the invariants
+    /// afterwards. Its tabs and folders go with it.
+    func removeSpaceFromSync(_ space: SpaceSession) {
+        handOverFavorites(from: space)
+        space.close()
+        removeSpace(space)
+        container.mainContext.delete(space.record)
+    }
+
+    /// A session always has a profile and a Space (`SYNC.md` § 2.3, invariants). If received deletions left none, the
+    /// first-launch ones come back under identifiers derived from the account's key, the same on all Macs: two Macs
+    /// that recreate them write the same records, and the conflict rule keeps one. True if something was created.
+    @discardableResult
+    func ensureSyncDefaults(profileID: UUID, spaceID: UUID) -> Bool {
+        let context = container.mainContext
+        var created = false
+        if profiles.isEmpty {
+            context.insert(ProfileRecord(id: profileID, name: Self.defaultProfileName))
+            refreshProfiles()
+            created = true
+        }
+        if spaces.isEmpty {
+            let record = SpaceRecord(id: spaceID, name: Self.defaultSpaceName, profile: profiles.first)
+            context.insert(record)
+            openSpace(record)
+            created = true
+        }
+        return created
+    }
+
     private func reloadSpaces() {
         let context = container.mainContext
         let records = (try? context.fetch(FetchDescriptor<SpaceRecord>())) ?? []

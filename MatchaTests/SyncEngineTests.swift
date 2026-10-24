@@ -158,7 +158,7 @@ struct SyncEngineTests {
     @Test func `content from a newer Matcha or unreadable is never overwritten`() async throws {
         let setup = try await pair()
         let (macA, macB) = (setup.macA, setup.macB)
-        let setting = SyncIdentifier.setting("searchEngine")
+        let setting = SyncIdentifiers.testAccount.setting("searchEngine")
         let future = SyncContent(
             type: "setting",
             schema: 2,
@@ -177,7 +177,7 @@ struct SyncEngineTests {
         #expect(macB.store.items[unreadable] == nil)
     }
 
-    @Test func `an expired cursor rereads everything`() async throws {
+    @Test func `an expired cursor rereads everything and deletes nothing on an absence`() async throws {
         let setup = try await pair()
         let (macA, macB, space) = (setup.macA, setup.macB, setup.space)
         let kept = macA.addTodayTab(in: space, url: "https://example.com/garde")
@@ -188,9 +188,12 @@ struct SyncEngineTests {
         try await macA.sync()
         await server.purgeDeletions()
 
+        // The server no longer knows the deletion: B keeps the tab and sends it again, as SYNC.md § 5 accepts for a Mac
+        // that missed a purged deletion; only an encrypted deletion deletes.
         try await macB.sync()
-        #expect(macB.store.items[closed] == nil)
         #expect(macB.store.items[kept] != nil)
+        #expect(macB.store.items[closed] != nil)
+        #expect(await server.content(of: closed)?.deleted == false)
         #expect(try await macB.sync()?.sent == 0)
     }
 
@@ -201,7 +204,7 @@ struct SyncEngineTests {
         let profile = macA.addProfile("Personnel")
         let space = macA.addSpace("Perso", profile: profile)
         for order in 0 ..< 5 {
-            macA.addTodayTab(in: space, url: "https://example.com/\(order)", order: order)
+            macA.addTodayTab(in: space, url: "https://example.com/\(order)", order: Double(order))
         }
         #expect(try await macA.sync()?.sent == 7)
         try await macB.sync()
@@ -213,11 +216,11 @@ struct SyncEngineTests {
         defer { try? FileManager.default.removeItem(at: url) }
         let store = MemorySyncStore()
         let transport = InMemorySyncTransport(server: server)
-        let first = SyncEngine(store: store, transport: transport, file: SyncStateFile(url: url))
+        let first = SyncEngine(store: store, transport: transport, identifiers: .testAccount, file: SyncStateFile(url: url))
         store.items[UUID()] = .profile(SyncProfileFields(name: "Personnel", order: 0))
         try await first.sync()
 
-        let relaunched = SyncEngine(store: store, transport: transport, file: SyncStateFile(url: url))
+        let relaunched = SyncEngine(store: store, transport: transport, identifiers: .testAccount, file: SyncStateFile(url: url))
         #expect(relaunched.state == first.state)
         #expect(try await relaunched.sync()?.sent == 0)
     }

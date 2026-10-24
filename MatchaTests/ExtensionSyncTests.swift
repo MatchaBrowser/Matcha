@@ -98,10 +98,24 @@ struct ExtensionSyncTests {
         let state = try #require(mac.manager.store.state(for: identifier))
         #expect(!state.isEnabled)
         #expect(state.showsButton == false)
-        #expect(state.hasAccessToPrivateData)
+        // Access to private windows is never granted by sync, and a refusal received applies (SYNC.md § 2.5).
+        #expect(!state.hasAccessToPrivateData)
         #expect(state.deniedPermissions["tabs"] == .distantFuture)
         #expect(state.grantedPermissions["tabs"] == nil)
         #expect(mac.synced.offers.isEmpty)
+    }
+
+    @Test func `received permissions only reduce those of this Mac`() {
+        let now = Date.now
+        let (granted, denied) = ExtensionSyncAdapter.reduced(
+            granted: ["tabs": now, "storage": now],
+            denied: [:],
+            receivedGranted: ["tabs": nil, "cookies": nil],
+            receivedDenied: ["history": nil],
+        )
+        // “storage” was withdrawn elsewhere, “cookies” granted elsewhere isn't added here.
+        #expect(granted == ["tabs": now])
+        #expect(denied == ["history": .distantFuture])
     }
 
     @Test func `an extension from another Mac waits for the user, who can ignore it`() async throws {
