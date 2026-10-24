@@ -1,18 +1,18 @@
 import SwiftUI
 
 /// Row of a split: one segment per tab, from left to right like the panes. A click on a segment
-/// displays the split with that pane active; the row is dragged as a whole; a tab or folder dropped
-/// on it is inserted before the split, at `dropDestination`.
+/// displays the split with that pane active; the row is dragged as a whole; an item dropped on its top half is
+/// inserted before the split, on its bottom half after it (`drop`).
 struct SplitRowView: View {
     /// Width of a segment from which it shows its tab's title.
     static let titleMinimumWidth = 64.0
 
     let group: SplitGroup
     let tabManager: TabManager
-    let dropDestination: SidebarDestination
+    let drop: SidebarRowDrop
 
     @State private var isHovered = false
-    @State private var isDropTargeted = false
+    @State private var dropPart: SidebarRowDrop.Part?
     @State private var rowWidth = 0.0
     /// This window's selection; absent outside a browser window.
     @Environment(TabViewer.self) private var viewer: TabViewer?
@@ -77,12 +77,8 @@ struct SplitRowView: View {
         .draggable(SidebarDragItem.split(group.id)) {
             SidebarDragPreview(title: titles) { Image(systemName: "rectangle.split.2x1") }
         }
-        .sidebarDropDestination(tabManager: tabManager, destination: dropDestination, isTargeted: $isDropTargeted)
-        .overlay(alignment: .top) {
-            if isDropTargeted {
-                InsertionLine()
-            }
-        }
+        .sidebarRowDropDestination(tabManager: tabManager, drop: drop, part: $dropPart)
+        .insertionLine(for: dropPart)
         .accessibilityElement(children: .contain)
         .accessibilityLabel(Text(
             "Split View with \(titles)",

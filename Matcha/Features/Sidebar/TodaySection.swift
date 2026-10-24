@@ -13,12 +13,12 @@ struct TodaySection<Header: View>: View {
         // A split fits on one row, in place of its first tab.
         ForEach(tabManager.layout.todayRows) { row in
             switch row {
-            case let .tab(id, index):
+            case let .tab(id, _):
                 if let tab = tabManager.tab(withID: id) {
-                    TabRowView(tab: tab, tabManager: tabManager, dropDestination: .today(index: index))
+                    TabRowView(tab: tab, tabManager: tabManager, drop: .today(row))
                 }
-            case let .split(group, index):
-                SplitRowView(group: group, tabManager: tabManager, dropDestination: .today(index: index))
+            case let .split(group, _):
+                SplitRowView(group: group, tabManager: tabManager, drop: .today(row))
             case .folder:
                 EmptyView()
             }

@@ -24,7 +24,7 @@ struct SidebarDropZone: View {
             }
             .frame(height: isTargeted ? 36 : restingHeight)
             .contentShape(Rectangle())
-            .sidebarDropDestination(tabManager: tabManager, isTargeted: $isTargeted) { _ in destination }
+            .sidebarDropDestination(tabManager: tabManager, destination: destination, isTargeted: $isTargeted)
             .accessibilityElement()
             .accessibilityLabel(accessibilityLabel)
     }
@@ -43,19 +43,9 @@ struct SidebarDropZone: View {
 }
 
 extension View {
-    /// Accepts a dragged tab, split or folder and puts it at the destination computed from where it was dropped in the
-    /// view (`SidebarDropModifier`).
-    func sidebarDropDestination(
-        tabManager: TabManager,
-        isTargeted: Binding<Bool>,
-        destination: @escaping (CGPoint) -> SidebarDestination,
-    ) -> some View {
-        modifier(SidebarDropModifier(tabManager: tabManager, isTargeted: isTargeted, destination: destination))
-    }
-
-    /// Accepts a dragged item and puts it at `destination`.
+    /// Accepts a dragged item and puts it at `destination` (`SidebarDropModifier`).
     func sidebarDropDestination(tabManager: TabManager, destination: SidebarDestination, isTargeted: Binding<Bool>) -> some View {
-        sidebarDropDestination(tabManager: tabManager, isTargeted: isTargeted) { _ in destination }
+        modifier(SidebarDropModifier(tabManager: tabManager, destination: destination, isTargeted: isTargeted))
     }
 
     /// Makes the tab draggable, with a compact preview; dropped outside the app's windows, it opens in a new window.
@@ -81,15 +71,5 @@ struct SidebarDragPreview<Icon: View>: View {
         .padding(.horizontal, 10)
         .frame(height: 30)
         .background(.regularMaterial, in: .rect(cornerRadius: 8))
-    }
-}
-
-/// Line marking where the dragged item will be inserted.
-struct InsertionLine: View {
-    var body: some View {
-        Capsule()
-            .fill(Color.accentColor)
-            .frame(height: 2)
-            .offset(y: -1)
     }
 }

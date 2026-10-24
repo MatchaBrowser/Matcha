@@ -21,6 +21,14 @@ nonisolated enum SidebarRow: Equatable, Sendable, Identifiable {
         case let .tab(_, index), let .split(_, index), let .folder(_, index): index
         }
     }
+
+    /// Position right after the row in its container (drop “after the row”): after all the members of a split.
+    var nextIndex: Int {
+        switch self {
+        case let .split(group, index): index + group.tabIDs.count
+        case let .tab(_, index), let .folder(_, index): index + 1
+        }
+    }
 }
 
 /// Rows displayed by the sidebar: a split member gives the row of its split if it is the first member,
