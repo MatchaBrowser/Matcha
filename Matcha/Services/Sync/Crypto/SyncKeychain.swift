@@ -1,65 +1,108 @@
 import Foundation
 import Security
 
-/// Sync keychain (`SYNC.md` § 3.8): account key, tokens and device identifier, as generic passwords of the
-/// `com.matchabrowser.matcha.sync` service, in this Mac's login keychain (never synced by iCloud; in the sandbox,
-/// reserved for Matcha). The data protection keychain would require a signed app identifier (provisioning profile,
-/// `DECISIONS.md`). The master password, the master key and the recovery key never go there.
+/// Sync keychain (`SYNC.md` § 3.8): generic passwords of the `com.matchabrowser.matcha.sync` service, in this Mac's
+/// login keychain, never synced by iCloud (in the sandbox, reserved for Matcha). The account key and the tokens are
+/// stored by server and by account (“<server>|<account>|<item>”): changing server or account mixes nothing. This
+/// Mac's identifier and machine mark are for the whole Mac (“device”). A keychain error (locked, access refused) is
+/// an error, never an absence. The master password, the master key and the recovery key never go there.
 nonisolated struct SyncKeychain: Sendable {
     static let service = "com.matchabrowser.matcha.sync"
 
-    /// Stored items.
+    /// Items of an account.
     enum Item: String, CaseIterable, Sendable {
         case accountKey
         case accessToken
         case refreshToken
-        case deviceID
     }
 
     /// Service of the items (a different one for tests).
     var service = Self.service
 
-    func set(_ data: Data, for item: Item) throws {
-        let query = baseQuery(for: item)
+    // MARK: Account items
+
+    func set(_ data: Data, for item: Item, server: SyncServerAddress, accountID: UUID) throws {
+        try set(data, account: Self.name(of: item, server: server, accountID: accountID))
+    }
+
+    func data(for item: Item, server: SyncServerAddress, accountID: UUID) throws -> Data? {
+        try data(account: Self.name(of: item, server: server, accountID: accountID))
+    }
+
+    /// Removes the account's items (sign-out, revoked device, deleted account).
+    func removeAccount(server: SyncServerAddress, accountID: UUID, items: [Item] = Item.allCases) {
+        for item in items {
+            remove(account: Self.name(of: item, server: server, accountID: accountID))
+        }
+    }
+
+    static func name(of item: Item, server: SyncServerAddress, accountID: UUID) -> String {
+        "\(server.normalized)|\(accountID.uuidString.lowercased())|\(item.rawValue)"
+    }
+
+    // MARK: This Mac
+
+    /// This Mac's sync identity: its device identifier, and the mark of the machine that drew it.
+    struct Device: Codable, Equatable, Sendable {
+        var id: UUID
+        var machineMark: String?
+    }
+
+    func device() throws -> Device? {
+        try data(account: "device").flatMap { try? JSONDecoder().decode(Device.self, from: $0) }
+    }
+
+    func setDevice(_ device: Device) throws {
+        try set(JSONEncoder().encode(device), account: "device")
+    }
+
+    /// Forgets this Mac's identity (tests).
+    func removeDevice() {
+        remove(account: "device")
+    }
+
+    // MARK: Keychain
+
+    private func set(_ data: Data, account: String) throws {
+        let query = baseQuery(account: account)
         let update: [String: Any] = [kSecValueData as String: data]
         var status = SecItemUpdate(query as CFDictionary, update as CFDictionary)
         if status == errSecItemNotFound {
             var attributes = query
             attributes[kSecValueData as String] = data
+            attributes[kSecAttrSynchronizable as String] = false
             status = SecItemAdd(attributes as CFDictionary, nil)
         }
         guard status == errSecSuccess else {
-            throw SyncKeychainError(status: status)
+            throw SyncClientError.keychain(status)
         }
     }
 
-    func data(for item: Item) -> Data? {
-        var query = baseQuery(for: item)
+    private func data(account: String) throws -> Data? {
+        var query = baseQuery(account: account)
         query[kSecReturnData as String] = true
         query[kSecMatchLimit as String] = kSecMatchLimitOne
         var result: CFTypeRef?
-        guard SecItemCopyMatching(query as CFDictionary, &result) == errSecSuccess else {
+        let status = SecItemCopyMatching(query as CFDictionary, &result)
+        switch status {
+        case errSecSuccess:
+            return result as? Data
+        case errSecItemNotFound:
             return nil
-        }
-        return result as? Data
-    }
-
-    /// Removes `items` (all by default: sign-out, revoked device).
-    func remove(_ items: [Item] = Item.allCases) {
-        for item in items {
-            SecItemDelete(baseQuery(for: item) as CFDictionary)
+        default:
+            throw SyncClientError.keychain(status)
         }
     }
 
-    private func baseQuery(for item: Item) -> [String: Any] {
+    private func remove(account: String) {
+        SecItemDelete(baseQuery(account: account) as CFDictionary)
+    }
+
+    private func baseQuery(account: String) -> [String: Any] {
         [
             kSecClass as String: kSecClassGenericPassword,
             kSecAttrService as String: service,
-            kSecAttrAccount as String: item.rawValue,
+            kSecAttrAccount as String: account,
         ]
     }
-}
-
-nonisolated struct SyncKeychainError: Error, Equatable {
-    let status: OSStatus
 }

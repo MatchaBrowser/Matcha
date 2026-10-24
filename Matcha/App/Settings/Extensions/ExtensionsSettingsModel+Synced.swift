@@ -18,7 +18,7 @@ extension ExtensionsSettingsModel {
         syncAdapter.synced.sortedOffers
     }
 
-    /// Already installed here: an update that asks for one more permission or site.
+    /// Already installed here: an update from another Mac, installed only on a click here.
     func isUpdate(_ offer: SyncExtensionFields) -> Bool {
         manager.installedIdentifiers.contains(offer.identifier)
     }

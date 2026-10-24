@@ -1,7 +1,8 @@
 import Foundation
 
-/// Fields of a synced record, by type (task 7.4, `SYNC.md` § 2.1): what this Mac has, or what it read from a
-/// received content. A missing field counts as `null`. Pure type.
+/// Fields of a synced record, by type (`SYNC.md` § 2.1): what this Mac has, or what it read from a received content.
+/// A missing field counts as `null`; an unreadable field takes its default value or makes the record ignored
+/// (§ 2.9). Pure type.
 nonisolated enum SyncFields: Equatable, Sendable {
     case profile(SyncProfileFields)
     case space(SyncSpaceFields)
@@ -63,10 +64,10 @@ nonisolated enum SyncFields: Equatable, Sendable {
     var parentIDs: [UUID] {
         switch self {
         case .profile, .webExtension, .setting, .siteZoom: []
-        case let .space(fields): fields.profileId.map { [$0] } ?? []
+        case let .space(fields): [fields.profileId]
         case let .folder(fields): [fields.spaceId, fields.parentId].compactMap(\.self)
         case let .tab(fields): [fields.profileId, fields.spaceId, fields.folderId].compactMap(\.self)
-        case let .sitePermission(fields): fields.profileId.map { [$0] } ?? []
+        case let .sitePermission(fields): [fields.profileId]
         }
     }
 }

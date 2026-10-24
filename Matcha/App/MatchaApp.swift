@@ -51,6 +51,8 @@ struct MatchaApp: App {
         environment.extensionWindows.miniWindows = miniWindows
         if !session.isInMemory {
             environment.extensions.start()
+            // Sync (tasks 7.7 and 7.9): never with a test store.
+            environment.sync.start(session: session)
         }
         // Edit > Find: the active mini window's page first.
         environment.pageFind.miniWindows = miniWindows
@@ -124,6 +126,7 @@ struct MatchaApp: App {
             )
             .environment(session)
             .environment(miniWindows)
+            .environment(environment.sync)
         }
     }
 }

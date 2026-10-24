@@ -8,12 +8,40 @@ import OSLog
 @MainActor
 @Observable
 final class SyncedExtensions {
+    /// Saved form, read leniently: a field missing from an older file takes its default value.
     private struct Saved: Codable {
         var packages: [String: SyncedPackage] = [:]
         var offers: [String: SyncExtensionFields] = [:]
         var ignored: Set<String> = []
+        var ignoredUpdates: [String: String] = [:]
         var obsoleteBlobs: [UUID] = []
         var names: [String: String] = [:]
+
+        init(
+            packages: [String: SyncedPackage],
+            offers: [String: SyncExtensionFields],
+            ignored: Set<String>,
+            ignoredUpdates: [String: String],
+            obsoleteBlobs: [UUID],
+            names: [String: String],
+        ) {
+            self.packages = packages
+            self.offers = offers
+            self.ignored = ignored
+            self.ignoredUpdates = ignoredUpdates
+            self.obsoleteBlobs = obsoleteBlobs
+            self.names = names
+        }
+
+        init(from decoder: any Decoder) throws {
+            let container = try decoder.container(keyedBy: CodingKeys.self)
+            packages = container.lenient([String: SyncedPackage].self, forKey: .packages) ?? [:]
+            offers = container.lenient([String: SyncExtensionFields].self, forKey: .offers) ?? [:]
+            ignored = container.lenient(Set<String>.self, forKey: .ignored) ?? []
+            ignoredUpdates = container.lenient([String: String].self, forKey: .ignoredUpdates) ?? [:]
+            obsoleteBlobs = container.lenient([UUID].self, forKey: .obsoleteBlobs) ?? []
+            names = container.lenient([String: String].self, forKey: .names) ?? [:]
+        }
     }
 
     /// Package of each extension installed from a file.
@@ -28,6 +56,11 @@ final class SyncedExtensions {
 
     /// Ignored on this Mac: no longer offered.
     var ignored: Set<String> = [] {
+        didSet { save() }
+    }
+
+    /// Updates ignored on this Mac (“Ignore This Version”): digest of the package not to offer again, by extension.
+    var ignoredUpdates: [String: String] = [:] {
         didSet { save() }
     }
 
@@ -53,6 +86,7 @@ final class SyncedExtensions {
         packages = saved.packages
         offers = saved.offers
         ignored = saved.ignored
+        ignoredUpdates = saved.ignoredUpdates
         obsoleteBlobs = saved.obsoleteBlobs
         names = saved.names
         isLoading = false
@@ -67,7 +101,14 @@ final class SyncedExtensions {
         guard !isLoading, let url else {
             return
         }
-        let saved = Saved(packages: packages, offers: offers, ignored: ignored, obsoleteBlobs: obsoleteBlobs, names: names)
+        let saved = Saved(
+            packages: packages,
+            offers: offers,
+            ignored: ignored,
+            ignoredUpdates: ignoredUpdates,
+            obsoleteBlobs: obsoleteBlobs,
+            names: names,
+        )
         do {
             try FileManager.default.createDirectory(at: url.deletingLastPathComponent(), withIntermediateDirectories: true)
             try SyncCoding.encoder().encode(saved).write(to: url, options: .atomic)

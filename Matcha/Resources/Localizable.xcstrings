@@ -59,6 +59,35 @@
         }
       }
     },
+    "%@ is ready." : {
+      "comment" : "Settings > Sync: the checked server answers (host name)",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ ist bereit."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ está listo."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ est prêt."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ è pronto."
+          }
+        }
+      }
+    },
     "%@ of %@" : {
       "comment" : "Progress of a download: bytes received of the total size, e.g. 12 MB of 40 MB",
       "localizations" : {
@@ -445,6 +474,101 @@
                 "stringUnit" : {
                   "state" : "translated",
                   "value" : "%lld cartelle"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "%lld items are too big to sync." : {
+      "comment" : "Settings > Sync: warning: records refused as too big (count)",
+      "localizations" : {
+        "de" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld Objekt ist zu groß zum Synchronisieren."
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld Objekte sind zu groß zum Synchronisieren."
+                }
+              }
+            }
+          }
+        },
+        "en" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld item is too big to sync."
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld items are too big to sync."
+                }
+              }
+            }
+          }
+        },
+        "es" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld elemento es demasiado grande para sincronizarse."
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld elementos son demasiado grandes para sincronizarse."
+                }
+              }
+            }
+          }
+        },
+        "fr" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld élément est trop gros pour être synchronisé."
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld éléments sont trop gros pour être synchronisés."
+                }
+              }
+            }
+          }
+        },
+        "it" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld elemento è troppo grande per essere sincronizzato."
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld elementi sono troppo grandi per essere sincronizzati."
                 }
               }
             }
@@ -1100,6 +1224,35 @@
         }
       }
     },
+    "A new recovery key replaces the old one, which stops working. Save the new kit." : {
+      "comment" : "Settings > Sync: new recovery kit sheet",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ein neuer Wiederherstellungsschlüssel ersetzt den alten, der dann nicht mehr funktioniert. Sichere das neue Kit."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Una nueva clave de recuperación sustituye a la anterior, que deja de funcionar. Guarda el nuevo kit."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Une nouvelle clé de secours remplace l'ancienne, qui ne marche plus. Enregistrez le nouveau kit."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Una nuova chiave di recupero sostituisce la precedente, che smette di funzionare. Salva il nuovo kit."
+          }
+        }
+      }
+    },
     "A New Tab in the Current Space" : {
       "comment" : "Settings > General: links from other apps open in a new tab of the Space shown",
       "localizations" : {
@@ -1183,6 +1336,64 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Sopra la pagina"
+          }
+        }
+      }
+    },
+    "Account" : {
+      "comment" : "Settings > Sync: section and row of the sync account",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Account"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cuenta"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Compte"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Account"
+          }
+        }
+      }
+    },
+    "Account and Sync" : {
+      "comment" : "Sidebar: accessibility label of the account's circle",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Account und Synchronisierung"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cuenta y sincronización"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Compte et synchronisation"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Account e sincronizzazione"
           }
         }
       }
@@ -1879,6 +2090,64 @@
         }
       }
     },
+    "An account already uses this email." : {
+      "comment" : "Settings > Sync: error email_taken",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ein Account verwendet diese E-Mail-Adresse bereits."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ya hay una cuenta con este correo."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Un compte utilise déjà cette adresse e-mail."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Un account usa già questa email."
+          }
+        }
+      }
+    },
+    "An invitation code is required, or the one entered isn't valid." : {
+      "comment" : "Settings > Sync: error invitation_required",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ein Einladungscode ist erforderlich, oder der eingegebene ist ungültig."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Se necesita un código de invitación, o el introducido no es válido."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Un code d'invitation est nécessaire, ou celui saisi n'est pas valide."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Serve un codice di invito, oppure quello inserito non è valido."
+          }
+        }
+      }
+    },
     "Angle" : {
       "comment" : "Label of the slider that sets the direction of the Space theme gradient",
       "localizations" : {
@@ -2048,6 +2317,64 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Chiedi prima di uscire"
+          }
+        }
+      }
+    },
+    "At least 12 characters." : {
+      "comment" : "Settings > Sync: password strength gauge: too short",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mindestens 12 Zeichen."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Al menos 12 caracteres."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Au moins 12 caractères."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Almeno 12 caratteri."
+          }
+        }
+      }
+    },
+    "Avatar" : {
+      "comment" : "Settings > Sync: section of the account's avatar",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Avatar"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Avatar"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Avatar"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Avatar"
           }
         }
       }
@@ -2579,6 +2906,64 @@
         }
       }
     },
+    "Change" : {
+      "comment" : "Settings > Sync: button that changes the checked server address",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ändern"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cambiar"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Changer"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cambia"
+          }
+        }
+      }
+    },
+    "Change Avatar…" : {
+      "comment" : "Sidebar, account menu: opens Settings > Sync",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Avatar ändern …"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cambiar avatar…"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Changer d'avatar…"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cambia avatar…"
+          }
+        }
+      }
+    },
     "Change data you copy and paste" : {
       "localizations" : {
         "de" : {
@@ -2603,6 +2988,64 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Modificare i dati che copi e incolli"
+          }
+        }
+      }
+    },
+    "Change Email" : {
+      "comment" : "Settings > Sync: title and button of the email change sheet",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "E-Mail-Adresse ändern"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cambiar correo"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Changer d'adresse e-mail"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cambia email"
+          }
+        }
+      }
+    },
+    "Change Email…" : {
+      "comment" : "Settings > Sync: account action",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "E-Mail-Adresse ändern …"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cambiar correo…"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Changer d'adresse e-mail…"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cambia email…"
           }
         }
       }
@@ -2661,6 +3104,122 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Cambia lingua…"
+          }
+        }
+      }
+    },
+    "Change Master Password" : {
+      "comment" : "Settings > Sync: title of the password change sheet",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Master-Passwort ändern"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cambiar contraseña maestra"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Changer le mot de passe maître"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cambia password principale"
+          }
+        }
+      }
+    },
+    "Change Master Password…" : {
+      "comment" : "Settings > Sync: account action",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Master-Passwort ändern …"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cambiar contraseña maestra…"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Changer le mot de passe maître…"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cambia password principale…"
+          }
+        }
+      }
+    },
+    "Change Password" : {
+      "comment" : "Settings > Sync: button of the password change sheet",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Passwort ändern"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cambiar contraseña"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Changer le mot de passe"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cambia password"
+          }
+        }
+      }
+    },
+    "Changes made on this Mac would delete %lld items, more than half of your synced data, on all your Macs." : {
+      "comment" : "Sync question: mass deletion (count, always 50 or more)",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Die Änderungen auf diesem Mac würden %lld Objekte löschen, mehr als die Hälfte deiner synchronisierten Daten, auf all deinen Macs."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Los cambios hechos en este Mac eliminarían %lld elementos, más de la mitad de tus datos sincronizados, en todos tus Mac."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Les changements faits sur ce Mac supprimeraient %lld éléments, plus de la moitié de vos données synchronisées, sur tous vos Mac."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Le modifiche fatte su questo Mac eliminerebbero %lld elementi, più della metà dei tuoi dati sincronizzati, su tutti i tuoi Mac."
           }
         }
       }
@@ -2776,6 +3335,35 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Scegli un’emoji nel Visore caratteri"
+          }
+        }
+      }
+    },
+    "Choose Photo…" : {
+      "comment" : "Settings > Sync: avatar: picks an image",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Foto auswählen …"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Elegir foto…"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Choisir une photo…"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Scegli foto…"
           }
         }
       }
@@ -3513,6 +4101,35 @@
         }
       }
     },
+    "Color %@" : {
+      "comment" : "Settings > Sync: avatar: accessibility label of a color swatch (hex code)",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Farbe %@"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Color %@"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Couleur %@"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Colore %@"
+          }
+        }
+      }
+    },
     "Color %lld" : {
       "comment" : "Accessibility label of a theme color picker; the number is the color's position",
       "localizations" : {
@@ -3703,6 +4320,93 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Comunicare con le app del tuo Mac"
+          }
+        }
+      }
+    },
+    "Confirm master password" : {
+      "comment" : "Settings > Sync: second password field",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Master-Passwort bestätigen"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Confirmar contraseña maestra"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Confirmer le mot de passe maître"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Conferma password principale"
+          }
+        }
+      }
+    },
+    "Connect" : {
+      "comment" : "Settings > Sync: checks the server address",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Verbinden"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Conectar"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Se connecter"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Connetti"
+          }
+        }
+      }
+    },
+    "Continue" : {
+      "comment" : "Recovery kit sheet: closes it once the kit is saved",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Weiter"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Continuar"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Continuer"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Continua"
           }
         }
       }
@@ -3908,6 +4612,122 @@
         }
       }
     },
+    "Create a new recovery key" : {
+      "comment" : "Settings > Sync: account recovery: replaces the recovery key",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Neuen Wiederherstellungsschlüssel erstellen"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Crear una nueva clave de recuperación"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Créer une nouvelle clé de secours"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Crea una nuova chiave di recupero"
+          }
+        }
+      }
+    },
+    "Create Account" : {
+      "comment" : "Settings > Sync: tab and button that create a sync account",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Account erstellen"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Crear cuenta"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Créer un compte"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Crea account"
+          }
+        }
+      }
+    },
+    "Create Kit" : {
+      "comment" : "Settings > Sync: button of the new recovery kit sheet",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kit erstellen"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Crear kit"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Créer le kit"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Crea kit"
+          }
+        }
+      }
+    },
+    "Created on %@" : {
+      "comment" : "Recovery kit: creation date",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Erstellt am %@"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Creado el %@"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Créé le %@"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Creato il %@"
+          }
+        }
+      }
+    },
     "Credit Card" : {
       "comment" : "Icon choice (SF Symbol)",
       "localizations" : {
@@ -3933,6 +4753,35 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Carta di credito"
+          }
+        }
+      }
+    },
+    "Current master password" : {
+      "comment" : "Settings > Sync: field of the account operations",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aktuelles Master-Passwort"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Contraseña maestra actual"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mot de passe maître actuel"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Password principale attuale"
           }
         }
       }
@@ -4198,6 +5047,64 @@
         }
       }
     },
+    "Delete Account" : {
+      "comment" : "Settings > Sync: button of the account deletion sheet",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Account löschen"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Eliminar cuenta"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Supprimer le compte"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Elimina account"
+          }
+        }
+      }
+    },
+    "Delete Account…" : {
+      "comment" : "Settings > Sync: account action",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Account löschen …"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Eliminar cuenta…"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Supprimer le compte…"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Elimina account…"
+          }
+        }
+      }
+    },
     "Delete Folder" : {
       "comment" : "Pinned folder context menu",
       "localizations" : {
@@ -4223,6 +5130,35 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Elimina cartella"
+          }
+        }
+      }
+    },
+    "Delete on All Macs" : {
+      "comment" : "Sync question: confirms a mass deletion",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Auf allen Macs löschen"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Eliminar en todos los Mac"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Supprimer sur tous les Mac"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Elimina su tutti i Mac"
           }
         }
       }
@@ -4285,6 +5221,35 @@
         }
       }
     },
+    "Delete Sync Account" : {
+      "comment" : "Settings > Sync: title of the account deletion sheet",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Synchronisierungsaccount löschen"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Eliminar la cuenta de sincronización"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Supprimer le compte de synchronisation"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Elimina l'account di sincronizzazione"
+          }
+        }
+      }
+    },
     "Delete Tab" : {
       "comment" : "Context menu of a pinned or favorite tab: removes it from the sidebar",
       "localizations" : {
@@ -4339,6 +5304,35 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Vuoi eliminare il profilo “%@”?"
+          }
+        }
+      }
+    },
+    "Delete these items on all your Macs?" : {
+      "comment" : "Sync question: title of a mass deletion",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Diese Objekte auf allen deinen Macs löschen?"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "¿Eliminar estos elementos en todos tus Mac?"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Supprimer ces éléments sur tous vos Mac ?"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Eliminare questi elementi su tutti i tuoi Mac?"
           }
         }
       }
@@ -4425,6 +5419,122 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Rilevare la tua posizione"
+          }
+        }
+      }
+    },
+    "Devices" : {
+      "comment" : "Settings > Sync: section of the account's devices",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Geräte"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dispositivos"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Appareils"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dispositivi"
+          }
+        }
+      }
+    },
+    "Disconnect" : {
+      "comment" : "Settings > Sync: confirms disconnecting a device",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Trennen"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Desconectar"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Déconnecter"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Disconnetti"
+          }
+        }
+      }
+    },
+    "Disconnect “%@”?" : {
+      "comment" : "Settings > Sync: confirmation title (device name)",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "„%@“ trennen?"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "¿Desconectar «%@»?"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Déconnecter « %@ » ?"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Disconnettere «%@»?"
+          }
+        }
+      }
+    },
+    "Disconnect…" : {
+      "comment" : "Settings > Sync: disconnects another device",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Trennen …"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Desconectar…"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Déconnecter…"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Disconnetti…"
           }
         }
       }
@@ -4949,6 +6059,35 @@
         }
       }
     },
+    "Email" : {
+      "comment" : "Recovery kit: account identifier",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "E-Mail-Adresse"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Correo"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Adresse e-mail"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Email"
+          }
+        }
+      }
+    },
     "Emoji" : {
       "comment" : "Icon of a folder or a Space: field that takes one emoji as the icon",
       "localizations" : {
@@ -5275,6 +6414,35 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Non riuscito"
+          }
+        }
+      }
+    },
+    "Fair" : {
+      "comment" : "Settings > Sync: password strength",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mittel"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aceptable"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Moyen"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Discreta"
           }
         }
       }
@@ -5683,6 +6851,35 @@
         }
       }
     },
+    "Forgot Password" : {
+      "comment" : "Settings > Sync: tab: recover the account with the recovery key",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Passwort vergessen"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "He olvidado la contraseña"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mot de passe oublié"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Password dimenticata"
+          }
+        }
+      }
+    },
     "Fork and Knife" : {
       "comment" : "Icon choice (SF Symbol)",
       "localizations" : {
@@ -6025,6 +7222,35 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Globo"
+          }
+        }
+      }
+    },
+    "Good" : {
+      "comment" : "Settings > Sync: password strength",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gut"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Buena"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bon"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Buona"
           }
         }
       }
@@ -6470,6 +7696,35 @@
         }
       }
     },
+    "If you forget your master password, this kit is the only way to get your synced data back. Matcha can't recover it for you. Keep it somewhere safe, away from this Mac." : {
+      "comment" : "Recovery kit sheet: explanation",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wenn du dein Master-Passwort vergisst, ist dieses Kit der einzige Weg zurück zu deinen synchronisierten Daten. Matcha kann es nicht für dich wiederherstellen. Bewahre es sicher auf, nicht auf diesem Mac."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Si olvidas tu contraseña maestra, este kit es la única forma de recuperar tus datos sincronizados. Matcha no puede recuperarla por ti. Guárdalo en un lugar seguro, fuera de este Mac."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Si vous oubliez votre mot de passe maître, ce kit est le seul moyen de retrouver vos données synchronisées. Matcha ne peut pas le récupérer pour vous. Rangez-le en lieu sûr, ailleurs que sur ce Mac."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Se dimentichi la password principale, questo kit è l'unico modo per recuperare i dati sincronizzati. Matcha non può recuperarla per te. Conservalo in un posto sicuro, lontano da questo Mac."
+          }
+        }
+      }
+    },
     "Ignore" : {
       "comment" : "Settings > Extensions: hides an extension offered by another Mac, on this Mac only",
       "localizations" : {
@@ -6495,6 +7750,35 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Ignora"
+          }
+        }
+      }
+    },
+    "Ignore This Version" : {
+      "comment" : "Settings > Extensions, From Your Other Macs: keeps the installed version of an extension and no longer offers this update",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Diese Version ignorieren"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ignorar esta versión"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ignorer cette version"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ignora questa versione"
           }
         }
       }
@@ -6702,6 +7986,35 @@
         }
       }
     },
+    "Initials" : {
+      "comment" : "Settings > Sync: avatar: initials field",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Initialen"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Iniciales"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Initiales"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Iniziali"
+          }
+        }
+      }
+    },
     "Installed" : {
       "comment" : "A Safari extension that is already installed in Matcha",
       "localizations" : {
@@ -6788,6 +8101,35 @@
         }
       }
     },
+    "Invitation code" : {
+      "comment" : "Settings > Sync: field for an invitation code",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Einladungscode"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Código de invitación"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Code d'invitation"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Codice di invito"
+          }
+        }
+      }
+    },
     "It only appears once you choose a homepage in the General tab." : {
       "comment" : "Settings > Appearance: note under “Show Home button”",
       "localizations" : {
@@ -6813,6 +8155,35 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Appare solo dopo aver scelto una pagina iniziale nel pannello Generali."
+          }
+        }
+      }
+    },
+    "It stops syncing and keeps its data. Signing in again reconnects it." : {
+      "comment" : "Settings > Sync: disconnecting a device",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Es hört auf zu synchronisieren und behält seine Daten. Eine neue Anmeldung verbindet es wieder."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Deja de sincronizar y conserva sus datos. Volver a iniciar sesión lo reconecta."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Il arrête de se synchroniser et garde ses données. Se reconnecter le remet en route."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Smette di sincronizzarsi e conserva i suoi dati. Accedendo di nuovo si riconnette."
           }
         }
       }
@@ -6930,6 +8301,35 @@
         }
       }
     },
+    "Keep Them" : {
+      "comment" : "Sync question: refuses a mass deletion",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Behalten"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Conservarlos"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Les garder"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Conservali"
+          }
+        }
+      }
+    },
     "Keyboard Shortcuts" : {
       "localizations" : {
         "de" : {
@@ -7012,6 +8412,35 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Computer portatile"
+          }
+        }
+      }
+    },
+    "Last seen %@" : {
+      "comment" : "Settings > Sync: device: last activity (relative date)",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zuletzt gesehen %@"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Visto %@"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vu %@"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Visto %@"
           }
         }
       }
@@ -7335,6 +8764,35 @@
         }
       }
     },
+    "Manage Account" : {
+      "comment" : "Settings > Sync: menu of the account actions (password, recovery kit, email, sign out, deletion)",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Account verwalten"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gestionar cuenta"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gérer le compte"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gestisci account"
+          }
+        }
+      }
+    },
     "Manage Extensions…" : {
       "localizations" : {
         "de" : {
@@ -7387,6 +8845,35 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Gestire i tuoi download"
+          }
+        }
+      }
+    },
+    "Master password" : {
+      "comment" : "Settings > Sync: password field",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Master-Passwort"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Contraseña maestra"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mot de passe maître"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Password principale"
           }
         }
       }
@@ -7503,6 +8990,35 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Matcha non può aprire questa pagina"
+          }
+        }
+      }
+    },
+    "Matcha can't recover this password. Without it or the recovery kit, your synced data is lost." : {
+      "comment" : "Settings > Sync: warning under a new password",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Matcha kann dieses Passwort nicht wiederherstellen. Ohne es oder das Wiederherstellungskit sind deine synchronisierten Daten verloren."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Matcha no puede recuperar esta contraseña. Sin ella ni el kit de recuperación, tus datos sincronizados se pierden."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Matcha ne peut pas récupérer ce mot de passe. Sans lui ni le kit de secours, vos données synchronisées sont perdues."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Matcha non può recuperare questa password. Senza di essa o il kit di recupero, i dati sincronizzati vanno persi."
           }
         }
       }
@@ -7680,6 +9196,64 @@
         }
       }
     },
+    "Matcha Recovery Kit" : {
+      "comment" : "Title of the recovery kit page",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Matcha-Wiederherstellungskit"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kit de recuperación de Matcha"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kit de secours de Matcha"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kit di recupero di Matcha"
+          }
+        }
+      }
+    },
+    "Matcha Recovery Kit.pdf" : {
+      "comment" : "File name of the saved recovery kit",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Matcha-Wiederherstellungskit.pdf"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kit de recuperación de Matcha.pdf"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kit de secours de Matcha.pdf"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kit di recupero di Matcha.pdf"
+          }
+        }
+      }
+    },
     "Matcha uses this shortcut for another command." : {
       "comment" : "Settings > Shortcuts: refused shortcut",
       "localizations" : {
@@ -7705,6 +9279,35 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Matcha usa questa scorciatoia per un altro comando."
+          }
+        }
+      }
+    },
+    "Merge" : {
+      "comment" : "Sync question: first sync, keeps both sides",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zusammenführen"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Combinar"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fusionner"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Unisci"
           }
         }
       }
@@ -8140,6 +9743,35 @@
         }
       }
     },
+    "New email" : {
+      "comment" : "Settings > Sync: new account identifier",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Neue E-Mail-Adresse"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nuevo correo"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nouvelle adresse e-mail"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nuova email"
+          }
+        }
+      }
+    },
     "New Folder" : {
       "comment" : "Context menus; also the default name of a new pinned folder",
       "localizations" : {
@@ -8250,6 +9882,64 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Nuovo profilo"
+          }
+        }
+      }
+    },
+    "New Recovery Kit" : {
+      "comment" : "Settings > Sync: title of the new recovery kit sheet",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Neues Wiederherstellungskit"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nuevo kit de recuperación"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nouveau kit de secours"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nuovo kit di recupero"
+          }
+        }
+      }
+    },
+    "New Recovery Kit…" : {
+      "comment" : "Settings > Sync: account action",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Neues Wiederherstellungskit …"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nuevo kit de recuperación…"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nouveau kit de secours…"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nuovo kit di recupero…"
           }
         }
       }
@@ -8599,6 +10289,35 @@
         }
       }
     },
+    "No Matcha sync server answers at this address." : {
+      "comment" : "Settings > Sync: error: not a sync server",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Unter dieser Adresse antwortet kein Matcha-Synchronisierungsserver."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ningún servidor de sincronización de Matcha responde en esta dirección."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aucun serveur de synchronisation Matcha ne répond à cette adresse."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nessun server di sincronizzazione Matcha risponde a questo indirizzo."
+          }
+        }
+      }
+    },
     "No Safari extensions were found in your apps. They are installed from the App Store." : {
       "localizations" : {
         "de" : {
@@ -8884,6 +10603,35 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Oceano"
+          }
+        }
+      }
+    },
+    "Off" : {
+      "comment" : "Settings > Sync: sync mode",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aus"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Desactivada"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Désactivée"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Disattivata"
           }
         }
       }
@@ -9463,6 +11211,35 @@
         }
       }
     },
+    "Other…" : {
+      "comment" : "Settings > Sync, avatar: opens a field and the Character Viewer to choose any emoji",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Andere …"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Otro…"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Autre…"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Altro…"
+          }
+        }
+      }
+    },
     "Page Source" : {
       "comment" : "Format of File > Save As… for a web page",
       "localizations" : {
@@ -9778,6 +11555,35 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Password"
+          }
+        }
+      }
+    },
+    "Password strength" : {
+      "comment" : "Settings > Sync: accessibility label of the gauge",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Passwortstärke"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Seguridad de la contraseña"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Solidité du mot de passe"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sicurezza della password"
           }
         }
       }
@@ -10420,6 +12226,35 @@
         }
       }
     },
+    "Private Server" : {
+      "comment" : "Settings > Sync: sync mode and section",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Privater Server"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Servidor privado"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Serveur privé"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Server privato"
+          }
+        }
+      }
+    },
     "Profile" : {
       "comment" : "Arc import preview: picker of the Matcha profile that receives Arc's main profile",
       "localizations" : {
@@ -10561,6 +12396,35 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Profili"
+          }
+        }
+      }
+    },
+    "Public Server (Coming Soon)" : {
+      "comment" : "Settings > Sync: sync mode not available yet",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Öffentlicher Server (bald verfügbar)"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Servidor público (próximamente)"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Serveur public (bientôt disponible)"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Server pubblico (in arrivo)"
           }
         }
       }
@@ -10902,6 +12766,64 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Registra una nuova scorciatoia."
+          }
+        }
+      }
+    },
+    "Recover Account" : {
+      "comment" : "Settings > Sync: button that recovers the account with the recovery key",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Account wiederherstellen"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Recuperar cuenta"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Récupérer le compte"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Recupera account"
+          }
+        }
+      }
+    },
+    "Recovery key" : {
+      "comment" : "Recovery kit: the key",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wiederherstellungsschlüssel"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Clave de recuperación"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Clé de secours"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Chiave di recupero"
           }
         }
       }
@@ -11482,6 +13404,64 @@
         }
       }
     },
+    "Replace Synced Data" : {
+      "comment" : "Sync question: this Mac's data replaces the synced data",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Synchronisierte Daten ersetzen"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sustituir los datos sincronizados"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Remplacer les données synchronisées"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sostituisci i dati sincronizzati"
+          }
+        }
+      }
+    },
+    "Replace This Mac's Data" : {
+      "comment" : "Sync question: this Mac takes the synced data",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Daten dieses Macs ersetzen"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sustituir los datos de este Mac"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Remplacer les données de ce Mac"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sostituisci i dati di questo Mac"
+          }
+        }
+      }
+    },
     "Report a Problem…" : {
       "localizations" : {
         "de" : {
@@ -11768,6 +13748,35 @@
         }
       }
     },
+    "Save as PDF…" : {
+      "comment" : "Recovery kit sheet: saves the kit",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Als PDF sichern …"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Guardar como PDF…"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Enregistrer en PDF…"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Salva come PDF…"
+          }
+        }
+      }
+    },
     "Save As…" : {
       "comment" : "Context menu of a web page: saves it as a web archive or its source",
       "localizations" : {
@@ -11793,6 +13802,64 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Salva con nome…"
+          }
+        }
+      }
+    },
+    "Save or print the kit to continue." : {
+      "comment" : "Recovery kit sheet: why Continue is disabled",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sichere oder drucke das Kit, um fortzufahren."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Guarda o imprime el kit para continuar."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Enregistrez ou imprimez le kit pour continuer."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Salva o stampa il kit per continuare."
+          }
+        }
+      }
+    },
+    "Save Your Recovery Kit" : {
+      "comment" : "Recovery kit sheet: title",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sichere dein Wiederherstellungskit"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Guarda tu kit de recuperación"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Enregistrez votre kit de secours"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Salva il tuo kit di recupero"
           }
         }
       }
@@ -11999,6 +14066,64 @@
         }
       }
     },
+    "Send Them Again" : {
+      "comment" : "Sync question: sends again what the server lost",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Erneut senden"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Volver a enviarlos"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Les renvoyer"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Inviali di nuovo"
+          }
+        }
+      }
+    },
+    "Send this Mac's items again?" : {
+      "comment" : "Sync question: title, the server lost items",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Objekte dieses Macs erneut senden?"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "¿Volver a enviar los elementos de este Mac?"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Renvoyer les éléments de ce Mac ?"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Inviare di nuovo gli elementi di questo Mac?"
+          }
+        }
+      }
+    },
     "Separate Tabs" : {
       "comment" : "Context menu of a tab in a split view: dissolves the split, tabs stay",
       "localizations" : {
@@ -12024,6 +14149,64 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Separa pannelli"
+          }
+        }
+      }
+    },
+    "Server" : {
+      "comment" : "Recovery kit: server address",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Server"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Servidor"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Serveur"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Server"
+          }
+        }
+      }
+    },
+    "Server address" : {
+      "comment" : "Settings > Sync: server address field",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Serveradresse"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dirección del servidor"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Adresse du serveur"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Indirizzo del server"
           }
         }
       }
@@ -12660,6 +14843,35 @@
         }
       }
     },
+    "Shown at the bottom of the sidebar, on all your synced Macs." : {
+      "comment" : "Settings > Sync: avatar footer",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Unten in der Seitenleiste zu sehen, auf all deinen synchronisierten Macs."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Se muestra al final de la barra lateral, en todos tus Mac sincronizados."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Affiché en bas de la barre latérale, sur tous vos Mac synchronisés."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mostrato in fondo alla barra laterale, su tutti i tuoi Mac sincronizzati."
+          }
+        }
+      }
+    },
     "Sidebar width" : {
       "comment" : "Accessibility label of the sidebar resize handle",
       "localizations" : {
@@ -12689,6 +14901,151 @@
         }
       }
     },
+    "Sign In" : {
+      "comment" : "Settings > Sync: tab and button that sign in",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Anmelden"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Iniciar sesión"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Se connecter"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Accedi"
+          }
+        }
+      }
+    },
+    "Sign in again to keep syncing." : {
+      "comment" : "Settings > Sync: session ended",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Melde dich erneut an, um weiter zu synchronisieren."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vuelve a iniciar sesión para seguir sincronizando."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Reconnectez-vous pour continuer la synchronisation."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Accedi di nuovo per continuare a sincronizzare."
+          }
+        }
+      }
+    },
+    "Sign Out" : {
+      "comment" : "Settings > Sync: confirms signing out",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Abmelden"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cerrar sesión"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Se déconnecter"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Esci"
+          }
+        }
+      }
+    },
+    "Sign out of sync?" : {
+      "comment" : "Settings > Sync: sign out confirmation title",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Von der Synchronisierung abmelden?"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "¿Cerrar la sesión de sincronización?"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Se déconnecter de la synchronisation ?"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Uscire dalla sincronizzazione?"
+          }
+        }
+      }
+    },
+    "Sign Out…" : {
+      "comment" : "Settings > Sync: account action",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Abmelden …"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cerrar sesión…"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Se déconnecter…"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Esci…"
+          }
+        }
+      }
+    },
     "Site Settings" : {
       "comment" : "Button next to the address: permissions and data of the website shown",
       "localizations" : {
@@ -12714,6 +15071,35 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Impostazioni del sito web"
+          }
+        }
+      }
+    },
+    "Some synced data is unreadable and was left aside." : {
+      "comment" : "Settings > Sync: warning: unreadable records",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Einige synchronisierte Daten sind unlesbar und wurden übergangen."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Algunos datos sincronizados no se pueden leer y se han dejado de lado."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Des données synchronisées sont illisibles et ont été mises de côté."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Alcuni dati sincronizzati sono illeggibili e sono stati messi da parte."
           }
         }
       }
@@ -12950,6 +15336,35 @@
         }
       }
     },
+    "Status" : {
+      "comment" : "Settings > Sync: row: state of sync",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Status"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Estado"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "État"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Stato"
+          }
+        }
+      }
+    },
     "Stop" : {
       "comment" : "Toolbar button: stop loading the page",
       "localizations" : {
@@ -12975,6 +15390,35 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Interrompi"
+          }
+        }
+      }
+    },
+    "Strong" : {
+      "comment" : "Settings > Sync: password strength",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Stark"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fuerte"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Solide"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Forte"
           }
         }
       }
@@ -13062,6 +15506,325 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Vai al pannello"
+          }
+        }
+      }
+    },
+    "Sync" : {
+      "comment" : "Settings: Sync tab, section and mode picker",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Synchronisierung"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sincronización"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Synchronisation"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sincronizzazione"
+          }
+        }
+      }
+    },
+    "Sync failed" : {
+      "comment" : "Sidebar, account menu: state of sync",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Synchronisierung fehlgeschlagen"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Error de sincronización"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Échec de la synchronisation"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sincronizzazione non riuscita"
+          }
+        }
+      }
+    },
+    "Sync failed." : {
+      "comment" : "Settings > Sync: unknown error",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Die Synchronisierung ist fehlgeschlagen."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "La sincronización ha fallado."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "La synchronisation a échoué."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "La sincronizzazione non è riuscita."
+          }
+        }
+      }
+    },
+    "Sync is off" : {
+      "comment" : "Sidebar, account menu: state of sync",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Synchronisierung aus"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sincronización desactivada"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Synchronisation désactivée"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sincronizzazione disattivata"
+          }
+        }
+      }
+    },
+    "Sync is on" : {
+      "comment" : "Sidebar, account menu: state of sync, before a first cycle",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Synchronisierung an"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sincronización activada"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Synchronisation activée"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sincronizzazione attivata"
+          }
+        }
+      }
+    },
+    "Sync Now" : {
+      "comment" : "Settings > Sync and account menu: starts a sync",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Jetzt synchronisieren"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sincronizar ahora"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Synchroniser maintenant"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sincronizza ora"
+          }
+        }
+      }
+    },
+    "Sync Settings…" : {
+      "comment" : "Sidebar, account menu: opens Settings > Sync",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Synchronisierungseinstellungen …"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ajustes de sincronización…"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Réglages de synchronisation…"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Impostazioni di sincronizzazione…"
+          }
+        }
+      }
+    },
+    "Sync: sign in again" : {
+      "comment" : "Sidebar, account menu: this Mac was signed out",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Synchronisierung: erneut anmelden"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sincronización: vuelve a iniciar sesión"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Synchronisation : reconnectez-vous"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sincronizzazione: accedi di nuovo"
+          }
+        }
+      }
+    },
+    "Synced" : {
+      "comment" : "Sidebar, account menu: state of sync",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Synchronisiert"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sincronizado"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Synchronisé"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sincronizzato"
+          }
+        }
+      }
+    },
+    "Synced %@" : {
+      "comment" : "Settings > Sync: status with the relative date of the last sync, e.g. Synced 2 minutes ago",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Synchronisiert %@"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sincronizado %@"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Synchronisé %@"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sincronizzato %@"
+          }
+        }
+      }
+    },
+    "Syncing…" : {
+      "comment" : "State of sync",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wird synchronisiert …"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sincronizando…"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Synchronisation…"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sincronizzazione…"
           }
         }
       }
@@ -13306,6 +16069,151 @@
         }
       }
     },
+    "The account's key couldn't be opened. Check the password or the recovery key." : {
+      "comment" : "Settings > Sync: error: account key unreadable",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Der Account-Schlüssel konnte nicht geöffnet werden. Prüfe das Passwort oder den Wiederherstellungsschlüssel."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No se ha podido abrir la clave de la cuenta. Comprueba la contraseña o la clave de recuperación."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "La clé du compte n'a pas pu être ouverte. Vérifiez le mot de passe ou la clé de secours."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Impossibile aprire la chiave dell'account. Controlla la password o la chiave di recupero."
+          }
+        }
+      }
+    },
+    "The account's space is full: new changes wait on this Mac." : {
+      "comment" : "Settings > Sync: warning: quota exceeded",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Der Speicher des Accounts ist voll: Neue Änderungen warten auf diesem Mac."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "El espacio de la cuenta está lleno: los cambios nuevos esperan en este Mac."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "L'espace du compte est plein : les nouveaux changements attendent sur ce Mac."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lo spazio dell'account è pieno: le nuove modifiche attendono su questo Mac."
+          }
+        }
+      }
+    },
+    "The account's space is full." : {
+      "comment" : "Settings > Sync: error quota_exceeded",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Der Speicher des Accounts ist voll."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "El espacio de la cuenta está lleno."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "L'espace du compte est plein."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lo spazio dell'account è pieno."
+          }
+        }
+      }
+    },
+    "The address must start with https://. Only this Mac's own server can use http://." : {
+      "comment" : "Settings > Sync: error: insecure address",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Die Adresse muss mit https:// beginnen. Nur ein Server auf diesem Mac darf http:// verwenden."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "La dirección debe empezar por https://. Solo un servidor de este Mac puede usar http://."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "L'adresse doit commencer par https://. Seul un serveur installé sur ce Mac peut utiliser http://."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "L'indirizzo deve iniziare con https://. Solo un server su questo Mac può usare http://."
+          }
+        }
+      }
+    },
+    "The address of your own sync server. Your data is encrypted on this Mac before leaving it." : {
+      "comment" : "Settings > Sync: server section footer",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Die Adresse deines eigenen Synchronisierungsservers. Deine Daten werden auf diesem Mac verschlüsselt, bevor sie ihn verlassen."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "La dirección de tu propio servidor de sincronización. Tus datos se cifran en este Mac antes de salir de él."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "L'adresse de votre propre serveur de synchronisation. Vos données sont chiffrées sur ce Mac avant de le quitter."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "L'indirizzo del tuo server di sincronizzazione. I tuoi dati vengono cifrati su questo Mac prima di lasciarlo."
+          }
+        }
+      }
+    },
     "The app that contains this Safari extension isn't on this Mac" : {
       "comment" : "Settings > Extensions: help of the Get the App button",
       "localizations" : {
@@ -13422,6 +16330,35 @@
         }
       }
     },
+    "The clock of one of your Macs seems to be ahead." : {
+      "comment" : "Settings > Sync: warning: received date in the future",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Die Uhr eines deiner Macs scheint vorzugehen."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "El reloj de uno de tus Mac parece adelantado."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "L'horloge d'un de vos Mac semble en avance."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "L'orologio di uno dei tuoi Mac sembra avanti."
+          }
+        }
+      }
+    },
     "The connection to “%@” is encrypted, but parts of this page were loaded without encryption." : {
       "comment" : "Certificate panel of a page whose images or media are not encrypted; %@ is the website",
       "localizations" : {
@@ -13504,6 +16441,64 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "La cartella Download non è disponibile."
+          }
+        }
+      }
+    },
+    "The email or the password is incorrect." : {
+      "comment" : "Settings > Sync: error invalid_credentials",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Die E-Mail-Adresse oder das Passwort ist falsch."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "El correo o la contraseña no son correctos."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "L'adresse e-mail ou le mot de passe est incorrect."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "L'email o la password non sono corretti."
+          }
+        }
+      }
+    },
+    "The keychain refused access. Unlock it, then try again." : {
+      "comment" : "Settings > Sync: error: keychain",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Der Schlüsselbund hat den Zugriff verweigert. Entsperre ihn und versuche es erneut."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "El llavero ha denegado el acceso. Desbloquéalo y vuelve a intentarlo."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Le trousseau a refusé l'accès. Déverrouillez-le, puis réessayez."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Il portachiavi ha negato l'accesso. Sbloccalo e riprova."
           }
         }
       }
@@ -13595,6 +16590,35 @@
         }
       }
     },
+    "The password must have at least 12 characters." : {
+      "comment" : "Settings > Sync: error: password too short",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Das Passwort muss mindestens 12 Zeichen haben."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "La contraseña debe tener al menos 12 caracteres."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Le mot de passe doit faire au moins 12 caractères."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "La password deve avere almeno 12 caratteri."
+          }
+        }
+      }
+    },
     "The server “%@” took too long to respond." : {
       "comment" : "Page shown after a timeout; %@ is the website",
       "localizations" : {
@@ -13620,6 +16644,209 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Il server “%@” ha impiegato troppo tempo a rispondere."
+          }
+        }
+      }
+    },
+    "The server can't be reached. Check the address and the connection." : {
+      "comment" : "Settings > Sync: error: network",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Der Server ist nicht erreichbar. Prüfe die Adresse und die Verbindung."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No se puede acceder al servidor. Comprueba la dirección y la conexión."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Le serveur est injoignable. Vérifiez l'adresse et la connexion."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Il server non è raggiungibile. Controlla l'indirizzo e la connessione."
+          }
+        }
+      }
+    },
+    "The server had a problem. Try again later." : {
+      "comment" : "Settings > Sync: error server_error",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Beim Server ist ein Problem aufgetreten. Versuche es später erneut."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "El servidor ha tenido un problema. Inténtalo más tarde."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Le serveur a rencontré un problème. Réessayez plus tard."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Il server ha avuto un problema. Riprova più tardi."
+          }
+        }
+      }
+    },
+    "The server is under maintenance. Try again later." : {
+      "comment" : "Settings > Sync: error unavailable",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Der Server wird gewartet. Versuche es später erneut."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "El servidor está en mantenimiento. Inténtalo más tarde."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Le serveur est en maintenance. Réessayez plus tard."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Il server è in manutenzione. Riprova più tardi."
+          }
+        }
+      }
+    },
+    "The server no longer knows %lld items of this Mac, maybe after a restore. Send them again, or take what the server has." : {
+      "comment" : "Sync question: records lost by the server (count, always 50 or more)",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Der Server kennt %lld Objekte dieses Macs nicht mehr, vielleicht nach einer Wiederherstellung. Sende sie erneut oder übernimm, was der Server hat."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "El servidor ya no conoce %lld elementos de este Mac, quizá tras una restauración. Vuelve a enviarlos o quédate con lo que tiene el servidor."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Le serveur ne connaît plus %lld éléments de ce Mac, peut-être après une restauration. Renvoyez-les, ou prenez ce qu'a le serveur."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Il server non conosce più %lld elementi di questo Mac, forse dopo un ripristino. Inviali di nuovo o prendi ciò che ha il server."
+          }
+        }
+      }
+    },
+    "The server's answer couldn't be read." : {
+      "comment" : "Settings > Sync: error: unreadable answer",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Die Antwort des Servers ist unlesbar."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No se puede leer la respuesta del servidor."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "La réponse du serveur est illisible."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "La risposta del server è illeggibile."
+          }
+        }
+      }
+    },
+    "The server's certificate isn't trusted by this Mac. Use a certificate macOS trusts: a public one (Let's Encrypt), one from a private network (Tailscale), or your own authority installed in Keychain Access." : {
+      "comment" : "Settings > Sync: error: certificate",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dieser Mac vertraut dem Zertifikat des Servers nicht. Verwende ein Zertifikat, dem macOS vertraut: ein öffentliches (Let’s Encrypt), eines aus einem privaten Netzwerk (Tailscale) oder deine eigene, in der Schlüsselbundverwaltung installierte Zertifizierungsstelle."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Este Mac no confía en el certificado del servidor. Usa un certificado en el que confíe macOS: uno público (Let’s Encrypt), uno de una red privada (Tailscale) o tu propia autoridad instalada en Acceso a Llaveros."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ce Mac ne fait pas confiance au certificat du serveur. Utilisez un certificat reconnu par macOS : un certificat public (Let's Encrypt), celui d'un réseau privé (Tailscale), ou votre propre autorité installée dans Trousseaux d'accès."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Questo Mac non si fida del certificato del server. Usa un certificato di cui macOS si fida: uno pubblico (Let's Encrypt), uno di una rete privata (Tailscale) o la tua autorità installata in Accesso Portachiavi."
+          }
+        }
+      }
+    },
+    "The server's security settings are too weak." : {
+      "comment" : "Settings > Sync: error weak_kdf",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Die Sicherheitseinstellungen des Servers sind zu schwach."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Los ajustes de seguridad del servidor son demasiado débiles."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Les réglages de sécurité du serveur sont trop faibles."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Le impostazioni di sicurezza del server sono troppo deboli."
           }
         }
       }
@@ -13678,6 +16905,35 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Il sorgente di questa pagina è troppo grande per essere mostrato."
+          }
+        }
+      }
+    },
+    "The two passwords are different." : {
+      "comment" : "Settings > Sync: password confirmation mismatch",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Die beiden Passwörter sind verschieden."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Las dos contraseñas son distintas."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Les deux mots de passe sont différents."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Le due password sono diverse."
           }
         }
       }
@@ -13794,6 +17050,35 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Questo indirizzo non è un file."
+          }
+        }
+      }
+    },
+    "This address isn't valid." : {
+      "comment" : "Settings > Sync: error: invalid address",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Diese Adresse ist ungültig."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Esta dirección no es válida."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cette adresse n'est pas valide."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Questo indirizzo non è valido."
           }
         }
       }
@@ -14026,6 +17311,238 @@
         }
       }
     },
+    "This image can't be used as an avatar." : {
+      "comment" : "Settings > Sync: avatar: unusable image",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dieses Bild kann nicht als Avatar verwendet werden."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Esta imagen no se puede usar como avatar."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cette image ne peut pas servir d'avatar."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Questa immagine non può essere usata come avatar."
+          }
+        }
+      }
+    },
+    "This Mac" : {
+      "comment" : "Settings > Sync: devices: the current device",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dieser Mac"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Este Mac"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ce Mac"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Questo Mac"
+          }
+        }
+      }
+    },
+    "This Mac and your synced data each have their own Spaces and tabs. Merge keeps both; replacing keeps only one side." : {
+      "comment" : "Sync question: first sync",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dieser Mac und deine synchronisierten Daten haben jeweils eigene Spaces und Tabs. Zusammenführen behält beides; Ersetzen behält nur eine Seite."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Este Mac y tus datos sincronizados tienen cada uno sus Spaces y pestañas. Combinar conserva ambos; sustituir conserva solo un lado."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ce Mac et vos données synchronisées ont chacun leurs Spaces et leurs onglets. Fusionner garde les deux ; remplacer n'en garde qu'un côté."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Questo Mac e i dati sincronizzati hanno ciascuno i propri Space e pannelli. Unire conserva entrambi; sostituire ne conserva solo uno."
+          }
+        }
+      }
+    },
+    "This Mac looks like a copy of another one. Sign in again to give it its own identity." : {
+      "comment" : "Settings > Sync: signed out: copied Mac",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dieser Mac scheint eine Kopie eines anderen zu sein. Melde dich erneut an, um ihm eine eigene Identität zu geben."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Este Mac parece una copia de otro. Vuelve a iniciar sesión para darle su propia identidad."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ce Mac semble être la copie d'un autre. Reconnectez-vous pour lui donner sa propre identité."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Questo Mac sembra la copia di un altro. Accedi di nuovo per dargli la sua identità."
+          }
+        }
+      }
+    },
+    "This Mac was disconnected from sync." : {
+      "comment" : "Settings > Sync: error device_revoked",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dieser Mac wurde von der Synchronisierung getrennt."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Este Mac se ha desconectado de la sincronización."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ce Mac a été déconnecté de la synchronisation."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Questo Mac è stato disconnesso dalla sincronizzazione."
+          }
+        }
+      }
+    },
+    "This Mac was disconnected from sync. Sign in again to resume." : {
+      "comment" : "Settings > Sync: signed out: device revoked",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dieser Mac wurde von der Synchronisierung getrennt. Melde dich erneut an, um fortzufahren."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Este Mac se ha desconectado de la sincronización. Vuelve a iniciar sesión para continuar."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ce Mac a été déconnecté de la synchronisation. Reconnectez-vous pour reprendre."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Questo Mac è stato disconnesso dalla sincronizzazione. Accedi di nuovo per riprendere."
+          }
+        }
+      }
+    },
+    "This Mac's clock is more than a day ahead: nothing is sent until it is corrected." : {
+      "comment" : "Settings > Sync: warning: clock far ahead",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Die Uhr dieses Macs geht mehr als einen Tag vor: Bis sie korrigiert ist, wird nichts gesendet."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "El reloj de este Mac va más de un día adelantado: no se envía nada hasta que se corrija."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "L'horloge de ce Mac a plus d'un jour d'avance : rien n'est envoyé tant qu'elle n'est pas corrigée."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "L'orologio di questo Mac è avanti di più di un giorno: non viene inviato nulla finché non è corretto."
+          }
+        }
+      }
+    },
+    "This Mac's clock is off. Check the date and time in System Settings." : {
+      "comment" : "Settings > Sync: warning: clock off",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Die Uhr dieses Macs geht falsch. Prüfe Datum und Uhrzeit in den Systemeinstellungen."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "El reloj de este Mac no está en hora. Comprueba la fecha y la hora en Ajustes del Sistema."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "L'horloge de ce Mac est décalée. Vérifiez la date et l'heure dans Réglages Système."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "L'orologio di questo Mac è sbagliato. Controlla data e ora in Impostazioni di Sistema."
+          }
+        }
+      }
+    },
     "This page" : {
       "comment" : "Permission banner: the page asking, when it has no website name (local file)",
       "localizations" : {
@@ -14171,6 +17688,64 @@
         }
       }
     },
+    "This profile, its cookies and sign-ins will be deleted on all your Macs." : {
+      "comment" : "Settings > Profiles: deletion with sync on",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dieses Profil, seine Cookies und Anmeldungen werden auf all deinen Macs gelöscht."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Este perfil, sus cookies y sus inicios de sesión se eliminarán en todos tus Mac."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ce profil, ses cookies et ses connexions seront supprimés sur tous vos Mac."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Questo profilo, i suoi cookie e gli accessi saranno eliminati su tutti i tuoi Mac."
+          }
+        }
+      }
+    },
+    "This server doesn't accept new accounts." : {
+      "comment" : "Settings > Sync: error registration_closed",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dieser Server nimmt keine neuen Accounts an."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Este servidor no acepta cuentas nuevas."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ce serveur n'accepte pas de nouveaux comptes."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Questo server non accetta nuovi account."
+          }
+        }
+      }
+    },
     "This shortcut opens a mini window from any app." : {
       "comment" : "Settings > Shortcuts: refused shortcut",
       "localizations" : {
@@ -14200,6 +17775,35 @@
         }
       }
     },
+    "This sync account was deleted from another device." : {
+      "comment" : "Settings > Sync: error account_deleted",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dieser Synchronisierungsaccount wurde auf einem anderen Gerät gelöscht."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Esta cuenta de sincronización se ha eliminado desde otro dispositivo."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ce compte de synchronisation a été supprimé depuis un autre appareil."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Questo account di sincronizzazione è stato eliminato da un altro dispositivo."
+          }
+        }
+      }
+    },
     "This version doesn't ask for any new permission." : {
       "comment" : "Extension update sheet: no permission added",
       "localizations" : {
@@ -14225,6 +17829,35 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Questa versione non chiede nuovi permessi."
+          }
+        }
+      }
+    },
+    "This version of Matcha is too old for this server. Update Matcha." : {
+      "comment" : "Settings > Sync: error unsupported_client",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Diese Matcha-Version ist für diesen Server zu alt. Aktualisiere Matcha."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Esta versión de Matcha es demasiado antigua para este servidor. Actualiza Matcha."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cette version de Matcha est trop ancienne pour ce serveur. Mettez Matcha à jour."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Questa versione di Matcha è troppo vecchia per questo server. Aggiorna Matcha."
           }
         }
       }
@@ -14374,6 +18007,35 @@
         }
       }
     },
+    "Too many attempts. Try again in a moment." : {
+      "comment" : "Settings > Sync: error rate_limited",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zu viele Versuche. Versuche es gleich noch einmal."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Demasiados intentos. Inténtalo dentro de un momento."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Trop de tentatives. Réessayez dans un instant."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Troppi tentativi. Riprova tra poco."
+          }
+        }
+      }
+    },
     "Tools" : {
       "comment" : "Icon choice (SF Symbol): a wrench and a screwdriver",
       "localizations" : {
@@ -14486,6 +18148,93 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Riprova"
+          }
+        }
+      }
+    },
+    "Turn Off" : {
+      "comment" : "Settings > Sync: confirms turning off sync",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ausschalten"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Desactivar"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Désactiver"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Disattiva"
+          }
+        }
+      }
+    },
+    "Turn off sync?" : {
+      "comment" : "Settings > Sync: confirmation title",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Synchronisierung ausschalten?"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "¿Desactivar la sincronización?"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Désactiver la synchronisation ?"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Disattivare la sincronizzazione?"
+          }
+        }
+      }
+    },
+    "Turn On Sync…" : {
+      "comment" : "Sidebar, account menu: opens Settings > Sync",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Synchronisierung einschalten …"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Activar sincronización…"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Activer la synchronisation…"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Attiva sincronizzazione…"
           }
         }
       }
@@ -14865,6 +18614,35 @@
         }
       }
     },
+    "Use the initials on this color" : {
+      "comment" : "Settings > Sync, avatar: help of a color swatch",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Initialen auf dieser Farbe verwenden"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Usar las iniciales sobre este color"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Utiliser les initiales sur cette couleur"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Usa le iniziali su questo colore"
+          }
+        }
+      }
+    },
     "User Name" : {
       "comment" : "Field of the sheet where a website asks for a user name and password",
       "localizations" : {
@@ -15064,6 +18842,64 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Apri comunque questo sito web"
+          }
+        }
+      }
+    },
+    "Waiting…" : {
+      "comment" : "Settings > Sync: no sync done yet",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Warten …"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "En espera…"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "En attente…"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "In attesa…"
+          }
+        }
+      }
+    },
+    "Weak: add words, numbers or symbols." : {
+      "comment" : "Settings > Sync: password strength: weak",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Schwach: Füge Wörter, Zahlen oder Symbole hinzu."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Débil: añade palabras, números o símbolos."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Faible : ajoutez des mots, des chiffres ou des symboles."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Debole: aggiungi parole, numeri o simboli."
           }
         }
       }
@@ -15443,6 +19279,35 @@
         }
       }
     },
+    "Your data isn't encrypted again. Your other Macs are disconnected and ask for the new password." : {
+      "comment" : "Settings > Sync: password change sheet",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Deine Daten werden nicht neu verschlüsselt. Deine anderen Macs werden getrennt und fragen nach dem neuen Passwort."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tus datos no se vuelven a cifrar. Tus otros Mac se desconectan y piden la nueva contraseña."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vos données ne sont pas rechiffrées. Vos autres Mac sont déconnectés et demandent le nouveau mot de passe."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "I tuoi dati non vengono cifrati di nuovo. Gli altri Mac vengono disconnessi e chiedono la nuova password."
+          }
+        }
+      }
+    },
     "Your Homepage" : {
       "comment" : "Option of “New tabs open with”",
       "localizations" : {
@@ -15472,6 +19337,93 @@
         }
       }
     },
+    "Your Macs already have data" : {
+      "comment" : "Sync question: title of the first sync choice",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Deine Macs haben bereits Daten"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tus Mac ya tienen datos"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vos Mac ont déjà des données"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "I tuoi Mac hanno già dei dati"
+          }
+        }
+      }
+    },
+    "Your Macs stay signed in. The recovery kit shows the email: save a new one afterwards." : {
+      "comment" : "Settings > Sync: email change sheet",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Deine Macs bleiben angemeldet. Das Wiederherstellungskit zeigt die E-Mail-Adresse: Sichere danach ein neues."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tus Mac siguen con la sesión iniciada. El kit de recuperación muestra el correo: guarda uno nuevo después."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vos Mac restent connectés. Le kit de secours indique l'adresse e-mail : enregistrez-en un nouveau ensuite."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "I tuoi Mac restano connessi. Il kit di recupero mostra l'email: salvane uno nuovo dopo."
+          }
+        }
+      }
+    },
+    "Your other Macs will be disconnected and will ask for the new password." : {
+      "comment" : "Settings > Sync: account recovery footer",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Deine anderen Macs werden getrennt und fragen nach dem neuen Passwort."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tus otros Mac se desconectarán y pedirán la nueva contraseña."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vos autres Mac seront déconnectés et demanderont le nouveau mot de passe."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gli altri Mac verranno disconnessi e chiederanno la nuova password."
+          }
+        }
+      }
+    },
     "Your password will be sent unencrypted." : {
       "comment" : "Login sheet of a website without encryption",
       "localizations" : {
@@ -15497,6 +19449,64 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "La password verrà inviata senza crittografia."
+          }
+        }
+      }
+    },
+    "Your Spaces, folders, Favorites, pinned and today tabs, extensions and settings, on all your Macs. Everything is encrypted on this Mac with your master password: the server can't read it." : {
+      "comment" : "Settings > Sync: what sync does",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Deine Spaces, Ordner, Favoriten, angehefteten und heutigen Tabs, Erweiterungen und Einstellungen, auf all deinen Macs. Alles wird auf diesem Mac mit deinem Master-Passwort verschlüsselt: Der Server kann es nicht lesen."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tus Spaces, carpetas, favoritos, pestañas fijadas y de hoy, extensiones y ajustes, en todos tus Mac. Todo se cifra en este Mac con tu contraseña maestra: el servidor no puede leerlo."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vos Spaces, dossiers, favoris, onglets épinglés et du jour, extensions et réglages, sur tous vos Mac. Tout est chiffré sur ce Mac avec votre mot de passe maître : le serveur ne peut pas le lire."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "I tuoi Space, cartelle, preferiti, pannelli fissati e di oggi, estensioni e impostazioni, su tutti i tuoi Mac. Tutto è cifrato su questo Mac con la tua password principale: il server non può leggerlo."
+          }
+        }
+      }
+    },
+    "Your synced data is deleted from the server, for all your Macs. Each Mac keeps its own tabs and Spaces." : {
+      "comment" : "Settings > Sync: account deletion sheet",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Deine synchronisierten Daten werden vom Server gelöscht, für all deine Macs. Jeder Mac behält seine eigenen Tabs und Spaces."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tus datos sincronizados se eliminan del servidor, para todos tus Mac. Cada Mac conserva sus propias pestañas y Spaces."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vos données synchronisées sont supprimées du serveur, pour tous vos Mac. Chaque Mac garde ses propres onglets et Spaces."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "I dati sincronizzati vengono eliminati dal server, per tutti i tuoi Mac. Ogni Mac conserva i propri pannelli e Space."
           }
         }
       }
@@ -15555,6 +19565,35 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "I tuoi pannelli saranno lì la prossima volta che apri Matcha. Le finestre private e i download in corso verranno chiusi."
+          }
+        }
+      }
+    },
+    "Your tabs, Spaces and settings stay on this Mac. They no longer sync with your other Macs." : {
+      "comment" : "Settings > Sync: sign out or turn off",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Deine Tabs, Spaces und Einstellungen bleiben auf diesem Mac. Sie werden nicht mehr mit deinen anderen Macs synchronisiert."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tus pestañas, Spaces y ajustes se quedan en este Mac. Ya no se sincronizan con tus otros Mac."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vos onglets, Spaces et réglages restent sur ce Mac. Ils ne se synchronisent plus avec vos autres Mac."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "I tuoi pannelli, Space e impostazioni restano su questo Mac. Non si sincronizzano più con gli altri Mac."
           }
         }
       }

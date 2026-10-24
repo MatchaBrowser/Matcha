@@ -18,7 +18,7 @@ final class SpacesUITests: XCTestCase {
         openEmptyTab(in: app)
         XCTAssertTrue(waitForCount(tabRows(in: app), 1))
 
-        app.buttons["newSpaceButton"].click()
+        createSpace(in: app)
         XCTAssertTrue(waitForCount(spaceButtons(in: app), 2))
         XCTAssertTrue(waitForCount(tabRows(in: app), 0))
 
@@ -39,7 +39,7 @@ final class SpacesUITests: XCTestCase {
         let favorites = app.descendants(matching: .any).matching(identifier: "favoriteTile")
         XCTAssertTrue(waitForCount(favorites, 1))
 
-        app.buttons["newSpaceButton"].click()
+        createSpace(in: app)
         XCTAssertTrue(waitForCount(spaceButtons(in: app), 2))
         XCTAssertTrue(waitForCount(favorites, 1))
     }
@@ -48,7 +48,7 @@ final class SpacesUITests: XCTestCase {
     func testRenameAndDeleteASpace() {
         let app = launchApp()
         XCTAssertTrue(waitForBrowserWindow(of: app))
-        app.buttons["newSpaceButton"].click()
+        createSpace(in: app)
         XCTAssertTrue(waitForCount(spaceButtons(in: app), 2))
 
         spaceButtons(in: app).element(boundBy: 1).rightClick()

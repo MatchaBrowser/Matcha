@@ -12,6 +12,7 @@ final class SettingsSelection {
         case profiles
         case privacy
         case extensions
+        case sync
         case advanced
     }
 

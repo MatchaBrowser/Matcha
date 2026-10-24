@@ -7,6 +7,7 @@ extension View {
         self.environment(environment.downloads)
             .environment(environment.extensions)
             .environment(environment.settingsSelection)
+            .environment(environment.sync)
             .environment(\.extensionWindows, environment.extensionWindows)
             .environment(\.pageFind, environment.pageFind)
     }

@@ -29,6 +29,9 @@ struct SettingsView: View {
             ExtensionsSettingsView(manager: extensions, syncAdapter: extensionSync)
                 .tabItem { Label("Extensions", systemImage: "puzzlepiece.extension") }
                 .tag(SettingsSelection.Tab.extensions)
+            SyncSettingsView()
+                .tabItem { Label("Sync", systemImage: "arrow.triangle.2.circlepath") }
+                .tag(SettingsSelection.Tab.sync)
             AdvancedSettingsView()
                 .tabItem { Label("Advanced", systemImage: "gearshape.2") }
                 .tag(SettingsSelection.Tab.advanced)

@@ -125,6 +125,15 @@ extension XCTestCase {
         return app
     }
 
+    /// New Space, from the menu of the account's circle at the bottom of the sidebar.
+    @MainActor
+    func createSpace(in app: XCUIApplication) {
+        app.descendants(matching: .any).matching(identifier: "accountButton").firstMatch.click()
+        let item = app.menuItems["Nouveau Space"]
+        XCTAssertTrue(item.waitForExistence(timeout: 3))
+        item.click()
+    }
+
     /// Browser window ready: its “New Tab” button is shown. The command bar never
     /// opens by itself, at launch or in a new window.
     @MainActor

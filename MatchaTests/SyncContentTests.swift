@@ -1,3 +1,4 @@
+import CryptoKit
 import Foundation
 @testable import Matcha
 import Testing
@@ -71,20 +72,36 @@ struct SyncContentTests {
         #expect(unknown.isFromNewerVersion)
     }
 
-    @Test func `derived identifiers are UUID version 5`() throws {
-        // RFC 9562, appendix A.4: “www.example.com” in the DNS namespace.
-        let dns = try #require(UUID(uuidString: "6BA7B810-9DAD-11D1-80B4-00C04FD430C8"))
-        #expect(SyncIdentifier.derived(from: "www.example.com", in: dns) == UUID(uuidString: "2ED6657D-E927-568B-95E1-2665A8AEA6A2"))
-        #expect(SyncIdentifier.namespace == UUID(uuidString: "393070D0-1478-44F6-82BF-07476B17D5F5"))
-        #expect(SyncIdentifier.setting("searchEngine") == SyncIdentifier.derived(from: "setting:searchEngine"))
-        #expect(SyncIdentifier.setting("searchEngine") != SyncIdentifier.setting("appearance"))
+    @Test func `derived identifiers match the reference vectors`() throws {
+        // `SYNC.md` § 3.10: account key = bytes 32 to 63.
+        let identifiers = SyncIdentifiers(accountKey: SymmetricKey(data: Data(32 ..< 64)))
+        let idKey = identifiers.idKey.withUnsafeBytes { Data($0) }
+        #expect(idKey.map { String(format: "%02x", $0) }.joined() == "1566d83727cc0f51bd6130bcfbeb63b5edeed74d0aa752c98507d8610a539dac")
         let profile = try #require(UUID(uuidString: "9B1E4D2A-0C3F-4A6B-8E5D-7F2C1A9B3E40"))
-        #expect(
-            SyncIdentifier.sitePermission(profileID: profile, origin: "https://meet.google.com", kind: "camera")
-                == SyncIdentifier.derived(from: "site-permission:9b1e4d2a-0c3f-4a6b-8e5d-7f2c1a9b3e40|https://meet.google.com|camera"),
-        )
-        #expect(SyncIdentifier.webExtension("dark-reader") == SyncIdentifier.derived(from: "extension:dark-reader"))
-        #expect(SyncIdentifier.siteZoom("example.com") == SyncIdentifier.derived(from: "site-zoom:example.com"))
+        let vectors: [(UUID, String)] = [
+            (identifiers.setting("searchEngine"), "29C6E709-25C1-837D-A81F-9938153247BB"),
+            (identifiers.siteZoom("google.com"), "D841E19B-C45E-8758-A7F8-EE09968642E7"),
+            (
+                identifiers.sitePermission(profileID: profile, origin: "https://meet.google.com", kind: "camera"),
+                "3574A498-BBBE-89DD-97E5-E8B259C7B0BF",
+            ),
+            (identifiers.packageExtension("0123456789abcdef0123456789abcdef"), "B146F347-53E0-8D14-B690-A7E7477085F7"),
+            (identifiers.appExtension(bundleIdentifier: "com.example.DarkReader.Extension"), "B57FF5FB-0A29-8DBD-A38F-18FFB8646F9E"),
+            (identifiers.defaultProfile, "F0C1AD76-39FD-8912-B97C-7D330800F8F3"),
+            (identifiers.defaultSpace, "8467CEA7-A22F-842E-AF9E-B52B799680AE"),
+        ]
+        for (id, expected) in vectors {
+            #expect(id == UUID(uuidString: expected))
+        }
+        // Another account gives other identifiers.
+        #expect(SyncIdentifiers.testAccount.setting("searchEngine") != identifiers.setting("searchEngine"))
+    }
+
+    @Test func `a received record must carry the identifier its fields give`() {
+        let identifiers = SyncIdentifiers.testAccount
+        let zoom = SyncFields.siteZoom(SyncSiteZoomFields(site: "example.com", level: 1.5))
+        #expect(identifiers.expectedID(of: zoom) == identifiers.siteZoom("example.com"))
+        #expect(identifiers.expectedID(of: .profile(SyncProfileFields(name: "Perso", order: 0))) == nil)
     }
 
     @Test func `the clock never goes back`() throws {
@@ -99,5 +116,16 @@ struct SyncContentTests {
         #expect(try clock.next(now: now) == date("2026-10-17T09:00:00.001Z"))
         // The Mac's time takes over again when it gets ahead.
         #expect(try clock.next(now: date("2026-10-17T10:00:00.000Z")) == date("2026-10-17T10:00:00.000Z"))
+    }
+
+    @Test func `a modification comes after the version it replaces, and the far future is not followed`() throws {
+        var clock = SyncClock()
+        let now = try date("2026-10-17T08:00:00.000Z")
+        // The replaced content was written by a Mac running ahead: the modification comes 1 ms after it.
+        #expect(try clock.next(now: now, after: date("2026-10-17T08:05:00.000Z")) == date("2026-10-17T08:05:00.001Z"))
+        // A date more than 24 hours ahead of this Mac doesn't move the clock.
+        #expect(try !clock.observe(date("2030-01-01T00:00:00.000Z"), now: now))
+        #expect(try clock.next(now: now) == date("2026-10-17T08:05:00.002Z"))
+        #expect(try clock.observe(date("2026-10-18T07:00:00.000Z"), now: now))
     }
 }

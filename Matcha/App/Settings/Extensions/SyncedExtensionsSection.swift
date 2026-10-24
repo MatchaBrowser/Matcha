@@ -1,8 +1,9 @@
 import SwiftUI
 
-/// “From Your Other Macs” (task 7.4): the extensions installed on your other Macs and not on this one, or whose
-/// update needs your approval. “Add…” goes through the permissions screen; “Ignore” removes it from the list on
-/// this Mac only. Absent as long as there is nothing to offer.
+/// “From Your Other Macs” (`SYNC.md` § 2.5): the extensions installed on your other Macs and not on this one, and the
+/// updates of installed ones, never installed without a click here. “Add…” or “Update…” goes through the permissions
+/// screen; “Ignore” removes it from the list on this Mac only, “Ignore This Version” keeps the installed version
+/// until a later one. Absent as long as there is nothing to offer.
 struct SyncedExtensionsSection: View {
     let model: ExtensionsSettingsModel
 
@@ -44,7 +45,7 @@ private struct SyncedExtensionRow: View {
                     .foregroundStyle(.secondary)
             }
             Spacer(minLength: 8)
-            Button("Ignore") { model.ignoreOffer(offer) }
+            Button(model.isUpdate(offer) ? "Ignore This Version" : "Ignore") { model.ignoreOffer(offer) }
                 .buttonStyle(.borderless)
                 .accessibilityIdentifier("syncedExtensionIgnoreButton")
             switch model.availability(of: offer) {

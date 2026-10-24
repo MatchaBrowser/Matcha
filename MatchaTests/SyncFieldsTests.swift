@@ -50,7 +50,13 @@ struct SyncFieldsTests {
                 identifier: "dark-reader",
                 name: "Dark Reader",
                 version: "4.9.99",
-                source: .package(blobID: UUID(), blobKey: "Y2zDqQ==", sha256: "ab12", size: 845_312, fileName: "darkreader.xpi"),
+                source: .package(
+                    blobID: UUID(),
+                    blobKey: Data(repeating: 1, count: 32).base64EncodedString(),
+                    sha256: String(repeating: "ab", count: 32),
+                    size: 845_312,
+                    fileName: "darkreader.xpi",
+                ),
                 isEnabled: true,
                 allowsPrivateWindows: false,
                 showsButton: true,
@@ -84,16 +90,73 @@ struct SyncFieldsTests {
         let ask = #"{"origin":"https://a.b","kind":"camera","decision":"ask"}"#
         #expect(try SyncFields(json: object(ask), type: .sitePermission) == nil)
         #expect(try SyncFields(json: object(#"{"site":"example.com","level":5}"#), type: .siteZoom) == nil)
-        #expect(try SyncFields(json: object(#"{"name":"Sans rang"}"#), type: .profile) == nil)
+        // A missing parent, an address that isn't web, an incomplete package, a number that isn't an exact integer.
+        #expect(try SyncFields(json: object(#"{"name":"Sans profil","symbol":"star.fill","order":0}"#), type: .space) == nil)
+        let script = #"{"place":"today","url":"javascript:alert(1)","spaceId":"9B1E4D2A-0C3F-4A6B-8E5D-7F2C1A9B3E40"}"#
+        #expect(try SyncFields(json: object(script), type: .tab) == nil)
+        let package = #"{"identifier":"x","source":{"kind":"package","blobId":"9B1E4D2A-0C3F-4A6B-8E5D-7F2C1A9B3E40"}}"#
+        #expect(try SyncFields(json: object(package), type: .webExtension) == nil)
+        #expect(try SyncFields(json: object(#"{"key":"tabSuspensionDelay","value":1e19}"#), type: .setting) == nil)
+        #expect(try SyncFields(json: object(#"{"key":"homePage","value":"javascript:alert(1)"}"#), type: .setting) == nil)
+        #expect(try SyncFields(json: object(#"{"key":"homePage","value":"localhost:3000"}"#), type: .setting) != nil)
+        // An origin not written as SYNC.md § 2.7 says.
+        let profileKey = #""profileId":"9B1E4D2A-0C3F-4A6B-8E5D-7F2C1A9B3E40""#
+        let origin = #"{"origin":"https://Meet.Google.com/","kind":"camera","decision":"deny","#
+        #expect(try SyncFields(json: object(origin + profileKey + "}"), type: .sitePermission) == nil)
+    }
+
+    @Test func `unreadable values take their default value`() throws {
+        #expect(try SyncFields(json: object(#"{"name":"Sans rang"}"#), type: .profile) == .profile(SyncProfileFields(
+            name: "Sans rang",
+            order: 0,
+        )))
+        let space = #"{"name":7,"order":2.5,"theme":"rouge","profileId":"9B1E4D2A-0C3F-4A6B-8E5D-7F2C1A9B3E40"}"#
+        guard case let .space(fields) = try SyncFields(json: object(space), type: .space) else {
+            Issue.record("Space ignored")
+            return
+        }
+        #expect(fields.name.isEmpty && fields.symbol == SidebarIcon.defaultSpaceSymbol && fields.theme == nil && fields.order == 2.5)
+        #expect(SyncOrder.integer(2.5) == 3 && SyncOrder.integer(1e300) == 1_000_000_000)
+        let source = #""source":{"kind":"appExtension","bundleIdentifier":"a","appBundleIdentifier":"b"}"#
+        let rights = #"{"identifier":"x","# + source + #","grantedPermissions":{"tabs":null,"storage":"demain"}}"#
+        guard case let .webExtension(extensionFields) = try SyncFields(json: object(rights), type: .webExtension) else {
+            Issue.record("Extension ignored")
+            return
+        }
+        #expect(extensionFields.grantedPermissions == ["tabs": Date?.none])
+        #expect(extensionFields.showsButton && !extensionFields.isEnabled)
     }
 
     @Test func `unknown fields are ignored, and kept by a modification`() throws {
         let received = try object(##"{"name":"Perso","order":1,"pinnedColor":"#FF0000"}"##)
         let fields = try #require(SyncFields(json: received, type: .profile))
         #expect(fields == .profile(SyncProfileFields(name: "Perso", order: 1)))
-        let changed = SyncFields.profile(SyncProfileFields(name: "Maison", order: 1)).json.keepingUnknownKeys(of: received)
+        let changed = SyncFieldMerge.merged(
+            remote: received,
+            local: SyncFields.profile(SyncProfileFields(name: "Maison", order: 1)).json,
+            baseline: fields.json,
+        )
         #expect(changed.objectValue["name"] == .string("Maison"))
         #expect(changed.objectValue["pinnedColor"] == .string("#FF0000"))
+    }
+
+    @Test func `only the fields changed here replace the received ones`() throws {
+        // A folder moved back to the root here: its parent leaves as null (absent), it isn't put back.
+        let folder = SyncFolderFields(name: "Projets", order: 1, isCollapsed: false, spaceId: space, parentId: profile)
+        var atRoot = folder
+        atRoot.parentId = nil
+        let parents = #""spaceId":"\#(space.uuidString)","parentId":"\#(profile.uuidString)""#
+        let received = try object(#"{"name":"Renamed elsewhere","order":1,"isCollapsed":false,"# + parents + "}")
+        let sent = SyncFieldMerge.merged(remote: received, local: SyncFields.folder(atRoot).json, baseline: SyncFields.folder(folder).json)
+        #expect(sent.objectValue["parentId"] == nil)
+        // The name received and not changed here leaves as it was received.
+        #expect(sent.objectValue["name"] == .string("Renamed elsewhere"))
+        // Permissions entry by entry: one granted here, one received kept.
+        let base = SyncJSON.object(["grantedPermissions": .object(["tabs": .null])])
+        let mine = SyncJSON.object(["grantedPermissions": .object(["tabs": .null, "storage": .null])])
+        let remote = SyncJSON.object(["grantedPermissions": .object(["tabs": .null, "cookies": .null])])
+        let merged = SyncFieldMerge.merged(remote: remote, local: mine, baseline: base)
+        #expect(merged.objectValue["grantedPermissions"]?.objectValue.keys.sorted() == ["cookies", "storage", "tabs"])
     }
 
     @Test func `settings are read as UserDefaults keeps them`() {

@@ -9,9 +9,11 @@ import Security
 nonisolated enum SyncCrypto {
     /// Version byte at the start of an encrypted content or package.
     static let formatVersion: UInt8 = 1
-    /// A record's content is padded to a multiple of 256 bytes, an extension package to a multiple of 64 KiB.
+    /// A record's content is padded to a multiple of 256 bytes, an extension package to a multiple of 64 KiB, the
+    /// account's avatar to a multiple of 4 KiB.
     static let recordPadding = 256
     static let blobPadding = 65536
+    static let avatarPadding = 4096
 
     // MARK: Keys
 
@@ -125,6 +127,31 @@ nonisolated enum SyncCrypto {
 
     static func decryptBlob(_ data: Data, id: UUID, key: SymmetricKey) throws -> Data {
         try unpad(open(versioned(data), key: key, aad: blobAAD(id: id)))
+    }
+
+    /// Avatar of the account (`SYNC.md` § 3.5): its image, encrypted with the data key and bound to the account, so that
+    /// another account's avatar doesn't open.
+    static func encryptAvatar(
+        _ image: Data,
+        accountID: UUID,
+        keyVersion: Int,
+        dataKey: SymmetricKey,
+        nonce: AES.GCM.Nonce? = nil,
+    ) throws -> Data {
+        try Data([formatVersion]) + seal(
+            pad(image, toMultipleOf: avatarPadding),
+            key: dataKey,
+            aad: avatarAAD(accountID: accountID, keyVersion: keyVersion),
+            nonce: nonce,
+        )
+    }
+
+    static func decryptAvatar(_ data: Data, accountID: UUID, keyVersion: Int, dataKey: SymmetricKey) throws -> Data {
+        try unpad(open(versioned(data), key: dataKey, aad: avatarAAD(accountID: accountID, keyVersion: keyVersion)))
+    }
+
+    static func avatarAAD(accountID: UUID, keyVersion: Int) -> Data {
+        Data("matcha.avatar.v1|\(accountID.uuidString.lowercased())|\(keyVersion)".utf8)
     }
 
     static func recordAAD(id: UUID, keyVersion: Int) -> Data {

@@ -11,15 +11,20 @@ nonisolated struct SyncSettingFields: Codable, Equatable, Sendable {
     }
 }
 
-/// A profile's decision for an origin and a permission (`SitePermissionRecord`).
+/// A profile's decision for an origin and a permission (`SitePermissionRecord`); the origin in the form of
+/// `SiteOrigin.key` (`SYNC.md` § 2.7).
 nonisolated struct SyncSitePermissionFields: Codable, Equatable, Sendable {
     var origin: String
     var kind: String
     var decision: String
-    var profileId: UUID?
+    var profileId: UUID
 
     var isValid: Bool {
-        !origin.isEmpty && SitePermissionKind(rawValue: kind) != nil && SitePermissionDecision(rawValue: decision) != nil
+        guard let parsed = SiteOrigin(key: origin) else {
+            return false
+        }
+        return parsed.isWeb && parsed.key == origin && SitePermissionKind(rawValue: kind) != nil
+            && SitePermissionDecision(rawValue: decision) != nil
     }
 }
 
@@ -29,7 +34,7 @@ nonisolated struct SyncSiteZoomFields: Codable, Equatable, Sendable {
     var level: Double
 
     var isValid: Bool {
-        !site.isEmpty && (0.5 ... 3).contains(level)
+        !site.isEmpty && level.isFinite && (0.5 ... 3).contains(level)
     }
 }
 
@@ -67,10 +72,25 @@ nonisolated enum SyncedSettings {
         switch (kinds[key], value) {
         case let (.choice(values), .string(text)): values.contains(text)
         case (.boolean, .bool): true
-        case (.text, .string): true
-        case let (.minutes(values), .number(number)): number == number.rounded() && values.contains(Int(number))
+        case let (.text, .string(text)): key != BrowserSettings.Key.homePage || isWebAddress(text)
+        case let (.minutes(values), .number(number)): Int(exactly: number).map(values.contains) ?? false
         default: false
         }
+    }
+
+    /// Typed address, or empty: refused if it has a scheme other than http or https (“javascript:”, “file:”…). A host
+    /// followed by a port (“localhost:3000”) has no scheme.
+    static func isWebAddress(_ text: String) -> Bool {
+        let trimmed = text.trimmingCharacters(in: .whitespaces)
+        guard let colon = trimmed.firstIndex(of: ":") else {
+            return true
+        }
+        let scheme = trimmed[..<colon]
+        let rest = trimmed[trimmed.index(after: colon)...]
+        guard scheme.allSatisfy({ $0.isASCII && ($0.isLetter || "+.-".contains($0)) }), rest.first?.isNumber != true else {
+            return true
+        }
+        return ["http", "https"].contains(scheme.lowercased())
     }
 
     /// Value of a setting as `UserDefaults` returns it, as JSON; nil if it is not of an expected kind for `key` (a
@@ -99,7 +119,7 @@ nonisolated enum SyncedSettings {
     static func defaultsValue(of value: SyncJSON) -> Any? {
         switch value {
         case let .bool(flag): flag
-        case let .number(number): Int(number)
+        case let .number(number): Int(exactly: number)
         case let .string(text): text
         default: nil
         }
