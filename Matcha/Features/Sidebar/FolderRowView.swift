@@ -3,19 +3,16 @@ import SwiftUI
 
 /// Row of a pinned folder: a click collapses or expands it; a menu to rename it, customize it (icon, text and
 /// background colors, `FolderCustomizationPanel`), create a subfolder in it or delete it. An item dropped on the
-/// row goes into the folder, or is placed before it if it is released on the top of the row.
+/// middle of the row goes into the folder, at its end; on the top of the row, before the folder; on the bottom, after
+/// it, or first in it if it is expanded (`drop`).
 struct FolderRowView: View {
-    /// Height of the top of the row where a drop places the item before the folder.
-    static let beforeZoneHeight = 8.0
-
     let folder: PinnedFolder
     let tabManager: TabManager
-    /// Position of the folder in its parent.
-    let dropDestination: SidebarDestination
+    let drop: SidebarRowDrop
 
     @Environment(WindowModel.self) private var windowModel: WindowModel?
     @State private var isHovered = false
-    @State private var isDropTargeted = false
+    @State private var dropPart: SidebarRowDrop.Part?
     @State private var draftName = ""
     @FocusState private var isNameFocused: Bool
 
@@ -49,7 +46,7 @@ struct FolderRowView: View {
         }
         .padding(.horizontal, 6)
         .frame(height: 32)
-        .background(FolderRowBackground(appearance: folder.appearance, isHovered: isHovered || isDropTargeted))
+        .background(FolderRowBackground(appearance: folder.appearance, isHovered: isHovered || dropPart == .into))
         .contentShape(Rectangle())
         .onTapGesture {
             guard !isRenaming else {
@@ -64,9 +61,9 @@ struct FolderRowView: View {
                 SidebarIconView(icon: folder.appearance.icon, defaultSymbol: SidebarIcon.defaultFolderSymbol)
             }
         }
-        .sidebarDropDestination(tabManager: tabManager, isTargeted: $isDropTargeted) { location in
-            location.y < Self.beforeZoneHeight ? dropDestination : .pinned(folder: folder.id, index: folder.items.count)
-        }
+        .sidebarRowDropDestination(tabManager: tabManager, drop: drop, part: $dropPart)
+        // Bottom of an expanded folder: the line is indented like its content, where the item will go.
+        .insertionLine(for: dropPart, afterIndent: folder.isCollapsed ? 0 : PinnedItemsView.indent)
         .accessibilityElement(children: .contain)
         .accessibilityLabel(folder.name)
         .accessibilityValue(accessibilityValue)

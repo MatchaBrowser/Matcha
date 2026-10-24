@@ -10,7 +10,7 @@ struct FavoritesGrid: View {
             if !favorites.isEmpty {
                 FavoritesGridLayout {
                     ForEach(Array(favorites.enumerated()), id: \.element.id) { index, tab in
-                        FavoriteTile(tab: tab, tabManager: tabManager, dropDestination: .favorites(index: index))
+                        FavoriteTile(tab: tab, tabManager: tabManager, drop: .favorite(at: index))
                     }
                 }
             }
@@ -25,15 +25,15 @@ struct FavoritesGrid: View {
     }
 }
 
-/// Tile of a favorite, with a speaker badge while its page plays sound (task 5.10); a tab dropped on it is inserted
-/// before it.
+/// Tile of a favorite, with a speaker badge while its page plays sound (task 5.10); a tab dropped on its left half is
+/// inserted before it, on its right half after it.
 private struct FavoriteTile: View {
     let tab: BrowserTab
     let tabManager: TabManager
-    let dropDestination: SidebarDestination
+    let drop: SidebarRowDrop
 
     @State private var isHovered = false
-    @State private var isDropTargeted = false
+    @State private var dropPart: SidebarRowDrop.Part?
     /// This window's selection; absent outside a browser window.
     @Environment(TabViewer.self) private var viewer: TabViewer?
 
@@ -51,12 +51,13 @@ private struct FavoriteTile: View {
                     SidebarRowBackground(isSelected: isSelected, isHovered: isHovered, cornerRadius: 10)
                 },
             )
-            .overlay(alignment: .leading) {
-                if isDropTargeted {
+            // Centered in the gap between two tiles.
+            .overlay(alignment: dropPart == .after ? .trailing : .leading) {
+                if let dropPart {
                     Capsule()
                         .fill(Color.accentColor)
-                        .frame(width: 2)
-                        .offset(x: -4)
+                        .frame(width: InsertionLine.thickness)
+                        .offset(x: (dropPart == .after ? 1 : -1) * (FavoritesGridLayout.spacing + InsertionLine.thickness) / 2)
                 }
             }
             .overlay(alignment: .topTrailing) {
@@ -70,7 +71,7 @@ private struct FavoriteTile: View {
             .onHover { isHovered = $0 }
             .contextMenu { TabContextMenu(tab: tab, tabManager: tabManager) }
             .tabDraggable(tab)
-            .sidebarDropDestination(tabManager: tabManager, destination: dropDestination, isTargeted: $isDropTargeted)
+            .sidebarRowDropDestination(tabManager: tabManager, drop: drop, axis: .horizontal, part: $dropPart)
             .help(tab.displayTitle)
             .accessibilityElement(children: .ignore)
             .accessibilityLabel(tab.displayTitle)

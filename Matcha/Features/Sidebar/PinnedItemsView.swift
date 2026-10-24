@@ -16,18 +16,18 @@ struct PinnedItemsView: View {
 
     var body: some View {
         ForEach(tabManager.layout.pinnedRows(items)) { row in
-            let destination = SidebarDestination.pinned(folder: parent, index: row.index)
+            let drop = SidebarRowDrop.pinned(row, in: parent)
             switch row {
             case let .tab(id, _):
                 if let tab = tabManager.tab(withID: id) {
-                    TabRowView(tab: tab, tabManager: tabManager, dropDestination: destination)
+                    TabRowView(tab: tab, tabManager: tabManager, drop: drop)
                         .padding(.leading, CGFloat(depth) * Self.indent)
                 }
             case let .split(group, _):
-                SplitRowView(group: group, tabManager: tabManager, dropDestination: destination)
+                SplitRowView(group: group, tabManager: tabManager, drop: drop)
                     .padding(.leading, CGFloat(depth) * Self.indent)
             case let .folder(folder, _):
-                FolderRowView(folder: folder, tabManager: tabManager, dropDestination: destination)
+                FolderRowView(folder: folder, tabManager: tabManager, drop: drop)
                     .padding(.leading, CGFloat(depth) * Self.indent)
                 if let windowModel, windowModel.customizedFolderID == folder.id {
                     FolderCustomizationPanel(folder: folder, tabManager: tabManager) {

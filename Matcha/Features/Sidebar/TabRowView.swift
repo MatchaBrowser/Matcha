@@ -1,14 +1,15 @@
 import SwiftUI
 
 /// Row of a pinned or today tab: icon, title, speaker while the page plays sound (task 5.10), close button on
-/// hover. It can be dragged; a tab dropped on it is inserted before it, at `dropDestination`.
+/// hover. It can be dragged; an item dropped on its top half is inserted before it, on its bottom half after it
+/// (`drop`).
 struct TabRowView: View {
     let tab: BrowserTab
     let tabManager: TabManager
-    let dropDestination: SidebarDestination
+    let drop: SidebarRowDrop
 
     @State private var isHovered = false
-    @State private var isDropTargeted = false
+    @State private var dropPart: SidebarRowDrop.Part?
     /// This window's selection; absent outside a browser window.
     @Environment(TabViewer.self) private var viewer: TabViewer?
 
@@ -48,12 +49,8 @@ struct TabRowView: View {
         .onHover { isHovered = $0 }
         .contextMenu { TabContextMenu(tab: tab, tabManager: tabManager) }
         .tabDraggable(tab)
-        .sidebarDropDestination(tabManager: tabManager, destination: dropDestination, isTargeted: $isDropTargeted)
-        .overlay(alignment: .top) {
-            if isDropTargeted {
-                InsertionLine()
-            }
-        }
+        .sidebarRowDropDestination(tabManager: tabManager, drop: drop, part: $dropPart)
+        .insertionLine(for: dropPart)
         .help(tab.url?.absoluteString ?? tab.displayTitle)
         .accessibilityElement(children: .ignore)
         .accessibilityLabel(tab.displayTitle)
