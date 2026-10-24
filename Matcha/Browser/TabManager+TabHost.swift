@@ -21,9 +21,14 @@ extension TabManager: TabHost {
         return place != .today
     }
 
-    /// After the source tab; from the Peek, after its source tab.
+    /// After the source tab; from the Peek, after its source tab. Selected in the window that shows it.
     func openLink(_ url: URL, configuration: WKWebViewConfiguration, from webView: WKWebView, inBackground: Bool) {
-        insertTab(configuration: configuration, after: insertionAnchor(for: webView), select: !inBackground).load(url, from: webView.url)
+        acting(for: webView) {
+            insertTab(configuration: configuration, after: insertionAnchor(for: webView), select: !inBackground).load(
+                url,
+                from: webView.url,
+            )
+        }
     }
 
     /// Window without a size opened by the Peek: the Peek first becomes a tab, so that `window.opener` stays valid.
@@ -34,8 +39,10 @@ extension TabManager: TabHost {
         if inBackground {
             return insertTab(configuration: configuration, after: insertionAnchor(for: webView), select: false).makeWebViewIfNeeded()
         }
-        let opener = tab(for: webView) ?? (isPeek(webView) ? openPeekAsTab() : nil)
-        return insertTab(configuration: configuration, after: opener, select: true).makeWebViewIfNeeded()
+        return acting(for: webView) {
+            let opener = tab(for: webView) ?? (isPeek(webView) ? openPeekAsTab() : nil)
+            return insertTab(configuration: configuration, after: opener, select: true).makeWebViewIfNeeded()
+        }
     }
 
     /// Refused if the source web view is not displayed.
@@ -76,5 +83,17 @@ extension TabManager: TabHost {
         } else if let tab = tab(for: webView) {
             close(tab)
         }
+    }
+
+    /// A page acts (link, window): `body` applies to the window that shows it, or its Peek's source tab; the active
+    /// window stays the same.
+    private func acting<Result>(for webView: WKWebView, _ body: () -> Result) -> Result {
+        let id = tab(for: webView)?.id ?? (isPeek(webView) ? peek?.sourceTabID : nil)
+        let previous = activeViewer
+        if let id, let viewer = viewer(showing: id) {
+            activate(viewer)
+        }
+        defer { activate(previous) }
+        return body()
     }
 }

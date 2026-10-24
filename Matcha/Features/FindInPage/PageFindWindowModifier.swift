@@ -22,7 +22,7 @@ struct PageFindWindowModifier: ViewModifier {
     private func register() {
         pageFind?.register(PageFindResponder.Window(
             window: window,
-            page: { [weak model] in model.flatMap { FrontPage.page(miniWindowTab: nil, tabManager: $0.space.tabManager) } },
+            page: { [weak model] in model.flatMap { FrontPage.page(miniWindowTab: nil, tabManager: $0.tabManager) } },
             closeCommandBar: closeCommandBar,
         ))
     }

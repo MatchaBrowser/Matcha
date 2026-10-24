@@ -2,8 +2,8 @@ import AppKit
 import OSLog
 import WebKit
 
-/// The windows as the extension manager's host (`ExtensionHost`, audit C1). Matcha has only one main browser window
-/// (`DECISIONS.md`):
+/// The windows as the extension manager's host (`ExtensionHost`, audit C1). Matcha has several browser windows on the
+/// same Spaces (`DECISIONS.md`):
 /// - a new tab goes to the top of the Today tabs of the displayed Space (after its parent tab if it belongs to this
 ///   Space), in the requested window, otherwise the active window, otherwise the main window; never in a private window
 ///   for an extension that has no access to it; the requested index is ignored;
@@ -56,7 +56,8 @@ extension ExtensionWindows: ExtensionHost {
         let urls: [URL?] = configuration.tabURLs.isEmpty ? [nil] : configuration.tabURLs
         let first = urls.reversed().map { openTab($0, in: model, after: nil, isActive: false, isPinned: false) }.last
         if let first {
-            model.space.tabManager.select(first)
+            model.activate()
+            model.tabManager.select(first)
             update()
         }
         if configuration.shouldBeFocused {
@@ -105,7 +106,9 @@ extension ExtensionWindows: ExtensionHost {
     /// `parent` if it belongs to this Space; active (selected) and pinned on request.
     @discardableResult
     func openTab(_ url: URL?, in model: WindowModel, after parent: BrowserTab?, isActive: Bool, isPinned: Bool) -> BrowserTab {
-        let tabManager = model.space.tabManager
+        let tabManager = model.tabManager
+        // Selected in that window, even if another one shows the same Space.
+        model.activate()
         let configuration = url.flatMap { manager?.pageConfiguration(for: $0) }
             ?? tabManager.pages.makeConfiguration(websiteDataStore: tabManager.websiteDataStore)
         let anchor = parent.flatMap { tabManager.tab(withID: $0.id) === $0 ? $0 : nil }

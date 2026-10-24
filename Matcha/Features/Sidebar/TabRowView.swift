@@ -9,9 +9,11 @@ struct TabRowView: View {
 
     @State private var isHovered = false
     @State private var isDropTargeted = false
+    /// This window's selection; absent outside a browser window.
+    @Environment(TabViewer.self) private var viewer: TabViewer?
 
     private var isSelected: Bool {
-        tabManager.selectedTabID == tab.id
+        (viewer ?? tabManager.activeViewer).selectedTabID == tab.id
     }
 
     var body: some View {

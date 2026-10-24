@@ -51,16 +51,16 @@ final class SettingsUITests: XCTestCase {
         app.typeKey("w", modifierFlags: .command)
     }
 
-    /// Mini window shortcut shown in General (⌃⌥⇧⌘N given at launch: never ⌥⌘N, which would reach the user's
+    /// Mini window shortcut shown in Shortcuts (⌃⌥⇧⌘N given at launch: never ⌥⌘N, which would reach the user's
     /// Matcha). The field is never clicked: no shortcut is recorded by a test.
     @MainActor
-    func testMiniWindowShortcutIsShownInGeneralSettings() {
+    func testMiniWindowShortcutIsShownInShortcutsSettings() {
         let app = launchApp(settings: ["KeyboardShortcuts_openMiniWindow": Self.shortcutArgument(keyCode: 45, carbonModifiers: 6912)])
         XCTAssertTrue(waitForBrowserWindow(of: app))
         app.typeKey(",", modifierFlags: .command)
-        let generalTab = app.toolbars.buttons["Général"]
-        XCTAssertTrue(generalTab.waitForExistence(timeout: 5))
-        generalTab.click()
+        let shortcutsTab = app.toolbars.buttons["Raccourcis"]
+        XCTAssertTrue(shortcutsTab.waitForExistence(timeout: 5))
+        shortcutsTab.click()
         let label = "Raccourci de la mini-fenêtre"
         let title = app.staticTexts.matching(NSPredicate(format: "value == %@ OR label == %@", label, label)).firstMatch
         XCTAssertTrue(title.waitForExistence(timeout: 3))

@@ -235,4 +235,20 @@ struct TabLifecycleServiceTests {
         #expect(await service.check(.memoryCritical) == 0)
         #expect(favorite.isLoaded)
     }
+
+    /// A window of its own tabs (detached tab): its hidden tabs sleep like those of a Space.
+    @Test func `hidden tabs of a window of its own tabs are suspended too`() async {
+        let tab = openTabs(1)[0]
+        let state = model.detachToNewWindow(tab)
+        let window = WindowModels(session: session, spaceID: state.spaceID, windowTabsID: state.windowTabsID).window
+        window.windowDidAppear()
+        service.windowDidAppear(window)
+        let hidden = window.tabManager.newTab()
+        window.tabManager.select(tab)
+        service.refreshVisibility()
+        clock.advance(3600)
+        #expect(await service.check(.inactivity) == 1)
+        #expect(hidden.suspension.isSuspended)
+        #expect(tab.isLoaded)
+    }
 }

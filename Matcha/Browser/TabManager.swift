@@ -2,13 +2,22 @@ import Foundation
 import Observation
 import WebKit
 
-/// A window's tabs, their arrangement in the sidebar and the selected tab.
+/// A Space's tabs, their arrangement in the sidebar, and the tab each window selected there (`TabManager+Selection`).
 @MainActor
 @Observable
 final class TabManager {
     /// Place and order of the tabs in the sidebar, saved by the Space (`SpaceStore`).
     private(set) var layout = SidebarLayout()
-    private(set) var selectedTabID: BrowserTab.ID?
+    /// Viewer the tab actions apply to (selection, new tabs, Peek): that of the window in front showing this Space.
+    /// The first one holds the restored selection until a window takes it.
+    private(set) var activeViewer = TabViewer()
+    /// The viewers of the windows that show or showed this Space, the active one included.
+    @ObservationIgnored private(set) var viewers: [TabViewer] = []
+    /// Which window shows each tab: the session's, shared by its Spaces; this manager's own otherwise (tests).
+    @ObservationIgnored var displays = TabDisplayRegistry() {
+        didSet { viewers.forEach(displays.register) }
+    }
+
     /// Folder whose name is being edited in the sidebar (UI state).
     var renamingFolderID: UUID?
     /// Peek opened on top of the displayed pages (Shift-click, task 4.4): a page outside the sidebar.
@@ -47,6 +56,7 @@ final class TabManager {
         coordinator = services.makeCoordinator()
         self.downloadScope = downloadScope
         coordinator.tabHost = self
+        adopt(activeViewer)
     }
 
     /// All tabs, in sidebar order.
@@ -64,6 +74,10 @@ final class TabManager {
 
     var selectedTab: BrowserTab? {
         selectedTabID.flatMap { tabsByID[$0] }
+    }
+
+    func selectedTab(in viewer: TabViewer) -> BrowserTab? {
+        viewer.selectedTabID.flatMap { tabsByID[$0] }
     }
 
     func tab(withID id: BrowserTab.ID) -> BrowserTab? {
@@ -198,7 +212,24 @@ final class TabManager {
 
     /// Selects `id` without loading its page (restoration).
     func restoreSelection(_ id: BrowserTab.ID?) {
-        selectedTabID = id
+        activeViewer.selectedTabID = id
+    }
+
+    /// Primitive of `TabManager+Selection`: makes `viewer` the active one.
+    func setActiveViewer(_ viewer: TabViewer) {
+        activeViewer = viewer
+    }
+
+    /// Primitive of `TabManager+Selection`: `viewer` now belongs to this Space.
+    func adopt(_ viewer: TabViewer) {
+        viewer.tabManager = self
+        viewers.append(viewer)
+        displays.register(viewer)
+    }
+
+    /// Primitive of `TabManager+Selection`: forgets `viewer` (never the active one).
+    func forget(_ viewer: TabViewer) {
+        viewers.removeAll { $0 === viewer }
     }
 
     /// Primitive of `TabManager+Peek`: replaces the Peek, without releasing anything.
@@ -223,62 +254,10 @@ final class TabManager {
         }
     }
 
-    /// Selects `id`, records its activity and makes sure the web view of each displayed tab exists
-    /// (its whole split).
-    func setSelection(_ id: BrowserTab.ID?) {
-        // The Peek belongs to the displayed tab: displaying another one closes it (task 4.4).
-        if let peek, peek.sourceTabID != id {
-            closePeek()
-        }
-        // Tabs that leave the screen keep their navigation state.
-        let leaving = displayedTabs
-        selectedTabID = id
-        let shown = displayedTabs
-        for tab in leaving where !shown.contains(where: { $0 === tab }) {
-            tab.captureInteractionState()
-        }
-        if let id {
-            tabsByID[id]?.lastActivity = .now
-        }
-        shown.forEach { $0.makeWebViewIfNeeded() }
-    }
-
-    /// Applies `change` to `tab`; if it was selected, the selection moves to its neighbor in the split, otherwise
-    /// (today tab) to the next today tab, or to the previous one if it was the last.
-    func moveSelection(awayFrom tab: BrowserTab, during change: () -> Void) {
-        moveSelection(awayFrom: [tab.id], preferring: layout.split(containing: tab.id)?.neighbor(of: tab.id), during: change)
-    }
-
-    /// Applies `change`; if the selected tab is part of `ids`, the selection moves to `preferred` (its neighbor in a
-    /// split, already on screen) if it is still placed. Otherwise, from a today tab, to the first today tab outside
-    /// `ids` that followed it, otherwise to the last one that preceded it. Never to another pinned tab or favorite,
-    /// which would load a page by itself: with no today tab left, or from a pinned tab or a favorite, the window
-    /// shows its empty page.
-    func moveSelection(awayFrom ids: Set<BrowserTab.ID>, preferring preferred: BrowserTab.ID? = nil, during change: () -> Void) {
-        let today = layout.today
-        let index = selectedTabID.flatMap { today.firstIndex(of: $0) }
-        let wasSelected = selectedTabID.map(ids.contains) ?? false
-        change()
-        guard wasSelected else {
-            return
-        }
-        if let preferred, !ids.contains(preferred), layout.place(of: preferred) != nil {
-            setSelection(preferred)
-            return
-        }
-        guard let index else {
-            setSelection(nil)
-            return
-        }
-        func remains(_ id: UUID) -> Bool {
-            !ids.contains(id) && layout.place(of: id) == .today
-        }
-        setSelection(today[index...].first(where: remains) ?? today[..<index].last(where: remains))
-    }
-
     func discard(_ tab: BrowserTab) {
         layout.remove(tab.id)
         tabsByID[tab.id] = nil
+        displays.forget(tab.id)
         tab.permissionPrompts.denyAll()
         tab.stop()
     }

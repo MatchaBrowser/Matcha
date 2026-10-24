@@ -7,7 +7,7 @@ extension CommandBarModel: CommandBarPanelModel {
         guard case let .currentTab(id) = mode else {
             return nil
         }
-        return windowModel.space.tabManager.tab(withID: id)
+        return windowModel.tabManager.tab(withID: id)
     }
 
     var rowIcons: CommandRowIcons {

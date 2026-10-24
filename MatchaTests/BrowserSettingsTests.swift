@@ -17,6 +17,11 @@ struct BrowserSettingsTests {
         #expect(!BrowserSettings.confirmsBeforeQuitting(in: defaults))
         defaults.set(true, forKey: BrowserSettings.Key.confirmBeforeQuitting)
         #expect(BrowserSettings.confirmsBeforeQuitting(in: defaults))
+        // Launch arguments (UI tests) give text.
+        defaults.set("YES", forKey: BrowserSettings.Key.confirmBeforeQuitting)
+        #expect(BrowserSettings.confirmsBeforeQuitting(in: defaults))
+        defaults.set("NO", forKey: BrowserSettings.Key.confirmBeforeQuitting)
+        #expect(!BrowserSettings.confirmsBeforeQuitting(in: defaults))
     }
 
     @Test func `pinned links stay in their tab by default`() {

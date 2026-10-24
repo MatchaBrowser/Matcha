@@ -7,6 +7,8 @@ import WebKit
 enum ExtensionTabOwner {
     /// Sidebar tab of a Space of a browser window; for a favorite, the Space that holds it.
     case space(SpaceSession, WindowModel)
+    /// Tab of a window of its own tabs (a detached tab, outside any Space).
+    case window(WindowModel)
     /// Page of the Peek (task 4.4) open in the displayed Space.
     case peek(SpaceSession, WindowModel)
     /// Page of a mini window (task 4.5).
@@ -18,6 +20,7 @@ enum ExtensionTabOwner {
     var siteZooms: SiteZoomStore? {
         switch self {
         case let .space(space, _), let .peek(space, _): space.tabManager.siteZooms
+        case let .window(model): model.tabManager.siteZooms
         case let .miniWindow(_, manager): manager.siteZooms
         case let .popupWindow(_, manager): manager.siteZooms
         }

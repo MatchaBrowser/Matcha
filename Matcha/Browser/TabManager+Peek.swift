@@ -8,11 +8,21 @@ import WebKit
 /// Task 5.7: a crashed Peek page is visible (`isVisible`), so it reloads.
 /// Task 6.3: for extensions, the open Peek is a tab, right after its source tab, and the active tab
 /// (`ExtensionWindows`).
+/// Several windows: a Space has one Peek, shown by the window that shows its source tab.
 extension TabManager {
-    /// Page in the foreground: the Peek if it is open, otherwise the selected tab, which is also the active pane
-    /// of a split (⌘R, ⌘[, ⌘], ⇧⌘C; 5.3, 5.4).
+    /// Page in the foreground of the active window: the Peek if it is open there, otherwise the selected tab, which is
+    /// also the active pane of a split (⌘R, ⌘[, ⌘], ⇧⌘C; 5.3, 5.4).
     var frontTab: BrowserTab? {
-        peek?.tab ?? selectedTab
+        frontTab(in: activeViewer)
+    }
+
+    func frontTab(in viewer: TabViewer) -> BrowserTab? {
+        peek(in: viewer)?.tab ?? selectedTab(in: viewer)
+    }
+
+    /// The Peek, if the window of `viewer` shows it: it shows its source tab.
+    func peek(in viewer: TabViewer) -> Peek? {
+        peek.flatMap { shows($0.sourceTabID, in: viewer) ? $0 : nil }
     }
 
     func isPeek(_ webView: WKWebView) -> Bool {
@@ -36,10 +46,10 @@ extension TabManager {
         return tab(withID: peek.sourceTabID)
     }
 
-    /// A Peek only opens on top of a displayed page (the selected tab or a pane of its split), or from the Peek
-    /// itself, which loads the link.
+    /// A Peek only opens on top of a displayed page (the selected tab or a pane of its split, in a window), or from
+    /// the Peek itself, which loads the link.
     func canPeek(from source: BrowserTab) -> Bool {
-        source === peek?.tab || displayedTabIDs.contains(source.id)
+        source === peek?.tab || viewer(showing: source.id) != nil
     }
 
     /// Opens `url` in a new Peek, with the configuration of `source` (same profile); a Peek already open is closed
@@ -56,9 +66,9 @@ extension TabManager {
             return nil
         }
         closePeek()
-        if source.id != selectedTabID {
-            // Pane of a split (Shift+Return on a link): the Peek belongs to the active pane.
-            setSelection(source.id)
+        // Pane of a split (Shift+Return on a link): the Peek belongs to the active pane, in the window that shows it.
+        if let viewer = viewer(showing: source.id), viewer.selectedTabID != source.id {
+            setSelection(source.id, for: viewer)
         }
         let page = BrowserTab(configuration: source.configuration, openerID: source.id)
         page.delegate = coordinator

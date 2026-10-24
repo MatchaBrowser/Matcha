@@ -12,6 +12,8 @@ struct PeekOverlay: View {
     static let initialScale = 0.5
 
     let tabManager: TabManager
+    /// This window's selection: the peek shows in the window that shows its source tab.
+    let viewer: TabViewer
     /// Pages of the displayed panes, in the layer's coordinate space; the peek is placed in their union.
     let pages: [CGRect]
     /// Corners of each page: those of the card, square at the top under an address bar.
@@ -24,7 +26,7 @@ struct PeekOverlay: View {
         let area = pages.dropFirst().reduce(pages.first ?? .zero) { $0.union($1) }
         let layout = PeekLayout(container: area.size)
         ZStack(alignment: .topLeading) {
-            if let peek = tabManager.peek, let webView = peek.tab.webView {
+            if let peek, let webView = peek.tab.webView {
                 scrim(in: area)
                 panel(webView, of: peek, layout: layout, area: area.size)
                 PeekToolbar(page: peek.tab, tabManager: tabManager)
@@ -38,14 +40,19 @@ struct PeekOverlay: View {
         .accessibilityElement(children: .contain)
         .accessibilityLabel(Text("Peek", comment: "Accessibility label of the floating preview opened by Shift-clicking a link"))
         .accessibilityIdentifier("peek")
-        .accessibilityHidden(tabManager.peek == nil)
+        .accessibilityHidden(peek == nil)
         // Animated opening; closing and turning into a tab without animation.
-        .animation(openingAnimation, value: tabManager.peek?.id)
+        .animation(openingAnimation, value: peek?.id)
         .position(x: area.midX, y: area.midY)
     }
 
+    /// The Space's peek, if this window shows it.
+    private var peek: Peek? {
+        tabManager.peek(in: viewer)
+    }
+
     private var openingAnimation: Animation? {
-        guard tabManager.peek != nil else {
+        guard peek != nil else {
             return nil
         }
         return reduceMotion ? Self.reducedOpening : Self.opening

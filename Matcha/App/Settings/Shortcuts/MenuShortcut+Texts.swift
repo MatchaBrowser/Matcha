@@ -6,6 +6,7 @@ extension MenuShortcut {
     var title: String {
         switch self {
         case .newTab: String(localized: "New Tab")
+        case .newWindow: String(localized: "New Window")
         case .newPrivateWindow: String(localized: "New Private Window")
         case .newMiniWindow: String(localized: "New Mini Window")
         case .openLocation: String(localized: "Open Location…")

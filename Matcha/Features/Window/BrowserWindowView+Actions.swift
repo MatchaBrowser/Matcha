@@ -14,7 +14,18 @@ extension BrowserWindowView {
     }
 
     var commandBarExecutor: CommandBarExecutor {
-        CommandBarExecutor(model: commandBar, window: window, openSettings: { openSettings() })
+        CommandBarExecutor(
+            model: commandBar,
+            window: window,
+            openSettings: { openSettings() },
+            revealInSpace: miniWindows.map { manager in
+                { tab, space in
+                    manager.actInMainWindow(on: space)
+                    space.tabManager.select(tab)
+                    manager.reveal(tab, in: space) { openWindow(id: MatchaApp.browserWindowID) }
+                }
+            },
+        )
     }
 
     var windowActions: WindowActions {
@@ -28,8 +39,9 @@ extension BrowserWindowView {
             toggleDownloads: toggleDownloads,
             isDownloadsPanelShown: isDownloadsPanelShown,
             // `hasURL` and not `url`: the window is not recomputed on each address change.
-            copyURL: tabManager.frontTab?.hasURL == true ? { model.copySelectedTabURL() } : nil,
+            copyURL: model.frontTab?.hasURL == true ? { model.copySelectedTabURL() } : nil,
             goHome: homeURL.map { url in { goHome(to: url) } },
+            spaceID: session.isPrivate ? nil : model.space.id,
             spaceNames: session.spaces.map(\.record.name),
             currentSpaceIndex: model.spaceIndex,
             selectSpace: { index in withMotion(.easeInOut(duration: 0.3)) { model.selectSpace(at: index) } },
@@ -44,21 +56,22 @@ extension BrowserWindowView {
     /// tab already displayed).
     func showTab(_ tab: BrowserTab) {
         commandBar.dismiss()
-        tabManager.closePeek()
+        model.closePeek()
+        model.activate()
         TabActivation.activate(tab, in: tabManager)
     }
 
     /// ⌘T and “New Tab”: the command bar, or a tab on the home page.
     func openCommandBarForNewTab() {
         // A single floating layer: the command bar closes the peek.
-        tabManager.closePeek()
+        model.closePeek()
         commandBar.newTab(commandBarSettings)
     }
 
     /// ⌘L and the address pill: the command bar on the address of the displayed tab.
     func editAddress() {
         // A single floating layer: the command bar closes the peek.
-        tabManager.closePeek()
+        model.closePeek()
         commandBar.editCurrentTab(commandBarSettings)
     }
 
@@ -92,11 +105,29 @@ extension BrowserWindowView {
 
     /// Loads the home page in the selected tab, or in a new tab if there is none.
     func goHome(to url: URL) {
-        tabManager.closePeek()
-        if let tab = tabManager.selectedTab {
+        model.closePeek()
+        model.activate()
+        if let tab = model.selectedTab {
             tab.load(url)
         } else {
             tabManager.newTab(url: url)
         }
+    }
+
+    // MARK: Opening
+
+    /// Window opened during use: where a dragged tab was dropped, or just below and to the right of the front window
+    /// (⌘N, “Open in New Window”). Once only: a window restored at launch keeps its place.
+    func placeAtRequestedOrigin() {
+        guard let window else {
+            return
+        }
+        if let origin = state.origin {
+            BrowserWindowFrame.place(window, topLeft: origin)
+        } else if state.cascades {
+            BrowserWindowFrame.cascade(window)
+        }
+        state.origin = nil
+        state.cascades = false
     }
 }

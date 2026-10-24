@@ -70,12 +70,20 @@ extension ExtensionTab {
             completionHandler(ExtensionError.notFound)
             return
         }
-        if case let .space(space, model) = owner {
+        switch owner {
+        case let .space(space, model):
             if model.space !== space {
                 model.select(space)
             }
-            space.tabManager.closePeek()
+            model.closePeek()
+            space.tabManager.activate(model.viewer(in: space))
             space.tabManager.select(page)
+        case let .window(model):
+            model.closePeek()
+            model.activate()
+            model.tabManager.select(page)
+        case .peek, .miniWindow, .popupWindow:
+            break
         }
         windows?.update()
         completionHandler(nil)
@@ -91,8 +99,10 @@ extension ExtensionTab {
         switch owner {
         case let .space(space, _):
             space.tabManager.close(page)
-        case let .peek(space, _):
-            PeekActions.close(in: space.tabManager)
+        case let .window(model):
+            model.tabManager.close(page)
+        case let .peek(_, model):
+            PeekActions.close(in: model.tabManager)
         case let .miniWindow(controller, _):
             controller.close()
         case let .popupWindow(controller, _):
@@ -138,13 +148,25 @@ extension ExtensionTab {
         for _: WKWebExtensionContext,
         completionHandler: @escaping @Sendable ((any WKWebExtensionTab)?, (any Error)?) -> Void,
     ) {
-        guard let page, case let .space(space, _) = owner else {
+        let tabManager: TabManager
+        switch owner {
+        case let .space(space, model):
+            tabManager = space.tabManager
+            tabManager.activate(model.viewer(in: space))
+        case let .window(model):
+            tabManager = model.tabManager
+            model.activate()
+        default:
             completionHandler(nil, ExtensionError.unsupported("Only tabs of a browser window can be duplicated."))
             return
         }
-        let copy = space.tabManager.duplicate(page)
+        guard let page else {
+            completionHandler(nil, ExtensionError.notFound)
+            return
+        }
+        let copy = tabManager.duplicate(page)
         if !configuration.shouldBeActive {
-            space.tabManager.select(page)
+            tabManager.select(page)
         }
         windows?.update()
         completionHandler(windows?.adapter(for: copy), nil)

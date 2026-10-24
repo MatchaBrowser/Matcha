@@ -121,9 +121,14 @@ final class NavigationUITests: XCTestCase {
         app.menuItems["Épingler"].click()
         tabRows(in: app).firstMatch.click()
 
-        // The pinned tab stays; the selection moves to the Today tab, which ⌘W closes for good.
+        // The pinned tab unloads and stays; the window shows its empty page: no other tab gets selected, ⌘W does
+        // nothing more.
         app.typeKey("w", modifierFlags: .command)
         XCTAssertTrue(waitForCount(tabRows(in: app), 2))
+        app.typeKey("w", modifierFlags: .command)
+        XCTAssertTrue(waitForCount(tabRows(in: app), 2))
+        // The Today tab, chosen, closes for good; the pinned tab stays.
+        tabRows(in: app).element(boundBy: 1).click()
         app.typeKey("w", modifierFlags: .command)
         XCTAssertTrue(waitForCount(tabRows(in: app), 1))
         app.typeKey("w", modifierFlags: .command)

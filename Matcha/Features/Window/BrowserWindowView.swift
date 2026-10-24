@@ -3,7 +3,8 @@ import SwiftUI
 import WebKit
 
 /// Browser window: Space background, sidebar on the left, page in a card on the right, and the command bar on top.
-/// The sidebar can be hidden (⌃⌘S); it then reappears over the page when hovering the left edge.
+/// The sidebar can be hidden (⌃⌘S); it then reappears over the page when hovering the left edge. There can be several,
+/// each on its Space and its tab (`WindowModel+Viewers`).
 struct BrowserWindowView: View {
     /// Margin around the content card, except on the sidebar's side.
     static let cardMargin = 8.0
@@ -12,6 +13,8 @@ struct BrowserWindowView: View {
     static let revealEdgeWidth = 8.0
 
     let session: BrowserSession
+    /// Space shown and tab to show at opening, restored with the window.
+    @Binding var state: BrowserWindowState
     @State var models: WindowModels
     @State var window: NSWindow?
     @AppStorage("sidebarWidth") private var sidebarWidth = SidebarMetrics.defaultWidth
@@ -24,13 +27,21 @@ struct BrowserWindowView: View {
     @AppStorage(BrowserSettings.Key.showsNavigationButtons) private var showsNavigationButtons = BrowserSettings.showsNavigationButtons
     @AppStorage(BrowserSettings.Key.showsSearchSuggestions) var showsSearchSuggestions = BrowserSettings.showsSearchSuggestions
     @Environment(\.openSettings) var openSettings
+    @Environment(\.openWindow) var openWindow
+    /// Absent from private windows.
+    @Environment(MiniWindowManager.self) var miniWindows: MiniWindowManager?
     /// Hidden sidebar shown over the page because the pointer hovers it.
     @State var isFloatingSidebarHovered = false
 
     /// No side effects: no task and no file read; the models are made once (`WindowModels`).
-    init(session: BrowserSession) {
+    init(session: BrowserSession, state: Binding<BrowserWindowState> = .constant(BrowserWindowState())) {
         self.session = session
-        _models = State(initialValue: WindowModels(session: session))
+        _state = state
+        _models = State(initialValue: WindowModels(
+            session: session,
+            spaceID: state.wrappedValue.spaceID,
+            windowTabsID: state.wrappedValue.windowTabsID,
+        ))
     }
 
     var model: WindowModel {
@@ -46,9 +57,9 @@ struct BrowserWindowView: View {
         model.space
     }
 
-    /// Tabs of the displayed Space.
+    /// Tabs of the window: its own, otherwise those of the displayed Space.
     var tabManager: TabManager {
-        space.tabManager
+        model.tabManager
     }
 
     /// Theme of the Space, or fixed theme of a private window.
@@ -79,6 +90,7 @@ struct BrowserWindowView: View {
             }
             ContentCard(
                 tabManager: tabManager,
+                viewer: model.viewer,
                 addressBarPosition: addressBarPosition,
                 showsNavigationButtons: showsNavigationButtons,
                 goHome: homeButtonAction,
@@ -110,22 +122,44 @@ struct BrowserWindowView: View {
         .background {
             WindowAccessor { window in
                 WindowChrome.configure(window)
+                // A private window has its own frame name (SwiftUI's).
+                if !session.isPrivate {
+                    BrowserWindowFrame.remember(window)
+                }
+                model.track(window)
                 Task { self.window = window }
             }
         }
         // As in Arc, the window buttons disappear with the sidebar.
-        .onChange(of: window) { WindowChrome.setButtonsHidden(!(isSidebarVisible || isFloatingSidebarShown), in: window) }
+        .onChange(of: window) {
+            WindowChrome.setButtonsHidden(!(isSidebarVisible || isFloatingSidebarShown), in: window)
+            placeAtRequestedOrigin()
+        }
         .onChange(of: isSidebarVisible || isFloatingSidebarShown) { _, shown in WindowChrome.setButtonsHidden(!shown, in: window) }
         // The bar targets a tab of the displayed Space: changing Space closes it. The downloads panel, however,
         // belongs to the window: it stays open.
-        .onChange(of: model.currentSpaceID) {
+        .onChange(of: model.currentSpaceID) { _, id in
             commandBar.dismiss()
+            state.spaceID = id
         }
+        .onChange(of: model.hasNoOwnTabsLeft) { _, isEmpty in
+            if isEmpty {
+                window?.performClose(nil)
+            }
+        }
+        // “Move to…”: the window shows a Space from now on.
+        .onChange(of: model.windowTabs == nil) { _, isSpaceWindow in
+            if isSpaceWindow {
+                state.windowTabsID = nil
+            }
+        }
+        // A Space deleted in another window, or by sync.
+        .onChange(of: session.spaces.map(\.id)) { model.spacesDidChange() }
         // Engine or suggestions changed in Settings while the bar stays open.
         .onChange(of: commandBarSettings) { _, settings in commandBar.apply(settings) }
         // The title is read by a view of its own: a new page title no longer recomputes the whole window, nor the menus
         // that follow its actions (audit H4).
-        .background { WindowTitle(session: session, tabManager: tabManager) }
+        .background { WindowTitle(session: session, tabManager: tabManager, viewer: model.viewer) }
         // A private window is always dark, so that it can be recognized.
         .preferredColorScheme(session.isPrivate ? .dark : nil)
         .frame(minWidth: BrowserWindowSize.minimum.width, minHeight: BrowserWindowSize.minimum.height)
@@ -134,23 +168,18 @@ struct BrowserWindowView: View {
         // With no selected tab, the empty page invites ⌘T: the bar never opens by itself.
         .onAppear {
             session.showFavorites(in: space)
+            model.windowDidAppear()
             tabManager.loadSelectedTab()
             // The tabs displayed by this window are never put to sleep (task 5.6).
             session.tabLifecycle.windowDidAppear(model)
         }
         .onDisappear {
             model.copyConfirmation.cancel()
-            // Window closed: the peek does not stay open (sound, process) without it.
-            tabManager.closePeek()
+            // Window closed: the peek does not stay open (sound, process) without it; its tabs return to the others.
+            model.windowDidClose()
             session.tabLifecycle.windowDidDisappear(model)
         }
         .task { await session.removeOrphanDataStores() }
-        // Two windows on two Spaces of the same profile: the active window holds the favorites (and saves them).
-        .onReceive(NotificationCenter.default.publisher(for: NSWindow.didBecomeKeyNotification)) { notification in
-            if let window, notification.object as? NSWindow === window {
-                session.showFavorites(in: space)
-            }
-        }
         // “Clear…” in the site settings (task 5.2): the alert belongs to the window.
         .modifier(SiteDataClearConfirmation(model: model))
         .modifier(ArcImportPresenter(model: model))
@@ -163,6 +192,8 @@ struct BrowserWindowView: View {
         // Edit > Find on the front page (audit H1).
         .findsInPages(model: model, window: window) { [commandBar] in commandBar.dismiss() }
         .environment(model)
+        // The sidebar's rows show this window's selection.
+        .environment(model.viewer)
         .focusedSceneValue(\.tabManager, tabManager)
         .focusedSceneValue(\.windowActions, windowActions)
     }

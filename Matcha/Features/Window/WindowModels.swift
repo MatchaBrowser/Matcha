@@ -6,13 +6,24 @@ import Foundation
 @MainActor
 final class WindowModels {
     private let session: BrowserSession
+    /// Space the window opens on (restored window, new window); nil: the last displayed one.
+    private let spaceID: UUID?
+    /// The window's own tabs (detached tab).
+    private let windowTabsID: UUID?
 
-    init(session: BrowserSession) {
+    init(session: BrowserSession, spaceID: UUID? = nil, windowTabsID: UUID? = nil) {
         self.session = session
+        self.spaceID = spaceID
+        self.windowTabsID = windowTabsID
     }
 
-    /// The displayed Space is remembered from one launch to the next, except with a test store.
-    lazy var window = WindowModel(session: session, defaults: session.isInMemory ? nil : .standard)
+    /// The last displayed Space is remembered from one launch to the next, except with a test store.
+    lazy var window = WindowModel(
+        session: session,
+        defaults: session.isInMemory ? nil : .standard,
+        spaceID: spaceID,
+        windowTabs: session.windowTabs(withID: windowTabsID),
+    )
 
     /// History of the displayed Space's profile, reread on each keystroke; none for a private window.
     lazy var commandBar: CommandBarModel = {

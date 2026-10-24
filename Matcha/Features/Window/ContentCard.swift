@@ -2,9 +2,11 @@ import SwiftUI
 
 /// Content area: the card of the selected tab, or the cards of its split side by side, separated by adjustable
 /// handles. A tab dragged from the sidebar and dropped on the edge of a pane joins the split.
-/// The peek opens over the pages of all panes.
+/// The peek opens over the pages of all panes. A tab shown by another window offers to show it here.
 struct ContentCard: View {
     let tabManager: TabManager
+    /// This window's selection in the Space.
+    let viewer: TabViewer
     let addressBarPosition: AddressBarPosition
     let showsNavigationButtons: Bool
     /// Action of the Home button; nil to hide it.
@@ -23,8 +25,8 @@ struct ContentCard: View {
     @State private var dropController = SplitDropController()
 
     var body: some View {
-        let panes = tabManager.displayedTabs
-        let split = tabManager.displayedSplit
+        let panes = tabManager.displayedTabs(in: viewer)
+        let split = tabManager.displayedSplit(in: viewer)
         GeometryReader { proxy in
             let widths = SplitGeometry.paneWidths(
                 fractions: liveFractions ?? split?.fractions ?? [],
@@ -39,7 +41,7 @@ struct ContentCard: View {
                     pageCard(nil, isMarked: false)
                 } else {
                     ForEach(Array(panes.enumerated()), id: \.element.id) { index, tab in
-                        pageCard(tab, isMarked: panes.count > 1 && tab.id == tabManager.selectedTabID)
+                        pageCard(tab, isMarked: panes.count > 1 && tab.id == viewer.selectedTabID)
                             .frame(width: widths[index])
                         if index < panes.count - 1, let split {
                             divider(after: index, in: split, widths: widths)
@@ -62,7 +64,7 @@ struct ContentCard: View {
             // The peek (Shift-click) covers the pages of all panes, not their address bar (task 4.4).
             .overlayPreferenceValue(PeekPageAreas.self) { anchors in
                 GeometryReader { overlay in
-                    PeekOverlay(tabManager: tabManager, pages: anchors.map { overlay[$0] }, pageCorners: pageCorners)
+                    PeekOverlay(tabManager: tabManager, viewer: viewer, pages: anchors.map { overlay[$0] }, pageCorners: pageCorners)
                 }
             }
         }
@@ -73,17 +75,34 @@ struct ContentCard: View {
         // ⌘W, menus, split formed or undone, other Space: the selected page takes the keyboard back if nobody has
         // it.
         .onChange(of: panes.map(\.id)) {
-            if let tab = tabManager.selectedTab {
+            // Never a page shown by another window: it would take that window's keyboard.
+            if let tab = tabManager.selectedTab(in: viewer), tabManager.shows(tab.id, in: viewer) {
                 TabActivation.focusPage(of: tab)
             }
         }
+    }
+
+    /// The page of `tab` is shown by another window: this one offers to show it.
+    private func isShownElsewhere(_ tab: BrowserTab?) -> Bool {
+        guard let tab else {
+            return false
+        }
+        return !tabManager.shows(tab.id, in: viewer)
     }
 
     private func pageCard(_ tab: BrowserTab?, isMarked: Bool) -> PageCard {
         PageCard(
             tab: tab,
             isMarked: isMarked,
-            isActive: tab == nil || tab?.id == tabManager.selectedTabID,
+            isActive: tab == nil || tab?.id == viewer.selectedTabID,
+            isShownElsewhere: isShownElsewhere(tab),
+            showHere: {
+                tabManager.activate(viewer)
+                tabManager.showHere(viewer)
+                if let tab = tabManager.selectedTab(in: viewer) {
+                    TabActivation.focusPage(of: tab)
+                }
+            },
             addressBarPosition: addressBarPosition,
             showsNavigationButtons: showsNavigationButtons,
             goHome: goHome,
@@ -125,6 +144,7 @@ struct ContentCard: View {
         dropController.canTakeTab = canTakeTab
         dropController.onTargetChange = { dropTarget = $0 }
         dropController.onDrop = { id, target in
+            tabManager.activate(viewer)
             guard let tab = tabManager.tab(withID: id), tabManager.openInSplit(tab, at: target.insertionIndex) else {
                 return
             }
@@ -135,10 +155,10 @@ struct ContentCard: View {
     /// A selected tab, outside the favorites, whose split is not full. The dragged tab itself is checked only on drop
     /// (`openInSplit` refuses a tab already displayed or a favorite).
     private var canTakeTab: Bool {
-        guard let selected = tabManager.selectedTab, tabManager.place(of: selected) != .favorite else {
+        guard let selected = tabManager.selectedTab(in: viewer), tabManager.place(of: selected) != .favorite else {
             return false
         }
-        return tabManager.displayedSplit?.isFull != true
+        return tabManager.displayedSplit(in: viewer)?.isFull != true
     }
 
     /// Corners of a page: those of the card, square at the top under the address bar.
@@ -150,7 +170,8 @@ struct ContentCard: View {
 
     /// Makes `tab` the active pane.
     private func activate(_ tab: BrowserTab) {
-        if tabManager.selectedTabID != tab.id {
+        tabManager.activate(viewer)
+        if viewer.selectedTabID != tab.id {
             tabManager.select(tab)
         }
     }

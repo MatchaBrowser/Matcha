@@ -9598,6 +9598,35 @@
         }
       }
     },
+    "Move this window's tabs to a Space" : {
+      "comment" : "Help tag of the “Move to…” menu of a window of its own tabs",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Die Tabs dieses Fensters in einen Space bewegen"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mover las pestañas de esta ventana a un Space"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Déplacer les onglets de cette fenêtre vers un Space"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sposta i pannelli di questa finestra in uno Space"
+          }
+        }
+      }
+    },
     "Move to Space" : {
       "comment" : "Tab context menu: submenu listing the other Spaces",
       "localizations" : {
@@ -9623,6 +9652,35 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Sposta in"
+          }
+        }
+      }
+    },
+    "Move to…" : {
+      "comment" : "Sidebar menu of a window of its own tabs: moves them into a Space",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bewegen nach…"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mover a…"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Déplacer vers…"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sposta in…"
           }
         }
       }
@@ -10055,6 +10113,35 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Apri nuovi pannelli con"
+          }
+        }
+      }
+    },
+    "New Window" : {
+      "comment" : "File menu",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Neues Fenster"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nueva ventana"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nouvelle fenêtre"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nuova finestra"
           }
         }
       }
@@ -10837,6 +10924,35 @@
         }
       }
     },
+    "Open in Another Window" : {
+      "comment" : "Title shown in place of a page displayed by another browser window",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "In einem anderen Fenster geöffnet"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Abierta en otra ventana"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ouvert dans une autre fenêtre"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aperto in un'altra finestra"
+          }
+        }
+      }
+    },
     "Open in New Tab" : {
       "comment" : "History window: context menu item",
       "localizations" : {
@@ -10862,6 +10978,34 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Apri in un nuovo pannello"
+          }
+        }
+      }
+    },
+    "Open in New Window" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "In neuem Fenster öffnen"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Abrir en una ventana nueva"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ouvrir dans une nouvelle fenêtre"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Apri in una nuova finestra"
           }
         }
       }
@@ -11207,6 +11351,35 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Arancione"
+          }
+        }
+      }
+    },
+    "Other Window" : {
+      "comment" : "Command bar: label of a tab open in another window, outside any Space",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Anderes Fenster"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Otra ventana"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Autre fenêtre"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Altra finestra"
           }
         }
       }
@@ -14556,6 +14729,35 @@
         }
       }
     },
+    "Show Here" : {
+      "comment" : "Button that moves the page of a tab shown by another window into this one",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hier anzeigen"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mostrar aquí"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Afficher ici"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mostra qui"
+          }
+        }
+      }
+    },
     "Show Home button" : {
       "localizations" : {
         "de" : {
@@ -17804,6 +18006,34 @@
         }
       }
     },
+    "This tab is shown in another window." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dieser Tab wird in einem anderen Fenster angezeigt."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Esta pestaña se muestra en otra ventana."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cet onglet est affiché dans une autre fenêtre."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Questo pannello è mostrato in un'altra finestra."
+          }
+        }
+      }
+    },
     "This version doesn't ask for any new permission." : {
       "comment" : "Extension update sheet: no permission added",
       "localizations" : {
@@ -17916,6 +18146,35 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Il certificato di questo sito web non è valido — Mostra certificato"
+          }
+        }
+      }
+    },
+    "This Window" : {
+      "comment" : "Sidebar title of a window holding only its own tabs, outside any Space",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dieses Fenster"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Esta ventana"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cette fenêtre"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Questa finestra"
           }
         }
       }

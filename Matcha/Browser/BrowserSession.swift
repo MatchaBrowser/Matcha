@@ -58,6 +58,8 @@ final class BrowserSession {
     @ObservationIgnored private var dataStores: [UUID: WKWebsiteDataStore] = [:]
     /// Space that holds the favorites of each profile (`BrowserSession+Favorites`).
     @ObservationIgnored var favoritesHolders: [UUID: WeakTabManager] = [:]
+    /// Tabs of the windows that show no Space (`BrowserSession+WindowTabs`); observed: tab sleeping follows them.
+    var windowTabs: [WindowTabs] = []
     @ObservationIgnored private var terminationObserver: (any NSObjectProtocol)?
 
     /// Opens the saved Spaces; at first launch, creates the “Personal” profile and the “Home” Space (“Personnel” and
@@ -104,13 +106,18 @@ final class BrowserSession {
         }
         tabLifecycle.session = self
         spaces.forEach(connect)
-        terminationObserver = NotificationCenter.default.addObserver(
-            forName: NSApplication.willTerminateNotification,
-            object: nil,
-            queue: .main,
-        ) { [weak self] _ in
-            MainActor.assumeIsolated { self?.saveAll() }
-        }
+        terminationObserver = observeTermination()
+    }
+
+    /// App quitting: the tabs of the windows without a Space go back to their Space first, then everything is saved.
+    private func observeTermination() -> any NSObjectProtocol {
+        NotificationCenter.default
+            .addObserver(forName: NSApplication.willTerminateNotification, object: nil, queue: .main) { [weak self] _ in
+                MainActor.assumeIsolated {
+                    self?.returnWindowTabs()
+                    self?.saveAll()
+                }
+            }
     }
 
     /// A private window's session goes away with it: its observer too (audit R5).
