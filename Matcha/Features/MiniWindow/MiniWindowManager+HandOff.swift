@@ -21,8 +21,8 @@ extension MiniWindowManager {
         return session.spaces.first { $0.id == id } ?? displayedSpace
     }
 
-    /// The main window reports itself when it appears and when its `NSWindow` changes; a pending hand-off (window
-    /// reopened by “Open in Space”) completes there.
+    /// A browsing window reports itself when it appears, when its `NSWindow` changes and when it comes to the front:
+    /// it becomes the main window. A pending hand-off (window reopened by “Open in Space”) completes there.
     func linkMainWindow(_ link: any MainWindowLink) {
         setMainWindow(link)
         guard let pending = pendingReveal, let windowModel = link.windowModel else {
@@ -35,13 +35,21 @@ extension MiniWindowManager {
         TabActivation.focusPage(of: pending.tab)
     }
 
-    /// The main window disappears: its displayed Space is remembered for the next mini windows.
-    func unlinkMainWindow(_ windowModel: WindowModel) {
-        guard let link = mainWindow, link.windowModel === windowModel else {
-            return
+    /// The tab actions of `space` apply to the main window, even if another window shows that Space: the pages sent
+    /// there are selected in it.
+    func actInMainWindow(on space: SpaceSession) {
+        if let windowModel = mainWindow?.windowModel {
+            space.tabManager.activate(windowModel.viewer(in: space))
         }
-        lastMainSpaceID = windowModel.space.id
-        setMainWindow(nil)
+    }
+
+    /// A browsing window disappears; the main window's displayed Space is remembered for the next mini windows. The
+    /// previous active window, if there is one, becomes the main window.
+    func unlinkMainWindow(_ windowModel: WindowModel) {
+        if mainWindow?.windowModel === windowModel {
+            lastMainSpaceID = windowModel.space.id
+        }
+        removeMainWindow(windowModel)
     }
 
     // MARK: Hand-off
@@ -60,6 +68,7 @@ extension MiniWindowManager {
             // Before any rendering of the main window: the web view never has two parents.
             controller.detachForHandOff()
         }
+        actInMainWindow(on: space)
         guard let tab = MiniWindowHandOff.move(controller.tab, profileID: controller.profileID, to: space) else {
             return
         }
@@ -74,6 +83,9 @@ extension MiniWindowManager {
         if let link = mainWindow, link.isShown, let windowModel = link.windowModel {
             if windowModel.space !== space {
                 withMotion(.easeInOut(duration: 0.3)) { windowModel.select(space) }
+            }
+            if windowModel.viewer.selectedTabID != tab.id {
+                windowModel.showTab(withID: tab.id)
             }
             link.bringToFront()
             TabActivation.focusPage(of: tab)

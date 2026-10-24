@@ -6,10 +6,36 @@ struct TabContextMenu: View {
     let tabManager: TabManager
 
     @Environment(WindowModel.self) private var windowModel: WindowModel?
+    @Environment(\.openWindow) private var openWindow
 
     var body: some View {
         let place = tabManager.place(of: tab)
         let group = tabManager.split(containing: tab)
+        // A window of its own tabs has neither favorites, nor pinned tabs, nor folders.
+        if windowModel?.windowTabs == nil {
+            placeItems(place: place, group: group)
+        }
+        moveItems
+        Divider()
+        SplitMenuItems(tab: tab, tabManager: tabManager)
+        Button("Duplicate Tab") { tabManager.duplicate(tab) }
+        Button("Copy Link") {
+            if let url = tab.url {
+                copyLink(url)
+            }
+        }
+        .disabled(tab.url == nil)
+        Divider()
+        closeItems(place: place, group: group)
+        // The tab's split stays whole.
+        let kept = Set(group?.tabIDs ?? [tab.id])
+        Button("Close Other Tabs") { tabManager.closeOtherTabs(than: tab) }
+            .disabled(!tabManager.todayTabs.contains { !kept.contains($0.id) })
+    }
+
+    /// Favorites, pinned tabs, folders.
+    @ViewBuilder
+    private func placeItems(place: TabPlace?, group: SplitGroup?) -> some View {
         if place == .favorite {
             Button("Remove from Favorites") { tabManager.setPlace(tab, to: .today) }
         } else {
@@ -29,28 +55,26 @@ struct TabContextMenu: View {
         } else {
             Button("Pin Tab") { tabManager.setPlace(tab, to: .pinned) }
         }
-        if let windowModel, windowModel.session.spaces.count > 1 {
-            Menu("Move to Space") {
-                ForEach(windowModel.session.spaces.filter { $0 !== windowModel.space }) { space in
-                    Button(space.record.name) { windowModel.move(tab, to: space) }
+    }
+
+    /// To another Space (from a window of its own tabs: to any Space), or to a window of its own.
+    @ViewBuilder private var moveItems: some View {
+        if let windowModel {
+            let targets = windowModel.session.spaces.filter { $0.tabManager !== windowModel.tabManager }
+            if !targets.isEmpty {
+                Menu("Move to Space") {
+                    ForEach(targets) { space in
+                        Button(space.record.name) { windowModel.move(tab, to: space) }
+                    }
+                }
+            }
+            // A private window's tabs stay in it: its session is its own.
+            if !windowModel.session.isPrivate {
+                Button("Open in New Window") {
+                    openWindow(id: MatchaApp.browserWindowID, value: windowModel.detachToNewWindow(tab))
                 }
             }
         }
-        Divider()
-        SplitMenuItems(tab: tab, tabManager: tabManager)
-        Button("Duplicate Tab") { tabManager.duplicate(tab) }
-        Button("Copy Link") {
-            if let url = tab.url {
-                copyLink(url)
-            }
-        }
-        .disabled(tab.url == nil)
-        Divider()
-        closeItems(place: place, group: group)
-        // The tab's split stays whole.
-        let kept = Set(group?.tabIDs ?? [tab.id])
-        Button("Close Other Tabs") { tabManager.closeOtherTabs(than: tab) }
-            .disabled(!tabManager.todayTabs.contains { !kept.contains($0.id) })
     }
 
     /// Close: a today tab disappears; a pinned tab or a favorite is unloaded, “Delete Tab” removes it from

@@ -129,9 +129,18 @@ extension XCTestCase {
     @MainActor
     func createSpace(in app: XCUIApplication) {
         app.descendants(matching: .any).matching(identifier: "accountButton").firstMatch.click()
-        let item = app.menuItems["Nouveau Space"]
-        XCTAssertTrue(item.waitForExistence(timeout: 3))
-        item.click()
+        clickOpenMenuItem("Nouveau Space", in: app)
+    }
+
+    /// Clicks the item `title` of the open menu (pop-up or context menu). The same title can also be in a closed menu
+    /// of the menu bar (Spaces): the open menu's item is the one that can be clicked.
+    @MainActor
+    func clickOpenMenuItem(_ title: String, in app: XCUIApplication) {
+        let items = app.menuItems.matching(NSPredicate(format: "title == %@", title))
+        XCTAssertTrue(items.firstMatch.waitForExistence(timeout: 3))
+        let item = items.allElementsBoundByIndex.first(where: \.isHittable)
+        XCTAssertNotNil(item, "No open menu item “\(title)”")
+        item?.click()
     }
 
     /// Browser window ready: its “New Tab” button is shown. The command bar never

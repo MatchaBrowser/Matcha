@@ -45,11 +45,12 @@ extension ExtensionWindows {
     func makeSnapshot() -> Snapshot {
         var snapshot = Snapshot()
         var sessions: [BrowserSession] = []
+        let homes = tabHomes()
         for entry in browserWindows {
             guard let model = entry.model else {
                 continue
             }
-            addBrowserWindow(entry, model: model, to: &snapshot)
+            addBrowserWindow(entry, model: model, homes: homes, to: &snapshot)
             sessions.append(model.session)
         }
         if let miniWindows {
@@ -76,40 +77,81 @@ extension ExtensionWindows {
         return snapshot
     }
 
-    /// Browser window: the tabs of each Space, in the order of the Spaces, then of the sidebar. A profile's favorites,
+    /// Window of each tab shown by a browser window, when several show the same session: a tab belongs to one window
+    /// only. The other tabs belong to the session's first window.
+    private func tabHomes() -> [UUID: UUID] {
+        var homes: [UUID: UUID] = [:]
+        for entry in browserWindows {
+            guard let model = entry.model else {
+                continue
+            }
+            let viewer = model.viewer
+            for id in viewer.displayedTabIDs where model.tabManager.shows(id, in: viewer) {
+                homes[id] = entry.id
+            }
+        }
+        return homes
+    }
+
+    /// Browser window: the tabs of each Space, in the order of the Spaces, then of the sidebar; with several windows on
+    /// the same session, those it shows, and all the others for the first of them (`tabHomes`). A profile's favorites,
     /// shared by its Spaces, appear only once, at the start of the first Space of that profile, taken from the Space
     /// that holds them (the last displayed one of that profile: the others only have a copy of them until they are
     /// displayed). The open Peek follows its originating tab.
-    private func addBrowserWindow(_ entry: BrowserWindowEntry, model: WindowModel, to snapshot: inout Snapshot) {
+    private func addBrowserWindow(_ entry: BrowserWindowEntry, model: WindowModel, homes: [UUID: UUID], to snapshot: inout Snapshot) {
+        // A window of its own tabs: only them.
+        if model.windowTabs != nil {
+            addWindowTabs(entry, model: model, to: &snapshot)
+            return
+        }
         let session = model.session
         let displayed = model.space
         entry.favoriteHolders[displayed.record.profile?.id] = displayed.id
+        let firstWindow = browserWindows.first { $0.model?.session === session && $0.model?.windowTabs == nil }
+        func belongs(_ tab: BrowserTab) -> Bool {
+            homes[tab.id].map { $0 == entry.id } ?? (firstWindow === entry)
+        }
         var tabIDs: [UUID] = []
         var profilesSeen = Set<UUID?>()
         for space in session.spaces {
             let profileID = space.record.profile?.id
             if profilesSeen.insert(profileID).inserted {
                 let holder = session.spaces.first { $0.id == entry.favoriteHolders[profileID] } ?? space
-                for tab in holder.tabManager.favoriteTabs {
+                for tab in holder.tabManager.favoriteTabs where belongs(tab) {
                     snapshot.add(tab, owner: .space(holder, model), isPinned: true, to: &tabIDs)
                 }
             }
             let layout = space.tabManager.layout
             let favorites = Set(layout.favorites)
             for id in layout.orderedTabIDs where !favorites.contains(id) {
-                if let tab = space.tabManager.tab(withID: id) {
+                if let tab = space.tabManager.tab(withID: id), belongs(tab) {
                     snapshot.add(tab, owner: .space(space, model), isPinned: layout.place(of: id) == .pinned, to: &tabIDs)
                 }
             }
         }
-        let manager = displayed.tabManager
-        var selected = Set(manager.displayedTabIDs).intersection(tabIDs)
-        var active = manager.selectedTabID.flatMap { selected.contains($0) ? $0 : nil }
-        // Peek is the page in front: a tab right after its originating tab, active while it is open (otherwise its
-        // content scripts could not talk to their extension: “Tab not found”).
-        if let peek = manager.peek {
+        addSelection(of: model, entry: entry, tabIDs: tabIDs, to: &snapshot)
+    }
+
+    /// Window of its own tabs (a detached tab): its tabs, in the sidebar's order.
+    private func addWindowTabs(_ entry: BrowserWindowEntry, model: WindowModel, to snapshot: inout Snapshot) {
+        var tabIDs: [UUID] = []
+        for tab in model.tabManager.tabs {
+            snapshot.add(tab, owner: .window(model), isPinned: false, to: &tabIDs)
+        }
+        addSelection(of: model, entry: entry, tabIDs: tabIDs, to: &snapshot)
+    }
+
+    /// Adds the window of `model` with its active and selected tabs: the panes it displays. Peek is the page in front:
+    /// a tab right after its originating tab, active while it is open (otherwise its content scripts could not talk to
+    /// their extension: “Tab not found”).
+    private func addSelection(of model: WindowModel, entry: BrowserWindowEntry, tabIDs: [UUID], to snapshot: inout Snapshot) {
+        var tabIDs = tabIDs
+        let viewer = model.viewer
+        var selected = Set(viewer.displayedTabIDs).intersection(tabIDs)
+        var active = viewer.selectedTabID.flatMap { selected.contains($0) ? $0 : nil }
+        if let peek = model.tabManager.peek(in: viewer) {
             var peekIDs: [UUID] = []
-            snapshot.add(peek.tab, owner: .peek(displayed, model), isPinned: false, to: &peekIDs)
+            snapshot.add(peek.tab, owner: .peek(model.space, model), isPinned: false, to: &peekIDs)
             tabIDs.insert(contentsOf: peekIDs, at: tabIDs.firstIndex(of: peek.sourceTabID).map { $0 + 1 } ?? tabIDs.count)
             selected.formUnion(peekIDs)
             active = peekIDs.first ?? active

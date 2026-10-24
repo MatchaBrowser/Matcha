@@ -15,6 +15,7 @@ extension MiniWindowManager {
     /// window comes to the front, reopened if needed by `openMainWindow`.
     func openFromHistory(_ urls: [URL], profileID: UUID?, openMainWindow: () -> Void) {
         let space = defaultTarget(profileID: profileID)
+        actInMainWindow(on: space)
         // Each new tab goes to the top: the first is opened last.
         let tabs = urls.reversed().map { space.tabManager.newTab(url: $0, select: false) }
         guard let first = tabs.last else {

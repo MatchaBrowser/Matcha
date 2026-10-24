@@ -4,8 +4,9 @@ import Observation
 import OSLog
 import SwiftUI
 
-/// State of a window: the displayed Space, the edge from which the chosen Space arrives (animation), the “URL Copied”
-/// confirmation, the downloads list, the site settings panel and the folder customization panel.
+/// State of a window: the displayed Space and the tab selected in each Space (`WindowModel+Viewers`), the edge from
+/// which the chosen Space arrives (animation), the “URL Copied” confirmation, the downloads list, the site settings
+/// panel and the folder customization panel.
 @MainActor
 @Observable
 final class WindowModel {
@@ -32,13 +33,31 @@ final class WindowModel {
     var editedSpaceID: UUID?
     /// Import from Arc started from this window (task 7.1).
     let arcImport = ArcImportModel()
-    /// Where to remember the displayed Space from one launch to the next; nil to remember nothing (tests).
+    /// Where to remember the last displayed Space, shown by the next new window; nil to remember nothing (tests).
     @ObservationIgnored private let defaults: UserDefaults?
+    /// This window's viewer of each Space it has shown: its selected tab there.
+    @ObservationIgnored var viewers: [UUID: TabViewer] = [:]
+    /// Between appearing and closing: the viewer of the displayed Space is on screen.
+    @ObservationIgnored var isOpen = false
+    /// Closed: its viewers are released, it no longer takes any.
+    @ObservationIgnored var isClosed = false
+    /// Makes the window's viewers active as soon as it becomes the key window, before the click that made it so.
+    @ObservationIgnored var keyObserver: (any NSObjectProtocol)?
+    /// The window's own tabs, outside any Space (a tab dragged out of the sidebar, `WindowModel+WindowTabs`): the
+    /// sidebar shows only them. The displayed Space is then the one they came from (theme, profile).
+    private(set) var windowTabs: WindowTabs?
 
-    init(session: BrowserSession, defaults: UserDefaults?) {
+    /// `spaceID`: the Space the window shows (restored window, new window); otherwise the last displayed one.
+    /// `windowTabs`: the window's own tabs (detached tab).
+    init(session: BrowserSession, defaults: UserDefaults?, spaceID: UUID? = nil, windowTabs: WindowTabs? = nil) {
         self.session = session
         self.defaults = defaults
-        currentSpaceID = defaults?.string(forKey: Self.currentSpaceKey).flatMap(UUID.init(uuidString:))
+        self.windowTabs = windowTabs
+        currentSpaceID = spaceID ?? defaults?.string(forKey: Self.currentSpaceKey).flatMap(UUID.init(uuidString:))
+    }
+
+    isolated deinit {
+        keyObserver.map(NotificationCenter.default.removeObserver)
     }
 
     /// Displayed Space: the chosen one, otherwise the first.
@@ -60,16 +79,19 @@ final class WindowModel {
         return (space, tab)
     }
 
-    /// Shows `target`, which takes back and now holds the favorites of its profile.
+    /// Shows `target`, which takes back and now holds the favorites of its profile; its tab actions apply to this
+    /// window.
     func select(_ target: SpaceSession) {
         let current = space
-        guard target !== current, let targetIndex = session.spaces.firstIndex(where: { $0 === target }) else {
+        // A window of its own tabs shows no Space (“Move to…” gives them to one).
+        guard windowTabs == nil, target !== current, let targetIndex = session.spaces.firstIndex(where: { $0 === target }) else {
             return
         }
-        // The displayed tabs (the whole split) leave the screen: they remember their navigation state; their peek
-        // closes.
-        current.tabManager.displayedTabs.forEach { $0.captureInteractionState() }
-        current.tabManager.closePeek()
+        // The tabs displayed here (the whole split) leave the screen: they remember their navigation state; the peek
+        // shown here closes.
+        let leaving = viewer(in: current)
+        current.tabManager.displayedTabs(in: leaving).forEach { $0.captureInteractionState() }
+        closePeek()
         // It takes back the favorites of its profile, held until then by another Space.
         session.showFavorites(in: target)
         transitionEdge = targetIndex > spaceIndex ? .trailing : .leading
@@ -77,6 +99,12 @@ final class WindowModel {
         editedSpaceID = nil
         currentSpaceID = target.id
         defaults?.set(target.id.uuidString, forKey: Self.currentSpaceKey)
+        let viewer = viewer(in: target)
+        target.tabManager.activate(viewer)
+        if isOpen {
+            current.tabManager.setOnScreen(leaving, false)
+            target.tabManager.setOnScreen(viewer, true)
+        }
         target.tabManager.loadSelectedTab()
     }
 
@@ -98,20 +126,20 @@ final class WindowModel {
         selectSpace(at: spaceIndex + (direction == .next ? 1 : -1))
     }
 
-    /// Sends the tab of the displayed Space to `target`. Same profile: the tab keeps its page and its history. Other
-    /// profile: it is recreated from its address, with the cookies of that profile.
+    /// Sends a tab of the window (displayed Space, or the window's own tabs) to `target`. Same profile: the tab keeps
+    /// its page and its history. Other profile: it is recreated from its address, with the cookies of that profile.
     func move(_ tab: BrowserTab, to target: SpaceSession) {
-        let source = space
-        guard target !== source else {
+        let source = tabManager
+        guard target.tabManager !== source else {
             return
         }
-        if target.record.profile?.id == source.record.profile?.id {
-            if let detached = source.tabManager.detach(tab) {
+        if target.record.profile?.id == space.record.profile?.id {
+            if let detached = source.detach(tab) {
                 target.tabManager.attach(detached)
             }
         } else {
             let url = tab.url
-            source.tabManager.delete(tab)
+            source.delete(tab)
             target.tabManager.newTab(url: url, select: false)
         }
     }
@@ -130,6 +158,52 @@ final class WindowModel {
             selectSpace(at: index == 0 ? 1 : index - 1)
         }
         session.deleteSpace(target)
+        spacesDidChange()
+    }
+
+    /// Spaces deleted (here, in another window, by sync): their viewers are dropped; if the displayed one is gone, the
+    /// window shows the first Space.
+    func spacesDidChange() {
+        let ids = Set(session.spaces.map(\.id))
+        viewers = viewers.filter { ids.contains($0.key) }
+        guard !isClosed, let currentSpaceID, !ids.contains(currentSpaceID), let first = session.spaces.first else {
+            return
+        }
+        self.currentSpaceID = first.id
+        // The window's own tabs stay; only the theme and profile shown change.
+        guard windowTabs == nil else {
+            return
+        }
+        let viewer = viewer(in: first)
+        first.tabManager.activate(viewer)
+        if isOpen {
+            first.tabManager.setOnScreen(viewer, true)
+        }
+        first.tabManager.loadSelectedTab()
+    }
+
+    /// “Move to…”: the window's own tabs go into `target`, which the window now shows, on the tab it showed.
+    func moveWindowTabs(to target: SpaceSession) {
+        guard let tabs = windowTabs else {
+            return
+        }
+        // Selected in this window, not in another one showing `target`.
+        let viewer = viewer(in: target)
+        target.tabManager.activate(viewer)
+        let selected = tabs.move(to: target)
+        tabs.tabManager.setOnScreen(tabs.tabManager.activeViewer, false)
+        session.removeWindowTabs(tabs)
+        windowTabs = nil
+        currentSpaceID = target.id
+        defaults?.set(target.id.uuidString, forKey: Self.currentSpaceKey)
+        session.showFavorites(in: target)
+        if isOpen {
+            target.tabManager.setOnScreen(viewer, true)
+        }
+        if let selected {
+            target.tabManager.setSelection(selected.id, for: viewer)
+        }
+        target.tabManager.loadSelectedTab()
     }
 
     /// “Customize…” in a folder's menu: opens its panel (closing that of another folder), or closes it if it is
@@ -150,7 +224,7 @@ final class WindowModel {
     /// otherwise the displayed tab). Without an address, nothing is copied or confirmed.
     @discardableResult
     func copySelectedTabURL(to pasteboard: NSPasteboard = .general) -> Bool {
-        guard let url = space.tabManager.frontTab?.url else {
+        guard let url = frontTab?.url else {
             return false
         }
         copyLink(url, to: pasteboard)

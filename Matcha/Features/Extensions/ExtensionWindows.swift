@@ -9,7 +9,8 @@ import WebKit
 /// - a browser window (main or private) is a “normal” window; its tabs are those of **all** its Spaces, Space after
 ///   Space, each in the sidebar's order (favorites, pinned, Today tabs), like tab groups; a profile's favorites appear
 ///   in it only once. The active tab is the active pane of the displayed Space, the selected tabs are the panes of its
-///   split. Switching Spaces therefore changes the active tab, without closing any tab;
+///   split. Switching Spaces therefore changes the active tab, without closing any tab. Several windows on the same
+///   session: each has the tabs it shows, the first one all the others;
 /// - the open Peek is a tab, right after its originating tab, and the active tab: WebKit rejects the messages of the
 ///   content scripts of a page that is not a known tab;
 /// - a mini window or a sign-in window is a single-page “popup” window.

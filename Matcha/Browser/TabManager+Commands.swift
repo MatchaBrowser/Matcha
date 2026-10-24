@@ -3,25 +3,31 @@ import WebKit
 
 /// Bulk actions on tabs: “Clear” for the today tabs, “Duplicate Tab”, “Close Other Tabs”.
 extension TabManager {
-    /// Closes all today tabs (“Clear” button). If the selected tab was one of them, the window shows its empty page:
+    /// Closes all today tabs (“Clear” button). A window whose selected tab was one of them shows its empty page:
     /// no pinned tab or favorite gets selected, it would load a page by itself.
     func clearToday() {
         let cleared = todayTabs
         // ⇧⌘T brings them all back (audit H2).
         rememberClosed(cleared)
-        let selectionCleared = cleared.contains { $0.id == selectedTabID }
+        let ids = Set(cleared.map(\.id))
+        let emptied = viewers.filter { $0.selectedTabID.map(ids.contains) ?? false }
         cleared.forEach(discard)
-        if selectionCleared {
-            setSelection(nil)
-        }
+        emptied.forEach { setSelection(nil, for: $0) }
     }
 
     /// Opens a copy of the tab right after it, with its history, and selects it.
     @discardableResult
     func duplicate(_ tab: BrowserTab) -> BrowserTab {
+        insertCopy(of: tab, after: tab, select: true)
+    }
+
+    /// A copy of `tab`, a tab of this profile (here or elsewhere), with its history, among the today tabs after
+    /// `anchor` (at the top without one).
+    @discardableResult
+    func insertCopy(of tab: BrowserTab, after anchor: BrowserTab?, select: Bool) -> BrowserTab {
         // Same configuration: same profile. The interaction state carries the back/forward history; that of a
         // sleeping tab (task 5.6) is its kept state.
-        let copy = insertTab(configuration: tab.configuration, after: tab, select: true)
+        let copy = insertTab(configuration: tab.configuration, after: anchor, select: select)
         let suspendedState = tab.suspension.isSuspended ? tab.savedInteractionState : nil
         if let state = tab.webView?.interactionState ?? suspendedState {
             copy.webView?.interactionState = state

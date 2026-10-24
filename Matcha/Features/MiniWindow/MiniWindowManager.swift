@@ -24,8 +24,8 @@ final class MiniWindowManager {
     @ObservationIgnored private(set) var windows: [MiniWindowController] = []
     /// Active mini window, tracked so the menus update; the action reads `keyWindow` again.
     private(set) var keyWindowID: MiniWindowController.ID?
-    /// Main browsing window (never a private window); the “Open in …” button follows it.
-    private(set) var mainWindow: (any MainWindowLink)?
+    /// Browsing windows (never a private window), the last active one first.
+    private(set) var mainWindows: [any MainWindowLink] = []
     /// Space displayed by the main window when it closed (at launch: the remembered one).
     @ObservationIgnored var lastMainSpaceID: UUID?
     /// Page to show as soon as the main window reopens.
@@ -154,9 +154,21 @@ final class MiniWindowManager {
         defaults?.set(NSStringFromSize(size), forKey: MiniWindowPlacement.sizeKey)
     }
 
-    /// Primitive for `+HandOff`: main window reported or gone.
-    func setMainWindow(_ link: (any MainWindowLink)?) {
-        mainWindow = link
+    /// Main browsing window: the last active one; the “Open in …” button follows it.
+    var mainWindow: (any MainWindowLink)? {
+        mainWindows.first
+    }
+
+    /// Primitive for `+HandOff`: a browsing window reported itself (appearing, coming to the front): it becomes the
+    /// main window.
+    func setMainWindow(_ link: any MainWindowLink) {
+        let model = link.windowModel
+        mainWindows = [link] + mainWindows.filter { $0.windowModel != nil && $0.windowModel !== model }
+    }
+
+    /// Primitive for `+HandOff`: a browsing window is gone.
+    func removeMainWindow(_ windowModel: WindowModel) {
+        mainWindows.removeAll { $0.windowModel == nil || $0.windowModel === windowModel }
     }
 
     /// Deleted profile: its mini windows close before its data is deleted.

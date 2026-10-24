@@ -7,7 +7,7 @@ extension TabManager {
     /// arrived tab is neither loaded nor selected. A displayed page does not change before the user's eyes: a
     /// displayed tab closed elsewhere stays there, in its place, until the user closes it.
     func reconcile(tabs stored: [StoredTab], layout newLayout: SidebarLayout) {
-        let displayed = Set(displayedTabIDs)
+        let displayed = Set(viewers.flatMap(\.displayedTabIDs))
         var target = newLayout
         for id in displayed where target.place(of: id) == nil {
             switch layout.place(of: id) {
@@ -29,9 +29,7 @@ extension TabManager {
             discard(tab)
         }
         updateLayout { $0 = target }
-        if let selectedTabID, tab(withID: selectedTabID) == nil {
-            setSelection(nil)
-        }
+        dropMissingSelections()
     }
 
     private func update(_ tab: BrowserTab, from entry: StoredTab, isDisplayed: Bool) {

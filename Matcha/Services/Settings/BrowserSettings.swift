@@ -54,9 +54,13 @@ nonisolated enum BrowserSettings {
         AddressResolver(searchEngine: searchEngine).resolve(text)
     }
 
-    /// Value of the alert before quitting in `defaults`, or its default value.
+    /// Value of the alert before quitting in `defaults`, or its default value. `bool(forKey:)` also reads the “YES” and
+    /// “NO” of launch arguments (`as? Bool` ignores them).
     static func confirmsBeforeQuitting(in defaults: UserDefaults = .standard) -> Bool {
-        defaults.object(forKey: Key.confirmBeforeQuitting) as? Bool ?? confirmBeforeQuitting
+        guard defaults.object(forKey: Key.confirmBeforeQuitting) != nil else {
+            return confirmBeforeQuitting
+        }
+        return defaults.bool(forKey: Key.confirmBeforeQuitting)
     }
 
     /// Value of the peek setting in `defaults`, or its default value. `bool(forKey:)` also reads the

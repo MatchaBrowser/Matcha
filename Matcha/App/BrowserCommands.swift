@@ -28,9 +28,9 @@ struct BrowserCommands: Commands {
         miniWindow?.tab ?? tabManager?.frontTab
     }
 
-    /// Peek open (and no command bar): ⌘W closes it.
+    /// Peek open in the active window (and no command bar): ⌘W closes it.
     private var isPeekOpen: Bool {
-        tabManager?.peek != nil && windowActions?.isCommandBarPresented != true
+        tabManager.map { $0.peek(in: $0.activeViewer) != nil } == true && windowActions?.isCommandBarPresented != true
     }
 
     private var closeTitle: Text {
@@ -66,6 +66,12 @@ struct BrowserCommands: Commands {
             }
             .keyboardShortcut(shortcuts.keyboardShortcut(for: .newTab))
             .disabled(windowActions == nil && miniWindow == nil)
+
+            // On the Space of the active window, without a tab.
+            Button("New Window") {
+                openWindow(id: MatchaApp.browserWindowID, value: BrowserWindowState(spaceID: windowActions?.spaceID, cascades: true))
+            }
+            .keyboardShortcut(shortcuts.keyboardShortcut(for: .newWindow))
 
             Button("New Private Window") {
                 openWindow(id: MatchaApp.privateWindowID)
@@ -220,8 +226,8 @@ struct BrowserCommands: Commands {
         } else if let windowActions, windowActions.isCommandBarPresented {
             // Command bar open: ⌘W closes only the bar, never the tab by reflex.
             windowActions.closeCommandBar()
-        } else if let tabManager, tabManager.peek != nil {
-            // Peek open: ⌘W closes only the peek.
+        } else if let tabManager, tabManager.peek(in: tabManager.activeViewer) != nil {
+            // Peek open in this window: ⌘W closes only the peek.
             PeekActions.close(in: tabManager)
         } else if let tabManager {
             if let tab = tabManager.selectedTab {

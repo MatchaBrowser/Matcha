@@ -1,26 +1,14 @@
 import SwiftUI
 
-/// Separator with “Clear”, “New Tab” button, then the today tabs.
-struct TodaySection: View {
+/// Header (separator with “Clear”, or “This Window” in a window of its own tabs), “New Tab” button, then the today
+/// tabs.
+struct TodaySection<Header: View>: View {
     let tabManager: TabManager
     let newTab: () -> Void
+    @ViewBuilder let header: () -> Header
 
     var body: some View {
-        HStack(spacing: 8) {
-            Rectangle()
-                .fill(.separatorLine)
-                .frame(height: 1)
-            if !tabManager.todayTabs.isEmpty {
-                Button(action: tabManager.clearToday) {
-                    Text("Clear", comment: "Sidebar button that closes all Today tabs.")
-                }
-                .buttonStyle(.borderless)
-                .font(.caption.weight(.medium))
-                .foregroundStyle(.secondary)
-                .help("Close all Today tabs")
-            }
-        }
-        .frame(height: 24)
+        header()
         NewTabRow(action: newTab)
         // A split fits on one row, in place of its first tab.
         ForEach(tabManager.layout.todayRows) { row in
@@ -38,6 +26,35 @@ struct TodaySection: View {
         // Large area below the today tabs, to drop them at the end of the list.
         SidebarDropZone(tabManager: tabManager, destination: .today(index: tabManager.layout.today.count), restingHeight: 60)
             .accessibilityIdentifier("todayDropZone")
+    }
+}
+
+extension TodaySection where Header == TodayHeader {
+    init(tabManager: TabManager, newTab: @escaping () -> Void) {
+        self.init(tabManager: tabManager, newTab: newTab) { TodayHeader(tabManager: tabManager) }
+    }
+}
+
+/// Separator with “Clear”, above the today tabs of a Space.
+struct TodayHeader: View {
+    let tabManager: TabManager
+
+    var body: some View {
+        HStack(spacing: 8) {
+            Rectangle()
+                .fill(.separatorLine)
+                .frame(height: 1)
+            if !tabManager.todayTabs.isEmpty {
+                Button(action: tabManager.clearToday) {
+                    Text("Clear", comment: "Sidebar button that closes all Today tabs.")
+                }
+                .buttonStyle(.borderless)
+                .font(.caption.weight(.medium))
+                .foregroundStyle(.secondary)
+                .help("Close all Today tabs")
+            }
+        }
+        .frame(height: 24)
     }
 }
 

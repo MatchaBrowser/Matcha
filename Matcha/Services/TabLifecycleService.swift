@@ -6,8 +6,9 @@ import WebKit
 /// Memory of a session's tabs (task 5.6): a tab hidden for longer than the configured delay is put to sleep (snapshot,
 /// navigation state remembered, web view released); it stays in the sidebar and is recreated when it is displayed. One
 /// check per minute, and at each system memory warning: the oldest half of the hidden tabs (simple warning), or all of
-/// them (critical warning), without snapshots. Rules: `TabSuspensionPolicy`. Only sees the sidebar tabs of the Spaces:
-/// never Peek, nor the pages of mini windows or those of sign-in windows.
+/// them (critical warning), without snapshots. Rules: `TabSuspensionPolicy`. Only sees the sidebar tabs of the Spaces and
+/// those of the windows of their own tabs (`WindowTabs`): never Peek, nor the pages of mini windows or those of sign-in
+/// windows.
 @MainActor
 @Observable
 final class TabLifecycleService {
@@ -172,21 +173,17 @@ final class TabLifecycleService {
     private func visibleTabIDs() -> Set<UUID> {
         var ids = Set<UUID>()
         for reference in displays {
-            guard let manager = reference.display?.displayedTabManager else {
-                continue
-            }
-            ids.formUnion(manager.displayedTabIDs)
-            if let source = manager.peek?.sourceTabID {
-                ids.insert(source)
-            }
+            ids.formUnion(reference.display?.visibleTabIDs ?? [])
         }
         return ids
     }
 
-    /// Sidebar tabs of all the Spaces of the session; a favorite shared by several Spaces appears only once.
+    /// Sidebar tabs of all the Spaces of the session, then those of the windows of their own tabs; a favorite shared by
+    /// several Spaces appears only once.
     private func openTabs() -> [BrowserTab] {
         var seen = Set<ObjectIdentifier>()
-        return (session?.spaces ?? []).flatMap(\.tabManager.tabs).filter { seen.insert(ObjectIdentifier($0)).inserted }
+        let managers = (session?.spaces.map(\.tabManager) ?? []) + (session?.windowTabs.map(\.tabManager) ?? [])
+        return managers.flatMap(\.tabs).filter { seen.insert(ObjectIdentifier($0)).inserted }
     }
 
     // MARK: Rules

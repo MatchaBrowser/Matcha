@@ -1,3 +1,5 @@
+import Foundation
+
 /// Actions that the active window offers to menu commands.
 struct WindowActions {
     /// Opens the command bar (new tab), or a tab on the homepage if the settings ask for it.
@@ -20,6 +22,8 @@ struct WindowActions {
     let copyURL: (() -> Void)?
     /// Loads the homepage; nil without a homepage set.
     let goHome: (() -> Void)?
+    /// Displayed Space, which a new window shows; nil in a private window (its Spaces are its own).
+    let spaceID: UUID?
     /// Names of the Spaces, in sidebar order.
     let spaceNames: [String]
     let currentSpaceIndex: Int

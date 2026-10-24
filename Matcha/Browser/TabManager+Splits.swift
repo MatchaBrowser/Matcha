@@ -3,18 +3,19 @@ import OSLog
 
 /// Split view: tabs shown side by side. The active pane is the selected tab.
 extension TabManager {
+    /// Displayed by the active viewer (`TabManager+Selection`).
     var displayedTabIDs: [BrowserTab.ID] {
-        layout.displayedTabIDs(selected: selectedTabID)
+        activeViewer.displayedTabIDs
     }
 
     /// Tabs shown in the card, from left to right: the selected tab's split, otherwise the tab alone.
     var displayedTabs: [BrowserTab] {
-        displayedTabIDs.compactMap(tab(withID:))
+        displayedTabs(in: activeViewer)
     }
 
     /// Displayed split: the selected tab's.
     var displayedSplit: SplitGroup? {
-        selectedTabID.flatMap(layout.split(containing:))
+        displayedSplit(in: activeViewer)
     }
 
     func split(containing tab: BrowserTab) -> SplitGroup? {
@@ -108,15 +109,16 @@ extension TabManager {
         layout.split(withID: groupID)?.tabIDs.contains { tab(withID: $0)?.appearsLoaded == true } ?? false
     }
 
-    /// Applies `change`; if `tab`, the active pane, has left its split, its neighbor becomes active: the rest of
-    /// the split stays displayed.
+    /// Applies `change`; if `tab`, the active pane of a window, has left its split, its neighbor becomes active
+    /// there: the rest of the split stays displayed.
     func keepingPanesOnScreen(leaving tab: BrowserTab, during change: () -> Void) {
-        let neighbor = selectedTabID == tab.id ? layout.split(containing: tab.id)?.neighbor(of: tab.id) : nil
+        let neighbor = layout.split(containing: tab.id)?.neighbor(of: tab.id)
+        let selecting = viewers.filter { $0.selectedTabID == tab.id }
         change()
         guard let neighbor, layout.place(of: neighbor) != nil, layout.split(containing: neighbor)?.contains(tab.id) != true else {
             return
         }
-        setSelection(neighbor)
+        selecting.forEach { setSelection(neighbor, for: $0) }
     }
 
     /// Applies `change`, then updates the original address of the tabs of `ids` that changed place.

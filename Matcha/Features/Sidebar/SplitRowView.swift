@@ -14,6 +14,12 @@ struct SplitRowView: View {
     @State private var isHovered = false
     @State private var isDropTargeted = false
     @State private var rowWidth = 0.0
+    /// This window's selection; absent outside a browser window.
+    @Environment(TabViewer.self) private var viewer: TabViewer?
+
+    private var selectedTabID: BrowserTab.ID? {
+        (viewer ?? tabManager.activeViewer).selectedTabID
+    }
 
     private var tabs: [BrowserTab] {
         group.tabIDs.compactMap(tabManager.tab(withID:))
@@ -21,7 +27,7 @@ struct SplitRowView: View {
 
     /// The split is displayed: the selected tab is part of it.
     private var isDisplayed: Bool {
-        tabManager.selectedTabID.map(group.contains) ?? false
+        selectedTabID.map(group.contains) ?? false
     }
 
     /// ×, on hover: a today split, or a pinned split with a loaded tab.
@@ -46,7 +52,7 @@ struct SplitRowView: View {
                 SplitSegmentView(
                     tab: tab,
                     tabManager: tabManager,
-                    isActive: isDisplayed && tabManager.selectedTabID == tab.id,
+                    isActive: isDisplayed && selectedTabID == tab.id,
                     showsTitle: showsTitles,
                     isLast: index == tabs.count - 1,
                 )

@@ -3,6 +3,7 @@
 /// Pure type.
 nonisolated enum MenuShortcut: String, CaseIterable, Sendable {
     case newTab
+    case newWindow
     case newPrivateWindow
     case newMiniWindow
     case openLocation
@@ -40,7 +41,7 @@ nonisolated enum MenuShortcut: String, CaseIterable, Sendable {
 
     var menu: Menu {
         switch self {
-        case .newTab, .newPrivateWindow, .newMiniWindow, .openLocation, .openFile, .openInSpace: .file
+        case .newTab, .newWindow, .newPrivateWindow, .newMiniWindow, .openLocation, .openFile, .openInSpace: .file
         case .closeTab, .closeWindow, .saveAs, .exportPDF, .print: .file
         case .copyURL:
             .edit
@@ -57,6 +58,7 @@ nonisolated enum MenuShortcut: String, CaseIterable, Sendable {
     var defaultKey: ShortcutKey? {
         switch self {
         case .newTab: ShortcutKey("t")
+        case .newWindow: ShortcutKey("n")
         case .newPrivateWindow: ShortcutKey("n", [.command, .shift])
         case .newMiniWindow: ShortcutKey("n", [.command, .option])
         case .openLocation: ShortcutKey("l")

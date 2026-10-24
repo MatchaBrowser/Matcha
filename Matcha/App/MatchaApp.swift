@@ -67,11 +67,14 @@ struct MatchaApp: App {
     }
 
     var body: some Scene {
-        // A single main window until sharing Spaces between windows is defined.
-        Window(Text(verbatim: "Matcha"), id: Self.browserWindowID) {
-            BrowserWindowView(session: session)
+        // Browsing windows (⌘N, a detached tab), each on its Space and its tab, the sidebar being the same; restored
+        // at launch with their Space.
+        WindowGroup(Text(verbatim: "Matcha"), id: Self.browserWindowID, for: BrowserWindowState.self) { $state in
+            BrowserWindowView(session: session, state: $state)
                 .environment(miniWindows)
                 .appServices(environment)
+        } defaultValue: {
+            BrowserWindowState()
         }
         .windowStyle(.hiddenTitleBar)
         // First opening: most of the screen, up to a comfortable size (audit H5); then the size the user chose.

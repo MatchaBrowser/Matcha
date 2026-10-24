@@ -10,6 +10,10 @@ struct PageCard: View {
     let isMarked: Bool
     /// Selected tab (only pane, or active pane of a split): it carries the site settings panel.
     var isActive = true
+    /// The tab's page is shown by another window: “Open in Another Window” and “Show Here” instead.
+    var isShownElsewhere = false
+    /// Takes the page from the window that shows it.
+    var showHere: () -> Void = {}
     let addressBarPosition: AddressBarPosition
     let showsNavigationButtons: Bool
     /// Action of the Home button; nil to hide it.
@@ -50,7 +54,7 @@ struct PageCard: View {
                 .simultaneousGesture(TapGesture().onEnded { activate() })
                 Divider()
                 if showsSiteSettings, let windowModel {
-                    SiteSettingsPanel(model: windowModel, tabManager: windowModel.space.tabManager, maximumContentWidth: 320)
+                    SiteSettingsPanel(model: windowModel, tabManager: windowModel.tabManager, maximumContentWidth: 320)
                         .padding(.horizontal, 12)
                         .transition(.move(edge: .top).combined(with: .opacity))
                     Divider()
@@ -103,7 +107,9 @@ struct PageCard: View {
 
     /// Page of the tab, or the welcome view.
     @ViewBuilder private var page: some View {
-        if let tab, tab.url != nil, let webView = tab.webView {
+        if isShownElsewhere {
+            ShownElsewhereView(showHere: showHere)
+        } else if let tab, tab.url != nil, let webView = tab.webView {
             WebView(webView: webView, sidebarDropTarget: sidebarDropTarget)
                 .id(ObjectIdentifier(webView))
                 // Tab woken from sleep (task 5.6): its snapshot, while the page reloads. It is there from the first

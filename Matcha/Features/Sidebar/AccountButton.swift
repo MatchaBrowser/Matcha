@@ -32,6 +32,8 @@ struct AccountButton: View {
                 .overlay(Circle().strokeBorder(ringColor, lineWidth: 1.5))
                 .frame(width: SidebarIconButtonStyle.size, height: SidebarIconButtonStyle.size)
                 .contentShape(Rectangle())
+                // The avatar is hidden from accessibility: without an element of its own, the menu would have none.
+                .accessibilityElement(children: .ignore)
         }
         .menuStyle(.button)
         .buttonStyle(.plain)

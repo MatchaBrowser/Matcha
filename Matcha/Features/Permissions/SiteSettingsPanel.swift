@@ -14,7 +14,7 @@ struct SiteSettingsPanel: View {
     var maximumContentWidth = Double.infinity
 
     private var tab: BrowserTab? {
-        tabManager.selectedTab
+        tabManager.selectedTab(in: model.viewer)
     }
 
     var body: some View {

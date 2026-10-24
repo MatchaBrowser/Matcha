@@ -5,10 +5,12 @@ import SwiftUI
 struct WindowTitle: View {
     let session: BrowserSession
     let tabManager: TabManager
+    let viewer: TabViewer
 
     var body: some View {
         Color.clear
-            .navigationTitle(session.isPrivate ? String(localized: "Private Browsing") : tabManager.selectedTab?.displayTitle ?? "Matcha")
+            .navigationTitle(session.isPrivate ? String(localized: "Private Browsing") : tabManager.selectedTab(in: viewer)?
+                .displayTitle ?? "Matcha")
             .accessibilityHidden(true)
     }
 }

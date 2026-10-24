@@ -43,42 +43,14 @@ struct SidebarDropZone: View {
 }
 
 extension View {
-    /// Accepts a dragged tab, split or folder and puts it at the destination computed from
-    /// where it was dropped in the view. A folder is accepted only among the pinned items, a split outside favorites.
+    /// Accepts a dragged tab, split or folder and puts it at the destination computed from where it was dropped in the
+    /// view (`SidebarDropModifier`).
     func sidebarDropDestination(
         tabManager: TabManager,
         isTargeted: Binding<Bool>,
         destination: @escaping (CGPoint) -> SidebarDestination,
     ) -> some View {
-        dropDestination(for: SidebarDragItem.self) { items, location in
-            guard let item = items.first else {
-                return false
-            }
-            let target = destination(location)
-            switch item {
-            case let .tab(id):
-                guard let tab = tabManager.tab(withID: id) else {
-                    return false
-                }
-                withMotion(.easeOut(duration: 0.15)) { tabManager.move(tab, to: target) }
-            case let .folder(id):
-                guard case .pinned = target else {
-                    return false
-                }
-                withMotion(.easeOut(duration: 0.15)) { tabManager.moveFolder(id, to: target) }
-            case let .split(id):
-                if case .favorites = target {
-                    return false
-                }
-                guard tabManager.layout.split(withID: id) != nil else {
-                    return false
-                }
-                withMotion(.easeOut(duration: 0.15)) { tabManager.moveSplit(id, to: target) }
-            }
-            return true
-        } isTargeted: { targeted in
-            withMotion(.easeOut(duration: 0.1)) { isTargeted.wrappedValue = targeted }
-        }
+        modifier(SidebarDropModifier(tabManager: tabManager, isTargeted: isTargeted, destination: destination))
     }
 
     /// Accepts a dragged item and puts it at `destination`.
@@ -86,11 +58,12 @@ extension View {
         sidebarDropDestination(tabManager: tabManager, isTargeted: isTargeted) { _ in destination }
     }
 
-    /// Makes the tab draggable, with a compact preview.
+    /// Makes the tab draggable, with a compact preview; dropped outside the app's windows, it opens in a new window.
     func tabDraggable(_ tab: BrowserTab) -> some View {
         draggable(SidebarDragItem.tab(tab.id)) {
             SidebarDragPreview(title: tab.displayTitle) { FaviconView(tab: tab) }
         }
+        .modifier(TabDragOutModifier(tab: tab))
     }
 }
 

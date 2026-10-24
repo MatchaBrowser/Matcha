@@ -60,7 +60,7 @@ final class CommandBarModel {
     /// the bar opens on its address.
     func newTab(_ settings: CommandBarSettings) {
         if let home = settings.newTabHomeURL {
-            let tab = windowModel.space.tabManager.newTab(url: home)
+            let tab = windowModel.tabManager.newTab(url: home)
             present(.currentTab(tab.id), text: home.absoluteString, pristineURL: home, settings: settings)
         } else {
             present(.newTab, text: "", pristineURL: nil, settings: settings)
@@ -69,7 +69,7 @@ final class CommandBarModel {
 
     /// ⌘L and the address pill: editing of the displayed tab, or a new tab if there is none.
     func editCurrentTab(_ settings: CommandBarSettings) {
-        if let tab = windowModel.space.tabManager.selectedTab {
+        if let tab = windowModel.selectedTab {
             present(.currentTab(tab.id), text: tab.url?.absoluteString ?? "", pristineURL: tab.url, settings: settings)
         } else {
             present(.newTab, text: "", pristineURL: nil, settings: settings)

@@ -75,9 +75,7 @@ extension TabManager {
         }
         adopted.forEach(register)
         updateLayout { $0.setFavorites(adopted.map(\.id)) }
-        if let selectedTabID, tab(withID: selectedTabID) == nil {
-            setSelection(nil)
-        }
+        dropMissingSelections()
     }
 
     /// Removes the tab from this Space without closing it, to send it to another Space of the same profile.
