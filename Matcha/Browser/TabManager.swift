@@ -258,8 +258,7 @@ final class TabManager {
         layout.remove(tab.id)
         tabsByID[tab.id] = nil
         displays.forget(tab.id)
-        tab.permissionPrompts.denyAll()
-        tab.stop()
+        tab.discard()
     }
 
     /// After the anchor (after its split if it has one) and the tabs already opened from it; at the top without a
