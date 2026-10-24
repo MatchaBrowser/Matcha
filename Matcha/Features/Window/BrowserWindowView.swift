@@ -23,15 +23,18 @@ struct BrowserWindowView: View {
     @AppStorage(BrowserSettings.Key.newTabPage) var newTabPage = BrowserSettings.newTabPage
     @AppStorage(BrowserSettings.Key.showsHomeButton) var showsHomeButton = BrowserSettings.showsHomeButton
     @AppStorage(BrowserSettings.Key.searchEngine) var searchEngine = BrowserSettings.searchEngine
-    @AppStorage(BrowserSettings.Key.addressBarPosition) private var addressBarPosition = BrowserSettings.addressBarPosition
-    @AppStorage(BrowserSettings.Key.showsNavigationButtons) private var showsNavigationButtons = BrowserSettings.showsNavigationButtons
+    @AppStorage(BrowserSettings.Key.addressBarPosition) var addressBarPosition = BrowserSettings.addressBarPosition
+    @AppStorage(BrowserSettings.Key.showsNavigationButtons) var showsNavigationButtons = BrowserSettings.showsNavigationButtons
     @AppStorage(BrowserSettings.Key.showsSearchSuggestions) var showsSearchSuggestions = BrowserSettings.showsSearchSuggestions
+    @AppStorage(BrowserSettings.Key.hiddenSidebarStyle) private var hiddenSidebarStyle = BrowserSettings.hiddenSidebarStyle
     @Environment(\.openSettings) var openSettings
     @Environment(\.openWindow) var openWindow
     /// Absent from private windows.
     @Environment(MiniWindowManager.self) var miniWindows: MiniWindowManager?
     /// Hidden sidebar shown over the page because the pointer hovers it.
     @State var isFloatingSidebarHovered = false
+    /// Hovering the column of icons: shows the sidebar after a short delay (`BrowserWindowView+Compact`).
+    @State var compactRevealTask: Task<Void, Never>?
 
     /// No side effects: no task and no file read; the models are made once (`WindowModels`).
     init(session: BrowserSession, state: Binding<BrowserWindowState> = .constant(BrowserWindowState())) {
@@ -76,31 +79,45 @@ struct BrowserWindowView: View {
         !isSidebarVisible && isFloatingSidebarHovered
     }
 
+    /// Hidden sidebar reduced to a column of icons (setting), under a bar with the window's buttons.
+    private var showsCompactSidebar: Bool {
+        !isSidebarVisible && hiddenSidebarStyle == .icons
+    }
+
+    /// As in Arc, the window's buttons disappear with the sidebar; the column of icons keeps them, in its bar.
+    private var showsWindowButtons: Bool {
+        isSidebarVisible || isFloatingSidebarShown || showsCompactSidebar
+    }
+
+    /// Margins of the card: none on the side of the sidebar, nor under the bar of the column of icons.
+    private var cardPaddingEdges: Edge.Set {
+        if isSidebarVisible {
+            return [.top, .trailing, .bottom]
+        }
+        return showsCompactSidebar ? [.trailing, .bottom] : .all
+    }
+
     /// Downloads panel visible: open, in the fixed or floating sidebar.
     var isDownloadsPanelShown: Bool {
         model.isDownloadsPresented && (isSidebarVisible || isFloatingSidebarShown)
     }
 
     var body: some View {
-        HStack(spacing: 0) {
-            if isSidebarVisible {
-                sidebar
-                    .frame(width: width)
-                    .transition(.move(edge: .leading))
+        VStack(spacing: 0) {
+            if showsCompactSidebar {
+                compactTopBar
             }
-            ContentCard(
-                tabManager: tabManager,
-                viewer: model.viewer,
-                addressBarPosition: addressBarPosition,
-                showsNavigationButtons: showsNavigationButtons,
-                goHome: homeButtonAction,
-                editAddress: editAddress,
-                // The floating sidebar covers the start of the card: the split drop zone starts after it.
-                dropInset: isFloatingSidebarShown ? max(0, width - Self.cardMargin) : 0,
-            )
-            // At the bottom: the top of the card hosts the address bar (setting) and, higher up, the command bar.
-            .overlay(alignment: .bottom) { CopyConfirmationView(model: model.copyConfirmation) }
-            .padding(isSidebarVisible ? [.top, .trailing, .bottom] : .all, Self.cardMargin)
+            HStack(spacing: 0) {
+                if isSidebarVisible {
+                    sidebar
+                        .frame(width: width)
+                        .transition(.move(edge: .leading))
+                } else if showsCompactSidebar {
+                    compactSidebar
+                        .transition(.move(edge: .leading))
+                }
+                content
+            }
         }
         .overlay(alignment: .leading) { sidebarOverlay }
         .overlay {
@@ -132,10 +149,10 @@ struct BrowserWindowView: View {
         }
         // As in Arc, the window buttons disappear with the sidebar.
         .onChange(of: window) {
-            WindowChrome.setButtonsHidden(!(isSidebarVisible || isFloatingSidebarShown), in: window)
+            WindowChrome.setButtonsHidden(!showsWindowButtons, in: window)
             placeAtRequestedOrigin()
         }
-        .onChange(of: isSidebarVisible || isFloatingSidebarShown) { _, shown in WindowChrome.setButtonsHidden(!shown, in: window) }
+        .onChange(of: showsWindowButtons) { _, shown in WindowChrome.setButtonsHidden(!shown, in: window) }
         // The bar targets a tab of the displayed Space: changing Space closes it. The downloads panel, however,
         // belongs to the window: it stays open.
         .onChange(of: model.currentSpaceID) { _, id in
@@ -198,6 +215,23 @@ struct BrowserWindowView: View {
         .focusedSceneValue(\.windowActions, windowActions)
     }
 
+    /// Card of the pages, with the “URL Copied” confirmation.
+    private var content: some View {
+        ContentCard(
+            tabManager: tabManager,
+            viewer: model.viewer,
+            addressBarPosition: addressBarPosition,
+            showsNavigationButtons: showsNavigationButtons,
+            goHome: homeButtonAction,
+            editAddress: editAddress,
+            // The floating sidebar covers the start of the card: the split drop zone starts after it.
+            dropInset: isFloatingSidebarShown ? max(0, width - Self.cardMargin) : 0,
+        )
+        // At the bottom: the top of the card hosts the address bar (setting) and, higher up, the command bar.
+        .overlay(alignment: .bottom) { CopyConfirmationView(model: model.copyConfirmation) }
+        .padding(cardPaddingEdges, Self.cardMargin)
+    }
+
     /// Sidebar of the displayed Space; changing Space slides it like a page.
     private var sidebar: some View {
         ZStack {
@@ -222,21 +256,24 @@ struct BrowserWindowView: View {
         }
     }
 
-    /// Visible sidebar: width handle. Hidden sidebar: hover strip, and the floating sidebar.
+    /// Visible sidebar: width handle. Hidden sidebar: hover strip (the column of icons, which is on the edge, plays
+    /// that part), and the floating sidebar.
     @ViewBuilder private var sidebarOverlay: some View {
         if isSidebarVisible {
             // Above the sidebar and the card, straddling their boundary.
             SidebarResizeHandle(width: $sidebarWidth)
                 .offset(x: width - SidebarResizeHandle.thickness / 2)
         } else {
-            Color.clear
-                .frame(width: Self.revealEdgeWidth)
-                .contentShape(Rectangle())
-                .onHover { hovering in
-                    if hovering {
-                        withMotion(.easeOut(duration: 0.15)) { isFloatingSidebarHovered = true }
+            if !showsCompactSidebar {
+                Color.clear
+                    .frame(width: Self.revealEdgeWidth)
+                    .contentShape(Rectangle())
+                    .onHover { hovering in
+                        if hovering {
+                            withMotion(.easeOut(duration: 0.15)) { isFloatingSidebarHovered = true }
+                        }
                     }
-                }
+            }
             if isFloatingSidebarShown {
                 FloatingSidebar(theme: theme, width: width) { hovering in
                     withMotion(.easeOut(duration: 0.15)) { isFloatingSidebarHovered = hovering }

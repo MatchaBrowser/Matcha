@@ -24,6 +24,12 @@ struct BrowserSettingsTests {
         #expect(!BrowserSettings.confirmsBeforeQuitting(in: defaults))
     }
 
+    /// Hidden sidebar: gone by default, as in Arc; the stored values never change (settings already saved).
+    @Test func `the hidden sidebar disappears by default`() {
+        #expect(BrowserSettings.hiddenSidebarStyle == .hidden)
+        #expect(HiddenSidebarStyle.allCases.map(\.rawValue) == ["hidden", "icons"])
+    }
+
     @Test func `pinned links stay in their tab by default`() {
         #expect(!BrowserSettings.opensPinnedLinksInPeek)
         #expect(!BrowserSettings.pinnedLinksOpenInPeek(in: emptyDefaults()))
