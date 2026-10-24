@@ -185,6 +185,10 @@ final class TabManager {
     func register(_ tab: BrowserTab) {
         tab.delegate = coordinator
         tabsByID[tab.id] = tab
+        // A tab restored without its page shows the icon of its website kept on disk, without waiting to be opened.
+        if tab.favicon == nil, !tab.isLoaded {
+            faviconService.showCachedIcon(on: tab, host: tab.url?.host())
+        }
     }
 
     /// Forgets a tab without closing it (it keeps existing elsewhere).

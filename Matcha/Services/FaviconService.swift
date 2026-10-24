@@ -1,9 +1,10 @@
 import AppKit
 import OSLog
+import WebKit
 
-/// Website icons: read from the page, downloaded, kept in memory and on disk, per domain. Downloads carry no cookies
-/// and stop at `maximumSize`; files are read and decoded off the main thread, bitmaps only (`FaviconDecoder`,
-/// audit W8).
+/// Website icons: read from inside the page (`FaviconPageReader`, with its network context), otherwise downloaded
+/// without cookies, kept in memory and on disk, per domain. Both stop at `maximumSize`; files are read and decoded
+/// off the main thread, bitmaps only (`FaviconDecoder`, audit W8). A tab not loaded yet shows the icon kept on disk.
 @MainActor
 final class FaviconService {
     /// Maximum size of a downloaded icon.
@@ -103,6 +104,10 @@ final class FaviconService {
                 var candidates: [FaviconCandidate] = []
                 if let webView = tab.webView {
                     candidates = await FaviconCandidate.extract(from: webView)
+                    let urls = FaviconSelector.urlsToTry(candidates: candidates, pageURL: pageURL)
+                    if let favicon = await self.readIcon(urls, in: webView, forHost: host) {
+                        return favicon
+                    }
                 }
                 return await self.fetchIcon(forPage: pageURL, candidates: candidates)
             }
@@ -120,6 +125,18 @@ final class FaviconService {
                 tab.favicon = favicon
             }
         }
+    }
+
+    /// The best icon the page itself can load, cached.
+    private func readIcon(_ urls: [URL], in webView: WKWebView, forHost host: String) async -> Favicon? {
+        guard let data = await FaviconPageReader.read(urls, from: webView, maximumSize: Self.maximumSize),
+              let decoded = await FaviconDecoder.decode(data)
+        else {
+            return nil
+        }
+        let favicon = Favicon(decoded: decoded)
+        store(data, favicon: favicon, forHost: host)
+        return favicon
     }
 
     /// Downloads the best available icon for `pageURL` and caches it.

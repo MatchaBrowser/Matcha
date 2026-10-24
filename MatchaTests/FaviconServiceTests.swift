@@ -30,6 +30,27 @@ struct FaviconServiceTests {
         try? FileManager.default.removeItem(at: directory)
     }
 
+    @Test func `a tab restored without its page shows the icon kept on disk`() async throws {
+        let cached = FaviconService(directory: directory)
+        _ = await cached.fetchIcon(forPage: page, candidates: [FaviconCandidate(url: Self.pngURL, rel: "icon")])
+        defer { try? FileManager.default.removeItem(at: directory) }
+        // A new launch: nothing in memory, the tab is restored without a web view.
+        let manager = TabManager(
+            websiteDataStore: .nonPersistent(),
+            services: SessionServices(favicons: FaviconService(directory: directory)),
+        )
+        let id = UUID()
+        var layout = SidebarLayout()
+        layout.setPlace(id, to: .pinned)
+        manager.restore(tabs: [StoredTab(id: id, url: page, title: "Page", lastActivity: .now)], layout: layout)
+        let tab = try #require(manager.tab(withID: id))
+        #expect(!tab.isLoaded)
+        for _ in 0 ..< 100 where tab.favicon == nil {
+            try await Task.sleep(for: .milliseconds(10))
+        }
+        #expect(tab.favicon != nil)
+    }
+
     @Test func `skips candidates that are not images`() async throws {
         let service = FaviconService(directory: nil)
         let text = try FaviconCandidate(url: #require(URL(string: "data:text/plain,bonjour")), rel: "icon", sizes: "512x512")
