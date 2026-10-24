@@ -199,6 +199,13 @@ final class BrowserTab: Identifiable {
         suspension.didSuspend(snapshot: snapshot, at: date)
     }
 
+    /// The tab goes away for good (closed, deleted, removed by sync): its web view is released right away, as in
+    /// `unload`, without waiting for the tab to be freed. A view still held elsewhere (window, SwiftUI, WebKit) would
+    /// otherwise keep its page running, sound included.
+    func discard() {
+        releaseWebView()
+    }
+
     /// Reads the web view's title and address again (end of the reload of a tab woken from sleep). A view without an
     /// address (failed reload) does not empty the tab.
     func syncWithWebView() {
@@ -261,7 +268,8 @@ final class BrowserTab: Identifiable {
         audio.reset()
         if let webView {
             (webView as? BrowserWebView)?.audio = nil
-            webView.pauseAllMediaPlayback(completionHandler: nil)
+            // Suspended rather than paused: if the view outlives the tab, its page cannot play again either.
+            webView.setAllMediaPlaybackSuspended(true, completionHandler: nil)
             webView.stopLoading()
             webView.navigationDelegate = nil
             webView.uiDelegate = nil

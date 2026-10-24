@@ -26,6 +26,15 @@ struct PageAudioIntegrationTests {
         try await tab.loadedWebView.callAsyncJavaScript(script, arguments: arguments, contentWorld: .page)
     }
 
+    /// True if the page's `son` element moves forward during half a second (it loops: any change counts).
+    private func isAdvancing(_ webView: WKWebView) async throws -> Bool {
+        let script = "return document.getElementById('son').currentTime"
+        let start = try await webView.callAsyncJavaScript(script, contentWorld: .page) as? Double
+        try await Task.sleep(for: .milliseconds(500))
+        let end = try await webView.callAsyncJavaScript(script, contentWorld: .page) as? Double
+        return start != end
+    }
+
     /// Waits until the page's `son` element plays (even muted).
     private func waitUntilPlaying(_ tab: BrowserTab) async throws {
         let clock = ContinuousClock()
@@ -69,6 +78,28 @@ struct PageAudioIntegrationTests {
 
         _ = try await evaluate("document.getElementById('son').volume = 0; return true", in: tab)
         try await waitUntil { !tab.isPlayingAudio }
+    }
+
+    /// Closing a tab stops its page without waiting for its web view to be freed: a view still held elsewhere (here,
+    /// by the window) goes silent, and its page can no longer play.
+    @Test func `a closed tab goes silent even if its web view lives on`() async throws {
+        let tab = try await show(AudioTestPages.playingPage(), title: "musique")
+        try await waitUntilPlaying(tab)
+        let webView = tab.loadedWebView
+        manager.close(tab)
+        #expect(!tab.isLoaded)
+        #expect(!tab.isPlayingAudio)
+        // WebKit suspends the page's media asynchronously, in its process; once paused, the position settles once.
+        let clock = ContinuousClock()
+        let deadline = clock.now + .seconds(10)
+        while try await isAdvancing(webView) {
+            guard clock.now < deadline else {
+                throw WaitTimeoutError(line: #line)
+            }
+        }
+
+        _ = try await webView.callAsyncJavaScript("document.getElementById('son').play(); return true", contentWorld: .page)
+        #expect(try await !isAdvancing(webView))
     }
 
     @Test func `leaving the page puts the icon out at once`() async throws {
