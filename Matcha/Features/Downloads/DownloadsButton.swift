@@ -6,6 +6,8 @@ import SwiftUI
 struct DownloadsButton: View {
     @Bindable var model: WindowModel
     let downloads: DownloadManager
+    /// In place of opening the panel in place (column of icons: the sidebar shows first); nil: opens or closes it.
+    var action: (() -> Void)?
 
     private var scope: DownloadScope {
         model.session.downloadScope
@@ -14,7 +16,11 @@ struct DownloadsButton: View {
     var body: some View {
         let active = downloads.items(in: scope).filter(\.isActive)
         Button {
-            withMotion(.easeOut(duration: 0.2)) { model.isDownloadsPresented.toggle() }
+            if let action {
+                action()
+            } else {
+                withMotion(.easeOut(duration: 0.2)) { model.isDownloadsPresented.toggle() }
+            }
         } label: {
             DownloadsIcon(
                 isDownloading: !active.isEmpty,

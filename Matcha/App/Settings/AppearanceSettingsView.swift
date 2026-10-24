@@ -7,6 +7,7 @@ struct AppearanceSettingsView: View {
     @AppStorage(BrowserSettings.Key.homePage) private var homePage = BrowserSettings.homePage
     @AppStorage(BrowserSettings.Key.addressBarPosition) private var addressBarPosition = BrowserSettings.addressBarPosition
     @AppStorage(BrowserSettings.Key.showsNavigationButtons) private var showsNavigationButtons = BrowserSettings.showsNavigationButtons
+    @AppStorage(BrowserSettings.Key.hiddenSidebarStyle) private var hiddenSidebarStyle = BrowserSettings.hiddenSidebarStyle
 
     var body: some View {
         Form {
@@ -20,6 +21,11 @@ struct AppearanceSettingsView: View {
                 Picker("Address bar", selection: $addressBarPosition) {
                     ForEach(AddressBarPosition.allCases) { position in
                         Text(position.title).tag(position)
+                    }
+                }
+                Picker("When the sidebar is hidden", selection: $hiddenSidebarStyle) {
+                    ForEach(HiddenSidebarStyle.allCases) { style in
+                        Text(style.title).tag(style)
                     }
                 }
                 Toggle("Show Back, Forward, and Reload buttons", isOn: $showsNavigationButtons)

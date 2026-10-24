@@ -11,6 +11,7 @@ nonisolated enum BrowserSettings {
         static let newTabPage = "newTabPage"
         static let showsHomeButton = "showsHomeButton"
         static let addressBarPosition = "addressBarPosition"
+        static let hiddenSidebarStyle = "hiddenSidebarStyle"
         static let showsNavigationButtons = "showsNavigationButtons"
         static let showsSearchSuggestions = "showsSearchSuggestions"
         static let opensPinnedLinksInPeek = "opensPinnedLinksInPeek"
@@ -29,6 +30,8 @@ nonisolated enum BrowserSettings {
     static let newTabPage = NewTabPage.blank
     static let showsHomeButton = false
     static let addressBarPosition = AddressBarPosition.sidebar
+    /// Hidden sidebar: gone, as in Arc; the column of icons is a choice.
+    static let hiddenSidebarStyle = HiddenSidebarStyle.hidden
     static let showsNavigationButtons = true
     /// Search engine suggestions in the command bar (never in a private window).
     static let showsSearchSuggestions = true

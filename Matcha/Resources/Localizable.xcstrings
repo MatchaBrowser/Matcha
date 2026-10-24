@@ -7486,6 +7486,34 @@
         }
       }
     },
+    "Hide It Completely" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vollständig ausblenden"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ocultarla por completo"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "La masquer complètement"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nasconderla completamente"
+          }
+        }
+      }
+    },
     "Hide Sidebar" : {
       "comment" : "View menu",
       "localizations" : {
@@ -15045,6 +15073,34 @@
         }
       }
     },
+    "Show Tab Icons" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tab-Symbole anzeigen"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mostrar los iconos de las pestañas"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Afficher les icônes des onglets"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mostra le icone dei pannelli"
+          }
+        }
+      }
+    },
     "Shown at the bottom of the sidebar, on all your synced Macs." : {
       "comment" : "Settings > Sync: avatar footer",
       "localizations" : {
@@ -19390,6 +19446,34 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Se un'estensione esiste anche per Safari, scegli la versione per Safari."
+          }
+        }
+      }
+    },
+    "When the sidebar is hidden" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wenn die Seitenleiste ausgeblendet ist"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cuando la barra lateral está oculta"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Quand la barre latérale est masquée"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Quando la barra laterale è nascosta"
           }
         }
       }
