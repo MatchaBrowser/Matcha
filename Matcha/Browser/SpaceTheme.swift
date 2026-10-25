@@ -14,7 +14,17 @@ nonisolated struct SpaceTheme: Codable, Hashable, Sendable {
     init(name: String? = nil, colors: [ThemeColor], angle: Double = 135) {
         self.name = name
         self.colors = Self.fitted(colors)
-        self.angle = angle
+        self.angle = Self.normalized(angle)
+    }
+
+    /// Read from a record or from sync: 2 or 3 colors and a finite angle, like any other theme (review ON16).
+    init(from decoder: any Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        try self.init(
+            name: container.decodeIfPresent(String.self, forKey: .name),
+            colors: container.decode([ThemeColor].self, forKey: .colors),
+            angle: container.decode(Double.self, forKey: .angle),
+        )
     }
 
     /// Replaces the colors; there must be 2 or 3 (the last one is repeated or the last ones removed).
@@ -49,6 +59,15 @@ nonisolated struct SpaceTheme: Codable, Hashable, Sendable {
     /// Theme read from `data`, or nil if `data` is empty or unreadable.
     static func decoded(from data: Data?) -> SpaceTheme? {
         data.flatMap { try? JSONDecoder().decode(SpaceTheme.self, from: $0) }
+    }
+
+    /// Angle between 0 and 360; 135 for a value that isn't finite.
+    private static func normalized(_ angle: Double) -> Double {
+        guard angle.isFinite else {
+            return 135
+        }
+        let remainder = angle.truncatingRemainder(dividingBy: 360)
+        return remainder < 0 ? remainder + 360 : remainder
     }
 
     private static func fitted(_ colors: [ThemeColor]) -> [ThemeColor] {

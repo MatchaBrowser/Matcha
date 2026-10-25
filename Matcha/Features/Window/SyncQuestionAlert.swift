@@ -5,11 +5,13 @@ import SwiftUI
 /// keep, send again).
 struct SyncQuestionAlert: ViewModifier {
     @Environment(SyncService.self) private var sync
+    /// False: this window doesn't ask (another one does, review ON23).
+    let isEnabled: Bool
 
     func body(content: Content) -> some View {
         content.alert(
             title,
-            isPresented: Binding { sync.question != nil } set: {
+            isPresented: Binding { isEnabled && sync.question != nil } set: {
                 if !$0 {
                     sync.question?.answerByDefault()
                     sync.question = nil
@@ -57,8 +59,8 @@ struct SyncQuestionAlert: ViewModifier {
 }
 
 extension View {
-    /// Asks the questions of sync in this window.
-    func asksSyncQuestions() -> some View {
-        modifier(SyncQuestionAlert())
+    /// Asks the questions of sync in this window, if `isEnabled`.
+    func asksSyncQuestions(_ isEnabled: Bool = true) -> some View {
+        modifier(SyncQuestionAlert(isEnabled: isEnabled))
     }
 }

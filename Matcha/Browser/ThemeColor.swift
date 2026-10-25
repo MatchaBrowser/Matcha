@@ -12,6 +12,16 @@ nonisolated struct ThemeColor: Codable, Hashable, Sendable {
         self.blue = Self.clamp(blue)
     }
 
+    /// Read from a record or from sync: kept between 0 and 1 like any other (review ON16).
+    init(from decoder: any Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        try self.init(
+            red: container.decode(Double.self, forKey: .red),
+            green: container.decode(Double.self, forKey: .green),
+            blue: container.decode(Double.self, forKey: .blue),
+        )
+    }
+
     /// Mix with `other`: 0 gives this color, 1 gives `other`.
     func mixed(with other: ThemeColor, amount: Double) -> ThemeColor {
         let amount = Self.clamp(amount)
@@ -26,6 +36,6 @@ nonisolated struct ThemeColor: Codable, Hashable, Sendable {
     static let black = ThemeColor(red: 0, green: 0, blue: 0)
 
     private static func clamp(_ value: Double) -> Double {
-        min(max(value, 0), 1)
+        value.isNaN ? 0 : min(max(value, 0), 1)
     }
 }

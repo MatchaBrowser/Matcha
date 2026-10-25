@@ -88,12 +88,21 @@ extension TabManager {
         return tab
     }
 
-    /// Takes in a tab coming from another Space, at the top of the today tabs.
-    func attach(_ tab: BrowserTab) {
+    /// Takes in a tab coming from another Space, at `destination` (the top of the today tabs by default). A pinned
+    /// tab or a favorite that stays one keeps its original address (review ON12); a today tab forgets it.
+    func attach(_ tab: BrowserTab, at destination: SidebarDestination = .today(index: 0)) {
         register(tab)
-        tab.pinnedURL = nil
-        tab.pinnedTitle = nil
-        updateLayout { $0.insertToday(tab.id, at: 0) }
+        updateLayout {
+            $0.insertToday(tab.id, at: 0)
+            $0.move(tab.id, to: destination)
+        }
+        if case .today = destination {
+            tab.pinnedURL = nil
+            tab.pinnedTitle = nil
+        } else if tab.pinnedURL == nil {
+            tab.pinnedURL = tab.url
+            tab.pinnedTitle = tab.title
+        }
         if selectedTab == nil {
             setSelection(tab.id)
         }

@@ -215,6 +215,13 @@ final class BrowserSession {
             }
             return savesFavorites(space)
         }
+        // The windows of their own tabs that came from it are saved with it (review ON7).
+        space.store.windowTabs = { [weak self, weak space] in
+            guard let self, let space else {
+                return []
+            }
+            return windowTabs.filter { originSpace(of: $0) === space }.flatMap { $0.tabManager.storedTabs() }
+        }
     }
 
     /// The Space leaves the session; the next Space of its profile saves the favorites from now on.

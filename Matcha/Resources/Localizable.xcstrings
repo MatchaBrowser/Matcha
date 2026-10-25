@@ -59,6 +59,35 @@
         }
       }
     },
+    "“%@” was moved, or Matcha can no longer read it since it was reopened. Choose it again to open it." : {
+      "comment" : "Page shown when a local file can't be read; %@ is the file's name",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "„%@“ wurde verschoben oder Matcha kann die Datei seit dem erneuten Öffnen nicht mehr lesen. Wähle sie erneut aus, um sie zu öffnen."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "“%@” se ha movido o Matcha ya no puede leerlo desde que se volvió a abrir. Vuelve a elegirlo para abrirlo."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "« %@ » a été déplacé, ou Matcha ne peut plus le lire depuis sa réouverture. Choisissez-le de nouveau pour l'ouvrir."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "“%@” è stato spostato, oppure Matcha non può più leggerlo da quando è stato riaperto. Sceglilo di nuovo per aprirlo."
+          }
+        }
+      }
+    },
     "%@ is ready." : {
       "comment" : "Settings > Sync: the checked server answers (host name)",
       "localizations" : {
@@ -3364,6 +3393,35 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Scegli un’emoji nel Visore caratteri"
+          }
+        }
+      }
+    },
+    "Choose File…" : {
+      "comment" : "Button of the page shown when a local file can't be read: opens the file panel",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Datei auswählen …"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Elegir archivo…"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Choisir le fichier…"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Scegli file…"
           }
         }
       }
@@ -9018,6 +9076,35 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Matcha non riesce ad aprire i suoi dati."
+          }
+        }
+      }
+    },
+    "Matcha Can't Open This File" : {
+      "comment" : "Title of the page shown when a local file can't be read",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Matcha kann diese Datei nicht öffnen"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Matcha no puede abrir este archivo"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Matcha ne peut pas ouvrir ce fichier"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Matcha non può aprire questo file"
           }
         }
       }

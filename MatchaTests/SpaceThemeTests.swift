@@ -67,4 +67,23 @@ struct SpaceThemeTests {
         let second = try BrowserSession(container: container)
         #expect(second.spaces.first?.theme == .forest)
     }
+
+    /// Review ON16: a theme read from a record or from sync gets the same bounds as one made in the app.
+    @Test func `a decoded theme is kept within its bounds`() throws {
+        let colors = [
+            #"{"red":2,"green":-1,"blue":0.5}"#,
+            #"{"red":0,"green":0,"blue":0}"#,
+            #"{"red":1,"green":1,"blue":1}"#,
+            #"{"red":1,"green":0,"blue":0}"#,
+        ]
+        let json = #"{"colors":["# + colors.joined(separator: ",") + #"],"angle":1e308}"#
+        let theme = try JSONDecoder().decode(SpaceTheme.self, from: Data(json.utf8))
+        #expect(theme.colors.count == SpaceTheme.colorCountRange.upperBound)
+        #expect(theme.colors.first == ThemeColor(red: 1, green: 0, blue: 0.5))
+        #expect(theme.angle >= 0 && theme.angle < 360)
+        #expect(theme.direction.horizontal.isFinite && theme.direction.vertical.isFinite)
+        let negative = try JSONDecoder().decode(SpaceTheme.self, from: Data(#"{"colors":[{"red":0,"green":0,"blue":0}],"angle":-90}"#.utf8))
+        #expect(negative.angle == 270)
+        #expect(negative.colors.count == SpaceTheme.colorCountRange.lowerBound)
+    }
 }

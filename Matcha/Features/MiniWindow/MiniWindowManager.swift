@@ -159,6 +159,22 @@ final class MiniWindowManager {
         mainWindows.first
     }
 
+    /// The window of `model` asks the questions of sync: only the main window, never a private one, so that they are
+    /// asked once (review ON23).
+    func asksSyncQuestions(in model: WindowModel) -> Bool {
+        !model.session.isPrivate && mainWindow?.windowModel === model
+    }
+
+    /// Reopens the main window through a browsing window's scene (`openMainWindow`), otherwise `fallback`: a mini
+    /// window's view lives outside any scene, its own `openWindow` may do nothing (review ON24).
+    func reopenMainWindow(otherwise fallback: () -> Void) {
+        if let openMainWindow {
+            openMainWindow()
+        } else {
+            fallback()
+        }
+    }
+
     /// Primitive for `+HandOff`: a browsing window reported itself (appearing, coming to the front): it becomes the
     /// main window.
     func setMainWindow(_ link: any MainWindowLink) {

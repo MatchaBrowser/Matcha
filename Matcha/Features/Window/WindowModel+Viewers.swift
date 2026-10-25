@@ -83,6 +83,9 @@ extension WindowModel {
             }
             window?.makeKeyAndOrderFront(nil)
         }
+        windowTabs?.closeWindow = { [weak window] in
+            window?.close()
+        }
         keyObserver.map(NotificationCenter.default.removeObserver)
         keyObserver = window.map { window in
             NotificationCenter.default

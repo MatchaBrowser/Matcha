@@ -19,6 +19,17 @@ struct PageLoadErrorView: View {
             // One block: the usual buttons on a line, the red one alone below them, centered.
             VStack(spacing: 16) {
                 HStack(spacing: 12) {
+                    if error.kind == .fileUnreadable {
+                        // Chosen again, the file can be read until the app quits.
+                        Button {
+                            OpenFilePanel.choose(in: error.url.deletingLastPathComponent(), multiple: false) { urls in
+                                urls.first.map { page.load($0) }
+                            }
+                        } label: {
+                            Text("Choose File…", comment: "Button of the page shown when a local file can't be read: opens the file panel")
+                        }
+                        .accessibilityIdentifier("pageLoadErrorChooseFileButton")
+                    }
                     Button {
                         _ = page.retryFailedLoad()
                     } label: {
@@ -67,6 +78,7 @@ struct PageLoadErrorView: View {
         case .offline: "wifi.slash"
         case .certificate: "lock.trianglebadge.exclamationmark"
         case .loginRequired: "person.badge.key"
+        case .fileUnreadable: "doc.badge.ellipsis"
         default: "exclamationmark.triangle"
         }
     }
@@ -77,6 +89,8 @@ struct PageLoadErrorView: View {
             Text("You Aren't Connected to the Internet", comment: "Title of the page shown when the Mac is offline")
         case .certificate:
             Text("This Connection Isn't Private", comment: "Title of the page shown when a website's certificate isn't valid")
+        case .fileUnreadable:
+            Text("Matcha Can't Open This File", comment: "Title of the page shown when a local file can't be read")
         default:
             Text("Matcha Can't Open This Page", comment: "Title of the page shown after a page couldn't load")
         }
@@ -106,6 +120,14 @@ struct PageLoadErrorView: View {
             )
         case .loginRequired:
             Text("“\(host)” needs a user name and password.", comment: "Page shown when a website's login was cancelled; %@ is the website")
+        case .fileUnreadable:
+            Text(
+                """
+                “\(error.url.lastPathComponent)” was moved, or Matcha can no longer read it since it was reopened. Choose it \
+                again to open it.
+                """,
+                comment: "Page shown when a local file can't be read; %@ is the file's name",
+            )
         case .other:
             Text(verbatim: error.detail)
         }

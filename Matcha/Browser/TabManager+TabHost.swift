@@ -37,7 +37,10 @@ extension TabManager: TabHost {
     /// which stays a Peek.
     func openWindow(configuration: WKWebViewConfiguration, from webView: WKWebView, inBackground: Bool) -> WKWebView? {
         if inBackground {
-            return insertTab(configuration: configuration, after: insertionAnchor(for: webView), select: false).makeWebViewIfNeeded()
+            // In the window that shows the page: never selected in another window showing this Space (review ON13).
+            return acting(for: webView) {
+                insertTab(configuration: configuration, after: insertionAnchor(for: webView), select: false).makeWebViewIfNeeded()
+            }
         }
         return acting(for: webView) {
             let opener = tab(for: webView) ?? (isPeek(webView) ? openPeekAsTab() : nil)

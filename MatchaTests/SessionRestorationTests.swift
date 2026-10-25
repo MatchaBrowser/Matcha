@@ -69,4 +69,18 @@ struct SessionRestorationTests {
         restored.goBack()
         try await waitUntil { restored.url == firstURL }
     }
+
+    /// Review ON11: a restored tab never shown keeps its history in its copy (duplicate, copy to another window).
+    @Test func `the copy of a restored tab never shown keeps its history`() async throws {
+        let original = try await tabWithHistory()
+        original.captureInteractionState()
+        let state = try #require(original.savedInteractionState)
+        let stored = StoredTab(id: UUID(), url: original.url, title: original.title, lastActivity: .now, interactionState: state)
+        let restored = BrowserTab(restoring: stored, configuration: TestPages.configuration())
+        let manager = TabManager(websiteDataStore: .nonPersistent())
+        manager.register(restored)
+        #expect(!restored.isLoaded)
+        let copy = manager.duplicate(restored)
+        try await waitUntil { copy.title == "deux" && copy.canGoBack && !copy.isLoading }
+    }
 }

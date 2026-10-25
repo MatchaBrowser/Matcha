@@ -121,7 +121,7 @@ struct BrowserCommands: Commands {
                 if let mini = miniWindow {
                     mini.close()
                 } else {
-                    NSApp.keyWindow?.performClose(nil)
+                    WindowChrome.close(NSApp.keyWindow)
                 }
             }
             .keyboardShortcut(shortcuts.keyboardShortcut(for: .closeWindow))
@@ -236,7 +236,7 @@ struct BrowserCommands: Commands {
                 tabManager.close(tab)
             }
         } else {
-            NSApp.keyWindow?.performClose(nil)
+            WindowChrome.close(NSApp.keyWindow)
         }
     }
 }

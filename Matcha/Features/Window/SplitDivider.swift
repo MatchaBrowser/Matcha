@@ -5,6 +5,7 @@ import SwiftUI
 struct SplitDivider: View {
     /// Horizontal movement since the start of the drag.
     let onDrag: (Double) -> Void
+    /// End of a drag, even a cancelled one (a dialog of the page during the drag, review ON25).
     let onDragEnded: () -> Void
     /// Double-click: equal fractions.
     let onReset: () -> Void
@@ -12,7 +13,8 @@ struct SplitDivider: View {
     let onStep: (Int) -> Void
 
     @State private var isHovered = false
-    @State private var isDragging = false
+    /// Reset by SwiftUI at the end of a drag, even a cancelled one, unlike `onEnded`.
+    @GestureState private var isDragging = false
 
     var body: some View {
         Color.clear
@@ -26,15 +28,16 @@ struct SplitDivider: View {
             .onHover { isHovered = $0 }
             .gesture(
                 DragGesture(minimumDistance: 1, coordinateSpace: .global)
-                    .onChanged { drag in
-                        isDragging = true
-                        onDrag(drag.translation.width)
+                    .updating($isDragging) { _, dragging, _ in
+                        dragging = true
                     }
-                    .onEnded { _ in
-                        isDragging = false
-                        onDragEnded()
-                    },
+                    .onChanged { drag in onDrag(drag.translation.width) },
             )
+            .onChange(of: isDragging) { _, dragging in
+                if !dragging {
+                    onDragEnded()
+                }
+            }
             .onTapGesture(count: 2, perform: onReset)
             .help(Text("Drag to resize. Double-click to make panes equal.", comment: "Help tag of the handle between two split view panes"))
             .accessibilityElement()

@@ -106,12 +106,11 @@ struct FolderRowView: View {
             }
             .onAppear { draftName = folder.name }
             .task {
-                // The field often appears while a context menu is closing: wait for it
-                // to finish before taking the keyboard, then select the name.
-                try? await Task.sleep(for: .milliseconds(80))
-                isNameFocused = true
-                try? await Task.sleep(for: .milliseconds(20))
-                NSApp.sendAction(#selector(NSText.selectAll(_:)), to: nil, from: nil)
+                await FolderNameSelection.run(
+                    focus: { isNameFocused = true },
+                    isFocused: { isNameFocused },
+                    selectAll: { NSApp.sendAction(#selector(NSText.selectAll(_:)), to: nil, from: nil) },
+                )
             }
             .accessibilityIdentifier("folderNameField")
     }

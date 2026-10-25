@@ -1,6 +1,7 @@
 import AppKit
 import Foundation
 @testable import Matcha
+import SwiftData
 import Testing
 
 /// Tabs going between a window of its own tabs and the Spaces: drag and drop between sidebars, command bar.
@@ -119,5 +120,62 @@ struct WindowTabsTransferTests {
         executor.perform(.run(.switchToTab(reference), mode: .newTab))
         #expect(revealed.map(\.id) == [wanted.id])
         #expect(window.windowTabs != nil)
+    }
+
+    /// Review ON12: a pinned tab dropped into the pinned tabs of another Space keeps its original address.
+    @Test func `a pinned tab dropped into another Space's pinned tabs keeps its original address`() {
+        let origin = space.tabManager.newTab(url: blankPage("elsewhere"))
+        space.tabManager.setPlace(origin, to: .pinned)
+        // Pinned on another page, then the tab went elsewhere.
+        let pinnedURL = blankPage("origin")
+        origin.pinnedURL = pinnedURL
+        let other = session.addSpace(inProfileOf: space)
+        let brought = session.bringTab(origin.id, into: other.tabManager, at: .pinned(folder: nil, index: 0))
+        #expect(brought === origin)
+        #expect(other.tabManager.place(of: origin) == .pinned)
+        #expect(origin.pinnedURL == pinnedURL)
+        #expect(space.tabManager.tab(withID: origin.id) == nil)
+    }
+
+    /// Review ON6: one rule for what moves, what is copied and what is recreated.
+    @Test(arguments: [
+        (true, TabPlace.today, false, TabTransferPlan.move),
+        (true, .pinned, false, .move),
+        (true, .favorite, true, .copy),
+        (true, .today, true, .move),
+        (false, .today, false, .recreate(keepsSource: false)),
+        (false, .pinned, true, .recreate(keepsSource: true)),
+    ])
+    func `a transfer moves, copies or recreates the tab`(sameProfile: Bool, place: TabPlace, intoWindowTabs: Bool, plan: TabTransferPlan) {
+        #expect(TabTransferPlan.plan(sameProfile: sameProfile, sourcePlace: place, intoWindowTabs: intoWindowTabs) == plan)
+    }
+
+    /// Review ON7: until their window closes, the tabs of a window of its own tabs are saved with their Space.
+    @Test func `the tabs of a window of its own tabs are saved with their Space until it closes`() throws {
+        let tab = space.tabManager.newTab(url: blankPage("detached"))
+        let window = detachedWindow(with: tab)
+        session.saveAll()
+        let record = try #require(try session.container.mainContext.fetch(FetchDescriptor<TabRecord>()).first { $0.id == tab.id })
+        #expect(record.place == .today && record.space?.id == space.id)
+        window.windowDidClose()
+        session.saveAll()
+        #expect(try session.container.mainContext.fetch(FetchDescriptor<TabRecord>()).allSatisfy { $0.id != tab.id })
+    }
+
+    /// Review ON8: deleting a profile closes its windows of their own tabs before its data is erased.
+    @Test func `deleting a profile closes its windows of their own tabs`() throws {
+        let work = session.addProfile(named: "Work")
+        let windowModel = WindowModel(session: session, defaults: nil, spaceID: work.id)
+        windowModel.windowDidAppear()
+        let tab = work.tabManager.newTab(url: blankPage("work"))
+        let state = windowModel.detachToNewWindow(tab)
+        var closed = false
+        let tabs = try #require(session.windowTabs(withID: state.windowTabsID))
+        tabs.closeWindow = { closed = true }
+        let profile = try #require(work.record.profile)
+        #expect(session.removeProfile(profile) != nil)
+        #expect(session.windowTabs.isEmpty)
+        #expect(closed)
+        #expect(!tab.isLoaded)
     }
 }
