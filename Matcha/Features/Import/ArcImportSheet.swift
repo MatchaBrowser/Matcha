@@ -71,6 +71,13 @@ struct ArcImportSheet: View {
                 Label("\(sidebar.skippedItems) items left out: Arc notes and Arc pages", systemImage: "info.circle")
                     .foregroundStyle(.secondary)
             }
+            if sidebar.itemsBeyondLimit > 0 {
+                Label(
+                    "Matcha imports the first \(ArcSidebarParser.maximumItems) items; the others are left out",
+                    systemImage: "exclamationmark.triangle",
+                )
+                .foregroundStyle(.secondary)
+            }
         }
         .font(.callout)
     }

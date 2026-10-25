@@ -26,6 +26,15 @@ struct FaviconSelectorTests {
         ])
     }
 
+    /// Review SV2: a page that declares many icons gets only `maximumURLs` tries, `/favicon.ico` last.
+    @Test func `at most eight addresses are tried`() {
+        let candidates = (1 ... 30).map { candidate("/icon-\($0).png", sizes: "\($0)x\($0)") }
+        let urls = FaviconSelector.urlsToTry(candidates: candidates, pageURL: page).map(\.absoluteString)
+        #expect(urls.count == FaviconSelector.maximumURLs)
+        #expect(urls.first == "https://www.example.com/icon-30.png")
+        #expect(urls.last == "https://www.example.com/favicon.ico")
+    }
+
     @Test func `vector icons rank as scalable`() {
         let svg = candidate("/icon.svg", type: "image/svg+xml")
         let any = candidate("/icon-any.png", sizes: "any")

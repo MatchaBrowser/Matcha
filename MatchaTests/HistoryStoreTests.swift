@@ -52,14 +52,24 @@ struct HistoryStoreTests {
         (try? container.mainContext.fetchCount(FetchDescriptor<HistoryRecord>())) ?? -1
     }
 
+    /// Review SV10: another profile's visit leaves this profile's history as it is.
+    @Test func `each profile has its own revision`() async {
+        await store.load()
+        let revision = store.revision(of: profile)
+        record("https://ailleurs.example/", profileID: UUID())
+        #expect(store.revision(of: profile) == revision)
+        record("https://ici.example/")
+        #expect(store.revision(of: profile) == revision + 1)
+    }
+
     @Test func `visits are written and read back`() async throws {
         record("https://example.com/", title: "Exemple")
         clock.advance(120)
         await store.load()
         #expect(store.isLoaded)
-        let revision = store.revision
+        let revision = store.revision(of: profile)
         record("https://www.example.com/", title: "Exemple 2")
-        #expect(store.revision == revision + 1)
+        #expect(store.revision(of: profile) == revision + 1)
 
         let found = await entries("exem")
         #expect(found.count == 1)

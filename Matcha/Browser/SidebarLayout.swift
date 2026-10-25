@@ -283,3 +283,13 @@ nonisolated struct SidebarLayout: Equatable, Sendable {
         }
     }
 }
+
+nonisolated extension SidebarLayout {
+    /// Primitive of the restoration (`init(positions:folders:)`): the three sections, built whole, without splits.
+    init(favorites: [UUID], pinned: [PinnedItem], today: [UUID]) {
+        self.init()
+        self.favorites = favorites
+        self.pinned = pinned
+        self.today = today
+    }
+}

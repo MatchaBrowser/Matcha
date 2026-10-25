@@ -10,7 +10,9 @@ extension TabManager {
     /// selected: nothing loads by itself.
     func restore(tabs stored: [StoredTab], layout restoredLayout: SidebarLayout) {
         var restored: [BrowserTab] = []
-        for entry in stored where restoredLayout.place(of: entry.id) != nil {
+        // One set rather than a search of the sidebar per tab: a Space of thousands of tabs opens at once (review SV9).
+        let placed = Set(restoredLayout.orderedTabIDs)
+        for entry in stored where placed.contains(entry.id) {
             let configuration = pages.makeConfiguration(websiteDataStore: websiteDataStore)
             let tab = BrowserTab(restoring: entry, configuration: configuration)
             register(tab)

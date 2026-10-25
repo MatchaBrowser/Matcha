@@ -53,16 +53,10 @@ nonisolated extension SidebarLayout {
     }
 
     /// Rebuilds the layout: each container in increasing order of rank. A folder whose parent is unknown, or
-    /// caught in a loop, goes to the root; so does a pinned tab in an unknown folder.
-    /// The saved splits are repaired if needed (see `restoreSplits`).
+    /// caught in a loop, goes to the root; so does a pinned tab in an unknown folder. Built in one pass, never tab
+    /// by tab: placing each tab searched the whole sidebar, and a Space of 10,000 pinned tabs took minutes to open
+    /// (review SV9). The saved splits are repaired if needed (see `restoreSplits`).
     init(positions: [UUID: SidebarPosition], folders: [FolderEntry]) {
-        self.init()
-        for (id, _) in positions.filter({ $0.value.place == .favorite }).sorted(by: Self.byOrder) {
-            setPlace(id, to: .favorite)
-        }
-        for (id, _) in positions.filter({ $0.value.place == .today }).sorted(by: Self.byOrder) {
-            insertToday(id, at: today.count)
-        }
         let knownFolders = Set(folders.map(\.id))
         var pinnedTabs = positions.filter { $0.value.place == .pinned }
         for (id, position) in pinnedTabs where position.folderID.map({ !knownFolders.contains($0) }) ?? false {
@@ -74,14 +68,20 @@ nonisolated extension SidebarLayout {
         for (id, entry) in remaining where entry.parentID.map({ !knownFolders.contains($0) }) ?? false {
             remaining[id]?.parentID = nil
         }
-        fillPinned(in: nil, tabs: pinnedTabs, folders: &remaining)
+        var tabsByFolder = Dictionary(grouping: pinnedTabs) { $0.value.folderID }
+        var pinned = Self.pinnedItems(in: nil, tabs: tabsByFolder, folders: &remaining)
         // Folders caught in a parent loop: never reached from the root. The pinned tabs of the root are
         // already placed; only those of folders remain to be placed.
-        let tabsInFolders = pinnedTabs.filter { $0.value.folderID != nil }
+        tabsByFolder.removeValue(forKey: UUID?.none)
         while let orphan = remaining.values.min(by: { $0.order < $1.order }) {
             remaining[orphan.id]?.parentID = nil
-            fillPinned(in: nil, tabs: tabsInFolders, folders: &remaining)
+            pinned += Self.pinnedItems(in: nil, tabs: tabsByFolder, folders: &remaining)
         }
+        self.init(
+            favorites: positions.filter { $0.value.place == .favorite }.sorted(by: Self.byOrder).map(\.key),
+            pinned: pinned,
+            today: positions.filter { $0.value.place == .today }.sorted(by: Self.byOrder).map(\.key),
+        )
         restoreSplits(from: positions)
     }
 
@@ -105,9 +105,13 @@ nonisolated extension SidebarLayout {
         setSplits(candidates.sorted { $0.id.uuidString < $1.id.uuidString })
     }
 
-    /// Adds, in order of rank, the tabs and folders of `parent`, then the content of each folder.
-    /// Each placed folder is removed from `folders`.
-    private mutating func fillPinned(in parent: UUID?, tabs: [UUID: SidebarPosition], folders: inout [UUID: FolderEntry]) {
+    /// The tabs and folders of `parent`, in order of rank, each folder with its content. Each placed folder is
+    /// removed from `folders`.
+    private static func pinnedItems(
+        in parent: UUID?,
+        tabs: [UUID?: [(key: UUID, value: SidebarPosition)]],
+        folders: inout [UUID: FolderEntry],
+    ) -> [PinnedItem] {
         enum Item { case tab(UUID), folder(FolderEntry) }
         func key(of item: Item) -> String {
             switch item {
@@ -115,22 +119,27 @@ nonisolated extension SidebarLayout {
             case let .folder(entry): entry.id.uuidString
             }
         }
-        let children = tabs.filter { $0.value.folderID == parent }.map { (order: $0.value.order, item: Item.tab($0.key)) }
+        let children = (tabs[parent] ?? []).map { (order: $0.value.order, item: Item.tab($0.key)) }
             + folders.values.filter { $0.parentID == parent }.map { (order: $0.order, item: Item.folder($0)) }
+        var items: [PinnedItem] = []
         // Equal ranks (two synced Macs): the identifier breaks the tie.
         for child in children.sorted(by: { ($0.order, key(of: $0.item)) < ($1.order, key(of: $1.item)) }) {
             switch child.item {
             case let .tab(id):
-                setPlace(id, to: .pinned)
-                move(id, to: .pinned(folder: parent, index: Int.max))
+                items.append(.tab(id))
             case let .folder(entry):
                 folders[entry.id] = nil
-                addFolder(id: entry.id, named: entry.name, in: parent)
-                setFolderCollapsed(entry.id, entry.isCollapsed)
-                setFolderAppearance(entry.id, entry.appearance)
-                fillPinned(in: entry.id, tabs: tabs, folders: &folders)
+                let content = pinnedItems(in: entry.id, tabs: tabs, folders: &folders)
+                items.append(.folder(PinnedFolder(
+                    id: entry.id,
+                    name: entry.name,
+                    isCollapsed: entry.isCollapsed,
+                    items: content,
+                    appearance: entry.appearance,
+                )))
             }
         }
+        return items
     }
 
     private static func collectPinned(_ items: [PinnedItem], in folder: UUID?, positions: inout [UUID: SidebarPosition]) {

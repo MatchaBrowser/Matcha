@@ -32,6 +32,8 @@ nonisolated struct ArcSidebar: Equatable, Sendable {
     var favorites: [Profile: [ImportedTab]]
     /// Arc notes and items without a recognized address, left out.
     var skippedItems: Int
+    /// Items beyond `ArcSidebarParser.maximumItems`, left out.
+    var itemsBeyondLimit = 0
 
     var favoriteCount: Int {
         favorites.values.reduce(0) { $0 + $1.count }

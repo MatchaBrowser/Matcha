@@ -91,6 +91,28 @@ struct ArcImporterTests {
         #expect(again[1].tabManager.favoriteTabs.map(\.title) == ["Intranet"])
     }
 
+    /// Review SV8: the favorites of a profile without an open Space are saved, after its own, without duplicates.
+    @Test func `favorites of a profile without an open Space are kept`() throws {
+        let context = session.container.mainContext
+        let profile = ProfileRecord(name: "Sans Space", order: 9)
+        context.insert(profile)
+        let existing = TabRecord(url: URL(string: "https://mail.example/"), title: "Courrier", place: .favorite)
+        context.insert(existing)
+        existing.pinnedURL = existing.url
+        existing.profile = profile
+        session.save(context)
+        session.refreshProfiles()
+        let favorites = try [
+            ImportedTab(title: "Mail", url: #require(URL(string: "https://mail.example/"))),
+            ImportedTab(title: "Agenda", url: #require(URL(string: "https://agenda.example/"))),
+        ]
+        let arc = ArcSidebar(spaces: [], favorites: [.default: favorites], skippedItems: 0)
+        let (summary, _) = importer().importSidebar(arc, options: ArcImportOptions(profileID: profile.id))
+        #expect(summary.favorites == 1)
+        let space = session.addSpace(in: profile)
+        #expect(space.tabManager.favoriteTabs.map(\.title) == ["Courrier", "Agenda"])
+    }
+
     @Test func `the default Arc profile goes to the chosen profile`() throws {
         let other = session.addProfile(named: "Autre")
         let profile = try #require(other.record.profile)

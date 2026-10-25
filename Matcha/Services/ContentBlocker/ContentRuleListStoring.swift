@@ -53,9 +53,9 @@ nonisolated enum ContentRuleListError {
         return message.localizedCaseInsensitiveContains("too many rules")
     }
 
-    /// WebKit's message about a refused compilation (invalid rule…), for the log; never an address.
+    /// WebKit's message about a refused compilation (invalid rule…), for the log; otherwise the error's domain and
+    /// code, never its description, which can hold a path (review SV6).
     static func message(of error: any Error) -> String {
-        let error = error as NSError
-        return error.userInfo[NSHelpAnchorErrorKey] as? String ?? error.localizedDescription
+        (error as NSError).userInfo[NSHelpAnchorErrorKey] as? String ?? error.logSummary
     }
 }

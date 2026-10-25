@@ -9312,6 +9312,35 @@
         }
       }
     },
+    "Matcha imports the first %lld items; the others are left out" : {
+      "comment" : "Arc import preview: the Arc sidebar has more items than Matcha imports; %lld is that limit",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Matcha importiert die ersten %lld Elemente; die übrigen werden ausgelassen"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Matcha importa los primeros %lld elementos; el resto se omite"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Matcha importe les %lld premiers éléments ; les autres sont laissés de côté"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Matcha importa i primi %lld elementi; gli altri vengono esclusi"
+          }
+        }
+      }
+    },
     "Matcha is using an encrypted connection to “%@”." : {
       "comment" : "Certificate panel of an encrypted page; %@ is the website",
       "localizations" : {

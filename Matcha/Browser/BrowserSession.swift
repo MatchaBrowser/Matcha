@@ -111,6 +111,9 @@ final class BrowserSession {
         tabLifecycle.session = self
         spaces.forEach(connect)
         terminationObserver = observeTermination()
+        history?.onVisitsRemoved = { [weak self] in
+            Task { await self?.forgetUnusedIcons() }
+        }
     }
 
     /// App quitting: the tabs of the windows without a Space go back to their Space first, then everything is saved.

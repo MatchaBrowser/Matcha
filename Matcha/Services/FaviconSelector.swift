@@ -8,9 +8,13 @@ nonisolated enum FaviconSelector {
     static let appleTouchIconSize = 180
     /// Assumed size of an icon without any indication.
     static let unknownSize = 16
+    /// Most addresses tried for one page, `/favicon.ico` included: a page that declares hundreds of icons, or whose
+    /// icons don't answer, doesn't hold the lookup for long (review SV2).
+    static let maximumURLs = 8
 
     /// Addresses to try, from best to worst: the largest first, in page order for equal sizes, then `/favicon.ico` at
-    /// the root of the website. Without duplicates. An encrypted page's icon never comes unencrypted (audit W8).
+    /// the root of the website. Without duplicates, `maximumURLs` at most. An encrypted page's icon never comes
+    /// unencrypted (audit W8).
     static func urlsToTry(candidates: [FaviconCandidate], pageURL: URL) -> [URL] {
         let schemes: Set<String> = pageURL.scheme?.lowercased() == "https" ? ["https", "data"] : ["http", "https", "data"]
         let ranked = candidates
@@ -22,8 +26,11 @@ nonisolated enum FaviconSelector {
             }
             .map(\.element.url)
         var urls: [URL] = []
-        for url in ranked + [defaultIconURL(for: pageURL)].compactMap(\.self) where !urls.contains(url) {
+        for url in ranked where !urls.contains(url) && urls.count < maximumURLs - 1 {
             urls.append(url)
+        }
+        if let fallback = defaultIconURL(for: pageURL), !urls.contains(fallback) {
+            urls.append(fallback)
         }
         return urls
     }

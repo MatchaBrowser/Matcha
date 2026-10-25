@@ -117,7 +117,9 @@ struct ArcSidebarParserTests {
         let items = ids.map { ($0, ["childrenIds": [], "data": ["tab": ["savedURL": "https://example.com/\($0)"]]] as [String: Any]) }
         let sidebar = try sidebar(pinned: ids, items: items)
         #expect(ImportNode.tabCount(of: sidebar.spaces[0].pinned) == ArcSidebarParser.maximumItems)
-        #expect(sidebar.skippedItems == 1)
+        // Review SV9: told apart from the Arc notes and pages.
+        #expect(sidebar.itemsBeyondLimit == 1)
+        #expect(sidebar.skippedItems == 0)
     }
 
     @Test func `arc icons and colors become a Matcha icon and theme`() {
