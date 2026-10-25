@@ -57,12 +57,15 @@ struct SiteActionBannerContent: View {
             ?? Text("This page", comment: "Permission banner: the page asking, when it has no website name (local file)")
     }
 
-    private var label: Text {
+    private var label: String {
         switch request.action {
         case .openApp:
-            Text("Request to Open an App", comment: "Accessibility label of the banner where a website asks to open another app")
+            String(
+                localized: "Request to Open an App",
+                comment: "Accessibility label of the banner where a website asks to open another app",
+            )
         case .downloadFiles:
-            Text("Download Request", comment: "Accessibility label of the banner where a website asks to download files")
+            String(localized: "Download Request", comment: "Accessibility label of the banner where a website asks to download files")
         }
     }
 

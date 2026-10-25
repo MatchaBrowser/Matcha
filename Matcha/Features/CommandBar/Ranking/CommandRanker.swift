@@ -66,13 +66,16 @@ nonisolated struct CommandRanker: Sendable {
     /// Tabs and history on their title and address; actions on their title and keywords, from two characters on and
     /// never loosely (word start at least).
     private static func match(_ candidate: CommandCandidate, _ query: CommandQuery) -> CommandMatch? {
+        guard let fields = candidate.fields else {
+            return nil
+        }
         switch candidate.kind {
         case .tab, .otherMacTab, .history:
-            CommandMatcher.match(query, titles: [candidate.title], url: candidate.url)
-        case let .action(_, keywords) where query.folded.count >= 2:
-            CommandMatcher.match(query, titles: [candidate.title] + keywords, url: nil, minimumTier: .wordPrefix)
+            return CommandMatcher.match(query, fields: fields)
+        case .action where query.folded.count >= 2:
+            return CommandMatcher.match(query, fields: fields, minimumTier: .wordPrefix)
         case .action, .suggestion:
-            nil
+            return nil
         }
     }
 }

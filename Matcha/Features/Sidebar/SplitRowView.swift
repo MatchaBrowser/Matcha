@@ -51,6 +51,7 @@ struct SplitRowView: View {
                 }
                 SplitSegmentView(
                     tab: tab,
+                    groupID: group.id,
                     tabManager: tabManager,
                     isActive: isDisplayed && selectedTabID == tab.id,
                     showsTitle: showsTitles,
@@ -96,6 +97,8 @@ private struct SplitSegmentView: View {
     static let closeButtonInset = SidebarIconButtonStyle.size + 3
 
     let tab: BrowserTab
+    /// The split: its panes move together (⌥⌘↑ and ⌥⌘↓, VoiceOver).
+    let groupID: UUID
     let tabManager: TabManager
     /// Active pane of the displayed split.
     let isActive: Bool
@@ -139,6 +142,8 @@ private struct SplitSegmentView: View {
         .accessibilityLabel(Text(verbatim: tab.displayTitle))
         .accessibilityAddTraits(isActive ? [.isButton, .isSelected] : .isButton)
         .accessibilityAction { TabActivation.activate(tab, in: tabManager) }
+        // Reached with ⇥ like a row; a step moves the whole split (review IU18).
+        .sidebarRowKeyboard { TabActivation.activate(tab, in: tabManager) } move: { tabManager.moveSplitStep(groupID, by: $0) }
         .accessibilityIdentifier("splitSegment")
         .tabAudioAccessibility(tab)
     }

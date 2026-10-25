@@ -15,6 +15,8 @@ enum HistoryClearAlert {
         for period in HistoryPeriod.allCases {
             alert.addButton(withTitle: String(localized: period.title)).hasDestructiveAction = true
         }
+        // No default button: Return erases nothing (review IU13).
+        alert.buttons.first?.keyEquivalent = ""
         alert.addButton(withTitle: String(localized: "Cancel")).keyEquivalent = "\u{1b}"
         let handle = { (response: NSApplication.ModalResponse) in
             if let period = period(for: response) {

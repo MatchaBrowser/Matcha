@@ -23,7 +23,8 @@ struct SiteSettingsPanel: View {
             header(origin)
             if let origin, let tab, let scope = tabManager.sitePermissions {
                 VStack(alignment: .leading, spacing: 6) {
-                    ForEach(SitePermissionKind.allCases) { kind in
+                    // Notifications: never in a private window, which can't send any (review IU16).
+                    ForEach(SitePermissionKind.allCases.filter { $0 != .notifications || scope.store.isPersistent }) { kind in
                         permissionRow(kind, origin: origin, scope: scope)
                     }
                     // Apps the site opens without asking (audit W2).
@@ -127,6 +128,9 @@ struct SiteSettingsPanel: View {
             scope.decision(kind, for: origin)
         } set: {
             scope.set($0, for: kind, origin: origin)
+            if kind == .notifications {
+                model.session.notificationDecisionDidChange($0, origin: origin, profileID: scope.profileID)
+            }
         }
         return HStack(spacing: 8) {
             Label(kind.title, systemImage: kind.symbolName)

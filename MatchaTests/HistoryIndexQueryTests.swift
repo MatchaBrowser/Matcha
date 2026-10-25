@@ -69,6 +69,16 @@ struct HistoryIndexQueryTests {
         #expect(found("", in: index).isEmpty)
     }
 
+    /// Review IU2: fuzzy matches are looked for only when the stricter ones leave room, and then come last.
+    @Test func `fuzzy matches fill the room left by the strict ones`() {
+        let index = HistoryIndex(visits: [
+            historyVisit("https://github.com/", title: "GitHub", minutesAgo: 1),
+            historyVisit("https://gthb.example/", title: "Gthb", minutesAgo: 60),
+        ])
+        #expect(found("gthb", in: index).map(\.title) == ["Gthb", "GitHub"])
+        #expect(found("gthb", in: index, limit: 1).map(\.title) == ["Gthb"])
+    }
+
     @Test func `a pasted address finds the same page`() {
         let entries = found("https://www.github.com/apple/swift/#readme", in: sample)
         #expect(entries.map(\.title) == ["GitHub - apple/swift"])

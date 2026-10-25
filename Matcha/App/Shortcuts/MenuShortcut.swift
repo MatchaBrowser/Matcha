@@ -87,11 +87,14 @@ nonisolated enum MenuShortcut: String, CaseIterable, Sendable {
         }
     }
 
-    /// Shortcuts that no command of this list can take: macOS's standard commands, find and spelling, tabs and
-    /// Spaces by number, the tab cycle, ⌘= (another name for ⌘+).
+    /// Shortcuts that no command of this list can take: macOS's standard commands (with their ⌥ variants: Paste and
+    /// Match Style, Close All, Minimize All, Quit and Keep Windows, review IU12), find and spelling, tabs and Spaces
+    /// by number, the tab cycle, ⌘= (another name for ⌘+).
     static let fixedKeys: Set<ShortcutKey> = {
         var keys: Set<ShortcutKey> = [
             ShortcutKey("z"), ShortcutKey("z", [.command, .shift]), ShortcutKey("x"), ShortcutKey("c"), ShortcutKey("v"),
+            ShortcutKey("v", [.command, .option, .shift]), ShortcutKey("w", [.command, .option]),
+            ShortcutKey("m", [.command, .option]), ShortcutKey("q", [.command, .option]),
             ShortcutKey("a"), ShortcutKey("f"), ShortcutKey("f", [.command, .option]), ShortcutKey("g"),
             ShortcutKey("g", [.command, .shift]), ShortcutKey("e"), ShortcutKey("j"), ShortcutKey(":"), ShortcutKey(";"),
             ShortcutKey(","), ShortcutKey("q"), ShortcutKey("h"), ShortcutKey("h", [.command, .option]), ShortcutKey("m"),

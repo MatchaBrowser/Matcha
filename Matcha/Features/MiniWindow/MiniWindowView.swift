@@ -63,8 +63,8 @@ struct MiniWindowView: View {
                 .gesture(WindowDragGesture())
                 .allowsWindowActivationEvents(true)
         }
-        // Invisible title, read by VoiceOver, Mission Control and the Window menu.
-        .onChange(of: windowTitle, initial: true) { _, title in controller.panel.title = title }
+        // Invisible title, read by VoiceOver, Mission Control and the Window menu; followed apart (review IU4).
+        .background { MiniWindowTitle(tab: tab, panel: controller.panel) }
         // Engine or suggestions changed in Settings while the bar stays open.
         .onChange(of: settings) { _, settings in controller.commandBar.apply(settings) }
     }
@@ -95,11 +95,24 @@ struct MiniWindowView: View {
         }
     }
 
-    private var windowTitle: String {
-        tab.url == nil ? String(localized: "Mini Window") : tab.displayTitle
-    }
-
     private var settings: CommandBarSettings {
         CommandBarSettings(searchEngine: searchEngine, newTabPage: .blank, homePage: "", showsSearchSuggestions: showsSearchSuggestions)
+    }
+}
+
+/// The mini window's title, the page's: read in this small view only, a new title doesn't recompute the mini window
+/// (review IU4).
+private struct MiniWindowTitle: View {
+    let tab: BrowserTab
+    let panel: NSWindow
+
+    var body: some View {
+        Color.clear
+            .onChange(of: title, initial: true) { _, title in panel.title = title }
+            .accessibilityHidden(true)
+    }
+
+    private var title: String {
+        tab.url == nil ? String(localized: "Mini Window") : tab.displayTitle
     }
 }

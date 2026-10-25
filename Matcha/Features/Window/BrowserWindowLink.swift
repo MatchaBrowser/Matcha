@@ -11,7 +11,8 @@ protocol MainWindowLink: AnyObject {
     func bringToFront()
 }
 
-/// Real link, held by `MiniWindowManager`; it retains neither the window nor its state.
+/// Real link, held by `MiniWindowManager`; it retains neither the window nor its state (`dismissCommandBar` holds the
+/// command bar weakly, review IU3).
 @MainActor
 final class BrowserWindowLink: MainWindowLink {
     private(set) weak var windowModel: WindowModel?

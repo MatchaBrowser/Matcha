@@ -37,6 +37,15 @@ nonisolated struct SidebarLayout: Equatable, Sendable {
         favorites + pinned.flatMap(\.tabIDs) + today
     }
 
+    /// Place of each placed tab, found in one pass.
+    var placesByTab: [UUID: TabPlace] {
+        var places: [UUID: TabPlace] = [:]
+        favorites.forEach { places[$0] = .favorite }
+        pinned.flatMap(\.tabIDs).forEach { places[$0] = .pinned }
+        today.forEach { places[$0] = .today }
+        return places
+    }
+
     func place(of id: UUID) -> TabPlace? {
         if favorites.contains(id) {
             return .favorite

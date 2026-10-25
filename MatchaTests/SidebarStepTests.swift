@@ -61,6 +61,32 @@ struct SidebarStepTests {
         #expect(layout.pinned.map(\.id) == [folder, ids[0]])
     }
 
+    /// Review IU18: a split moves one row at a time, over a tab, a folder or another whole split.
+    @Test func `a split moves over the next row`() throws {
+        var layout = SidebarLayout()
+        (0 ..< 6).forEach { layout.insertToday(ids[$0], at: layout.today.count) }
+        let split = SplitGroup(tabIDs: [ids[2], ids[3]])
+        let neighbor = SplitGroup(tabIDs: [ids[4], ids[5]])
+        layout.setSplits([split, neighbor])
+
+        func stepped(_ layout: SidebarLayout, by offset: Int) -> SidebarLayout? {
+            var layout = layout
+            guard let destination = layout.splitStepDestination(of: split.id, by: offset) else {
+                return nil
+            }
+            layout.moveSplit(split.id, to: destination)
+            return layout
+        }
+        let raised = try #require(stepped(layout, by: -1))
+        #expect(indices(raised.today) == [0, 2, 3, 1, 4, 5])
+        let down = try #require(stepped(layout, by: 1))
+        #expect(indices(down.today) == [0, 1, 4, 5, 2, 3])
+        #expect(down.splits.count == 2)
+        #expect(stepped(down, by: 1) == nil)
+        let top = try #require(stepped(raised, by: -1))
+        #expect(stepped(top, by: -1) == nil)
+    }
+
     @MainActor
     @Test func `the manager moves a tab and says when it can't`() {
         let manager = TabManager(websiteDataStore: .nonPersistent())

@@ -15,6 +15,10 @@ final class OpenTabsProvider: CommandProvider {
         self.windowModel = windowModel
     }
 
+    var answersAtOnce: Bool {
+        true
+    }
+
     func candidates(for _: CommandQuery, context _: CommandContext) async -> [CommandCandidate] {
         openTabs()
     }
@@ -55,9 +59,11 @@ final class OpenTabsProvider: CommandProvider {
         seen: inout Set<UUID>,
     ) -> [CommandCandidate] {
         let tabManager = space.tabManager
+        // One pass over the sidebar rather than a search per tab (review IU2).
+        let places = tabManager.layout.placesByTab
         var result: [CommandCandidate] = []
         for tab in tabManager.tabs {
-            guard let place = tabManager.place(of: tab),
+            guard let place = places[tab.id],
                   place != .favorite || listsFavorites,
                   !isCurrent || tab.id != windowModel.selectedTab?.id,
                   // The address shown (review TR1); an unloaded pinned tab shows its original address.

@@ -59,8 +59,16 @@ struct SidebarIconView: View {
         }
     }
 
+    /// Symbols already looked up: an `NSImage` made at each rendering costs (review IU9).
+    private static var knownSymbols: [String: Bool] = [:]
+
     /// True if this macOS knows the SF Symbol `name`.
     static func symbolExists(_ name: String) -> Bool {
-        NSImage(systemSymbolName: name, accessibilityDescription: nil) != nil
+        if let known = knownSymbols[name] {
+            return known
+        }
+        let exists = NSImage(systemSymbolName: name, accessibilityDescription: nil) != nil
+        knownSymbols[name] = exists
+        return exists
     }
 }

@@ -3,6 +3,12 @@ import WebKit
 
 /// Load state, displayed title and navigation commands of the page (buttons, menus, shortcuts).
 extension BrowserTab {
+    /// The page goes: its permission requests are denied, its sheets end (review IU15).
+    func endPageRequests() {
+        permissionPrompts.denyAll()
+        pageDialogs.endSheets()
+    }
+
     var isLoaded: Bool {
         webView != nil
     }

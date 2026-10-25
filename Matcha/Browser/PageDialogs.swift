@@ -141,12 +141,36 @@ nonisolated struct LoginAnswer: Sendable {
 }
 
 /// JavaScript dialogs and login sheets of a page's document: how many it showed, and whether the user stopped them;
-/// the login sheets on screen, by protected area (`LoginRequest.key`).
+/// the login sheets on screen, by protected area (`LoginRequest.key`). The sheets on screen end without an answer when
+/// the document changes or the page goes (review IU15): their task is cancelled, the presenter ends the sheet.
 @MainActor
 final class PageDialogState {
     private(set) var shown = 0
     private(set) var isSuppressed = false
     var pendingLogins: [String: Task<LoginAnswer?, Never>] = [:]
+    /// Cancellation of each sheet on screen (dialogs, file choice).
+    private var sheets: [UUID: () -> Void] = [:]
+
+    /// Runs `show` (a sheet); nil if the document changes or the page goes first.
+    func present<Answer: Sendable>(_ show: @escaping @MainActor () async -> Answer?) async -> Answer? {
+        let task = Task { await show() }
+        let id = UUID()
+        sheets[id] = { task.cancel() }
+        defer { sheets[id] = nil }
+        return await task.value
+    }
+
+    /// True while a sheet is on screen (tests).
+    var hasSheetOnScreen: Bool {
+        !sheets.isEmpty
+    }
+
+    /// The document changed or the page goes: its sheets end, without an answer.
+    func endSheets() {
+        sheets.values.forEach { $0() }
+        sheets = [:]
+        pendingLogins.values.forEach { $0.cancel() }
+    }
 
     func didShow() {
         shown += 1
@@ -159,5 +183,6 @@ final class PageDialogState {
     func documentDidChange() {
         shown = 0
         isSuppressed = false
+        endSheets()
     }
 }

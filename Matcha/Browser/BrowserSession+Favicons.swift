@@ -17,7 +17,7 @@ extension BrowserSession {
     /// Domains of the saved tabs, and of the open ones (their address may not be saved yet).
     private func tabHosts() -> Set<String> {
         let records = (try? container.mainContext.fetch(FetchDescriptor<TabRecord>())) ?? []
-        let open = (spaces.map(\.tabManager) + windowTabs.map(\.tabManager)).flatMap(\.tabs)
+        let open = allTabManagers.flatMap(\.tabs)
         let urls = records.flatMap { [$0.url, $0.pinnedURL] } + open.flatMap { [$0.url, $0.pinnedURL] }
         return Set(urls.compactMap { $0?.host() })
     }

@@ -5,8 +5,9 @@ import Observation
 /// differ by their sources and actions (audit C6).
 ///
 /// Each keystroke rebuilds the rows right away (rows from the text, then results already received, re-ranked), then a
-/// single task queries the sources in order; the rows are republished after each source, and a more recent keystroke
-/// cancels the current task. The unmodified ⌘L address shows its own rows and queries nothing.
+/// single task queries the sources: those that answer at once, ranked together, then the history and the suggestions
+/// at the same time (review IU2); the rows are republished after each of these, and a more recent keystroke cancels
+/// the current task. The unmodified ⌘L address shows its own rows and queries nothing.
 @MainActor
 @Observable
 final class CommandBarResults {
@@ -109,10 +110,13 @@ final class CommandBarResults {
         selectedRowID = rows[min(max(current + delta, 0), rows.count - 1)].id
     }
 
-    /// Row run by Return (`rowID` nil: the selected row, otherwise the first one) or by a click.
+    /// Row run by Return (`rowID` nil: the selected row, otherwise the first one) or by a click on row `rowID`; nil
+    /// for a clicked row gone in the meantime, never another one (review IU11).
     func row(for rowID: CommandRow.ID?) -> CommandRow? {
-        let id = rowID ?? selectedRowID
-        return rows.first { $0.id == id } ?? rows.first
+        if let rowID {
+            return rows.first { $0.id == rowID }
+        }
+        return rows.first { $0.id == selectedRowID } ?? rows.first
     }
 
     /// The bar closes: everything is forgotten.
@@ -144,14 +148,35 @@ final class CommandBarResults {
     }
 
     private func gather(_ query: CommandQuery, context: CommandContext) async {
-        for index in providers.indices {
-            let found = await providers[index].candidates(for: query, context: context)
-            guard !Task.isCancelled else {
-                return
-            }
-            candidates[index] = found
+        let immediate = providers.indices.filter { providers[$0].answersAtOnce }
+        for index in immediate {
+            candidates[index] = await providers[index].candidates(for: query, context: context)
+        }
+        guard !Task.isCancelled else {
+            return
+        }
+        if !immediate.isEmpty {
             refresh(resetSelection: false)
         }
+        await withTaskGroup(of: (index: Int, found: [CommandCandidate]).self) { group in
+            for index in providers.indices where !providers[index].answersAtOnce {
+                group.addTask { [self] in
+                    await (index, ask(index, query, context: context))
+                }
+            }
+            for await (index, found) in group {
+                guard !Task.isCancelled else {
+                    return
+                }
+                candidates[index] = found
+                refresh(resetSelection: false)
+            }
+        }
+    }
+
+    /// Results of source `index`.
+    private func ask(_ index: Int, _ query: CommandQuery, context: CommandContext) async -> [CommandCandidate] {
+        await providers[index].candidates(for: query, context: context)
     }
 
     /// Recomputes the rows; the selection returns to the first row if requested or if the selected row has

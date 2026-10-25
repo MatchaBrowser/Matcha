@@ -83,6 +83,21 @@ struct PageDialogTests {
         try await waitUntil(timeout: .seconds(60)) { page.title == "1:\(file.lastPathComponent)" }
     }
 
+    /// Review IU15: a sheet on screen ends, without an answer, when its document changes or its page goes.
+    @Test func `a sheet ends with its document`() async throws {
+        let state = PageDialogState()
+        let answer = Task {
+            await state.present { () async -> Int? in
+                try? await Task.sleep(for: .seconds(60))
+                return Task.isCancelled ? nil : 1
+            }
+        }
+        try await waitUntil { state.hasSheetOnScreen }
+        state.documentDidChange()
+        #expect(await answer.value == nil)
+        #expect(!state.hasSheetOnScreen)
+    }
+
     @Test func `a website's login is asked for, certificates are left to the system`() async throws {
         let page = try await openPage()
         let basic = challenge(method: NSURLAuthenticationMethodHTTPBasic, previousFailures: 1)

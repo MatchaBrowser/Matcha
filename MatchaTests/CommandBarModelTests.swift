@@ -175,6 +175,22 @@ struct CommandBarModelTests {
         #expect(model.selectedRowID == CommandPrimaryRows.id)
     }
 
+    /// Review IU2: the suggestions don't wait for the history; the tabs are ranked before either.
+    @Test func `suggestions don't wait for the history`() async throws {
+        let other = tabManager.newTab(url: blankPage("one"))
+        tabManager.newTab(url: blankPage("two"))
+        let history = HeldHistory()
+        engine.responses["blank"] = ["blank page"]
+        let model = CommandBarModel(windowModel: windowModel, history: history, suggestions: engine.provider(), now: { fixedNow })
+        model.newTab(blank)
+        model.updateText("blank")
+        try await waitUntil { ids(model).contains("suggestion:blank page") }
+        #expect(history.isWaiting)
+        #expect(ids(model).contains("tab:\(other.id.uuidString)"))
+        history.resume(with: [])
+        await model.waitForPendingResults()
+    }
+
     @Test func `selection moves without wrapping`() {
         let model = makeModel()
         model.newTab(blank)
@@ -233,5 +249,15 @@ struct CommandBarModelTests {
         #expect(model.submission(for: nil) == .ignore)
         model.dismiss()
         #expect(model.submission(for: nil) == .ignore)
+    }
+
+    /// Review IU11: a click on a row gone in the meantime runs nothing, never the first row.
+    @Test func `a click on a row gone runs nothing`() {
+        let model = makeModel()
+        model.newTab(blank)
+        model.updateText("blank")
+        #expect(model.submission(for: "tab:\(UUID().uuidString)") == .ignore)
+        #expect(model.submission(for: nil) != .ignore)
+        #expect(model.submission(for: CommandPrimaryRows.id) == model.submission(for: nil))
     }
 }

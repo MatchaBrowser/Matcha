@@ -91,6 +91,16 @@ extension TabManager {
         changingPlaces(of: group.tabIDs) { $0.moveSplit(groupID, to: destination) }
     }
 
+    /// Moves the split one row up (−1) or down (+1) in its list, without dragging (review IU18); false at the edge.
+    @discardableResult
+    func moveSplitStep(_ groupID: UUID, by offset: Int) -> Bool {
+        guard let destination = layout.splitStepDestination(of: groupID, by: offset) else {
+            return false
+        }
+        moveSplit(groupID, to: destination)
+        return true
+    }
+
     /// “Pin Split View” and “Unpin Split View”.
     func setSplitPlace(_ groupID: UUID, to place: TabPlace) {
         guard let group = layout.split(withID: groupID) else {

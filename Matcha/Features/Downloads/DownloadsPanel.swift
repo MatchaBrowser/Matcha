@@ -52,7 +52,8 @@ struct DownloadsPanel: View {
                 DownloadsEmptyState()
             } else {
                 ScrollView {
-                    VStack(spacing: 0) {
+                    // Up to 200 rows: only those shown are drawn (review IU6).
+                    LazyVStack(spacing: 0) {
                         ForEach(items) { item in
                             DownloadRow(item: item, downloads: downloads)
                         }
@@ -62,6 +63,8 @@ struct DownloadsPanel: View {
                 .frame(height: min(Double(items.count) * DownloadRow.height, Self.maximumListHeight))
             }
         }
+        // A file deleted or moved since is “not found”: looked at once, when the panel opens.
+        .onAppear { downloads.items(in: scope).forEach { $0.checkFile() } }
         .accessibilityElement(children: .contain)
         .accessibilityIdentifier("downloadsPanel")
     }

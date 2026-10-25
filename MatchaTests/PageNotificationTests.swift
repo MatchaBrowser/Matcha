@@ -125,6 +125,18 @@ struct PageNotificationTests {
         try await waitUntil { system.removed == ["\(thread)#boite"] }
     }
 
+    /// Review IU16: a decision changed in the site settings reaches the open pages of the website at once.
+    @Test func `a decision changed in the site settings reaches the open pages`() async throws {
+        let tab = try await open()
+        #expect(!tab.canSendNotifications)
+        let profileID = manager.sitePermissions?.profileID
+        session.notificationDecisionDidChange(.allow, origin: origin, profileID: profileID)
+        #expect(tab.canSendNotifications)
+        session.notificationDecisionDidChange(.allow, origin: origin, profileID: UUID())
+        session.notificationDecisionDidChange(nil, origin: origin, profileID: profileID)
+        #expect(!tab.canSendNotifications)
+    }
+
     /// Review SV7: the same tag in two profiles gives two notifications, each bringing back its own page.
     @Test func `the same tag in two profiles never replaces the other`() async throws {
         let first = try #require(session.profiles.first)

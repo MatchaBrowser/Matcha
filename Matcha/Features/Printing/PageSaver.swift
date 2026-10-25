@@ -89,6 +89,8 @@ enum PageSaver {
             self.panel = panel
             let label = NSTextField(labelWithString: String(localized: "Format:", comment: "Label of the format menu of Save As…"))
             popUp.addItems(withTitles: Format.allCases.map(\.title))
+            // VoiceOver reads “Format” with the menu (review IU21).
+            popUp.setAccessibilityTitleUIElement(label)
             let stack = NSStackView(views: [label, popUp])
             stack.edgeInsets = NSEdgeInsets(top: 8, left: 16, bottom: 8, right: 16)
             view = stack

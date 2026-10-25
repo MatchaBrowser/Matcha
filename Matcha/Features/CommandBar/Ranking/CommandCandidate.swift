@@ -32,16 +32,29 @@ nonisolated struct CommandCandidate: Equatable, Sendable {
     let title: String
     /// Nil for actions and suggestions.
     let url: URL?
-
     /// Stable identifier, reused by the displayed row: `tab:<uuid>`, `otherMac:<uuid>:<address key>` (one per address
     /// and Mac), `history:<address key>`, `action:<name>`, `suggestion:<folded text>`.
-    var id: String {
-        switch kind {
+    let id: String
+    /// Folded title (and keywords of an action) and address, compared with the text: made once, when the source gives
+    /// the candidate, not at each ranking of the same keystroke (review IU2); nil for a suggestion.
+    let fields: CommandMatchFields?
+
+    init(kind: Kind, title: String, url: URL?) {
+        self.kind = kind
+        self.title = title
+        self.url = url
+        let urlKey = url.map(CommandText.urlKey)
+        id = switch kind {
         case let .tab(reference, _, _, _): "tab:\(reference.tabID.uuidString)"
-        case let .otherMacTab(deviceID, _, _): "otherMac:\(deviceID.uuidString):\(url.map(CommandText.urlKey) ?? "")"
-        case .history: "history:\(url.map(CommandText.urlKey) ?? "")"
+        case let .otherMacTab(deviceID, _, _): "otherMac:\(deviceID.uuidString):\(urlKey ?? "")"
+        case .history: "history:\(urlKey ?? "")"
         case let .action(action, _): "action:\(action.rawValue)"
         case .suggestion: "suggestion:\(CommandText.fold(title))"
+        }
+        fields = switch kind {
+        case .tab, .otherMacTab, .history: CommandMatchFields(titles: [title], url: url)
+        case let .action(_, keywords): CommandMatchFields(titles: [title] + keywords, url: nil)
+        case .suggestion: nil
         }
     }
 }

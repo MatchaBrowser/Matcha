@@ -44,6 +44,14 @@ struct MenuShortcutTests {
         #expect(MenuShortcut.saveAs.defaultKey?.displayText == "⌘S")
         #expect(MenuShortcut.openFile.defaultKey?.displayText == "⌘O")
         #expect(MenuShortcut.openInSpace.defaultKey?.displayText == "⇧⌘O")
+        // Review IU12: macOS's ⌥ variants stay theirs.
+        for key in [
+            ShortcutKey("v", [.command, .option, .shift]),
+            ShortcutKey("w", [.command, .option]),
+            ShortcutKey("q", [.command, .option]),
+        ] {
+            #expect(MenuShortcut.fixedKeys.contains(key))
+        }
     }
 
     @Test func `a changed shortcut is kept, and the default one is no change`() throws {

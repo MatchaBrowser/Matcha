@@ -75,13 +75,24 @@ nonisolated enum CommandMatcher {
 
     /// Like `match(_:titles:url:minimumTier:)`, with fields already folded (history, task 5.5).
     static func match(_ query: CommandQuery, fields: CommandMatchFields, minimumTier: MatchTier = .fuzzy) -> CommandMatch? {
-        guard !query.folded.isEmpty else {
+        if let match = strictMatch(query, fields: fields) {
+            return match.tier >= minimumTier ? match : nil
+        }
+        return minimumTier == .fuzzy ? fuzzyMatch(query, fields: fields) : nil
+    }
+
+    /// The tiers above fuzzy only: the history looks for fuzzy matches only if these leave room (review IU2).
+    static func strictMatch(_ query: CommandQuery, fields: CommandMatchFields) -> CommandMatch? {
+        guard !query.folded.isEmpty, let tier = strictTier(query, fields) else {
             return nil
         }
-        if let tier = strictTier(query, fields) {
-            return tier >= minimumTier ? CommandMatch(tier: tier, quality: 100) : nil
-        }
-        guard minimumTier == .fuzzy, let quality = bestFuzzyQuality(query.compact, fields), quality >= minimumFuzzyQuality else {
+        return CommandMatch(tier: tier, quality: 100)
+    }
+
+    /// The fuzzy tier alone, for fields that `strictMatch` doesn't match.
+    static func fuzzyMatch(_ query: CommandQuery, fields: CommandMatchFields) -> CommandMatch? {
+        guard !query.folded.isEmpty, let quality = bestFuzzyQuality(query.compactCharacters, fields), quality >= minimumFuzzyQuality
+        else {
             return nil
         }
         return CommandMatch(tier: .fuzzy, quality: quality)
@@ -91,8 +102,10 @@ nonisolated enum CommandMatcher {
     /// word: length of `needle` over the length of the shortest window found by advancing as early as possible. Nil
     /// if no word start allows finding everything.
     static func fuzzyQuality(of needle: String, in haystack: String) -> Int? {
-        let needle = Array(needle)
-        let haystack = Array(haystack)
+        fuzzyQuality(of: Array(needle), in: Array(haystack))
+    }
+
+    private static func fuzzyQuality(of needle: [Character], in haystack: [Character]) -> Int? {
         guard let first = needle.first else {
             return nil
         }
@@ -133,28 +146,29 @@ nonisolated enum CommandMatcher {
     /// punctuation (“node.js”, “6.4”) counts as its pieces; “c++”, a single piece, stays whole so as not to be
     /// reduced to “c” (and therefore starts no word).
     private static func isWordPrefixMatch(_ query: CommandQuery, _ fields: CommandMatchFields) -> Bool {
+        guard query.wordPartsAreWords, !query.wordParts.isEmpty else {
+            return false
+        }
         let haystacks = fields.titles + [fields.address].compactMap(\.self)
-        return !query.wordParts.isEmpty && query.wordParts.allSatisfy { parts in
+        return query.wordParts.allSatisfy { parts in
             parts.allSatisfy { part in haystacks.contains { hasWord(startingWith: part, in: $0) } }
         }
     }
 
-    /// True if a word of `text` (run of letters and digits, like `CommandText.words`) starts with `part`, without
-    /// splitting the text: history (task 5.5) passes thousands of addresses on each keystroke.
+    /// True if a word of `text` (run of letters and digits, like `CommandText.words`) starts with `part` (letters and
+    /// digits only), without splitting the text: history (task 5.5) passes thousands of addresses on each keystroke.
+    /// Only the occurrences of its first letter are looked at, not every character (review IU2).
     private static func hasWord(startingWith part: String, in text: String) -> Bool {
-        guard let first = part.first, part.allSatisfy(isWordCharacter) else {
+        guard let first = part.first else {
             return false
         }
-        var previousIsWordCharacter = false
-        var index = text.startIndex
-        while index < text.endIndex {
-            let character = text[index]
-            let isWord = isWordCharacter(character)
-            if isWord, !previousIsWordCharacter, character == first, text[index...].hasPrefix(part) {
+        var start = text.startIndex
+        while let index = text[start...].firstIndex(of: first) {
+            let startsWord = index == text.startIndex || !isWordCharacter(text[text.index(before: index)])
+            if startsWord, text[index...].hasPrefix(part) {
                 return true
             }
-            previousIsWordCharacter = isWord
-            index = text.index(after: index)
+            start = text.index(after: index)
         }
         return false
     }
@@ -163,11 +177,11 @@ nonisolated enum CommandMatcher {
         character.isLetter || character.isNumber
     }
 
-    private static func bestFuzzyQuality(_ compact: String, _ fields: CommandMatchFields) -> Int? {
+    private static func bestFuzzyQuality(_ compact: [Character], _ fields: CommandMatchFields) -> Int? {
         guard (3 ... maximumFuzzyLength).contains(compact.count) else {
             return nil
         }
-        let haystacks = (fields.titles + [fields.address].compactMap(\.self)).map { String($0.prefix(fuzzyFieldLength)) }
+        let haystacks = (fields.titles + [fields.address].compactMap(\.self)).map { Array($0.prefix(fuzzyFieldLength)) }
         return haystacks.compactMap { fuzzyQuality(of: compact, in: $0) }.max()
     }
 

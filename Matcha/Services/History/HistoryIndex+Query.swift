@@ -5,7 +5,8 @@ nonisolated extension HistoryIndex {
     /// Addresses that match `query` according to `CommandMatcher` (the same as `CommandRanker`), hence a superset of
     /// what the bar will keep; at most `limit`, the best ones in ranking order: tier, approximate band, frequency and
     /// recency, last visit, key. A character mask first rules out the addresses that cannot match, without comparing
-    /// them one by one. Nothing if the current task is cancelled (a more recent keystroke).
+    /// them one by one. Fuzzy matches rank last: they are looked for only if the stricter ones don't fill `limit`
+    /// (review IU2). Nothing if the current task is cancelled (a more recent keystroke).
     func entries(matching query: CommandQuery, limit: Int, now: Date) -> [HistoryEntry] {
         guard !query.isEmpty, limit > 0 else {
             return []
@@ -14,20 +15,29 @@ nonisolated extension HistoryIndex {
         // shortest of the compared texts), except the same page, which goes through the key.
         let required = HistoryCharacterMask([query.urlFolded])
         var matches: [Match] = []
+        var unmatched: [HistoryIndexEntry] = []
         for (offset, entry) in entries.values.enumerated() {
             if offset.isMultiple(of: 1024), Task.isCancelled {
                 return []
             }
-            guard entry.characters.contains(required) || entry.fields.isSamePage(as: query.addressKey),
-                  let match = CommandMatcher.match(query, fields: entry.fields)
-            else {
+            guard entry.characters.contains(required) || entry.fields.isSamePage(as: query.addressKey) else {
                 continue
             }
-            matches.append(Match(entry: entry, match: match, frecency: Frecency.score(
-                visitCount: entry.visitCount,
-                lastVisit: entry.lastVisit,
-                now: now,
-            )))
+            if let match = CommandMatcher.strictMatch(query, fields: entry.fields) {
+                matches.append(Match(entry, match, now: now))
+            } else {
+                unmatched.append(entry)
+            }
+        }
+        if matches.count < limit {
+            for (offset, entry) in unmatched.enumerated() {
+                if offset.isMultiple(of: 1024), Task.isCancelled {
+                    return []
+                }
+                if let match = CommandMatcher.fuzzyMatch(query, fields: entry.fields) {
+                    matches.append(Match(entry, match, now: now))
+                }
+            }
         }
         matches.sort(by: Match.isBetter)
         return matches.prefix(limit).map(\.entry.historyEntry)
@@ -38,6 +48,12 @@ nonisolated extension HistoryIndex {
         let entry: HistoryIndexEntry
         let match: CommandMatch
         let frecency: Int
+
+        init(_ entry: HistoryIndexEntry, _ match: CommandMatch, now: Date) {
+            self.entry = entry
+            self.match = match
+            frecency = Frecency.score(visitCount: entry.visitCount, lastVisit: entry.lastVisit, now: now)
+        }
 
         static func isBetter(_ lhs: Self, _ rhs: Self) -> Bool {
             if lhs.match.tier != rhs.match.tier {

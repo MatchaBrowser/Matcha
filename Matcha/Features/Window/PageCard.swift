@@ -83,7 +83,7 @@ struct PageCard: View {
         }
         .shadow(color: .black.opacity(0.18), radius: 3, y: 1)
         .accessibilityElement(children: .contain)
-        .accessibilityLabel(Text(verbatim: tab?.displayTitle ?? ""))
+        .modifier(PageTitleLabel(tab: tab))
         .accessibilityValue(accessibilityValue)
         .accessibilityIdentifier("pagePane")
     }
@@ -150,5 +150,15 @@ struct PageCard: View {
     /// Without a tab, ⌘T opens one; an empty tab is filled with ⌘L.
     private var emptyPageDescription: LocalizedStringKey {
         tab == nil ? "Press ⌘T to search or enter an address." : "Press ⌘L to search or enter an address."
+    }
+}
+
+/// The page's title as the card's accessibility label, read here only: a new title doesn't recompute the card
+/// (review IU4).
+private struct PageTitleLabel: ViewModifier {
+    let tab: BrowserTab?
+
+    func body(content: Content) -> some View {
+        content.accessibilityLabel(Text(verbatim: tab?.displayTitle ?? ""))
     }
 }

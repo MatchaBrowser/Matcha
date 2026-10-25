@@ -28,7 +28,8 @@ struct HistoryRowView: View {
         .accessibilityElement(children: .ignore)
         .accessibilityAddTraits(.isStaticText)
         .accessibilityLabel(Text(verbatim: row.title))
-        .accessibilityValue(Text(verbatim: row.host))
+        // The domain, then the time of the visit (review IU21).
+        .accessibilityValue(Text(verbatim: "\(row.host), \(row.lastVisit.formatted(.dateTime.hour().minute()))"))
         .accessibilityIdentifier("historyRow")
     }
 }

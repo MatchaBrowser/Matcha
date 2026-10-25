@@ -5,7 +5,8 @@ import SwiftUI
 /// other apps open.
 struct DefaultBrowserSection: View {
     @AppStorage(BrowserSettings.Key.externalLinkDestination) private var destination = BrowserSettings.externalLinkDestination
-    @State private var isDefault = DefaultBrowser.isMatcha
+    /// Read when the section appears, not at each `init` (LaunchServices, review IU8).
+    @State private var isDefault = false
     @State private var isAsking = false
 
     var body: some View {
@@ -39,6 +40,7 @@ struct DefaultBrowserSection: View {
                 .font(.caption)
                 .foregroundStyle(.secondary)
         }
+        .onAppear { isDefault = DefaultBrowser.isMatcha }
         // Changed elsewhere (System Settings, another browser): read again on returning to Matcha.
         .onReceive(NotificationCenter.default.publisher(for: NSApplication.didBecomeActiveNotification)) { _ in
             isDefault = DefaultBrowser.isMatcha

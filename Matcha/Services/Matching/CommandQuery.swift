@@ -16,6 +16,10 @@ nonisolated struct CommandQuery: Equatable, Sendable {
     let wordParts: [[String]]
     /// Folded text without spaces, for fuzzy matching.
     let compact: String
+    /// `compact` as characters, made once per keystroke rather than for each compared address (review IU2).
+    let compactCharacters: [Character]
+    /// True if each piece of `wordParts` is only letters and digits: a piece with punctuation starts no word.
+    let wordPartsAreWords: Bool
     /// Folded text without “https://”, “http://”, “www.” or trailing “/”, compared with addresses.
     let urlFolded: String
     let searchEngine: SearchEngine
@@ -34,6 +38,8 @@ nonisolated struct CommandQuery: Equatable, Sendable {
             return pieces.count > 1 ? pieces.map(String.init) : [token]
         }
         compact = tokens.joined()
+        compactCharacters = Array(compact)
+        wordPartsAreWords = wordParts.allSatisfy { $0.allSatisfy { $0.allSatisfy { $0.isLetter || $0.isNumber } } }
         let stripped = CommandText.stripURLPrefixes(folded)
         urlFolded = stripped.count > 1 && stripped.hasSuffix("/") ? String(stripped.dropLast()) : stripped
         self.searchEngine = searchEngine

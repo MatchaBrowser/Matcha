@@ -18,6 +18,9 @@ struct BrowserWindowView: View {
     @State var models: WindowModels
     @State var window: NSWindow?
     @AppStorage("sidebarWidth") private var sidebarWidth = SidebarMetrics.defaultWidth
+    /// Width while the handle is dragged, for this window only: the saved width is written at the end, and the other
+    /// windows follow once (review IU1).
+    @State private var liveSidebarWidth: Double?
     @SceneStorage("sidebarVisible") var isSidebarVisible = true
     @AppStorage(BrowserSettings.Key.homePage) var homePage = BrowserSettings.homePage
     @AppStorage(BrowserSettings.Key.newTabPage) var newTabPage = BrowserSettings.newTabPage
@@ -71,7 +74,7 @@ struct BrowserWindowView: View {
     }
 
     private var width: Double {
-        SidebarMetrics.clampedWidth(sidebarWidth)
+        SidebarMetrics.clampedWidth(liveSidebarWidth ?? sidebarWidth)
     }
 
     /// Hidden sidebar shown: hovered. The downloads panel is part of it: it reappears with it.
@@ -271,7 +274,7 @@ struct BrowserWindowView: View {
     @ViewBuilder private var sidebarOverlay: some View {
         if isSidebarVisible {
             // Above the sidebar and the card, straddling their boundary.
-            SidebarResizeHandle(width: $sidebarWidth)
+            SidebarResizeHandle(width: $sidebarWidth, liveWidth: $liveSidebarWidth)
                 .offset(x: width - SidebarResizeHandle.thickness / 2)
         } else {
             if !showsCompactSidebar {
