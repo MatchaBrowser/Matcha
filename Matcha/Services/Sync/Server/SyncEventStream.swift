@@ -4,11 +4,14 @@ import OSLog
 /// Event stream of the server (`GET /v1/sync/events`, `SYNC.md` § 4.6): each time another device of the account had
 /// changes applied, the changes are read again, and also on each connection (what happened in between). The server
 /// closes the stream when the access token expires, after `event: expired`: the token is renewed (one renewal at a
-/// time) and the stream reconnects right away. Any other cut (network, answer other than `200`, no `ping` for 90
-/// seconds) reconnects after a growing delay, from 1 second to 5 minutes.
+/// time) and the stream reconnects right away, unless the previous renewal was less than 30 seconds ago: a server that
+/// says `expired` at each connection gets the growing delay (review SY18). Any other cut (network, answer other than
+/// `200`, no `ping` for 90 seconds) reconnects after a growing delay, from 1 second to 5 minutes.
 @MainActor
 final class SyncEventStream {
     static let maximumDelay: Duration = .seconds(5 * 60)
+    /// Two renewals closer than this: the second reconnection waits.
+    static let minimumRenewalInterval: Duration = .seconds(30)
 
     private let client: SyncAPIClient
     /// Requests without data for 90 seconds end (the server sends a `ping` every 30 seconds).
@@ -18,7 +21,6 @@ final class SyncEventStream {
     var onChanges: (() -> Void)?
     /// The session ended (revoked device, deleted account, unknown tokens): the stream stops.
     var onSessionEnded: ((SyncServerError) -> Void)?
-    private(set) var isConnected = false
 
     init(client: SyncAPIClient) {
         self.client = client
@@ -33,24 +35,31 @@ final class SyncEventStream {
         }
     }
 
+    /// Ends the stream and its session (review SY18): a stream is never started again.
     func stop() {
         task?.cancel()
         task = nil
-        isConnected = false
+        session.invalidateAndCancel()
     }
 
     private func run() async {
         var delay: Duration = .seconds(1)
+        var lastRenewal: ContinuousClock.Instant?
         while !Task.isCancelled {
             do {
                 try await listen()
-                delay = .seconds(1)
+                let now = ContinuousClock.now
+                if let lastRenewal, now - lastRenewal < Self.minimumRenewalInterval {
+                    try? await Task.sleep(for: delay)
+                    delay = min(delay * 2, Self.maximumDelay)
+                } else {
+                    delay = .seconds(1)
+                }
+                lastRenewal = now
             } catch let error as SyncServerError where error.endsSession {
-                isConnected = false
                 onSessionEnded?(error)
                 return
             } catch {
-                isConnected = false
                 guard !Task.isCancelled else {
                     return
                 }
@@ -69,7 +78,7 @@ final class SyncEventStream {
         let token = await tokens.accessToken
         var request = client.eventsRequest()
         request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
-        let (bytes, response) = try await session.bytes(for: request)
+        let (bytes, response) = try await session.bytes(for: request, delegate: client.redirects)
         guard let http = response as? HTTPURLResponse else {
             throw SyncClientError.unreadableAnswer
         }
@@ -81,7 +90,6 @@ final class SyncEventStream {
             _ = try await renew(after: token)
             return
         }
-        isConnected = true
         onChanges?()
         var event: String?
         // Lines of a reasonable length: a server that never ends one can't make the memory grow (review TR2).
@@ -89,7 +97,6 @@ final class SyncEventStream {
             if line.hasPrefix("event:") {
                 event = line.dropFirst(6).trimmingCharacters(in: .whitespaces)
                 if event == "expired" {
-                    isConnected = false
                     _ = try await renew(after: token)
                     return
                 }
@@ -101,7 +108,6 @@ final class SyncEventStream {
                 event = nil
             }
         }
-        isConnected = false
         throw URLError(.networkConnectionLost)
     }
 

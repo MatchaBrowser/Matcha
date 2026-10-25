@@ -41,6 +41,17 @@ nonisolated struct SyncServerError: Error, Equatable, Sendable {
     }
 }
 
+/// In the logs, the HTTP status rather than the case's index (review SY39); the code is logged apart.
+nonisolated extension SyncServerError: CustomNSError {
+    static var errorDomain: String {
+        "SyncServerError"
+    }
+
+    var errorCode: Int {
+        status
+    }
+}
+
 /// Problems on this Mac's side, before or after the server.
 nonisolated enum SyncClientError: Error, Equatable, Sendable {
     /// Not a sync server, or another version of the API.

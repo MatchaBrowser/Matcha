@@ -50,6 +50,8 @@ struct SyncConnectForm: View {
                 TextField("Server address", text: $address, prompt: Text(verbatim: "https://sync.example.com"))
                     .textContentType(.URL)
                     .onSubmit(checkServer)
+                    // The server checked is the one signed in to: “Change” first (review SY29).
+                    .disabled(endpoint != nil)
                     .accessibilityIdentifier("syncServerField")
                 Button(endpoint == nil ? "Connect" : "Change") {
                     endpoint == nil ? checkServer() : (endpoint = nil)

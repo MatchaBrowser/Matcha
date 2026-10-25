@@ -4,7 +4,8 @@ import OSLog
 /// HTTP client of a sync server's API v1 (`SYNC.md` § 4): JSON bodies, header `Matcha-Client` on every request,
 /// bearer token on the authenticated routes, renewed once (`SyncTokenStore`) when the server answers
 /// `token_expired`. An error answer becomes a `SyncServerError` with its stable code. Certificates: only those macOS
-/// trusts (default checks of `URLSession`), without exception.
+/// trusts (default checks of `URLSession`), without exception. Redirections are never followed (review SY21): a 307
+/// or a 308 would send the body (`authKey`, key envelopes) to another host.
 final nonisolated class SyncAPIClient: Sendable {
     let address: SyncServerAddress
     let base: URL
@@ -14,6 +15,7 @@ final nonisolated class SyncAPIClient: Sendable {
     /// Tokens of the session; nil before signing in.
     let tokens: SyncTokenStore?
     let clock = SyncServerClock()
+    let redirects = SyncRedirectRefusal()
 
     init(address: SyncServerAddress, session: URLSession, clientVersion: String, tokens: SyncTokenStore? = nil) throws {
         guard let base = address.apiBase else {
@@ -33,11 +35,6 @@ final nonisolated class SyncAPIClient: Sendable {
         configuration.httpCookieStorage = nil
         configuration.urlCache = nil
         return URLSession(configuration: configuration)
-    }
-
-    /// The same client signed in with `tokens`.
-    func signedIn(with tokens: SyncTokenStore) throws -> SyncAPIClient {
-        try SyncAPIClient(address: address, session: session, clientVersion: clientVersion, tokens: tokens)
     }
 
     // MARK: Requests
@@ -95,6 +92,10 @@ final nonisolated class SyncAPIClient: Sendable {
             throw SyncClientError.unreadableAnswer
         }
         await clock.record(http.value(forHTTPHeaderField: "Date"))
+        // A redirection not followed: this address isn't the API's.
+        if (300 ..< 400).contains(http.statusCode) {
+            throw SyncClientError.notASyncServer
+        }
         guard (200 ..< 300).contains(http.statusCode) else {
             throw Self.error(from: data, response: http)
         }
@@ -105,9 +106,9 @@ final nonisolated class SyncAPIClient: Sendable {
     /// body is refused without being read to its end.
     private func body(of request: URLRequest, limit: Int?) async throws -> (Data, URLResponse) {
         guard let limit else {
-            return try await session.data(for: request)
+            return try await session.data(for: request, delegate: redirects)
         }
-        let (bytes, response) = try await session.bytes(for: request)
+        let (bytes, response) = try await session.bytes(for: request, delegate: redirects)
         if let http = response as? HTTPURLResponse, !(200 ..< 300).contains(http.statusCode) {
             return try await (BoundedRead.prefix(of: bytes, limit: SyncEventStream.maximumLineLength), response)
         }
@@ -164,5 +165,19 @@ final nonisolated class SyncAPIClient: Sendable {
     /// `POST /v1/auth/refresh`, without the access token.
     func renew(_ refreshToken: String) async throws -> SyncRefreshResponse {
         try await json("POST", "auth/refresh", body: SyncRefreshRequest(refreshToken: refreshToken), authenticated: false)
+    }
+}
+
+/// Refuses every redirection of the sync API (review SY21): the redirection's own answer is returned instead.
+final nonisolated class SyncRedirectRefusal: NSObject, URLSessionTaskDelegate, Sendable {
+    /// The completion handler form: the `async` one crashes the compiler (Swift 6.4, nonisolated class).
+    func urlSession(
+        _: URLSession,
+        task _: URLSessionTask,
+        willPerformHTTPRedirection _: HTTPURLResponse,
+        newRequest _: URLRequest,
+        completionHandler: @escaping @Sendable (URLRequest?) -> Void,
+    ) {
+        completionHandler(nil)
     }
 }

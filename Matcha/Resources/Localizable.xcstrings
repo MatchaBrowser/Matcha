@@ -20059,6 +20059,35 @@
         }
       }
     },
+    "Your recovery kit wasn't saved: make a new one in Manage Account." : {
+      "comment" : "Settings > Sync: warning when a new recovery key was made but its kit wasn't saved",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dein Wiederherstellungskit wurde nicht gesichert: Erstelle unter „Account verwalten“ ein neues."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tu kit de recuperación no se guardó: crea uno nuevo en Gestionar cuenta."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Votre kit de secours n'a pas été enregistré : créez-en un nouveau dans Gérer le compte."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Il tuo kit di recupero non è stato salvato: creane uno nuovo in Gestisci account."
+          }
+        }
+      }
+    },
     "Your Spaces, folders, Favorites, pinned and today tabs, extensions and settings, on all your Macs. Everything is encrypted on this Mac with your master password: the server can't read it." : {
       "comment" : "Settings > Sync: what sync does",
       "localizations" : {

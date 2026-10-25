@@ -54,14 +54,10 @@ final class AppEnvironment {
         return FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask).first?.appendingPathComponent("Sync")
     }
 
-    /// Settings in `Application Support/Sync/extensions.json`; during tests (unit tests and test store), in memory.
+    /// Settings of the signed-in account, in `Application Support/Sync` (`SyncService` picks the file when its sync starts,
+    /// review SY11); during tests (unit tests and test store), in memory.
     private static func makeExtensionSync(manager: ExtensionManager) -> ExtensionSyncAdapter {
-        let url = TestEnvironment.usesInMemoryStore() ? nil : FileManager.default.urls(
-            for: .applicationSupportDirectory,
-            in: .userDomainMask,
-        ).first?
-            .appendingPathComponent("Sync/extensions.json")
-        return ExtensionSyncAdapter(manager: manager, synced: SyncedExtensions(url: url))
+        ExtensionSyncAdapter(manager: manager, synced: SyncedExtensions(url: nil))
     }
 
     /// In the unit tests' host app and with a test store (UI tests), a non-persistent controller, with nothing saved or

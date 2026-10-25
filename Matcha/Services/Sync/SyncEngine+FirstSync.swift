@@ -34,6 +34,8 @@ extension SyncEngine {
         } else {
             await chooseFirstSync()
         }
+        // Signed out while the question was waiting: nothing is applied nor saved (review SY7).
+        try Task.checkCancellation()
         Logger.sync.notice("First sync: \(String(describing: choice), privacy: .public)")
         switch choice {
         case .merge:
@@ -43,7 +45,7 @@ extension SyncEngine {
         case .replaceRemote:
             try replaceRemoteData(liveIDs: liveIDs)
         }
-        try retryWaiting()
+        try retryWaiting(after: Set(liveIDs))
         state.cursor = cursor
         state.hasCompletedFirstSync = true
         state.mergesWithoutAsking = false

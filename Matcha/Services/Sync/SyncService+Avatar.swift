@@ -16,33 +16,52 @@ extension SyncService {
         configuration.serverInfo?.maximumAvatarImageBytes ?? 256 * 1024
     }
 
-    /// Reads the account: the avatar is downloaded again if its date changed, forgotten if there is none.
+    /// Reads the account: the avatar is downloaded again if its date changed, forgotten if there is none. An answer
+    /// that comes after a change of account is dropped (review SY24); an avatar that can't be read shows the default
+    /// one, and isn't downloaded again until another one is announced (review SY37).
     func refreshAvatar() async {
         guard supportsAvatar, let (client, accountKey) = try? signedInAccount(), let accountID = configuration.accountID else {
             return
         }
+        let isCurrent = { [weak self] in self?.client === client && self?.configuration.accountID == accountID && !Task.isCancelled }
         avatarCheckedAt = .now
         do {
-            guard let description = try await client.account().avatar else {
+            let account = try await client.account()
+            guard isCurrent() else {
+                return
+            }
+            guard let description = account.avatar else {
                 forgetAvatar()
                 return
             }
-            guard description.updatedAt != configuration.avatarUpdatedAt || avatar == nil else {
+            let isKnown = description.updatedAt == configuration.avatarUpdatedAt && avatar != nil
+            guard !isKnown, description.updatedAt != configuration.unreadableAvatarAt || description.updatedAt == nil else {
                 return
             }
             let limit = configuration.serverInfo?.maximumAvatarBytes ?? SyncServerInfo(api: 1).maximumAvatarBytes
-            guard let encrypted = try await client.avatar(limit: limit) else {
+            let encrypted = try await client.avatar(limit: limit)
+            guard isCurrent() else {
+                return
+            }
+            guard let encrypted else {
                 forgetAvatar()
                 return
             }
-            let dataKey = SyncAccountKeys.dataKey(accountKey: accountKey)
-            let image = try SyncCrypto.decryptAvatar(
-                encrypted,
-                accountID: accountID,
-                keyVersion: SyncServerTransport.keyVersion,
-                dataKey: dataKey,
-            )
-            keepAvatar(image, updatedAt: description.updatedAt)
+            do {
+                let dataKey = SyncAccountKeys.dataKey(accountKey: accountKey)
+                let image = try SyncCrypto.decryptAvatar(
+                    encrypted,
+                    accountID: accountID,
+                    keyVersion: SyncServerTransport.keyVersion,
+                    dataKey: dataKey,
+                )
+                keepAvatar(image, updatedAt: description.updatedAt)
+            } catch {
+                Logger.sync.error("Unreadable avatar: \(error.logSummary, privacy: .public)")
+                forgetAvatar()
+                configuration.unreadableAvatarAt = description.updatedAt
+                configuration.save(to: defaults)
+            }
         } catch {
             Logger.sync.error("Avatar not read: \(error.logSummary, privacy: .public)")
         }
@@ -82,6 +101,7 @@ extension SyncService {
     private func keepAvatar(_ image: Data, updatedAt: Date?) {
         setAvatar(image)
         configuration.avatarUpdatedAt = updatedAt
+        configuration.unreadableAvatarAt = nil
         configuration.save(to: defaults)
         if let url = avatarCacheURL {
             try? FileManager.default.createDirectory(at: url.deletingLastPathComponent(), withIntermediateDirectories: true)

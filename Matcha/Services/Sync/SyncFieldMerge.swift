@@ -3,16 +3,23 @@ import Foundation
 /// Content sent for a modification made on this Mac (`SYNC.md` § 5): the last accepted content, where only the fields
 /// changed on this Mac since its last sync are replaced, entry by entry for an extension's permission lists. A value
 /// received and not applied here (an update not installed, a permission, an `allow`) leaves again as it is, and so do
-/// the fields unknown to this version. A field emptied here (absent: `null`) is removed. Pure type.
+/// the fields unknown to this version. A field emptied here (absent: `null`) is removed, with a baseline or without
+/// (review SY1). Pure type.
 nonisolated enum SyncFieldMerge {
     /// Fields compared entry by entry: name or pattern → expiration date.
     static let entryByEntryKeys: Set<String> = ["grantedPermissions", "deniedPermissions", "grantedMatchPatterns", "deniedMatchPatterns"]
 
-    /// `remote` with the changes from `baseline` to `local`; without a baseline (the record wasn't on this Mac), all
-    /// of `local` replaces `remote`.
-    static func merged(remote: SyncJSON, local: SyncJSON, baseline: SyncJSON?) -> SyncJSON {
+    /// `remote` with the changes from `baseline` to `local`; without a baseline (the record wasn't on this Mac), each
+    /// of `knownKeys` takes `local`'s value, absent ones included (the encoding leaves out what is `nil`), and the
+    /// others stay as received.
+    static func merged(remote: SyncJSON, local: SyncJSON, baseline: SyncJSON?, knownKeys: Set<String>) -> SyncJSON {
         guard let baseline else {
-            return .object(remote.objectValue.merging(local.objectValue) { _, mine in mine })
+            var result = remote.objectValue
+            let mine = local.objectValue
+            for key in knownKeys.union(mine.keys) {
+                result[key] = mine[key]
+            }
+            return .object(result)
         }
         var result = remote.objectValue
         let mine = local.objectValue

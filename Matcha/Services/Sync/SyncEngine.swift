@@ -58,6 +58,12 @@ final class SyncEngine {
     var report = Report()
     /// During a full reread: records the server has in an older version than the one accepted here; nil otherwise.
     var staleOnServer: Set<UUID>?
+    /// This Mac's fields as this cycle last read them (`detectLocalChanges`); nil before. A record that differs when a
+    /// received change is applied was changed here meanwhile (review SY23).
+    var detectedSnapshot: [UUID: SyncJSON]?
+    /// Changes sent again on top of the server's content after a conflict won (review SY5): once applied, their
+    /// content carries the other Mac's fields, applied here too.
+    var remerged: Set<UUID> = []
 
     /// `deviceID`: this Mac's identifier, kept in the keychain; it replaces the one of the state file (a cloned Mac
     /// draws a new one, `SYNC.md` § 5).
@@ -97,9 +103,18 @@ final class SyncEngine {
         }
         isSyncing = true
         report = Report()
+        detectedSnapshot = nil
+        remerged = []
         defer { isSyncing = false }
-        await store.prepare(using: transport)
+        // Before anything leaves, the first cycle after a launch included (review SY9).
+        if let lead = await transport.clockLead() {
+            isSendingPaused = lead > SyncClock.maximumLead
+        }
+        if !isSendingPaused {
+            await store.prepare(using: transport)
+        }
         try await resendInFlight()
+        try applyAccepted()
         if state.hasCompletedFirstSync {
             try detectLocalChanges()
             try await guardMassDeletion()
@@ -113,8 +128,12 @@ final class SyncEngine {
         }
         // This Mac's changes that are newer than those read: sent again on top of the version read.
         try await push()
+        state.purgeOldEntries(now: now())
         save()
-        await store.finish(using: transport)
+        if !isSendingPaused {
+            let waitingExtensions = state.pending.values.contains { $0.content.recordType == .webExtension }
+            await store.finish(using: transport, recordsSent: !waitingExtensions)
+        }
         let (sent, received, conflicts) = (report.sent, report.received, report.conflicts)
         Logger.sync.info(
             "Sync: \(sent, privacy: .public) sent, \(received, privacy: .public) received, \(conflicts, privacy: .public) conflicts",
@@ -124,12 +143,31 @@ final class SyncEngine {
 
     // MARK: This Mac's changes
 
+    /// True if this Mac has something to send: a change waiting, or a change of its data since its last sync, read
+    /// without the network and without queuing anything (review SY15); `next`: when to look again at a change of its
+    /// tabs that waits (`deviceTabs`).
+    func localChangesToSend() throws -> (hasChanges: Bool, next: Date?) {
+        if !isSendingPaused, !state.pending.isEmpty || state.inFlight != nil {
+            return (true, nil)
+        }
+        var probe = detector
+        let (changes, next) = try probe.changes(in: store.snapshot(), exceptions: store.exceptions(), state: state, now: now())
+        return (!changes.isEmpty, next)
+    }
+
     /// Collects this Mac's changes since its last sync and queues them for sending.
     func detectLocalChanges() throws {
         let snapshot = try store.snapshot()
         let exceptions = try store.exceptions()
+        // An extension installed from an offer: its state here is its reference (review SY1).
+        for id in store.takeAdoptedRecords() where state.pending[id] == nil {
+            if let fields = snapshot[id] {
+                state.entries[id, default: SyncEntry(type: fields.type.rawValue)].local = fields.json
+            }
+        }
         let (changes, next) = detector.changes(in: snapshot, exceptions: exceptions, state: state, now: now())
         nextCheck = next
+        detectedSnapshot = snapshot.mapValues(\.json)
         changes.forEach(record)
     }
 
@@ -147,7 +185,12 @@ final class SyncEngine {
                 modifiedBy: state.deviceID,
             )
             if let replaced, !replaced.deleted, replaced.type == content.type {
-                content.fields = SyncFieldMerge.merged(remote: replaced.fields, local: local, baseline: state.baseline(of: id))
+                content.fields = SyncFieldMerge.merged(
+                    remote: replaced.fields,
+                    local: local,
+                    baseline: state.baseline(of: id),
+                    knownKeys: fields.type.fieldKeys,
+                )
             }
             state.pending[id] = SyncPendingChange(content: content, local: local)
         } else if entry?.version == nil {
@@ -193,14 +236,17 @@ final class SyncEngine {
         guard deletions.count >= Self.massChangeThreshold, deletions.count * 2 > state.liveRecordCount else {
             return
         }
-        if await confirmMassDeletion(deletions.count) {
+        let isConfirmed = await confirmMassDeletion(deletions.count)
+        // Signed out while the question was waiting: nothing more (review SY7).
+        try Task.checkCancellation()
+        if isConfirmed {
             return
         }
         Logger.sync.notice("Mass deletion refused: \(deletions.count, privacy: .public) records restored")
         for id in deletions {
             state.pending[id] = nil
         }
-        try applyRemote(deletions)
+        try applyAccepted(deletions)
         save()
     }
 
@@ -224,11 +270,16 @@ final class SyncEngine {
     func observe(_ content: SyncContent) {
         if !state.clock.observe(content.modifiedAt, now: now()) {
             Logger.sync.notice("Received date far in the future: clock unchanged")
-            state.sawFutureDate = true
+            state.futureDateSeenAt = now()
         }
     }
 
+    /// Saves the state; never once the cycle is cancelled: signing out may have just deleted the file, which would
+    /// otherwise come back in clear text (`SYNC.md` § 5, review SY7).
     func save() {
+        guard !Task.isCancelled else {
+            return
+        }
         do {
             try file.save(state)
         } catch {

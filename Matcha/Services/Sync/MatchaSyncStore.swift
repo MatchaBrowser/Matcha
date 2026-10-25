@@ -114,8 +114,20 @@ final class MatchaSyncStore: SyncLocalStore {
         await extensions?.preparePackages(using: transport)
     }
 
-    func finish(using transport: any SyncTransport) async {
-        await extensions?.deleteObsoletePackages(using: transport)
+    func finish(using transport: any SyncTransport, recordsSent: Bool) async {
+        await extensions?.deleteObsoletePackages(using: transport, recordsSent: recordsSent)
+    }
+
+    func takeAdoptedRecords() -> Set<UUID> {
+        guard let extensions else {
+            return []
+        }
+        let adopted = extensions.takeAdopted()
+        guard !adopted.isEmpty else {
+            return []
+        }
+        let fields = extensions.fields()
+        return Set(adopted.compactMap { fields[$0].map(identifiers.webExtension) })
     }
 
     func apply(_ changes: [SyncLocalChange]) throws -> Set<UUID> {

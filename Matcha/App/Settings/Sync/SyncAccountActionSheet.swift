@@ -16,7 +16,6 @@ enum SyncAccountAction: String, Identifiable {
 struct SyncAccountActionSheet: View {
     let sync: SyncService
     let action: SyncAccountAction
-    let showKit: (SyncRecoveryKit) -> Void
 
     @Environment(\.dismiss) private var dismiss
     @State private var password = ""
@@ -58,7 +57,9 @@ struct SyncAccountActionSheet: View {
                     ProgressView()
                         .controlSize(.small)
                 }
+                // An operation started can't be left: its error would be lost (review SY30).
                 Button("Cancel", role: .cancel) { dismiss() }
+                    .disabled(isWorking)
                 Button(confirmTitle, role: action == .deleteAccount ? .destructive : nil, action: confirm)
                     .keyboardShortcut(.defaultAction)
                     .disabled(!canConfirm || isWorking)
@@ -119,10 +120,8 @@ struct SyncAccountActionSheet: View {
                 case .changePassword:
                     try await sync.changePassword(current: password, new: newPassword)
                 case .newRecoveryKit:
-                    let kit = try await sync.replaceRecoveryKey(password: password)
-                    dismiss()
-                    showKit(kit)
-                    return
+                    // Kept by sync until saved (`pendingRecoveryKit`): shown once this sheet is gone (review SY12).
+                    _ = try await sync.replaceRecoveryKey(password: password)
                 case .changeEmail:
                     try await sync.changeEmail(password: password, to: email)
                 case .deleteAccount:

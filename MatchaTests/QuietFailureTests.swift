@@ -39,4 +39,25 @@ struct QuietFailureTests {
         #expect(SyncedExtensions(url: url).packages.isEmpty)
         #expect(SyncedExtensions(url: folder.appending(path: "missing.json")).packages.isEmpty)
     }
+
+    /// Review SY11: one extensions file per account, the old single file taken over by the first, deleted at sign-out.
+    @Test @MainActor func `synced extensions are kept per account`() {
+        defer { try? FileManager.default.removeItem(at: folder) }
+        let legacy = folder.appending(path: "extensions.json")
+        let first = folder.appending(path: "extensions-a.json")
+        let second = folder.appending(path: "extensions-b.json")
+        let old = SyncedExtensions(url: legacy)
+        old.ignored = ["com.example.old"]
+
+        let synced = SyncedExtensions(url: nil)
+        synced.use(url: first, legacy: legacy)
+        #expect(synced.ignored == ["com.example.old"])
+        #expect(!FileManager.default.fileExists(atPath: legacy.path))
+        synced.use(url: second, legacy: legacy)
+        #expect(synced.ignored.isEmpty)
+        synced.ignored = ["com.example.b"]
+        synced.forget()
+        #expect(!FileManager.default.fileExists(atPath: second.path))
+        #expect(FileManager.default.fileExists(atPath: first.path))
+    }
 }

@@ -30,9 +30,17 @@ protocol SyncTransport: Sendable {
 
     /// Deletes the package `id` (no error if it does not exist).
     func deleteBlob(id: UUID) async throws
+
+    /// This Mac's time minus the server's, in seconds, read before sending anything (`SYNC.md` § 2.8, review SY9); nil
+    /// if it can't be known.
+    func clockLead() async -> TimeInterval?
 }
 
 extension SyncTransport {
+    func clockLead() async -> TimeInterval? {
+        nil
+    }
+
     /// A batch whose changes the transport sends itself, in clear text (tests).
     func prepare(_ changes: [SyncOutgoingChange]) throws -> SyncPreparedBatch {
         SyncPreparedBatch(key: UUID(), changes: changes, body: Data())

@@ -59,15 +59,27 @@ extension SyncService {
             recovery: SyncKeyEnvelope(authKey: creation.recoveryAuthKey, wrappedAccountKey: creation.recoveryWrappedAccountKey),
             device: SyncDeviceDescription(id: device.id, name: Self.deviceName),
         ))
-        try keep(response, accountKey: creation.accountKey, endpoint: endpoint, email: email)
+        try keep(response, accountKey: creation.accountKey, endpoint: endpoint, email: email, deviceID: device.id)
         let kit = SyncRecoveryKit(server: server, email: email, recoveryKey: creation.recoveryKey.displayed)
-        pendingRecoveryKit = kit
+        awaitSaving(kit)
         return kit
     }
 
-    /// The recovery kit is saved: sync starts (a keychain error is shown as the last error).
+    /// The kit of a new recovery key, kept until it is saved, and noted across launches (review SY12).
+    func awaitSaving(_ kit: SyncRecoveryKit) {
+        pendingRecoveryKit = kit
+        configuration.isRecoveryKitUnsaved = true
+        configuration.save(to: defaults)
+    }
+
+    /// The recovery kit is saved: sync starts if it wasn't running (a keychain error is shown as the last error).
     func recoveryKitSaved() {
         pendingRecoveryKit = nil
+        configuration.isRecoveryKitUnsaved = false
+        configuration.save(to: defaults)
+        guard !isActive else {
+            return
+        }
         do {
             try startSignedIn()
         } catch {
@@ -88,7 +100,7 @@ extension SyncService {
             device: SyncDeviceDescription(id: device.id, name: Self.deviceName),
         ))
         let accountKey = try Self.unwrap(response.wrappedAccountKey, with: keys.wrapKey)
-        try keep(response, accountKey: accountKey, endpoint: endpoint, email: email)
+        try keep(response, accountKey: accountKey, endpoint: endpoint, email: email, deviceID: device.id)
         try startSignedIn()
     }
 
@@ -96,6 +108,9 @@ extension SyncService {
     /// and the sync state is deleted (a later sign-in is a first sync).
     func signOut() async {
         await withdrawDeviceTabs()
+        // Nothing of this account runs while its tokens are revoked (review SY24).
+        let client = client
+        deactivate()
         if let client {
             try? await client.logout()
         }
@@ -134,9 +149,14 @@ extension SyncService {
             recovery: replacement.map { try Self.envelope(of: accountKey, for: $0) },
             device: SyncDeviceDescription(id: device.id, name: Self.deviceName),
         ))
-        try keep(response, accountKey: accountKey, endpoint: endpoint, email: email)
+        try keep(response, accountKey: accountKey, endpoint: endpoint, email: email, deviceID: device.id)
         try startSignedIn()
-        return replacement.map { SyncRecoveryKit(server: server, email: email, recoveryKey: $0.displayed) }
+        guard let replacement else {
+            return nil
+        }
+        let kit = SyncRecoveryKit(server: server, email: email, recoveryKey: replacement.displayed)
+        awaitSaving(kit)
+        return kit
     }
 
     // MARK: Account changes
@@ -168,7 +188,9 @@ extension SyncService {
         guard let server = configuration.server, let email = configuration.email else {
             throw SyncClientError.signedOut
         }
-        return SyncRecoveryKit(server: server, email: email, recoveryKey: recoveryKey.displayed)
+        let kit = SyncRecoveryKit(server: server, email: email, recoveryKey: recoveryKey.displayed)
+        awaitSaving(kit)
+        return kit
     }
 
     /// Changes the account's identifier; the devices stay signed in. The recovery kit names it: a new one should be
@@ -211,15 +233,24 @@ extension SyncService {
 
     // MARK: Helpers
 
-    /// Keeps the session of `response`: account key and tokens in the keychain, the account in the configuration.
-    private func keep(_ response: SyncSessionResponse, accountKey: SymmetricKey, endpoint: SyncServerEndpoint, email: String) throws {
+    /// Keeps the session of `response`: account key and tokens in the keychain, the account in the configuration. The
+    /// device is the one this Mac drew (`deviceID`, `SYNC.md` § 2.7): a session for another one is refused, the server
+    /// can't give this Mac another device's identity (review SY19).
+    private func keep(
+        _ response: SyncSessionResponse,
+        accountKey: SymmetricKey,
+        endpoint: SyncServerEndpoint,
+        email: String,
+        deviceID: UUID,
+    ) throws {
+        guard response.deviceId == deviceID else {
+            Logger.sync.error("Session for another device: refused")
+            throw SyncClientError.unreadableAnswer
+        }
         let (server, accountID) = (endpoint.address, response.accountId)
         try keychain.set(Self.bytes(accountKey), for: .accountKey, server: server, accountID: accountID)
         try keychain.set(Data(response.accessToken.utf8), for: .accessToken, server: server, accountID: accountID)
         try keychain.set(Data(response.refreshToken.utf8), for: .refreshToken, server: server, accountID: accountID)
-        if response.deviceId != (try? keychain.device())?.id {
-            try keychain.setDevice(SyncKeychain.Device(id: response.deviceId, machineMark: SyncMachineMark.current()))
-        }
         configuration = SyncConfiguration()
         configuration.mode = .privateServer
         configuration.server = server

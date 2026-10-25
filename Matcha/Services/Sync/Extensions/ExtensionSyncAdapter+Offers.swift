@@ -38,12 +38,21 @@ extension ExtensionSyncAdapter {
     }
 
     /// The offered extension was just installed: its package is the one received (nothing to send back), it is no
-    /// longer offered.
+    /// longer offered, and its state here becomes the reference of its record: the permissions and the private windows
+    /// of the other Macs are never overwritten by this first state (`SYNC.md` § 2.5, review SY1).
     func didInstallOffer(_ fields: SyncExtensionFields) {
         if let package = SyncedPackage(source: fields.source, version: fields.version) {
             synced.packages[fields.identifier] = package
         }
         synced.offers[fields.identifier] = nil
+        synced.adopted.insert(fields.identifier)
+    }
+
+    /// Extensions installed from an offer since the last sync; forgotten once read.
+    func takeAdopted() -> Set<String> {
+        let adopted = synced.adopted
+        synced.adopted = []
+        return adopted
     }
 
     /// The app's page in the App Store, found through the public iTunes Search API; nil if it is unknown.

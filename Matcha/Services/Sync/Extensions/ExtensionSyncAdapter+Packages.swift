@@ -12,8 +12,9 @@ extension ExtensionSyncAdapter {
     nonisolated static let maximumPackageSize = 20 * 1024 * 1024
 
     /// Before a sync: uploads the package of extensions installed from a file that have none for their version. A
-    /// received update is never installed here: it waits for the user's click (`SYNC.md` § 2.5).
-    func preparePackages(using transport: any SyncTransport) async {
+    /// received update is never installed here: it waits for the user's click (`SYNC.md` § 2.5). A version too large
+    /// isn't archived again; a refused upload waits, longer each time (review SY16).
+    func preparePackages(using transport: any SyncTransport, now: Date = .now) async {
         guard transport.supportsBlobs, let directory = manager.directory else {
             return
         }
@@ -22,10 +23,19 @@ extension ExtensionSyncAdapter {
             if let known = synced.packages[identifier], version == nil || known.version == version {
                 continue
             }
+            if let failure = synced.packageFailures[identifier], failure.version == version, !failure.allowsAttempt(at: now) {
+                continue
+            }
             do {
                 let folder = directory.appendingPathComponent(identifier, isDirectory: true)
                 guard let (package, sealed) = try await Self.sealPackage(of: folder, version: version, fileName: "\(identifier).zip") else {
                     Logger.sync.notice("Extension package too large: not synced")
+                    synced.packageFailures[identifier] = SyncedPackageFailure(
+                        version: version,
+                        isTooLarge: true,
+                        attempts: 1,
+                        failedAt: now,
+                    )
                     continue
                 }
                 try await transport.putBlob(sealed, id: package.blobID)
@@ -33,14 +43,27 @@ extension ExtensionSyncAdapter {
                     synced.obsoleteBlobs.append(old)
                 }
                 synced.packages[identifier] = package
+                synced.packageFailures[identifier] = nil
             } catch {
                 Logger.sync.error("Extension package not sent: \(error.logSummary, privacy: .public)")
+                let previous = synced.packageFailures[identifier].flatMap { $0.version == version ? $0 : nil }
+                let isTooLarge = (error as? SyncServerError)?.code == SyncServerError.blobTooLarge
+                synced.packageFailures[identifier] = SyncedPackageFailure(
+                    version: version,
+                    isTooLarge: isTooLarge,
+                    attempts: (previous?.attempts ?? 0) + 1,
+                    failedAt: now,
+                )
             }
         }
     }
 
-    /// After a sync: deletes from the server the replaced packages or those of uninstalled extensions.
-    func deleteObsoletePackages(using transport: any SyncTransport) async {
+    /// After a sync: deletes from the server the replaced packages or those of uninstalled extensions; never while an
+    /// extension's record waits to leave, which may still cite the old package (`SYNC.md` § 4.7, review SY33).
+    func deleteObsoletePackages(using transport: any SyncTransport, recordsSent: Bool = true) async {
+        guard recordsSent else {
+            return
+        }
         let installed = Set(manager.installedIdentifiers)
         for (identifier, package) in synced.packages where !installed.contains(identifier) {
             synced.packages[identifier] = nil
@@ -81,11 +104,14 @@ extension ExtensionSyncAdapter {
         return file
     }
 
-    /// Archive of the folder, encrypted with a new key, off the main thread; nil beyond 20 MiB.
+    /// Archive of the folder, encrypted with a new key, off the main thread; nil beyond 20 MiB, known as soon as the
+    /// archive passes it.
     @concurrent
     nonisolated static func sealPackage(of folder: URL, version: String?, fileName: String) async throws -> (SyncedPackage, Data)? {
-        let archive = try ZipWriter.archive(folder: folder)
-        guard archive.count <= maximumPackageSize else {
+        let archive: Data
+        do {
+            archive = try ZipWriter.archive(folder: folder, limit: maximumPackageSize)
+        } catch ZipWriter.Failure.tooLarge {
             return nil
         }
         let key = SymmetricKey(size: .bits256)

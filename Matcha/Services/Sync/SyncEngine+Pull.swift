@@ -28,7 +28,7 @@ extension SyncEngine {
                     winners.append(record.id)
                 }
             }
-            try applyRemote(winners)
+            try applyAccepted(winners)
             cursor = page.cursor
             state.cursor = page.cursor
             save()
@@ -36,7 +36,7 @@ extension SyncEngine {
                 break
             }
         }
-        try retryWaiting()
+        try retryWaiting(after: seen)
         return seen
     }
 
@@ -45,7 +45,8 @@ extension SyncEngine {
     private func receive(_ record: SyncRemoteRecord) -> Bool {
         let id = record.id
         var entry = state.entries[id] ?? SyncEntry(type: record.content?.type ?? "")
-        if let known = entry.version, record.version <= known {
+        // During a full reread, an older version is read too: a restored server has it (review SY10).
+        if staleOnServer == nil, let known = entry.version, record.version <= known {
             return false
         }
         entry.version = record.version
@@ -97,12 +98,17 @@ extension SyncEngine {
                 state.entries[id] = nil
             }
         }
-        let resent = missing + stale.filter { state.pending[$0] == nil && state.entries[$0]?.local != nil }
+        // A deletion the restored server lost is sent again too (review SY10).
+        let resent = missing + stale.filter { id in
+            state.pending[id] == nil && (state.entries[id]?.local != nil || state.entries[id]?.remote?.deleted == true)
+        }
         guard !resent.isEmpty else {
             return
         }
         let isMassive = resent.count >= Self.massChangeThreshold && resent.count * 2 > state.liveRecordCount + missing.count
-        if isMassive, await confirmRecreations(resent.count) == .replaceLocal {
+        let choice = isMassive ? await confirmRecreations(resent.count) : .sendAgain
+        try Task.checkCancellation()
+        if choice == .replaceLocal {
             let live = seen.filter { state.entries[$0]?.remote?.deleted == false && state.entries[$0]?.isUnreadable == false }
             try replaceLocalData(keeping: live)
             missing.forEach { state.entries[$0] = nil }
@@ -118,7 +124,14 @@ extension SyncEngine {
     /// Queues the last content accepted for `id` (or this Mac's fields), on top of the server's version or as a
     /// creation.
     private func sendAgain(_ id: UUID, asCreation: Bool) {
-        guard let entry = state.entries[id], let local = entry.local else {
+        guard let entry = state.entries[id] else {
+            return
+        }
+        if let accepted = entry.remote, accepted.deleted {
+            state.pending[id] = SyncPendingChange(content: accepted, local: nil)
+            return
+        }
+        guard let local = entry.local else {
             return
         }
         if asCreation {
@@ -129,49 +142,6 @@ extension SyncEngine {
         } else if let type = SyncRecordType(rawValue: entry.type), let fields = SyncFields(json: local, type: type) {
             let content = SyncContent(fields: fields, modifiedAt: state.clock.next(now: now()), modifiedBy: state.deviceID)
             state.pending[id] = SyncPendingChange(content: content, local: local)
-        }
-    }
-
-    /// Applies the accepted content of `ids` on this Mac. This Mac's fields after applying become the reference for
-    /// the next changes: nothing is sent back as an echo. An unreadable record, or one from a newer version, is
-    /// never applied.
-    func applyRemote(_ ids: [UUID]) throws {
-        var changes: [SyncLocalChange] = []
-        for id in Set(ids) {
-            guard let entry = state.entries[id], !entry.isUnreadable, let remote = entry.remote else {
-                continue
-            }
-            if remote.deleted {
-                if let type = remote.recordType {
-                    changes.append(.delete(id, type))
-                }
-            } else if let fields = remote.readableFields {
-                changes.append(.upsert(id, fields))
-            } else {
-                // Unknown type, format or value: ignored, without overwriting what this Mac has.
-                Logger.sync.notice("Record of an unknown format ignored")
-            }
-        }
-        guard !changes.isEmpty else {
-            return
-        }
-        let waiting = try store.apply(SyncLocalChange.ordered(changes))
-        let snapshot = try store.snapshot()
-        for change in changes {
-            let isWaiting = waiting.contains(change.id)
-            state.entries[change.id]?.isWaiting = isWaiting
-            state.entries[change.id]?.local = isWaiting ? nil : snapshot[change.id]?.json
-            if !isWaiting {
-                report.received += 1
-            }
-        }
-    }
-
-    /// What was waiting for its parent: tried again once per read, after all the pages.
-    func retryWaiting() throws {
-        let waiting = state.entries.compactMap { $0.value.isWaiting ? $0.key : nil }
-        if !waiting.isEmpty {
-            try applyRemote(waiting)
         }
     }
 }

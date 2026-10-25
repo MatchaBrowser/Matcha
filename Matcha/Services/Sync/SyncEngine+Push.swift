@@ -21,7 +21,7 @@ extension SyncEngine {
             return
         }
         let winners = try await send(inFlight).winners
-        try applyRemote(winners)
+        try applyAccepted(winners)
         save()
     }
 
@@ -36,14 +36,14 @@ extension SyncEngine {
             guard !batches.isEmpty else {
                 return
             }
-            var winners: [UUID] = []
             var retries = false
             var queue = batches
             while !queue.isEmpty {
                 let ids = queue.removeFirst()
                 do {
                     let outcome = try await sendBatch(ids)
-                    winners += outcome.winners
+                    // Applied at once: a later batch that fails doesn't lose them (review SY6).
+                    try applyAccepted(outcome.winners)
                     retries = retries || outcome.retries
                 } catch SyncTransportError.batchTooLarge {
                     // Too big for one request: in two halves; a single change that is too big stays on this Mac.
@@ -55,7 +55,6 @@ extension SyncEngine {
                     }
                 }
             }
-            try applyRemote(winners)
             save()
             if !retries {
                 return
@@ -116,14 +115,7 @@ extension SyncEngine {
         let isCurrent = state.pending[id] == sent
         switch result {
         case let .applied(version):
-            accept(change.content, version: version, local: sent.local, for: id)
-            if isCurrent {
-                state.pending[id] = nil
-            }
-            if !change.content.deleted {
-                state.isQuotaExceeded = false
-            }
-            report.sent += 1
+            applied(change, version: version, sent: sent, isCurrent: isCurrent)
             return .done
         case .conflict(current: nil):
             // Unknown to the server: sent again as a creation; a deletion has nothing left to delete there.
@@ -151,6 +143,22 @@ extension SyncEngine {
             }
             return .done
         }
+    }
+
+    private func applied(_ change: SyncOutgoingChange, version: Int, sent: SyncPendingChange, isCurrent: Bool) {
+        let id = change.id
+        accept(change.content, version: version, local: sent.local, for: id)
+        if isCurrent {
+            state.pending[id] = nil
+        }
+        // Sent again on top of the other Mac's content: its fields are applied here too (review SY5).
+        if remerged.remove(id) != nil {
+            state.toApply.insert(id)
+        }
+        if !change.content.deleted {
+            state.isQuotaExceeded = false
+        }
+        report.sent += 1
     }
 
     /// Conflict: the server's current content is taken if it is newer (and newer than what this Mac accepted); the
@@ -195,7 +203,26 @@ extension SyncEngine {
             state.pending[id] = nil
             return .remoteWins
         }
+        remerge(id, onto: content)
         return .retry
+    }
+
+    /// Conflict won: the change leaves again on top of the server's content, with only this Mac's changed fields
+    /// (review SY5); sent as it was, it would erase what the other Mac changed.
+    private func remerge(_ id: UUID, onto current: SyncContent) {
+        guard var pending = state.pending[id], let local = pending.local, !pending.content.deleted, !current.deleted,
+              current.type == pending.content.type, let type = current.recordType
+        else {
+            return
+        }
+        pending.content.fields = SyncFieldMerge.merged(
+            remote: current.fields,
+            local: local,
+            baseline: state.entries[id]?.local,
+            knownKeys: type.fieldKeys,
+        )
+        state.pending[id] = pending
+        remerged.insert(id)
     }
 
     /// `content` is on the server at `version`; `local`: this Mac's fields it carries.

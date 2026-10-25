@@ -56,11 +56,11 @@ struct SyncSettingsView: View {
         .scrollDisabled(true)
         .fixedSize(horizontal: false, vertical: true)
         .asksSyncQuestions()
-        .sheet(item: Binding { kit ?? sync.pendingRecoveryKit } set: {
-            if $0 == nil {
-                kit = nil
-            }
-        }) { shown in
+        // A kit waiting to be saved comes back when the settings open again (review SY12).
+        .onAppear {
+            kit = kit ?? sync.pendingRecoveryKit
+        }
+        .sheet(item: $kit) { shown in
             SyncRecoveryKitView(kit: shown) {
                 kit = nil
                 if sync.pendingRecoveryKit != nil {

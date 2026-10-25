@@ -82,6 +82,12 @@ actor InMemorySyncServer {
         return counter
     }
 
+    /// Puts back `backup` (an earlier copy of `records`), as a restored server: earlier cursors expire (review SY10).
+    func restore(_ backup: [UUID: SyncRemoteRecord]) {
+        records = backup
+        oldestCursor = counter + 1
+    }
+
     /// Forgets deletions, as after 180 days: earlier cursors expire.
     func purgeDeletions() {
         records = records.filter { $0.value.content?.deleted != true }
@@ -236,6 +242,14 @@ struct TinyRequestTransport: SyncTransport {
 final class MemorySyncStore: SyncLocalStore {
     var items: [UUID: SyncFields] = [:]
     var hasOnlyFirstLaunchData = false
+    /// Records just taken from the synced data (an extension installed from an offer).
+    var adopted: Set<UUID> = []
+
+    func takeAdoptedRecords() -> Set<UUID> {
+        defer { adopted = [] }
+        return adopted
+    }
+
     /// Changes applied, in order.
     private(set) var applied: [SyncLocalChange] = []
 

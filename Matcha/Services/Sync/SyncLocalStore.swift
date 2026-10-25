@@ -22,8 +22,12 @@ protocol SyncLocalStore: AnyObject {
     /// Before a cycle: what must be sent before the records that reference it (extension packages).
     func prepare(using transport: any SyncTransport) async
 
-    /// After a successful cycle: cleanup on the server (old packages).
-    func finish(using transport: any SyncTransport) async
+    /// After a successful cycle: cleanup on the server (old packages); `recordsSent`: nothing waits to leave.
+    func finish(using transport: any SyncTransport, recordsSent: Bool) async
+
+    /// Records just taken from the synced data (an extension installed from an offer): their state here is their
+    /// reference, nothing is sent back (review SY1); forgotten once read.
+    func takeAdoptedRecords() -> Set<UUID>
 }
 
 extension SyncLocalStore {
@@ -33,7 +37,11 @@ extension SyncLocalStore {
 
     func prepare(using _: any SyncTransport) async {}
 
-    func finish(using _: any SyncTransport) async {}
+    func finish(using _: any SyncTransport, recordsSent _: Bool) async {}
+
+    func takeAdoptedRecords() -> Set<UUID> {
+        []
+    }
 }
 
 /// What doesn't travel among this Mac's records (`SYNC.md` § 5).
@@ -55,11 +63,31 @@ nonisolated enum SyncLocalChange: Equatable, Sendable {
     }
 
     /// Application order of a batch: creations and modifications of parents first (profiles, Spaces, folders,
-    /// tabs…), then deletions, from the content up to the parents.
+    /// tabs…), a folder after the folder it is in when both are in the batch (review SY25), then deletions, from the
+    /// content up to the parents.
     static func ordered(_ changes: [SyncLocalChange]) -> [SyncLocalChange] {
-        changes.sorted { first, second in
+        var parents: [UUID: [UUID]] = [:]
+        for case let .upsert(id, fields) in changes {
+            parents[id] = fields.parentIDs
+        }
+        var depths: [UUID: Int] = [:]
+        func depth(_ id: UUID, visiting: Set<UUID> = []) -> Int {
+            if let known = depths[id] {
+                return known
+            }
+            // A cycle of folders: left to the writer (`SYNC.md` § 2.3).
+            guard !visiting.contains(id) else {
+                return 0
+            }
+            let inBatch = (parents[id] ?? []).filter { parents[$0] != nil }
+            let value = inBatch.map { depth($0, visiting: visiting.union([id])) + 1 }.max() ?? 0
+            depths[id] = value
+            return value
+        }
+        return changes.sorted { first, second in
             switch (first, second) {
-            case let (.upsert(_, firstFields), .upsert(_, secondFields)): firstFields.type.applyRank < secondFields.type.applyRank
+            case let (.upsert(firstID, firstFields), .upsert(secondID, secondFields)):
+                (firstFields.type.applyRank, depth(firstID)) < (secondFields.type.applyRank, depth(secondID))
             case (.upsert, .delete): true
             case (.delete, .upsert): false
             case let (.delete(_, firstType), .delete(_, secondType)): firstType.applyRank > secondType.applyRank
