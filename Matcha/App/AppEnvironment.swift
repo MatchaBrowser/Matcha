@@ -59,8 +59,8 @@ final class AppEnvironment {
         applicationSupport?.appendingPathComponent("Sync")
     }
 
-    /// Settings of the signed-in account, in `Application Support/Sync` (`SyncService` picks the file when its sync starts,
-    /// review SY11); during tests (unit tests and test store), in memory.
+    /// Settings of the signed-in account, in `Application Support/Sync` (`SyncService` picks the file when its sync
+    /// starts, review SY11); during tests (unit tests and test store), in memory.
     private static func makeExtensionSync(manager: ExtensionManager) -> ExtensionSyncAdapter {
         ExtensionSyncAdapter(manager: manager, synced: SyncedExtensions(url: nil))
     }

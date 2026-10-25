@@ -127,8 +127,8 @@ final class BrowserTab: Identifiable {
         }
     }
 
-    /// The tab's web view, created if needed; an unloaded tab then reloads its address, a sleeping tab its page and
-    /// its history, without counting a new visit.
+    /// The tab's web view, created if needed: an unloaded tab then loads its address again (a new visit); a sleeping
+    /// tab gets its page and its history back, without counting a new visit.
     @discardableResult
     func makeWebViewIfNeeded() -> WKWebView {
         if let webView {

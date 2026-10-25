@@ -21,7 +21,8 @@ nonisolated struct ExtensionState: Codable, Equatable, Sendable {
     /// Button next to the address (task 6.5): false if it is hidden; nil (default): shown.
     var showsButton: Bool?
     /// Publisher proven by the installed file's signature (Chrome identifier of its developer, audit E1); nil if it
-    /// couldn't be proven: no file can then update this extension and keep its data.
+    /// couldn't be proven: then only the offer of your other Macs updates this extension and keeps its data, never a
+    /// file chosen here (`ExtensionInstaller+Placement`).
     var publisher: String?
     /// Installed version, shown next to the one of an update.
     var version: String?

@@ -47,8 +47,9 @@ final class WindowModel {
     @ObservationIgnored var isClosed = false
     /// Makes the window's viewers active as soon as it becomes the key window, before the click that made it so.
     @ObservationIgnored var keyObserver: (any NSObjectProtocol)?
-    /// The window's own tabs, outside any Space (a tab dragged out of the sidebar, `WindowModel+WindowTabs`): the
-    /// sidebar shows only them. The displayed Space is then the one they came from (theme, profile).
+    /// The window's own tabs, outside any Space (a tab dragged out of the sidebar: `detachToNewWindow`,
+    /// `BrowserSession+WindowTabs`): the sidebar shows only them. The displayed Space is then the one they came from
+    /// (theme, profile).
     private(set) var windowTabs: WindowTabs?
 
     /// `spaceID`: the Space the window shows (restored window, new window); otherwise the last displayed one.

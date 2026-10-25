@@ -76,8 +76,8 @@ final class HistoryStore {
         isLoaded ? indexes[profileID] ?? HistoryIndex() : nil
     }
 
-    /// The profile's addresses that match `query`, for the command bar (`HistoryIndex.entries(matching:limit:now:)`): searched off the
-    /// main thread, in a copy of the index; a more recent keystroke (cancelled task) stops the search.
+    /// The profile's addresses that match `query`, for the command bar (`HistoryIndex.entries(matching:limit:now:)`):
+    /// searched off the main thread, in a copy of the index; a more recent keystroke (cancelled task) stops the search.
     func entries(profileID: UUID?, matching query: CommandQuery, limit: Int) async -> [HistoryEntry] {
         await load()
         guard let index = indexes[profileID] else {

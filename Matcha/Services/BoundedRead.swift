@@ -7,7 +7,8 @@ nonisolated enum BoundedRead {
     /// The data passed its ceiling.
     struct TooLarge: Error, Equatable {}
 
-    /// The bytes of `bytes`, `TooLarge` beyond `limit`: as soon as `expectedLength` (-1: unknown) or the reading passes it.
+    /// The bytes of `bytes`, `TooLarge` beyond `limit`: as soon as `expectedLength` (-1: unknown) or the reading passes
+    /// it.
     static func data<Bytes: AsyncSequence>(
         of bytes: Bytes,
         expectedLength: Int64,

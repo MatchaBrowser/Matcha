@@ -34,7 +34,7 @@ private struct PermissionBannerContent: View {
         PromptBannerLayout(
             label: String(
                 localized: "Permission Request",
-                comment: "Accessibility label of the banner where a website asks to use the camera or microphone",
+                comment: "Accessibility label of the banner where a website asks for a permission (camera, microphone, notifications)",
             ),
             identifier: "permissionBanner",
         ) {

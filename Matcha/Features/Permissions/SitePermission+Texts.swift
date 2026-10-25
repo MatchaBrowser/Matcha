@@ -30,9 +30,15 @@ extension SitePermissionDecision {
     var stateTitle: String {
         switch self {
         case .allow:
-            String(localized: "Allowed", comment: "Settings > Privacy: a website is allowed to use the camera or microphone")
+            String(
+                localized: "Allowed",
+                comment: "Settings > Privacy: a website is allowed to use the camera, the microphone or notifications",
+            )
         case .deny:
-            String(localized: "Denied", comment: "Settings > Privacy: a website is not allowed to use the camera or microphone")
+            String(
+                localized: "Denied",
+                comment: "Settings > Privacy: a website is not allowed to use the camera, the microphone or notifications",
+            )
         }
     }
 }

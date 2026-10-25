@@ -17,9 +17,8 @@ final class PolicyRecorder {
 ///
 /// Every property the coordinator reads must be overridden here: reading a property that is not overridden on a
 /// hand-made `WKNavigationAction` crashes the test. `targetFrame` is nil: the fake always looks like a link that opens
-/// a new window; `sourceFrame` too: a load started by the app. `navigationType`: `.other` for `window.open` or the window of a context menu
-/// item (verified, task
-/// 5.9: no button and no key).
+/// a new window; `sourceFrame` too: a load started by the app. `navigationType`: `.other` for `window.open` or the
+/// window of a context menu item (verified, task 5.9: no button and no key).
 @MainActor
 final class FakeNavigationAction: WKNavigationAction {
     private let fakeRequest: URLRequest

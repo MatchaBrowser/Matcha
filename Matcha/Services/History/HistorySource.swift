@@ -9,8 +9,8 @@ nonisolated struct HistoryEntry: Equatable, Sendable {
     let lastVisit: Date
 }
 
-/// History as seen by the bar (task 5.5): addresses grouped by URL, at most `limit`, a superset of what matches
-/// `query`. Never read for a private session.
+/// History as seen by the bar (task 5.5): addresses grouped by URL that match `query` (`CommandMatcher`), the best
+/// `limit` of them, hence a superset of what the bar keeps. Never read for a private session.
 @MainActor
 protocol HistorySource: AnyObject {
     func entries(matching query: CommandQuery, limit: Int) async -> [HistoryEntry]

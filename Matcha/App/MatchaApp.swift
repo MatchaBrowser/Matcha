@@ -37,9 +37,10 @@ struct MatchaApp: App {
         if !session.isInMemory {
             environment.downloads.restoreList(from: .standard)
         }
-        // Global mini window shortcut, except in the unit tests' host app: it would be taken from the user, and its
-        // first access would write ⌥⌘N into their settings (same app identifier). Blocker (task 6.2, set aside):
-        // lists read again or compiled in the background, except there too (the tests have their own store).
+        // Global mini window shortcut (none by default, `MiniWindowShortcut`), except in the unit tests' host app: it
+        // would be taken from the user's own (same app identifier).
+        // Blocker (task 6.2, set aside): lists read again or compiled in the background, except there too (the tests
+        // have their own store).
         if !TestEnvironment.isUnitTestHost() {
             miniWindows.start()
             let global = KeyboardShortcuts.getShortcut(for: .openMiniWindow)

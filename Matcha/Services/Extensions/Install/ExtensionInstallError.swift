@@ -7,7 +7,7 @@ nonisolated enum ExtensionInstallError: Error, Equatable, LocalizedError {
     case unknownFormat
     /// No `manifest.json` at the root (nor in a single subfolder).
     case noManifest
-    /// Damaged, encrypted or too large archive, or in an unsupported format.
+    /// Damaged or encrypted archive, or in an unsupported format (a too large one is `tooLarge`, review EX22).
     case unreadable
     /// Manifest rejected by WebKit (unsupported manifest version, required field missing…).
     case invalidManifest(String)

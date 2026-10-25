@@ -1,8 +1,9 @@
 import Foundation
 
 /// Extension file chosen by the user (task 6.4): Chrome `.crx` (“Cr24” header version 2 or 3, followed by a zip
-/// archive), Firefox `.xpi` or `.zip` (zip archives). The signature of a `.crx` is not verified: the user chooses the
-/// file, and the permissions screen comes before any installation. Pure type.
+/// archive), Firefox `.xpi` or `.zip` (zip archives). Reading only: the signature of a CRX3 file is checked apart
+/// (`CRXSignature`), it proves the publisher but isn't required to install (the user chooses the file, and the
+/// permissions screen comes before any installation). Pure type.
 nonisolated enum ExtensionPackage {
     enum Failure: Error, Equatable {
         /// Neither a `.crx` nor a zip archive.

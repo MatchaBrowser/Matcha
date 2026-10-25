@@ -4,7 +4,7 @@ import Foundation
 /// Writing of a zip archive (task 7.4): the folder of an installed extension, sent encrypted to your other Macs
 /// (`SYNC.md` § 2.5). Each file is compressed with “deflate” if that makes it smaller, stored as is otherwise; the
 /// entries follow the order of the paths; symbolic links and hidden system files (`.DS_Store`) are ignored. Read back
-/// by `ZipArchive`. Pure type.
+/// by `ZipArchive`. Without UI dependency; reads the folder from the disk.
 nonisolated enum ZipWriter {
     enum Failure: Error, Equatable {
         case unreadableFolder
@@ -65,7 +65,8 @@ nonisolated enum ZipWriter {
                 (0, entry.contents)
             }
             let offset = UInt32(output.count)
-            // Local header: signature, version 2.0, UTF-8 flag, method, zero date.
+            // Local header: signature, version 2.0, UTF-8 flag, method, time 00:00 and date 1980-01-01 (the earliest
+            // a zip can hold: a stable archive for the same files).
             output.append(le32(0x0403_4B50))
             output.append(le16(20) + le16(0x0800) + le16(method) + le16(0) + le16(0x21))
             output.append(le32(crc) + le32(UInt32(stored.count)) + le32(UInt32(entry.contents.count)))

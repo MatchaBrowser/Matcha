@@ -1,7 +1,8 @@
 import Foundation
 
-/// Type of a synced record (task 7.4, `SYNC.md` § 2.1), in the application order of a received batch (§ 2.3):
-/// profiles, Spaces, folders, tabs, extensions, settings, site decisions, zooms, tabs of the other Macs. Pure type.
+/// Type of a synced record (task 7.4, `SYNC.md` § 2.1). The order of the cases is the one in which a received batch is
+/// applied (§ 2.3, `applyRank`): profiles, Spaces, folders, tabs, extensions, settings, site decisions, zooms, tabs of
+/// the other Macs. Pure type.
 nonisolated enum SyncRecordType: String, CaseIterable, Codable, Sendable {
     case profile
     case space

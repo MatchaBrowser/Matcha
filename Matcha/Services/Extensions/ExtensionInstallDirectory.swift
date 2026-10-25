@@ -2,8 +2,8 @@ import Foundation
 
 /// Folder of the installed extensions (task 6.3): `Application Support/Extensions/<identifier>/`, one unpacked folder
 /// per extension, with its `manifest.json`. The folder name is the extension's identifier: it gives its address
-/// (`webkit-extension://<identifier>/`) and its storage, which must stay the same from one launch to the next. Task 6.4
-/// will copy the installed extensions there. Pure type.
+/// (`webkit-extension://<identifier>/`) and its storage, which must stay the same from one launch to the next. The
+/// installer puts the extensions installed from a file there (`ExtensionInstaller`). Pure type.
 nonisolated enum ExtensionInstallDirectory {
     static let folderName = "Extensions"
     static let manifestName = "manifest.json"

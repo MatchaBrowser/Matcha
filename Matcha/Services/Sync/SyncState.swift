@@ -1,10 +1,10 @@
 import Foundation
 import OSLog
 
-/// This Mac's sync state for one account (`SYNC.md` § 5), kept from one launch to the next: device identifier, read
-/// cursor, clock, what the server has of each record and what this Mac had of it then, changes waiting to be sent, and
-/// the batch sent without an answer yet. Decoded leniently: a field missing from an older file takes its default
-/// value. Pure type.
+/// This Mac's sync state for one account (`SYNC.md` § 5), kept from one launch to the next in its file
+/// (`SyncStateFile`, one per server and account): device identifier, read cursor, clock, what the server has of each
+/// record and what this Mac had of it then, changes waiting to be sent, and the batch sent without an answer yet.
+/// Decoded leniently: a field missing from an older file takes its default value. Pure type.
 nonisolated struct SyncState: Codable, Equatable, Sendable {
     var deviceID = UUID()
     var cursor: String?

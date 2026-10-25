@@ -3,12 +3,12 @@ import WebKit
 /// Context menu of pages (task 5.9), delegate side: the window WebKit opens for a Matcha item
 /// (`BrowserWebView+PageMenu`) follows the choice recorded by the originating web view, only once and within a second.
 /// - “… in New Tab”: a background tab created with the configuration supplied by WebKit, after the originating tab;
-///   from Peek, after its originating tab, and Peek stays Peek; from a mini window, in the target Space (like
-///   ⌘-click); from a sign-in window, as from its originating page
-///   (`TabHost.openWindow(configuration:from:inBackground:)`).
+///   from Peek, after its originating tab, and Peek stays Peek; from a mini window, in the target Space (like ⌘-click);
+///   from a sign-in window, as from its originating page (`TabHost.openWindow(configuration:from:inBackground:)`).
 /// - “Open Link in Peek”: `TabHost.openInPeek` (hence `TabManager.openPeek(_:from:openingPoint:)`) with the requested
 ///   address, and WebKit gets no window; if refused (tab no longer displayed, a link the app doesn't open itself:
-///   `NavigationPolicy.opensElsewhere`), a background tab. The menu's window has no `window.opener` (checked): nothing to keep.
+///   `NavigationPolicy.opensElsewhere`), a background tab. The menu's window has no `window.opener` (checked): nothing
+///   to keep.
 /// - Link to another app (mailto:…): handed to that app, like ⌘-click.
 extension NavigationCoordinator: PageMenuDelegate {
     func pageMenuOffersPeek(in webView: WKWebView) -> Bool {

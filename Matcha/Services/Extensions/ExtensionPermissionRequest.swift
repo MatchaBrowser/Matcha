@@ -2,7 +2,7 @@ import Foundation
 
 /// Request from a running extension (`permissions.request()`, task 6.3): permissions (“tabs”, “cookies”…), websites
 /// (address patterns or addresses) or access to all websites. Pure type, described for the alert of
-/// `ExtensionPermissionAlert`; the permissions screen of task 6.4 can use it.
+/// `ExtensionPermissionAlert` (`ExtensionPermissionSummary`, the same sentences as the permissions screen).
 nonisolated struct ExtensionPermissionRequest: Equatable, Sendable {
     /// Name of the extension (its display name, otherwise its identifier).
     var extensionName: String

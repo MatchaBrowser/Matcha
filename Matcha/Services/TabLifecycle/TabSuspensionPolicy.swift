@@ -33,8 +33,8 @@ nonisolated enum TabSuspensionReason: String, Sendable {
 /// Rules of tab sleeping (task 5.6). Never: a displayed tab (all the panes of a split, the originating tab of a Peek),
 /// one without a web view, one waiting for a permission answer, one using the camera or the microphone, one that opened
 /// a sign-in window that is still open (task 5.8), one whose website may send notifications, or one playing sound:
-/// according to its speaker icon (task 5.10), otherwise checked afterwards with WebKit. “Never” in the settings: nothing, even during a
-/// memory warning.
+/// according to its speaker icon (task 5.10), otherwise checked afterwards with WebKit. “Never” in the settings:
+/// nothing, even during a memory warning.
 nonisolated enum TabSuspensionPolicy {
     /// During a simple warning, a tab hidden for a shorter time is spared: people often go back to the tab they just
     /// left.
