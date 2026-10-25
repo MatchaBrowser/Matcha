@@ -122,7 +122,7 @@ final class PageZoomUITests: XCTestCase {
     /// Mini window: the badge is in its toolbar; the browser window behind shows none.
     @MainActor
     func testZoomInMiniWindowShowsTheBadgeInItsToolbar() throws {
-        try XCTSkipUnless(FileManager.default.isReadableFile(atPath: Self.localDocsPath), "Postfix documentation missing")
+        try requireResource(FileManager.default.isReadableFile(atPath: Self.localDocsPath), "Postfix documentation missing")
         let app = launchApp()
         XCTAssertTrue(waitForBrowserWindow(of: app))
         let mini = openMiniWindow(in: app)

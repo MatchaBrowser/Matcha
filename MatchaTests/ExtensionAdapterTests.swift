@@ -134,9 +134,9 @@ struct ExtensionAdapterTests {
 
     // MARK: Actions
 
-    private func result(_ action: (@escaping @Sendable ((any Error)?) -> Void) -> Void) async -> (any Error)? {
-        await withCheckedContinuation { continuation in
-            action { continuation.resume(returning: $0) }
+    private func result(_ action: (@escaping @Sendable ((any Error)?) -> Void) -> Void) async throws -> (any Error)? {
+        try await awaitCallback { done in
+            action { error in Task { @MainActor in done(error) } }
         }
     }
 
@@ -148,7 +148,7 @@ struct ExtensionAdapterTests {
         _ = tabManager.newTab()
         let context = try await context()
         let adapter = try adapter(first)
-        #expect(await result { adapter.activate(for: context, completionHandler: $0) } == nil)
+        #expect(try await result { adapter.activate(for: context, completionHandler: $0) } == nil)
         #expect(model.space === home)
         #expect(home.tabManager.selectedTab === first)
     }
@@ -158,15 +158,15 @@ struct ExtensionAdapterTests {
         let other = tabManager.newTab()
         let context = try await context()
         let adapter = try adapter(tab)
-        #expect(await result { adapter.setPinned(true, for: context, completionHandler: $0) } == nil)
+        #expect(try await result { adapter.setPinned(true, for: context, completionHandler: $0) } == nil)
         #expect(tabManager.place(of: tab) == .pinned)
-        #expect(await result { adapter.setPinned(false, for: context, completionHandler: $0) } == nil)
+        #expect(try await result { adapter.setPinned(false, for: context, completionHandler: $0) } == nil)
         #expect(tabManager.place(of: tab) == .today)
-        #expect(await result { adapter.setZoomFactor(1.25, for: context, completionHandler: $0) } == nil)
+        #expect(try await result { adapter.setZoomFactor(1.25, for: context, completionHandler: $0) } == nil)
         #expect(tab.pageZoom == 1.25)
-        #expect(await result { adapter.goBack(for: context, completionHandler: $0) } != nil)
+        #expect(try await result { adapter.goBack(for: context, completionHandler: $0) } != nil)
         let closing = try self.adapter(other)
-        #expect(await result { closing.close(for: context, completionHandler: $0) } == nil)
+        #expect(try await result { closing.close(for: context, completionHandler: $0) } == nil)
         #expect(tabManager.tab(withID: other.id) == nil)
     }
 
@@ -175,7 +175,7 @@ struct ExtensionAdapterTests {
         let context = try await context()
         let adapter = try adapter(tab)
         let url = try #require(URL(string: "webkit-extension://matcha-test/options.html"))
-        #expect(await result { adapter.loadURL(url, for: context, completionHandler: $0) } != nil)
+        #expect(try await result { adapter.loadURL(url, for: context, completionHandler: $0) } != nil)
         #expect(tab.url == nil)
     }
 
@@ -186,11 +186,11 @@ struct ExtensionAdapterTests {
         windows.update()
         let context = try await context()
         let browser = try #require(windows.adapter(for: model))
-        #expect(await result { browser.close(for: context, completionHandler: $0) } != nil)
+        #expect(try await result { browser.close(for: context, completionHandler: $0) } != nil)
         let window = windows.windowAdapter(mini.id)
         #expect(window.windowType(for: context) == .popup)
         #expect((window.activeTab(for: context) as? ExtensionTab)?.tabID == mini.tab.id)
-        #expect(await result { window.close(for: context, completionHandler: $0) } == nil)
+        #expect(try await result { window.close(for: context, completionHandler: $0) } == nil)
         #expect(miniWindows.windows.isEmpty)
     }
 }

@@ -5,6 +5,7 @@ import Testing
 
 @MainActor
 struct BrowserSessionTests {
+    private let testDefaults = TestDefaults("BrowserSessionTests")
     @Test func `first launch creates a default profile and space`() throws {
         let session = try BrowserSession(container: BrowserSchema.makeContainer(inMemory: true))
         #expect(session.spaces.count == 1)
@@ -31,7 +32,7 @@ struct BrowserSessionTests {
     }
 
     @Test func `unit tests never open the real store`() throws {
-        let defaults = try #require(UserDefaults(suiteName: "BrowserSessionTests-\(UUID().uuidString)"))
+        let defaults = testDefaults.make()
         let session = try #require(BrowserSession.launch(
             defaults: defaults,
             environment: ["XCTestConfigurationFilePath": "/tmp/x"],
@@ -48,7 +49,7 @@ struct BrowserSessionTests {
         let store = folder.appending(path: "matcha.store")
         let garbage = Data("pas une base de données".utf8)
         try garbage.write(to: store)
-        let defaults = try #require(UserDefaults(suiteName: "BrowserSessionTests-\(UUID().uuidString)"))
+        let defaults = testDefaults.make()
         var asked = 0
 
         #expect(BrowserSession.launch(defaults: defaults, environment: [:], storeURL: store) { _ in

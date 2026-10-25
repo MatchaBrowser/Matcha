@@ -7,7 +7,7 @@ import WebKit
 /// Sign-in windows (task 5.8) in a session: Spaces, mini windows, private window, profiles. Real web views, pages from
 /// `TestPages`, windows never shown, closed at the end of each test (`PopupWindowTests`).
 @MainActor
-@Suite(.serialized)
+@Suite(.webKit, .serialized)
 final class PopupWindowSessionTests {
     private let session: BrowserSession
     private let model: WindowModel

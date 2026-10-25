@@ -4,6 +4,7 @@ import Testing
 
 /// Zip archives and extension packages (task 6.4): reading, dangerous paths, `.crx` header.
 @MainActor
+@Suite(.webKit)
 struct ZipArchiveTests {
     private func fixture(_ name: String) throws -> Data {
         let url = try #require(Bundle(for: TestPages.self).url(forResource: name, withExtension: nil))

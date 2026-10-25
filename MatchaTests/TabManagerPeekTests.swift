@@ -5,6 +5,7 @@ import WebKit
 
 /// Peek (task 4.4) in the tab manager: outside the sidebar, closing, “Open as Tab”.
 @MainActor
+@Suite(.webKit)
 struct TabManagerPeekTests {
     private let manager = TabManager(websiteDataStore: .nonPersistent())
 

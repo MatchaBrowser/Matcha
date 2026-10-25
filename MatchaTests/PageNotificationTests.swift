@@ -7,13 +7,14 @@ import WebKit
 /// request through the banner, showing, closing and clicking, with a fake of macOS's notifications. The pages are
 /// local HTML with an https address (`loadHTMLString`), never loaded from the network.
 @MainActor
+@Suite(.webKit)
 struct PageNotificationTests {
     private let system = FakeSystemNotifications()
     private let center: PageNotificationCenter
     private let revealer = FakeNotificationRevealer()
     private let session: BrowserSession
     private let window = AudioTestWindow()
-    private let origin = SiteOrigin(scheme: "https", host: "notify.example.com", port: nil)!
+    private let origin = testOrigin("https", "notify.example.com")
 
     init() throws {
         center = PageNotificationCenter(system: system)
@@ -49,15 +50,8 @@ struct PageNotificationTests {
     }
 
     /// Waits until `script` returns true in the page.
-    private func waitUntilTrue(_ script: String, in tab: BrowserTab) async throws {
-        let clock = ContinuousClock()
-        let deadline = clock.now + .seconds(10)
-        while try await evaluate(script, in: tab) as? Bool != true {
-            guard clock.now < deadline else {
-                throw WaitTimeoutError(line: #line)
-            }
-            try await Task.sleep(for: .milliseconds(50))
-        }
+    private func waitUntilTrue(_ script: String, in tab: BrowserTab, sourceLocation: SourceLocation = #_sourceLocation) async throws {
+        try await waitUntilAsync(sourceLocation: sourceLocation) { try await evaluate(script, in: tab) as? Bool == true }
     }
 
     @Test func `a page reads the remembered decision from the start of its document`() async throws {
@@ -123,6 +117,19 @@ struct PageNotificationTests {
         try await waitUntil { system.added.count == 2 }
         _ = try await evaluate("window.again.close(); return true", in: tab)
         try await waitUntil { system.removed == ["\(thread)#boite"] }
+    }
+
+    /// Review TS11: the states given to the pages are the profile's notification decisions only.
+    @Test func `the pages read only their profile's notification decisions`() {
+        let store = SitePermissionStore(context: nil)
+        let profile = UUID()
+        let other = testOrigin("https", "other.example.com")
+        store.set(.allow, for: .notifications, origin: origin, profileID: profile)
+        store.set(.deny, for: .notifications, origin: other, profileID: profile)
+        store.set(.allow, for: .camera, origin: TestOrigins.meet, profileID: profile)
+        store.set(.allow, for: .notifications, origin: TestOrigins.meet, profileID: UUID())
+        let states = NavigationCoordinator.notificationStates(of: SitePermissionScope(store: store, profileID: profile))
+        #expect(states == [origin.key: .granted, other.key: .denied])
     }
 
     /// Review IU16: a decision changed in the site settings reaches the open pages of the website at once.

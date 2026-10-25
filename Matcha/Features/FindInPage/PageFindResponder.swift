@@ -34,16 +34,18 @@ final class PageFindResponder {
     // MARK: Commands
 
     func canPerform(tag: Int) -> Bool {
-        guard let target = target() else {
-            return false
-        }
+        target().map { Self.canPerform(tag: tag, hasQuery: $0.page.find.hasQuery) } ?? false
+    }
+
+    /// Find, and Use Selection for Find, always; Find Next and Find Previous once something was searched.
+    nonisolated static func canPerform(tag: Int, hasQuery: Bool) -> Bool {
         switch NSFindPanelAction(rawValue: UInt(max(tag, 0))) {
         case .showFindPanel?, .setFindString?:
-            return true
+            true
         case .next?, .previous?:
-            return target.page.find.hasQuery
+            hasQuery
         default:
-            return false
+            false
         }
     }
 

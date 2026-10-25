@@ -5,6 +5,7 @@ import WebKit
 
 /// Events given to the extension controller when tabs, Spaces and windows change (task 6.3).
 @MainActor
+@Suite(.webKit)
 struct ExtensionWindowsTests {
     private let session: BrowserSession
     private let model: WindowModel

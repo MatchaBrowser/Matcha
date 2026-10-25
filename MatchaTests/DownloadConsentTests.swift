@@ -6,6 +6,7 @@ import WebKit
 /// Downloads a page starts on its own (audit W7): a second one, or one from a frame inside the page, waits for the
 /// user in the banner, unless it follows a real click or the user allowed it.
 @MainActor
+@Suite(.webKit)
 struct DownloadConsentTests {
     private let manager = TabManager(websiteDataStore: .nonPersistent())
     private let now = Date(timeIntervalSinceReferenceDate: 1000)

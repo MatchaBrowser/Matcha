@@ -6,6 +6,7 @@ import WebKit
 /// Page targeted by the page commands (find 5.3; printing, PDF and zoom 5.4): active mini window, otherwise Peek,
 /// otherwise active pane.
 @MainActor
+@Suite(.webKit)
 struct FrontPageTests {
     private let manager = TabManager(websiteDataStore: .nonPersistent())
 

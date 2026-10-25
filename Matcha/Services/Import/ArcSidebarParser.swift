@@ -21,6 +21,8 @@ nonisolated enum ArcSidebarParser {
         case unreadable
         /// JSON object without a recognized Arc sidebar.
         case notArcSidebar
+        /// A file larger than any Arc sidebar: not read.
+        case tooLarge
     }
 
     static let keptSchemes: Set<String> = ["http", "https", "file"]

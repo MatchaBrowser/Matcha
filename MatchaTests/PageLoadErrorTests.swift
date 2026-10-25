@@ -5,6 +5,7 @@ import WebKit
 
 /// A page that couldn't load (audit K5): why, in place of the page, with “Try Again”.
 @MainActor
+@Suite(.webKit)
 struct PageLoadErrorTests {
     private let url = URL(string: "https://example.com/page")!
 
@@ -32,7 +33,8 @@ struct PageLoadErrorTests {
     @Test func `a first load that fails keeps its address and can be tried again`() async throws {
         let manager = TabManager(websiteDataStore: .nonPersistent())
         let tab = manager.insertTab(configuration: TestPages.configuration(), after: nil, select: true)
-        // Nothing listens there: refused at once, without network.
+        // Nothing listens there: refused at once, without network. A port of the ephemeral range only serves outgoing
+        // connections, which never listen; the tests' sandbox can't open a port of its own to be sure (review TS5).
         let refused = try #require(URL(string: "http://127.0.0.1:49999/"))
         tab.load(refused)
         try await waitUntil { tab.loadFailure.error != nil }

@@ -111,6 +111,19 @@ nonisolated enum SplitGeometry {
         return nil
     }
 
+    /// Pane edge under the x-coordinate `offset` of the pane `index` (from its own left edge); nil under the floating
+    /// sidebar, which covers the panes up to `leadingInset`.
+    static func dropTarget(atX offset: Double, inPane index: Int, widths: [Double], leadingInset: Double) -> SplitDropTarget? {
+        guard widths.indices.contains(index) else {
+            return nil
+        }
+        let position = paneOrigins(widths: widths)[index] + offset
+        guard position >= leadingInset else {
+            return nil
+        }
+        return dropTarget(atX: position, widths: widths)
+    }
+
     private static func normalized(_ widths: [Double]) -> [Double] {
         let sum = widths.reduce(0, +)
         guard sum > 0, sum.isFinite else {

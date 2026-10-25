@@ -19,9 +19,18 @@ final class PageHistory {
     /// Key of the page reloaded when waking from sleep (task 5.6): its next load is not a visit.
     private var resumedURLKey: String?
     private var pendingChange: Task<Void, Never>?
+    /// Documents finished loading (`pageDidFinishLoading`), recorded or not: what the tests wait for rather than a
+    /// fixed time (review TS2).
+    private(set) var finishedLoads = 0
+
+    /// True while an address changed by the page waits `sameDocumentDelay` (tests).
+    var hasPendingChange: Bool {
+        pendingChange != nil
+    }
 
     /// A document has finished loading in the page (`didFinish` of the main frame).
     func pageDidFinishLoading(url: URL?, title: String?, scope: HistoryScope?) {
+        finishedLoads += 1
         cancelPendingChange()
         self.scope = scope
         loadedURL = url
@@ -58,10 +67,13 @@ final class PageHistory {
         let delay = sameDocumentDelay
         pendingChange = Task { [weak self] in
             try? await Task.sleep(for: delay)
-            guard !Task.isCancelled, let self, let page, !page.isLoading, page.url == url else {
+            guard !Task.isCancelled, let self else {
                 return
             }
-            record(url: url, title: page.title)
+            pendingChange = nil
+            if let page, !page.isLoading, page.url == url {
+                record(url: url, title: page.title)
+            }
         }
     }
 

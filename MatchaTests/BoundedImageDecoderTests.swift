@@ -7,6 +7,8 @@ import UniformTypeIdentifiers
 
 /// Review TR3: images from outside decoded with bounds; the size a file announces is checked before decoding.
 struct BoundedImageDecoderTests {
+    private let testKeychain = TestKeychain()
+    private let testDefaults = TestDefaults("BoundedImageDecoderTests")
     /// PNG of `width` × `height` pixels, of one color.
     private func png(width: Int, height: Int) throws -> Data {
         let context = try #require(CGContext(
@@ -75,8 +77,9 @@ struct BoundedImageDecoderTests {
     }
 
     @Test @MainActor func `the avatar received is decoded once, and refused if it isn't a bitmap`() throws {
-        let sync = try SyncService(
-            defaults: #require(UserDefaults(suiteName: "BoundedImageDecoderTests-\(UUID().uuidString)")),
+        let sync = SyncService(
+            defaults: testDefaults.make(),
+            keychain: testKeychain.make(),
             extensions: nil,
             directory: nil,
         )

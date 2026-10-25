@@ -37,6 +37,7 @@ final class FakePageMenuDelegate: NSObject, WKUIDelegate, PageMenuDelegate {
 /// Page context menu (task 5.9) on a fake menu that reproduces the identifiers, action and state of WebKit's
 /// items (taken from a real menu, `PageMenuIntegrationTests`).
 @MainActor
+@Suite(.webKit)
 struct BrowserWebViewPageMenuTests {
     private let webView = BrowserWebView(frame: .zero, configuration: WKWebViewConfiguration())
     private let target = FakeWebKitMenuTarget()

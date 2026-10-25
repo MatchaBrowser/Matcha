@@ -6,6 +6,7 @@ import WebKit
 /// Search in a real page (task 5.3): what `WKWebView.find(_:configuration:)` does behind
 /// `BrowserTab.search`, and the tab's search (deselection, page unloaded or changed).
 @MainActor
+@Suite(.webKit)
 struct BrowserTabFindTests {
     /// Tab on a local page whose body is `body`.
     private func page(_ body: String) async throws -> BrowserTab {

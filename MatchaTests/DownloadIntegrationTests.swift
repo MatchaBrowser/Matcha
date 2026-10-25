@@ -7,6 +7,7 @@ import WebKit
 /// End-to-end downloads with real web views, without network (task 5.1): `download` link to a `data:` address,
 /// local file that WebKit cannot display. The files go into a temporary folder.
 @MainActor
+@Suite(.webKit)
 struct DownloadIntegrationTests {
     /// Files shipped with macOS that WebKit does not display (the first one present is used); the UI test uses the
     /// same ones.
@@ -128,9 +129,9 @@ struct DownloadIntegrationTests {
         // Port 1 of the local machine: connection refused immediately, without network.
         let request = try URLRequest(url: #require(URL(string: "http://127.0.0.1:1/archive.zip")))
         // Delegate attached at creation, as the coordinator does: the failure can come right after.
-        let item = await withCheckedContinuation { continuation in
+        let item = try await awaitCallback { done in
             page.loadedWebView.startDownload(using: request) { download in
-                continuation.resume(returning: downloads.track(download, scope: .regular, pageURL: nil))
+                done(downloads.track(download, scope: .regular, pageURL: nil))
             }
         }
 

@@ -252,12 +252,18 @@ final class MemorySyncStore: SyncLocalStore {
 
     /// Changes applied, in order.
     private(set) var applied: [SyncLocalChange] = []
+    /// Thrown by the next `apply`, which writes nothing (a save refused by SwiftData).
+    var applyFailure: (any Error)?
 
     func snapshot() -> [UUID: SyncFields] {
         items
     }
 
-    func apply(_ changes: [SyncLocalChange]) -> Set<UUID> {
+    func apply(_ changes: [SyncLocalChange]) throws -> Set<UUID> {
+        if let applyFailure {
+            self.applyFailure = nil
+            throw applyFailure
+        }
         var waiting: Set<UUID> = []
         for change in changes {
             applied.append(change)

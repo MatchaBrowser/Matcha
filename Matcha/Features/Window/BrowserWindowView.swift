@@ -82,14 +82,21 @@ struct BrowserWindowView: View {
         !isSidebarVisible && (isFloatingSidebarHovered || model.holdsFloatingSidebar)
     }
 
-    /// Hidden sidebar reduced to a column of icons (setting), under a bar with the window's buttons.
-    private var showsCompactSidebar: Bool {
-        !isSidebarVisible && hiddenSidebarStyle == .icons
+    /// Fixed, floating or column of icons (`SidebarPresentation`).
+    private var presentation: SidebarPresentation {
+        SidebarPresentation(
+            isSidebarVisible: isSidebarVisible,
+            isFloatingSidebarShown: isFloatingSidebarShown,
+            hiddenSidebarStyle: hiddenSidebarStyle,
+        )
     }
 
-    /// As in Arc, the window's buttons disappear with the sidebar; the column of icons keeps them, in its bar.
+    private var showsCompactSidebar: Bool {
+        presentation.showsCompactSidebar
+    }
+
     private var showsWindowButtons: Bool {
-        isSidebarVisible || isFloatingSidebarShown || showsCompactSidebar
+        presentation.showsWindowButtons
     }
 
     /// Width hidden by the floating sidebar (`floatingWidth`, nil when it isn't shown) at the start of the card, where a
@@ -102,12 +109,8 @@ struct BrowserWindowView: View {
         return max(0, floatingWidth - (showsCompactSidebar ? CompactSidebar.width : cardMargin))
     }
 
-    /// Margins of the card: none on the side of the sidebar, nor under the bar of the column of icons.
     private var cardPaddingEdges: Edge.Set {
-        if isSidebarVisible {
-            return [.top, .trailing, .bottom]
-        }
-        return showsCompactSidebar ? [.trailing, .bottom] : .all
+        presentation.cardPaddingEdges
     }
 
     /// Downloads panel visible: open, in the fixed or floating sidebar.

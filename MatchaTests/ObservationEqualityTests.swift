@@ -6,6 +6,7 @@ import Testing
 /// Review CO8: the observed values are written without checking first; Observation itself notifies no one for the
 /// same `Equatable` value. If a compiler stops doing so, this test says it.
 @MainActor
+@Suite(.webKit)
 struct ObservationEqualityTests {
     @Test func `writing the same value notifies no one`() {
         let tab = BrowserTab(configuration: TestPages.configuration())

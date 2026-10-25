@@ -5,7 +5,7 @@ import Testing
 /// Saved values read leniently (audit R4): a field added later or one unreadable entry no longer loses everything.
 @MainActor
 struct LenientDecodingTests {
-    private let suiteName = "LenientDecodingTests-\(UUID().uuidString)"
+    private let testDefaults = TestDefaults("LenientDecodingTests")
 
     @Test func `an extension state saved by an older version keeps its decisions`() throws {
         let json = #"{"isEnabled": false, "grantedPermissions": {"tabs": 0}}"#
@@ -17,9 +17,8 @@ struct LenientDecodingTests {
         #expect(state.showsButton == nil)
     }
 
-    @Test func `one unreadable extension state is dropped alone and the saved value is kept aside`() throws {
-        let defaults = try #require(UserDefaults(suiteName: suiteName))
-        defer { defaults.removePersistentDomain(forName: suiteName) }
+    @Test func `one unreadable extension state is dropped alone and the saved value is kept aside`() {
+        let defaults = testDefaults.make()
         let json = #"{"bon": {"isEnabled": false}, "abime": {"isEnabled": "oui"}}"#
         defaults.set(Data(json.utf8), forKey: ExtensionStateStore.defaultsKey)
 
@@ -29,9 +28,8 @@ struct LenientDecodingTests {
         #expect(defaults.data(forKey: ExtensionStateStore.unreadableKey) == Data(json.utf8))
     }
 
-    @Test func `an unreadable saved value is kept aside before being written over`() throws {
-        let defaults = try #require(UserDefaults(suiteName: suiteName))
-        defer { defaults.removePersistentDomain(forName: suiteName) }
+    @Test func `an unreadable saved value is kept aside before being written over`() {
+        let defaults = testDefaults.make()
         let garbage = Data("pas du JSON".utf8)
         defaults.set(garbage, forKey: ExtensionStateStore.defaultsKey)
 
@@ -42,8 +40,7 @@ struct LenientDecodingTests {
     }
 
     @Test func `one unreadable download is dropped alone`() throws {
-        let defaults = try #require(UserDefaults(suiteName: suiteName))
-        defer { defaults.removePersistentDomain(forName: suiteName) }
+        let defaults = testDefaults.make()
         let good = SavedDownload(id: UUID(), fileName: "a.zip", fileURL: nil, outcome: .finished, byteCount: 1, failureReason: nil)
         let goodJSON = try #require(try String(bytes: JSONEncoder().encode(good), encoding: .utf8))
         let json = "[\(goodJSON), {\"fileName\": 3}]"

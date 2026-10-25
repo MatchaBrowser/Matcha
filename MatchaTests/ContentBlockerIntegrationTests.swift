@@ -7,7 +7,9 @@ import WebKit
 /// (`BlockerTestPages`) in the tabs of a Space: blocked image and hidden element, lists set afterwards, global
 /// setting, site exception (its pages reload), private window, window opened by a page.
 @MainActor
+@Suite(.webKit)
 final class ContentBlockerIntegrationTests {
+    private let testDefaults = TestDefaults("ContentBlockerIntegrationTests")
     private let service = BlockerTestPages.service()
     private let store: WKContentRuleListStore
     private let directory: URL
@@ -44,10 +46,8 @@ final class ContentBlockerIntegrationTests {
     }
 
     /// Second launch: the lists are read back as they are (same compilation date), without recompiling.
-    @Test func `a second launch reuses the compiled lists`() async throws {
-        let suiteName = "ContentBlockerIntegrationTests-\(UUID().uuidString)"
-        let defaults = try #require(UserDefaults(suiteName: suiteName))
-        defer { defaults.removePersistentDomain(forName: suiteName) }
+    @Test func `a second launch reuses the compiled lists`() async {
+        let defaults = testDefaults.make()
         await BlockerTestPages.service(defaults: defaults).load(from: BlockerTestPages.fixtures, store: store)
         let first = CompiledBlocklist.load(from: defaults)
         #expect(first.count == 2)

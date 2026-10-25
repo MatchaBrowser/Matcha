@@ -7,6 +7,7 @@ import WebKit
 /// Review TR1: what is shown, copied or acted upon reads the displayed document, never the load a page started. The
 /// scenario of audit W4: a page sends the tab to a site that never answers; its own content stays on screen.
 @MainActor
+@Suite(.webKit)
 struct DisplayedAddressSurfacesTests {
     private let session: BrowserSession
     private let window: WindowModel

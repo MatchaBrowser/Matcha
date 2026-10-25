@@ -7,6 +7,7 @@ import WebKit
 /// tested by `DownloadPolicyTests` (a `WKNavigationResponse` created by hand makes WebKit crash when it is
 /// released) and end to end by `DownloadIntegrationTests`.
 @MainActor
+@Suite(.webKit)
 struct NavigationCoordinatorDownloadTests {
     private let manager = TabManager(websiteDataStore: .nonPersistent())
 

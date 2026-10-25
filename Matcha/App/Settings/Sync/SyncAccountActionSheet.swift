@@ -101,14 +101,7 @@ struct SyncAccountActionSheet: View {
     }
 
     private var canConfirm: Bool {
-        guard !password.isEmpty else {
-            return false
-        }
-        switch action {
-        case .changePassword: return SyncPasswordStrength(newPassword).isAcceptable && newPassword == confirmation
-        case .changeEmail: return email.contains("@")
-        case .newRecoveryKit, .deleteAccount: return true
-        }
+        SyncFormRules.canConfirm(action, password: password, newPassword: newPassword, confirmation: confirmation, email: email)
     }
 
     private func confirm() {

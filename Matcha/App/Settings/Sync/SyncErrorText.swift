@@ -16,9 +16,7 @@ enum SyncErrorText {
             return message(for: error)
         }
         if let error = error as? SyncCryptoError {
-            return error == .passwordTooShort
-                ? String(localized: "The password must have at least 12 characters.")
-                : String(localized: "The server's security settings are too weak.")
+            return message(for: error)
         }
         if let error = error as? URLError {
             return message(for: error)
@@ -56,6 +54,16 @@ enum SyncErrorText {
         case .signedOut: String(localized: "Sign in again to keep syncing.")
         case .accountKeyUnreadable: String(localized: "The account's key couldn't be opened. Check the password or the recovery key.")
         case .keychain: String(localized: "The keychain refused access. Unlock it, then try again.")
+        }
+    }
+
+    /// Only weak parameters blame the server; a key that doesn't open is the password's or the recovery key's.
+    private static func message(for error: SyncCryptoError) -> String {
+        switch error {
+        case .passwordTooShort: String(localized: "The password must have at least 12 characters.")
+        case .weakKDF: String(localized: "The server's security settings are too weak.")
+        case .unreadable, .invalidRecoveryKey: message(for: SyncClientError.accountKeyUnreadable)
+        case .keyDerivationFailed: String(localized: "Sync failed.", comment: "Settings > Sync: unknown error")
         }
     }
 

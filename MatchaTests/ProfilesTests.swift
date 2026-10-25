@@ -5,6 +5,7 @@ import Testing
 import WebKit
 
 @MainActor
+@Suite(.webKit)
 struct ProfilesTests {
     private let session: BrowserSession
     private let model: WindowModel

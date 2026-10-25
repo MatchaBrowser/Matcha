@@ -3,6 +3,7 @@ import Testing
 import WebKit
 
 @MainActor
+@Suite(.webKit)
 struct BrowserTabTests {
     private func makeTab() -> BrowserTab {
         BrowserTab(configuration: WebConfigurationFactory().makeConfiguration(websiteDataStore: .nonPersistent()))

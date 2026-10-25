@@ -5,6 +5,7 @@ import WebKit
 
 /// Split view in the tab manager: display, active pane, closing, placement.
 @MainActor
+@Suite(.webKit)
 struct TabManagerSplitTests {
     private let manager = TabManager(websiteDataStore: .nonPersistent())
 

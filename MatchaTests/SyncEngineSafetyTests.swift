@@ -186,4 +186,18 @@ struct SyncEngineSafetyTests {
         #expect(!asked)
         #expect(store.items.count == macA.store.items.count + 1)
     }
+
+    /// Review TS8: changes this Mac couldn't write are read again at the next cycle, the cursor stays before them.
+    @Test func `changes that can't be applied are read again`() async throws {
+        let setup = try await pair()
+        let (macA, macB, space) = (setup.macA, setup.macB, setup.space)
+        macA.rename(space, to: "Nouveau")
+        try await macA.sync()
+        macB.store.applyFailure = CocoaError(.fileWriteUnknown)
+        await #expect(throws: CocoaError.self) { try await macB.sync() }
+        #expect(macB.name(of: space) == "Perso")
+
+        try await macB.sync()
+        #expect(macB.name(of: space) == "Nouveau")
+    }
 }

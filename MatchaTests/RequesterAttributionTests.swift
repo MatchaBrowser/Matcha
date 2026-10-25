@@ -6,6 +6,7 @@ import WebKit
 /// Review WB1: a request to open an app or to download is the asking document's, never that of a frame inside it
 /// passed off as the page, nor of the address being loaded.
 @MainActor
+@Suite(.webKit)
 struct RequesterAttributionTests {
     private let manager = TabManager(websiteDataStore: .nonPersistent())
     private let probe = FrameProbe()

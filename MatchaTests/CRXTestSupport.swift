@@ -64,6 +64,38 @@ enum CRXBuilder {
         return Data("Cr24".utf8) + le32(3) + le32(header.count) + header + archive
     }
 
+    /// CRX3 file of `archive` whose signed header claims the key `claimed`, with these proofs in this order: RSA
+    /// (`sha256_with_rsa`) then P-256 (`sha256_with_ecdsa`); a proof with `corrupt` has one byte of its signature changed.
+    static func crx(
+        archive: Data,
+        claimed: Data,
+        rsa: [(key: Developer, corrupt: Bool)],
+        ecdsa: [(key: P256.Signing.PrivateKey, corrupt: Bool)] = [],
+    ) throws -> Data {
+        let signedHeader = field(1, Data(SHA256.hash(data: claimed).prefix(16)))
+        let message = Data("CRX3 SignedData\0".utf8) + le32(signedHeader.count) + signedHeader + archive
+        var header = Data()
+        for proof in rsa {
+            let signature = try corrupted(proof.key.sign(message), proof.corrupt)
+            header += field(2, field(1, proof.key.publicKeyInfo) + field(2, signature))
+        }
+        for proof in ecdsa {
+            let signature = try corrupted(proof.key.signature(for: message).derRepresentation, proof.corrupt)
+            header += field(3, field(1, proof.key.publicKey.derRepresentation) + field(2, signature))
+        }
+        header += field(10000, signedHeader)
+        return Data("Cr24".utf8) + le32(3) + le32(header.count) + header + archive
+    }
+
+    private static func corrupted(_ signature: Data, _ corrupt: Bool) -> Data {
+        guard corrupt, let last = signature.indices.last else {
+            return signature
+        }
+        var changed = signature
+        changed[last] ^= 0x01
+        return changed
+    }
+
     static func der(_ tag: UInt8, _ content: Data) -> Data {
         var length = Data()
         if content.count < 0x80 {

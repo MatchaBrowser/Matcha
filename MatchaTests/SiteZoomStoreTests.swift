@@ -7,11 +7,11 @@ import WebKit
 /// settings, memory only for a private window, tracked pages.
 @MainActor
 struct SiteZoomStoreTests {
-    private let suiteName = "SiteZoomStoreTests-\(UUID().uuidString)"
+    private let testDefaults = TestDefaults("SiteZoomStoreTests")
     private let defaults: UserDefaults
 
     init() throws {
-        defaults = try #require(UserDefaults(suiteName: suiteName))
+        defaults = testDefaults.make()
     }
 
     /// Page without a web view: only its copied zoom counts (`BrowserTab.pageZoom`).
@@ -56,7 +56,6 @@ struct SiteZoomStoreTests {
         store.setLevel(1, forSite: "example.com")
         #expect(store.levels.isEmpty)
         #expect(defaults.object(forKey: SiteZoomStore.defaultsKey) == nil)
-        defaults.removePersistentDomain(forName: suiteName)
     }
 
     @Test func `zooms survive a relaunch, unreadable values are ignored and others clamped`() {
@@ -71,7 +70,6 @@ struct SiteZoomStoreTests {
         let relaunched = SiteZoomStore(defaults: defaults)
         #expect(relaunched.level(forSite: "apple.com") == 0.75)
         #expect(relaunched.level(forSite: "example.com") == 1.5)
-        defaults.removePersistentDomain(forName: suiteName)
     }
 
     @Test func `a private store writes nothing`() {

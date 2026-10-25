@@ -7,7 +7,9 @@ import Testing
 import WebKit
 
 @MainActor
+@Suite(.webKit)
 struct WindowModelTests {
+    private let testDefaults = TestDefaults("WindowModelTests")
     private let session: BrowserSession
     private let model: WindowModel
 
@@ -119,8 +121,8 @@ struct WindowModelTests {
         #expect(try context.fetch(FetchDescriptor<TabRecord>()).allSatisfy { $0.id != tab.id })
     }
 
-    @Test func `shown space is remembered`() throws {
-        let defaults = try #require(UserDefaults(suiteName: "WindowModelTests-\(UUID().uuidString)"))
+    @Test func `shown space is remembered`() {
+        let defaults = testDefaults.make()
         let remembering = WindowModel(session: session, defaults: defaults)
         remembering.newSpace()
         let reopened = WindowModel(session: session, defaults: defaults)

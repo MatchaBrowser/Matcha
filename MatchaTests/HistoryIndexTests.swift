@@ -4,7 +4,7 @@ import Testing
 
 /// Test visit: `minutesAgo` before `fixedNow`.
 func historyVisit(_ address: String, title: String? = nil, minutesAgo: Double = 0, id: UUID = UUID()) -> HistoryVisit {
-    HistoryVisit(id: id, url: URL(string: address)!, title: title, date: fixedNow.addingTimeInterval(-minutesAgo * 60))
+    HistoryVisit(id: id, url: testURL(address), title: title, date: fixedNow.addingTimeInterval(-minutesAgo * 60))
 }
 
 /// In-memory history of a profile (task 5.5): grouping by address, titles, deletions.

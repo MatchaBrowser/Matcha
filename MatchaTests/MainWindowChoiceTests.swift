@@ -6,6 +6,7 @@ import Testing
 /// Which browsing window acts for the app: questions of sync (review ON23), reopening from a mini window (review ON24),
 /// leaving for a window of its own and closing (review ON18).
 @MainActor
+@Suite(.webKit)
 struct MainWindowChoiceTests {
     private let session: BrowserSession
     private let manager: MiniWindowManager

@@ -72,9 +72,9 @@ final class ArcImportModel {
     }
 
     @concurrent
-    private nonisolated static func read(_ url: URL) async throws -> ArcSidebar {
+    nonisolated static func read(_ url: URL) async throws -> ArcSidebar {
         guard try (url.resourceValues(forKeys: [.fileSizeKey]).fileSize ?? 0) <= maximumFileSize else {
-            throw ArcSidebarParser.Failure.unreadable
+            throw ArcSidebarParser.Failure.tooLarge
         }
         return try ArcSidebarParser.parse(Data(contentsOf: url))
     }

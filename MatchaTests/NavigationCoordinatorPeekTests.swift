@@ -6,6 +6,7 @@ import WebKit
 /// Peek (task 4.4) through the navigation delegate, with real web views and the pages of `TestPages`.
 /// A click simulated in JavaScript carries no modifier key: Shift-clicks go through `FakeNavigationAction`.
 @MainActor
+@Suite(.webKit)
 struct NavigationCoordinatorPeekTests {
     private let manager = TabManager(websiteDataStore: .nonPersistent())
 

@@ -5,6 +5,7 @@ import WebKit
 
 /// Suspension of a session's tabs (task 5.6): what is visible, when and what to suspend.
 @MainActor
+@Suite(.webKit)
 struct TabLifecycleServiceTests {
     private let session: BrowserSession
     private let model: WindowModel

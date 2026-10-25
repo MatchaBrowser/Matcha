@@ -7,6 +7,8 @@ import Testing
 /// kit, sync started, revoked device, sign-out.
 @MainActor
 struct SyncServiceTests {
+    private let testKeychain = TestKeychain()
+    private let testDefaults = TestDefaults("SyncServiceTests")
     /// Fake server keeping what an account needs: its key envelope, and the records pushed.
     private final class FakeServer: @unchecked Sendable {
         private let lock = NSLock()
@@ -62,11 +64,22 @@ struct SyncServiceTests {
         }
     }
 
-    @Test func `an account is created, syncs once its kit is saved, and stops when revoked`() async throws {
+    /// An account created on a fake server, its kit not saved yet: the common setup of the account tests (review TS15).
+    private struct SignedUp {
+        let server: FakeServer
+        let service: SyncService
+        let keychain: SyncKeychain
+        let defaults: UserDefaults
+        let session: BrowserSession
+        let address: SyncServerAddress
+        let kit: SyncRecoveryKit
+    }
+
+    private func signUp() async throws -> SignedUp {
         let server = FakeServer()
         let (host, urlSession) = MockURLProtocol.serve { request, body in try server.handle(request, body) }
-        let defaults = try #require(UserDefaults(suiteName: "SyncServiceTests-\(UUID().uuidString)"))
-        let keychain = SyncKeychain(service: "com.matchabrowser.matcha.sync.tests.\(UUID().uuidString)")
+        let defaults = testDefaults.make()
+        let keychain = testKeychain.make()
         let session = try BrowserSession(container: BrowserSchema.makeContainer(inMemory: true))
         let service = SyncService(defaults: defaults, keychain: keychain, extensions: nil, directory: nil, apiSession: urlSession)
         service.start(session: session)
@@ -74,48 +87,63 @@ struct SyncServiceTests {
 
         // The reference server answers under /api: found from the bare address.
         let endpoint = try await service.checkServer("https://\(host)")
-        let address = endpoint.address
-        #expect(address.normalized == "https://\(host)/api")
+        #expect(endpoint.address.normalized == "https://\(host)/api")
         #expect(endpoint.info.requiresInvitation)
         await #expect(throws: SyncServerError(status: 403, code: "invitation_required")) {
-            _ = try await service.createAccount(
-                on: endpoint,
-                email: "Jeremy@Example.com ",
-                password: "un mot de passe assez long",
-                invitation: nil,
-            )
+            _ = try await service.createAccount(on: endpoint, email: "Jeremy@Example.com ", password: Self.password, invitation: nil)
         }
         let kit = try await service.createAccount(
             on: endpoint,
             email: "Jeremy@Example.com ",
-            password: "un mot de passe assez long",
+            password: Self.password,
             invitation: "K7QD-2MXP",
         )
-        #expect(kit.email == "jeremy@example.com")
-        #expect(SyncRecoveryKey(text: kit.recoveryKey) != nil)
-        // Nothing syncs before the kit is saved, which is remembered across launches (review SY12).
-        #expect(!service.isActive)
-        #expect(service.configuration.isRecoveryKitUnsaved)
-        #expect(SyncConfiguration.load(from: defaults).isRecoveryKitUnsaved)
-        #expect(service.configuration.accountID == server.accountID)
-        #expect(try keychain.data(for: .accountKey, server: address, accountID: server.accountID) != nil)
+        return SignedUp(
+            server: server,
+            service: service,
+            keychain: keychain,
+            defaults: defaults,
+            session: session,
+            address: endpoint.address,
+            kit: kit,
+        )
+    }
 
-        service.recoveryKitSaved()
-        #expect(service.isActive)
-        #expect(!service.configuration.isRecoveryKitUnsaved)
-        await service.coordinator?.syncNow()
-        #expect(server.recordCount >= 2)
+    private static let password = "un mot de passe assez long"
 
-        // Revoked elsewhere: sync stops, the tokens and the key leave the keychain, the browsing data stays.
-        service.sessionEnded(SyncServerError(status: 401, code: "device_revoked"))
-        #expect(!service.isActive)
-        #expect(service.configuration.signedOutReason == .deviceRevoked)
-        #expect(try keychain.data(for: .accountKey, server: address, accountID: server.accountID) == nil)
-        #expect(session.spaces.count == 1)
+    @Test func `a new account syncs nothing before its kit is saved`() async throws {
+        let account = try await signUp()
+        #expect(account.kit.email == "jeremy@example.com")
+        #expect(SyncRecoveryKey(text: account.kit.recoveryKey) != nil)
+        // Remembered across launches (review SY12).
+        #expect(!account.service.isActive)
+        #expect(account.service.configuration.isRecoveryKitUnsaved)
+        #expect(SyncConfiguration.load(from: account.defaults).isRecoveryKitUnsaved)
+        #expect(account.service.configuration.accountID == account.server.accountID)
+        #expect(try account.keychain.data(for: .accountKey, server: account.address, accountID: account.server.accountID) != nil)
+    }
 
-        await service.signOut()
-        #expect(service.configuration == SyncConfiguration())
-        keychain.removeDevice()
+    @Test func `sync starts once the kit is saved`() async throws {
+        let account = try await signUp()
+        account.service.recoveryKitSaved()
+        #expect(account.service.isActive)
+        #expect(!account.service.configuration.isRecoveryKitUnsaved)
+        await account.service.coordinator?.syncNow()
+        #expect(account.server.recordCount >= 2)
+    }
+
+    /// Revoked elsewhere: sync stops, the tokens and the key leave the keychain, the browsing data stays.
+    @Test func `a revoked Mac stops syncing and keeps its data`() async throws {
+        let account = try await signUp()
+        account.service.recoveryKitSaved()
+        account.service.sessionEnded(SyncServerError(status: 401, code: "device_revoked"))
+        #expect(!account.service.isActive)
+        #expect(account.service.configuration.signedOutReason == .deviceRevoked)
+        #expect(try account.keychain.data(for: .accountKey, server: account.address, accountID: account.server.accountID) == nil)
+        #expect(account.session.spaces.count == 1)
+
+        await account.service.signOut()
+        #expect(account.service.configuration == SyncConfiguration())
     }
 
     /// Review SY19: the server can't give this Mac the identity of another device.
@@ -123,8 +151,8 @@ struct SyncServiceTests {
         let server = FakeServer()
         server.imposedDevice = UUID()
         let (host, urlSession) = MockURLProtocol.serve { request, body in try server.handle(request, body) }
-        let defaults = try #require(UserDefaults(suiteName: "SyncServiceTests-\(UUID().uuidString)"))
-        let keychain = SyncKeychain(service: "com.matchabrowser.matcha.sync.tests.\(UUID().uuidString)")
+        let defaults = testDefaults.make()
+        let keychain = testKeychain.make()
         let service = SyncService(defaults: defaults, keychain: keychain, extensions: nil, directory: nil, apiSession: urlSession)
         let endpoint = try await service.checkServer("https://\(host)")
         await #expect(throws: SyncClientError.unreadableAnswer) {
@@ -150,8 +178,8 @@ struct SyncServiceTests {
         try Data("{}".utf8).write(to: old)
         try Data("{}".utf8).write(to: recent)
         try FileManager.default.setAttributes([.modificationDate: Date.now.addingTimeInterval(-70 * 24 * 60 * 60)], ofItemAtPath: old.path)
-        let defaults = try #require(UserDefaults(suiteName: "SyncServiceTests-\(UUID().uuidString)"))
-        let service = SyncService(defaults: defaults, extensions: nil, directory: folder)
+        let defaults = testDefaults.make()
+        let service = SyncService(defaults: defaults, keychain: testKeychain.make(), extensions: nil, directory: folder)
         try service.start(session: BrowserSession(container: BrowserSchema.makeContainer(inMemory: true)))
         #expect(!FileManager.default.fileExists(atPath: old.path))
         #expect(FileManager.default.fileExists(atPath: recent.path))

@@ -6,6 +6,7 @@ import Testing
 /// Matcha data as seen by sync (task 7.4): snapshot, and received changes applied to the session.
 @MainActor
 struct MatchaSyncStoreTests {
+    private let testDefaults = TestDefaults("MatchaSyncStoreTests")
     private let session: BrowserSession
     private let defaults: UserDefaults
     private let store: MatchaSyncStore
@@ -13,7 +14,7 @@ struct MatchaSyncStoreTests {
 
     init() throws {
         session = try BrowserSession(container: BrowserSchema.makeContainer(inMemory: true))
-        defaults = try #require(UserDefaults(suiteName: "MatchaSyncStoreTests-\(UUID().uuidString)"))
+        defaults = testDefaults.make()
         store = MatchaSyncStore(session: session, defaults: defaults, identifiers: .testAccount)
         home = try #require(session.spaces.first)
         session.showFavorites(in: home)

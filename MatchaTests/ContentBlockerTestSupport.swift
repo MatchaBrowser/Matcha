@@ -22,7 +22,7 @@ enum BlockerTestPages {
         components.host = host
         components.path = "/page"
         components.queryItems = [URLQueryItem(name: "body", value: body)]
-        return components.url!
+        return required(components.url, else: testURL("obtest://pages/page"))
     }
 
     /// Compiled list store in a new temporary folder (to delete after the test), never the app's own.
@@ -40,8 +40,8 @@ enum BlockerTestPages {
     }
 
     /// State of the page of `tab` once loaded: the image (“loaded” or “blocked”) and the display of the `.ad` element.
-    static func outcome(of tab: BrowserTab, line: Int = #line) async throws -> Outcome {
-        try await waitUntil(line: line) { tab.title == "loaded" || tab.title == "blocked" }
+    static func outcome(of tab: BrowserTab, sourceLocation: SourceLocation = #_sourceLocation) async throws -> Outcome {
+        try await waitUntil(sourceLocation: sourceLocation) { tab.title == "loaded" || tab.title == "blocked" }
         let script = "getComputedStyle(document.querySelector('.ad')).display"
         let display = try await tab.loadedWebView.evaluateJavaScript(script) as? String
         return Outcome(imageLoaded: tab.title == "loaded", adHidden: display == "none")

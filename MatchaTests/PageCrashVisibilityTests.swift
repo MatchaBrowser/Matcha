@@ -7,6 +7,7 @@ import WebKit
 /// what is shown in an open window, in the displayed Space, reloads right away; so do the pages of mini windows. Real
 /// web views, terminations reported to the delegate as WebKit does.
 @MainActor
+@Suite(.webKit)
 struct PageCrashVisibilityTests {
     private let session: BrowserSession
     private let model: WindowModel

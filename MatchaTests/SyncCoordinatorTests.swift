@@ -6,22 +6,12 @@ import Testing
 /// Sync triggering (task 7.4): a first cycle at startup, then a cycle shortly after each change saved on this Mac.
 @MainActor
 struct SyncCoordinatorTests {
+    private let testDefaults = TestDefaults("SyncCoordinatorTests")
     private let server = InMemorySyncServer()
-
-    /// Waits until `condition` becomes true (2 seconds at most).
-    private func eventually(_ condition: () async -> Bool) async throws -> Bool {
-        for _ in 0 ..< 100 {
-            if await condition() {
-                return true
-            }
-            try await Task.sleep(for: .milliseconds(20))
-        }
-        return await condition()
-    }
 
     @Test func `a change of this Mac leaves shortly after it is saved`() async throws {
         let session = try BrowserSession(container: BrowserSchema.makeContainer(inMemory: true))
-        let defaults = try #require(UserDefaults(suiteName: "SyncCoordinatorTests-\(UUID().uuidString)"))
+        let defaults = testDefaults.make()
         let engine = SyncEngine(
             store: MatchaSyncStore(session: session, defaults: defaults, identifiers: .testAccount),
             transport: InMemorySyncTransport(server: server),
@@ -32,27 +22,27 @@ struct SyncCoordinatorTests {
         defer { coordinator.stop() }
         coordinator.start(observing: session.container.mainContext, defaults: defaults, watchedKeys: SyncedSettings.keys)
         let space = try #require(session.spaces.first)
-        #expect(try await eventually { await server.content(of: space.id) != nil })
+        try await waitUntilAsync { await server.content(of: space.id) != nil }
         #expect(coordinator.lastSyncDate != nil)
 
         session.renameSpace(space, to: "Renommé")
-        #expect(try await eventually {
+        try await waitUntilAsync {
             guard case let .space(fields) = await server.content(of: space.id)?.readableFields else {
                 return false
             }
             return fields.name == "Renommé"
-        })
+        }
 
         defaults.set("bing", forKey: BrowserSettings.Key.searchEngine)
-        #expect(try await eventually { await server.content(of: SyncIdentifiers.testAccount.setting("searchEngine")) != nil })
+        try await waitUntilAsync { await server.content(of: SyncIdentifiers.testAccount.setting("searchEngine")) != nil }
         // A cycle may still be running (the setting's own save triggers one): it ends idle.
-        #expect(try await eventually { coordinator.status == .idle })
+        try await waitUntilAsync { coordinator.status == .idle }
     }
 
     /// A coordinator of an empty session, started, after its first cycle.
     private func startedCoordinator() async throws -> (SyncCoordinator, BrowserSession) {
         let session = try BrowserSession(container: BrowserSchema.makeContainer(inMemory: true))
-        let defaults = try #require(UserDefaults(suiteName: "SyncCoordinatorTests-\(UUID().uuidString)"))
+        let defaults = testDefaults.make()
         let engine = SyncEngine(
             store: MatchaSyncStore(session: session, defaults: defaults, identifiers: .testAccount),
             transport: InMemorySyncTransport(server: server),
@@ -61,7 +51,7 @@ struct SyncCoordinatorTests {
         )
         let coordinator = SyncCoordinator(engine: engine, debounce: .milliseconds(50))
         coordinator.start(observing: session.container.mainContext, defaults: defaults, watchedKeys: SyncedSettings.keys)
-        #expect(try await eventually { coordinator.lastSyncDate != nil && coordinator.status == .idle })
+        try await waitUntilAsync { coordinator.lastSyncDate != nil && coordinator.status == .idle }
         return (coordinator, session)
     }
 
@@ -84,6 +74,82 @@ struct SyncCoordinatorTests {
         coordinator.wait(until: .now.addingTimeInterval(0.5))
         await coordinator.syncNow()
         #expect(coordinator.lastSyncDate == synced)
-        #expect(try await eventually { coordinator.lastSyncDate != synced })
+        try await waitUntilAsync { coordinator.lastSyncDate != synced }
+    }
+
+    /// Review TS8: a failed cycle is reported, and a later one ends idle.
+    @Test func `a failed cycle is reported and the next one recovers`() async throws {
+        let session = try BrowserSession(container: BrowserSchema.makeContainer(inMemory: true))
+        let defaults = testDefaults.make()
+        let engine = SyncEngine(
+            store: MatchaSyncStore(session: session, defaults: defaults, identifiers: .testAccount),
+            transport: LossyTransport(server: server, losses: LossyTransport.Losses(1)),
+            identifiers: .testAccount,
+            file: SyncStateFile(url: nil),
+        )
+        let coordinator = SyncCoordinator(engine: engine, debounce: .milliseconds(50))
+        defer { coordinator.stop() }
+        var outcomes: [String] = []
+        coordinator.didFinishCycle = { error in
+            outcomes.append(error.map { $0 is URLError ? "network" : "other" } ?? "done")
+        }
+        coordinator.start(observing: session.container.mainContext, defaults: defaults, watchedKeys: SyncedSettings.keys)
+        try await waitUntil { !outcomes.isEmpty }
+        #expect(outcomes == ["network"])
+        #expect(coordinator.status == .failed)
+        #expect(coordinator.lastSyncDate == nil)
+
+        await coordinator.syncNow()
+        try await waitUntil { coordinator.status == .idle && outcomes.last == "done" }
+        #expect(coordinator.lastSyncDate != nil)
+    }
+
+    /// A model saved, under the key of the notification that names it.
+    enum Saved: Sendable {
+        case insertedVisit, updatedVisit, deletedVisit, updatedTab, deletedTab
+
+        var key: ModelContext.NotificationKey {
+            switch self {
+            case .insertedVisit: .insertedIdentifiers
+            case .updatedVisit, .updatedTab: .updatedIdentifiers
+            case .deletedVisit, .deletedTab: .deletedIdentifiers
+            }
+        }
+
+        var isTab: Bool {
+            self == .updatedTab || self == .deletedTab
+        }
+    }
+
+    /// Review SY17: only a save that touches something else than the history starts a cycle.
+    @Test(arguments: [
+        ([], false),
+        ([.insertedVisit], false),
+        ([.insertedVisit, .updatedVisit, .deletedVisit], false),
+        ([.updatedTab], true),
+        ([.insertedVisit, .deletedTab], true),
+    ] as [([Saved], Bool)])
+    func `only saves beyond the history concern sync`(saved: [Saved], concernsSync: Bool) throws {
+        let container = try BrowserSchema.makeContainer(inMemory: true)
+        let context = container.mainContext
+        let visit = HistoryRecord(
+            url: testURL("https://example.test/"),
+            urlKey: "example.test",
+            title: nil,
+            visitDate: .now,
+            profileID: nil,
+            spaceID: nil,
+        )
+        let tab = TabRecord(url: testURL("https://example.test/"))
+        context.insert(visit)
+        context.insert(tab)
+        try context.save()
+        var userInfo: [AnyHashable: Any] = [:]
+        for model in saved {
+            let identifiers = userInfo[model.key.rawValue] as? [PersistentIdentifier] ?? []
+            userInfo[model.key.rawValue] = identifiers + [model.isTab ? tab.persistentModelID : visit.persistentModelID]
+        }
+        #expect(SyncCoordinator.concernsSync(userInfo) == concernsSync)
+        #expect(!SyncCoordinator.concernsSync(nil))
     }
 }

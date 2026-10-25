@@ -5,6 +5,7 @@ import WebKit
 
 /// AppKit container of the Peek page, in an offscreen window: keyboard, ⎋, size.
 @MainActor
+@Suite(.webKit)
 struct PeekWebContainerTests {
     private let window = NSWindow(
         contentRect: NSRect(x: 0, y: 0, width: 800, height: 600),
@@ -14,7 +15,7 @@ struct PeekWebContainerTests {
     )
 
     private var contentView: NSView {
-        window.contentView!
+        required(window.contentView, else: NSView())
     }
 
     private func makeWebView() -> WKWebView {
@@ -81,7 +82,6 @@ struct PeekWebContainerTests {
         contentView.addSubview(card)
         card.addSubview(peekPage)
 
-        try await Task.sleep(for: .milliseconds(200))
-        #expect(window.firstResponder === peekPage)
+        try await waitUntil { window.firstResponder === peekPage }
     }
 }

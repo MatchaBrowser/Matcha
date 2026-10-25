@@ -13,6 +13,11 @@ final class PageAudio {
     /// Scheduled switch-off of the icon.
     @ObservationIgnored private var expiry: Task<Void, Never>?
 
+    /// True while the switch-off of the icon is scheduled (tests).
+    var isSwitchOffScheduled: Bool {
+        expiry != nil
+    }
+
     /// Delay between the end of the last sound and the switch-off of the icon (2 s); changed in tests.
     var silenceDelay: TimeInterval {
         get { state.silenceDelay }
@@ -46,6 +51,7 @@ final class PageAudio {
             guard !Task.isCancelled, let self else {
                 return
             }
+            expiry = nil
             // Same deadline (otherwise this task would have been cancelled): the clock never misses it by a hair.
             state.expire(at: max(.now, deadline))
             publish()

@@ -32,25 +32,135 @@ func expectSplitInvariants(_ layout: SidebarLayout, sourceLocation: SourceLocati
     #expect(ids == ids.sorted(), sourceLocation: sourceLocation)
 }
 
-struct WaitTimeoutError: Error, CustomStringConvertible {
-    let line: Int
-    var description: String {
-        "Condition still false at line \(line)"
+/// Waits until `condition` becomes true, checking it every 20 ms: the one wait of the tests (review TS14). 30 s by
+/// default: loading a page (especially a real file, `file:`) takes less than a second alone, but more than 10 s when the
+/// whole suite runs in parallel (web views and main thread shared); a true condition does not wait any longer because
+/// of it. After `timeout`, an issue is recorded where it is called (`sourceLocation`) and the test stops.
+@MainActor
+func waitUntil(
+    timeout: Duration = .seconds(30),
+    sourceLocation: SourceLocation = #_sourceLocation,
+    _ condition: () -> Bool,
+) async throws {
+    let deadline = ContinuousClock.now + timeout
+    while !condition() {
+        guard ContinuousClock.now < deadline else {
+            try #require(condition(), "Condition still false after \(timeout)", sourceLocation: sourceLocation)
+            return
+        }
+        try await Task.sleep(for: .milliseconds(20))
     }
 }
 
-/// Waits until `condition` becomes true, checking it every 20 ms. 30 s by default: loading a page (especially a real
-/// file, `file:`) takes less than a second alone, but more than 10 s when the whole suite runs in parallel (web views
-/// and main thread shared); a true condition does not wait any longer because of it.
+/// True once `condition` holds, false after `timeout`, without recording an issue: for a step the test tries again
+/// (`waitUntil` would fail the test at the first miss).
 @MainActor
-func waitUntil(timeout: Duration = .seconds(30), line: Int = #line, _ condition: () -> Bool) async throws {
-    let clock = ContinuousClock()
-    let deadline = clock.now + timeout
+func holds(within timeout: Duration, _ condition: () -> Bool) async throws -> Bool {
+    let deadline = ContinuousClock.now + timeout
     while !condition() {
-        guard clock.now < deadline else {
-            throw WaitTimeoutError(line: line)
+        guard ContinuousClock.now < deadline else {
+            return false
         }
         try await Task.sleep(for: .milliseconds(20))
+    }
+    return true
+}
+
+/// The value a callback API gives (WebKit, a delegate): a callback never called fails the test after `timeout`, where
+/// it is called, instead of holding the whole suite (review TS1).
+@MainActor
+func awaitCallback<Value: Sendable>(
+    timeout: Duration = .seconds(30),
+    sourceLocation: SourceLocation = #_sourceLocation,
+    _ start: (@escaping @MainActor @Sendable (Value) -> Void) -> Void,
+) async throws -> Value {
+    // `.some` even for an optional value: only the deadline gives nil.
+    let value: Value? = await CallbackTimeout.value(timeout: timeout, fallback: nil) { done in
+        start { done(.some($0)) }
+    }
+    return try #require(value, "Callback not called after \(timeout)", sourceLocation: sourceLocation)
+}
+
+/// `waitUntil` for a condition read asynchronously: a page's script, an actor.
+@MainActor
+func waitUntilAsync(
+    timeout: Duration = .seconds(30),
+    sourceLocation: SourceLocation = #_sourceLocation,
+    _ condition: () async throws -> Bool,
+) async throws {
+    let deadline = ContinuousClock.now + timeout
+    while try await !condition() {
+        guard ContinuousClock.now < deadline else {
+            try #require(try await condition(), "Condition still false after \(timeout)", sourceLocation: sourceLocation)
+            return
+        }
+        try await Task.sleep(for: .milliseconds(20))
+    }
+}
+
+/// `value`, which the test knows is there; nil records an issue where it is used and gives `fallback`, rather than a
+/// forced unwrap, which would crash the host app and fail every test still running (review TS13). For a value built
+/// outside a throwing context (a constant, a fake); elsewhere, `try #require`.
+func required<Value>(
+    _ value: Value?,
+    else fallback: @autoclosure () -> Value,
+    sourceLocation: SourceLocation = #_sourceLocation,
+) -> Value {
+    guard let value else {
+        Issue.record("Unexpected nil", sourceLocation: sourceLocation)
+        return fallback()
+    }
+    return value
+}
+
+/// The address `string` (relative to `base`), which the test knows is valid (`required`).
+func testURL(_ string: String, relativeTo base: URL? = nil, sourceLocation: SourceLocation = #_sourceLocation) -> URL {
+    required(URL(string: string, relativeTo: base), else: URL(filePath: "/invalid-test-address"), sourceLocation: sourceLocation)
+}
+
+/// The origin `scheme://host:port`, which the test knows is valid (`required`).
+func testOrigin(_ scheme: String, _ host: String, port: Int? = nil, sourceLocation _: SourceLocation = #_sourceLocation) -> SiteOrigin {
+    // swiftlint:disable:next force_unwrapping
+    required(SiteOrigin(scheme: scheme, host: host, port: port), else: SiteOrigin(scheme: "https", host: "invalid.test", port: nil)!)
+}
+
+/// Defaults suites of a test, erased with it (review TS3): the tests run in Matcha's own container, where a suite left
+/// behind, even emptied by `removePersistentDomain`, stays as a plist. Held by the test (a property of its type): when
+/// the test ends, each suite made by `make` is emptied and its file deleted.
+final class TestDefaults: @unchecked Sendable {
+    private let prefix: String
+    private var names: [String] = []
+
+    init(_ prefix: String = "MatchaTests") {
+        self.prefix = prefix
+    }
+
+    /// A new, empty suite.
+    func make() -> UserDefaults {
+        let name = "\(prefix)-\(UUID().uuidString)"
+        names.append(name)
+        return required(UserDefaults(suiteName: name), else: .standard)
+    }
+
+    deinit {
+        names.forEach(Self.erase)
+    }
+
+    /// Empties the suite `name` and deletes its file.
+    static func erase(_ name: String) {
+        UserDefaults(suiteName: name)?.removePersistentDomain(forName: name)
+        let library = FileManager.default.urls(for: .libraryDirectory, in: .userDomainMask).first
+        if let file = library?.appending(path: "Preferences/\(name).plist") {
+            try? FileManager.default.removeItem(at: file)
+        }
+    }
+}
+
+extension Trait where Self == TimeLimitTrait {
+    /// Most a test that drives WebKit may last (review TS1): a callback that never comes fails that test, never holds
+    /// the whole suite (the CI stops after 60 minutes).
+    static var webKit: Self {
+        .timeLimit(.minutes(2))
     }
 }
 
@@ -69,7 +179,7 @@ final class TestPages: NSObject, WKURLSchemeHandler {
         if !body.isEmpty {
             components.queryItems = [URLQueryItem(name: "body", value: body)]
         }
-        return components.url!
+        return required(components.url, else: URL(filePath: "/invalid-test-address"))
     }
 
     /// The app's configuration, with the `obtest:` scheme added.

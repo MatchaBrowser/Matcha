@@ -77,7 +77,7 @@ final class ContextMenuDriver: NSObject {
 /// identifiers captured, WebKit item triggered, window put away. WebKit only opens its menu for a web view in a shown
 /// window: the window is placed off every screen; the menu appears for a moment.
 @MainActor
-@Suite(.serialized)
+@Suite(.webKit, .serialized)
 final class PageMenuIntegrationTests {
     private let manager = TabManager(websiteDataStore: .nonPersistent())
     private let window = NSWindow(
@@ -108,10 +108,8 @@ final class PageMenuIntegrationTests {
         page.load(TestPages.url("source", body: "<style>body{margin:0}</style>" + body))
         try await waitUntil { page.title == "source" && !page.isLoading }
         let script = "document.visibilityState == 'visible' && document.elementFromPoint(400, 300)?.tagName == '\(element)'"
-        let deadline = ContinuousClock.now + .seconds(5)
-        while try await webView.evaluateJavaScript(script) as? Bool != true, ContinuousClock.now < deadline {
-            try await Task.sleep(for: .milliseconds(50))
-        }
+        // Visible and laid out before the right click: a missed menu would make the test pass for nothing (review TS14).
+        try await waitUntilAsync { try await webView.evaluateJavaScript(script) as? Bool == true }
         return page
     }
 
@@ -121,7 +119,7 @@ final class PageMenuIntegrationTests {
         let driver = ContextMenuDriver(choosing: choice)
         for _ in 1 ... 3 {
             try sendRightClick()
-            if await (try? waitUntil(timeout: .seconds(2)) { driver.didOpen }) != nil {
+            if try await holds(within: .seconds(2), { driver.didOpen }) {
                 break
             }
         }

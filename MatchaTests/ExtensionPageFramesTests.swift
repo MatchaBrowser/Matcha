@@ -7,6 +7,7 @@ import WebKit
 /// by a content script, loads and runs with the extensions API. The scheme stays WebKit's: those of Safari, Chrome
 /// and Firefox do not load in the web pages of another app (`DECISIONS.md`).
 @MainActor
+@Suite(.webKit)
 struct ExtensionPageFramesTests {
     /// Manifest V2 extension: its content script adds the `frame.html` iframe, which announces its scheme to the page.
     private func makeExtension() throws -> URL {
@@ -80,9 +81,9 @@ struct ExtensionPageFramesTests {
         manager.testWindows.update()
         tab.load(TestPages.url("frames"))
         var reply = ""
-        for _ in 0 ..< 300 where reply.isEmpty {
+        try await waitUntilAsync {
             reply = await (try? tab.loadedWebView.evaluateJavaScript("document.documentElement.dataset.reply ?? ''") as? String) ?? ""
-            try await Task.sleep(for: .milliseconds(100))
+            return !reply.isEmpty
         }
         #expect(reply == "frame: ran webkit-extension: api true")
         tab.unload(resettingTo: nil, title: nil)

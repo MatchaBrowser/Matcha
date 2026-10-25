@@ -7,6 +7,7 @@ import WebKit
 /// spread to the site's other open pages, forgotten at 100%. Simulated web pages (`loadSimulatedRequest`), without
 /// network.
 @MainActor
+@Suite(.webKit)
 struct PageZoomIntegrationTests {
     private let store = SiteZoomStore(defaults: nil)
     private let manager = TabManager(websiteDataStore: .nonPersistent())

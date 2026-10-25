@@ -26,7 +26,7 @@ struct HistoryStoreTests {
     private let profile = UUID()
     private let calendar: Calendar = {
         var calendar = Calendar(identifier: .gregorian)
-        calendar.timeZone = TimeZone(identifier: "Europe/Paris")!
+        calendar.timeZone = required(TimeZone(identifier: "Europe/Paris"), else: .gmt)
         return calendar
     }()
 
@@ -41,7 +41,7 @@ struct HistoryStoreTests {
 
     @discardableResult
     private func record(_ address: String, title: String? = nil, profileID: UUID? = nil, in store: HistoryStore? = nil) -> HistoryVisit {
-        (store ?? self.store).recordVisit(url: URL(string: address)!, title: title, profileID: profileID ?? profile, spaceID: nil)
+        (store ?? self.store).recordVisit(url: testURL(address), title: title, profileID: profileID ?? profile, spaceID: nil)
     }
 
     private func entries(_ text: String, profileID: UUID? = nil, in store: HistoryStore? = nil) async -> [HistoryEntry] {

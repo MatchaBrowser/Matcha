@@ -1,11 +1,12 @@
 import Foundation
 @testable import Matcha
+import Testing
 
 // Fake sources for the command bar.
 
 /// Address `about:blank?<name>`: WebKit keeps it as is, without any network access.
 func blankPage(_ name: String) -> URL {
-    URL(string: "about:blank?\(name)")!
+    testURL("about:blank?\(name)")
 }
 
 /// Fake history: returns `entries` and records each read.

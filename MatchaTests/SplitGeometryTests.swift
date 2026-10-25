@@ -95,6 +95,21 @@ struct SplitGeometryTests {
         #expect(SplitDropTarget(paneIndex: 1, side: .trailing).insertionIndex == 2)
     }
 
+    /// Review TS12: a point of a pane, in its own coordinates, and never under the floating sidebar.
+    @Test func `a point of a pane drops on its edge, except under the sidebar`() {
+        let widths = [400.0, 400.0]
+        func target(_ offset: Double, pane: Int, inset: Double = 0) -> SplitDropTarget? {
+            SplitGeometry.dropTarget(atX: offset, inPane: pane, widths: widths, leadingInset: inset)
+        }
+        #expect(target(50, pane: 0) == SplitDropTarget(paneIndex: 0, side: .leading))
+        #expect(target(50, pane: 0, inset: 60) == nil)
+        #expect(target(10, pane: 1) == SplitDropTarget(paneIndex: 1, side: .leading))
+        #expect(target(10, pane: 1, inset: 60) == SplitDropTarget(paneIndex: 1, side: .leading))
+        #expect(target(390, pane: 1) == SplitDropTarget(paneIndex: 1, side: .trailing))
+        #expect(target(200, pane: 1) == nil)
+        #expect(target(10, pane: 2) == nil)
+    }
+
     @MainActor
     @Test func `gap equals the card margin`() {
         #expect(SplitGeometry.gap == BrowserWindowView.cardMargin)

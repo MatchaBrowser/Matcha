@@ -5,6 +5,7 @@ import WebKit
 
 /// What a page asks the user directly (audits K1 to K3): JavaScript dialogs, files to send, a login.
 @MainActor
+@Suite(.webKit)
 struct PageDialogTests {
     private let manager = TabManager(websiteDataStore: .nonPersistent())
     private let dialogs = FakePageDialogs()

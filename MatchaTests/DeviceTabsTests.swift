@@ -5,6 +5,7 @@ import Testing
 /// Today tabs of the other Macs (`SYNC.md` § 2.4): published by each Mac in one record, only shown by the others.
 @MainActor
 struct DeviceTabsTests {
+    private let testDefaults = TestDefaults("DeviceTabsTests")
     private let device = UUID()
     private let space = UUID()
     private let server = InMemorySyncServer()
@@ -147,9 +148,7 @@ struct DeviceTabsTests {
 
     @Test func `this Mac's today tabs are in the snapshot, by Space in order, until it signs out`() throws {
         let session = try BrowserSession(container: BrowserSchema.makeContainer(inMemory: true))
-        let suite = "DeviceTabsTests-\(UUID().uuidString)"
-        let defaults = try #require(UserDefaults(suiteName: suite))
-        defer { defaults.removePersistentDomain(forName: suite) }
+        let defaults = testDefaults.make()
         let store = MatchaSyncStore(
             session: session,
             defaults: defaults,

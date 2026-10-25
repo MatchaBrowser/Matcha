@@ -6,6 +6,7 @@ import WebKit
 /// Sound of a real page (task 5.10): the script in its isolated world, its messages, the icon, and pausing through
 /// `pauseAllMediaPlayback`. The pages play silence (`AudioTestPages`), in an offscreen window.
 @MainActor
+@Suite(.webKit)
 struct PageAudioIntegrationTests {
     private let manager = TabManager(websiteDataStore: .nonPersistent())
     private let window = AudioTestWindow()
@@ -36,16 +37,9 @@ struct PageAudioIntegrationTests {
     }
 
     /// Waits until the page's `son` element plays (even muted).
-    private func waitUntilPlaying(_ tab: BrowserTab) async throws {
-        let clock = ContinuousClock()
-        let deadline = clock.now + .seconds(10)
+    private func waitUntilPlaying(_ tab: BrowserTab, sourceLocation: SourceLocation = #_sourceLocation) async throws {
         let script = "const son = document.getElementById('son'); return !son.paused && son.currentTime > 0.1"
-        while try await evaluate(script, in: tab) as? Bool != true {
-            guard clock.now < deadline else {
-                throw WaitTimeoutError(line: #line)
-            }
-            try await Task.sleep(for: .milliseconds(50))
-        }
+        try await waitUntilAsync(sourceLocation: sourceLocation) { try await evaluate(script, in: tab) as? Bool == true }
     }
 
     @Test func `a playing page lights the icon and pausing it puts the icon out at once`() async throws {
@@ -79,6 +73,7 @@ struct PageAudioIntegrationTests {
         let tab = try await show(AudioTestPages.playingPage(attributes: "muted"), title: "musique")
         tab.audio.silenceDelay = 0.3
         try await waitUntilPlaying(tab)
+        // A muted element gives no report at all: only a wait can show that the icon stays off.
         try await Task.sleep(for: .milliseconds(500))
         #expect(!tab.isPlayingAudio)
 
@@ -99,13 +94,7 @@ struct PageAudioIntegrationTests {
         #expect(!tab.isLoaded)
         #expect(!tab.isPlayingAudio)
         // WebKit suspends the page's media asynchronously, in its process; once paused, the position settles once.
-        let clock = ContinuousClock()
-        let deadline = clock.now + .seconds(10)
-        while try await isAdvancing(webView) {
-            guard clock.now < deadline else {
-                throw WaitTimeoutError(line: #line)
-            }
-        }
+        try await waitUntilAsync { try await !isAdvancing(webView) }
 
         _ = try await webView.callAsyncJavaScript("document.getElementById('son').play(); return true", contentWorld: .page)
         #expect(try await !isAdvancing(webView))

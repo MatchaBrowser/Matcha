@@ -7,10 +7,8 @@ final class DeveloperToolsUITests: XCTestCase {
 
     override func setUpWithError() throws {
         continueAfterFailure = false
-        try XCTSkipUnless(
-            FileManager.default.fileExists(atPath: "/usr/share/doc/postfix/html/index.html"),
-            "Postfix documentation missing",
-        )
+        let isAvailable = FileManager.default.fileExists(atPath: "/usr/share/doc/postfix/html/index.html")
+        try requireResource(isAvailable, "Postfix documentation missing")
     }
 
     /// Opens the page, then the context menu on its title; returns the “Inspect Element” item (possibly missing).

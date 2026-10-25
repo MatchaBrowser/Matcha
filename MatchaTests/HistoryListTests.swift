@@ -7,16 +7,16 @@ import Testing
 struct HistoryListTests {
     private let calendar: Calendar = {
         var calendar = Calendar(identifier: .gregorian)
-        calendar.timeZone = TimeZone(identifier: "Europe/Paris")!
+        calendar.timeZone = required(TimeZone(identifier: "Europe/Paris"), else: .gmt)
         return calendar
     }()
 
     private func date(_ day: Int, _ hour: Int, _ minute: Int = 0, month: Int = 10) -> Date {
-        calendar.date(from: DateComponents(year: 2026, month: month, day: day, hour: hour, minute: minute))!
+        required(calendar.date(from: DateComponents(year: 2026, month: month, day: day, hour: hour, minute: minute)), else: fixedNow)
     }
 
     private func visit(_ address: String, title: String? = nil, at date: Date) -> HistoryVisit {
-        HistoryVisit(url: URL(string: address)!, title: title, date: date)
+        HistoryVisit(url: testURL(address), title: title, date: date)
     }
 
     // MARK: Periods

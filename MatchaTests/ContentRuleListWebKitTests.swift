@@ -7,6 +7,7 @@ import WebKit
 /// rule only acts within its own list (hence exceptions per page, and not a separate list of exceptions); a list
 /// of more than 150,000 rules is rejected, then split by `BlocklistLoader`.
 @MainActor
+@Suite(.webKit)
 final class ContentRuleListWebKitTests {
     private let store: WKContentRuleListStore
     private let directory: URL

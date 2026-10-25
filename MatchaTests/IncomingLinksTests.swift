@@ -6,7 +6,9 @@ import Testing
 /// Links opened by other apps (task 8.2): they wait until the app is ready, then open in a mini window or in a new
 /// tab of the displayed Space, depending on the setting.
 @MainActor
+@Suite(.webKit)
 struct IncomingLinksTests {
+    private let testDefaults = TestDefaults("IncomingLinksTests")
     private let session: BrowserSession
     private let model: WindowModel
     private let manager: MiniWindowManager
@@ -31,9 +33,8 @@ struct IncomingLinksTests {
         #expect(opened.count == 1)
     }
 
-    @Test func `each link opens in its own mini window by default`() throws {
-        #expect(try ExternalLinkDestination
-            .current(in: #require(UserDefaults(suiteName: "IncomingLinks-\(UUID().uuidString)"))) == .miniWindow)
+    @Test func `each link opens in its own mini window by default`() {
+        #expect(ExternalLinkDestination.current(in: testDefaults.make()) == .miniWindow)
         manager.openFromOtherApp([TestPages.url("page"), TestPages.url("autre")], destination: .miniWindow)
         #expect(manager.windows.count == 2)
         #expect(session.spaces[0].tabManager.tabs.isEmpty)

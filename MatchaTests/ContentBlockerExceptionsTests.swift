@@ -6,11 +6,11 @@ import Testing
 /// or in memory only; views of a session (saved, or in memory for a private window).
 @MainActor
 struct ContentBlockerExceptionsTests {
-    private let suiteName = "ContentBlockerExceptionsTests-\(UUID().uuidString)"
+    private let testDefaults = TestDefaults("ContentBlockerExceptionsTests")
     private let defaults: UserDefaults
 
     init() throws {
-        defaults = try #require(UserDefaults(suiteName: suiteName))
+        defaults = testDefaults.make()
     }
 
     @Test(arguments: [

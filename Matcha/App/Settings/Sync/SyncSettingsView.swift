@@ -80,7 +80,7 @@ struct SyncSettingsView: View {
     }
 
     private var mode: Mode {
-        sync.isActive || sync.configuration.mode == .privateServer || choosesPrivateServer ? .privateServer : .off
+        SyncFormRules.mode(isActive: sync.isActive, configured: sync.configuration.mode, choosesPrivateServer: choosesPrivateServer)
     }
 
     private var modeBinding: Binding<Mode> {

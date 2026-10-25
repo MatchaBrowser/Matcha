@@ -3,6 +3,7 @@ import Testing
 import WebKit
 
 @MainActor
+@Suite(.webKit)
 struct WebConfigurationFactoryTests {
     @Test func `uses given website data store`() {
         let store = WKWebsiteDataStore.nonPersistent()

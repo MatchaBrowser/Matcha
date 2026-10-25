@@ -6,6 +6,7 @@ import WebKit
 /// Extension installation (task 6.4): from a file or a folder, from an app's Safari extension; permissions granted
 /// at installation, update, uninstallation. Temporary folders only, nothing in the user's folders.
 @MainActor
+@Suite(.webKit)
 struct ExtensionInstallerTests {
     private let root: URL
     private let directory: URL
@@ -136,6 +137,20 @@ struct ExtensionInstallerTests {
         #expect(manager.installedIdentifiers == [first.identifier])
         #expect(manager.contexts[first.identifier]?.isLoaded == true)
         #expect(store.state(for: first.identifier)?.hasAccessToPrivateData == true)
+    }
+
+    /// Review EX20 (TS9): an update whose files can't be put in place leaves the installed version loaded.
+    @Test func `an update that can't be put in place keeps the installed version`() async throws {
+        defer { cleanUp() }
+        let first = try await installer.prepare(fileAt: fixture("test-extension-package.crx"))
+        try await installer.install(first, allowsPrivateWindows: false)
+        let update = try await installer.prepare(fileAt: fixture("test-extension-package.xpi"), preferredIdentifier: first.identifier)
+        // The extensions folder can't change: the files can't be put in place.
+        try FileManager.default.setAttributes([.posixPermissions: 0o555], ofItemAtPath: directory.path)
+        defer { try? FileManager.default.setAttributes([.posixPermissions: 0o755], ofItemAtPath: directory.path) }
+        await #expect(throws: (any Error).self) { try await installer.install(update, allowsPrivateWindows: false) }
+        #expect(manager.contexts[first.identifier]?.isLoaded == true)
+        #expect(manager.installedIdentifiers == [first.identifier])
     }
 
     /// Review EX2: an offered `.crx` signed by another publisher than the installed extension's still replaces it.

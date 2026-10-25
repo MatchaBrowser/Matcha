@@ -7,6 +7,7 @@ import WebKit
 /// Links in a mini window, through the common navigation delegate (`NavigationCoordinator`, host
 /// `MiniWindowManager`), with real web views and the pages of `TestPages`.
 @MainActor
+@Suite(.webKit)
 struct MiniWindowLinkTests {
     private let session: BrowserSession
     private let model: WindowModel

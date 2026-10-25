@@ -10,7 +10,7 @@ import WebKit
 /// end of the tests). One test at a time: fewer web views at once, so the waits of the other suites (10 s) are not
 /// exceeded.
 @MainActor
-@Suite(.serialized)
+@Suite(.webKit, .serialized)
 final class PopupWindowTests {
     private let manager = TabManager(websiteDataStore: .nonPersistent())
     private let popups = PopupWindowManager.forTests()

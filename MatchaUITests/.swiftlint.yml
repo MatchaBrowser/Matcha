@@ -1,5 +1,3 @@
-# Tests : un dépaquetage forcé fait échouer le test aussitôt, à sa ligne ; une requête XCUIElementQuery n'a pas
-# d'isEmpty.
+# UI tests: no forced unwrap either (review TS13, `XCTUnwrap`); an `XCUIElementQuery` has no `isEmpty`.
 disabled_rules:
-  - force_unwrapping
   - empty_count

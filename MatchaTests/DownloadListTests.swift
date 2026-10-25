@@ -6,14 +6,13 @@ import Testing
 /// reported as missing.
 @MainActor
 struct DownloadListTests {
+    private let testDefaults = TestDefaults("DownloadListTests")
     private let folder: TemporaryDownloadsFolder
     private let defaults: UserDefaults
 
     init() throws {
         folder = try TemporaryDownloadsFolder()
-        let name = "DownloadListTests-\(UUID().uuidString)"
-        defaults = try #require(UserDefaults(suiteName: name))
-        defaults.removePersistentDomain(forName: name)
+        defaults = testDefaults.make()
     }
 
     /// Manager “launched” on the test's settings: it picks up the saved list.
