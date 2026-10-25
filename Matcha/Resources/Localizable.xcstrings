@@ -1918,7 +1918,7 @@
       }
     },
     "Allow" : {
-      "comment" : "Banner where a website wants to download files: allow them for this page\nPermission banner: allow the website to send notifications, and remember it\nSite settings: the website may use the camera or microphone without asking",
+      "comment" : "Banner where a website wants to download files: allow them for this page\nPermission banner: allow the website to send notifications, and remember it\nSite settings: the website may use the camera, the microphone or notifications without asking",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -2004,7 +2004,7 @@
       }
     },
     "Allowed" : {
-      "comment" : "Settings > Privacy: a website is allowed to use the camera or microphone",
+      "comment" : "Settings > Privacy: a website is allowed to use the camera, the microphone or notifications",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -2352,7 +2352,7 @@
       }
     },
     "Ask" : {
-      "comment" : "Site settings: the website must ask before using the camera or microphone",
+      "comment" : "Site settings: the website must ask before using the camera, the microphone or notifications",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -5455,7 +5455,7 @@
       }
     },
     "Denied" : {
-      "comment" : "Settings > Privacy: a website is not allowed to use the camera or microphone",
+      "comment" : "Settings > Privacy: a website is not allowed to use the camera, the microphone or notifications",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -5484,7 +5484,7 @@
       }
     },
     "Deny" : {
-      "comment" : "Site settings: the website may not use the camera or microphone",
+      "comment" : "Site settings: the website may not use the camera, the microphone or notifications",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -6998,7 +6998,7 @@
       }
     },
     "Forget Decision" : {
-      "comment" : "Settings > Privacy: removes a saved camera or microphone decision; the website will ask again",
+      "comment" : "Settings > Privacy: forgets a website's saved decision (camera, microphone, notifications); it will ask again",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -10724,7 +10724,7 @@
       }
     },
     "No saved decisions." : {
-      "comment" : "Settings > Privacy: no website has a saved camera or microphone decision",
+      "comment" : "Settings > Privacy: no website has a saved decision (camera, microphone, notifications)",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -12291,7 +12291,7 @@
       }
     },
     "Permission Request" : {
-      "comment" : "Accessibility label of the banner where a website asks to use the camera or microphone",
+      "comment" : "Accessibility label of the banner where a website asks for a permission (camera, microphone, notifications)",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -12639,7 +12639,7 @@
       }
     },
     "Press this shortcut in any app to open a mini window, even when Matcha is in the background. It uses the profile of the Space shown." : {
-      "comment" : "Settings > General: note under the mini window shortcut",
+      "comment" : "Settings > Shortcuts: note under the mini window shortcut",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -16530,31 +16530,31 @@
         }
       }
     },
-    "Tabs you haven't looked at for this long free their memory, and sooner when your Mac runs low on memory. They stay in the sidebar and reload when you show them; text typed in a page may be lost. Tabs playing sound or using the camera or microphone are never affected." : {
+    "Tabs you haven't looked at for this long free their memory, and sooner when your Mac runs low on memory. They stay in the sidebar and reload when you show them; text typed in a page may be lost. Tabs playing sound, using the camera or microphone, or allowed to send notifications are never affected." : {
       "comment" : "Settings > General: note under “Free memory of inactive tabs after”",
       "localizations" : {
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Tabs, die du so lange nicht angesehen hast, geben ihren Speicher frei – früher, wenn dein Mac wenig Speicher hat. Sie bleiben in der Seitenleiste und werden neu geladen, wenn du sie anzeigst; in eine Seite eingegebener Text kann verloren gehen. Tabs, die Ton abspielen oder Kamera oder Mikrofon verwenden, sind nie betroffen."
+            "value" : "Tabs, die du so lange nicht angesehen hast, geben ihren Speicher frei – früher, wenn dein Mac wenig Speicher hat. Sie bleiben in der Seitenleiste und werden neu geladen, wenn du sie anzeigst; in eine Seite eingegebener Text kann verloren gehen. Tabs, die Ton abspielen, Kamera oder Mikrofon verwenden oder Mitteilungen senden dürfen, sind nie betroffen."
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Las pestañas que no hayas mirado durante este tiempo liberan su memoria, y antes si tu Mac se queda sin memoria. Siguen en la barra lateral y se vuelven a cargar cuando las muestras; el texto escrito en una página puede perderse. Las pestañas que reproducen sonido o usan la cámara o el micrófono nunca se ven afectadas."
+            "value" : "Las pestañas que no hayas mirado durante este tiempo liberan su memoria, y antes si tu Mac se queda sin memoria. Siguen en la barra lateral y se vuelven a cargar cuando las muestras; el texto escrito en una página puede perderse. Las pestañas que reproducen sonido, usan la cámara o el micrófono, o pueden enviar notificaciones nunca se ven afectadas."
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Les onglets que vous n'avez pas regardés depuis ce délai libèrent leur mémoire, et plus tôt quand le Mac en manque. Ils restent dans la barre latérale et se rechargent quand vous les affichez ; un texte saisi dans une page peut être perdu. Les onglets qui jouent du son ou utilisent la caméra ou le micro ne sont jamais concernés."
+            "value" : "Les onglets que vous n'avez pas regardés depuis ce délai libèrent leur mémoire, et plus tôt quand le Mac en manque. Ils restent dans la barre latérale et se rechargent quand vous les affichez ; un texte saisi dans une page peut être perdu. Les onglets qui jouent du son, utilisent la caméra ou le micro, ou peuvent envoyer des notifications ne sont jamais concernés."
           }
         },
         "it" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "I pannelli che non guardi da questo tempo liberano la loro memoria, e prima se il Mac ne ha poca. Restano nella barra laterale e si ricaricano quando li mostri; il testo inserito in una pagina potrebbe andare perso. I pannelli che riproducono audio o usano la fotocamera o il microfono non vengono mai toccati."
+            "value" : "I pannelli che non guardi da questo tempo liberano la loro memoria, e prima se il Mac ne ha poca. Restano nella barra laterale e si ricaricano quando li mostri; il testo inserito in una pagina potrebbe andare perso. I pannelli che riproducono audio, usano la fotocamera o il microfono, o possono inviare notifiche non vengono mai toccati."
           }
         }
       }
@@ -19692,7 +19692,7 @@
       }
     },
     "Website Permissions" : {
-      "comment" : "Settings > Privacy: section listing the saved camera and microphone decisions",
+      "comment" : "Settings > Privacy: section listing the saved decisions of websites (camera, microphone, notifications)",
       "localizations" : {
         "de" : {
           "stringUnit" : {

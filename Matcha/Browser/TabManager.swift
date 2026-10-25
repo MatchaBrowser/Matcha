@@ -34,12 +34,12 @@ final class TabManager {
     var closedTabs = ClosedTabGroups()
     private var tabsByID: [BrowserTab.ID: BrowserTab] = [:]
 
-    /// Data store (cookies, storage) of this window's tabs.
+    /// Data store (cookies, storage) of these tabs: that of the Space's profile (or of a window's own tabs).
     @ObservationIgnored let websiteDataStore: WKWebsiteDataStore
-    /// Delegate of all web views of this window (the views do not retain it).
+    /// Delegate of all web views of these tabs (the views do not retain it).
     @ObservationIgnored let coordinator: NavigationCoordinator
     @ObservationIgnored let faviconService: FaviconService
-    /// Configuration of new pages (source viewer, extensions).
+    /// Configuration of new pages (source viewer, web extensions).
     @ObservationIgnored let pages: WebConfigurationFactory
     /// Window these tabs' downloads belong to: a private window's scope forgets them.
     @ObservationIgnored let downloadScope: DownloadScope
@@ -58,7 +58,7 @@ final class TabManager {
     /// Closing of the Peek by its page (`SessionServices.closePeek`).
     @ObservationIgnored let closePeekFromPage: @MainActor (TabManager) -> Void
 
-    /// `services`: the session's (audit C2); the tests' own by default, without extensions, downloads or windows.
+    /// `services`: the session's (audit C2); the tests' own by default, without web extensions, downloads or windows.
     init(websiteDataStore: WKWebsiteDataStore, services: SessionServices = SessionServices(), downloadScope: DownloadScope = .regular) {
         self.websiteDataStore = websiteDataStore
         faviconService = services.favicons
@@ -206,7 +206,7 @@ final class TabManager {
         }
     }
 
-    // MARK: Primitives for extensions
+    // MARK: Primitives for the `TabManager+…` files
 
     /// Adds an existing tab (restored or coming from another Space), attached to this Space's delegate.
     func register(_ tab: BrowserTab) {

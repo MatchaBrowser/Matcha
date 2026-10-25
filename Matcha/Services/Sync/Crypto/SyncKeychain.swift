@@ -3,10 +3,11 @@ import OSLog
 import Security
 
 /// Sync keychain (`SYNC.md` § 3.8): generic passwords of the `com.matchabrowser.matcha.sync` service, in this Mac's
-/// login keychain, never synced by iCloud (in the sandbox, reserved for Matcha). The account key and the tokens are
-/// stored by server and by account (“<server>|<account>|<item>”): changing server or account mixes nothing. This
-/// Mac's identifier and machine mark are for the whole Mac (“device”). A keychain error (locked, access refused) is
-/// an error, never an absence. The master password, the master key and the recovery key never go there.
+/// login keychain, marked not synchronizable (`kSecAttrSynchronizable` false: never in iCloud Keychain); the sandbox
+/// keeps them to Matcha. The account key and the tokens are stored by server and by account
+/// (“<server>|<account>|<item>”): changing server or account mixes nothing. This Mac's identifier and machine mark are
+/// for the whole Mac (“device”). A keychain error (locked, access refused) is an error, never an absence. The master
+/// password, the master key and the recovery key never go there.
 nonisolated struct SyncKeychain: Sendable {
     static let service = "com.matchabrowser.matcha.sync"
 

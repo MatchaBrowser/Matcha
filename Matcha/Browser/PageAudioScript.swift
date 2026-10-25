@@ -1,15 +1,15 @@
 import OSLog
 import WebKit
 
-/// Sound script (task 5.10), injected at the start of each document (main frame and iframes, even from other sites)
-/// in an isolated world (`WKContentWorld`): the page does not see it, can neither call nor fool it, and only it can
-/// write to `PageAudioMessageHandler`. It listens on `window`, in the capture phase, before any listener of the page
-/// (which can't stop the events before it, review WB9), to the events of the document's audio and video elements (`play`, `playing`,
-/// `pause`, `ended`, `emptied`, `volumechange`) and tells the app, 100 ms after a
-/// burst, whether one of them plays with sound (neither muted nor at zero volume); as long as that is the case, it says
-/// so again every 2 s (an element removed from the page stops with no visible event; the app, which clears the state on
-/// pause, realigns). Nothing else runs when nothing plays. Does not see: Web Audio, an element outside the document
-/// (`new Audio()`), an element in a shadow DOM (its events do not leave it) — `DECISIONS.md`.
+/// Sound script (task 5.10), injected at the start of each document (main frame and iframes, even from other sites) in
+/// an isolated world (`WKContentWorld`): the page does not see it, can neither call nor fool it, and only it can write
+/// to `PageAudioMessageHandler`. It listens on `window`, in the capture phase, before any listener of the page (which
+/// can't stop the events before it, review WB9), to the events of the document's audio and video elements (`play`,
+/// `playing`, `pause`, `ended`, `emptied`, `volumechange`) and tells the app, 100 ms after a burst, whether one of them
+/// plays with sound (neither muted nor at zero volume); as long as that is the case, it says so again every 2 s (an
+/// element removed from the page stops with no visible event; the app, which clears the state on pause, realigns).
+/// Nothing else runs when nothing plays. Does not see: Web Audio, an element outside the document (`new Audio()`), an
+/// element in a shadow DOM (its events do not leave it) — `DECISIONS.md`.
 @MainActor
 enum PageAudioScript {
     static let world = WKContentWorld.world(name: "MatchaPageAudio")

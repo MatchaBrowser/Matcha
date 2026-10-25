@@ -4,8 +4,7 @@ import OSLog
 import SwiftData
 import WebKit
 
-/// A running Space: its record, its theme, its tabs and their automatic
-/// saving.
+/// A running Space: its record, its theme, its tabs and their automatic saving.
 @MainActor
 @Observable
 final class SpaceSession: Identifiable {
@@ -22,10 +21,10 @@ final class SpaceSession: Identifiable {
         record.id
     }
 
-    /// Reloads the saved tabs of the Space, then saves each change.
-    /// `websiteDataStore`: data store of the Space's profile; `downloadScope`: that of the window;
-    /// `sitePermissions`: permission decisions of the session, seen for the Space's profile; `siteZooms`: per-site page
-    /// zoom of the session; `history`: history of the session (nil for a private window).
+    /// Reloads the saved tabs of the Space, then saves each change. `websiteDataStore`: data store of the Space's
+    /// profile; `downloadScope`: that of the session (a private window has its own); `sitePermissions`: permission
+    /// decisions of the session, seen for the Space's profile; `siteZooms`: per-site page zoom of the session;
+    /// `history`: history of the session (nil for a private window).
     init(
         record: SpaceRecord,
         context: ModelContext,
@@ -90,7 +89,8 @@ final class SpaceSession: Identifiable {
         }
     }
 
-    /// Saves right away, with the navigation state of each loaded tab (app quitting).
+    /// Saves right away, with the navigation state of each loaded tab: app quitting, a sync about to apply changes, the
+    /// last save of a Space's favorites before it goes.
     func saveNow() {
         tabManager.captureInteractionStates()
         store.saveNow(tabManager)

@@ -193,7 +193,8 @@ final class BrowserSession {
         try! BrowserSession(container: BrowserSchema.makeContainer(inMemory: true), isPrivate: true, services: services)
     }
 
-    /// Saves each Space right away (app quitting).
+    /// Saves each Space right away: app quitting, and before sync applies changes (what is less than a second old is not
+    /// lost).
     func saveAll() {
         spaces.forEach { $0.saveNow() }
     }

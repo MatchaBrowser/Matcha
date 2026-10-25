@@ -73,7 +73,7 @@ struct GeneralSettingsView: View {
                 Text("""
                 Tabs you haven't looked at for this long free their memory, and sooner when your Mac runs low on memory. \
                 They stay in the sidebar and reload when you show them; text typed in a page may be lost. \
-                Tabs playing sound or using the camera or microphone are never affected.
+                Tabs playing sound, using the camera or microphone, or allowed to send notifications are never affected.
                 """, comment: "Settings > General: note under “Free memory of inactive tabs after”")
                     .font(.caption)
                     .foregroundStyle(.secondary)

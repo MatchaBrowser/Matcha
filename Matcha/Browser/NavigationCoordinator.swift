@@ -2,12 +2,12 @@ import AppKit
 import OSLog
 import WebKit
 
-/// Navigation and UI delegate of the web views of a `TabHost` (the tabs of a Space and their Peek, the mini windows
-/// or the sign-in windows): new windows, sign-in windows (`PopupWindowManager`), closing by the page, links to other
-/// apps (`+ExternalApps`), clicks with modifiers, Peek, downloads, site permissions (`+Permissions`), history (`+History`),
-/// termination of a page's process (`+Crash`), context menu of pages (`+PageMenu`), blocker (task 6.2). The rules
-/// come from `NavigationPolicy`, `PopupWindowFeatures`, `DownloadPolicy`, `SitePermissionPolicy`, `PageCrashPolicy`
-/// and `PendingPageMenuIntent`; the host decides where pages go.
+/// Navigation and UI delegate of the web views of a `TabHost` (the tabs of a Space and their Peek, the mini windows or
+/// the sign-in windows): new windows, sign-in windows (`PopupWindowManager`), closing by the page, links to other apps
+/// (`+ExternalApps`), clicks with modifiers, Peek, downloads, site permissions (`+Permissions`), history (`+History`),
+/// termination of a page's process (`+Crash`), context menu of pages (`+PageMenu`), blocker (task 6.2). The rules come
+/// from `NavigationPolicy`, `PopupWindowFeatures`, `DownloadPolicy`, `SitePermissionPolicy`, `PageCrashPolicy` and
+/// `PendingPageMenuIntent`; the host decides where pages go.
 @MainActor
 final class NavigationCoordinator: NSObject {
     weak var tabHost: (any TabHost)?

@@ -11,7 +11,8 @@ protocol SyncTransport: Sendable {
     /// answer, and sends it again exactly as it is after a network error or a restart (`SYNC.md` § 4.6).
     func prepare(_ changes: [SyncOutgoingChange]) throws -> SyncPreparedBatch
 
-    /// Sends `batch`; one result per change, in the same order.
+    /// Sends `batch`; one result per change, in the order of `batch.changes`: the server transport matches its
+    /// answers by identifier, and an answer without one for each change is unreadable (review SY2).
     func push(_ batch: SyncPreparedBatch) async throws -> [SyncPushResult]
 
     /// Changes written after `cursor` (nil: from the beginning), by increasing version. Throws

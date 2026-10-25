@@ -1,8 +1,8 @@
 import SwiftUI
 
 /// Settings > Privacy: what websites may do without asking, answered “Always” in the page's banner (open another app,
-/// download files: audits W2 and W7), each with a button to forget it. The profile is named as soon as there are several. Private windows
-/// are not listed.
+/// download files: audits W2 and W7), each with a button to forget it. The profile is named as soon as there are
+/// several. Private windows are not listed.
 struct SiteActionsSection: View {
     let store: SiteActionAllowances
     let profiles: [ProfileRecord]

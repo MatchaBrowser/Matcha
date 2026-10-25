@@ -2,10 +2,9 @@ import WebKit
 
 /// Builds the WebKit configuration shared by all web views, with the sound script (task 5.10), the notification script
 /// (`PageNotificationScript`), the source viewer and the extension controller (task 6.3, private windows included:
-/// extensions only have access to them if the user allows it). Each page has its own content controller (`pageConfiguration`): the blocker
-/// (task 6.2) sets or removes
-/// its lists there page by page; WebKit injects the extensions' scripts into it. One for the app (`AppEnvironment`);
-/// the tests make theirs, without extensions.
+/// extensions only have access to them if the user allows it). Each page has its own content controller
+/// (`pageConfiguration`): the blocker (task 6.2) sets or removes its lists there page by page; WebKit injects the
+/// extensions' scripts into it. One for the app (`AppEnvironment`); the tests make theirs, without extensions.
 @MainActor
 final class WebConfigurationFactory {
     /// Safari version announced to sites, so that they treat the app as Safari: the installed Safari's (audit H5).

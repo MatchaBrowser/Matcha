@@ -2,7 +2,7 @@ import Foundation
 
 /// Reads the source code of a page for “View Page Source” and Save As > Page Source, off the main thread: a local file
 /// (regular file only), or the site's response with the profile's cookies (ephemeral session, presented as Safari).
-/// Never more than `maximumSize` bytes. Pure type.
+/// Never more than `maximumSize` bytes. Without UI dependency, but not pure: it reads the disk and the network.
 nonisolated enum PageSourceLoader {
     enum Failure: LocalizedError, Equatable {
         case tooLarge

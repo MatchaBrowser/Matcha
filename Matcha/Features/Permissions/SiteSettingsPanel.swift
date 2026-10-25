@@ -1,11 +1,11 @@
 import SwiftUI
 
 /// Site settings panel of the displayed tab (task 5.2): below the address pill of the sidebar, or at the top of the
-/// card below the address bar above the page. Camera and microphone (“Ask”, “Allow”, “Deny”, the profile's
-/// decisions), the apps it opens without asking (audit W2), the site's zoom (task 5.4), the blocker on this site (task 6.2, hidden while it
-/// is set aside), then
-/// the site's cookies and data, cleared (this site only) after confirmation. It follows the displayed tab and never
-/// opens or closes by itself (button, ×).
+/// card below the address bar above the page. Camera, microphone and notifications (“Ask”, “Allow”, “Deny”, the
+/// profile's decisions; no notifications in a private window), the apps it opens without asking (audit W2), the site's
+/// zoom (task 5.4), the blocker on this site (task 6.2, hidden while it is set aside), then the site's cookies and data,
+/// cleared (this site only) after confirmation. It follows the displayed tab and never opens or closes by itself
+/// (button, ×).
 struct SiteSettingsPanel: View {
     let model: WindowModel
     /// Tabs of the Space of the sidebar or card that shows the panel.
@@ -122,7 +122,7 @@ struct SiteSettingsPanel: View {
         }
     }
 
-    /// Camera or microphone: “Ask” (no remembered decision), “Allow”, “Deny”.
+    /// Camera, microphone or notifications: “Ask” (no remembered decision), “Allow”, “Deny”.
     private func permissionRow(_ kind: SitePermissionKind, origin: SiteOrigin, scope: SitePermissionScope) -> some View {
         let decision = Binding<SitePermissionDecision?> {
             scope.decision(kind, for: origin)
@@ -137,11 +137,11 @@ struct SiteSettingsPanel: View {
                 .lineLimit(1)
             Spacer(minLength: 8)
             Picker(kind.title, selection: decision) {
-                Text("Ask", comment: "Site settings: the website must ask before using the camera or microphone")
+                Text("Ask", comment: "Site settings: the website must ask before using the camera, the microphone or notifications")
                     .tag(SitePermissionDecision?.none)
-                Text("Allow", comment: "Site settings: the website may use the camera or microphone without asking")
+                Text("Allow", comment: "Site settings: the website may use the camera, the microphone or notifications without asking")
                     .tag(SitePermissionDecision?.some(.allow))
-                Text("Deny", comment: "Site settings: the website may not use the camera or microphone")
+                Text("Deny", comment: "Site settings: the website may not use the camera, the microphone or notifications")
                     .tag(SitePermissionDecision?.some(.deny))
             }
             .labelsHidden()

@@ -91,7 +91,8 @@ final class SpaceStore {
         }
     }
 
-    /// Saves right away (app quitting), cancelling the deferred save.
+    /// Saves right away, cancelling the deferred save: at the end of its wait, or for `SpaceSession.saveNow` (app
+    /// quitting, sync, a Space going away).
     func saveNow(_ manager: TabManager) {
         pendingSave?.cancel()
         pendingSave = nil

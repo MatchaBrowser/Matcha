@@ -2,10 +2,9 @@ import SwiftUI
 
 /// Commands of the front page (`FrontPage`, task 5.4): File > “Save As…” (⌘S, audit H1), “Export as PDF…” and “Print…”
 /// (⌘P), in place of the standard print commands (absent until now: nothing is duplicated); View > “Actual Size” (⌘0),
-/// “Zoom In” (⌘+, and
-/// ⌘= through `BrowserWebView`), “Zoom Out” (⌘-), after “Reload Page”. The zoom is remembered for the page's site,
-/// shown next to its address pill (`ZoomBadge`) and announced to VoiceOver. A page that keeps these shortcuts for
-/// itself comes first, as in Safari: WebKit sends it the shortcuts first.
+/// “Zoom In” (⌘+, and ⌘= through `BrowserWebView`), “Zoom Out” (⌘-), after “Reload Page”. The zoom is remembered for
+/// the page's site, shown next to its address pill (`ZoomBadge`) and announced to VoiceOver. A page that keeps these
+/// shortcuts for itself comes first, as in Safari: WebKit sends it the shortcuts first.
 struct PageCommands: Commands {
     let miniWindows: MiniWindowManager
     @FocusedValue(\.tabManager) private var tabManager

@@ -36,7 +36,7 @@ struct ShortcutsSettingsView: View {
                 Text("""
                 Press this shortcut in any app to open a mini window, even when Matcha is in the background. \
                 It uses the profile of the Space shown.
-                """, comment: "Settings > General: note under the mini window shortcut")
+                """, comment: "Settings > Shortcuts: note under the mini window shortcut")
                     .font(.caption)
                     .foregroundStyle(.secondary)
             }

@@ -4,9 +4,9 @@ import Foundation
 /// The text is ignored: the ranking does the matching.
 ///
 /// A profile's favorites are the same tabs in each of its Spaces (`ProfileFavorites`): those of the displayed profile
-/// are listed with the displayed Space, those of another profile with the first of its Spaces. A private window has its own session, with a
-/// single Space: it sees only
-/// its own tabs. A window of its own tabs lists them first, then the tabs of every Space.
+/// are listed with the displayed Space, those of another profile with the first of its Spaces. A private window has its
+/// own session, with a single Space: it sees only its own tabs. A window of its own tabs lists them first, then the
+/// tabs of every Space.
 @MainActor
 final class OpenTabsProvider: CommandProvider {
     private let windowModel: WindowModel
