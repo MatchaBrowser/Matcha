@@ -46,12 +46,17 @@ final class AppEnvironment {
         pages = WebConfigurationFactory { extensions.attach(to: $0) }
     }
 
-    /// `Application Support/Sync`; nil during tests (unit tests and test store): nothing is written.
-    private static var syncDirectory: URL? {
+    /// `Application Support` of the app; nil during tests (unit tests and test store): nothing is written there.
+    private static var applicationSupport: URL? {
         guard !TestEnvironment.usesInMemoryStore() else {
             return nil
         }
-        return FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask).first?.appendingPathComponent("Sync")
+        return FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask).first
+    }
+
+    /// `Application Support/Sync`.
+    private static var syncDirectory: URL? {
+        applicationSupport?.appendingPathComponent("Sync")
     }
 
     /// Settings of the signed-in account, in `Application Support/Sync` (`SyncService` picks the file when its sync starts,
@@ -63,14 +68,13 @@ final class AppEnvironment {
     /// In the unit tests' host app and with a test store (UI tests), a non-persistent controller, with nothing saved or
     /// loaded (same settings and same container as the app).
     private static func makeExtensionManager() -> ExtensionManager {
-        guard !TestEnvironment.usesInMemoryStore() else {
+        guard let applicationSupport else {
             return ExtensionManager(configuration: .nonPersistent(), store: ExtensionStateStore(defaults: nil), directory: nil)
         }
-        let applicationSupport = FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask).first
         return ExtensionManager(
             configuration: .default(),
             store: ExtensionStateStore(defaults: .standard),
-            directory: applicationSupport.map(ExtensionInstallDirectory.directory(in:)),
+            directory: ExtensionInstallDirectory.directory(in: applicationSupport),
         )
     }
 
@@ -85,6 +89,7 @@ final class AppEnvironment {
             notifications: pageNotifications,
             otherMacs: otherMacs,
             makePopupWindows: { PopupWindowManager(settings: $0) },
+            closePeek: { PeekActions.close(in: $0) },
         )
     }
 }

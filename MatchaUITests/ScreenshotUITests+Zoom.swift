@@ -30,7 +30,7 @@ extension ScreenshotUITests {
         openAddress("https://example.com", in: app)
         let button = siteSettingsButton(in: app)
         guard button.waitForExistence(timeout: 20) else {
-            XCTFail("Bouton des réglages du site introuvable : réseau nécessaire pour example.com")
+            XCTFail("Site settings button not found: example.com needs the network")
             return
         }
         app.typeKey("+", modifierFlags: .command)

@@ -132,7 +132,7 @@ struct CommandRankerTests {
     @Test func `other space tabs carry the space name`() throws {
         let budget = tab("Budget", url: "https://www.sheets.example/budget", place: .pinned, spaceName: "Travail")
         guard case let .tab(reference, _, _, _) = budget.kind else {
-            Issue.record("Onglet attendu")
+            Issue.record("Tab expected")
             return
         }
         let row = try #require(rank("budget", [budget]).last)

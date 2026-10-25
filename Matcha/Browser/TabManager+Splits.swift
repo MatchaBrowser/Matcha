@@ -123,7 +123,7 @@ extension TabManager {
     /// there: the rest of the split stays displayed.
     func keepingPanesOnScreen(leaving tab: BrowserTab, during change: () -> Void) {
         let neighbor = layout.split(containing: tab.id)?.neighbor(of: tab.id)
-        let selecting = viewers.filter { $0.selectedTabID == tab.id }
+        let selecting = viewers.all.filter { $0.selectedTabID == tab.id }
         change()
         guard let neighbor, layout.place(of: neighbor) != nil, layout.split(containing: neighbor)?.contains(tab.id) != true else {
             return

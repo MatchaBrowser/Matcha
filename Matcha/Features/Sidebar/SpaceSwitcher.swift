@@ -65,10 +65,7 @@ struct SpaceSwitcher: View {
                 withMotion(.easeInOut(duration: 0.3)) { model.select(space) }
             }
         } label: {
-            icon(of: space, isCurrent: isCurrent)
-                .frame(width: 24, height: 24)
-                .background(Circle().fill(Color.primary.opacity(isCurrent ? 0.12 : 0)))
-                .contentShape(Rectangle())
+            SpaceIcon(space: space, isCurrent: isCurrent)
         }
         .buttonStyle(.plain)
         .help(model.session.profiles.count > 1 ? "\(space.record.name) — \(space.record.profile?.name ?? "")" : space.record.name)
@@ -84,20 +81,6 @@ struct SpaceSwitcher: View {
         }, arrowEdge: .top) {
             SpaceEditor(space: space) { model.editedSpaceID = nil }
         }
-    }
-
-    /// Gray symbol (larger and in the foreground for the displayed Space), or emoji, which keeps its colors and is
-    /// dimmed for another Space. A single `Text` (`SidebarIconView.text`): the editor's popover stays in the
-    /// accessibility tree when an emoji replaces the symbol.
-    private func icon(of space: SpaceSession, isCurrent: Bool) -> some View {
-        SidebarIconView.text(
-            space.icon,
-            defaultSymbol: SidebarIcon.defaultSpaceSymbol,
-            tint: isCurrent ? .primary : .secondary,
-            size: isCurrent ? 11 : 9,
-            emojiSize: isCurrent ? 14 : 12,
-        )
-        .opacity(isCurrent || space.icon.emoji == nil ? 1 : 0.6)
     }
 
     /// In Debug, the icon in its saved form (“symbol:star.fill”, “emoji:🌿”), for the UI tests.

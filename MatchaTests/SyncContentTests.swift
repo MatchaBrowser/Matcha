@@ -22,7 +22,7 @@ struct SyncContentTests {
         #expect(content.recordType == .space)
         #expect(try content.modifiedAt == date("2026-10-17T08:30:12.345Z"))
         guard case let .space(fields) = content.readableFields else {
-            Issue.record("Space illisible")
+            Issue.record("Unreadable Space")
             return
         }
         #expect(fields.name == "Perso")

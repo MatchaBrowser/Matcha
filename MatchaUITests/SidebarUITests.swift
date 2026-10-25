@@ -93,7 +93,7 @@ final class SidebarUITests: XCTestCase {
         tabRows(in: app).element(boundBy: 1).press(forDuration: 0.5, thenDragTo: pinnedZone)
         // The pinned tab survives “Clear”, which only closes Today tabs.
         clickWhenSettled(app.buttons["Effacer"])
-        XCTAssertTrue(waitForCount(tabRows(in: app), 1), "onglets restants : \(tabRows(in: app).count)")
+        XCTAssertTrue(waitForCount(tabRows(in: app), 1), "remaining tabs: \(tabRows(in: app).count)")
         XCTAssertEqual(favorites.count, 1)
     }
 

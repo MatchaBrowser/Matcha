@@ -50,7 +50,7 @@ struct MatchaSyncStoreTests {
         #expect(!store.hasOnlyFirstLaunchData)
         let after = try store.snapshot()
         guard case let .tab(pinned) = after[tab.id], case let .tab(favored) = after[favorite.id] else {
-            Issue.record("Onglets absents de l'instantané")
+            Issue.record("Tabs missing from the snapshot")
             return
         }
         #expect(pinned.place == .pinned && pinned.spaceId == home.id && pinned.url == tab.pinnedURL)

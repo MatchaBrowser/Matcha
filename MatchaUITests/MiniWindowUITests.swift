@@ -133,7 +133,7 @@ final class MiniWindowUITests: XCTestCase {
         // MATCHA_TEST_GLOBAL_SHORTCUT=1.
         try XCTSkipUnless(
             ProcessInfo.processInfo.environment["MATCHA_TEST_GLOBAL_SHORTCUT"] != nil,
-            "Touches simulées sans effet sur les raccourcis globaux",
+            "Simulated keys have no effect on global shortcuts",
         )
         let shortcut = Self.shortcutArgument(keyCode: 79, carbonModifiers: 6400)
         let app = launchApp(settings: ["KeyboardShortcuts_openMiniWindow": shortcut])

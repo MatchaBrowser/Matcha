@@ -24,7 +24,7 @@ final class FindInPageUITests: XCTestCase {
         let field = openFindBar(in: app)
         app.typeText("postfix")
         XCTAssertTrue(waitForValue(of: field) { $0 == "postfix" })
-        XCTAssertFalse(findStatus(in: app).waitForExistence(timeout: 2), "« postfix » est dans la page")
+        XCTAssertFalse(findStatus(in: app).waitForExistence(timeout: 2), "“postfix” is in the page")
 
         replaceFindText(with: "zzqqxx", in: app)
         XCTAssertTrue(waitForNotFound(in: app))

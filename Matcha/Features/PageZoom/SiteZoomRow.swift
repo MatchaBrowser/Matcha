@@ -68,11 +68,7 @@ struct SiteZoomRow: View {
         guard let next = change.level(from: level) else {
             return
         }
-        if let siteZooms, let site {
-            siteZooms.setLevel(next, forSite: site)
-        } else {
-            tab.setPageZoom(next)
-        }
+        PageZoom.set(next, on: tab, siteZooms: siteZooms)
         // As after ⌘+ or ⌘-: VoiceOver says the new zoom (review IU20).
         ZoomAnnouncement.post(next)
     }

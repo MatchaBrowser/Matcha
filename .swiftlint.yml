@@ -7,12 +7,12 @@ excluded:
   - build
   - DerivedData
 
-# La mise en forme relève de SwiftFormat, qui ajoute des virgules finales.
+# Formatting belongs to SwiftFormat, which adds trailing commas.
 disabled_rules:
   - trailing_comma
 
-# Règles ajoutées (audit C7). Écartées : legacy_objc_type (NSNumber, NSMutableData imposés par les API du système),
-# implicitly_unwrapped_optional (signatures de WebKit), discouraged_optional_boolean (booléens à trois états).
+# Rules added (audit C7). Left out: legacy_objc_type (NSNumber, NSMutableData required by the system's APIs),
+# implicitly_unwrapped_optional (WebKit's signatures), discouraged_optional_boolean (three-state booleans).
 opt_in_rules:
   - indentation_width
   - force_unwrapping
@@ -37,7 +37,7 @@ line_length:
   warning: 140
   ignores_comments: true
 
-# « Fichiers courts » de CLAUDE.md : environ 300 lignes, sans compter les commentaires.
+# “Short files” of CLAUDE.md: about 300 lines, comments not counted.
 file_length:
   warning: 300
   ignore_comment_only_lines: true

@@ -40,6 +40,6 @@ struct AppearanceSettingsView: View {
         .formStyle(.grouped)
         .scrollDisabled(true)
         .fixedSize(horizontal: false, vertical: true)
-        .onChange(of: appearance) { appearance.apply() }
+        // The appearance follows the setting in `MatchaApp` (scene `onChange`), even without a window (review CO4).
     }
 }

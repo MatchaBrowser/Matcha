@@ -6,23 +6,13 @@ struct ContentBlockerExceptionsSection: View {
     let service: ContentBlockerService
 
     var body: some View {
-        let sites = service.exceptions.sortedSites
         Section {
-            if sites.isEmpty {
-                Text("No exceptions.", comment: "Settings > Privacy: the content blocker is active on every website")
-                    .foregroundStyle(.secondary)
-            } else {
-                ScrollView {
-                    VStack(spacing: 0) {
-                        ForEach(sites, id: \.self) { site in
-                            row(site)
-                        }
-                    }
-                }
-                // Like the permissions list: it scrolls beyond a few rows.
-                .scrollDisabled(false)
-                .frame(height: min(Double(sites.count) * SitePermissionsSection.rowHeight, SitePermissionsSection.maximumListHeight))
-            }
+            PrivacySiteList(
+                items: service.exceptions.sortedSites,
+                id: \.self,
+                empty: Text("No exceptions.", comment: "Settings > Privacy: the content blocker is active on every website"),
+                row: row,
+            )
         } header: {
             Text("Blocker Exceptions", comment: "Settings > Privacy: section listing the websites where the content blocker is off")
         } footer: {
@@ -41,17 +31,10 @@ struct ContentBlockerExceptionsSection: View {
                 .lineLimit(1)
                 .truncationMode(.middle)
             Spacer(minLength: 8)
-            Button {
+            PrivacySiteRemoveButton(title: removeTitle, identifier: "contentBlockerExceptionRemoveButton") {
                 service.setException(false, forSite: site)
-            } label: {
-                Label { removeTitle } icon: { Image(systemName: "trash") }
             }
-            .labelStyle(.iconOnly)
-            .buttonStyle(.borderless)
-            .help(removeTitle)
-            .accessibilityIdentifier("contentBlockerExceptionRemoveButton")
         }
-        .frame(height: SitePermissionsSection.rowHeight)
         .accessibilityElement(children: .contain)
         .accessibilityIdentifier("contentBlockerExceptionRow")
     }

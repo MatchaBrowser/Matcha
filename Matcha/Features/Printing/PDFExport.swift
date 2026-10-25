@@ -17,7 +17,7 @@ enum PDFExport {
         panel.allowedContentTypes = [.pdf]
         panel.canCreateDirectories = true
         panel.isExtensionHidden = false
-        panel.nameFieldStringValue = PDFExportFile.name(title: page.title, url: page.documentURL)
+        panel.nameFieldStringValue = PageExportFile.name(title: page.title, url: page.documentURL)
         Task {
             guard await panel.beginSheetModal(for: window) == .OK, let destination = panel.url else {
                 return
@@ -29,7 +29,7 @@ enum PDFExport {
     private static func export(_ webView: WKWebView, to destination: URL, window: NSWindow) async {
         do {
             let data = try await webView.pdf()
-            try PDFExportFile.write(data, to: destination)
+            try PageExportFile.write(data, to: destination)
             Logger.browser.info("Page exported as PDF (\(data.count, privacy: .public) bytes)")
         } catch {
             Logger.browser.error("PDF export failed: \(error.logSummary, privacy: .public)")
@@ -42,10 +42,6 @@ enum PDFExport {
         alert.alertStyle = .warning
         alert.messageText = String(localized: "The page couldn't be exported as PDF.", comment: "Alert after File > Export as PDF… failed")
         alert.informativeText = error.localizedDescription
-        if window.isVisible, window.attachedSheet == nil {
-            alert.beginSheetModal(for: window)
-        } else {
-            alert.runModal()
-        }
+        alert.present(in: window)
     }
 }

@@ -73,7 +73,7 @@ final class ScreenshotUITests: XCTestCase {
     @MainActor
     func testCaptureWindow() throws {
         guard environment["MATCHA_SCREENSHOT"] != nil else {
-            throw XCTSkip("MATCHA_SCREENSHOT non défini")
+            throw XCTSkip("MATCHA_SCREENSHOT not set")
         }
         let app = launchApp(settings: settingsOverrides)
         let window = app.windows.firstMatch

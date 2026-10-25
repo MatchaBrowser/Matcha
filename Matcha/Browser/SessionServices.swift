@@ -21,6 +21,9 @@ struct SessionServices {
     var otherMacs: OtherMacsTabs?
     /// Sign-in windows of a session; nil: a window opened with a size becomes a tab.
     var makePopupWindows: @MainActor (PopupWindowSettings) -> (any PopupWindowHosting)?
+    /// A page closes its Peek (`window.close()`): the interface also gives keyboard focus back to the page under it
+    /// (`PeekActions`, review CO1); without interface, the Peek just closes.
+    var closePeek: @MainActor (TabManager) -> Void
 
     init(
         pages: WebConfigurationFactory = WebConfigurationFactory(),
@@ -31,6 +34,7 @@ struct SessionServices {
         notifications: PageNotificationCenter? = nil,
         otherMacs: OtherMacsTabs? = nil,
         makePopupWindows: @escaping @MainActor (PopupWindowSettings) -> (any PopupWindowHosting)? = { _ in nil },
+        closePeek: @escaping @MainActor (TabManager) -> Void = { $0.closePeek() },
     ) {
         self.pages = pages
         self.favicons = favicons
@@ -40,6 +44,7 @@ struct SessionServices {
         self.notifications = notifications
         self.otherMacs = otherMacs
         self.makePopupWindows = makePopupWindows
+        self.closePeek = closePeek
     }
 
     /// Navigation delegate of pages, with these services.

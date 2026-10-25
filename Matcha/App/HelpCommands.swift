@@ -33,7 +33,6 @@ struct HelpCommands: Commands {
         guard let url = URL(string: page.rawValue) else {
             return
         }
-        _ = miniWindows.keyWindowID
         if miniWindows.keyWindow == nil, let tabManager, let windowActions {
             windowActions.showTab(tabManager.newTab(url: url))
         } else {

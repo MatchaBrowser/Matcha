@@ -78,7 +78,7 @@ struct PagePrintingTests {
         let data = try await tab.loadedWebView.pdf()
         let destination = temporaryFile("longue.pdf")
         defer { try? FileManager.default.removeItem(at: destination) }
-        try PDFExportFile.write(data, to: destination)
+        try PageExportFile.write(data, to: destination)
 
         let document = try #require(PDFDocument(url: destination))
         #expect(document.pageCount == 1)
@@ -98,15 +98,17 @@ struct PagePrintingTests {
         ("Ligne\nsuivante", "Lignesuivante.pdf"),
     ])
     func `PDF file name comes from the title`(title: String, expected: String) {
-        #expect(PDFExportFile.name(title: title, url: URL(string: "https://example.com/a")) == expected)
+        #expect(PageExportFile.name(title: title, url: URL(string: "https://example.com/a")) == expected)
     }
 
     @Test func `PDF file name falls back on the host, then the file, then page`() {
-        #expect(PDFExportFile.name(title: nil, url: URL(string: "https://www.example.com/a")) == "www.example.com.pdf")
-        #expect(PDFExportFile.name(title: "  ", url: URL(string: "file:///tmp/notes.html")) == "notes.html.pdf")
-        #expect(PDFExportFile.name(title: "...", url: URL(string: "about:blank")) == "page.pdf")
-        #expect(PDFExportFile.name(title: nil, url: nil) == "page.pdf")
-        let long = PDFExportFile.name(title: String(repeating: "é", count: 300), url: nil)
+        #expect(PageExportFile.name(title: nil, url: URL(string: "https://www.example.com/a")) == "www.example.com.pdf")
+        #expect(PageExportFile.name(title: "  ", url: URL(string: "file:///tmp/notes.html")) == "notes.html.pdf")
+        #expect(PageExportFile.name(title: "...", url: URL(string: "about:blank")) == "page.pdf")
+        // Review CO6: “Save As…” too, with its own extension.
+        #expect(PageExportFile.name(title: "Notes.webarchive", url: nil, fileExtension: "webarchive") == "Notes.webarchive")
+        #expect(PageExportFile.name(title: nil, url: nil) == "page.pdf")
+        let long = PageExportFile.name(title: String(repeating: "é", count: 300), url: nil)
         #expect(long.utf8.count <= 255)
         #expect(long.hasSuffix(".pdf"))
     }
@@ -114,9 +116,9 @@ struct PagePrintingTests {
     @Test func `writing replaces an existing file`() throws {
         let destination = temporaryFile("export.pdf")
         defer { try? FileManager.default.removeItem(at: destination) }
-        try PDFExportFile.write(Data("premier".utf8), to: destination)
+        try PageExportFile.write(Data("premier".utf8), to: destination)
         #expect(try Data(contentsOf: destination) == Data("premier".utf8))
-        try PDFExportFile.write(Data("second".utf8), to: destination)
+        try PageExportFile.write(Data("second".utf8), to: destination)
         #expect(try Data(contentsOf: destination) == Data("second".utf8))
     }
 }

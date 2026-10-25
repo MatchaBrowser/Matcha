@@ -62,7 +62,7 @@ struct WindowModelViewersTests {
         let second = openSecondWindow()
         second.activate()
         second.windowDidClose()
-        #expect(tabManager.viewers.count == 1)
+        #expect(tabManager.viewers.all.count == 1)
         #expect(tabManager.activeViewer === first.viewer)
     }
 

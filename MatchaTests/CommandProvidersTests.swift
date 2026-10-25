@@ -129,7 +129,7 @@ struct CommandProvidersTests {
         if case let .tab(_, place, _, _) = candidates.first?.kind {
             #expect(place == .pinned)
         } else {
-            Issue.record("Onglet attendu")
+            Issue.record("Tab expected")
         }
     }
 

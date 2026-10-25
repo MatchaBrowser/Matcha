@@ -16,8 +16,8 @@ struct HistoryIndexTests {
             historyVisit("https://example.com/autre", title: "Autre", minutesAgo: 20),
         ])
         #expect(index.visits.count == 3)
-        #expect(Set(index.entries.keys) == ["example.com", "example.com/autre"])
-        let entry = try #require(index.entries["example.com"])
+        #expect(Set(index.entriesByKey.keys) == ["example.com", "example.com/autre"])
+        let entry = try #require(index.entriesByKey["example.com"])
         #expect(entry.visitCount == 2)
         #expect(entry.lastVisit == fixedNow.addingTimeInterval(-600))
         // Address of the last visit; title of the last visit that has one.
@@ -30,24 +30,24 @@ struct HistoryIndexTests {
         var index = HistoryIndex(visits: [historyVisit("https://example.com/", title: "Ancien", minutesAgo: 30)])
         let newer = historyVisit("https://example.com/", title: "Nouveau", minutesAgo: 5)
         index.insert(newer)
-        #expect(index.entries["example.com"]?.title == "Nouveau")
+        #expect(index.entriesByKey["example.com"]?.title == "Nouveau")
 
         // The title of a visit changes (title arriving late); when empty, it no longer counts.
         index.setTitle("Renommé", ofVisit: newer.id)
-        #expect(index.entries["example.com"]?.title == "Renommé")
+        #expect(index.entriesByKey["example.com"]?.title == "Renommé")
         index.setTitle("  ", ofVisit: newer.id)
         #expect(index.visits[newer.id]?.title == nil)
-        #expect(index.entries["example.com"]?.title == "Ancien")
+        #expect(index.entriesByKey["example.com"]?.title == "Ancien")
         // Unknown visit: nothing.
         index.setTitle("Fantôme", ofVisit: UUID())
-        #expect(index.entries["example.com"]?.title == "Ancien")
+        #expect(index.entriesByKey["example.com"]?.title == "Ancien")
     }
 
     @Test func `inserting the same visit twice counts it once`() {
         let visit = historyVisit("https://example.com/", title: "Exemple")
         var index = HistoryIndex(visits: [visit])
         index.insert(visit)
-        #expect(index.entries["example.com"]?.visitCount == 1)
+        #expect(index.entriesByKey["example.com"]?.visitCount == 1)
         #expect(index.visits.count == 1)
     }
 
@@ -55,12 +55,12 @@ struct HistoryIndexTests {
         let visit = historyVisit("https://example.com/", title: "Exemple", minutesAgo: 1)
         var index = HistoryIndex(visits: [visit])
         index.refresh(visit: visit.id, date: fixedNow, title: nil)
-        let entry = try #require(index.entries["example.com"])
+        let entry = try #require(index.entriesByKey["example.com"])
         #expect(entry.visitCount == 1)
         #expect(entry.lastVisit == fixedNow)
         #expect(entry.title == "Exemple")
         index.refresh(visit: visit.id, date: fixedNow, title: "Rechargé")
-        #expect(index.entries["example.com"]?.title == "Rechargé")
+        #expect(index.entriesByKey["example.com"]?.title == "Rechargé")
     }
 
     @Test func `removing visits recomputes their address`() throws {
@@ -70,18 +70,18 @@ struct HistoryIndexTests {
         var index = HistoryIndex(visits: [old, recent, other])
 
         index.remove([recent.id])
-        let entry = try #require(index.entries["example.com"])
+        let entry = try #require(index.entriesByKey["example.com"])
         #expect(entry.visitCount == 1)
         #expect(entry.lastVisit == old.date)
         #expect(entry.title == "Ancien")
         #expect(entry.url.absoluteString == "https://example.com/")
 
         index.remove([old.id, UUID()])
-        #expect(index.entries["example.com"] == nil)
-        #expect(index.entries.keys.sorted() == ["apple.com"])
+        #expect(index.entriesByKey["example.com"] == nil)
+        #expect(index.entriesByKey.keys.sorted() == ["apple.com"])
         index.remove([other.id])
         #expect(index.isEmpty)
-        #expect(index.entries.isEmpty)
+        #expect(index.entriesByKey.isEmpty)
     }
 
     @Test func `removing since a date keeps older visits`() {
@@ -93,8 +93,8 @@ struct HistoryIndexTests {
             historyVisit("https://future.example/", minutesAgo: -30),
         ])
         index.remove(since: fixedNow.addingTimeInterval(-3600))
-        #expect(index.entries.keys.sorted() == ["example.com"])
-        #expect(index.entries["example.com"]?.visitCount == 1)
+        #expect(index.entriesByKey.keys.sorted() == ["example.com"])
+        #expect(index.entriesByKey["example.com"]?.visitCount == 1)
     }
 
     @Test func `changes replayed after loading never count twice`() {
@@ -114,9 +114,9 @@ struct HistoryIndexTests {
         var empty: [UUID?: HistoryIndex] = [:]
         changes.forEach { $0.apply(to: &empty) }
         for indexes in [loaded, empty] {
-            #expect(indexes[profile]?.entries["example.com"]?.visitCount == 1)
-            #expect(indexes[profile]?.entries["example.com"]?.title == "Exemple")
-            #expect(indexes[profile]?.entries["example.com"]?.lastVisit == fixedNow)
+            #expect(indexes[profile]?.entriesByKey["example.com"]?.visitCount == 1)
+            #expect(indexes[profile]?.entriesByKey["example.com"]?.title == "Exemple")
+            #expect(indexes[profile]?.entriesByKey["example.com"]?.lastVisit == fixedNow)
         }
 
         HistoryChange.remove([visit.id], profileID: profile).apply(to: &loaded)
@@ -134,7 +134,7 @@ struct HistoryIndexTests {
         ]
         HistoryChange.removeSince(fixedNow.addingTimeInterval(-3600), profileID: first).apply(to: &indexes)
         #expect(indexes[first] == nil)
-        #expect(indexes[second]?.entries.keys.sorted() == ["b.example"])
+        #expect(indexes[second]?.entriesByKey.keys.sorted() == ["b.example"])
         HistoryChange.removeSince(nil, profileID: nil).apply(to: &indexes)
         #expect(indexes.keys.map(\.self) == [second])
     }

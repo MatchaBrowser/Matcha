@@ -52,15 +52,8 @@ struct TabRowView: View {
         .sidebarRowDropDestination(tabManager: tabManager, drop: drop, part: $dropPart)
         .insertionLine(for: dropPart)
         .help(tab.displayedURL?.absoluteString ?? tab.displayTitle)
-        .accessibilityElement(children: .ignore)
-        .accessibilityLabel(tab.displayTitle)
-        .accessibilityAddTraits(isSelected ? [.isButton, .isSelected] : .isButton)
-        .accessibilityAction { TabActivation.activate(tab, in: tabManager) }
-        .accessibilityAction(named: "Close Tab") { tabManager.close(tab) }
-        .sidebarRowKeyboard { TabActivation.activate(tab, in: tabManager) } move: { tabManager.moveStep(tab, by: $0) }
+        .tabAccessibility(tab, tabManager: tabManager, isSelected: isSelected, canClose: true) { tabManager.moveStep(tab, by: $0) }
         .accessibilityIdentifier("tabRow")
-        // “Playing Audio”; in Debug, “suspended” for a sleeping tab (UI tests of task 5.6).
-        .tabAudioAccessibility(tab)
     }
 
     private var closeButton: some View {

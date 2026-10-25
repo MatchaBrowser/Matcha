@@ -34,24 +34,24 @@ struct LocalizationTests {
         let reference = try Self.localizableKeys()
         #expect(!reference.isEmpty)
         let missing = reference.subtracting(keys).sorted()
-        #expect(missing.isEmpty, "Non traduit en \(language) : \(missing)")
+        #expect(missing.isEmpty, "Not translated in \(language): \(missing)")
         let empty = try Self.table("Localizable", "strings", language).filter { ($0.value as? String)?.isEmpty != false }
-        #expect(empty.isEmpty, "Valeur vide en \(language) : \(empty.keys.sorted())")
+        #expect(empty.isEmpty, "Empty value in \(language): \(empty.keys.sorted())")
     }
 
     @Test(arguments: languages)
     func `every plural has all its variants`(language: String) throws {
         let plurals = try Self.table("Localizable", "stringsdict", language)
         let missing = try Self.pluralKeys().subtracting(plurals.keys).sorted()
-        #expect(missing.isEmpty, "Pluriel absent en \(language) : \(missing)")
+        #expect(missing.isEmpty, "Plural missing in \(language): \(missing)")
         for (key, value) in plurals {
-            let rules = try #require(value as? [String: Any], "Pluriel illisible en \(language) : \(key)")
-            #expect(rules["NSStringLocalizedFormatKey"] is String, "\(key) en \(language)")
+            let rules = try #require(value as? [String: Any], "Unreadable plural in \(language): \(key)")
+            #expect(rules["NSStringLocalizedFormatKey"] is String, "\(key) in \(language)")
             let variables = rules.values.compactMap { $0 as? [String: Any] }
-            #expect(!variables.isEmpty, "\(key) en \(language)")
+            #expect(!variables.isEmpty, "\(key) in \(language)")
             for variable in variables {
                 for category in Self.requiredPluralCategories[language, default: ["other"]] {
-                    #expect((variable[category] as? String)?.isEmpty == false, "\(key) sans « \(category) » en \(language)")
+                    #expect((variable[category] as? String)?.isEmpty == false, "\(key) without “\(category)” in \(language)")
                 }
             }
         }
@@ -63,13 +63,13 @@ struct LocalizationTests {
         #expect(!reference.isEmpty)
         let values = try Self.table("InfoPlist", "strings", language)
         let missing = reference.filter { (values[$0] as? String)?.isEmpty != false }.sorted()
-        #expect(missing.isEmpty, "Info.plist non traduit en \(language) : \(missing)")
+        #expect(missing.isEmpty, "Info.plist not translated in \(language): \(missing)")
     }
 
     @Test func `the Info.plist has its source texts`() throws {
         let info = Bundle.main.infoDictionary ?? [:]
         let missing = try Self.infoPlistKeys().filter { (info[$0] as? String)?.isEmpty != false }.sorted()
-        #expect(missing.isEmpty, "Info.plist sans texte anglais : \(missing)")
+        #expect(missing.isEmpty, "Info.plist without English text: \(missing)")
     }
 
     // MARK: - Reading the bundle
@@ -80,7 +80,7 @@ struct LocalizationTests {
             return [:]
         }
         let plist = try PropertyListSerialization.propertyList(from: Data(contentsOf: url), format: nil)
-        return try #require(plist as? [String: Any], "\(language).lproj/\(name).\(type) illisible")
+        return try #require(plist as? [String: Any], "\(language).lproj/\(name).\(type) unreadable")
     }
 
     /// All the keys present in at least one language: each translation must have all of them.

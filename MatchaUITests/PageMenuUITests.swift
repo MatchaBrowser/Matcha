@@ -110,7 +110,7 @@ final class PageMenuUITests: XCTestCase {
     /// From a mini window: a background tab in the main window, like ⌘-click; no Peek.
     @MainActor
     func testOpenLinkInNewTabFromAMiniWindowAddsATabToTheSidebar() throws {
-        try XCTSkipUnless(FileManager.default.isReadableFile(atPath: Self.localDocsPath), "Documentation de Postfix absente")
+        try XCTSkipUnless(FileManager.default.isReadableFile(atPath: Self.localDocsPath), "Postfix documentation missing")
         let app = launchApp()
         XCTAssertTrue(waitForBrowserWindow(of: app))
         let mini = openMiniWindow(in: app)

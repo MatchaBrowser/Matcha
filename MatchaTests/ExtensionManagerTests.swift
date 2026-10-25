@@ -148,7 +148,7 @@ struct ExtensionManagerTests {
                 try await Task.sleep(for: .milliseconds(100))
             }
             #expect(!reply.hasPrefix("error"), "\(reply)")
-            #expect(tabManager.tabs.count == 2, "\(tabManager.tabs.count) onglets, réponse : \(reply)")
+            #expect(tabManager.tabs.count == 2, "\(tabManager.tabs.count) tabs, reply: \(reply)")
             let created = try #require(tabManager.tabs.first { $0 !== opener })
             try await waitUntil { created.url != nil }
             #expect(created.url == URL(string: "about:blank"))

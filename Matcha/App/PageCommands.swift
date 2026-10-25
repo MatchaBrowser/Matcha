@@ -12,10 +12,9 @@ struct PageCommands: Commands {
     /// Shortcuts chosen in Settings > Shortcuts.
     let shortcuts: MenuShortcutStore
 
-    /// Active mini window: `keyWindowID` is read so the menu follows along, the window is read again on each action.
+    /// Active mini window, followed by the menu.
     private var miniWindow: MiniWindowController? {
-        _ = miniWindows.keyWindowID
-        return miniWindows.keyWindow
+        miniWindows.observedKeyWindow
     }
 
     private var page: BrowserTab? {

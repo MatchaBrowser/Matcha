@@ -7,7 +7,7 @@ import Foundation
 nonisolated struct HistoryIndex: Sendable {
     private(set) var visits: [UUID: HistoryVisit] = [:]
     /// Addresses, by key.
-    private(set) var entries: [String: HistoryIndexEntry] = [:]
+    private(set) var entriesByKey: [String: HistoryIndexEntry] = [:]
     private var visitIDsByKey: [String: Set<UUID>] = [:]
 
     init(visits: [HistoryVisit] = []) {
@@ -82,17 +82,17 @@ nonisolated struct HistoryIndex: Sendable {
         let keyVisits = visitIDsByKey[key]?.compactMap { visits[$0] } ?? []
         guard let latest = keyVisits.max(by: Self.isOlder) else {
             visitIDsByKey[key] = nil
-            entries[key] = nil
+            entriesByKey[key] = nil
             return
         }
         let titled = keyVisits.filter { $0.title != nil }.max(by: Self.isOlder)
-        entries[key] = HistoryIndexEntry(
+        entriesByKey[key] = HistoryIndexEntry(
             urlKey: key,
             url: latest.url,
             title: titled?.title,
             visitCount: keyVisits.count,
             lastVisit: latest.date,
-            previous: entries[key],
+            previous: entriesByKey[key],
         )
     }
 

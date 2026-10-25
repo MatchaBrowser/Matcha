@@ -16,7 +16,7 @@ nonisolated extension HistoryIndex {
         let required = HistoryCharacterMask([query.urlFolded])
         var matches: [Match] = []
         var unmatched: [HistoryIndexEntry] = []
-        for (offset, entry) in entries.values.enumerated() {
+        for (offset, entry) in entriesByKey.values.enumerated() {
             if offset.isMultiple(of: 1024), Task.isCancelled {
                 return []
             }

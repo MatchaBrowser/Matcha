@@ -8,15 +8,18 @@ import WebKit
 final class TabManager {
     /// Place and order of the tabs in the sidebar, saved by the Space (`SpaceStore`).
     private(set) var layout = SidebarLayout()
-    /// Viewer the tab actions apply to (selection, new tabs, Peek): that of the window in front showing this Space.
-    /// The first one holds the restored selection until a window takes it.
-    private(set) var activeViewer = TabViewer()
-    /// The viewers of the windows that show or showed this Space, the active one included.
-    @ObservationIgnored private(set) var viewers: [TabViewer] = []
-    /// Which window shows each tab: the session's, shared by its Spaces and its windows of their own tabs (review ON2);
-    /// this manager's own otherwise (tests).
-    @ObservationIgnored var displays = TabDisplayRegistry() {
-        didSet { viewers.forEach(displays.register) }
+    /// The windows' selections in this Space (`TabViewers`).
+    @ObservationIgnored let viewers = TabViewers()
+
+    /// Viewer the tab actions apply to: that of the window in front showing this Space (`TabViewers.active`).
+    var activeViewer: TabViewer {
+        viewers.active
+    }
+
+    /// Which window shows each tab (`TabViewers.displays`).
+    var displays: TabDisplayRegistry {
+        get { viewers.displays }
+        set { viewers.displays = newValue }
     }
 
     /// The favorites of this Space's profile, shared with its other Spaces (review ON1); nil outside a session (tests)
@@ -52,12 +55,15 @@ final class TabManager {
     @ObservationIgnored weak var popupWindows: (any PopupWindowHosting)?
     /// The session's blocker (task 6.2), given by the session; nil (tests): pages are not tracked.
     @ObservationIgnored var contentBlocking: ContentBlockerScope?
+    /// Closing of the Peek by its page (`SessionServices.closePeek`).
+    @ObservationIgnored let closePeekFromPage: @MainActor (TabManager) -> Void
 
     /// `services`: the session's (audit C2); the tests' own by default, without extensions, downloads or windows.
     init(websiteDataStore: WKWebsiteDataStore, services: SessionServices = SessionServices(), downloadScope: DownloadScope = .regular) {
         self.websiteDataStore = websiteDataStore
         faviconService = services.favicons
         pages = services.pages
+        closePeekFromPage = services.closePeek
         coordinator = services.makeCoordinator()
         self.downloadScope = downloadScope
         coordinator.tabHost = self
@@ -128,7 +134,8 @@ final class TabManager {
         tab.delegate = coordinator
         tab.makeWebViewIfNeeded()
         tabsByID[tab.id] = tab
-        layout.insertToday(tab.id, at: todayInsertionIndex(after: anchor))
+        let anchorID = anchor?.id
+        layout.insertToday(tab.id, at: layout.todayInsertionIndex(after: anchorID) { tabsByID[$0]?.openerID == anchorID })
         if select || selectedTab == nil {
             setSelection(tab.id)
         }
@@ -221,21 +228,10 @@ final class TabManager {
         activeViewer.selectedTabID = id
     }
 
-    /// Primitive of `TabManager+Selection`: makes `viewer` the active one.
-    func setActiveViewer(_ viewer: TabViewer) {
-        activeViewer = viewer
-    }
-
     /// Primitive of `TabManager+Selection`: `viewer` now belongs to this Space.
     func adopt(_ viewer: TabViewer) {
         viewer.tabManager = self
-        viewers.append(viewer)
-        displays.register(viewer)
-    }
-
-    /// Primitive of `TabManager+Selection`: forgets `viewer` (never the active one).
-    func forget(_ viewer: TabViewer) {
-        viewers.removeAll { $0 === viewer }
+        viewers.adopt(viewer)
     }
 
     /// Primitive of `TabManager+Peek`: replaces the Peek, without releasing anything.
@@ -270,18 +266,5 @@ final class TabManager {
         tabsByID[tab.id] = nil
         displays.forget(tab.id)
         tab.discard()
-    }
-
-    /// After the anchor (after its split if it has one) and the tabs already opened from it; at the top without a
-    /// today anchor.
-    private func todayInsertionIndex(after anchor: BrowserTab?) -> Int {
-        guard let anchor, var index = layout.today.firstIndex(of: layout.split(containing: anchor.id)?.tabIDs.last ?? anchor.id) else {
-            return 0
-        }
-        index += 1
-        while index < layout.today.count, tabsByID[layout.today[index]]?.openerID == anchor.id {
-            index += 1
-        }
-        return index
     }
 }

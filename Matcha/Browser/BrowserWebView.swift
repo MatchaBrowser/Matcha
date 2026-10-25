@@ -33,6 +33,8 @@ final class BrowserWebView: WKWebView {
     /// Sound of the tab this web view belongs to (task 5.10), recipient of the messages of the sound script; nil once
     /// the view is released by its tab.
     weak var audio: PageAudio?
+    /// Recipient of the messages of the notification script: the tab's navigation delegate (review CO1).
+    weak var notifications: (any PageNotificationReceiving)?
 
     /// Inspectable according to the developer tools setting, followed as long as the view exists.
     override init(frame: CGRect, configuration: WKWebViewConfiguration) {

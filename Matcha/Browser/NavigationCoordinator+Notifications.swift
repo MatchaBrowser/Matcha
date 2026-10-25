@@ -6,7 +6,7 @@ import WebKit
 /// WB2): only the main frame of a website in a secure context (https, or http on this Mac) may ask, once at a time;
 /// a frame of the same website may notify, never one of another site; nothing in a private window, where nothing is
 /// remembered.
-extension NavigationCoordinator {
+extension NavigationCoordinator: PageNotificationReceiving {
     /// Message of the notification script of `frame`; `reply` settles the script's promise.
     func receive(
         _ message: PageNotificationMessage,

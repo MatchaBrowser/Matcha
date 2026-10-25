@@ -29,10 +29,6 @@ enum HistoryOpenConfirmation {
                 open()
             }
         }
-        if let window, window.isVisible, window.attachedSheet == nil {
-            alert.beginSheetModal(for: window, completionHandler: handle)
-        } else {
-            handle(alert.runModal())
-        }
+        alert.present(in: window, completion: handle)
     }
 }

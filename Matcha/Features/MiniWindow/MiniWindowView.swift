@@ -37,13 +37,7 @@ struct MiniWindowView: View {
                 },
             )
             page
-                .background(.background)
-                .clipShape(.rect(cornerRadius: Self.cardCornerRadius))
-                .overlay {
-                    RoundedRectangle(cornerRadius: Self.cardCornerRadius)
-                        .strokeBorder(.hairline, lineWidth: 1)
-                        .allowsHitTesting(false)
-                }
+                .pageCardFrame(cornerRadius: Self.cardCornerRadius)
                 .overlay(alignment: .bottom) { CopyConfirmationView(model: controller.copyConfirmation) }
                 .padding([.leading, .trailing, .bottom], Self.cardMargin)
         }

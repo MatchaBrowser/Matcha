@@ -73,14 +73,7 @@ private struct FavoriteTile: View {
             .tabDraggable(tab)
             .sidebarRowDropDestination(tabManager: tabManager, drop: drop, axis: .horizontal, part: $dropPart)
             .help(tab.displayTitle)
-            .accessibilityElement(children: .ignore)
-            .accessibilityLabel(tab.displayTitle)
-            .accessibilityAddTraits(isSelected ? [.isButton, .isSelected] : .isButton)
-            .accessibilityAction { TabActivation.activate(tab, in: tabManager) }
-            .sidebarRowKeyboard(isHorizontal: true) { TabActivation.activate(tab, in: tabManager) } move: {
-                tabManager.moveStep(tab, by: $0)
-            }
+            .tabAccessibility(tab, tabManager: tabManager, isSelected: isSelected, isHorizontal: true) { tabManager.moveStep(tab, by: $0) }
             .accessibilityIdentifier("favoriteTile")
-            .tabAudioAccessibility(tab)
     }
 }

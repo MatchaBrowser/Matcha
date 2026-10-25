@@ -110,7 +110,8 @@ final class TabSuspension {
         suspendedAt = nil
     }
 
-    /// Removes the snapshot from the page; the observed value is only written if it changes.
+    /// Removes the snapshot from the page; the observed value is only written if it changes (`TabCover` isn't
+    /// `Equatable`: Observation would notify for nil over nil).
     private func dropCover() {
         if cover != nil {
             cover = nil

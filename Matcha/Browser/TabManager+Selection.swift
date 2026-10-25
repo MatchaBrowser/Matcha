@@ -12,7 +12,7 @@ extension TabManager {
     /// A window shows this Space for the first time: it takes the viewer left by a closed window (and its selection),
     /// otherwise a new one, on the active viewer's tab if no window shows it.
     func makeViewer() -> TabViewer {
-        if let free = viewers.first(where: { !$0.isInUse }) {
+        if let free = viewers.all.first(where: { !$0.isInUse }) {
             free.isInUse = true
             return free
         }
@@ -29,33 +29,31 @@ extension TabManager {
     func releaseViewer(_ viewer: TabViewer) {
         setOnScreen(viewer, false)
         viewer.isInUse = false
-        guard viewers.count > 1, viewers.contains(where: { $0 === viewer }) else {
+        guard viewers.all.count > 1, viewers.contains(viewer) else {
             return
         }
-        let others = viewers.filter { $0 !== viewer }
+        let others = viewers.all.filter { $0 !== viewer }
         if activeViewer === viewer, let heir = others.first(where: \.isOnScreen) ?? others.first {
-            setActiveViewer(heir)
+            viewers.setActive(heir)
         }
-        forget(viewer)
+        viewers.forget(viewer)
     }
 
     /// The tab actions now apply to `viewer` (its window comes to the front, shows this Space, or acts).
     func activate(_ viewer: TabViewer) {
-        if activeViewer !== viewer, viewers.contains(where: { $0 === viewer }) {
-            setActiveViewer(viewer)
+        if activeViewer !== viewer, viewers.contains(viewer) {
+            viewers.setActive(viewer)
         }
     }
 
     /// The window of `viewer` shows this Space (true), or no longer does. Shown, it takes its tabs from the other
     /// windows and creates their web views; hidden, the active viewer becomes that of another window showing it.
     func setOnScreen(_ viewer: TabViewer, _ isOnScreen: Bool) {
-        if viewer.isOnScreen != isOnScreen {
-            viewer.isOnScreen = isOnScreen
-        }
+        viewer.isOnScreen = isOnScreen
         if isOnScreen {
             showHere(viewer)
-        } else if activeViewer === viewer, let other = viewers.first(where: \.isOnScreen) {
-            setActiveViewer(other)
+        } else if activeViewer === viewer, let other = viewers.all.first(where: \.isOnScreen) {
+            viewers.setActive(other)
         }
     }
 
@@ -82,13 +80,13 @@ extension TabManager {
 
     /// Viewer whose window shows `id`; otherwise the active viewer if it displays it, otherwise the first that does.
     func viewer(showing id: BrowserTab.ID) -> TabViewer? {
-        if let holder = displays.holder(of: id), viewers.contains(where: { $0 === holder }) {
+        if let holder = displays.holder(of: id), viewers.contains(holder) {
             return holder
         }
         if activeViewer.displayedTabIDs.contains(id) {
             return activeViewer
         }
-        return viewers.first { $0.displayedTabIDs.contains(id) }
+        return viewers.all.first { $0.displayedTabIDs.contains(id) }
     }
 
     // MARK: Changing
@@ -132,7 +130,7 @@ extension TabManager {
     /// window shows its empty page.
     func moveSelection(awayFrom ids: Set<BrowserTab.ID>, preferring preferred: BrowserTab.ID? = nil, during change: () -> Void) {
         let today = layout.today
-        let moving = viewers.compactMap { viewer -> SelectionMove? in
+        let moving = viewers.all.compactMap { viewer -> SelectionMove? in
             guard let selected = viewer.selectedTabID, ids.contains(selected) else {
                 return nil
             }
@@ -140,7 +138,7 @@ extension TabManager {
         }
         change()
         for move in moving {
-            setSelection(nextSelection(from: move.todayIndex, in: today, leaving: ids, preferring: preferred), for: move.viewer)
+            setSelection(layout.nextSelection(from: move.todayIndex, in: today, leaving: ids, preferring: preferred), for: move.viewer)
         }
     }
 
@@ -149,34 +147,16 @@ extension TabManager {
     func moveSelection(of viewer: TabViewer, awayFrom ids: Set<BrowserTab.ID>) {
         let today = layout.today
         let index = viewer.selectedTabID.flatMap { today.firstIndex(of: $0) }
-        setSelection(nextSelection(from: index, in: today, leaving: ids, preferring: nil), for: viewer)
+        setSelection(layout.nextSelection(from: index, in: today, leaving: ids, preferring: nil), for: viewer)
     }
 
     /// Windows whose selected tab no longer exists in this Space show their empty page.
     func dropMissingSelections() {
-        for viewer in viewers {
+        for viewer in viewers.all {
             if let id = viewer.selectedTabID, tab(withID: id) == nil {
                 setSelection(nil, for: viewer)
             }
         }
-    }
-
-    private func nextSelection(
-        from index: Int?,
-        in today: [BrowserTab.ID],
-        leaving ids: Set<BrowserTab.ID>,
-        preferring preferred: BrowserTab.ID?,
-    ) -> BrowserTab.ID? {
-        if let preferred, !ids.contains(preferred), layout.place(of: preferred) != nil {
-            return preferred
-        }
-        guard let index else {
-            return nil
-        }
-        func remains(_ id: UUID) -> Bool {
-            !ids.contains(id) && layout.place(of: id) == .today
-        }
-        return today[index...].first(where: remains) ?? today[..<index].last(where: remains)
     }
 }
 

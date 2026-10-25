@@ -17,14 +17,12 @@ struct HistoryCommands: Commands {
 
     /// Front page: the active mini window's, the peek if it is open, otherwise the selected tab.
     private var frontTab: BrowserTab? {
-        _ = miniWindows.keyWindowID
-        return miniWindows.keyWindow?.tab ?? tabManager?.frontTab
+        miniWindows.observedKeyWindow?.tab ?? tabManager?.frontTab
     }
 
     /// Tabs of the active browsing window; nil when a mini window is active.
     private var browsingTabs: TabManager? {
-        _ = miniWindows.keyWindowID
-        return miniWindows.keyWindow == nil ? tabManager : nil
+        miniWindows.observedKeyWindow == nil ? tabManager : nil
     }
 
     /// “Reopen Closed Tabs” when the last closing took several (“Clear”).

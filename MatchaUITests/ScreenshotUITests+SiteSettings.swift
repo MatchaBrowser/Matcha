@@ -16,7 +16,7 @@ extension ScreenshotUITests {
         }
         let button = siteSettingsButton(in: app)
         guard button.waitForExistence(timeout: 20) else {
-            XCTFail("Bouton des réglages du site introuvable : l'onglet affiché doit être un site web (http ou https)")
+            XCTFail("Site settings button not found: the displayed tab must be a website (http or https)")
             return
         }
         button.click()
@@ -42,12 +42,12 @@ extension ScreenshotUITests {
         openAddress(address, in: app)
         if let title = environment["MATCHA_SCREENSHOT_PERMISSION_BUTTON"] {
             let pageButton = app.webViews.buttons[title].firstMatch
-            XCTAssertTrue(pageButton.waitForExistence(timeout: 20), "Bouton « \(title) » introuvable dans la page")
+            XCTAssertTrue(pageButton.waitForExistence(timeout: 20), "Button “\(title)” not found in the page")
             clickWhenSettled(pageButton)
         }
         let banner = app.descendants(matching: .any).matching(identifier: "permissionBanner").firstMatch
         guard banner.waitForExistence(timeout: 20) else {
-            XCTFail("Aucun bandeau de permission")
+            XCTFail("No permission banner")
             return
         }
         sleep(1)
