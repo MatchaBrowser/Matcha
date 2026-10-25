@@ -13,6 +13,8 @@ final class NavigationCoordinator: NSObject {
     weak var tabHost: (any TabHost)?
     /// Receives the downloads (the app's, given by its host); nil: pages can't download.
     var downloadManager: DownloadManager?
+    /// Shows the notifications of the pages (`+Notifications`); nil: they read “denied”.
+    var notificationCenter: PageNotificationCenter?
 
     /// Hands a URL to the app that handles it; replaceable in tests.
     var openExternally: (URL) -> Bool = { NSWorkspace.shared.open($0) }
@@ -96,6 +98,7 @@ final class NavigationCoordinator: NSObject {
     ) {
         if navigationAction.targetFrame?.isMainFrame == true {
             tabHost?.contentBlocking?.prepare(webView, for: navigationAction.request.url)
+            prepareNotifications(for: webView)
         }
         decisionHandler(.allow)
     }
@@ -127,6 +130,7 @@ extension NavigationCoordinator: WKNavigationDelegate {
         tab.pageDownloads.documentDidChange()
         tab.pageDialogs.documentDidChange()
         tab.audio.reset()
+        notificationsDocumentDidChange(in: webView, page: tab)
         tabHost.faviconService.showCachedIcon(on: tab, host: webView.url?.host())
         tabHost.siteZooms?.pageDidCommit(tab, url: webView.url)
     }

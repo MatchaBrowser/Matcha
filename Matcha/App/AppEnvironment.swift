@@ -29,6 +29,8 @@ final class AppEnvironment {
     let shortcutRecorder = ShortcutRecorder()
     /// Edit > Find on the pages of the active window.
     let pageFind = PageFindResponder()
+    /// Notifications of the websites, shown by macOS.
+    let pageNotifications = PageNotificationCenter(system: UserNotificationsBridge())
 
     init() {
         let extensions = Self.makeExtensionManager()
@@ -82,6 +84,7 @@ final class AppEnvironment {
             downloads: downloads,
             contentBlocker: contentBlocker,
             dialogs: pageDialogs,
+            notifications: pageNotifications,
             makePopupWindows: { PopupWindowManager(settings: $0) },
         )
     }

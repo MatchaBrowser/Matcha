@@ -204,6 +204,35 @@
         }
       }
     },
+    "%@ wants to send you notifications." : {
+      "comment" : "Permission banner; %@ is the website",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ möchte dir Mitteilungen senden."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ quiere enviarte notificaciones."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ souhaite vous envoyer des notifications."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ vuole inviarti notifiche."
+          }
+        }
+      }
+    },
     "%@ wants to use your camera and microphone." : {
       "comment" : "Permission banner; %@ is the website",
       "localizations" : {
@@ -1831,7 +1860,7 @@
       }
     },
     "Allow" : {
-      "comment" : "Banner where a website wants to download files: allow them for this page\nSite settings: the website may use the camera or microphone without asking",
+      "comment" : "Banner where a website wants to download files: allow them for this page\nPermission banner: allow the website to send notifications, and remember it\nSite settings: the website may use the camera or microphone without asking",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -10689,6 +10718,35 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Non sicuro"
+          }
+        }
+      }
+    },
+    "Notifications" : {
+      "comment" : "Website permission: sending notifications",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mitteilungen"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Notificaciones"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Notifications"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Notifiche"
           }
         }
       }

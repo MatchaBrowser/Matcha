@@ -15,6 +15,8 @@ struct SessionServices {
     var contentBlocker: ContentBlockerService?
     /// JavaScript dialogs, files to send, logins, saving and printing of the pages.
     var dialogs: any PageDialogPresenting
+    /// Notifications of the pages; nil: they read “denied”.
+    var notifications: PageNotificationCenter?
     /// Sign-in windows of a session; nil: a window opened with a size becomes a tab.
     var makePopupWindows: @MainActor (PopupWindowSettings) -> (any PopupWindowHosting)?
 
@@ -24,6 +26,7 @@ struct SessionServices {
         downloads: DownloadManager? = nil,
         contentBlocker: ContentBlockerService? = nil,
         dialogs: any PageDialogPresenting = UnavailablePageDialogs(),
+        notifications: PageNotificationCenter? = nil,
         makePopupWindows: @escaping @MainActor (PopupWindowSettings) -> (any PopupWindowHosting)? = { _ in nil },
     ) {
         self.pages = pages
@@ -31,6 +34,7 @@ struct SessionServices {
         self.downloads = downloads
         self.contentBlocker = contentBlocker
         self.dialogs = dialogs
+        self.notifications = notifications
         self.makePopupWindows = makePopupWindows
     }
 
@@ -39,6 +43,7 @@ struct SessionServices {
         let coordinator = NavigationCoordinator()
         coordinator.dialogs = dialogs
         coordinator.downloadManager = downloads
+        coordinator.notificationCenter = notifications
         return coordinator
     }
 }
