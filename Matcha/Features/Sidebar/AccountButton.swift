@@ -27,7 +27,7 @@ struct AccountButton: View {
                 Button("Change Avatar…", systemImage: "person.crop.circle", action: openSyncSettings)
             }
         } label: {
-            AccountAvatarView(image: sync.avatar, size: 17)
+            AccountAvatarView(image: sync.avatarImage, size: 17)
                 .padding(2.5)
                 .overlay(Circle().strokeBorder(ringColor, lineWidth: 1.5))
                 .frame(width: SidebarIconButtonStyle.size, height: SidebarIconButtonStyle.size)

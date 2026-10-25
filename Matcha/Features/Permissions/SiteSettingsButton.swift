@@ -8,7 +8,7 @@ struct SiteSettingsButton: View {
     let action: () -> Void
 
     var body: some View {
-        if SiteOrigin.web(of: tab?.url) != nil {
+        if SiteOrigin.web(of: tab?.documentURL) != nil {
             Button(action: action) {
                 Label { title } icon: { Image(systemName: "switch.2") }
             }

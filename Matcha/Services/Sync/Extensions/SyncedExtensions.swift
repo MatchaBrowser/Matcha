@@ -77,9 +77,21 @@ final class SyncedExtensions {
     @ObservationIgnored private let url: URL?
     @ObservationIgnored private var isLoading = false
 
+    /// The saved state; nil without a file, or for one that can't be read, which is logged (review TR4).
+    private static func saved(at url: URL) -> Saved? {
+        do {
+            return try SyncCoding.decoder().decode(Saved.self, from: Data(contentsOf: url))
+        } catch CocoaError.fileReadNoSuchFile {
+            return nil
+        } catch {
+            Logger.sync.error("Synced extensions unreadable: \(error.logSummary, privacy: .public)")
+            return nil
+        }
+    }
+
     init(url: URL?) {
         self.url = url
-        guard let url, let data = try? Data(contentsOf: url), let saved = try? SyncCoding.decoder().decode(Saved.self, from: data) else {
+        guard let url, let saved = Self.saved(at: url) else {
             return
         }
         isLoading = true

@@ -1,4 +1,5 @@
 import Foundation
+import OSLog
 import Security
 
 /// Sync keychain (`SYNC.md` § 3.8): generic passwords of the `com.matchabrowser.matcha.sync` service, in this Mac's
@@ -48,8 +49,18 @@ nonisolated struct SyncKeychain: Sendable {
         var machineMark: String?
     }
 
+    /// This Mac's identity; nil if it has none yet. An item that can't be decoded is logged, then replaced by a new
+    /// identity: this Mac becomes another device of the account rather than staying unable to sync (review TR4).
     func device() throws -> Device? {
-        try data(account: "device").flatMap { try? JSONDecoder().decode(Device.self, from: $0) }
+        guard let data = try data(account: "device") else {
+            return nil
+        }
+        do {
+            return try JSONDecoder().decode(Device.self, from: data)
+        } catch {
+            Logger.sync.error("Device identity undecodable, replaced: \(error.logSummary, privacy: .public)")
+            return nil
+        }
     }
 
     func setDevice(_ device: Device) throws {
@@ -94,8 +105,12 @@ nonisolated struct SyncKeychain: Sendable {
         }
     }
 
+    /// Deletes an item; a failure is logged (status only): the item stays in the keychain (review TR4).
     private func remove(account: String) {
-        SecItemDelete(baseQuery(account: account) as CFDictionary)
+        let status = SecItemDelete(baseQuery(account: account) as CFDictionary)
+        if status != errSecSuccess, status != errSecItemNotFound {
+            Logger.sync.error("Keychain item not deleted: \(status, privacy: .public)")
+        }
     }
 
     private func baseQuery(account: String) -> [String: Any] {

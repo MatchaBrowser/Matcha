@@ -1,3 +1,4 @@
+import CoreGraphics
 import CryptoKit
 import Foundation
 import Observation
@@ -23,7 +24,10 @@ final class SyncService {
     /// This Mac's time minus the server's, in seconds (warning beyond 10 minutes).
     private(set) var clockOffset: TimeInterval?
     /// Image of the account's avatar (JPEG or PNG), decrypted and kept in cache; nil without one.
-    var avatar: Data?
+    private(set) var avatar: Data?
+    /// `avatar` decoded once, by the bounded decoder: it comes from any Mac of the account (review TR3); nil without one
+    /// or if it can't be decoded.
+    private(set) var avatarImage: CGImage?
     /// Last reading of the account's avatar on the server.
     @ObservationIgnored var avatarCheckedAt: Date?
     @ObservationIgnored let defaults: UserDefaults
@@ -65,7 +69,13 @@ final class SyncService {
         self.otherMacs = otherMacs
         self.directory = directory
         configuration = SyncConfiguration.load(from: defaults)
-        avatar = avatarCacheURL.flatMap { try? Data(contentsOf: $0) }
+        setAvatar(avatarCacheURL.flatMap { try? Data(contentsOf: $0) })
+    }
+
+    /// The avatar and its image, decoded once (`SyncService+Avatar`).
+    func setAvatar(_ image: Data?) {
+        avatar = image
+        avatarImage = image.flatMap { BoundedImageDecoder.decode($0, limits: .avatar) }
     }
 
     /// Sync is on and this Mac is signed in.
@@ -130,26 +140,6 @@ final class SyncService {
             return nil
         }
         return (SymmetricKey(data: accountKey), SyncRefreshResponse(accessToken: access, refreshToken: refresh))
-    }
-
-    /// This Mac's device identifier, drawn the first time and kept in the keychain with the machine's mark; `isNew`
-    /// when it was just drawn again because the mark changed (copied Mac).
-    func deviceIdentity() throws -> (id: UUID, isNew: Bool) {
-        let mark = SyncMachineMark.current()
-        if let device = try keychain.device() {
-            if device.machineMark == nil || mark == nil || device.machineMark == mark {
-                if device.machineMark == nil, let mark {
-                    try keychain.setDevice(SyncKeychain.Device(id: device.id, machineMark: mark))
-                }
-                return (device.id, false)
-            }
-            let copy = SyncKeychain.Device(id: UUID(), machineMark: mark)
-            try keychain.setDevice(copy)
-            return (copy.id, true)
-        }
-        let device = SyncKeychain.Device(id: UUID(), machineMark: mark)
-        try keychain.setDevice(device)
-        return (device.id, false)
     }
 
     // MARK: Running

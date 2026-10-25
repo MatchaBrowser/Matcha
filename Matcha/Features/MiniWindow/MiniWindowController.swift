@@ -103,7 +103,7 @@ final class MiniWindowController: NSObject, Identifiable {
 
     /// ⇧⌘C and the “Copy URL” row: the page's address, with the “URL Copied” confirmation.
     func copyURL(to pasteboard: NSPasteboard = .general) {
-        guard let url = tab.url else {
+        guard let url = tab.displayedURL else {
             return
         }
         TabLinkCopier.copy(url, to: pasteboard)

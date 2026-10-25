@@ -9,7 +9,7 @@ struct SiteZoomRow: View {
     let siteZooms: SiteZoomStore?
 
     private var site: String? {
-        SiteZoomKey.key(for: tab.url)
+        SiteZoomKey.key(for: tab.documentURL)
     }
 
     /// Zoom of the site (it may differ briefly from the page's, while the page loads its document).

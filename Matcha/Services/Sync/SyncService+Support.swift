@@ -1,8 +1,30 @@
 import CryptoKit
 import Foundation
 
-/// Questions to the user and sync state files.
+/// Questions to the user, this Mac's identity and sync state files.
 extension SyncService {
+    // MARK: Device
+
+    /// This Mac's device identifier, drawn the first time and kept in the keychain with the machine's mark; `isNew`
+    /// when it was just drawn again because the mark changed (copied Mac).
+    func deviceIdentity() throws -> (id: UUID, isNew: Bool) {
+        let mark = SyncMachineMark.current()
+        if let device = try keychain.device() {
+            if device.machineMark == nil || mark == nil || device.machineMark == mark {
+                if device.machineMark == nil, let mark {
+                    try keychain.setDevice(SyncKeychain.Device(id: device.id, machineMark: mark))
+                }
+                return (device.id, false)
+            }
+            let copy = SyncKeychain.Device(id: UUID(), machineMark: mark)
+            try keychain.setDevice(copy)
+            return (copy.id, true)
+        }
+        let device = SyncKeychain.Device(id: UUID(), machineMark: mark)
+        try keychain.setDevice(device)
+        return (device.id, false)
+    }
+
     // MARK: Questions
 
     func askFirstSync() async -> SyncEngine.FirstSyncChoice {

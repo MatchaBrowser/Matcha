@@ -4,7 +4,8 @@ import SwiftUI
 /// Avatar of the sync account in a circle (task 7.9): its image (a photo, or an emoji or initials drawn as an image);
 /// without one, the generic person symbol.
 struct AccountAvatarView: View {
-    let image: Data?
+    /// Decoded once by sync (`SyncService.avatarImage`), never in `body`.
+    let image: CGImage?
     var size: Double = 22
 
     var body: some View {
@@ -15,8 +16,8 @@ struct AccountAvatarView: View {
     }
 
     @ViewBuilder private var content: some View {
-        if let image = image.flatMap(NSImage.init(data:)) {
-            Image(nsImage: image)
+        if let image {
+            Image(decorative: image, scale: 1)
                 .resizable()
                 .scaledToFill()
         } else {

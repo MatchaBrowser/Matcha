@@ -40,18 +40,12 @@ nonisolated enum PageSourceLoader {
         let session = URLSession(configuration: configuration)
         defer { session.finishTasksAndInvalidate() }
         let (bytes, response) = try await session.bytes(from: page)
-        guard response.expectedContentLength <= Int64(maximumSize) else {
+        do {
+            let data = try await BoundedRead.data(of: bytes, expectedLength: response.expectedContentLength, limit: maximumSize)
+            return (data, response.textEncodingName)
+        } catch is BoundedRead.TooLarge {
             throw Failure.tooLarge
         }
-        var data = Data()
-        data.reserveCapacity(Int(max(0, response.expectedContentLength)))
-        for try await byte in bytes {
-            guard data.count < maximumSize else {
-                throw Failure.tooLarge
-            }
-            data.append(byte)
-        }
-        return (data, response.textEncodingName)
     }
 
     /// Content of a regular file of at most `maximumSize` bytes (never a device such as `/dev/zero`).

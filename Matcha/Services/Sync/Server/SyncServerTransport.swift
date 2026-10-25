@@ -14,6 +14,8 @@ nonisolated struct SyncServerTransport: SyncTransport {
     /// Size of a request body the server accepts (4 MiB by default).
     let maxRequestBytes: Int
     let supportsBlobs: Bool
+    /// Size of an encrypted package the server keeps (21 MiB by default): a larger answer is refused as it comes.
+    let maxBlobBytes: Int
 
     init(client: SyncAPIClient, accountKey: SymmetricKey, server: SyncServerInfo) {
         self.client = client
@@ -21,6 +23,7 @@ nonisolated struct SyncServerTransport: SyncTransport {
         maxChangesPerPush = min(max(server.limits?.maxChangesPerPush ?? 500, 1), 500)
         maxRequestBytes = server.limits?.maxRequestBytes ?? 4 * 1024 * 1024
         supportsBlobs = server.hasBlobs
+        maxBlobBytes = server.maximumBlobBytes
     }
 
     func prepare(_ changes: [SyncOutgoingChange]) throws -> SyncPreparedBatch {
@@ -75,7 +78,7 @@ nonisolated struct SyncServerTransport: SyncTransport {
     }
 
     func blob(id: UUID) async throws -> Data {
-        try await client.blob(id: id)
+        try await client.blob(id: id, limit: maxBlobBytes)
     }
 
     func deleteBlob(id: UUID) async throws {

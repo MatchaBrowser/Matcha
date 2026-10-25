@@ -17,7 +17,7 @@ enum PDFExport {
         panel.allowedContentTypes = [.pdf]
         panel.canCreateDirectories = true
         panel.isExtensionHidden = false
-        panel.nameFieldStringValue = PDFExportFile.name(title: page.title, url: page.url)
+        panel.nameFieldStringValue = PDFExportFile.name(title: page.title, url: page.documentURL)
         Task {
             guard await panel.beginSheetModal(for: window) == .OK, let destination = panel.url else {
                 return

@@ -44,9 +44,19 @@ nonisolated struct SyncServerInfo: Codable, Equatable, Sendable {
         features?.contains("avatar") == true
     }
 
+    /// Largest encrypted avatar the server keeps (`SYNC.md` § 4.2, 264 KiB by default).
+    var maximumAvatarBytes: Int {
+        limits?.maxAvatarBytes ?? 270_336
+    }
+
+    /// Largest encrypted package the server keeps (`SYNC.md` § 4.2, 21 MiB by default).
+    var maximumBlobBytes: Int {
+        limits?.maxBlobBytes ?? 22_020_096
+    }
+
     /// Largest image of an avatar: the encrypted size allowed, less the padding and the encryption's overhead.
     var maximumAvatarImageBytes: Int {
-        min(256 * 1024, (limits?.maxAvatarBytes ?? 270_336) - SyncCrypto.avatarPadding - 29)
+        min(256 * 1024, maximumAvatarBytes - SyncCrypto.avatarPadding - 29)
     }
 
     /// Iterations used for a new account or password: this Matcha's minimum, raised to the server's if it asks for

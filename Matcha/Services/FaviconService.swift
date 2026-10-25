@@ -170,21 +170,7 @@ final class FaviconService {
         if let http = response as? HTTPURLResponse, !(200 ..< 300).contains(http.statusCode) {
             return nil
         }
-        guard response.expectedContentLength <= maximumSize else {
-            return nil
-        }
-        var data = Data()
-        do {
-            for try await byte in bytes {
-                guard data.count < maximumSize else {
-                    return nil
-                }
-                data.append(byte)
-            }
-        } catch {
-            return nil
-        }
-        return data
+        return try? await BoundedRead.data(of: bytes, expectedLength: response.expectedContentLength, limit: Int(maximumSize))
     }
 
     private func store(_ data: Data, favicon: Favicon, forHost host: String) {

@@ -97,3 +97,13 @@ final class TestPages: NSObject, WKURLSchemeHandler {
 
     func webView(_: WKWebView, stop _: any WKURLSchemeTask) {}
 }
+
+/// Pages that never answer: their load stays pending (a site that doesn't respond, audit W4).
+@MainActor
+final class SilentPages: NSObject, WKURLSchemeHandler {
+    static let scheme = "obtest-lent"
+
+    func webView(_: WKWebView, start _: any WKURLSchemeTask) {}
+
+    func webView(_: WKWebView, stop _: any WKURLSchemeTask) {}
+}

@@ -76,7 +76,7 @@ final class MiniCommandBarModel: CommandBarPanelModel {
 
     /// Icon of the field: the site's icon when editing the page's address.
     var editedTab: BrowserTab? {
-        mode == .editAddress && tab.url != nil ? tab : nil
+        mode == .editAddress && tab.displayedURL != nil ? tab : nil
     }
 
     /// No tab row in this bar.
@@ -89,14 +89,15 @@ final class MiniCommandBarModel: CommandBarPanelModel {
     /// Already open in the same mode: the text stays, the field only takes the keyboard back.
     /// `.editAddress` without a page falls back to `.newSearch`.
     func present(_ requested: MiniCommandBarMode, settings: CommandBarSettings) {
-        let newMode = tab.url == nil ? .newSearch : requested
+        let newMode = tab.displayedURL == nil ? .newSearch : requested
         focusRequest += 1
         if isPresented, newMode == mode {
             apply(settings)
             return
         }
         mode = newMode
-        let pristineURL = newMode == .editAddress ? tab.url : nil
+        // The address shown, never a load the page started (review TR1).
+        let pristineURL = newMode == .editAddress ? tab.displayedURL : nil
         results.start(
             text: pristineURL?.absoluteString ?? "",
             pristineURL: pristineURL,

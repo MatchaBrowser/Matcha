@@ -93,8 +93,8 @@ final class ExtensionInstaller {
             manager.refreshInstalledFolders()
             if let previous {
                 manager.store.setState(previous, for: identifier)
-                if wasLoaded, let restored = try? await manager.read(identifier) {
-                    _ = try? manager.load(restored, identifier: identifier)
+                if wasLoaded {
+                    await reload(identifier)
                 }
             } else {
                 manager.store.removeState(for: identifier)
@@ -112,6 +112,16 @@ final class ExtensionInstaller {
         case .replacement: "replaced"
         }
         Logger.extensions.info("Extension \(kind, privacy: .public) (\(identifier, privacy: .private))")
+    }
+
+    /// The previous version, restored, loads again; a failure is logged: it stays unloaded until the next launch
+    /// (review TR4).
+    private func reload(_ identifier: String) async {
+        do {
+            try await manager.load(manager.read(identifier), identifier: identifier)
+        } catch {
+            Logger.extensions.error("Previous version not loaded again: \(error.logSummary, privacy: .public)")
+        }
     }
 
     /// Decisions of the installed version (audit E2: what it asks for, minus what the user refused).

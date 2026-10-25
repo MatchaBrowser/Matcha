@@ -20,7 +20,7 @@ struct PageProblemView: View {
             }
         } description: {
             // The site, without the full address.
-            Text(verbatim: AddressDisplay.short(for: page.url))
+            Text(verbatim: AddressDisplay.short(for: page.displayedURL))
         } actions: {
             Button("Reload") { page.reload() }
                 .accessibilityIdentifier("pageProblemReloadButton")

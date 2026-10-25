@@ -119,12 +119,12 @@ extension SyncAPIClient {
         return (try? SyncCoding.decoder().decode(SyncAvatarDescription.self, from: answer)) ?? SyncAvatarDescription()
     }
 
-    /// The encrypted avatar; nil without one.
-    func avatar() async throws -> Data? {
+    /// The encrypted avatar, of at most `limit` bytes (`maxAvatarBytes`); nil without one.
+    func avatar(limit: Int) async throws -> Data? {
         var request = urlRequest("GET", "account/avatar")
         request.setValue("application/octet-stream", forHTTPHeaderField: "Accept")
         do {
-            return try await send(request, authenticated: true).0
+            return try await send(request, authenticated: true, limit: limit).0
         } catch let error as SyncServerError where error.status == 404 {
             return nil
         }
@@ -146,11 +146,12 @@ extension SyncAPIClient {
         }
     }
 
-    func blob(id: UUID) async throws -> Data {
+    /// The encrypted package `id`, of at most `limit` bytes (`maxBlobBytes`).
+    func blob(id: UUID, limit: Int) async throws -> Data {
         var request = urlRequest("GET", "blobs/\(id.uuidString)")
         request.setValue("application/octet-stream", forHTTPHeaderField: "Accept")
         do {
-            return try await send(request, authenticated: true).0
+            return try await send(request, authenticated: true, limit: limit).0
         } catch let error as SyncServerError where error.status == 404 {
             throw SyncTransportError.blobNotFound
         }

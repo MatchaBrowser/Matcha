@@ -139,7 +139,12 @@ final class DownloadManager: NSObject {
         guard let directory = directory() else {
             return nil
         }
-        try? FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)
+        do {
+            try FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)
+        } catch {
+            // The download then fails, with its own error (review TR4).
+            Logger.downloads.error("Downloads folder not created: \(error.logSummary, privacy: .public)")
+        }
         let name = DownloadFileName.make(suggested: suggestedFilename, url: response.url ?? item.sourceURL, mimeType: response.mimeType)
         let unique = DownloadFileName.unique(name) { candidate in
             reservedNames.contains(Self.reservationKey(candidate)) || Self.itemExists(at: directory.appendingPathComponent(candidate))

@@ -1,4 +1,5 @@
 import Foundation
+import OSLog
 
 /// Replaces a folder by another, with the old one kept aside (hidden, next to it) until the replacement is confirmed
 /// (`finish`) or undone (`restore`, audit E6): an update that can't load gives back the previous version.
@@ -23,7 +24,7 @@ nonisolated struct FolderSwap {
             try manager.moveItem(at: source, to: destination)
         } catch {
             if let backup {
-                try? manager.moveItem(at: backup, to: destination)
+                Self.moveBack(backup, to: destination)
             }
             throw error
         }
@@ -38,10 +39,19 @@ nonisolated struct FolderSwap {
 
     /// The old folder comes back (or nothing, if there was none).
     func restore() {
-        let manager = FileManager.default
-        try? manager.removeItem(at: destination)
+        try? FileManager.default.removeItem(at: destination)
         if let backup {
-            try? manager.moveItem(at: backup, to: destination)
+            Self.moveBack(backup, to: destination)
+        }
+    }
+
+    /// Puts the previous version back; a failure is logged: the extension stays without its folder until reinstalled
+    /// (review TR4).
+    private static func moveBack(_ backup: URL, to destination: URL) {
+        do {
+            try FileManager.default.moveItem(at: backup, to: destination)
+        } catch {
+            Logger.extensions.error("Previous version not restored: \(error.logSummary, privacy: .public)")
         }
     }
 }

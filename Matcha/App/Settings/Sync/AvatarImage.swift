@@ -7,9 +7,10 @@ enum AvatarImage {
     /// Side of an avatar's image, in pixels.
     static let side = 256
 
-    /// JPEG of the photo at `url`; nil if it can't be read or made small enough.
+    /// JPEG of the photo at `url`; nil if it can't be read or made small enough. Decoded by the bounded decoder,
+    /// upright and already reduced: never a PDF or an SVG (review TR3).
     static func photo(from url: URL, maximumBytes: Int) -> Data? {
-        guard let image = NSImage(contentsOf: url), let source = image.cgImage(forProposedRect: nil, context: nil, hints: nil) else {
+        guard let source = BoundedImageDecoder.decode(contentsOf: url, limits: .photo) else {
             return nil
         }
         let square = min(source.width, source.height)

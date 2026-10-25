@@ -30,7 +30,8 @@ extension SyncService {
             guard description.updatedAt != configuration.avatarUpdatedAt || avatar == nil else {
                 return
             }
-            guard let encrypted = try await client.avatar() else {
+            let limit = configuration.serverInfo?.maximumAvatarBytes ?? SyncServerInfo(api: 1).maximumAvatarBytes
+            guard let encrypted = try await client.avatar(limit: limit) else {
                 forgetAvatar()
                 return
             }
@@ -71,7 +72,7 @@ extension SyncService {
     }
 
     func forgetAvatar() {
-        avatar = nil
+        setAvatar(nil)
         configuration.avatarUpdatedAt = nil
         if let url = avatarCacheURL {
             try? FileManager.default.removeItem(at: url)
@@ -79,7 +80,7 @@ extension SyncService {
     }
 
     private func keepAvatar(_ image: Data, updatedAt: Date?) {
-        avatar = image
+        setAvatar(image)
         configuration.avatarUpdatedAt = updatedAt
         configuration.save(to: defaults)
         if let url = avatarCacheURL {

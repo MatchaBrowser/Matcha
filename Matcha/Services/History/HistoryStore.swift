@@ -171,6 +171,12 @@ final class HistoryStore {
             return recent
         }
         let descriptor = FetchDescriptor<HistoryRecord>(predicate: #Predicate { $0.id == id })
-        return (try? context.fetch(descriptor))?.first
+        do {
+            return try context.fetch(descriptor).first
+        } catch {
+            // The visit then isn't updated (review TR4).
+            Logger.history.error("History entry unreadable: \(error.logSummary, privacy: .public)")
+            return nil
+        }
     }
 }
