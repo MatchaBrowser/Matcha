@@ -3,7 +3,7 @@ import Observation
 import OSLog
 
 /// State of a window's command bar: opening and mode; the text, rows and selection are those of `results`, fed by the
-/// open tabs, the actions, the history and the suggestions, in that order.
+/// open tabs, the tabs of the other Macs, the actions, the history and the suggestions, in that order.
 @MainActor
 @Observable
 final class CommandBarModel {
@@ -19,6 +19,7 @@ final class CommandBarModel {
     init(
         windowModel: WindowModel,
         history: (any HistorySource)? = nil,
+        otherMacs: OtherMacsTabs? = nil,
         suggestions: SearchSuggestionsProvider = SearchSuggestionsProvider(),
         ranker: CommandRanker = CommandRanker(),
         now: @escaping () -> Date = { .now },
@@ -26,7 +27,13 @@ final class CommandBarModel {
         self.windowModel = windowModel
         let actions = ActionsProvider(windowModel: windowModel)
         results = CommandBarResults(
-            providers: [OpenTabsProvider(windowModel: windowModel), actions, HistoryProvider(source: history), suggestions],
+            providers: [
+                OpenTabsProvider(windowModel: windowModel),
+                OtherMacsTabsProvider(otherMacs: otherMacs),
+                actions,
+                HistoryProvider(source: history),
+                suggestions,
+            ],
             ranker: ranker,
             now: now,
             pristineActions: actions.available(in:),

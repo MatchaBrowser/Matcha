@@ -14,8 +14,8 @@ final class SpaceStore {
     private var pendingSave: Task<Void, Never>?
     /// True once the Space is deleted: nothing is saved anymore.
     private var isStopped = false
-    /// True if this Space holds its profile's favorites: otherwise they are neither written nor deleted
-    /// (`BrowserSession+Favorites`). Always true outside a session (tests).
+    /// True if this Space saves its profile's favorites, the same in each of its Spaces: otherwise they are neither
+    /// written nor deleted here (`BrowserSession+Favorites`). Always true outside a session (tests).
     var savesFavorites: () -> Bool = { true }
     /// Navigation state last read or written for each tab: an unchanged one isn't written again (audit R8).
     private var savedStates: [UUID: Data?] = [:]
@@ -200,7 +200,12 @@ final class SpaceStore {
         (space.tabs ?? []) + (space.profile?.favorites ?? [])
     }
 
+    /// Record of a tab that is new to this Space: the one it had elsewhere (a favorite or a tab coming from another
+    /// Space, whose Space may save later: never two records for one tab), otherwise a new one.
     private func insertedTab(id: UUID) -> TabRecord {
+        if let existing = try? context.fetch(FetchDescriptor<TabRecord>(predicate: #Predicate { $0.id == id })).first {
+            return existing
+        }
         let record = TabRecord(id: id)
         context.insert(record)
         return record

@@ -74,16 +74,15 @@ struct CommandProvidersTests {
         #expect(await openTabs().map(\.id) == [id(second)])
     }
 
-    @Test func `shared favorites come once from the shown space`() async throws {
+    @Test func `shared favorites come once from the shown space`() async {
         let shown = windowModel.space
         let favorite = shown.tabManager.newTab(url: blankPage("favorite"))
         shown.tabManager.setPlace(favorite, to: .favorite)
         shown.tabManager.newTab()
         shown.saveNow()
         let other = session.addSpace(inProfileOf: shown)
-        // The profile's other Space has its own copy of the favorite, under the same identifier.
-        let copy = try #require(other.tabManager.tab(withID: favorite.id))
-        #expect(copy !== favorite)
+        // The profile's other Space has the same favorite tab (`ProfileFavorites`).
+        #expect(other.tabManager.tab(withID: favorite.id) === favorite)
 
         let listed = await openTabs().filter { $0.id == id(favorite) }
         #expect(listed.count == 1)
@@ -91,8 +90,8 @@ struct CommandProvidersTests {
             TabReference(tabID: favorite.id, spaceID: shown.id), place: .favorite, spaceName: nil, lastActivity: favorite.lastActivity,
         ))
 
-        // Favorite shown: the copy from the other Space is not offered in its place (going there
-        // would switch Space for the page already on screen).
+        // Favorite shown: it is not offered from the other Space either (going there would switch Space for the page
+        // already on screen).
         shown.tabManager.select(favorite)
         #expect(windowModel.space === shown)
         #expect(await openTabs().allSatisfy { $0.id != id(favorite) })

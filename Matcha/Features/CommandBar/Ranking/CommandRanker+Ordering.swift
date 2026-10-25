@@ -17,9 +17,10 @@ private nonisolated struct RankedCandidate {
     let foldedTitle: String
     /// Address key of tabs and history.
     let urlKey: String?
-    /// 4: tab of the displayed Space, 3: tab of another Space, 2: action, 1: history.
+    /// 5: tab of the displayed Space, 4: tab of another Space, 3: action, 2: tab of another Mac, 1: history.
     let kindPriority: Int
-    /// Tab: last activity; history: frecency; action: opposite of its rank.
+    /// Tab: last activity; tab of another Mac: when that Mac wrote its tabs; history: frecency; action: opposite of
+    /// its rank.
     let signal: Double
     /// History: last visit; 0 otherwise.
     let secondarySignal: Double
@@ -35,8 +36,13 @@ private nonisolated struct RankedCandidate {
         switch candidate.kind {
         case let .tab(_, _, spaceName, lastActivity):
             group = .tab
-            kindPriority = spaceName == nil ? 4 : 3
+            kindPriority = spaceName == nil ? 5 : 4
             signal = lastActivity.timeIntervalSinceReferenceDate
+            secondarySignal = 0
+        case let .otherMacTab(_, _, modifiedAt):
+            group = .tab
+            kindPriority = 2
+            signal = modifiedAt.timeIntervalSinceReferenceDate
             secondarySignal = 0
         case let .history(visitCount, lastVisit):
             group = .history
@@ -45,7 +51,7 @@ private nonisolated struct RankedCandidate {
             secondarySignal = lastVisit.timeIntervalSinceReferenceDate
         case let .action(action, _):
             group = .action
-            kindPriority = 2
+            kindPriority = 3
             signal = -Double(CommandActionID.allCases.firstIndex(of: action) ?? 0)
             secondarySignal = 0
         case .suggestion:
@@ -128,6 +134,14 @@ nonisolated extension CommandRanker {
                 id: candidate.id, style: .tab(reference, place: place, spaceName: spaceName), title: candidate.title,
                 subtitle: subtitle(AddressDisplay.short(for: candidate.url), title: candidate.title), url: candidate.url,
                 target: .switchToTab(reference),
+            )
+        case let .otherMacTab(_, deviceName, _):
+            guard let url = candidate.url else {
+                return nil
+            }
+            return CommandRow(
+                id: candidate.id, style: .otherMacTab(deviceName: deviceName), title: candidate.title,
+                subtitle: subtitle(AddressDisplay.short(for: url), title: candidate.title), url: url, target: .open(url),
             )
         case .history:
             guard let url = candidate.url else {

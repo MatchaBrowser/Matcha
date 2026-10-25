@@ -13,10 +13,15 @@ final class TabManager {
     private(set) var activeViewer = TabViewer()
     /// The viewers of the windows that show or showed this Space, the active one included.
     @ObservationIgnored private(set) var viewers: [TabViewer] = []
-    /// Which window shows each tab: the session's, shared by its Spaces; this manager's own otherwise (tests).
+    /// Which window shows each tab: the session's, shared by its Spaces and its windows of their own tabs (review ON2);
+    /// this manager's own otherwise (tests).
     @ObservationIgnored var displays = TabDisplayRegistry() {
         didSet { viewers.forEach(displays.register) }
     }
+
+    /// The favorites of this Space's profile, shared with its other Spaces (review ON1); nil outside a session (tests)
+    /// and for a window of its own tabs.
+    @ObservationIgnored weak var profileFavorites: ProfileFavorites?
 
     /// Folder whose name is being edited in the sidebar (UI state).
     var renamingFolderID: UUID?
@@ -176,7 +181,7 @@ final class TabManager {
         }
         keepingPanesOnScreen(leaving: tab) {
             let previous = layout.place(of: tab.id)
-            layout.setPlace(tab.id, to: place)
+            updateLayout { $0.setPlace(tab.id, to: place) }
             updatePinnedOrigin(of: tab, previousPlace: previous)
         }
     }
@@ -188,7 +193,7 @@ final class TabManager {
         }
         keepingPanesOnScreen(leaving: tab) {
             let previous = layout.place(of: tab.id)
-            layout.move(tab.id, to: destination)
+            updateLayout { $0.move(tab.id, to: destination) }
             updatePinnedOrigin(of: tab, previousPlace: previous)
         }
     }
@@ -237,9 +242,14 @@ final class TabManager {
         peek = newPeek
     }
 
-    /// The extensions' only entry point to modify the layout.
+    /// The only entry point to modify the layout outside this file (`TabManager+…` files). A change of the favorites
+    /// goes to the other Spaces of the profile (`ProfileFavorites`).
     func updateLayout(_ change: (inout SidebarLayout) -> Void) {
+        let favorites = layout.favorites
         change(&layout)
+        if layout.favorites != favorites {
+            profileFavorites?.didChange(in: self)
+        }
     }
 
     /// A tab that becomes pinned or a favorite keeps its current address and title as its origin;
@@ -255,7 +265,7 @@ final class TabManager {
     }
 
     func discard(_ tab: BrowserTab) {
-        layout.remove(tab.id)
+        updateLayout { $0.remove(tab.id) }
         tabsByID[tab.id] = nil
         displays.forget(tab.id)
         tab.discard()

@@ -14,6 +14,7 @@ extension BrowserSession {
         manager.lifecycle = tabLifecycle
         manager.popupWindows = popupWindows
         manager.contentBlocking = contentBlocking
+        manager.displays = displays
         let tabs = WindowTabs(tabManager: manager, space: space)
         windowTabs.append(tabs)
         return tabs
@@ -28,13 +29,20 @@ extension BrowserSession {
         windowTabs.removeAll { $0 === tabs }
     }
 
+    /// Where the tabs of a window without a Space go back: their Space, if it is still in the same profile; otherwise
+    /// the first Space of that profile; otherwise the first Space, where they are recreated with its cookies (review
+    /// ON5: never lost because their Space was deleted or moved to another profile).
+    func originSpace(of tabs: WindowTabs) -> SpaceSession? {
+        spaces.first { $0.id == tabs.spaceID && $0.openedProfileID == tabs.profileID }
+            ?? spaces.first { $0.openedProfileID == tabs.profileID }
+            ?? spaces.first
+    }
+
     /// App quitting: the tabs of each window without a Space go back to the top of the today tabs of their Space
-    /// (otherwise the first Space of their profile), to be saved with it.
+    /// (`originSpace(of:)`), to be saved with it.
     func returnWindowTabs() {
         for tabs in windowTabs {
-            let space = tabs.space.flatMap { origin in spaces.first { $0 === origin } }
-                ?? spaces.first { $0.openedProfileID == tabs.space?.openedProfileID }
-            guard let space else {
+            guard let space = originSpace(of: tabs) else {
                 continue
             }
             let count = tabs.tabManager.todayTabs.count

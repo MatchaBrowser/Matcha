@@ -19,6 +19,8 @@ nonisolated struct CommandRow: Identifiable, Equatable, Sendable {
         case searchAlternative
         /// `spaceName` is nil for a tab of the displayed Space.
         case tab(TabReference, place: TabPlace, spaceName: String?)
+        /// Tab of another Mac, opened here.
+        case otherMacTab(deviceName: String)
         case history
         case suggestion
         case action(CommandActionID)

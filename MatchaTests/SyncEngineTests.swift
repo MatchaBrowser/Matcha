@@ -32,7 +32,7 @@ struct SyncEngineTests {
         #expect(macB.name(of: profile) == "Personnel")
 
         macA.rename(space, to: "Maison")
-        let tab = macA.addTodayTab(in: space, url: "https://example.com")
+        let tab = macA.addPinnedTab(in: space, url: "https://example.com")
         try await macA.sync()
         try await macB.sync()
         #expect(macB.name(of: space) == "Maison")
@@ -92,7 +92,7 @@ struct SyncEngineTests {
         let (macA, macB, profile) = (setup.macA, setup.macB, setup.profile)
         // A sends a tab whose Space has not been sent yet.
         let later = UUID()
-        let tab = macA.addTodayTab(in: later, url: "https://example.com")
+        let tab = macA.addPinnedTab(in: later, url: "https://example.com")
         try await macA.sync()
         try await macB.sync()
         #expect(macB.store.items[tab] == nil)
@@ -113,45 +113,44 @@ struct SyncEngineTests {
         #expect(macB.url(of: tab)?.absoluteString == "https://example.com")
     }
 
-    @Test func `a today tab that changes page waits to be stable`() async throws {
+    /// `SYNC.md` § 2.4: the today tabs an older version sent are forgotten after the update, never deleted (their
+    /// deletion would close them on a Mac still on that version); one pinned here leaves as a modification.
+    @Test func `today tabs of an older version are forgotten, never deleted`() async throws {
         let setup = try await pair()
-        let (macA, macB, space) = (setup.macA, setup.macB, setup.space)
-        let tab = macA.addTodayTab(in: space, url: "https://example.com/1")
-        try await macA.sync()
-        try await macB.sync()
-
-        macA.store.items[tab] = .tab(macA.todayTab(in: space, url: "https://example.com/2"))
-        #expect(try await macA.sync(after: 1)?.sent == 0)
-        #expect(macA.engine.nextCheck == macA.time + SyncChangeDetector.stability)
-        #expect(try await macA.sync(after: 5)?.sent == 1)
-        try await macB.sync()
-        #expect(macB.url(of: tab)?.absoluteString == "https://example.com/2")
-
-        // A page that keeps changing is sent after 30 seconds.
-        var sent = 0
-        for step in 3 ... 12 {
-            macA.store.items[tab] = .tab(macA.todayTab(in: space, url: "https://example.com/\(step)"))
-            sent += try await macA.sync(after: 4)?.sent ?? 0
+        let (macA, space) = (setup.macA, setup.space)
+        let closed = UUID()
+        let pinnedLater = UUID()
+        for id in [closed, pinnedLater] {
+            macA.store.items[id] = .tab(SyncTabFields(
+                place: .today,
+                url: URL(string: "https://example.com/\(id)"),
+                title: nil,
+                order: 0,
+                spaceId: space,
+            ))
         }
-        #expect(sent == 1)
+        try await macA.sync()
 
-        // Moving the tab is sent right away.
-        try await macA.sync(after: 10)
-        macA.store.items[tab] = .tab(macA.todayTab(in: space, url: "https://example.com/12", order: 5))
-        #expect(try await macA.sync(after: 1)?.sent == 1)
+        // The update: today tabs leave the snapshot.
+        macA.engine.state.forgetTodayTabs()
+        macA.store.items[closed] = nil
+        macA.store.items[pinnedLater] = .tab(macA.pinnedTab(in: space, url: "https://example.com/pinned"))
+        #expect(try await macA.sync()?.sent == 1)
+        #expect(await server.content(of: closed)?.deleted == false)
+        #expect(await server.content(of: pinnedLater)?.fields.objectValue["place"] == .string("pinned"))
     }
 
     @Test func `a refused change is not sent again until it changes`() async throws {
         let setup = try await pair()
         let (macA, space) = (setup.macA, setup.space)
-        let tab = macA.addTodayTab(in: space, url: "https://example.com/trop-gros")
+        let tab = macA.addPinnedTab(in: space, url: "https://example.com/trop-gros")
         await server.refuse(tab)
         #expect(try await macA.sync()?.sent == 0)
         #expect(try await macA.sync()?.sent == 0)
         #expect(await server.content(of: tab) == nil)
 
         await server.unrefuse(tab)
-        macA.store.items[tab] = .tab(macA.todayTab(in: space, url: "https://example.com/plus-petit", order: 1))
+        macA.store.items[tab] = .tab(macA.pinnedTab(in: space, url: "https://example.com/plus-petit", order: 1))
         #expect(try await macA.sync()?.sent == 1)
     }
 
@@ -180,8 +179,8 @@ struct SyncEngineTests {
     @Test func `an expired cursor rereads everything and deletes nothing on an absence`() async throws {
         let setup = try await pair()
         let (macA, macB, space) = (setup.macA, setup.macB, setup.space)
-        let kept = macA.addTodayTab(in: space, url: "https://example.com/garde")
-        let closed = macA.addTodayTab(in: space, url: "https://example.com/ferme", order: 1)
+        let kept = macA.addPinnedTab(in: space, url: "https://example.com/garde")
+        let closed = macA.addPinnedTab(in: space, url: "https://example.com/ferme", order: 1)
         try await macA.sync()
         try await macB.sync()
         macA.store.items[closed] = nil
@@ -204,7 +203,7 @@ struct SyncEngineTests {
         let profile = macA.addProfile("Personnel")
         let space = macA.addSpace("Perso", profile: profile)
         for order in 0 ..< 5 {
-            macA.addTodayTab(in: space, url: "https://example.com/\(order)", order: Double(order))
+            macA.addPinnedTab(in: space, url: "https://example.com/\(order)", order: Double(order))
         }
         #expect(try await macA.sync()?.sent == 7)
         try await macB.sync()

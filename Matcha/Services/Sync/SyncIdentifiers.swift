@@ -54,6 +54,11 @@ nonisolated struct SyncIdentifiers: Sendable {
         id(for: Self.extensionName(fields))
     }
 
+    /// Today tabs of the Mac `deviceID`, read-only for the others (`SYNC.md` § 2.4).
+    func deviceTabs(_ deviceID: UUID) -> UUID {
+        id(for: "device-tabs:\(deviceID.uuidString.lowercased())")
+    }
+
     /// Profile and Space recreated by sync when received deletions leave none (`SYNC.md` § 2.3, invariants).
     var defaultProfile: UUID {
         id(for: "default-profile")
@@ -71,6 +76,7 @@ nonisolated struct SyncIdentifiers: Sendable {
         case let .siteZoom(fields): siteZoom(fields.site)
         case let .sitePermission(fields): sitePermission(profileID: fields.profileId, origin: fields.origin, kind: fields.kind)
         case let .webExtension(fields): webExtension(fields)
+        case let .deviceTabs(fields): deviceTabs(fields.deviceId)
         case .profile, .space, .folder, .tab: nil
         }
     }

@@ -5,7 +5,7 @@ import Foundation
 nonisolated struct SyncServerError: Error, Equatable, Sendable {
     let status: Int
     let code: String
-    /// Seconds to wait before trying again (`429`, `503`).
+    /// Seconds to wait before trying again, read from `Retry-After` whatever the status (`SyncRetryAfter`).
     let retryAfter: TimeInterval?
 
     init(status: Int, code: String, retryAfter: TimeInterval? = nil) {

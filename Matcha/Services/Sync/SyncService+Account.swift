@@ -95,6 +95,7 @@ extension SyncService {
     /// Signs out: this Mac's tokens are revoked on the server (when it answers), sync stops, the browsing data stays,
     /// and the sync state is deleted (a later sign-in is a first sync).
     func signOut() async {
+        await withdrawDeviceTabs()
         if let client {
             try? await client.logout()
         }
@@ -202,9 +203,10 @@ extension SyncService {
         try await signedInAccount().client.renameDevice(id, to: name)
     }
 
-    /// Disconnects a device: its tokens are revoked, it keeps its data.
+    /// Disconnects a device: its tokens are revoked, it keeps its data, its tabs are no longer shown on the other Macs.
     func revokeDevice(_ id: UUID) async throws {
         try await signedInAccount().client.deleteDevice(id)
+        forgetDeviceTabs(of: id)
     }
 
     // MARK: Helpers

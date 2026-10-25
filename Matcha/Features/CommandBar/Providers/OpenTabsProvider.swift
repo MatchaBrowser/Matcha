@@ -3,9 +3,9 @@ import Foundation
 /// Open tabs of all the window's Spaces, the displayed one first, and of the windows of their own tabs (detached tabs).
 /// The text is ignored: the ranking does the matching.
 ///
-/// A profile's favorites are shared by its Spaces, but each Space keeps its own copy of them until one switches to
-/// it (`adoptFavorites`): those of the displayed profile come only from the displayed Space, those of another
-/// profile from the first of its Spaces. A private window has its own session, with a single Space: it sees only
+/// A profile's favorites are the same tabs in each of its Spaces (`ProfileFavorites`): those of the displayed profile
+/// are listed with the displayed Space, those of another profile with the first of its Spaces. A private window has its own session, with a
+/// single Space: it sees only
 /// its own tabs. A window of its own tabs lists them first, then the tabs of every Space.
 @MainActor
 final class OpenTabsProvider: CommandProvider {

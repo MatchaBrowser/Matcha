@@ -17,6 +17,8 @@ struct SessionServices {
     var dialogs: any PageDialogPresenting
     /// Notifications of the pages; nil: they read “denied”.
     var notifications: PageNotificationCenter?
+    /// Today tabs of the account's other Macs, offered by the command bar; nil: none.
+    var otherMacs: OtherMacsTabs?
     /// Sign-in windows of a session; nil: a window opened with a size becomes a tab.
     var makePopupWindows: @MainActor (PopupWindowSettings) -> (any PopupWindowHosting)?
 
@@ -27,6 +29,7 @@ struct SessionServices {
         contentBlocker: ContentBlockerService? = nil,
         dialogs: any PageDialogPresenting = UnavailablePageDialogs(),
         notifications: PageNotificationCenter? = nil,
+        otherMacs: OtherMacsTabs? = nil,
         makePopupWindows: @escaping @MainActor (PopupWindowSettings) -> (any PopupWindowHosting)? = { _ in nil },
     ) {
         self.pages = pages
@@ -35,6 +38,7 @@ struct SessionServices {
         self.contentBlocker = contentBlocker
         self.dialogs = dialogs
         self.notifications = notifications
+        self.otherMacs = otherMacs
         self.makePopupWindows = makePopupWindows
     }
 

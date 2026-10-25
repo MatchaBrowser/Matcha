@@ -1,10 +1,11 @@
 import Foundation
 
 /// A tab with its synced fields, both ways side by side (audit C6). Favorite and pinned tab: their original address
-/// and title travel; today tab: its address, title and last use (`SYNC.md` § 2.4). Only web addresses travel, without
-/// user name nor password.
+/// and title travel, only web addresses, without user name nor password. A today tab stays on this Mac (`SYNC.md`
+/// § 2.4).
 extension TabRecord {
-    /// Nil for a tab without a place, or without its profile (favorite) or its Space (the others): it isn't sent.
+    /// Nil for a today tab, a tab without a place, or without its profile (favorite) or its Space (pinned tab): it
+    /// isn't sent.
     var syncFields: SyncTabFields? {
         switch place {
         case .favorite:
@@ -30,20 +31,7 @@ extension TabRecord {
                 spaceId: spaceID,
                 folderId: folder?.id,
             )
-        case .today:
-            guard let spaceID = space?.id else {
-                return nil
-            }
-            let isWeb = !showsNonWebPage
-            return SyncTabFields(
-                place: .today,
-                url: isWeb ? SyncWebURL.shared(url) : nil,
-                title: isWeb ? title : nil,
-                order: Double(order),
-                spaceId: spaceID,
-                lastActivity: lastActivity,
-            )
-        case nil:
+        case .today, nil:
             return nil
         }
     }
@@ -62,14 +50,10 @@ extension TabRecord {
         return !SyncWebURL.isWeb(originURL)
     }
 
-    /// Shows a page that isn't a web address (local file, `about:`…): its address doesn't travel.
-    var showsNonWebPage: Bool {
-        url.map { !SyncWebURL.isWeb($0) } ?? false
-    }
-
-    /// Favorite and pinned tab: their original address changes; their current address follows it if they had not left
-    /// the old one; a local one keeps its address and title. Today tab: its current address. `isNew`: just created, it
-    /// won't select itself.
+    /// Their original address changes; their current address follows it if they had not left the old one; a local one
+    /// keeps its address and title. A today tab here that becomes a favorite or a pinned tab elsewhere takes its new
+    /// place and address. `isNew`: just created, it won't select itself. Never called for a received today tab
+    /// (`SyncRecordWriter`).
     func apply(
         _ fields: SyncTabFields,
         isNew: Bool,
@@ -78,13 +62,7 @@ extension TabRecord {
         space newSpace: SpaceRecord?,
     ) {
         let newPlace = fields.place.tabPlace
-        if newPlace == .today {
-            pinnedURL = nil
-            pinnedTitle = nil
-            url = fields.url
-            title = fields.title
-            lastActivity = fields.lastActivity ?? lastActivity
-        } else if !isLocalOnly || place == .today {
+        if !isLocalOnly || place == .today {
             let followsOrigin = isNew || place == .today || url == pinnedURL
             pinnedURL = fields.url
             pinnedTitle = fields.title

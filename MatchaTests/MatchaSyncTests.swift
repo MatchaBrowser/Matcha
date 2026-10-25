@@ -4,7 +4,7 @@ import SwiftData
 import Testing
 
 /// Two Matcha sessions synced by the engine and an in-memory server (task 7.4): the second Mac gets back the
-/// Spaces, folders, favorites, pinned tabs, today tabs and settings of the first one.
+/// Spaces, folders, favorites, pinned tabs and settings of the first one, and sees its today tabs.
 @MainActor
 struct MatchaSyncTests {
     private let server = InMemorySyncServer()
@@ -21,14 +21,16 @@ struct MatchaSyncTests {
         }
     }
 
-    private func makeMac() throws -> Mac {
+    /// `device`: this Mac in sync, which then publishes its today tabs (`deviceTabs`).
+    private func makeMac(device: SyncDeviceDescription? = nil) throws -> Mac {
         let session = try BrowserSession(container: BrowserSchema.makeContainer(inMemory: true))
         let defaults = try #require(UserDefaults(suiteName: "MatchaSyncTests-\(UUID().uuidString)"))
         let engine = SyncEngine(
-            store: MatchaSyncStore(session: session, defaults: defaults, identifiers: .testAccount),
+            store: MatchaSyncStore(session: session, defaults: defaults, identifiers: .testAccount, device: device),
             transport: InMemorySyncTransport(server: server),
             identifiers: .testAccount,
             file: SyncStateFile(url: nil),
+            deviceID: device?.id,
         )
         if let home = session.spaces.first {
             session.showFavorites(in: home)
@@ -61,7 +63,9 @@ struct MatchaSyncTests {
         #expect(mirror.tabManager.layout.folderEntries.map(\.name) == ["Projets"])
         #expect(mirror.tabManager.layout.positions[pinned.id]?.folderID == folder)
         #expect(mirror.tabManager.favoriteTabs.map(\.id) == [favorite.id])
-        #expect(second.session.spaces.last?.tabManager.todayTabs.map(\.url) == [today.url])
+        // Today tabs stay on each Mac (`SYNC.md` § 2.4).
+        #expect(today.url != nil)
+        #expect(second.session.spaces.last?.tabManager.todayTabs.isEmpty == true)
         #expect(second.defaults.string(forKey: BrowserSettings.Key.searchEngine) == "duckDuckGo")
 
         // Then in the other direction, without echoing anything back.
@@ -71,5 +75,25 @@ struct MatchaSyncTests {
         try await first.engine.sync()
         #expect(home.record.name == "Chez moi")
         #expect(try await first.engine.sync()?.sent == 0)
+    }
+
+    /// `SYNC.md` § 2.4: each Mac sees the other's today tabs, without them entering its sidebar.
+    @Test func `each Mac sees the today tabs of the other`() async throws {
+        let first = try makeMac(device: SyncDeviceDescription(id: UUID(), name: "MacBook"))
+        let home = try #require(first.home)
+        home.tabManager.newTab(url: URL(string: "https://example.com/reading"))
+        first.session.saveAll()
+        try await first.engine.sync()
+
+        let second = try makeMac(device: SyncDeviceDescription(id: UUID(), name: "iMac"))
+        try await second.engine.sync()
+        let seen = OtherMac.all(in: second.engine.state, now: .now)
+        #expect(seen.map(\.name) == ["MacBook"])
+        #expect(seen.first?.spaces.first?.tabs.map(\.url.absoluteString) == ["https://example.com/reading"])
+        let secondTodayTabs = second.session.spaces.flatMap(\.tabManager.todayTabs)
+        #expect(secondTodayTabs.isEmpty)
+        // The second Mac has no web tab: nothing to show on the first.
+        try await first.engine.sync()
+        #expect(OtherMac.all(in: first.engine.state, now: .now).isEmpty)
     }
 }

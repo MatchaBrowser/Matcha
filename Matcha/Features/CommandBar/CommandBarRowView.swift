@@ -59,7 +59,7 @@ struct CommandBarRowView: View {
             )
         case .suggestion, .action:
             nil
-        case .openAddress, .tab, .history:
+        case .openAddress, .tab, .otherMacTab, .history:
             row.subtitle
         }
     }
@@ -76,7 +76,7 @@ struct CommandBarRowView: View {
             } else {
                 siteIcon
             }
-        case .openAddress, .history:
+        case .openAddress, .otherMacTab, .history:
             siteIcon
         case let .action(action):
             Image(systemName: action.symbolName)
@@ -95,6 +95,9 @@ struct CommandBarRowView: View {
                 capsule(Text(verbatim: spaceName))
             }
             capsule(Text("Switch to Tab", comment: "Hint on tab rows of the command bar"))
+        }
+        if case let .otherMacTab(deviceName) = row.style {
+            capsule(Text(verbatim: deviceName))
         }
         if isSelected {
             Image(systemName: "return")

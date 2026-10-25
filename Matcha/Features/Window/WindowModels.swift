@@ -29,7 +29,7 @@ final class WindowModels {
     lazy var commandBar: CommandBarModel = {
         let window = window
         let history = session.history.map { store in ProfileHistory(store: store) { window.space.record.profile?.id } }
-        return CommandBarModel(windowModel: window, history: history)
+        return CommandBarModel(windowModel: window, history: history, otherMacs: session.services.otherMacs)
     }()
 }
 

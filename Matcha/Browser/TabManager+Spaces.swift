@@ -63,14 +63,11 @@ extension TabManager {
 
     // MARK: Between Spaces
 
-    /// Takes over the favorites of `other`, another Space of the same profile: same tabs, same web views.
-    /// Their windows and links now open in this Space.
-    func adoptFavorites(from other: TabManager) {
-        guard other !== self else {
-            return
-        }
-        let adopted = other.layout.favorites.compactMap(other.tab(withID:))
-        for id in layout.favorites where !adopted.contains(where: { $0.id == id }) {
+    /// Takes `adopted` as its favorites, the same tabs as the other Spaces of the profile (`ProfileFavorites`): in
+    /// place of its copies of the same tabs, without those no longer among them (they stay wherever they went).
+    func adoptFavorites(_ adopted: [BrowserTab]) {
+        let ids = Set(adopted.map(\.id))
+        for id in layout.favorites where !ids.contains(id) {
             unregister(id)
         }
         adopted.forEach(register)

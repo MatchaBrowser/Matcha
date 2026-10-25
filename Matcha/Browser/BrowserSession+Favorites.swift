@@ -5,52 +5,40 @@ struct WeakTabManager {
     weak var manager: TabManager?
 }
 
-/// A profile's favorites, shared by its Spaces (profile at opening: `openedProfileID`): only one Space holds them at a
-/// time (the last one shown, otherwise the profile's first), and only that Space saves them. The other Spaces keep a
-/// copy, taken from the holding Space when they are shown (`adoptFavorites`): without this, a Space left in the
-/// background would overwrite, when it saves, the favorites added elsewhere.
+/// A profile's favorites, shared by its Spaces (`ProfileFavorites`, review ON1): the same tabs in each of them, saved
+/// by one only; their links open in the Space of the window in front.
 extension BrowserSession {
-    /// Manager of the Space that holds the favorites of profile `profileID`.
-    func favoritesHolder(of profileID: UUID?) -> TabManager? {
-        if let profileID, let manager = favoritesHolders[profileID]?.manager, spaces.contains(where: { $0.tabManager === manager }) {
-            return manager
+    /// The favorites of profile `profileID`, shared by its open Spaces.
+    func favorites(of profileID: UUID?) -> ProfileFavorites {
+        if let favorites = profileFavorites[profileID] {
+            return favorites
         }
-        return spaces.first { $0.openedProfileID == profileID }?.tabManager
+        let favorites = ProfileFavorites()
+        profileFavorites[profileID] = favorites
+        return favorites
     }
 
-    /// `space` is shown: it takes over its profile's favorites (same tabs, same web views; their links now open in it)
-    /// and holds them.
+    /// Manager of a Space of profile `profileID`, which takes what is added to its favorites (import): any one, they
+    /// share them; nil if the profile has no open Space.
+    func favoritesManager(of profileID: UUID?) -> TabManager? {
+        profileFavorites[profileID]?.saver
+    }
+
+    /// `space` is shown in the window in front: the links and windows opened by the favorites go to it.
     func showFavorites(in space: SpaceSession) {
-        let profileID = space.openedProfileID
-        if let holder = favoritesHolder(of: profileID), holder !== space.tabManager {
-            space.tabManager.adoptFavorites(from: holder)
-        }
-        if let profileID {
-            favoritesHolders[profileID] = WeakTabManager(manager: space.tabManager)
-        }
+        favorites(of: space.openedProfileID).focus(space.tabManager)
     }
 
-    /// True if `space` holds its profile's favorites (and saves them).
-    func holdsFavorites(_ space: SpaceSession) -> Bool {
-        favoritesHolder(of: space.openedProfileID) === space.tabManager
+    /// True if `space` saves its profile's favorites: the first open Space of the profile.
+    func savesFavorites(_ space: SpaceSession) -> Bool {
+        profileFavorites[space.openedProfileID]?.saver === space.tabManager
     }
 
-    /// `space` is about to go away: if it held the favorites, they are saved (unless `saving` is false: they already
-    /// are) and pass to another Space of the profile.
-    func handOverFavorites(from space: SpaceSession, saving: Bool = true) {
-        guard holdsFavorites(space) else {
-            return
-        }
-        if saving {
+    /// `space` is about to go away: if it saved the favorites, it saves them a last time (unless `saving` is false:
+    /// they already are), and the next Space of the profile saves them from now on (`removeSpace`).
+    func saveFavoritesBeforeLeaving(_ space: SpaceSession, saving: Bool = true) {
+        if saving, savesFavorites(space) {
             space.saveNow()
-        }
-        let profileID = space.openedProfileID
-        guard let heir = spaces.first(where: { $0 !== space && $0.openedProfileID == profileID }) else {
-            return
-        }
-        heir.tabManager.adoptFavorites(from: space.tabManager)
-        if let profileID {
-            favoritesHolders[profileID] = WeakTabManager(manager: heir.tabManager)
         }
     }
 }

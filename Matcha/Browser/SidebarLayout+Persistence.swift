@@ -68,7 +68,9 @@ nonisolated extension SidebarLayout {
         for (id, position) in pinnedTabs where position.folderID.map({ !knownFolders.contains($0) }) ?? false {
             pinnedTabs[id]?.folderID = nil
         }
-        var remaining = Dictionary(uniqueKeysWithValues: folders.map { ($0.id, $0) })
+        // Nothing in the store prevents two folders with the same identifier (no uniqueness with CloudKit): the first
+        // one is kept, as `SpaceStore` does (review ON9).
+        var remaining = Dictionary(folders.map { ($0.id, $0) }) { first, _ in first }
         for (id, entry) in remaining where entry.parentID.map({ !knownFolders.contains($0) }) ?? false {
             remaining[id]?.parentID = nil
         }

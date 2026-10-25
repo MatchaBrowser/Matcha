@@ -18,6 +18,8 @@ nonisolated struct CommandCandidate: Equatable, Sendable {
     enum Kind: Equatable, Sendable {
         /// Open tab; `spaceName` is nil for the displayed Space.
         case tab(TabReference, place: TabPlace, spaceName: String?, lastActivity: Date)
+        /// Today tab of another Mac of the account (`SYNC.md` § 2.4); `modifiedAt`: when that Mac last wrote its tabs.
+        case otherMacTab(deviceID: UUID, deviceName: String, modifiedAt: Date)
         /// History address, all visits grouped.
         case history(visitCount: Int, lastVisit: Date)
         /// `keywords`: words searched in addition to the title, never displayed.
@@ -31,11 +33,12 @@ nonisolated struct CommandCandidate: Equatable, Sendable {
     /// Nil for actions and suggestions.
     let url: URL?
 
-    /// Stable identifier, reused by the displayed row: `tab:<uuid>`, `history:<address key>`, `action:<name>`,
-    /// `suggestion:<folded text>`.
+    /// Stable identifier, reused by the displayed row: `tab:<uuid>`, `otherMac:<uuid>:<address key>` (one per address
+    /// and Mac), `history:<address key>`, `action:<name>`, `suggestion:<folded text>`.
     var id: String {
         switch kind {
         case let .tab(reference, _, _, _): "tab:\(reference.tabID.uuidString)"
+        case let .otherMacTab(deviceID, _, _): "otherMac:\(deviceID.uuidString):\(url.map(CommandText.urlKey) ?? "")"
         case .history: "history:\(url.map(CommandText.urlKey) ?? "")"
         case let .action(action, _): "action:\(action.rawValue)"
         case .suggestion: "suggestion:\(CommandText.fold(title))"

@@ -70,7 +70,7 @@ extension BrowserSession {
             ensureOneSpace()
         }
         forgetDataStore(of: identifier)
-        favoritesHolders[identifier] = nil
+        profileFavorites[identifier] = nil
         sitePermissions.removeAll(profileID: identifier)
         history?.removeAll(profileID: identifier)
         return identifier

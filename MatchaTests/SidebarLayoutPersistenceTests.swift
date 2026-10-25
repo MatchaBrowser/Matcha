@@ -88,6 +88,17 @@ struct SidebarLayoutPersistenceTests {
         #expect(layout.pinned.folder(folder.id)?.items == [.tab(ids[1])])
     }
 
+    @Test func `two folders with the same identifier keep the first one`() {
+        let id = UUID()
+        let first = FolderEntry(id: id, name: "First", isCollapsed: false, parentID: nil, order: 0)
+        let second = FolderEntry(id: id, name: "Second", isCollapsed: true, parentID: nil, order: 1)
+        let positions = [ids[0]: SidebarPosition(place: .pinned, order: 0, folderID: id)]
+        let layout = SidebarLayout(positions: positions, folders: [first, second])
+        #expect(layout.pinned.map(\.id) == [id])
+        #expect(layout.folderEntries.map(\.name) == ["First"])
+        #expect(layout.pinned.folder(id)?.items == [.tab(ids[0])])
+    }
+
     @Test func `positions carry split membership and fractions`() throws {
         var layout = richLayout().layout
         let joined = layout.joinSplit(ids[7], anchor: ids[6], at: 1)

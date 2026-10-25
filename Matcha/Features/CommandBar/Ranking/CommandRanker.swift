@@ -3,8 +3,8 @@ import Foundation
 /// Ranking of the command bar rows, pure and lexicographic (see `DECISIONS.md`,
 /// “Classement pur et lexicographique”):
 /// 1. the rows of the typed text (`CommandPrimaryRows`), always on top;
-/// 2. tabs, actions and history matching the text, by match tier, kind, activity or frecency, title then
-///    identifier; capped per kind and in total;
+/// 2. tabs (other Macs' included), actions and history matching the text, by match tier, kind, activity or
+///    frecency, title then identifier; capped per kind and in total;
 /// 3. the engine's suggestions, in its order, only for a search.
 nonisolated struct CommandRanker: Sendable {
     /// Number of rows kept.
@@ -58,7 +58,7 @@ nonisolated struct CommandRanker: Sendable {
             switch candidate.kind {
             case .suggestion: false
             case .history: candidate.url != nil
-            case .tab, .action: seen.insert(candidate.id).inserted
+            case .tab, .otherMacTab, .action: seen.insert(candidate.id).inserted
             }
         }
     }
@@ -67,7 +67,7 @@ nonisolated struct CommandRanker: Sendable {
     /// never loosely (word start at least).
     private static func match(_ candidate: CommandCandidate, _ query: CommandQuery) -> CommandMatch? {
         switch candidate.kind {
-        case .tab, .history:
+        case .tab, .otherMacTab, .history:
             CommandMatcher.match(query, titles: [candidate.title], url: candidate.url)
         case let .action(_, keywords) where query.folded.count >= 2:
             CommandMatcher.match(query, titles: [candidate.title] + keywords, url: nil, minimumTier: .wordPrefix)

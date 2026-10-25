@@ -97,9 +97,9 @@ nonisolated enum SyncTabPlace: String, Codable, Sendable {
     case today
 }
 
-/// Fields of a tab (`SYNC.md` § 2.1 and § 2.4): original address and title of a favorite or a pinned tab, current
-/// address and title of a today tab; `profileId` for a favorite, `spaceId` for the others. Only http and https
-/// addresses travel: any other makes the record ignored.
+/// Fields of a tab (`SYNC.md` § 2.1): original address and title of a favorite or a pinned tab; `profileId` for a
+/// favorite, `spaceId` for a pinned tab. Only http and https addresses travel: any other makes the record ignored.
+/// `today` is only read, from older versions, to be ignored (§ 2.4).
 nonisolated struct SyncTabFields: Codable, Equatable, Sendable {
     var place: SyncTabPlace
     var url: URL?
@@ -108,8 +108,6 @@ nonisolated struct SyncTabFields: Codable, Equatable, Sendable {
     var profileId: UUID?
     var spaceId: UUID?
     var folderId: UUID?
-    /// Last use of a today tab; nil for the others.
-    var lastActivity: Date?
 
     init(
         place: SyncTabPlace,
@@ -119,7 +117,6 @@ nonisolated struct SyncTabFields: Codable, Equatable, Sendable {
         profileId: UUID? = nil,
         spaceId: UUID? = nil,
         folderId: UUID? = nil,
-        lastActivity: Date? = nil,
     ) {
         self.place = place
         self.url = url
@@ -128,7 +125,6 @@ nonisolated struct SyncTabFields: Codable, Equatable, Sendable {
         self.profileId = profileId
         self.spaceId = spaceId
         self.folderId = folderId
-        self.lastActivity = lastActivity
     }
 
     init(from decoder: any Decoder) throws {
@@ -151,26 +147,5 @@ nonisolated struct SyncTabFields: Codable, Equatable, Sendable {
         title = container.lenient(String.self, forKey: .title)
         order = container.order(forKey: .order)
         folderId = container.lenient(UUID.self, forKey: .folderId)
-        lastActivity = container.lenient(Date.self, forKey: .lastActivity)
-    }
-
-    /// True if `other` only differs by the address and the title of a today tab: a change that waits for the page to
-    /// be stable before being sent (`SYNC.md` § 2.4).
-    func differsOnlyByPage(from other: SyncTabFields) -> Bool {
-        guard place == .today, other.place == .today else {
-            return false
-        }
-        var mine = self
-        mine.url = other.url
-        mine.title = other.title
-        mine.lastActivity = other.lastActivity
-        return mine == other
-    }
-
-    /// True if `other` only differs by the last use: not sent on its own (`SYNC.md` § 2.4).
-    func differsOnlyByLastActivity(from other: SyncTabFields) -> Bool {
-        var mine = self
-        mine.lastActivity = other.lastActivity
-        return mine == other && lastActivity != other.lastActivity
     }
 }

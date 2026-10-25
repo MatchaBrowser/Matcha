@@ -22,6 +22,8 @@ final class AppEnvironment {
     let extensionSync: ExtensionSyncAdapter
     /// Sync through a private server (tasks 7.7 and 7.9).
     let sync: SyncService
+    /// Today tabs of the account's other Macs, filled by sync (`SYNC.md` § 2.4).
+    let otherMacs = OtherMacsTabs()
     /// Tab shown by the Settings window.
     let settingsSelection = SettingsSelection()
     /// Shortcuts of the menu commands, and their recording (Settings > Shortcuts).
@@ -40,7 +42,7 @@ final class AppEnvironment {
         extensions.host = extensionWindows
         extensions.permissionPrompter = ExtensionPermissionAlert()
         extensionSync = Self.makeExtensionSync(manager: extensions)
-        sync = SyncService(defaults: .standard, extensions: extensionSync, directory: Self.syncDirectory)
+        sync = SyncService(defaults: .standard, extensions: extensionSync, otherMacs: otherMacs, directory: Self.syncDirectory)
         pages = WebConfigurationFactory { extensions.attach(to: $0) }
     }
 
@@ -85,6 +87,7 @@ final class AppEnvironment {
             contentBlocker: contentBlocker,
             dialogs: pageDialogs,
             notifications: pageNotifications,
+            otherMacs: otherMacs,
             makePopupWindows: { PopupWindowManager(settings: $0) },
         )
     }

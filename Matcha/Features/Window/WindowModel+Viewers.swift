@@ -100,7 +100,7 @@ extension WindowModel {
         closePeek()
         // Its own tabs close with it (⇧⌘T in their Space brings them back).
         if let windowTabs {
-            windowTabs.close()
+            windowTabs.close(into: session.originSpace(of: windowTabs))
             session.removeWindowTabs(windowTabs)
         }
         keyObserver.map(NotificationCenter.default.removeObserver)
@@ -134,7 +134,7 @@ extension WindowModel {
     /// favorite or a pinned tab stays in the sidebar: the new window gets a copy of it.
     func detachToNewWindow(_ tab: BrowserTab) -> BrowserWindowState {
         let source = tabManager
-        let origin = windowTabs?.space ?? space
+        let origin = windowTabs.flatMap(session.originSpace(of:)) ?? space
         let tabs = session.makeWindowTabs(from: origin)
         if source.place(of: tab) == .today, let moved = source.detach(tab) {
             tabs.take(moved)

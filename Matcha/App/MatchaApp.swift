@@ -90,6 +90,7 @@ struct MatchaApp: App {
                 miniWindows: miniWindows,
                 shortcuts: environment.menuShortcuts,
                 settingsSelection: environment.settingsSelection,
+                otherMacs: environment.otherMacs,
             )
         }
         .onChange(of: appearance, initial: true) { appearance.apply() }

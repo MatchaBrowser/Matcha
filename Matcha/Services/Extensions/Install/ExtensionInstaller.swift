@@ -20,7 +20,7 @@ final class ExtensionInstaller {
     }
 
     /// Prepares the extension of the file or folder `url`. `preferredIdentifier`: the one it has on your other Macs
-    /// (offer received by sync), used if it is new here.
+    /// (offer received by sync), used if it is new here; if it is installed here, the file is its update (`placement`).
     func prepare(fileAt url: URL, preferredIdentifier: String? = nil) async throws -> ExtensionInstallCandidate {
         let staging = stagingRoot.appendingPathComponent(UUID().uuidString, isDirectory: true)
         do {

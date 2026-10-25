@@ -69,7 +69,6 @@ struct MatchaSyncStoreTests {
         let space = UUID()
         let folder = UUID()
         let inFolder = UUID()
-        let today = UUID()
         let changes: [SyncLocalChange] = try [
             .upsert(
                 space,
@@ -83,14 +82,6 @@ struct MatchaSyncStoreTests {
             ),
             .upsert(folder, .folder(SyncFolderFields(name: "Projets", order: 0, isCollapsed: false, spaceId: space))),
             .upsert(inFolder, pinnedTab("https://example.com/projet", folder: folder, in: space)),
-            .upsert(today, .tab(SyncTabFields(
-                place: .today,
-                url: URL(string: "https://example.com/jour"),
-                title: "Jour",
-                order: 0,
-                spaceId: space,
-                lastActivity: SyncCoding.date(milliseconds: 1_800_000_000_000),
-            ))),
         ]
         #expect(try store.apply(SyncLocalChange.ordered(changes)).isEmpty)
 
@@ -98,7 +89,6 @@ struct MatchaSyncStoreTests {
         #expect(session.spaces.map(\.id) == [home.id, space])
         #expect(opened.tabManager.layout.folderEntries.map(\.name) == ["Projets"])
         #expect(opened.tabManager.layout.positions[inFolder]?.folderID == folder)
-        #expect(opened.tabManager.todayTabs.map(\.id) == [today])
         // Nothing loaded or selected.
         #expect(opened.tabManager.selectedTab == nil)
         #expect(opened.tabManager.tabs.allSatisfy { !$0.isLoaded })
@@ -122,50 +112,42 @@ struct MatchaSyncStoreTests {
     @Test func `a pinned tab that isn't a web address stays on this Mac`() throws {
         let local = home.tabManager.newTab(url: URL(string: "file:///Users/Shared/notes.html"), select: false)
         home.tabManager.setPlace(local, to: .pinned)
-        let page = home.tabManager.newTab(url: URL(string: "about:blank#jour"), select: false)
         home.saveNow()
         #expect(try store.snapshot()[local.id] == nil)
-        let exceptions = try store.exceptions()
-        #expect(exceptions.localRecords == [local.id])
-        #expect(exceptions.nonWebPages == [page.id])
-        guard case let .tab(fields) = try store.snapshot()[page.id] else {
-            Issue.record("Today tab missing")
-            return
-        }
-        #expect(fields.url == nil)
+        #expect(try store.exceptions().localRecords == [local.id])
     }
 
-    @Test func `a background tab follows its new address, the displayed page stays`() throws {
-        let background = home.tabManager.newTab(url: URL(string: "about:blank#fond"), select: false)
-        let shown = home.tabManager.newTab(url: URL(string: "about:blank#affiche"))
-        let shownURL = shown.url
+    /// `SYNC.md` § 2.4: today tabs stay on each Mac. None is in the snapshot; a received one, or its deletion, changes
+    /// nothing here, even for a favorite or a pinned tab with its identifier.
+    @Test func `today tabs neither leave nor arrive`() throws {
+        let today = home.tabManager.newTab(url: URL(string: "https://example.com/today"), select: false)
+        let pinned = home.tabManager.newTab(url: URL(string: "https://example.com/pinned"), select: false)
+        home.tabManager.setPlace(pinned, to: .pinned)
         home.saveNow()
-        let moved = SyncTabFields(
-            place: .today,
-            url: URL(string: "https://example.com/ailleurs"),
-            title: "Ailleurs",
-            order: 0,
-            spaceId: home.id,
-        )
-        _ = try store.apply([.upsert(background.id, .tab(moved)), .upsert(shown.id, .tab(moved))])
-        #expect(background.url?.absoluteString == "https://example.com/ailleurs")
-        #expect(!background.isLoaded)
-        #expect(shown.url == shownURL)
-        #expect(home.tabManager.selectedTab === shown)
+        #expect(try store.snapshot()[today.id] == nil)
+        #expect(try store.snapshot()[pinned.id] != nil)
+
+        let received = UUID()
+        let legacy = SyncTabFields(place: .today, url: URL(string: "https://example.com/elsewhere"), title: nil, order: 0, spaceId: home.id)
+        #expect(try store.apply([.upsert(received, .tab(legacy)), .upsert(pinned.id, .tab(legacy))]).isEmpty)
+        #expect(home.tabManager.tab(withID: received) == nil)
+        #expect(home.tabManager.place(of: pinned) == .pinned)
+        #expect(pinned.url?.absoluteString == "https://example.com/pinned")
+
+        _ = try store.apply([.delete(today.id, .tab)])
+        #expect(home.tabManager.tab(withID: today.id) === today)
     }
 
     @Test func `deletions close tabs and Spaces; without any left, the default ones come back`() throws {
-        let shown = home.tabManager.newTab(url: URL(string: "about:blank#affiche"))
-        let tab = home.tabManager.newTab(url: URL(string: "about:blank#ferme"), select: false)
+        // A selected tab elsewhere: otherwise the new pinned tab would be selected, so displayed, and kept.
+        home.tabManager.newTab(url: URL(string: "about:blank#shown"))
+        let tab = home.tabManager.newTab(url: URL(string: "https://example.com/closed"), select: false)
+        home.tabManager.setPlace(tab, to: .pinned)
         let other = session.addSpace(inProfileOf: home)
         home.saveNow()
         _ = try store.apply([.delete(tab.id, .tab), .delete(other.id, .space)])
         #expect(home.tabManager.tab(withID: tab.id) == nil)
         #expect(session.spaces.map(\.id) == [home.id])
-
-        // The displayed tab, closed elsewhere, stays there until the user closes it.
-        _ = try store.apply([.delete(shown.id, .tab)])
-        #expect(home.tabManager.selectedTab === shown)
 
         // The last Space deleted elsewhere: the first-launch one comes back under its derived identifier, the same on
         // all Macs (SYNC.md § 2.3).
@@ -175,6 +157,25 @@ struct MatchaSyncStoreTests {
         _ = try store.apply([.delete(profile, .profile)])
         #expect(session.profiles.map(\.id) == [SyncIdentifiers.testAccount.defaultProfile])
         #expect(session.spaces.count == 1)
+    }
+
+    /// Review ON3: the Space saving the favorites, deleted in the batch that brings a favorite, doesn't save its
+    /// favorites from before the batch over the received one.
+    @Test func `a favorite received with the deletion of the Space saving the favorites is kept`() throws {
+        let other = session.addSpace(inProfileOf: home)
+        #expect(session.savesFavorites(home))
+        session.saveAll()
+        let received = UUID()
+        let url = URL(string: "https://example.com/received")
+        let favorite = SyncTabFields(place: .favorite, url: url, title: "Received", order: 5, profileId: profileID)
+        _ = try store.apply([.upsert(received, .tab(favorite)), .delete(home.id, .space)])
+        #expect(session.spaces.map(\.id) == [other.id])
+        guard case let .tab(kept) = try store.snapshot()[received] else {
+            Issue.record("Received favorite deleted with the Space")
+            return
+        }
+        #expect(kept.place == .favorite && kept.url == favorite.url)
+        #expect(other.tabManager.tab(withID: received) != nil)
     }
 
     @Test func `a deleted folder sends its content back to the root`() throws {

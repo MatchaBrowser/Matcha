@@ -49,7 +49,7 @@ final class SyncEngine {
     var confirmMassDeletion: @MainActor (_ count: Int) async -> Bool = { _ in false }
     /// The server no longer knows `count` records of this Mac, more than half of the account.
     var confirmRecreations: @MainActor (_ count: Int) async -> RecreationChoice = { _ in .sendAgain }
-    /// Date at which to read this Mac again for a waiting today tab page; nil if there is none.
+    /// Date at which to read this Mac again for a waiting change of its tabs (`deviceTabs`); nil if there is none.
     var nextCheck: Date?
     private(set) var isSyncing = false
     /// This Mac's clock is more than 24 hours ahead of the server's: nothing is sent until it is corrected, reading goes
@@ -85,6 +85,8 @@ final class SyncEngine {
         if let deviceID {
             state.deviceID = deviceID
         }
+        // Today tabs no longer travel (`SYNC.md` § 2.4): those of an older version are forgotten, never deleted.
+        state.forgetTodayTabs()
     }
 
     /// One cycle; nil if a cycle is already running (only one sync at a time).
@@ -165,6 +167,21 @@ final class SyncEngine {
             )
             state.pending[id] = SyncPendingChange(content: deletion, local: nil)
         }
+    }
+
+    /// Deletion of a record this Mac doesn't have, sent at the next cycle: the tabs of a Mac the user revoked (`SYNC.md`
+    /// § 2.4). Nothing if the server has no content for it.
+    func queueDeletion(of id: UUID, type: SyncRecordType) {
+        guard let entry = state.entries[id], entry.version != nil, entry.remote?.deleted == false else {
+            return
+        }
+        let deletion = SyncContent.deletion(
+            of: type.rawValue,
+            schema: type.schema,
+            modifiedAt: state.clock.next(now: now(), after: entry.remote?.modifiedAt),
+            modifiedBy: state.deviceID,
+        )
+        state.pending[id] = SyncPendingChange(content: deletion, local: nil)
     }
 
     /// Deletion of more than half of the account's records (and at least 50) about to leave: asks first. Refused, the

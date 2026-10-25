@@ -58,7 +58,7 @@ struct SyncEngineSafetyTests {
     @Test func `deleting more than half of the account asks first`() async throws {
         let setup = try await pair()
         let (macA, macB, space) = (setup.macA, setup.macB, setup.space)
-        let tabs = (0 ..< 60).map { macA.addTodayTab(in: space, url: "https://example.com/\($0)", order: Double($0)) }
+        let tabs = (0 ..< 60).map { macA.addPinnedTab(in: space, url: "https://example.com/\($0)", order: Double($0)) }
         try await macA.sync()
         try await macB.sync()
 
@@ -135,7 +135,7 @@ struct SyncEngineSafetyTests {
     @Test func `a full account keeps the changes, and sends deletions first`() async throws {
         let setup = try await pair()
         let (macA, space) = (setup.macA, setup.space)
-        let tab = macA.addTodayTab(in: space, url: "https://example.com/plein")
+        let tab = macA.addPinnedTab(in: space, url: "https://example.com/plein")
         await server.refuse(tab, code: SyncRejectionCode.quotaExceeded)
         #expect(try await macA.sync()?.sent == 0)
         #expect(macA.engine.state.isQuotaExceeded)
@@ -151,20 +151,9 @@ struct SyncEngineSafetyTests {
         let mac = SimulatedMac(server: server, transport: TinyRequestTransport(server: server))
         let profile = mac.addProfile("Personnel")
         let space = mac.addSpace("Perso", profile: profile)
-        mac.addTodayTab(in: space, url: "https://example.com")
+        mac.addPinnedTab(in: space, url: "https://example.com")
         #expect(try await mac.sync()?.sent == 3)
         #expect(mac.engine.state.pending.isEmpty)
-    }
-
-    @Test func `a change of the last use alone doesn't leave`() async throws {
-        let setup = try await pair()
-        let (macA, space) = (setup.macA, setup.space)
-        let tab = macA.addTodayTab(in: space, url: "https://example.com")
-        try await macA.sync()
-        var fields = macA.todayTab(in: space, url: "https://example.com")
-        fields.lastActivity = macA.time
-        macA.store.items[tab] = .tab(fields)
-        #expect(try await macA.sync()?.sent == 0)
     }
 
     @Test func `an unreadable state file is set aside, and the sync merges without asking`() async throws {
