@@ -104,9 +104,10 @@ struct ExtensionStateStoreTests {
         #expect(ExtensionPermissionRequest(extensionName: "Ext", permissions: []).isEmpty)
     }
 
+    /// Review EX27: what the permissions let the extension do, in the words of the permissions screen.
     @Test func `alert details list permissions then websites`() {
-        let request = ExtensionPermissionRequest(extensionName: "Ext", permissions: ["tabs"])
-        #expect(ExtensionPermissionAlert.details(of: request).contains("tabs"))
+        let request = ExtensionPermissionRequest(extensionName: "Ext", permissions: ["tabs", "storage"])
+        #expect(ExtensionPermissionAlert.details(of: request) == ExtensionPermissionSummary.Line.browsingHistory.title)
         let all = ExtensionPermissionRequest(extensionName: "Ext", matchPatterns: ["*://*/*"], includesAllWebsites: true)
         #expect(!ExtensionPermissionAlert.details(of: all).contains("*://*/*"))
     }

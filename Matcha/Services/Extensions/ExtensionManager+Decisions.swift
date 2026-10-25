@@ -45,15 +45,21 @@ extension ExtensionManager {
         state.publisher = stored?.publisher
         state.version = stored?.version
         state.appExtensionIdentity = stored?.appExtensionIdentity
+        state.baseURLHost = stored?.baseURLHost
+        // A site granted again is no longer removed.
+        state.revokedMatchPatterns = (stored?.revokedMatchPatterns ?? []).subtracting(state.grantedMatchPatterns.keys)
         return state
     }
 
     /// Identifier of extension `identifier` for WebKit and websites (`runtime.id`, messages from websites allowed by
     /// `externally_connectable`): for an app's Safari extension, the one Safari gives it (“bundle identifier (team)”),
-    /// which its websites know; otherwise `identifier`.
+    /// which its websites know; otherwise `identifier`. The identity remembered at installation, without checking the
+    /// signature again (review EX7), and still known once the app is deleted (its data can then be erased, review EX5).
     func webExtensionIdentifier(for identifier: String) -> String {
-        store.state(for: identifier)?.appExtensionPath
-            .flatMap { SafariExtensionFinder.safariIdentifier(ofAppExtensionAt: URL(filePath: $0)) } ?? identifier
+        guard let state = store.state(for: identifier), let path = state.appExtensionPath else {
+            return identifier
+        }
+        return state.appExtensionIdentity ?? SafariExtensionFinder.safariIdentifier(ofAppExtensionAt: URL(filePath: path)) ?? identifier
     }
 
     /// Decisions remembered as soon as WebKit changes them (answer to a request, `permissions.remove()`…), and when the

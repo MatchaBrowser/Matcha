@@ -61,11 +61,17 @@ struct ExtensionButtonsTests {
         #expect(action.label == "Matcha Test Action")
         #expect(action.presentsPopup)
 
-        let revision = manager.toolbar.actionRevision
+        // Review EX18: the button of this extension, and only it, follows its action.
+        let changed = SendableFlag()
+        withObservationTracking {
+            _ = manager.toolbar.action(of: identifier, for: nil)
+        } onChange: {
+            changed.raise()
+        }
         try await TestExtension.waitForBackground(of: #require(manager.contexts[identifier]))
         try await waitUntil { manager.toolbar.action(of: identifier, for: nil)?.badgeText == "7" }
         // WebKit reports the update a little after the badge changes.
-        try await waitUntil { manager.toolbar.actionRevision != revision }
+        try await waitUntil { changed.isRaised }
         manager.unload(identifier: identifier)
     }
 

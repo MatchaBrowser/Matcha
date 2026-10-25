@@ -95,24 +95,28 @@ final class FakePermissionPrompter: ExtensionPermissionPrompting {
         self.answer = answer
     }
 
-    func ask(_ request: ExtensionPermissionRequest, completion: @escaping @MainActor (Bool) -> Void) {
+    func ask(_ request: ExtensionPermissionRequest, completion: @escaping @MainActor (ExtensionPermissionAnswer) -> Void) {
         requests.append(request)
-        completion(answer)
+        completion(answer ? .allowed : .denied)
     }
 }
 
 /// Holds each request until the test answers it.
 @MainActor
 final class HeldPermissionPrompter: ExtensionPermissionPrompting {
-    private(set) var pending: [(ExtensionPermissionRequest, @MainActor (Bool) -> Void)] = []
+    private(set) var pending: [(ExtensionPermissionRequest, @MainActor (ExtensionPermissionAnswer) -> Void)] = []
 
-    func ask(_ request: ExtensionPermissionRequest, completion: @escaping @MainActor (Bool) -> Void) {
+    func ask(_ request: ExtensionPermissionRequest, completion: @escaping @MainActor (ExtensionPermissionAnswer) -> Void) {
         pending.append((request, completion))
     }
 
     func answer(_ allowed: Bool) {
+        answer(allowed ? .allowed : .denied)
+    }
+
+    func answer(_ answer: ExtensionPermissionAnswer) {
         let first = pending.removeFirst()
-        first.1(allowed)
+        first.1(answer)
     }
 }
 
@@ -215,5 +219,36 @@ extension ExtensionManager {
             preconditionFailure("Manager made without its windows")
         }
         return windows
+    }
+}
+
+extension ExtensionManager {
+    /// Loads the extension of folder `url` (unpacked, with its `manifest.json`) under identifier `identifier`, with the
+    /// decisions remembered for it, without installing it (tests only, review EX26).
+    @discardableResult
+    func load(resourceBaseURL url: URL, identifier: String) async throws -> WKWebExtensionContext {
+        let webExtension = try await WKWebExtension(resourceBaseURL: url)
+        return try load(webExtension, identifier: identifier)
+    }
+}
+
+extension ExtensionStateStore {
+    /// Known identifiers (tests only, review EX26).
+    var identifiers: [String] {
+        states.keys.sorted()
+    }
+}
+
+/// A flag set from a `@Sendable` closure (observation's `onChange`).
+final class SendableFlag: @unchecked Sendable {
+    private let lock = NSLock()
+    private var raised = false
+
+    var isRaised: Bool {
+        lock.withLock { raised }
+    }
+
+    func raise() {
+        lock.withLock { raised = true }
     }
 }

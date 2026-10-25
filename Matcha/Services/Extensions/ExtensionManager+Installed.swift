@@ -5,6 +5,24 @@ import WebKit
 /// Installed extensions (tasks 6.3 and 6.4): those of the extensions folder and the Safari extensions of apps, read at
 /// launch, loaded if they are enabled; enabling, disabling, uninstalling, options page.
 extension ExtensionManager {
+    /// Runs `work` once the operations already started on extension `identifier` have ended (review EX21): an
+    /// uninstallation received from another Mac or a change of state never interleaves with an installation's waits.
+    func serialized(_ identifier: String, _ work: @escaping @MainActor () async throws -> Void) async throws {
+        let previous = operations[identifier]
+        let task = Task { @MainActor in
+            await previous?.value
+            try await work()
+        }
+        let marker = Task { @MainActor in _ = try? await task.value }
+        operations[identifier] = marker
+        defer {
+            if operations[identifier] == marker {
+                operations[identifier] = nil
+            }
+        }
+        try await task.value
+    }
+
     /// Identifiers of the installed extensions: folders of `directory`, then the remembered Safari extensions of apps.
     var installedIdentifiers: [String] {
         installedFolders + store.appExtensions.map(\.identifier).filter { !installedFolders.contains($0) }
@@ -33,7 +51,14 @@ extension ExtensionManager {
     }
 
     /// Enables or disables the installed extension `identifier`: loaded, or unloaded; remembered for the next launches.
+    /// Never during another operation on it (review EX21).
     func setEnabled(_ isEnabled: Bool, identifier: String) async throws {
+        try await serialized(identifier) { [self] in
+            try await performSetEnabled(isEnabled, identifier: identifier)
+        }
+    }
+
+    private func performSetEnabled(_ isEnabled: Bool, identifier: String) async throws {
         if isEnabled, contexts[identifier] == nil {
             let webExtension = if let installed = installed[identifier] {
                 installed
@@ -54,9 +79,15 @@ extension ExtensionManager {
         store.state(for: identifier)?.isEnabled ?? true
     }
 
-    /// Uninstalls extension `identifier`: unloaded, its data (storage) erased, its folder deleted (a Safari extension
-    /// stays in its app), its decisions forgotten.
+    /// Uninstalls extension `identifier`: unloaded, its data (storage) erased, its folder deleted off the main thread
+    /// (a Safari extension stays in its app), its decisions forgotten. Never during another operation on it (EX21).
     func uninstall(identifier: String) async {
+        try? await serialized(identifier) { [self] in
+            await performUninstall(identifier: identifier)
+        }
+    }
+
+    private func performUninstall(identifier: String) async {
         unload(identifier: identifier)
         let webExtensionIdentifier = webExtensionIdentifier(for: identifier)
         let types: Set<WKWebExtension.DataType> = [.local, .session, .synchronized]
@@ -67,12 +98,8 @@ extension ExtensionManager {
         let isFolder = store.state(for: identifier)?.appExtensionPath == nil
         if isFolder, let directory, ExtensionInstallDirectory.isValidIdentifier(identifier) {
             let folder = directory.appendingPathComponent(identifier, isDirectory: true)
-            if FileManager.default.fileExists(atPath: folder.path) {
-                do {
-                    try FileManager.default.removeItem(at: folder)
-                } catch {
-                    Logger.extensions.error("Extension folder not deleted: \(error.logSummary, privacy: .public)")
-                }
+            if FileManager.default.fileExists(atPath: folder.path), await !FileRemoval.remove(folder) {
+                Logger.extensions.error("Extension folder not deleted")
             }
         }
         store.removeState(for: identifier)

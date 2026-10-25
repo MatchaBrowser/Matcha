@@ -7,7 +7,7 @@ import WebKit
 /// pages (`WebConfigurationFactory`), private windows included; extensions see and inject nothing there as long as they
 /// do not have access to private data (`hasAccessToPrivateData`, denied by default, as in Safari).
 ///
-/// - Loading: `load(resourceBaseURL:identifier:)` (unpacked folder); at launch (`start`), the enabled extensions of
+/// - Loading: `load(_:identifier:)` (installed with `ExtensionInstaller`); at launch (`start`), the enabled extensions of
 ///   `Application Support/Extensions/<identifier>/` (`ExtensionInstallDirectory`). The identifier sets the address of
 ///   the extension's pages (`webkit-extension://<identifier>/`) and its storage, kept from one launch to the next
 ///   (persistent controller, `.default()`).
@@ -48,6 +48,8 @@ final class ExtensionManager: NSObject {
     @ObservationIgnored var isStarted = false
     /// Removed with the manager (tests), without `deinit` (`NotificationObservation`).
     @ObservationIgnored var observers: [NotificationObservation] = []
+    /// Last operation started on each extension (`serialized`).
+    @ObservationIgnored var operations: [String: Task<Void, Never>] = [:]
 
     init(configuration: WKWebExtensionController.Configuration, store: ExtensionStateStore, directory: URL?) {
         // Extension pages (popup, options, background): presented to websites as Safari, like the tabs.
@@ -92,16 +94,22 @@ final class ExtensionManager: NSObject {
     @discardableResult
     func read(_ identifier: String) async throws -> WKWebExtension {
         let webExtension: WKWebExtension
-        if let state = store.state(for: identifier), let path = state.appExtensionPath {
+        if var state = store.state(for: identifier), let path = state.appExtensionPath {
             let url = URL(filePath: path)
             guard let bundle = Bundle(url: url) else {
                 throw ExtensionError.notInstalled(identifier)
             }
-            // Another bundle at the same place (other identifier, other team, altered signature): not loaded.
-            if let identity = state.appExtensionIdentity, SafariExtensionFinder.safariIdentifier(ofAppExtensionAt: url) != identity {
+            // Signature checked off the main thread (review EX7). Another bundle at the same place (other identifier,
+            // other team, altered signature): not loaded. Installed before its identity was kept: kept now (EX9).
+            let identity = await SafariExtensionFinder.identity(ofAppExtensionAt: url)
+            if let known = state.appExtensionIdentity, identity != known {
                 throw ExtensionError.identityChanged(identifier)
             }
             webExtension = try await WKWebExtension(appExtensionBundle: bundle)
+            if state.appExtensionIdentity == nil, let identity {
+                state.appExtensionIdentity = identity
+                store.setState(state, for: identifier)
+            }
         } else if let directory {
             webExtension = try await WKWebExtension(resourceBaseURL: directory.appendingPathComponent(identifier, isDirectory: true))
         } else {
@@ -109,14 +117,6 @@ final class ExtensionManager: NSObject {
         }
         installed[identifier] = webExtension
         return webExtension
-    }
-
-    /// Loads the extension of folder `url` (unpacked, with its `manifest.json`) under identifier `identifier`, with the
-    /// decisions remembered for it; it is now enabled.
-    @discardableResult
-    func load(resourceBaseURL url: URL, identifier: String) async throws -> WKWebExtensionContext {
-        let webExtension = try await WKWebExtension(resourceBaseURL: url)
-        return try load(webExtension, identifier: identifier)
     }
 
     /// Reads the extensions folder again: at launch, after an installation or a removal.
@@ -135,7 +135,8 @@ final class ExtensionManager: NSObject {
         }
         let context = WKWebExtensionContext(for: webExtension)
         context.uniqueIdentifier = webExtensionIdentifier(for: identifier)
-        if let baseURL = URL(string: "\(Self.scheme)://\(identifier)/") {
+        let addressHost = store.state(for: identifier)?.baseURLHost ?? identifier
+        if let baseURL = URL(string: "\(Self.scheme)://\(addressHost)/") {
             context.baseURL = baseURL
         }
         context.isInspectable = WebInspection.isEnabled()

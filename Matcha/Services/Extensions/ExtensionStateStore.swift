@@ -14,16 +14,11 @@ final class ExtensionStateStore {
     static let unreadableKey = "installedExtensions.unreadable"
 
     @ObservationIgnored private let defaults: UserDefaults?
-    private var states: [String: ExtensionState]
+    private(set) var states: [String: ExtensionState]
 
     init(defaults: UserDefaults?) {
         self.defaults = defaults
         states = Self.load(from: defaults)
-    }
-
-    /// Known identifiers.
-    var identifiers: [String] {
-        states.keys.sorted()
     }
 
     /// Installed Safari extensions of apps (task 6.4): (identifier, `.appex`), sorted by identifier.

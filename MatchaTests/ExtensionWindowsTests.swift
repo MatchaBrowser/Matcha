@@ -234,4 +234,14 @@ struct ExtensionWindowsTests {
         let tab = tabManager.newTab()
         try await waitUntil { sink.events.contains(.openTab(tab.id)) }
     }
+
+    /// Review EX12: an extension's options page opens only at an address the extension may open.
+    @Test func `an options page at a local file is refused`() async throws {
+        let folder = try TestExtension.makeFolder()
+        defer { try? FileManager.default.removeItem(at: folder) }
+        let context = try await WKWebExtensionContext(for: WKWebExtension(resourceBaseURL: folder))
+        let count = tabManager.todayTabs.count
+        #expect(!windows.openPage(URL(filePath: "/etc/hosts"), for: context))
+        #expect(tabManager.todayTabs.count == count)
+    }
 }

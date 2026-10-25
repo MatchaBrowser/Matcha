@@ -9,7 +9,8 @@ import WebKit
 struct ExtensionSyncTests {
     private let root: URL
     private let server = InMemorySyncServer()
-    private let identifier = "matcha-test-extension"
+    /// Of the random form: the only one sync may propose (review EX10).
+    private let identifier = "0123456789abcdef0123456789abcdef"
 
     /// A Mac: its extension manager, its installer, its extension sync.
     @MainActor

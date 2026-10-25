@@ -1,3 +1,4 @@
+import CryptoKit
 import Foundation
 
 /// Stable identifier of an installed extension (task 6.4), valid for `ExtensionInstallDirectory`: it sets its address
@@ -10,23 +11,24 @@ nonisolated enum ExtensionIdentifier {
         UUID().uuidString.lowercased().replacingOccurrences(of: "-", with: "")
     }
 
-    /// Safari extension of an app: prefix `safari-` and its bundle identifier.
-    static func forAppExtension(bundleIdentifier: String) -> String? {
-        slug("safari-\(bundleIdentifier)")
+    /// True for an identifier of the form `random()` draws: the only one sync may propose (review EX10).
+    static func isRandom(_ identifier: String) -> Bool {
+        identifier.count == 32 && identifier.allSatisfy { ("0" ... "9").contains($0) || ("a" ... "f").contains($0) }
     }
 
-    /// Name from the manifest, or its translated text (`__MSG_cle__`, key matched case-insensitively) taken from
-    /// `messages` (`_locales/<default_locale>/messages.json`).
-    static func name(in manifest: [String: Any], messages: [String: Any]?) -> String? {
-        guard let raw = manifest["name"] as? String else {
+    /// Safari extension of an app: prefix `safari-` and its bundle identifier; followed by a digest of the bundle
+    /// identifier when another installed extension already has it (review EX4: “desktop-safari” and “desktop.safari”
+    /// give the same text, never the same extension).
+    static func forAppExtension(bundleIdentifier: String, avoiding taken: Set<String> = []) -> String? {
+        guard let base = slug("safari-\(bundleIdentifier)") else {
             return nil
         }
-        guard raw.hasPrefix("__MSG_"), raw.hasSuffix("__"), raw.count > 8 else {
-            return raw
+        guard taken.contains(base) else {
+            return base
         }
-        let key = raw.dropFirst(6).dropLast(2).lowercased()
-        let entry = messages?.first { $0.key.lowercased() == key }?.value as? [String: Any]
-        return entry?["message"] as? String
+        let digest = SHA256.hash(data: Data(bundleIdentifier.utf8)).prefix(4).map { String(format: "%02x", $0) }.joined()
+        let prefix = base.prefix(ExtensionInstallDirectory.maximumIdentifierLength - digest.count - 1)
+        return slug("\(prefix)-\(digest)")
     }
 
     /// ASCII lowercase letters, digits and hyphens (accents removed, everything else becomes a hyphen), 63 characters

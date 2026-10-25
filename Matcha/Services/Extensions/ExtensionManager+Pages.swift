@@ -20,23 +20,33 @@ extension ExtensionManager {
         context.webExtension.displayName ?? context.uniqueIdentifier
     }
 
-    /// Asks the user (`permissionPrompter`); an empty request is denied without showing anything.
-    func ask(_ request: ExtensionPermissionRequest, for context: WKWebExtensionContext, completion: @escaping @MainActor (Bool) -> Void) {
+    /// Asks the user (`permissionPrompter`); an empty request, or one made while another of the same extension waits,
+    /// isn't shown: `notAsked`, never remembered as a refusal (review EX6).
+    func ask(
+        _ request: ExtensionPermissionRequest,
+        for context: WKWebExtensionContext,
+        completion: @escaping @MainActor (ExtensionPermissionAnswer) -> Void,
+    ) {
         let key = ObjectIdentifier(context)
         guard !request.isEmpty, !promptingContexts.contains(key) else {
-            completion(false)
+            completion(.notAsked)
             return
         }
         promptingContexts.insert(key)
-        permissionPrompter.ask(request) { [weak self] allowed in
+        permissionPrompter.ask(request) { [weak self] answer in
             self?.promptingContexts.remove(key)
-            Logger.extensions.info("Permission request \(allowed ? "granted" : "denied", privacy: .public)")
-            completion(allowed)
+            Logger.extensions.info("Permission request: \(String(describing: answer), privacy: .public)")
+            completion(answer)
         }
     }
 
-    /// The user removes an extension's access to a website (Settings): it may ask again.
+    /// The user removes an extension's access to a website (Settings): it may ask again, and no update grants it back
+    /// by itself (review EX3).
     func revokeSite(_ pattern: String, identifier: String) {
+        if var state = store.state(for: identifier) {
+            state.revokedMatchPatterns.insert(pattern)
+            store.setState(state, for: identifier)
+        }
         if let context = contexts[identifier], let matchPattern = try? WKWebExtension.MatchPattern(string: pattern) {
             context.setPermissionStatus(.unknown, for: matchPattern)
             saveState(of: context, identifier: identifier)

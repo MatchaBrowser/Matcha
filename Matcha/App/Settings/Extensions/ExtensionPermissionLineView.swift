@@ -8,7 +8,7 @@ struct ExtensionPermissionLineView: View {
     var body: some View {
         Label {
             VStack(alignment: .leading, spacing: 2) {
-                Text(title)
+                Text(verbatim: line.title)
                 if case let .websites(hosts) = line {
                     Text(verbatim: hosts.joined(separator: ", "))
                         .font(.caption)
@@ -20,24 +20,6 @@ struct ExtensionPermissionLineView: View {
             Image(systemName: symbol)
                 .foregroundStyle(.secondary)
                 .frame(width: 18)
-        }
-    }
-
-    private var title: LocalizedStringKey {
-        switch line {
-        case .allWebsites: "Read and change your data on all websites"
-        case .websites: "Read and change your data on these websites:"
-        case .browsingHistory: "Read your browsing history"
-        case .cookies: "Read and change website cookies"
-        case .clipboardRead: "Read data you copy and paste"
-        case .clipboardWrite: "Change data you copy and paste"
-        case .blockContent: "Block content on websites"
-        case .nativeApps: "Communicate with apps on your Mac"
-        case .notifications: "Show notifications"
-        case .downloads: "Manage your downloads"
-        case .bookmarks: "Read and change your bookmarks"
-        case .location: "Detect your location"
-        case .localFiles: "Read your local files"
         }
     }
 

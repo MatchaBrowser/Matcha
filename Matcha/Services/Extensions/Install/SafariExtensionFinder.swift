@@ -92,6 +92,12 @@ nonisolated enum SafariExtensionFinder {
         return "\(bundleIdentifier) (\(team))"
     }
 
+    /// `safariIdentifier`, off the main thread: checking a signature hashes all the bundle's resources (review EX7).
+    @concurrent
+    static func identity(ofAppExtensionAt url: URL) async -> String? {
+        safariIdentifier(ofAppExtensionAt: url)
+    }
+
     /// True if the code signature of bundle `url` is intact (audit E7): an altered extension isn't offered, and its
     /// team, read from that signature, can be trusted.
     static func hasValidSignature(_ url: URL) -> Bool {

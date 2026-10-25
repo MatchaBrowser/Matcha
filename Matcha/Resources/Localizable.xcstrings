@@ -12138,35 +12138,6 @@
         }
       }
     },
-    "Permissions: %@" : {
-      "comment" : "Extension permission alert; %@ lists technical permission names",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Berechtigungen: %@"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Permisos: %@"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Permissions : %@"
-          }
-        },
-        "it" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Autorizzazioni: %@"
-          }
-        }
-      }
-    },
     "Person" : {
       "comment" : "Icon choice (SF Symbol)",
       "localizations" : {
