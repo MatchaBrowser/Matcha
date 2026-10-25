@@ -29,6 +29,22 @@ struct SidebarLayoutPersistenceTests {
         return RichLayout(layout: layout, work: work, client: client)
     }
 
+    /// Review SV9: a large sidebar comes back the same, built in one pass (tab by tab, 10,000 pinned tabs took
+    /// minutes).
+    @Test(.timeLimit(.minutes(1)))
+    func `a large sidebar comes back in order`() {
+        var positions: [UUID: SidebarPosition] = [:]
+        let folders = (0 ..< 50).map { FolderEntry(id: UUID(), name: "Dossier \($0)", isCollapsed: false, parentID: nil, order: $0) }
+        for order in 0 ..< 20000 {
+            let folder = order.isMultiple(of: 2) ? folders[order % folders.count].id : nil
+            positions[UUID()] = SidebarPosition(place: order < 100 ? .today : .pinned, order: order, folderID: folder)
+        }
+        let layout = SidebarLayout(positions: positions, folders: folders)
+        #expect(layout.orderedTabIDs.count == positions.count)
+        let restored = SidebarLayout(positions: layout.positions, folders: layout.folderEntries)
+        #expect(restored == layout)
+    }
+
     @Test func `positions describe every tab`() {
         let rich = richLayout()
         let (layout, work, client) = (rich.layout, rich.work, rich.client)

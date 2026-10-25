@@ -22,6 +22,10 @@ struct FaviconServiceTests {
         let image = await service.fetchIcon(forPage: page, candidates: [candidate])
         #expect(image != nil)
         #expect(service.cachedIcon(forHost: "www.example.test") === image)
+        await service.waitForDisk()
+        // Review SV3: a PNG of the decoded icon, not the downloaded bytes.
+        let file = directory.appendingPathComponent("www.example.test")
+        #expect((try? Data(contentsOf: file))?.prefix(4) == Data([0x89, 0x50, 0x4E, 0x47]))
 
         let reloaded = FaviconService(directory: directory)
         #expect(reloaded.cachedIcon(forHost: "www.example.test") == nil)
@@ -33,6 +37,7 @@ struct FaviconServiceTests {
     @Test func `a tab restored without its page shows the icon kept on disk`() async throws {
         let cached = FaviconService(directory: directory)
         _ = await cached.fetchIcon(forPage: page, candidates: [FaviconCandidate(url: Self.pngURL, rel: "icon")])
+        await cached.waitForDisk()
         defer { try? FileManager.default.removeItem(at: directory) }
         // A new launch: nothing in memory, the tab is restored without a web view.
         let manager = TabManager(

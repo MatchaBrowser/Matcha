@@ -110,7 +110,8 @@ extension NavigationCoordinator {
             return
         }
         Task {
-            await reply(notificationCenter.post(content, origin: origin, page: page, webView: webView, frame: frame))
+            let sender = PageNotificationCenter.Sender(page: page, webView: webView, frame: frame)
+            await reply(notificationCenter.post(content, origin: origin, profileID: scope.profileID, from: sender))
         }
     }
 }

@@ -51,9 +51,9 @@ struct HistoryView: View {
             }
         }
         .task(id: model.refreshKey) {
-            // A burst of keystrokes or visits recomputes only once.
-            if model.isReady {
-                try? await Task.sleep(for: .milliseconds(100))
+            let delay = model.refreshDelay
+            if delay > .zero {
+                try? await Task.sleep(for: delay)
             }
             guard !Task.isCancelled else {
                 return

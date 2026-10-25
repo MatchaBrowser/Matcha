@@ -10,8 +10,6 @@ import SwiftData
 @MainActor
 @Observable
 final class HistoryStore {
-    /// Changes on every modification of the loaded history: the views that show it update.
-    private(set) var revision = 0
     private(set) var isLoaded = false
 
     /// Clock of the visits (replaced in tests).
@@ -20,11 +18,18 @@ final class HistoryStore {
     @ObservationIgnored let calendar: Calendar
     @ObservationIgnored private let container: ModelContainer
     @ObservationIgnored private var indexes: [UUID?: HistoryIndex] = [:]
+    /// Revision of each profile's history (`revision(of:)`).
+    @ObservationIgnored private var revisions: [UUID?: HistoryRevision] = [:]
     @ObservationIgnored private var loadTask: Task<Void, Never>?
     /// Changes made during the read, replayed afterwards.
     @ObservationIgnored private var pendingChanges: [HistoryChange] = []
     /// Last visits written, for their title and their refresh without going through the database.
     @ObservationIgnored private var recentRecords: [(id: UUID, record: HistoryRecord)] = []
+    /// Called once visits are deleted, and after the read for those deleted before: what was kept for the websites no
+    /// longer visited can go (website icons, review SV1).
+    @ObservationIgnored var onVisitsRemoved: (@MainActor () -> Void)?
+    /// Visits deleted before the history was read.
+    @ObservationIgnored private var removedBeforeLoad = false
 
     init(container: ModelContainer, now: @escaping () -> Date = { .now }, calendar: Calendar = .autoupdatingCurrent) {
         self.container = container
@@ -51,6 +56,21 @@ final class HistoryStore {
         await loadTask?.value
     }
 
+    /// Changes on every modification of the profile's loaded history: the views that show it update, never for another
+    /// profile's visit (review SV10).
+    func revision(of profileID: UUID?) -> Int {
+        revisionCounter(of: profileID).value
+    }
+
+    private func revisionCounter(of profileID: UUID?) -> HistoryRevision {
+        if let counter = revisions[profileID] {
+            return counter
+        }
+        let counter = HistoryRevision()
+        revisions[profileID] = counter
+        return counter
+    }
+
     /// The profile's history, nil until it has been read.
     func index(for profileID: UUID?) -> HistoryIndex? {
         isLoaded ? indexes[profileID] ?? HistoryIndex() : nil
@@ -66,12 +86,22 @@ final class HistoryStore {
         return await Self.search(index, query, limit: limit, now: now())
     }
 
+    /// Domains of the visits of every profile, gathered off the main thread.
+    func visitedHosts() async -> Set<String> {
+        await load()
+        return await Self.hosts(of: Array(indexes.values))
+    }
+
     private func finishLoading(_ loaded: [UUID?: HistoryIndex]) {
         indexes = loaded
         pendingChanges.forEach { $0.apply(to: &indexes) }
         pendingChanges = []
         isLoaded = true
-        revision += 1
+        revisions.values.forEach { $0.value += 1 }
+        if removedBeforeLoad {
+            removedBeforeLoad = false
+            onVisitsRemoved?()
+        }
     }
 
     // MARK: Visits
@@ -137,12 +167,21 @@ final class HistoryStore {
             return
         }
         change.apply(to: &indexes)
-        revision += 1
+        revisionCounter(of: change.profileID).value += 1
     }
 
     /// Visits deleted from the database: those kept aside are no longer needed.
     func forgetRecentRecords() {
         recentRecords = []
+    }
+
+    /// Visits deleted and their changes applied: `onVisitsRemoved` now, or once the history is read.
+    func visitsWereRemoved() {
+        if isLoaded {
+            onVisitsRemoved?()
+        } else {
+            removedBeforeLoad = true
+        }
     }
 
     func deleteRecords(where predicate: Predicate<HistoryRecord>) {
@@ -159,6 +198,11 @@ final class HistoryStore {
         } catch {
             Logger.history.error("History not saved: \(error.logSummary, privacy: .public)")
         }
+    }
+
+    @concurrent
+    private nonisolated static func hosts(of indexes: [HistoryIndex]) async -> Set<String> {
+        Set(indexes.flatMap { $0.visits.values.compactMap { $0.url.host() } })
     }
 
     @concurrent
@@ -179,4 +223,11 @@ final class HistoryStore {
             return nil
         }
     }
+}
+
+/// Revision of one profile's history (`HistoryStore.revision(of:)`).
+@MainActor
+@Observable
+final class HistoryRevision {
+    var value = 0
 }

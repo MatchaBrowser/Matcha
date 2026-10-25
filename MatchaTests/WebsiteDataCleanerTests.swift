@@ -14,6 +14,7 @@ struct WebsiteDataCleanerTests {
         ("localhost", "localhost"),
         ("192.168.1.10", "192.168.1.10"),
         ("Example.COM.", "shop.example.com"),
+        ("www.example.com", "www.example.com"),
     ])
     func `records of the site and its subdomains match`(record: String, host: String) {
         #expect(WebsiteDataMatcher.matches(recordName: record, host: host))
@@ -27,6 +28,8 @@ struct WebsiteDataCleanerTests {
         ("", "example.com"),
         ("example.com", ""),
         ("co.uk", "bbc.co.uk.example"),
+        // Review SV4: “www.com” is a website of its own.
+        ("www.com", "example.com"),
     ])
     func `records of other sites never match`(record: String, host: String) {
         #expect(!WebsiteDataMatcher.matches(recordName: record, host: host))

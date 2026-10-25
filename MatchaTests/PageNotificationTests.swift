@@ -103,16 +103,18 @@ struct PageNotificationTests {
         return true
         """, in: tab)
         try await waitUntilTrue("return window.shown === true", in: tab)
+        // Review SV7: grouped by website and profile.
+        let thread = try "\(#require(manager.sitePermissions?.profileID).uuidString) https://notify.example.com"
         #expect(system.added == [SystemNotification(
-            identifier: "https://notify.example.com#boite",
+            identifier: "\(thread)#boite",
             title: "Nouveau message",
             subtitle: "notify.example.com",
             body: "Bonjour",
-            threadIdentifier: "https://notify.example.com",
+            threadIdentifier: thread,
             isSilent: false,
         )])
 
-        system.onActivate?("https://notify.example.com#boite")
+        system.onActivate?("\(thread)#boite")
         #expect(revealer.revealed.map(\.id) == [tab.id])
         try await waitUntilTrue("return window.clicked === true", in: tab)
 
@@ -120,7 +122,27 @@ struct PageNotificationTests {
         _ = try await evaluate("window.again = new Notification('Encore', { tag: 'boite' }); return true", in: tab)
         try await waitUntil { system.added.count == 2 }
         _ = try await evaluate("window.again.close(); return true", in: tab)
-        try await waitUntil { system.removed == ["https://notify.example.com#boite"] }
+        try await waitUntil { system.removed == ["\(thread)#boite"] }
+    }
+
+    /// Review SV7: the same tag in two profiles gives two notifications, each bringing back its own page.
+    @Test func `the same tag in two profiles never replaces the other`() async throws {
+        let first = try #require(session.profiles.first)
+        let other = session.addProfile(named: "Travail")
+        for manager in [manager, other.tabManager] {
+            manager.sitePermissions?.set(.allow, for: .notifications, origin: origin)
+        }
+        let tab = try await open()
+        let otherTab = try await open(in: other.tabManager)
+        for page in [tab, otherTab] {
+            _ = try await evaluate("new Notification('Message', { tag: 'boite' }); return true", in: page)
+        }
+        try await waitUntil { system.added.count == 2 }
+        let identifiers = system.added.map(\.identifier)
+        #expect(Set(identifiers).count == 2)
+        #expect(identifiers.first?.hasPrefix(first.id.uuidString) == true)
+        system.onActivate?(identifiers[1])
+        #expect(revealer.revealed.map(\.id) == [otherTab.id])
     }
 
     @Test func `a denied website or a private window can't notify`() async throws {

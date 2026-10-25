@@ -163,8 +163,7 @@ final class ContentBlockerService {
             }
             return lists
         } catch {
-            let reason = error.localizedDescription
-            Logger.contentBlocker.error("Unreadable blocklist manifest, blocker inactive: \(reason, privacy: .public)")
+            Logger.contentBlocker.error("Unreadable blocklist manifest, blocker inactive: \(error.logSummary, privacy: .public)")
             return []
         }
     }

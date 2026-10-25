@@ -32,7 +32,7 @@ enum PDFExport {
             try PDFExportFile.write(data, to: destination)
             Logger.browser.info("Page exported as PDF (\(data.count, privacy: .public) bytes)")
         } catch {
-            Logger.browser.error("PDF export failed: \(error.localizedDescription, privacy: .private)")
+            Logger.browser.error("PDF export failed: \(error.logSummary, privacy: .public)")
             showFailure(error, in: window)
         }
     }

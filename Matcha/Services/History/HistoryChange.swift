@@ -32,7 +32,8 @@ nonisolated enum HistoryChange: Equatable, Sendable {
         }
     }
 
-    private var profileID: UUID? {
+    /// Profile whose history changes.
+    var profileID: UUID? {
         switch self {
         case let .insert(_, profileID): profileID
         case let .setTitle(_, _, profileID): profileID

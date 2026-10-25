@@ -21,6 +21,10 @@ struct DownloadFileNameTests {
         ("photo\u{202E}gpj.app", "photogpj.app"),
         ("\u{2066}isolé\u{2069}.txt", "isolé.txt"),
         ("café 👩‍💻.txt", "café 👩‍💻.txt"),
+        // Review SV5: invisible characters and line separators.
+        ("fac\u{200B}ture\u{2060}\u{FEFF}\u{AD}.pdf", "facture.pdf"),
+        ("deux\u{2028}lignes\u{2029}.txt", "deuxlignes.txt"),
+        ("نامه\u{200C}ها.txt", "نامه\u{200C}ها.txt"),
     ])
     func `suggested names are sanitized`(suggested: String, expected: String) {
         #expect(DownloadFileName.sanitized(suggested) == expected)

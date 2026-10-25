@@ -13,9 +13,13 @@ nonisolated enum DownloadFileName {
     static let maximumExtensionLength = 20
     /// Double extensions kept together: “archive 2.tar.gz”, not “archive.tar 2.gz”.
     static let compoundExtensions = ["tar.gz", "tar.bz2", "tar.xz", "tar.zst", "tar.lz", "tar.lzma", "tar.lz4", "tar.z", "tar.bz"]
-    /// Bidirectional controls: they make it possible to disguise an extension (“photo”, U+202E then “gpj.app”
-    /// displays as “photoppa.jpg”).
-    private static let bidiControls = Set<UInt32>([0x061C, 0x200E, 0x200F]).union(0x202A ... 0x202E).union(0x2066 ... 0x2069)
+    /// Characters removed from a name: controls (line feed, tab, NUL…), invisible format characters (bidirectional
+    /// controls, zero-width spaces, soft hyphen…) and line or paragraph separators. A bidirectional control makes it
+    /// possible to disguise an extension (“photo”, U+202E then “gpj.app” displays as “photoppa.jpg”); an invisible one
+    /// makes two names look the same (review SV5).
+    private static let removedCategories: Set<Unicode.GeneralCategory> = [.control, .format, .lineSeparator, .paragraphSeparator]
+    /// Format characters kept: the joiners that shape emoji (“👩‍💻”) and some scripts (Persian, Indic).
+    private static let keptJoiners: Set<Unicode.Scalar> = ["\u{200C}", "\u{200D}"]
 
     /// Name proposed by the page or WebKit, made safe; otherwise the last component of `url` (address with a path:
     /// web or file, not `data:` or `blob:`), otherwise `fallback`. A name without an extension gets the one of the
@@ -31,14 +35,16 @@ nonisolated enum DownloadFileName {
         return fitted(name, suffix: "", extension: "." + preferred)
     }
 
-    /// Last component of a path (`/` or `\`), without control characters or bidirectional controls, `:` replaced
-    /// by `-` (the Finder shows it as `/`), without a dot or space at the start (no hidden file), without a space at
-    /// the end, and 255 bytes at most, extension included. Empty if nothing is left.
+    /// Last component of a path (`/` or `\`), without the characters of `removedCategories` (`keptJoiners` aside),
+    /// `:` replaced by `-` (the Finder shows it as `/`), without a dot or space at the start (no hidden file), without a
+    /// space at the end, and 255 bytes at most, extension included. Empty if nothing is left.
     static func sanitized(_ suggested: String) -> String {
         let component = suggested.split { $0 == "/" || $0 == "\\" }.last.map(String.init) ?? ""
         var scalars = String.UnicodeScalarView()
-        // C0 and C1 control characters (line feed, tab, NUL…) and bidirectional controls.
-        for scalar in component.unicodeScalars where scalar.properties.generalCategory != .control && !bidiControls.contains(scalar.value) {
+        let kept = component.unicodeScalars.filter {
+            keptJoiners.contains($0) || !removedCategories.contains($0.properties.generalCategory)
+        }
+        for scalar in kept {
             scalars.append(scalar == ":" ? "-" : scalar)
         }
         var name = Substring(String(scalars))

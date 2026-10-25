@@ -3,8 +3,9 @@ import OSLog
 import WebKit
 
 /// Website icons: read from inside the page (`FaviconPageReader`, with its network context), otherwise downloaded
-/// without cookies, kept in memory and on disk, per domain. Both stop at `maximumSize`; files are read and decoded
-/// off the main thread, bitmaps only (`FaviconDecoder`, audit W8). A tab not loaded yet shows the icon kept on disk.
+/// without cookies, kept in memory and on disk (`FaviconDiskCache`), per domain. Both stop at `maximumSize`; files are
+/// read and decoded off the main thread, bitmaps only (`FaviconDecoder`, audit W8). A tab not loaded yet shows the icon
+/// kept on disk. Erasing the history or a website's data erases the icons it no longer needs (review SV1).
 @MainActor
 final class FaviconService {
     /// Maximum size of a downloaded icon.
@@ -16,17 +17,23 @@ final class FaviconService {
             .appendingPathComponent("Favicons", isDirectory: true)
     }
 
-    private let directory: URL?
+    private let disk: FaviconDiskCache?
     private let memory = NSCache<NSString, Favicon>()
     private let session: URLSession
     /// Download in progress per domain, shared by the tabs of the same website.
     private var downloads: [String: Task<Favicon?, Never>] = [:]
+    /// Reading of a domain's file in progress, shared by the tabs of the same website (review SV3).
+    private var diskReads: [String: Task<Favicon?, Never>] = [:]
+    /// Last write or erasure on disk: each one waits for the previous one.
+    private var diskQueue: Task<Void, Never>?
+    /// True once the disk cache has been trimmed (`FaviconDiskCache.maximumFiles`) during this launch.
+    private var hasTrimmed = false
     /// Domains whose icon has been successfully refreshed since launch.
     private var refreshedHosts: Set<String> = []
 
     /// `directory`: folder of the disk cache, or nil for an in-memory cache only.
     init(directory: URL?) {
-        self.directory = directory
+        disk = directory.map(FaviconDiskCache.init(directory:))
         session = URLSession(configuration: Self.makeConfiguration())
     }
 
@@ -48,16 +55,28 @@ final class FaviconService {
         memory.object(forKey: host as NSString)
     }
 
-    /// Already known icon of the domain: in memory, otherwise read from disk.
+    /// Already known icon of the domain: in memory, otherwise read from disk, once for all the tabs that ask.
     func loadCachedIcon(forHost host: String) async -> Favicon? {
         if let favicon = cachedIcon(forHost: host) {
             return favicon
         }
-        guard let file = fileURL(forHost: host), let data = await Self.read(file), let decoded = await FaviconDecoder.decode(data) else {
+        guard let disk else {
             return nil
         }
-        let favicon = Favicon(decoded: decoded)
-        memory.setObject(favicon, forKey: host as NSString)
+        let reading = diskReads[host] ?? Task {
+            guard let data = await disk.read(forHost: host, maximumSize: Self.maximumSize),
+                  let decoded = await FaviconDecoder.decode(data)
+            else {
+                return nil
+            }
+            return Favicon(decoded: decoded)
+        }
+        diskReads[host] = reading
+        let favicon = await reading.value
+        diskReads[host] = nil
+        if let favicon, cachedIcon(forHost: host) == nil {
+            memory.setObject(favicon, forKey: host as NSString)
+        }
         return favicon
     }
 
@@ -135,7 +154,7 @@ final class FaviconService {
             return nil
         }
         let favicon = Favicon(decoded: decoded)
-        store(data, favicon: favicon, forHost: host)
+        store(decoded, favicon: favicon, forHost: host)
         return favicon
     }
 
@@ -149,7 +168,7 @@ final class FaviconService {
                 continue
             }
             let favicon = Favicon(decoded: decoded)
-            store(data, favicon: favicon, forHost: host)
+            store(decoded, favicon: favicon, forHost: host)
             return favicon
         }
         Logger.favicons.debug("No icon for \(host, privacy: .private)")
@@ -173,30 +192,55 @@ final class FaviconService {
         return try? await BoundedRead.data(of: bytes, expectedLength: response.expectedContentLength, limit: Int(maximumSize))
     }
 
-    private func store(_ data: Data, favicon: Favicon, forHost host: String) {
+    /// In memory, then on disk, off the main thread: the decoded icon, never the downloaded bytes (review SV3).
+    private func store(_ decoded: DecodedFavicon, favicon: Favicon, forHost host: String) {
         memory.setObject(favicon, forKey: host as NSString)
-        guard let directory, let file = fileURL(forHost: host) else {
+        guard let disk else {
             return
         }
-        do {
-            try FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)
-            try data.write(to: file, options: .atomic)
-        } catch {
-            Logger.favicons.error("Icon not saved to disk: \(error.logSummary, privacy: .public)")
+        let image = decoded.image
+        let trims = !hasTrimmed
+        hasTrimmed = true
+        enqueue {
+            await disk.write(image, forHost: host)
+            if trims {
+                await disk.trim()
+            }
         }
     }
 
-    /// Cached file, off the main thread; nil beyond `maximumSize`.
-    @concurrent
-    private static func read(_ file: URL) async -> Data? {
-        guard let size = try? file.resourceValues(forKeys: [.fileSizeKey]).fileSize, size <= maximumSize else {
-            return nil
+    /// Website data cleared: its icon is erased, and fetched again at its next load.
+    func removeIcon(forHost host: String) async {
+        memory.removeObject(forKey: host as NSString)
+        refreshedHosts.remove(host)
+        if let disk {
+            await enqueue { await disk.remove(hosts: [host]) }.value
         }
-        return try? Data(contentsOf: file)
     }
 
-    private func fileURL(forHost host: String) -> URL? {
-        let name = String(host.map { $0.isLetter || $0.isNumber || $0 == "." || $0 == "-" ? $0 : "_" })
-        return directory?.appendingPathComponent(name, isDirectory: false)
+    /// History erased: only the icons of `hosts` stay (websites still in the history or in a tab); the others are
+    /// fetched again at their next load.
+    func removeIcons(keeping hosts: Set<String>) async {
+        memory.removeAllObjects()
+        refreshedHosts.formIntersection(hosts)
+        if let disk {
+            await enqueue { await disk.removeAll(keeping: hosts) }.value
+        }
+    }
+
+    /// Waits for the writes and erasures on disk (tests).
+    func waitForDisk() async {
+        await diskQueue?.value
+    }
+
+    @discardableResult
+    private func enqueue(_ operation: @escaping @Sendable () async -> Void) -> Task<Void, Never> {
+        let previous = diskQueue
+        let task = Task {
+            await previous?.value
+            await operation()
+        }
+        diskQueue = task
+        return task
     }
 }

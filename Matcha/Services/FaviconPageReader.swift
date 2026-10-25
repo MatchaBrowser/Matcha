@@ -5,16 +5,21 @@ import WebKit
 /// context: its cookies, the certificate the user accepted, this Mac's local network. An icon behind a sign-in or on
 /// a home server is found as the page shows it. An SVG icon is drawn into a bitmap by WebKit, in its sandboxed process:
 /// the app's process still only decodes bitmaps (`FaviconDecoder`, audit W8). A cross-origin icon that the website
-/// doesn't share is left to the download without cookies (`FaviconService.fetchIcon`).
+/// doesn't share is left to the download without cookies (`FaviconService.fetchIcon`). An icon that doesn't answer
+/// stops after `requestTimeout`, the whole reading after `timeout` (review SV2).
 nonisolated enum FaviconPageReader {
     /// Side of an SVG icon drawn into a bitmap, in pixels.
     static let drawnSide = 128
+    /// Longest wait for one icon, in milliseconds.
+    static let requestTimeout = 5000
+    /// Longest wait for the whole reading.
+    static let timeout = Duration.seconds(15)
 
     /// JavaScript function body: the first of `urls` that loads, as base 64 (an SVG drawn as PNG); null if none does.
     static let script = """
     for (const href of urls) {
         try {
-            const response = await fetch(href, { credentials: 'include' });
+            const response = await fetch(href, { credentials: 'include', signal: AbortSignal.timeout(requestTimeout) });
             if (!response.ok) {
                 continue;
             }
@@ -51,14 +56,24 @@ nonisolated enum FaviconPageReader {
     return null;
     """
 
-    /// The first icon of `urls` that the page displayed in `webView` can load; nil if none.
+    /// The first icon of `urls` that the page displayed in `webView` can load; nil if none, or after `timeout` (a page
+    /// process that never answers).
     @MainActor
     static func read(_ urls: [URL], from webView: WKWebView, maximumSize: Int) async -> Data? {
         guard !urls.isEmpty else {
             return nil
         }
-        let arguments: [String: Any] = ["urls": urls.map(\.absoluteString), "maximum": maximumSize, "side": drawnSide]
-        let result = try? await webView.callAsyncJavaScript(script, arguments: arguments, contentWorld: .defaultClient)
-        return (result as? String).flatMap { Data(base64Encoded: $0) }
+        let arguments: [String: Any] = [
+            "urls": urls.map(\.absoluteString),
+            "maximum": maximumSize,
+            "side": drawnSide,
+            "requestTimeout": requestTimeout,
+        ]
+        let result = await CallbackTimeout.value(timeout: timeout, fallback: nil as String?) { done in
+            webView.callAsyncJavaScript(script, arguments: arguments, in: nil, in: .defaultClient) { result in
+                done(try? result.get() as? String)
+            }
+        }
+        return result.flatMap { Data(base64Encoded: $0) }
     }
 }

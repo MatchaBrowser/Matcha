@@ -23,7 +23,8 @@ struct ImportSummary: Equatable {
 /// Imports an Arc sidebar (task 7.1): each Arc Space becomes a new Space (name, icon, colors, pinned tabs and folders,
 /// and its open tabs if requested), the profiles added in Arc become profiles, the favorites join those of their
 /// profile (without duplicate addresses). The new Spaces are saved with their content, then opened; the favorites of an
-/// already open profile join those of its Spaces (`favoritesManager`), which share them.
+/// already open profile join those of its Spaces (`favoritesManager`), which share them; those of a profile without an
+/// open Space are saved directly, like those of a created profile (review SV8).
 @MainActor
 struct ArcImporter {
     let session: BrowserSession
@@ -37,8 +38,10 @@ struct ArcImporter {
         let target = session.profiles.first { $0.id == options.profileID } ?? session.profiles.first
         let (profiles, created) = resolveProfiles(of: sidebar, defaultProfile: target, context: context)
         summary.profiles = created.count
-        // Favorites of the created profiles: saved before their Spaces open, which will read them.
-        summary.favorites = insertFavorites(sidebar.favorites, profiles: profiles, only: created, context: context)
+        // Favorites of the profiles without an open Space (created ones included): saved before their Spaces open,
+        // which will read them.
+        let closed = profiles.values.filter { session.favoritesManager(of: $0.id) == nil }
+        summary.favorites = insertFavorites(sidebar.favorites, profiles: profiles, only: closed, context: context)
         // Spaces: one per Arc Space, and an empty Space for a created profile that has none.
         var records: [SpaceRecord] = []
         for arcSpace in sidebar.spaces {
@@ -49,11 +52,15 @@ struct ArcImporter {
             if let theme = ArcAppearance.theme(for: arcSpace.colors) {
                 record.themeData = theme.encoded()
             }
-            insert(arcSpace.pinned, in: record, folder: nil, context: context, summary: &summary)
+            var content = SpaceContent()
+            insert(arcSpace.pinned, folder: nil, context: context, into: &content, summary: &summary)
             if options.includesOpenTabs {
-                insertOpenTabs(ImportNode.flattenedTabs(of: arcSpace.openTabs), in: record, context: context)
+                content.tabs += openTabs(ImportNode.flattenedTabs(of: arcSpace.openTabs), context: context)
                 summary.tabs += ImportNode.tabCount(of: arcSpace.openTabs)
             }
+            // Attached from the Space, all at once: tab by tab, each one updated the whole list (review SV9).
+            record.tabs = content.tabs
+            record.folders = content.folders
             records.append(record)
         }
         for profile in created where !records.contains(where: { $0.profile === profile }) {
@@ -65,7 +72,7 @@ struct ArcImporter {
         }
         let opened = records.map(session.openSpace)
         summary.spaces = opened.count
-        summary.favorites += importFavorites(sidebar.favorites, profiles: profiles, skipping: created)
+        summary.favorites += importFavorites(sidebar.favorites, profiles: profiles, skipping: closed)
         Logger.imports.info(
             "Arc import: \(summary.spaces, privacy: .public) Spaces, \(summary.tabs, privacy: .public) tabs",
         )
@@ -100,20 +107,24 @@ struct ArcImporter {
 
     // MARK: Records
 
-    /// Favorites of the `only` profiles, saved directly (their Spaces are not open yet). Returns their number.
+    /// Favorites of the `only` profiles, saved directly (their Spaces are not open yet): at the end of their favorites,
+    /// without the addresses already there. Returns their number.
     private func insertFavorites(
         _ favorites: [ArcSidebar.Profile: [ImportedTab]],
         profiles: [ArcSidebar.Profile: ProfileRecord],
-        only created: [ProfileRecord],
+        only closed: [ProfileRecord],
         context: ModelContext,
     ) -> Int {
         var count = 0
         for (key, tabs) in favorites {
-            guard let profile = profiles[key], created.contains(where: { $0 === profile }) else {
+            guard let profile = profiles[key], closed.contains(where: { $0 === profile }) else {
                 continue
             }
-            for (order, tab) in Self.withoutDuplicates(tabs).enumerated() {
-                let record = TabRecord(url: tab.url, title: tab.title, place: .favorite, order: order)
+            let existing = profile.favorites ?? []
+            let present = Set(existing.compactMap { $0.pinnedURL ?? $0.url })
+            let first = (existing.map(\.order).max() ?? -1) + 1
+            for (offset, tab) in Self.withoutDuplicates(tabs).filter({ !present.contains($0.url) }).enumerated() {
+                let record = TabRecord(url: tab.url, title: tab.title, place: .favorite, order: first + offset)
                 context.insert(record)
                 record.pinnedURL = tab.url
                 record.pinnedTitle = tab.title
@@ -125,14 +136,20 @@ struct ArcImporter {
         return count
     }
 
-    /// Arc's open tabs, among the Today tabs of the Space.
-    private func insertOpenTabs(_ tabs: [ImportedTab], in space: SpaceRecord, context: ModelContext) {
-        for (order, tab) in tabs.enumerated() {
+    /// Arc's open tabs, for the Today tabs of the Space.
+    private func openTabs(_ tabs: [ImportedTab], context: ModelContext) -> [TabRecord] {
+        tabs.enumerated().map { order, tab in
             let record = TabRecord(url: tab.url, title: tab.title, place: .today, order: order)
             context.insert(record)
-            record.space = space
             record.lastActivity = .distantPast
+            return record
         }
+    }
+
+    /// Tabs and folders made for a Space, attached to it at the end.
+    private struct SpaceContent {
+        var tabs: [TabRecord] = []
+        var folders: [FolderRecord] = []
     }
 
     /// New Space at the end, with the icon and theme a Space added by hand would have (then replaced by Arc's if it has
@@ -151,14 +168,16 @@ struct ArcImporter {
         return record
     }
 
-    /// Pinned tabs and folders, in order (tabs and folders of the same container share their index).
+    /// Pinned tabs and folders, in order (tabs and folders of the same container share their index); the tabs of a
+    /// folder are attached to it at once.
     private func insert(
         _ nodes: [ImportNode],
-        in space: SpaceRecord,
         folder: FolderRecord?,
         context: ModelContext,
+        into content: inout SpaceContent,
         summary: inout ImportSummary,
     ) {
+        var folderTabs: [TabRecord] = []
         for (order, node) in nodes.enumerated() {
             switch node {
             case let .tab(tab):
@@ -166,20 +185,21 @@ struct ArcImporter {
                 context.insert(record)
                 record.pinnedURL = tab.url
                 record.pinnedTitle = tab.title
-                record.space = space
-                record.folder = folder
                 record.lastActivity = .distantPast
+                content.tabs.append(record)
+                folderTabs.append(record)
                 summary.tabs += 1
             case let .folder(name, children):
                 let trimmed = name.trimmingCharacters(in: .whitespacesAndNewlines)
                 let record = FolderRecord(name: trimmed.isEmpty ? String(localized: "New Folder") : trimmed, order: order)
                 context.insert(record)
-                record.space = space
                 record.parent = folder
+                content.folders.append(record)
                 summary.folders += 1
-                insert(children, in: space, folder: record, context: context, summary: &summary)
+                insert(children, folder: record, context: context, into: &content, summary: &summary)
             }
         }
+        folder?.tabs = folderTabs
     }
 
     /// Favorites of the profiles already there: at the end of their favorites, without the addresses already in

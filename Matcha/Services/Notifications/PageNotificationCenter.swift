@@ -9,7 +9,8 @@ protocol PageNotificationRevealing: AnyObject {
 }
 
 /// Notifications of the pages (`PageNotificationScript`), shown by macOS (`SystemNotifications`): the website as
-/// subtitle, grouped by website; a tag replaces the website's previous notification with the same tag. A click brings
+/// subtitle, grouped by website and profile; a tag replaces the previous notification with the same tag of the same
+/// website in the same profile, never another profile's (review SV7). A click brings
 /// the page back to the front (`revealer`), then gives it the `click` event. Also prepares, page by page, the decisions
 /// the script reads at the start of each document. Made once for the app (`AppEnvironment`).
 @MainActor
@@ -23,6 +24,13 @@ final class PageNotificationCenter {
     private var delivered: [Delivered] = []
     /// Last decisions given to the script of each page (content controller).
     private let preparedStates = NSMapTable<WKUserContentController, PreparedStates>.weakToStrongObjects()
+
+    /// Where a notification comes from: its page, its web view and the frame that sent it.
+    struct Sender {
+        let page: BrowserTab
+        let webView: WKWebView
+        let frame: WKFrameInfo
+    }
 
     private struct Delivered {
         let identifier: String
@@ -73,37 +81,43 @@ final class PageNotificationCenter {
         await system.requestAuthorization()
     }
 
-    /// Shows `content`, sent by `frame` of `page` (website `origin`); false if macOS refuses (notifications of Matcha
-    /// turned off in System Settings).
-    func post(
-        _ content: PageNotificationContent,
-        origin: SiteOrigin,
-        page: BrowserTab,
-        webView: WKWebView,
-        frame: WKFrameInfo,
-    ) async -> Bool {
+    /// Shows `content`, sent by `sender` (website `origin`, profile `profileID`); false if macOS refuses (notifications
+    /// of Matcha turned off in System Settings).
+    func post(_ content: PageNotificationContent, origin: SiteOrigin, profileID: UUID?, from sender: Sender) async -> Bool {
         guard await system.requestAuthorization() else {
             Logger.notifications.notice("Notification not shown: turned off for Matcha")
             return false
         }
-        // The tag belongs to the website: another one can't replace its notifications.
-        let identifier = content.tag.isEmpty ? UUID().uuidString : "\(origin.key)#\(content.tag)"
+        // The tag belongs to the website in its profile: another website or profile can't replace its notifications.
+        let thread = Self.threadIdentifier(origin: origin, profileID: profileID)
+        let identifier = content.tag.isEmpty ? UUID().uuidString : "\(thread)#\(content.tag)"
         do {
             try await system.add(SystemNotification(
                 identifier: identifier,
                 title: content.title,
                 subtitle: origin.displayName,
                 body: content.body,
-                threadIdentifier: origin.key,
+                threadIdentifier: thread,
                 isSilent: content.isSilent,
             ))
         } catch {
             Logger.notifications.error("Notification not shown: \(error.logSummary, privacy: .public)")
             return false
         }
-        track(Delivered(identifier: identifier, scriptID: content.scriptID, page: page, webView: webView, frame: frame))
+        track(Delivered(
+            identifier: identifier,
+            scriptID: content.scriptID,
+            page: sender.page,
+            webView: sender.webView,
+            frame: sender.frame,
+        ))
         Logger.notifications.info("Notification shown (\(origin.displayHost, privacy: .private))")
         return true
+    }
+
+    /// Group of the notifications of `origin` in profile `profileID`.
+    static func threadIdentifier(origin: SiteOrigin, profileID: UUID?) -> String {
+        "\(profileID?.uuidString ?? "default") \(origin.key)"
     }
 
     /// `notification.close()` in the page of `webView`.

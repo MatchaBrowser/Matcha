@@ -6,7 +6,8 @@ import WebKit
 nonisolated enum WebsiteDataMatcher {
     /// True if record `recordName` (its `displayName`: usually the registrable domain, “google.com”, or a whole host,
     /// “localhost”) covers `host` (“mail.google.com”): same host, or a host under this domain. Another website that
-    /// only shares a suffix (“notgoogle.com”) is never targeted.
+    /// only shares a suffix (“notgoogle.com”) is never targeted. Neither loses its “www.”: “www.google.com” is already
+    /// under “google.com”, and a record named “www.com” covered every `.com` website (review SV4).
     static func matches(recordName: String, host: String) -> Bool {
         let name = normalized(recordName)
         let host = normalized(host)
@@ -21,7 +22,7 @@ nonisolated enum WebsiteDataMatcher {
         if value.hasSuffix(".") {
             value.removeLast()
         }
-        return value.hasPrefix("www.") ? String(value.dropFirst(4)) : value
+        return value
     }
 }
 

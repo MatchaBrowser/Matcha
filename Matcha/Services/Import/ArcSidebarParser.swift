@@ -13,7 +13,8 @@ import Foundation
 /// than `maximumDepth` and items beyond `maximumItems` are skipped. Pure type.
 nonisolated enum ArcSidebarParser {
     static let maximumDepth = 32
-    static let maximumItems = 50000
+    /// Most items read: the import is made on the main thread, about 2 s for 10,000 items in Debug (review SV9).
+    static let maximumItems = 10000
 
     enum Failure: Error, Equatable {
         /// Not a JSON object.
@@ -42,7 +43,7 @@ nonisolated enum ArcSidebarParser {
                 favorites[profile(from: key), default: []].append(contentsOf: tabs)
             }
         }
-        return ArcSidebar(spaces: spaces, favorites: favorites, skippedItems: reader.skipped)
+        return ArcSidebar(spaces: spaces, favorites: favorites, skippedItems: reader.skipped, itemsBeyondLimit: reader.beyondLimit)
     }
 
     // MARK: Reading
@@ -50,6 +51,7 @@ nonisolated enum ArcSidebarParser {
     private struct Reader {
         let items: [String: [String: Any]]
         var skipped = 0
+        var beyondLimit = 0
         private var visited: Set<String> = []
         private var depth = 0
         private var read = 0
@@ -93,7 +95,7 @@ nonisolated enum ArcSidebarParser {
             }
             read += 1
             guard read <= ArcSidebarParser.maximumItems else {
-                skipped += 1
+                beyondLimit += 1
                 return []
             }
             let data = item["data"] as? [String: Any] ?? [:]
