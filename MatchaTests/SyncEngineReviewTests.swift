@@ -51,6 +51,8 @@ private struct FailingTransport: SyncTransport {
 private final class Hook {
     var action: (() -> Void)?
 
+    nonisolated init() {}
+
     func run() {
         let action = action
         self.action = nil
@@ -58,8 +60,9 @@ private final class Hook {
     }
 }
 
-/// Transport whose clock lead is `lead`, and which runs `hook` before reading changes.
-private struct ScriptedTransport: SyncTransport {
+/// Transport whose clock lead is `lead`, and which runs `hook` before reading changes. Explicitly nonisolated: the
+/// inferred isolation differs between compilers (the CI's and Xcode's).
+private nonisolated struct ScriptedTransport: SyncTransport {
     let server: InMemorySyncServer
     var lead: TimeInterval?
     var hook = Hook()
@@ -70,7 +73,7 @@ private struct ScriptedTransport: SyncTransport {
     }
 
     func changes(since cursor: String?) async throws -> SyncChangePage {
-        hook.run()
+        await hook.run()
         return try await server.changes(since: cursor)
     }
 
