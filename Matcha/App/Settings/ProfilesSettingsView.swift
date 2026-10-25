@@ -66,10 +66,16 @@ private struct ProfileRow: View {
             TextField("Profile name", text: $name)
                 .labelsHidden()
                 .focused($isEditing)
-                .onSubmit { session.renameProfile(profile, to: name) }
+                .onSubmit(rename)
                 .onChange(of: isEditing) { _, editing in
                     if !editing {
-                        session.renameProfile(profile, to: name)
+                        rename()
+                    }
+                }
+                // A renaming received from another Mac shows, outside an edit (review SY31).
+                .onChange(of: profile.name) { _, received in
+                    if !isEditing {
+                        name = received
                     }
                 }
                 .accessibilityIdentifier("profileNameField")
@@ -82,5 +88,12 @@ private struct ProfileRow: View {
                 .disabled(session.profiles.count <= 1)
         }
         .onAppear { name = profile.name }
+    }
+
+    /// Only a name changed here: leaving the field without typing sends nothing to the other Macs.
+    private func rename() {
+        if name != profile.name {
+            session.renameProfile(profile, to: name)
+        }
     }
 }

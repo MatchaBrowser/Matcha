@@ -11,6 +11,14 @@ struct SyncPasswordStrengthTests {
         #expect(!SyncPasswordStrength("aaaaaaaaaaaa").isAcceptable)
     }
 
+    /// Review SY20: a common word, a year and a typical suffix make a weak password, whatever its length.
+    @Test func `common words and years count as one guess`() {
+        #expect(SyncPasswordStrength("Matcha2026!!") == .weak)
+        #expect(SyncPasswordStrength("Password1990?") == .weak)
+        #expect(SyncPasswordStrength("Soleil2025!!") == .weak)
+        #expect(SyncPasswordStrength("Kq7!vR2#mT9z") >= .fair)
+    }
+
     @Test func `long and varied passwords are strong`() {
         #expect(SyncPasswordStrength("Café crème, 2026 !") >= .good)
         #expect(SyncPasswordStrength("correct horse battery staple") >= .good)

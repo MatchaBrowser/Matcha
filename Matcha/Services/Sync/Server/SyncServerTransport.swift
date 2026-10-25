@@ -50,10 +50,7 @@ nonisolated struct SyncServerTransport: SyncTransport {
         } catch let error as SyncServerError where error.code == SyncServerError.requestTooLarge {
             throw SyncTransportError.batchTooLarge
         }
-        guard response.results.count == batch.changes.count else {
-            throw SyncClientError.unreadableAnswer
-        }
-        return response.results.map { result in
+        return try Self.results(response.results, for: batch.changes).map { result in
             switch result.status {
             case "applied":
                 guard let version = result.version else {
@@ -65,6 +62,27 @@ nonisolated struct SyncServerTransport: SyncTransport {
             default:
                 return .rejected(code: result.code ?? SyncRejectionCode.invalidPayload)
             }
+        }
+    }
+
+    /// The server's result for each change, matched by identifier, never by position (review SY2): a result for
+    /// another change, or a current record of another identifier, would apply one record's content under another
+    /// (`SYNC.md` § 3.9). One result per change, nothing more: otherwise the answer is unreadable.
+    static func results(_ results: [SyncServerPushResult], for changes: [SyncOutgoingChange]) throws -> [SyncServerPushResult] {
+        var byID: [UUID: SyncServerPushResult] = [:]
+        for result in results {
+            guard let id = result.id, byID.updateValue(result, forKey: id) == nil, result.current.map({ $0.id == id }) ?? true else {
+                throw SyncClientError.unreadableAnswer
+            }
+        }
+        guard byID.count == changes.count else {
+            throw SyncClientError.unreadableAnswer
+        }
+        return try changes.map { change in
+            guard let result = byID[change.id] else {
+                throw SyncClientError.unreadableAnswer
+            }
+            return result
         }
     }
 
@@ -83,6 +101,15 @@ nonisolated struct SyncServerTransport: SyncTransport {
 
     func deleteBlob(id: UUID) async throws {
         try await client.deleteBlob(id: id)
+    }
+
+    /// From the last answer's `Date` header; before any answer (first cycle after a launch), from `GET /v1/server`.
+    func clockLead() async -> TimeInterval? {
+        if let offset = await client.clock.offset {
+            return offset
+        }
+        _ = try? await client.server()
+        return await client.clock.offset
     }
 
     /// The record with its decrypted content; nil content if it can't be opened or read: it is then ignored, never

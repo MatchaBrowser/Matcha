@@ -1,3 +1,4 @@
+import AppKit
 import CoreGraphics
 import CryptoKit
 import Foundation
@@ -43,6 +44,11 @@ final class SyncService {
     /// Data of this Mac as the running engine sees it.
     @ObservationIgnored var store: MatchaSyncStore?
     @ObservationIgnored var eventStream: SyncEventStream?
+    /// Work of the signed-in account (server description, avatar): cancelled with it, never written to another
+    /// account (review SY24).
+    @ObservationIgnored var accountTasks: [Task<Void, Never>] = []
+    /// Waits for the app's activation to start again after the keychain refused (locked at launch, review SY22).
+    @ObservationIgnored var activationObserver: (any NSObjectProtocol)?
     /// Keys of `UserDefaults` whose change is a change of this Mac.
     @ObservationIgnored var watchedKeys = SyncedSettings.keys + [SiteZoomStore.defaultsKey, ExtensionStateStore.defaultsKey]
 
@@ -90,9 +96,12 @@ final class SyncService {
 
     // MARK: Launch
 
-    /// Starts sync at launch if this Mac is signed in; a copy of another Mac signs out first.
+    /// Starts sync at launch if this Mac is signed in; a copy of another Mac signs out first. The states no longer
+    /// used are cleaned up in any case (review SY35).
     func start(session: BrowserSession) {
         self.session = session
+        let current = configuration.server.flatMap { server in configuration.accountID.flatMap { stateURL(server: server, accountID: $0) } }
+        removeUnusedStates(keeping: current)
         guard configuration.mode == .privateServer, configuration.signedOutReason == nil, let server = configuration.server,
               let accountID = configuration.accountID
         else {
@@ -119,27 +128,11 @@ final class SyncService {
                 deviceID: device.id,
             )
         } catch {
-            // Keychain locked or refused: an error, not a sign-out; sync waits for the next launch.
+            // Keychain locked or refused: an error, not a sign-out; sync tries again when the app becomes active.
             Logger.sync.error("Sync not started: \(error.logSummary, privacy: .public)")
             lastError = error
+            startAgainOnActivation()
         }
-    }
-
-    /// The account kept in the keychain: its key and its tokens; nil if one is missing.
-    func storedCredentials(server: SyncServerAddress, accountID: UUID) throws -> (accountKey: SymmetricKey, tokens: SyncRefreshResponse)? {
-        guard let accountKey = try keychain.data(for: .accountKey, server: server, accountID: accountID),
-              let access = try keychain.data(for: .accessToken, server: server, accountID: accountID).flatMap({ String(
-                  bytes: $0,
-                  encoding: .utf8,
-              ) }),
-              let refresh = try keychain.data(for: .refreshToken, server: server, accountID: accountID).flatMap({ String(
-                  bytes: $0,
-                  encoding: .utf8,
-              ) })
-        else {
-            return nil
-        }
-        return (SymmetricKey(data: accountKey), SyncRefreshResponse(accessToken: access, refreshToken: refresh))
     }
 
     // MARK: Running
@@ -174,6 +167,11 @@ final class SyncService {
             device: device,
         )
         self.store = localStore
+        // This account's extensions only (review SY11); the single file of earlier versions becomes its own.
+        extensions?.synced.use(
+            url: extensionsURL(server: server, accountID: accountID),
+            legacy: directory?.appendingPathComponent("extensions.json"),
+        )
         let engine = SyncEngine(
             store: localStore,
             transport: SyncServerTransport(client: client, accountKey: accountKey, server: info),
@@ -193,14 +191,17 @@ final class SyncService {
         coordinator.start(observing: session.container.mainContext, defaults: defaults, watchedKeys: watchedKeys)
         startEventStream(client: client, info: info)
         removeUnusedStates(keeping: stateURL(server: server, accountID: accountID))
-        Task {
+        accountTasks.append(Task {
             await refreshServerInfo()
             await refreshAvatar()
-        }
+        })
     }
 
     /// Stops the engine and the event stream; a running cycle is cancelled (its state is saved after each step).
     func deactivate() {
+        stopWaitingForActivation()
+        accountTasks.forEach { $0.cancel() }
+        accountTasks = []
         coordinator?.stop()
         coordinator = nil
         store = nil
@@ -229,7 +230,7 @@ final class SyncService {
 
     /// The server's description, read again at each start (limits, events, packages).
     private func refreshServerInfo() async {
-        guard let client, let info = try? await client.server(), info.api == 1 else {
+        guard let client, let info = try? await client.server(), info.api == 1, !Task.isCancelled, self.client === client else {
             return
         }
         let hadEvents = configuration.serverInfo?.hasEvents == true
@@ -251,11 +252,12 @@ final class SyncService {
                 return
             }
             if let wait = error.retryAfter {
-                coordinator?.syncSoon(after: .seconds(wait))
+                coordinator?.wait(until: .now.addingTimeInterval(wait))
             }
         }
+        // Renewed tokens the keychain refused: written again (review SY4).
+        await client?.tokens?.saveIfNeeded()
         clockOffset = await client?.clock.offset
-        coordinator?.engine.isSendingPaused = (clockOffset ?? 0) > Self.maximumClockLead
         // No event announces a new avatar: it is read with the account, at most every 15 minutes (SYNC.md § 4.4).
         if avatarCheckedAt.map({ Date.now.timeIntervalSince($0) > 15 * 60 }) ?? true {
             await refreshAvatar()
@@ -284,6 +286,9 @@ final class SyncService {
         deactivate()
         if deletesState, let server = configuration.server, let accountID = configuration.accountID {
             SyncStateFile(url: stateURL(server: server, accountID: accountID)).delete()
+            extensions?.synced.forget()
+        } else {
+            extensions?.synced.use(url: nil)
         }
         if let reason {
             configuration.signedOutReason = reason

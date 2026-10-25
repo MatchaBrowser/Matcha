@@ -36,3 +36,23 @@ nonisolated struct SyncedPackage: Codable, Equatable, Sendable {
         self.fileName = fileName
     }
 }
+
+/// A package that couldn't be sent, for one version of an extension (review SY16): too large, it isn't tried again for
+/// this version; refused by the server, it waits 1 minute, doubled at each attempt, 6 hours at most. Pure type.
+nonisolated struct SyncedPackageFailure: Codable, Equatable, Sendable {
+    static let firstDelay: TimeInterval = 60
+    static let maximumDelay: TimeInterval = 6 * 60 * 60
+
+    var version: String?
+    var isTooLarge: Bool
+    var attempts: Int
+    var failedAt: Date
+
+    func allowsAttempt(at now: Date) -> Bool {
+        guard !isTooLarge else {
+            return false
+        }
+        let delay = min(Self.firstDelay * pow(2, Double(max(attempts - 1, 0))), Self.maximumDelay)
+        return now >= failedAt.addingTimeInterval(delay)
+    }
+}

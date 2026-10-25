@@ -19,7 +19,7 @@ nonisolated enum SyncCoding {
             let container = try decoder.singleValueContainer()
             let text = try container.decode(String.self)
             guard let date = date(from: text) else {
-                throw DecodingError.dataCorruptedError(in: container, debugDescription: "Date illisible")
+                throw DecodingError.dataCorruptedError(in: container, debugDescription: "Unreadable date")
             }
             return date
         }

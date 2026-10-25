@@ -32,6 +32,12 @@ nonisolated struct SyncConfiguration: Codable, Equatable, Sendable {
     var signedOutReason: SignedOutReason?
     /// Date of the account's avatar kept in cache: downloaded again only when the server announces another one.
     var avatarUpdatedAt: Date?
+    /// Date of an avatar that couldn't be read: not downloaded again until the server announces another one (review
+    /// SY37).
+    var unreadableAvatarAt: Date?
+    /// A new recovery key was made and its kit not saved yet: the old key no longer works (review SY12). Kept across
+    /// launches; the settings ask for a new kit.
+    var isRecoveryKitUnsaved = false
 
     init() {}
 
@@ -44,6 +50,8 @@ nonisolated struct SyncConfiguration: Codable, Equatable, Sendable {
         serverInfo = container.lenient(SyncServerInfo.self, forKey: .serverInfo)
         signedOutReason = container.lenient(SignedOutReason.self, forKey: .signedOutReason)
         avatarUpdatedAt = container.lenient(Date.self, forKey: .avatarUpdatedAt)
+        unreadableAvatarAt = container.lenient(Date.self, forKey: .unreadableAvatarAt)
+        isRecoveryKitUnsaved = container.lenient(Bool.self, forKey: .isRecoveryKitUnsaved) ?? false
     }
 
     static func load(from defaults: UserDefaults) -> SyncConfiguration {

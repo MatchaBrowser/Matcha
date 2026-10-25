@@ -12,11 +12,18 @@ nonisolated struct SyncClock: Codable, Equatable, Sendable {
     private(set) var latest: Int64 = 0
 
     /// Date of a new modification: the Mac's time, or 1 ms after the latest known date and after `replaced` (date of
-    /// the content it replaces).
+    /// the content it replaces). A replaced date more than 24 hours ahead dates this modification only: the clock
+    /// doesn't follow it, so the next modifications of this Mac aren't dated in the future too (review SY8).
     mutating func next(now: Date = .now, after replaced: Date? = nil) -> Date {
+        let current = SyncCoding.milliseconds(of: now)
         let floor = replaced.map { SyncCoding.milliseconds(of: $0) + 1 } ?? Int64.min
-        latest = max(SyncCoding.milliseconds(of: now), latest + 1, floor)
-        return SyncCoding.date(milliseconds: latest)
+        let candidate = max(current, latest + 1)
+        guard floor > candidate else {
+            latest = candidate
+            return SyncCoding.date(milliseconds: candidate)
+        }
+        latest = floor <= current + Int64(Self.maximumLead * 1000) ? floor : candidate
+        return SyncCoding.date(milliseconds: floor)
     }
 
     /// Date of a received modification; false if it is too far ahead of this Mac to be taken into account.

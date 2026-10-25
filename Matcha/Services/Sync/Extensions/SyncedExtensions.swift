@@ -4,7 +4,8 @@ import OSLog
 
 /// What extension sync remembers on this Mac (task 7.4), in a JSON file (in memory without a file): packages sent or
 /// received, extensions from the other Macs awaiting the user's consent, those the user ignored, packages to delete
-/// from the server.
+/// from the server. One file per server and account, read when its sync starts (`use(url:)`), deleted when the user
+/// signs out (review SY11).
 @MainActor
 @Observable
 final class SyncedExtensions {
@@ -16,6 +17,8 @@ final class SyncedExtensions {
         var ignoredUpdates: [String: String] = [:]
         var obsoleteBlobs: [UUID] = []
         var names: [String: String] = [:]
+        var packageFailures: [String: SyncedPackageFailure] = [:]
+        var adopted: Set<String> = []
 
         init(
             packages: [String: SyncedPackage],
@@ -24,6 +27,8 @@ final class SyncedExtensions {
             ignoredUpdates: [String: String],
             obsoleteBlobs: [UUID],
             names: [String: String],
+            packageFailures: [String: SyncedPackageFailure],
+            adopted: Set<String>,
         ) {
             self.packages = packages
             self.offers = offers
@@ -31,6 +36,8 @@ final class SyncedExtensions {
             self.ignoredUpdates = ignoredUpdates
             self.obsoleteBlobs = obsoleteBlobs
             self.names = names
+            self.packageFailures = packageFailures
+            self.adopted = adopted
         }
 
         init(from decoder: any Decoder) throws {
@@ -41,6 +48,8 @@ final class SyncedExtensions {
             ignoredUpdates = container.lenient([String: String].self, forKey: .ignoredUpdates) ?? [:]
             obsoleteBlobs = container.lenient([UUID].self, forKey: .obsoleteBlobs) ?? []
             names = container.lenient([String: String].self, forKey: .names) ?? [:]
+            packageFailures = container.lenient([String: SyncedPackageFailure].self, forKey: .packageFailures) ?? [:]
+            adopted = container.lenient(Set<String>.self, forKey: .adopted) ?? []
         }
     }
 
@@ -74,7 +83,18 @@ final class SyncedExtensions {
         didSet { save() }
     }
 
-    @ObservationIgnored private let url: URL?
+    /// Packages that couldn't be sent, by extension (review SY16).
+    var packageFailures: [String: SyncedPackageFailure] = [:] {
+        didSet { save() }
+    }
+
+    /// Extensions just installed from an offer: their state here becomes the reference of their record, so their
+    /// first sync sends nothing back (review SY1).
+    var adopted: Set<String> = [] {
+        didSet { save() }
+    }
+
+    @ObservationIgnored private var url: URL?
     @ObservationIgnored private var isLoading = false
 
     /// The saved state; nil without a file, or for one that can't be read, which is logged (review TR4).
@@ -91,16 +111,43 @@ final class SyncedExtensions {
 
     init(url: URL?) {
         self.url = url
-        guard let url, let saved = Self.saved(at: url) else {
-            return
+        load(url.flatMap(Self.saved(at:)))
+    }
+
+    /// The file of the account whose sync starts: read, or empty. `legacy`, the single file of earlier versions, becomes
+    /// the file of the first account that starts.
+    func use(url newURL: URL?, legacy: URL? = nil) {
+        let files = FileManager.default
+        if let newURL, let legacy, !files.fileExists(atPath: newURL.path), files.fileExists(atPath: legacy.path) {
+            do {
+                try files.moveItem(at: legacy, to: newURL)
+            } catch {
+                Logger.sync.error("Synced extensions not moved: \(error.logSummary, privacy: .public)")
+            }
         }
+        url = newURL
+        load(newURL.flatMap(Self.saved(at:)))
+    }
+
+    /// Forgets everything and deletes the file: the user signed out (package keys included).
+    func forget() {
+        if let url {
+            try? FileManager.default.removeItem(at: url)
+        }
+        url = nil
+        load(nil)
+    }
+
+    private func load(_ saved: Saved?) {
         isLoading = true
-        packages = saved.packages
-        offers = saved.offers
-        ignored = saved.ignored
-        ignoredUpdates = saved.ignoredUpdates
-        obsoleteBlobs = saved.obsoleteBlobs
-        names = saved.names
+        packages = saved?.packages ?? [:]
+        offers = saved?.offers ?? [:]
+        ignored = saved?.ignored ?? []
+        ignoredUpdates = saved?.ignoredUpdates ?? [:]
+        obsoleteBlobs = saved?.obsoleteBlobs ?? []
+        names = saved?.names ?? [:]
+        packageFailures = saved?.packageFailures ?? [:]
+        adopted = saved?.adopted ?? []
         isLoading = false
     }
 
@@ -120,6 +167,8 @@ final class SyncedExtensions {
             ignoredUpdates: ignoredUpdates,
             obsoleteBlobs: obsoleteBlobs,
             names: names,
+            packageFailures: packageFailures,
+            adopted: adopted,
         )
         do {
             try FileManager.default.createDirectory(at: url.deletingLastPathComponent(), withIntermediateDirectories: true)

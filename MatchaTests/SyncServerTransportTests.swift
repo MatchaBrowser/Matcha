@@ -157,4 +157,43 @@ struct SyncServerTransportTests {
         let batch = try transport.prepare([SyncOutgoingChange(id: UUID(), baseVersion: nil, content: content)])
         await #expect(throws: SyncTransportError.batchTooLarge) { try await transport.push(batch) }
     }
+
+    /// Review SY2: the results are matched by identifier; another record's result, or a current record of another
+    /// identifier, makes the answer unreadable.
+    @Test func `push results are matched by identifier, never by position`() throws {
+        let content = SyncContent(fields: .profile(SyncProfileFields(name: "P", order: 0)), modifiedAt: .now, modifiedBy: UUID())
+        let first = SyncOutgoingChange(id: UUID(), baseVersion: nil, content: content)
+        let second = SyncOutgoingChange(id: UUID(), baseVersion: 3, content: content)
+        func result(_ id: UUID?, current: UUID? = nil) -> SyncServerPushResult {
+            SyncServerPushResult(
+                id: id,
+                status: current == nil ? "applied" : "conflict",
+                version: 4,
+                current: current.map { SyncServerRecord(id: $0, version: 4, payload: "") },
+            )
+        }
+        let reversed = try SyncServerTransport.results([result(second.id), result(first.id)], for: [first, second])
+        #expect(reversed.map(\.id) == [first.id, second.id])
+        #expect(try SyncServerTransport.results([result(first.id), result(second.id, current: second.id)], for: [first, second]).count == 2)
+
+        let wrong: [[SyncServerPushResult]] = [
+            [result(first.id)],
+            [result(first.id), result(UUID())],
+            [result(first.id), result(first.id)],
+            [result(first.id), result(nil)],
+            [result(first.id), result(second.id, current: first.id)],
+        ]
+        for results in wrong {
+            #expect(throws: SyncClientError.unreadableAnswer) { try SyncServerTransport.results(results, for: [first, second]) }
+        }
+    }
+
+    /// Review SY21: a redirection is never followed; its answer says the address isn't the API's.
+    @Test func `a redirection is refused`() async throws {
+        let (host, session) = MockURLProtocol.serve { _, _ in
+            MockResponse(status: 307, headers: ["Location": "https://elsewhere.example/api/v1/server"])
+        }
+        let api = try client(host, session)
+        await #expect(throws: SyncClientError.notASyncServer) { try await api.server() }
+    }
 }

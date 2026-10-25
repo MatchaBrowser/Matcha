@@ -70,7 +70,17 @@ extension SyncService {
         return directory?.appendingPathComponent("state-\(name).json")
     }
 
-    /// States no longer used for 60 days: copies in clear text of part of the data, deleted.
+    /// Extensions file of an account (`extensions-<digest>.json`, review SY11).
+    func extensionsURL(server: SyncServerAddress, accountID: UUID) -> URL? {
+        stateURL(server: server, accountID: accountID).map { url in
+            url.deletingLastPathComponent().appendingPathComponent(url.lastPathComponent.replacingOccurrences(
+                of: "state-",
+                with: "extensions-",
+            ))
+        }
+    }
+
+    /// States (and extensions files) no longer used for 60 days: copies in clear text of part of the data, deleted.
     func removeUnusedStates(keeping current: URL?) {
         guard let directory, let files = try? FileManager.default.contentsOfDirectory(
             at: directory,
@@ -79,7 +89,11 @@ extension SyncService {
             return
         }
         let limit = Date.now.addingTimeInterval(-Self.unusedStateLifetime)
-        for file in files where file.lastPathComponent.hasPrefix("state-") && file != current {
+        let kept = current.map { current in
+            [current.lastPathComponent, current.lastPathComponent.replacingOccurrences(of: "state-", with: "extensions-")]
+        } ?? []
+        let isSyncFile = { (name: String) in name.hasPrefix("state-") || name.hasPrefix("extensions-") }
+        for file in files where isSyncFile(file.lastPathComponent) && !kept.contains(file.lastPathComponent) {
             let modified = try? file.resourceValues(forKeys: [.contentModificationDateKey]).contentModificationDate
             if let modified, modified < limit {
                 try? FileManager.default.removeItem(at: file)

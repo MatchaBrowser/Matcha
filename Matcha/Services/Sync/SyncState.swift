@@ -20,8 +20,18 @@ nonisolated struct SyncState: Codable, Equatable, Sendable {
     var mergesWithoutAsking = false
     /// The account's space is full: deletions are sent first, in a batch of their own (`SYNC.md` § 4.6).
     var isQuotaExceeded = false
-    /// A received date was too far in the future to be taken into account by the clock (`SYNC.md` § 2.8).
-    var sawFutureDate = false
+    /// Last time a received date was too far in the future to be taken into account by the clock (`SYNC.md` § 2.8);
+    /// the warning goes away a week later (review SY27).
+    var futureDateSeenAt: Date?
+    /// Received contents accepted but not applied on this Mac yet (a later batch failed, applying threw): applied at
+    /// the next step, never forgotten (review SY6).
+    var toApply: Set<UUID> = []
+
+    /// How long the warning about a date in the future stays.
+    static let futureDateWarningLifetime: TimeInterval = 7 * 24 * 60 * 60
+    /// Deletions and records waiting for their parent are forgotten after this long: the server keeps a deletion 180
+    /// days, and an older cursor reads everything again (`SYNC.md` § 4.6, review SY14).
+    static let tombstoneLifetime: TimeInterval = 180 * 24 * 60 * 60
 
     init(deviceID: UUID = UUID()) {
         self.deviceID = deviceID
@@ -39,7 +49,25 @@ nonisolated struct SyncState: Codable, Equatable, Sendable {
         inFlight = try container.decodeIfPresent(SyncInFlight.self, forKey: .inFlight)
         mergesWithoutAsking = try container.decodeIfPresent(Bool.self, forKey: .mergesWithoutAsking) ?? false
         isQuotaExceeded = try container.decodeIfPresent(Bool.self, forKey: .isQuotaExceeded) ?? false
-        sawFutureDate = try container.decodeIfPresent(Bool.self, forKey: .sawFutureDate) ?? false
+        futureDateSeenAt = try container.decodeIfPresent(Date.self, forKey: .futureDateSeenAt)
+        toApply = try container.decodeIfPresent(Set<UUID>.self, forKey: .toApply) ?? []
+    }
+
+    /// True if one of the account's Macs seems to be ahead: a date in the future was received this week.
+    func showsFutureDateWarning(now: Date = .now) -> Bool {
+        futureDateSeenAt.map { now.timeIntervalSince($0) < Self.futureDateWarningLifetime } ?? false
+    }
+
+    /// Forgets the deletions, and the records waiting for a parent, older than `tombstoneLifetime` (review SY14); a
+    /// pending change keeps its entry.
+    mutating func purgeOldEntries(now: Date = .now) {
+        let limit = now.addingTimeInterval(-Self.tombstoneLifetime)
+        for (id, entry) in entries where pending[id] == nil && !toApply.contains(id) {
+            guard let remote = entry.remote, remote.modifiedAt < limit, remote.deleted || entry.isWaiting else {
+                continue
+            }
+            entries[id] = nil
+        }
     }
 
     /// What this Mac had of `id` at its last sync, or what it is about to send; nil: nothing (absent).

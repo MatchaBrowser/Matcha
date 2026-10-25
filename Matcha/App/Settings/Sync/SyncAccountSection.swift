@@ -46,8 +46,9 @@ struct SyncAccountSection: View {
         } header: {
             Text("Account")
         }
-        .sheet(item: $action) { action in
-            SyncAccountActionSheet(sync: sync, action: action, showKit: showKit)
+        // A new kit is shown once the operation's sheet is gone: one sheet at a time (review SY12).
+        .sheet(item: $action, onDismiss: showPendingKit) { action in
+            SyncAccountActionSheet(sync: sync, action: action)
         }
         .confirmationDialog("Sign out of sync?", isPresented: $confirmsSignOut) {
             Button("Sign Out") {
@@ -55,6 +56,12 @@ struct SyncAccountSection: View {
             }
         } message: {
             Text("Your tabs, Spaces and settings stay on this Mac. They no longer sync with your other Macs.")
+        }
+    }
+
+    private func showPendingKit() {
+        if let kit = sync.pendingRecoveryKit {
+            showKit(kit)
         }
     }
 
@@ -69,7 +76,13 @@ struct SyncAccountSection: View {
             if state.isQuotaExceeded {
                 warnings.append(String(localized: "The account's space is full: new changes wait on this Mac."))
             }
-            if state.sawFutureDate {
+            if sync.configuration.isRecoveryKitUnsaved, sync.pendingRecoveryKit == nil {
+                warnings.append(String(
+                    localized: "Your recovery kit wasn't saved: make a new one in Manage Account.",
+                    comment: "Settings > Sync: warning when a new recovery key was made but its kit wasn't saved",
+                ))
+            }
+            if state.showsFutureDateWarning() {
                 warnings.append(String(localized: "The clock of one of your Macs seems to be ahead."))
             }
             if state.entries.values.contains(where: \.isUnreadable) {

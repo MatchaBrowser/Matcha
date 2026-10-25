@@ -16,26 +16,33 @@ nonisolated enum ZipWriter {
     /// Most entries in an archive without zip64 (a 16-bit count, audit E7).
     static let maximumEntries = Int(UInt16.max)
 
-    /// Archive of the content of `folder`, with paths relative to it.
-    static func archive(folder: URL, fileManager: FileManager = .default) throws -> Data {
+    /// Archive of the content of `folder`, with paths relative to it; `tooLarge` beyond `limit` bytes, as soon as it is
+    /// known (review SY16): a folder whose files weigh more than ten times the limit isn't even read.
+    static func archive(folder: URL, limit: Int = maximumFileSize, fileManager: FileManager = .default) throws -> Data {
         let base = folder.standardizedFileURL.resolvingSymlinksInPath()
-        guard let enumerator = fileManager.enumerator(at: base, includingPropertiesForKeys: [.isRegularFileKey, .isSymbolicLinkKey]) else {
+        let keys: Set<URLResourceKey> = [.isRegularFileKey, .isSymbolicLinkKey, .fileSizeKey]
+        guard let enumerator = fileManager.enumerator(at: base, includingPropertiesForKeys: Array(keys)) else {
             throw Failure.unreadableFolder
         }
         var files: [(path: String, url: URL)] = []
+        var total = 0
         for case let url as URL in enumerator {
-            let values = try url.resourceValues(forKeys: [.isRegularFileKey, .isSymbolicLinkKey])
+            let values = try url.resourceValues(forKeys: keys)
             guard values.isRegularFile == true, values.isSymbolicLink != true, url.lastPathComponent != ".DS_Store" else {
                 continue
+            }
+            total += values.fileSize ?? 0
+            guard total / 10 <= limit else {
+                throw Failure.tooLarge
             }
             let path = url.standardizedFileURL.resolvingSymlinksInPath().path.dropFirst(base.path.count + 1)
             files.append((String(path), url))
         }
-        return try archive(files.sorted { $0.path < $1.path }.map { file in try (file.path, Data(contentsOf: file.url)) })
+        return try archive(files.sorted { $0.path < $1.path }.map { file in try (file.path, Data(contentsOf: file.url)) }, limit: limit)
     }
 
-    /// Archive of `entries` (relative path, content), in the given order.
-    static func archive(_ entries: [(path: String, contents: Data)]) throws -> Data {
+    /// Archive of `entries` (relative path, content), in the given order; `tooLarge` as soon as it passes `limit`.
+    static func archive(_ entries: [(path: String, contents: Data)], limit: Int = maximumFileSize) throws -> Data {
         guard entries.count <= maximumEntries else {
             throw Failure.tooLarge
         }
@@ -64,6 +71,9 @@ nonisolated enum ZipWriter {
             output.append(le16(UInt16(name.count)) + le16(0))
             output.append(name)
             output.append(stored)
+            guard output.count <= limit else {
+                throw Failure.tooLarge
+            }
             // Central directory entry.
             central.append(le32(0x0201_4B50))
             central.append(le16(0x031E) + le16(20) + le16(0x0800) + le16(method) + le16(0) + le16(0x21))

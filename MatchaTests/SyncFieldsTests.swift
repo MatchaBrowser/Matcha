@@ -134,6 +134,7 @@ struct SyncFieldsTests {
             remote: received,
             local: SyncFields.profile(SyncProfileFields(name: "Maison", order: 1)).json,
             baseline: fields.json,
+            knownKeys: SyncRecordType.profile.fieldKeys,
         )
         #expect(changed.objectValue["name"] == .string("Maison"))
         #expect(changed.objectValue["pinnedColor"] == .string("#FF0000"))
@@ -146,7 +147,12 @@ struct SyncFieldsTests {
         atRoot.parentId = nil
         let parents = #""spaceId":"\#(space.uuidString)","parentId":"\#(profile.uuidString)""#
         let received = try object(#"{"name":"Renamed elsewhere","order":1,"isCollapsed":false,"# + parents + "}")
-        let sent = SyncFieldMerge.merged(remote: received, local: SyncFields.folder(atRoot).json, baseline: SyncFields.folder(folder).json)
+        let sent = SyncFieldMerge.merged(
+            remote: received,
+            local: SyncFields.folder(atRoot).json,
+            baseline: SyncFields.folder(folder).json,
+            knownKeys: SyncRecordType.folder.fieldKeys,
+        )
         #expect(sent.objectValue["parentId"] == nil)
         // The name received and not changed here leaves as it was received.
         #expect(sent.objectValue["name"] == .string("Renamed elsewhere"))
@@ -154,8 +160,64 @@ struct SyncFieldsTests {
         let base = SyncJSON.object(["grantedPermissions": .object(["tabs": .null])])
         let mine = SyncJSON.object(["grantedPermissions": .object(["tabs": .null, "storage": .null])])
         let remote = SyncJSON.object(["grantedPermissions": .object(["tabs": .null, "cookies": .null])])
-        let merged = SyncFieldMerge.merged(remote: remote, local: mine, baseline: base)
+        let merged = SyncFieldMerge.merged(remote: remote, local: mine, baseline: base, knownKeys: SyncRecordType.webExtension.fieldKeys)
         #expect(merged.objectValue["grantedPermissions"]?.objectValue.keys.sorted() == ["cookies", "storage", "tabs"])
+    }
+
+    /// Review SY1: without a baseline, every known field takes this Mac's value, an emptied one included; the unknown
+    /// ones stay.
+    @Test func `without a baseline, an emptied field leaves emptied and unknown fields stay`() throws {
+        let parents = #""spaceId":"\#(space.uuidString)","parentId":"\#(profile.uuidString)""#
+        let received = try object(#"{"name":"Projets","order":1,"isCollapsed":false,"icon":"star","future":1,"# + parents + "}")
+        let mine = SyncFields.folder(SyncFolderFields(name: "Projets", order: 1, isCollapsed: false, spaceId: space))
+        let sent = SyncFieldMerge.merged(remote: received, local: mine.json, baseline: nil, knownKeys: SyncRecordType.folder.fieldKeys)
+        #expect(sent.objectValue["parentId"] == nil)
+        #expect(sent.objectValue["icon"] == nil)
+        #expect(sent.objectValue["future"] == .number(1))
+        #expect(SyncFields(json: sent, type: .folder) == mine)
+    }
+
+    /// Review SY1: `SyncRecordType.fieldKeys` lists exactly the fields each type encodes.
+    @Test func `the known fields of each type are the ones it encodes`() throws {
+        let theme = try #require(SpaceTheme.presets.first)
+        let source = SyncExtensionSource.package(blobID: UUID(), blobKey: "k", sha256: "s", size: 1, fileName: "x.zip")
+        let tab = try SyncDeviceTabsFields.Tab(url: #require(URL(string: "https://example.com")), title: "Exemple")
+        let samples: [SyncFields] = [
+            .profile(SyncProfileFields(name: "P", order: 1)),
+            .space(SyncSpaceFields(name: "S", symbol: "star", theme: theme, order: 1, profileId: profile)),
+            .folder(SyncFolderFields(
+                name: "F", order: 1, isCollapsed: true, spaceId: space, parentId: profile, icon: "star", textColor: "#000000",
+                backgroundColor: "#FFFFFF",
+            )),
+            .tab(SyncTabFields(
+                place: .pinned, url: URL(string: "https://example.com"), title: "T", order: 1, profileId: profile,
+                spaceId: space, folderId: profile,
+            )),
+            .webExtension(SyncExtensionFields(
+                identifier: "x", name: "X", version: "1", source: source, isEnabled: true, allowsPrivateWindows: true,
+                showsButton: true, grantedPermissions: ["tabs": nil], deniedPermissions: ["storage": nil],
+                grantedMatchPatterns: ["*://*/*": nil], deniedMatchPatterns: ["https://a/*": nil],
+            )),
+            .setting(SyncSettingFields(key: "showsHomeButton", value: .bool(true))),
+            .sitePermission(SyncSitePermissionFields(origin: "https://example.com", kind: "camera", decision: "deny", profileId: profile)),
+            .siteZoom(SyncSiteZoomFields(site: "example.com", level: 1.25)),
+            .deviceTabs(SyncDeviceTabsFields(deviceId: profile, name: "Mac", spaces: [.init(spaceId: space, name: "S", tabs: [tab])])),
+        ]
+        #expect(Set(samples.map(\.type)) == Set(SyncRecordType.allCases))
+        for sample in samples {
+            #expect(Set(sample.json.objectValue.keys) == sample.type.fieldKeys, "\(sample.type)")
+        }
+    }
+
+    /// Review SY28: fields that can't be encoded are never sent as empty fields, nor taken for a deletion.
+    @Test func `fields that can't be encoded are left aside`() {
+        let zoom = SyncFields.siteZoom(SyncSiteZoomFields(site: "example.com", level: .nan))
+        #expect(zoom.encodedJSON == nil)
+        var detector = SyncChangeDetector()
+        let id = UUID()
+        var state = SyncState()
+        state.entries[id] = SyncEntry(type: "siteZoom", version: 1, local: .object(["site": .string("example.com"), "level": .number(1)]))
+        #expect(detector.changes(in: [id: zoom], state: state, now: .now).changes.isEmpty)
     }
 
     @Test func `settings are read as UserDefaults keeps them`() {

@@ -47,7 +47,11 @@ nonisolated struct SyncChangeDetector: Sendable {
                 continue
             }
             let current = snapshot[id]
-            let currentJSON = current?.json
+            let currentJSON = current?.encodedJSON
+            // Fields that can't be encoded: neither sent as empty nor taken for a deletion (review SY28).
+            if current != nil, currentJSON == nil {
+                continue
+            }
             let baseline = state.baseline(of: id)
             guard currentJSON != baseline else {
                 held[id] = nil

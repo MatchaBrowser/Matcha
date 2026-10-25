@@ -28,9 +28,15 @@ nonisolated enum SyncFields: Equatable, Sendable {
         }
     }
 
-    /// Fields as JSON (object).
+    /// Fields as JSON (object); empty if they can't be encoded, which the change detector never sends (`encodedJSON`).
     var json: SyncJSON {
-        let value: SyncJSON? = switch self {
+        encodedJSON ?? .emptyObject
+    }
+
+    /// Fields as JSON; nil if they can't be encoded (a `Double` that isn't finite): never sent as empty fields
+    /// (review SY28).
+    var encodedJSON: SyncJSON? {
+        switch self {
         case let .profile(fields): try? .encoding(fields)
         case let .space(fields): try? .encoding(fields)
         case let .folder(fields): try? .encoding(fields)
@@ -41,7 +47,6 @@ nonisolated enum SyncFields: Equatable, Sendable {
         case let .siteZoom(fields): try? .encoding(fields)
         case let .deviceTabs(fields): try? .encoding(fields)
         }
-        return value ?? .emptyObject
     }
 
     /// Fields of type `type` read from `json`; nil if a value is missing or outside the known values (placement,
