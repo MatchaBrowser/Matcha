@@ -70,7 +70,7 @@ final class FakeExtensionSink: ExtensionEventSink {
 
     private static func id(of window: any WKWebExtensionWindow) -> UUID {
         guard let window = window as? ExtensionWindow else {
-            Issue.record("Fenêtre inattendue : \(window)")
+            Issue.record("Unexpected window: \(window)")
             return UUID()
         }
         return window.windowID
@@ -78,7 +78,7 @@ final class FakeExtensionSink: ExtensionEventSink {
 
     private static func id(of tab: any WKWebExtensionTab) -> UUID {
         guard let tab = tab as? ExtensionTab else {
-            Issue.record("Onglet inattendu : \(tab)")
+            Issue.record("Unexpected tab: \(tab)")
             return UUID()
         }
         return tab.tabID

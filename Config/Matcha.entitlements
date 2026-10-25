@@ -2,8 +2,8 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
-	<!-- Sparkle dans le bac à sable (tâche 8.4) : services d'installation et d'état de l'installeur. Les autres droits
-	     (bac à sable, réseau, caméra, micro, fichiers) viennent des réglages de compilation de la cible. -->
+	<!-- Sparkle in the sandbox (task 8.4): the installer's installation and status services. The other entitlements
+	     (sandbox, network, camera, microphone, files) come from the target's build settings. -->
 	<key>com.apple.security.temporary-exception.mach-lookup.global-name</key>
 	<array>
 		<string>$(PRODUCT_BUNDLE_IDENTIFIER)-spks</string>

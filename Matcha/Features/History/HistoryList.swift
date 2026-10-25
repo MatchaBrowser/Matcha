@@ -1,40 +1,5 @@
 import Foundation
 
-/// Day of a section in the history window.
-nonisolated enum HistoryDay: Hashable, Sendable {
-    case today
-    case yesterday
-    /// Start of the day.
-    case date(Date)
-}
-
-/// Row of the history window: an address visited on a given day, with all its visits of that day merged.
-nonisolated struct HistoryRow: Identifiable, Hashable, Sendable {
-    /// “<start of day>|<address key>”.
-    let id: String
-    let url: URL
-    /// Last title of the address, otherwise its readable address.
-    let title: String
-    /// Domain without “www.”, or file name (`AddressDisplay.short`).
-    let host: String
-    /// Last visit of that day.
-    let lastVisit: Date
-    /// Visits of that day, deleted with the row.
-    let visitIDs: [UUID]
-}
-
-nonisolated struct HistorySection: Identifiable, Hashable, Sendable {
-    let day: HistoryDay
-    /// Start of the day.
-    let start: Date
-    /// From the most recent to the oldest.
-    let rows: [HistoryRow]
-
-    var id: Date {
-        start
-    }
-}
-
 /// Content of the history window, pure: a profile's visits grouped by day (most recent first) and by address,
 /// filtered by the searched text.
 nonisolated enum HistoryList {
@@ -42,7 +7,7 @@ nonisolated enum HistoryList {
     /// everything.
     static func sections(from index: HistoryIndex, search: String, now: Date, calendar: Calendar) -> [HistorySection] {
         let tokens = CommandText.fold(search).split(separator: " ").map(String.init)
-        let entries = tokens.isEmpty ? index.entries : index.entries.filter { matches($0.value, tokens: tokens) }
+        let entries = tokens.isEmpty ? index.entriesByKey : index.entriesByKey.filter { matches($0.value, tokens: tokens) }
         let visits = index.visits.values
             .filter { entries[$0.urlKey] != nil }
             .sorted { HistoryIndex.isOlder($1, $0) }

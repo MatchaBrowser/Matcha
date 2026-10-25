@@ -20,7 +20,7 @@ struct HistoryIndexQueryTests {
     /// Addresses that `CommandMatcher` accepts, one by one, with the title the bar gives them.
     private func bruteForce(_ text: String, in index: HistoryIndex) -> Set<String> {
         let query = CommandQuery(text: text, searchEngine: .google)
-        return Set(index.entries.values.filter { entry in
+        return Set(index.entriesByKey.values.filter { entry in
             CommandMatcher.match(query, titles: [entry.title ?? CommandText.displayURL(entry.url)], url: entry.url) != nil
         }.map(\.urlKey))
     }
@@ -89,7 +89,7 @@ struct HistoryIndexQueryTests {
         let ranker = CommandRanker()
         for text in ["git", "doc", "fr", "local", "swift", "post"] {
             let query = CommandQuery(text: text, searchEngine: .google)
-            let all = sample.entries.values.map(\.historyEntry)
+            let all = sample.entriesByKey.values.map(\.historyEntry)
             let filtered = sample.entries(matching: query, limit: HistoryProvider.fetchLimit, now: fixedNow)
             #expect(rows(ranker, query, all) == rows(ranker, query, filtered), "« \(text) »")
         }

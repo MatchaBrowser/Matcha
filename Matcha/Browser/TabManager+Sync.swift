@@ -9,7 +9,7 @@ extension TabManager {
     /// displayed tab closed elsewhere stays there, in its place, until the user closes it. A favorite counts as
     /// displayed when a window of another Space of the profile shows it (review ON4).
     func reconcile(tabs stored: [StoredTab], layout newLayout: SidebarLayout) {
-        let displayed = Set(viewers.flatMap(\.displayedTabIDs)).union(layout.favorites.filter { displays.holder(of: $0) != nil })
+        let displayed = Set(viewers.all.flatMap(\.displayedTabIDs)).union(layout.favorites.filter { displays.holder(of: $0) != nil })
         var target = newLayout
         for id in displayed where target.place(of: id) == nil {
             switch layout.place(of: id) {

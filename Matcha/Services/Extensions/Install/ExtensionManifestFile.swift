@@ -1,7 +1,7 @@
 import Foundation
 
 /// `manifest.json` of an unpacked extension, and the texts of its default language
-/// (`_locales/<default_locale>/messages.json`) for `__MSG_cle__` names (task 6.4). Pure type.
+/// (`_locales/<default_locale>/messages.json`) for `__MSG_key__` names (task 6.4). Pure type.
 nonisolated struct ExtensionManifestFile {
     let manifest: [String: Any]
     let messages: [String: Any]?

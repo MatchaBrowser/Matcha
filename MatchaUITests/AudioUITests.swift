@@ -56,7 +56,7 @@ final class AudioUITests: XCTestCase {
                 return directory + "/" + file
             }
         }
-        throw XCTSkip("Aucune musique de Photos dans \(Self.musicDirectory)")
+        throw XCTSkip("No Photos music in \(Self.musicDirectory)")
     }
 
     /// Waits until the row no longer says “Playing Audio” (no value, or empty).

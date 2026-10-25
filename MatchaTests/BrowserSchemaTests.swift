@@ -11,12 +11,12 @@ struct BrowserSchemaTests {
         let schema = Schema(BrowserSchema.models)
         for entity in schema.entities {
             for attribute in entity.attributes {
-                #expect(!attribute.isUnique, "\(entity.name).\(attribute.name) est unique")
-                #expect(attribute.isOptional || attribute.defaultValue != nil, "\(entity.name).\(attribute.name) sans défaut")
+                #expect(!attribute.isUnique, "\(entity.name).\(attribute.name) is unique")
+                #expect(attribute.isOptional || attribute.defaultValue != nil, "\(entity.name).\(attribute.name) without a default")
             }
             for relationship in entity.relationships {
                 #expect(relationship.isOptional, "\(entity.name).\(relationship.name) obligatoire")
-                #expect(relationship.inverseName != nil, "\(entity.name).\(relationship.name) sans inverse")
+                #expect(relationship.inverseName != nil, "\(entity.name).\(relationship.name) without an inverse")
             }
         }
     }
@@ -154,7 +154,7 @@ struct BrowserSchemaTests {
         )
         let reopened = HistoryStore(container: container)
         await reopened.load()
-        #expect(reopened.index(for: profileID)?.entries["example.com"]?.title == "Exemple")
+        #expect(reopened.index(for: profileID)?.entriesByKey["example.com"]?.title == "Exemple")
     }
 
     /// Folder customization: a store created with the previous schema (`FolderRecord` without icon or colors)

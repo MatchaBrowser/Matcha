@@ -41,7 +41,7 @@ extension XCTestCase {
         app.typeKey(key, modifierFlags: .command)
         let badge = zoomBadge(in: app)
         let shown = percent == 100 ? badge.waitForNonExistence(timeout: 3) : waitForPercent(percent, of: badge, inValue: true)
-        XCTAssertTrue(shown, "⌘\(key) : \(percent) % attendu", file: file, line: line)
+        XCTAssertTrue(shown, "⌘\(key): \(percent)% expected", file: file, line: line)
     }
 
     /// Element of the “Zoom” row of the site settings: `siteZoomOutButton`, `siteZoomResetButton` (its value is

@@ -43,7 +43,7 @@ enum CertificatePanel {
             comment: "Certificate panel: what the certificate is for",
         ))
         Logger.browser.info("Certificate shown")
-        if let window, window.isVisible, window.attachedSheet == nil {
+        if let window, window.canPresentSheet {
             panel.beginSheet(for: window, modalDelegate: nil, didEnd: nil, contextInfo: nil, trust: trust, message: message)
         } else {
             panel.runModal(for: trust, message: message)

@@ -70,17 +70,7 @@ struct PageCard: View {
                 // Area that the peek (Shift-click) dims, below the address bar (task 4.4).
                 .anchorPreference(key: PeekPageAreas.self, value: .bounds) { [$0] }
         }
-        // Not into the hidden title bar's area: clipped on screen, it would still take the clicks of the margin above.
-        .background(.background, ignoresSafeAreaEdges: [])
-        .clipShape(.rect(cornerRadius: BrowserWindowView.cardCornerRadius))
-        .overlay {
-            RoundedRectangle(cornerRadius: BrowserWindowView.cardCornerRadius)
-                .strokeBorder(
-                    isMarked ? AnyShapeStyle(Color.accentColor.opacity(0.7)) : AnyShapeStyle(.hairline),
-                    lineWidth: isMarked ? 2 : 1,
-                )
-                .allowsHitTesting(false)
-        }
+        .pageCardFrame(cornerRadius: BrowserWindowView.cardCornerRadius, isMarked: isMarked)
         .shadow(color: .black.opacity(0.18), radius: 3, y: 1)
         .accessibilityElement(children: .contain)
         .modifier(PageTitleLabel(tab: tab))

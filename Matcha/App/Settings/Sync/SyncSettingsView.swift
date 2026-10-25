@@ -110,9 +110,3 @@ struct SyncSettingsView: View {
         }
     }
 }
-
-extension SyncRecoveryKit: Identifiable {
-    var id: String {
-        recoveryKey
-    }
-}

@@ -88,7 +88,7 @@ struct HistoryStoreTests {
         #expect(await entries("example").map(\.title) == ["Perso"])
         #expect(await entries("example", profileID: other).map(\.title) == ["Travail"])
         #expect(await entries("example", profileID: UUID()).isEmpty)
-        #expect(store.index(for: other)?.entries.count == 1)
+        #expect(store.index(for: other)?.entriesByKey.count == 1)
     }
 
     @Test func `visits written while the history loads count once`() async {
@@ -100,8 +100,8 @@ struct HistoryStoreTests {
             record("https://pendant.example/\(round)", title: "Pendant", in: store)
             await loading.value
             let index = store.index(for: profile)
-            #expect(index?.entries["pendant.example/\(round)"]?.visitCount == 1)
-            #expect(index?.entries["avant.example/\(round)"]?.visitCount == 1)
+            #expect(index?.entriesByKey["pendant.example/\(round)"]?.visitCount == 1)
+            #expect(index?.entriesByKey["avant.example/\(round)"]?.visitCount == 1)
         }
     }
 
@@ -115,7 +115,7 @@ struct HistoryStoreTests {
         // Read back by another store: the date and the title have been saved.
         let reopened = makeStore()
         await reopened.load()
-        let entry = try #require(reopened.index(for: profile)?.entries["example.com"])
+        let entry = try #require(reopened.index(for: profile)?.entriesByKey["example.com"])
         #expect(entry.title == "Titre tardif")
         #expect(entry.visitCount == 1)
         #expect(entry.lastVisit == fixedNow.addingTimeInterval(10))
@@ -131,7 +131,7 @@ struct HistoryStoreTests {
         try context.save()
         record("https://recent.example/", title: "Récent")
         await store.load()
-        #expect(store.index(for: profile)?.entries.keys.sorted() == ["recent.example"])
+        #expect(store.index(for: profile)?.entriesByKey.keys.sorted() == ["recent.example"])
         #expect(recordCount == 1)
     }
 
@@ -143,8 +143,8 @@ struct HistoryStoreTests {
         await store.load()
 
         store.deleteVisits([first.id, other.id], profileID: profile)
-        #expect(store.index(for: profile)?.entries.keys.sorted() == ["example.com"])
-        #expect(store.index(for: profile)?.entries["example.com"]?.visitCount == 1)
+        #expect(store.index(for: profile)?.entriesByKey.keys.sorted() == ["example.com"])
+        #expect(store.index(for: profile)?.entriesByKey["example.com"]?.visitCount == 1)
         #expect(recordCount == 1)
         store.deleteVisits([], profileID: profile)
         #expect(recordCount == 1)
@@ -155,7 +155,7 @@ struct HistoryStoreTests {
         await store.load()
         store.deleteVisits(Set(visits.prefix(1100).map(\.id)), profileID: profile)
         #expect(recordCount == 100)
-        #expect(store.index(for: profile)?.entries.count == 100)
+        #expect(store.index(for: profile)?.entriesByKey.count == 100)
     }
 
     @Test func `clearing a period keeps older visits and other profiles`() async throws {
@@ -172,7 +172,7 @@ struct HistoryStoreTests {
         await store.load()
 
         func keys() -> [String] {
-            store.index(for: profile)?.entries.keys.sorted() ?? []
+            store.index(for: profile)?.entriesByKey.keys.sorted() ?? []
         }
         store.clear(.lastHour, profileID: profile)
         #expect(keys() == ["avant-hier.example", "ce-matin.example", "hier.example"])
@@ -182,14 +182,14 @@ struct HistoryStoreTests {
         #expect(keys() == ["avant-hier.example"])
         store.clear(.allHistory, profileID: profile)
         #expect(keys().isEmpty)
-        #expect(store.index(for: other)?.entries.keys.sorted() == ["autre-profil.example"])
+        #expect(store.index(for: other)?.entriesByKey.keys.sorted() == ["autre-profil.example"])
         #expect(recordCount == 1)
 
         // Read back from the database: the same thing.
         let reopened = makeStore()
         await reopened.load()
-        #expect(reopened.index(for: profile)?.entries.isEmpty == true)
-        #expect(reopened.index(for: other)?.entries.count == 1)
+        #expect(reopened.index(for: profile)?.entriesByKey.isEmpty == true)
+        #expect(reopened.index(for: other)?.entriesByKey.count == 1)
     }
 
     @Test func `deleting a profile deletes its history`() async throws {
@@ -203,8 +203,8 @@ struct HistoryStoreTests {
         await history.load()
 
         try await session.deleteProfile(#require(space.record.profile))
-        #expect(history.index(for: profileID)?.entries.isEmpty == true)
-        #expect(history.index(for: kept)?.entries.count == 1)
+        #expect(history.index(for: profileID)?.entriesByKey.isEmpty == true)
+        #expect(history.index(for: kept)?.entriesByKey.count == 1)
         #expect(try session.container.mainContext.fetchCount(FetchDescriptor<HistoryRecord>()) == 1)
     }
 

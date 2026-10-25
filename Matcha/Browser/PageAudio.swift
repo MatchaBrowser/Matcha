@@ -31,11 +31,10 @@ final class PageAudio {
         publish()
     }
 
-    /// Copies the state (the observed value is only written if it changes) and schedules the switch-off of the icon.
+    /// Copies the state and schedules the switch-off of the icon. Writing the same value notifies no one (Observation
+    /// compares `Equatable` values, review CO8).
     private func publish() {
-        if isPlaying != state.isPlaying {
-            isPlaying = state.isPlaying
-        }
+        isPlaying = state.isPlaying
         expiry?.cancel()
         expiry = nil
         guard let deadline = state.silenceDeadline else {

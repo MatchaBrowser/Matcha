@@ -248,4 +248,22 @@ struct SidebarLayoutTests {
         #expect(layout.pinned.folder(child)?.items == [.tab(ids[2])])
         #expect(layout.orderedTabIDs == [ids[0], ids[1], ids[2], ids[3]])
     }
+
+    /// Review CO2: where a new today tab goes, and the tab shown once the selected one leaves, without `TabManager`.
+    @Test func `insertion after an anchor and the next selection`() {
+        var layout = SidebarLayout()
+        (0 ..< 4).forEach { layout.insertToday(ids[$0], at: layout.today.count) }
+        #expect(layout.todayInsertionIndex(after: ids[1]) { $0 == ids[2] } == 3)
+        #expect(layout.todayInsertionIndex(after: ids[1]) { _ in false } == 2)
+        #expect(layout.todayInsertionIndex(after: nil) { _ in true } == 0)
+
+        let today = layout.today
+        layout.remove(ids[1])
+        #expect(layout.nextSelection(from: 1, in: today, leaving: [ids[1]], preferring: nil) == ids[2])
+        #expect(layout.nextSelection(from: 1, in: today, leaving: [ids[1]], preferring: ids[3]) == ids[3])
+        #expect(layout.nextSelection(from: nil, in: today, leaving: [ids[1]], preferring: nil) == nil)
+        layout.remove(ids[2])
+        layout.remove(ids[3])
+        #expect(layout.nextSelection(from: 3, in: today, leaving: [ids[3]], preferring: nil) == ids[0])
+    }
 }

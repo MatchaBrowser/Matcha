@@ -12,8 +12,7 @@ struct TabCommands: Commands {
     /// Tabs of the active browsing window; nil when a mini window is active (`keyWindowID` is read so the menu
     /// follows along, the window is read again on each action).
     private var tabManager: TabManager? {
-        _ = miniWindows.keyWindowID
-        return miniWindows.keyWindow == nil ? focusedTabManager : nil
+        miniWindows.observedKeyWindow == nil ? focusedTabManager : nil
     }
 
     var body: some Commands {

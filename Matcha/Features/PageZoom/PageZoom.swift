@@ -16,11 +16,17 @@ enum PageZoom {
         guard page.isLoaded, let level = change.level(from: page.pageZoom) else {
             return nil
         }
+        set(level, on: page, siteZooms: siteZooms)
+        return level
+    }
+
+    /// Gives `level` to `page`: to its site with `siteZooms` (its other open pages follow), otherwise to the page alone.
+    /// The keyboard and the site settings' row go through here (review CO4).
+    static func set(_ level: Double, on page: BrowserTab, siteZooms: SiteZoomStore?) {
         if let siteZooms {
             siteZooms.setZoom(level, for: page)
         } else {
             page.setPageZoom(level)
         }
-        return level
     }
 }

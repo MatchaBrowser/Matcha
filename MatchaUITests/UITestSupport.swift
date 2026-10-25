@@ -272,7 +272,7 @@ extension XCTestCase {
 
     /// Tests that load a real page are skipped without Internet access.
     func skipIfOffline() throws {
-        let reachable = expectation(description: "example.com répond")
+        let reachable = expectation(description: "example.com answers")
         var request = URLRequest(url: URL(string: "https://example.com/")!)
         request.timeoutInterval = 5
         URLSession.shared.dataTask(with: request) { data, _, _ in
@@ -281,6 +281,6 @@ extension XCTestCase {
             }
         }.resume()
         let online = XCTWaiter().wait(for: [reachable], timeout: 6) == .completed
-        try XCTSkipUnless(online, "Pas d'accès à example.com")
+        try XCTSkipUnless(online, "No access to example.com")
     }
 }

@@ -106,10 +106,7 @@ final class MiniWindowController: NSObject, Identifiable {
         guard let url = tab.displayedURL else {
             return
         }
-        TabLinkCopier.copy(url, to: pasteboard)
-        copyConfirmation.show()
-        // Never the address itself.
-        Logger.miniWindow.info("Address copied from a mini window")
+        copyConfirmation.copy(url, to: pasteboard)
     }
 
     // MARK: Closing

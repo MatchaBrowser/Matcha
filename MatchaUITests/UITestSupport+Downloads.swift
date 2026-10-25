@@ -29,7 +29,7 @@ extension XCTestCase {
     /// File to download; the test is skipped if there is none.
     func undisplayableFile() throws -> String {
         guard let path = Self.undisplayableFiles.first(where: FileManager.default.isReadableFile(atPath:)) else {
-            throw XCTSkip("Aucun fichier non affichable livré avec macOS")
+            throw XCTSkip("No file macOS can't display is shipped with macOS")
         }
         return path
     }
@@ -96,6 +96,6 @@ extension XCTestCase {
         let app = launchApp(settings: Self.downloadsTestSettings)
         _ = waitForBrowserWindow(of: app)
         app.terminate()
-        XCTAssertFalse(FileManager.default.fileExists(atPath: downloadsTestFolder.path), "Dossier de test non effacé")
+        XCTAssertFalse(FileManager.default.fileExists(atPath: downloadsTestFolder.path), "Test folder not erased")
     }
 }

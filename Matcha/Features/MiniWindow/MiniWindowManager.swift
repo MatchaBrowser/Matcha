@@ -92,6 +92,13 @@ final class MiniWindowManager {
         windows.first { $0.panel.isKeyWindow }
     }
 
+    /// Active mini window for a menu: `keyWindowID` is read so the menu follows along (review CO4); an action reads
+    /// `keyWindow` again.
+    var observedKeyWindow: MiniWindowController? {
+        _ = keyWindowID
+        return keyWindow
+    }
+
     func window(for tab: BrowserTab) -> MiniWindowController? {
         windows.first { $0.tab === tab }
     }

@@ -10,7 +10,7 @@ extension TabManager {
         // ⇧⌘T brings them all back (audit H2).
         rememberClosed(cleared)
         let ids = Set(cleared.map(\.id))
-        let emptied = viewers.filter { $0.selectedTabID.map(ids.contains) ?? false }
+        let emptied = viewers.all.filter { $0.selectedTabID.map(ids.contains) ?? false }
         cleared.forEach(discard)
         emptied.forEach { setSelection(nil, for: $0) }
     }
@@ -44,21 +44,5 @@ extension TabManager {
         let others = todayTabs.filter { !kept.contains($0.id) }
         rememberClosed(others)
         others.forEach { delete($0) }
-    }
-}
-
-extension TabManager {
-    /// Moves the tab one step up (−1) or down (+1) in its list, without dragging (audit H3); false at the edge.
-    @discardableResult
-    func moveStep(_ tab: BrowserTab, by offset: Int) -> Bool {
-        guard let destination = layout.stepDestination(of: tab.id, by: offset) else {
-            return false
-        }
-        move(tab, to: destination)
-        return true
-    }
-
-    func canMoveStep(_ tab: BrowserTab, by offset: Int) -> Bool {
-        layout.stepDestination(of: tab.id, by: offset) != nil
     }
 }

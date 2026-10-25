@@ -218,10 +218,7 @@ final class WindowModel {
 
     /// Copies `url` (context menu of a tab) and confirms “URL Copied” in this window.
     func copyLink(_ url: URL, to pasteboard: NSPasteboard = .general) {
-        TabLinkCopier.copy(url, to: pasteboard)
-        copyConfirmation.show()
-        // Never the address itself.
-        Logger.browser.info("Address copied")
+        copyConfirmation.copy(url, to: pasteboard)
     }
 
     /// ⇧⌘C and the “Copy URL” action of the command bar: the address of the frontmost page (the peek if it is open,

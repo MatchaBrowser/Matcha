@@ -15,12 +15,4 @@ final class Favicon {
     convenience init(decoded: DecodedFavicon) {
         self.init(image: NSImage(cgImage: decoded.image, size: .zero), tone: decoded.tone)
     }
-
-    /// Look of `image`, analyzed on a 32 × 32 pixel reduction.
-    static func tone(of image: NSImage) -> FaviconTone {
-        guard let cgImage = image.cgImage(forProposedRect: nil, context: nil, hints: nil) else {
-            return .neutral
-        }
-        return FaviconDecoder.tone(of: cgImage)
-    }
 }

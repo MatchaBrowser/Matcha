@@ -1,5 +1,6 @@
-import Foundation
+import AppKit
 import Observation
+import OSLog
 
 /// “URL Copied” confirmation of a window: visible for 1.5 s after each copy. A new copy while it is displayed
 /// restarts the wait; closing the window cancels it.
@@ -24,6 +25,15 @@ final class CopyConfirmationModel {
     }
 
     /// Shows the confirmation and restarts the wait before hiding it.
+    /// Copies `url` (as a URL and as text), then confirms: the same in a browser window and in a mini window (review
+    /// CO4).
+    func copy(_ url: URL, to pasteboard: NSPasteboard = .general) {
+        TabLinkCopier.copy(url, to: pasteboard)
+        show()
+        // Never the address itself.
+        Logger.browser.info("Address copied")
+    }
+
     func show() {
         hideTask?.cancel()
         isVisible = true

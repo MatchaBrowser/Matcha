@@ -24,9 +24,7 @@ final class PageLoadFailure {
     }
 
     func clear() {
-        if error != nil {
-            error = nil
-        }
+        error = nil
         serverTrust = nil
         certificateExceptions = nil
     }

@@ -30,12 +30,13 @@ struct FaviconToneTests {
     }
 
     @MainActor
-    @Test func `tone is read from a real image`() {
+    @Test func `tone is read from a real image`() throws {
         let image = NSImage(size: NSSize(width: 32, height: 32), flipped: false) { rect in
             NSColor.black.setFill()
             NSBezierPath(ovalIn: rect.insetBy(dx: 6, dy: 6)).fill()
             return true
         }
-        #expect(Favicon.tone(of: image) == .dark)
+        let cgImage = try #require(image.cgImage(forProposedRect: nil, context: nil, hints: nil))
+        #expect(FaviconDecoder.tone(of: cgImage) == .dark)
     }
 }

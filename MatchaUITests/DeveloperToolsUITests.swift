@@ -9,7 +9,7 @@ final class DeveloperToolsUITests: XCTestCase {
         continueAfterFailure = false
         try XCTSkipUnless(
             FileManager.default.fileExists(atPath: "/usr/share/doc/postfix/html/index.html"),
-            "Documentation de Postfix absente",
+            "Postfix documentation missing",
         )
     }
 

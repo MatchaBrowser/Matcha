@@ -3,30 +3,16 @@ import SwiftUI
 /// Settings > Privacy: the decisions remembered per site (camera, microphone), each with a button to forget it
 /// (task 5.2). The profile is named as soon as there are several. Private windows are not listed.
 struct SitePermissionsSection: View {
-    static let rowHeight = 30.0
-    static let maximumListHeight = 210.0
-
     let store: SitePermissionStore
     let profiles: [ProfileRecord]
 
     var body: some View {
-        let entries = store.entries
         Section {
-            if entries.isEmpty {
-                Text("No saved decisions.", comment: "Settings > Privacy: no website has a saved camera or microphone decision")
-                    .foregroundStyle(.secondary)
-            } else {
-                ScrollView {
-                    VStack(spacing: 0) {
-                        ForEach(entries) { entry in
-                            row(entry)
-                        }
-                    }
-                }
-                // The settings window takes the height of its content: the list scrolls beyond a few rows.
-                .scrollDisabled(false)
-                .frame(height: min(Double(entries.count) * Self.rowHeight, Self.maximumListHeight))
-            }
+            PrivacySiteList(
+                items: store.entries,
+                empty: Text("No saved decisions.", comment: "Settings > Privacy: no website has a saved camera or microphone decision"),
+                row: row,
+            )
         } header: {
             Text("Website Permissions", comment: "Settings > Privacy: section listing the saved camera and microphone decisions")
         } footer: {
@@ -57,17 +43,8 @@ struct SitePermissionsSection: View {
                 .foregroundStyle(.secondary)
             Text(verbatim: entry.decision.stateTitle)
                 .frame(minWidth: 70, alignment: .trailing)
-            Button {
-                store.remove(entry)
-            } label: {
-                Label { forgetTitle } icon: { Image(systemName: "trash") }
-            }
-            .labelStyle(.iconOnly)
-            .buttonStyle(.borderless)
-            .help(forgetTitle)
-            .accessibilityIdentifier("sitePermissionForgetButton")
+            PrivacySiteRemoveButton(title: forgetTitle, identifier: "sitePermissionForgetButton") { store.remove(entry) }
         }
-        .frame(height: Self.rowHeight)
         .accessibilityElement(children: .contain)
         .accessibilityIdentifier("sitePermissionRow")
     }

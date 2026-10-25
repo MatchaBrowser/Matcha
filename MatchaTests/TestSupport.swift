@@ -35,7 +35,7 @@ func expectSplitInvariants(_ layout: SidebarLayout, sourceLocation: SourceLocati
 struct WaitTimeoutError: Error, CustomStringConvertible {
     let line: Int
     var description: String {
-        "Condition toujours fausse à la ligne \(line)"
+        "Condition still false at line \(line)"
     }
 }
 

@@ -62,16 +62,8 @@ struct CompactSidebar: View {
                 Button {
                     withMotion(.easeInOut(duration: 0.3)) { model.select(space) }
                 } label: {
-                    SidebarIconView.text(
-                        space.icon,
-                        defaultSymbol: SidebarIcon.defaultSpaceSymbol,
-                        tint: isCurrent ? .primary : .secondary,
-                        size: isCurrent ? 11 : 9,
-                        emojiSize: isCurrent ? 14 : 12,
-                    )
-                    .frame(width: 24, height: 24)
-                    .background(Circle().fill(Color.primary.opacity(isCurrent ? 0.12 : 0)))
-                    .contentShape(Rectangle())
+                    // The same as in the Space switcher: an emoji of another Space is dimmed there too.
+                    SpaceIcon(space: space, isCurrent: isCurrent)
                 }
                 .buttonStyle(.plain)
                 .help(space.record.name)
@@ -115,14 +107,8 @@ private struct CompactTabButton: View {
             .contextMenu { TabContextMenu(tab: tab, tabManager: tabManager) }
             .tabDraggable(tab)
             .help(tab.displayTitle)
-            .accessibilityElement(children: .ignore)
-            .accessibilityLabel(tab.displayTitle)
-            .accessibilityAddTraits(isSelected ? [.isButton, .isSelected] : .isButton)
-            .accessibilityAction { TabActivation.activate(tab, in: tabManager) }
-            .accessibilityAction(named: "Close Tab") { tabManager.close(tab) }
             // Reached with ⇥ like a row of the sidebar (review IU18).
-            .sidebarRowKeyboard { TabActivation.activate(tab, in: tabManager) } move: { tabManager.moveStep(tab, by: $0) }
+            .tabAccessibility(tab, tabManager: tabManager, isSelected: isSelected, canClose: true) { tabManager.moveStep(tab, by: $0) }
             .accessibilityIdentifier("compactTab")
-            .tabAudioAccessibility(tab)
     }
 }

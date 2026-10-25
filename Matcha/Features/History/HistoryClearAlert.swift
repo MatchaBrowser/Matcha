@@ -23,11 +23,7 @@ enum HistoryClearAlert {
                 clear(period)
             }
         }
-        if let window, window.isVisible, window.attachedSheet == nil {
-            alert.beginSheetModal(for: window, completionHandler: handle)
-        } else {
-            handle(alert.runModal())
-        }
+        alert.present(in: window, completion: handle)
     }
 
     /// Period of the `response` button (in the order of `HistoryPeriod.allCases`); nil for “Cancel”.

@@ -36,7 +36,7 @@ enum PageSaver {
         panel.canCreateDirectories = true
         panel.isExtensionHidden = false
         panel.allowedContentTypes = [Format.webArchive.contentType]
-        panel.nameFieldStringValue = PDFExportFile.name(title: page.title, url: url, fileExtension: "webarchive")
+        panel.nameFieldStringValue = PageExportFile.name(title: page.title, url: url, fileExtension: "webarchive")
         let accessory = FormatAccessory(panel: panel)
         panel.accessoryView = accessory.view
         Task {
@@ -55,7 +55,7 @@ enum PageSaver {
             case .pageSource:
                 try await PageSourceSchemeHandler.fetch(url, store: webView.configuration.websiteDataStore).0
             }
-            try PDFExportFile.write(data, to: destination)
+            try PageExportFile.write(data, to: destination)
             Logger.browser.info("Page saved (\(data.count, privacy: .public) bytes)")
         } catch {
             Logger.browser.error("Page not saved: \(error.logSummary, privacy: .public)")
@@ -68,11 +68,7 @@ enum PageSaver {
         alert.alertStyle = .warning
         alert.messageText = String(localized: "The page couldn't be saved.", comment: "Alert after Save As… failed")
         alert.informativeText = error.localizedDescription
-        if window.isVisible, window.attachedSheet == nil {
-            alert.beginSheetModal(for: window)
-        } else {
-            alert.runModal()
-        }
+        alert.present(in: window)
     }
 
     /// Format choice under the save panel; the name's extension follows.

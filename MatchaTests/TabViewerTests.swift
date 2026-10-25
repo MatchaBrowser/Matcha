@@ -104,7 +104,7 @@ struct TabViewerTests {
         let viewer = manager.makeViewer()
         manager.setOnScreen(viewer, true)
         manager.releaseViewer(viewer)
-        #expect(manager.viewers.count == 1)
+        #expect(manager.viewers.all.count == 1)
         let next = manager.makeViewer()
         #expect(next === viewer)
         #expect(next.selectedTabID == tab.id)
@@ -114,7 +114,7 @@ struct TabViewerTests {
         let (first, second) = twoWindows()
         manager.activate(second)
         manager.releaseViewer(second)
-        #expect(manager.viewers.count == 1)
+        #expect(manager.viewers.all.count == 1)
         #expect(manager.activeViewer === first)
     }
 

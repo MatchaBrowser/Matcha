@@ -15,8 +15,10 @@ final class PageDownloads {
         !held.isEmpty
     }
 
-    /// New document: its downloads are counted from zero. Those still waiting were declined with the banner.
+    /// New document: its downloads are counted from zero, and those still waiting are declined, whatever was called
+    /// before (review CO7).
     func documentDidChange() {
+        release(allowing: false)
         started = 0
         lastClick = nil
         isAllowed = false

@@ -72,10 +72,11 @@ final class BrowserTab: Identifiable {
     private(set) var pageZoom = ZoomLevels.actualSize
 
     /// Navigation and UI delegate, attached to each web view created (and to the current view).
-    @ObservationIgnored weak var delegate: (any WKNavigationDelegate & WKUIDelegate)? {
+    @ObservationIgnored weak var delegate: (any WKNavigationDelegate & WKUIDelegate & PageNotificationReceiving)? {
         didSet {
             webView?.navigationDelegate = delegate
             webView?.uiDelegate = delegate
+            (webView as? BrowserWebView)?.notifications = delegate
         }
     }
 
@@ -140,6 +141,7 @@ final class BrowserTab: Identifiable {
         webView.allowsMagnification = true
         webView.navigationDelegate = delegate
         webView.uiDelegate = delegate
+        webView.notifications = delegate
         webView.pageZoom = pageZoom
         webView.audio = audio
         // Reusable copy for the next views (reload, duplication).
@@ -254,10 +256,7 @@ final class BrowserTab: Identifiable {
 
     /// “Back” also leaves a failed load shown over the page it was leaving (audit K5).
     func updateCanGoBack() {
-        let canGoBack = webView?.canGoBack == true || (loadFailure.error != nil && webView?.url != nil)
-        if self.canGoBack != canGoBack {
-            self.canGoBack = canGoBack
-        }
+        canGoBack = webView?.canGoBack == true || (loadFailure.error != nil && webView?.url != nil)
     }
 
     /// Loads `url`; `source`: the page whose link it is, if any; `isFromAnotherApp`: received from another app. A local
@@ -274,9 +273,7 @@ final class BrowserTab: Identifiable {
 
     /// The page's zoom (100% = 1); kept for the web view recreated after an unload.
     func setPageZoom(_ zoom: Double) {
-        if pageZoom != zoom {
-            pageZoom = zoom
-        }
+        pageZoom = zoom
         webView?.pageZoom = zoom
     }
 
@@ -327,10 +324,7 @@ final class BrowserTab: Identifiable {
             find.pageDidChange()
         }
         url = newURL
-        let hasNewURL = newURL != nil
-        if hasURL != hasNewURL {
-            hasURL = hasNewURL
-        }
+        hasURL = newURL != nil
     }
 
     private func observe(_ webView: WKWebView) {

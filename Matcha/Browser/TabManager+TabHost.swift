@@ -83,7 +83,7 @@ extension TabManager: TabHost {
 
     func closePage(of webView: WKWebView) {
         if isPeek(webView) {
-            PeekActions.close(in: self)
+            closePeekFromPage(self)
         } else if let tab = tab(for: webView) {
             close(tab)
         }

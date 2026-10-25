@@ -138,13 +138,8 @@ private struct SplitSegmentView: View {
         .onTapGesture { TabActivation.activate(tab, in: tabManager) }
         .contextMenu { TabContextMenu(tab: tab, tabManager: tabManager) }
         .help(tab.displayedURL?.absoluteString ?? tab.displayTitle)
-        .accessibilityElement(children: .ignore)
-        .accessibilityLabel(Text(verbatim: tab.displayTitle))
-        .accessibilityAddTraits(isActive ? [.isButton, .isSelected] : .isButton)
-        .accessibilityAction { TabActivation.activate(tab, in: tabManager) }
         // Reached with ⇥ like a row; a step moves the whole split (review IU18).
-        .sidebarRowKeyboard { TabActivation.activate(tab, in: tabManager) } move: { tabManager.moveSplitStep(groupID, by: $0) }
+        .tabAccessibility(tab, tabManager: tabManager, isSelected: isActive) { tabManager.moveSplitStep(groupID, by: $0) }
         .accessibilityIdentifier("splitSegment")
-        .tabAudioAccessibility(tab)
     }
 }

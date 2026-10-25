@@ -79,7 +79,7 @@ final class FolderUITests: XCTestCase {
         drag(selected, to: rows.element(boundBy: 1), at: 0.85)
         XCTAssertTrue(waitFor { rows.element(boundBy: 2).isSelected })
         clickWhenSettled(work)
-        XCTAssertTrue(waitForCount(rows, 2), "onglets visibles : \(rows.count)")
+        XCTAssertTrue(waitForCount(rows, 2), "visible tabs: \(rows.count)")
 
         // Bottom of the collapsed folder: the last today tab goes between the two folders.
         drag(rows.element(boundBy: 1), to: work, at: 0.85)

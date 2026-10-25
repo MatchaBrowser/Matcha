@@ -8,25 +8,15 @@ struct SiteActionsSection: View {
     let profiles: [ProfileRecord]
 
     var body: some View {
-        let entries = store.sortedEntries
         Section {
-            if entries.isEmpty {
-                Text(
+            PrivacySiteList(
+                items: store.sortedEntries,
+                empty: Text(
                     "No website opens apps or downloads files without asking.",
                     comment: "Settings > Privacy: no website may open an app or download files without asking",
-                )
-                .foregroundStyle(.secondary)
-            } else {
-                ScrollView {
-                    VStack(spacing: 0) {
-                        ForEach(entries) { entry in
-                            row(entry)
-                        }
-                    }
-                }
-                .scrollDisabled(false)
-                .frame(height: min(Double(entries.count) * SitePermissionsSection.rowHeight, SitePermissionsSection.maximumListHeight))
-            }
+                ),
+                row: row,
+            )
         } header: {
             Text("Allowed Without Asking", comment: "Settings > Privacy: websites that may open an app or download files without asking")
         } footer: {
@@ -56,17 +46,8 @@ struct SiteActionsSection: View {
                 .labelStyle(.titleAndIcon)
                 .foregroundStyle(.secondary)
                 .lineLimit(1)
-            Button {
-                store.remove(entry)
-            } label: {
-                Label { Self.forgetTitle } icon: { Image(systemName: "trash") }
-            }
-            .labelStyle(.iconOnly)
-            .buttonStyle(.borderless)
-            .help(Self.forgetTitle)
-            .accessibilityIdentifier("siteActionForgetButton")
+            PrivacySiteRemoveButton(title: Self.forgetTitle, identifier: "siteActionForgetButton") { store.remove(entry) }
         }
-        .frame(height: SitePermissionsSection.rowHeight)
         .accessibilityElement(children: .contain)
         .accessibilityIdentifier("siteActionRow")
     }
