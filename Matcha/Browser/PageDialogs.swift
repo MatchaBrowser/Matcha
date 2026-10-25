@@ -11,8 +11,8 @@ protocol PageDialogPresenting: AnyObject {
     func present(_ dialog: PageDialog, for webView: WKWebView) async -> PageDialogAnswer?
     /// Files chosen by the user for an `<input type="file">`; nil: none.
     func chooseFiles(allowsMultipleSelection: Bool, allowsDirectories: Bool, for webView: WKWebView) async -> [URL]?
-    /// User name and password typed for a website that asks for them; nil: cancelled.
-    func credential(for login: LoginRequest, for webView: WKWebView) async -> URLCredential?
+    /// User name and password typed for a website that asks for them; nil if it couldn't be shown.
+    func credential(for login: LoginRequest, for webView: WKWebView) async -> LoginAnswer?
     /// “Save As…” for `page`.
     func save(_ page: BrowserTab)
     /// “Print…” for `page`.
@@ -30,7 +30,7 @@ final class UnavailablePageDialogs: PageDialogPresenting {
         nil
     }
 
-    func credential(for _: LoginRequest, for _: WKWebView) async -> URLCredential? {
+    func credential(for _: LoginRequest, for _: WKWebView) async -> LoginAnswer? {
         nil
     }
 
@@ -39,7 +39,8 @@ final class UnavailablePageDialogs: PageDialogPresenting {
     func print(_: BrowserTab) {}
 }
 
-/// A JavaScript dialog, as shown: never longer than `maximumLength`, with the website of the frame that opens it.
+/// A JavaScript dialog, as shown: its text and a `prompt`'s default text never longer than `maximumLength` (review
+/// WB18), with the website of the frame that opens it.
 nonisolated struct PageDialog: Equatable, Sendable {
     enum Kind: Equatable, Sendable {
         case alert
@@ -51,16 +52,33 @@ nonisolated struct PageDialog: Equatable, Sendable {
 
     let kind: Kind
     let message: String
-    /// Website of the frame that opens it; nil for a page without one (local file).
+    /// Website of the frame that opens it; nil for a page without one (local file, or a frame with an opaque origin:
+    /// `data:`, sandboxed).
     let site: String?
+    /// Opened by a frame inside the page: without a website, it never passes for the page itself (review WB7).
+    let isFromEmbeddedFrame: Bool
     /// “Don't allow this page to show more dialogs”, from the second dialog of a page on.
     let offersSuppression: Bool
 
-    init(kind: Kind, message: String, site: String?, offersSuppression: Bool) {
-        self.kind = kind
-        self.message = message.count > Self.maximumLength ? String(message.prefix(Self.maximumLength)) + "…" : message
+    init(kind: Kind, message: String, site: String?, isFromEmbeddedFrame: Bool = false, offersSuppression: Bool) {
+        if case let .prompt(defaultText) = kind {
+            self.kind = .prompt(defaultText: Self.cut(defaultText, ellipsis: false))
+        } else {
+            self.kind = kind
+        }
+        self.message = Self.cut(message, ellipsis: true)
         self.site = site
+        self.isFromEmbeddedFrame = isFromEmbeddedFrame
         self.offersSuppression = offersSuppression
+    }
+
+    /// `text` within `maximumLength`, without counting the whole of a huge one.
+    private static func cut(_ text: String, ellipsis: Bool) -> String {
+        let start = text.prefix(maximumLength + 1)
+        guard start.count > maximumLength else {
+            return text
+        }
+        return String(start.dropLast()) + (ellipsis ? "…" : "")
     }
 }
 
@@ -84,6 +102,24 @@ nonisolated struct LoginRequest: Equatable, Sendable {
     /// The previous attempt was refused.
     let failedBefore: Bool
     let user: String?
+    /// “Don't allow this page to show more dialogs”, from the page's second dialog or sheet on (review WB6).
+    var offersSuppression = false
+
+    /// True if a sheet may ask (review WB6): only the website of the page on screen or of the page being loaded,
+    /// never an image or a frame of another site (whose name and words the attacker would choose). Kerberos
+    /// (`Negotiate`) first lets the system sign in alone; a sheet only once that failed (review WB16).
+    static func mayAsk(method: String, failures: Int, host: String, pageHosts: [String?]) -> Bool {
+        if method == NSURLAuthenticationMethodNegotiate, failures == 0 {
+            return false
+        }
+        return pageHosts.contains { $0?.lowercased() == host.lowercased() }
+    }
+
+    /// Identity of a protected area: one sheet at a time for it.
+    static func key(of space: URLProtectionSpace) -> String {
+        [space.protocol ?? "", space.host.lowercased(), String(space.port), space.realm ?? "", space.authenticationMethod]
+            .joined(separator: "\u{1F}")
+    }
 
     /// Methods for which the user types a user name and password; the others (certificates) are left to the system.
     static func asksForPassword(_ method: String) -> Bool {
@@ -97,11 +133,20 @@ nonisolated struct LoginRequest: Equatable, Sendable {
     }
 }
 
-/// JavaScript dialogs of a page's document: how many it showed, and whether the user stopped them.
+/// The answer of a login sheet; `credential` nil: cancelled.
+nonisolated struct LoginAnswer: Sendable {
+    var credential: URLCredential?
+    /// The page may show no more dialogs or sheets until its next document.
+    var suppressesFurther = false
+}
+
+/// JavaScript dialogs and login sheets of a page's document: how many it showed, and whether the user stopped them;
+/// the login sheets on screen, by protected area (`LoginRequest.key`).
 @MainActor
 final class PageDialogState {
     private(set) var shown = 0
     private(set) var isSuppressed = false
+    var pendingLogins: [String: Task<LoginAnswer?, Never>] = [:]
 
     func didShow() {
         shown += 1

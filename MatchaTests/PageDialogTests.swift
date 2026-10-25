@@ -49,6 +49,25 @@ struct PageDialogTests {
     @Test func `a long message is cut`() {
         let dialog = PageDialog(kind: .alert, message: String(repeating: "a", count: 5000), site: nil, offersSuppression: false)
         #expect(dialog.message.count == PageDialog.maximumLength + 1)
+        // Review WB18: a prompt's default text too.
+        let prompt = PageDialog(
+            kind: .prompt(defaultText: String(repeating: "x", count: 50000)),
+            message: "",
+            site: nil,
+            offersSuppression: false,
+        )
+        #expect(prompt.kind == .prompt(defaultText: String(repeating: "x", count: PageDialog.maximumLength)))
+    }
+
+    /// Review WB7: a frame without a website (`data:`, sandboxed) never passes for the page itself.
+    @Test func `a dialog of a frame without a website says it is embedded`() async throws {
+        let frame = try #require("<script>alert('session expirée')</script>".addingPercentEncoding(withAllowedCharacters: .alphanumerics))
+        let page = try await openPage(body: "<iframe src='data:text/html,\(frame)'></iframe>")
+        try await waitUntil { !dialogs.shown.isEmpty }
+        #expect(dialogs.shown.first?.site == nil)
+        #expect(dialogs.shown.first?.isFromEmbeddedFrame == true)
+        _ = try await page.loadedWebView.evaluateJavaScript("alert('page'); true")
+        #expect(dialogs.shown.last?.isFromEmbeddedFrame == false)
     }
 
     @Test func `a file input gets the files the user chose`() async throws {
@@ -73,7 +92,7 @@ struct PageDialogTests {
         #expect(disposition == .useCredential)
         #expect(credential?.user == "ada")
         #expect(dialogs.logins == [LoginRequest(
-            site: "http://intranet.local",
+            site: "http://pages",
             realm: "Administration",
             isSecure: false,
             failedBefore: true,
@@ -88,6 +107,45 @@ struct PageDialogTests {
         #expect(dialogs.logins.count == 2)
     }
 
+    /// Review WB6: an image or a frame of another site gets no sheet; Kerberos lets the system sign in first (WB16).
+    @Test func `only the page's website may ask, and Kerberos tries the system first`() async throws {
+        let page = try await openPage()
+        dialogs.credential = URLCredential(user: "ada", password: "secret", persistence: .forSession)
+        let other = challenge(method: NSURLAuthenticationMethodHTTPBasic, host: "evil.example")
+        #expect(await manager.coordinator.webView(page.loadedWebView, respondTo: other).0 == .performDefaultHandling)
+        let kerberos = challenge(method: NSURLAuthenticationMethodNegotiate)
+        #expect(await manager.coordinator.webView(page.loadedWebView, respondTo: kerberos).0 == .performDefaultHandling)
+        #expect(dialogs.logins.isEmpty)
+
+        let failed = challenge(method: NSURLAuthenticationMethodNegotiate, previousFailures: 1)
+        #expect(await manager.coordinator.webView(page.loadedWebView, respondTo: failed).0 == .useCredential)
+        #expect(dialogs.logins.count == 1)
+    }
+
+    /// Review WB6: one sheet at a time per protected area, and the user can stop them.
+    @Test func `a burst of challenges shows one sheet, and the user can stop them`() async throws {
+        let page = try await openPage()
+        dialogs.credential = URLCredential(user: "ada", password: "secret", persistence: .forSession)
+        dialogs.holdsLogins = true
+        let basic = challenge(method: NSURLAuthenticationMethodHTTPBasic)
+        let coordinator = manager.coordinator
+        let webView = page.loadedWebView
+        let answers = (0 ..< 5).map { _ in Task { await coordinator.webView(webView, respondTo: basic).1?.user } }
+        try await waitUntil { dialogs.logins.count == 1 }
+        dialogs.releaseLogins()
+        for answer in answers {
+            #expect(await answer.value == "ada")
+        }
+        #expect(dialogs.logins.map(\.offersSuppression) == [false])
+
+        dialogs.holdsLogins = false
+        dialogs.suppressesFurther = true
+        _ = await coordinator.webView(webView, respondTo: basic)
+        #expect(dialogs.logins.map(\.offersSuppression) == [false, true])
+        #expect(await coordinator.webView(webView, respondTo: basic).0 == .performDefaultHandling)
+        #expect(dialogs.logins.count == 2)
+    }
+
     private func openPage(body: String = "") async throws -> BrowserTab {
         let page = manager.insertTab(configuration: TestPages.configuration(), after: nil, select: true)
         page.load(TestPages.url("page", body: body))
@@ -95,9 +153,10 @@ struct PageDialogTests {
         return page
     }
 
-    private func challenge(method: String, previousFailures: Int = 0) -> URLAuthenticationChallenge {
+    /// A challenge from `host`: by default, that of the pages of `TestPages`.
+    private func challenge(method: String, previousFailures: Int = 0, host: String = "pages") -> URLAuthenticationChallenge {
         let space = URLProtectionSpace(
-            host: "intranet.local",
+            host: host,
             port: 80,
             protocol: "http",
             realm: "Administration",
@@ -122,6 +181,15 @@ final class FakePageDialogs: PageDialogPresenting {
     var files: [URL]?
     var logins: [LoginRequest] = []
     var credential: URLCredential?
+    var suppressesFurther = false
+    /// The login sheets wait for `releaseLogins()`.
+    var holdsLogins = false
+    private var heldLogins: [CheckedContinuation<Void, Never>] = []
+
+    func releaseLogins() {
+        heldLogins.forEach { $0.resume() }
+        heldLogins = []
+    }
 
     func present(_ dialog: PageDialog, for _: WKWebView) async -> PageDialogAnswer? {
         shown.append(dialog)
@@ -132,9 +200,12 @@ final class FakePageDialogs: PageDialogPresenting {
         files
     }
 
-    func credential(for login: LoginRequest, for _: WKWebView) async -> URLCredential? {
+    func credential(for login: LoginRequest, for _: WKWebView) async -> LoginAnswer? {
         logins.append(login)
-        return credential
+        if holdsLogins {
+            await withCheckedContinuation { heldLogins.append($0) }
+        }
+        return LoginAnswer(credential: credential, suppressesFurther: suppressesFurther)
     }
 
     func save(_: BrowserTab) {}

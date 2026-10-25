@@ -39,13 +39,34 @@ final class NavigationCoordinator: NSObject {
             modifierFlags: navigationAction.modifierFlags,
             buttonNumber: navigationAction.buttonNumber,
             targetsMainFrame: navigationAction.targetFrame?.isMainFrame ?? true,
+            isFromMainFrame: Self.sourceFrame(of: navigationAction)?.isMainFrame ?? true,
             isSchemeHandledByWebView: url.map { handles($0, in: webView) } ?? true,
             opensNewWindow: navigationAction.targetFrame == nil,
-            pageURL: webView.url,
+            pageURL: displayedDocument(of: webView),
             shouldPerformDownload: navigationAction.shouldPerformDownload,
             source: source,
             opensOtherSitesInPeek: source == .tab && tabHost?.isFavoriteOrPinned(webView) == true && opensPinnedLinksInPeek(),
         )
+    }
+
+    /// The frame whose document asks for the navigation. Declared non-null, yet WebKit's implementation returns nil
+    /// when it knows no source frame: read as an optional (review WB1).
+    static func sourceFrame(of navigationAction: WKNavigationAction) -> WKFrameInfo? {
+        navigationAction.sourceFrame as WKFrameInfo?
+    }
+
+    /// Address of the document `webView` displays, never the one being loaded (audit W4, review WB1).
+    func displayedDocument(of webView: WKWebView) -> URL? {
+        tabHost?.page(for: webView)?.documentURL ?? webView.backForwardList.currentItem?.url
+    }
+
+    /// Website that asks for `navigationAction` (review WB1): the origin of the document of its frame, never the
+    /// address being loaded; without a frame (a load started by the app), the displayed document's.
+    func requester(of navigationAction: WKNavigationAction, in webView: WKWebView) -> SiteOrigin? {
+        guard let frame = Self.sourceFrame(of: navigationAction) else {
+            return displayedDocument(of: webView).flatMap(SiteOrigin.init(url:))
+        }
+        return frame.securityOrigin.siteOrigin
     }
 
     /// True if WebKit loads this scheme itself or if the view's configuration associates a handler with it. Extension
@@ -126,6 +147,7 @@ extension NavigationCoordinator: WKNavigationDelegate {
         // Blocker (task 6.2): realigned on the displayed document (redirect, back from the cache).
         tabHost.contentBlocking?.prepare(webView, for: webView.url)
         tab.documentDidChange()
+        updateCertificateException(of: tab, in: webView)
         tab.permissionPrompts.denyAll()
         tab.pageDownloads.documentDidChange()
         tab.pageDialogs.documentDidChange()
@@ -144,6 +166,7 @@ extension NavigationCoordinator: WKNavigationDelegate {
         tab.suspension.endRestoring()
         tab.crash.end()
         tab.documentDidChange()
+        updateCertificateException(of: tab, in: webView)
         tabHost.faviconService.refreshIcon(of: tab)
         // Recorded at each loaded page: a crash does not lose the history.
         tab.captureInteractionState()
@@ -157,6 +180,11 @@ extension NavigationCoordinator: WKNavigationDelegate {
         decisionHandler: @escaping @MainActor @Sendable (WKNavigationActionPolicy) -> Void,
     ) {
         recordClick(navigationAction, in: webView)
+        if opensSourceViewerForAPage(navigationAction, in: webView) {
+            Logger.browser.notice("Source viewer asked for by a page: cancelled")
+            decisionHandler(.cancel)
+            return
+        }
         switch NavigationPolicy.decide(request(for: navigationAction, in: webView)) {
         case .allow:
             allow(navigationAction, in: webView, decisionHandler: decisionHandler)
@@ -164,7 +192,7 @@ extension NavigationCoordinator: WKNavigationDelegate {
             decisionHandler(.cancel)
         case let .openExternally(url):
             decisionHandler(.cancel)
-            requestOpening(url, from: webView)
+            requestOpening(url, from: webView, origin: requester(of: navigationAction, in: webView))
         case let .openInNewTab(url, inBackground):
             decisionHandler(.cancel)
             // Same configuration as the originating view: same profile.
@@ -176,12 +204,16 @@ extension NavigationCoordinator: WKNavigationDelegate {
                 allow(navigationAction, in: webView, decisionHandler: decisionHandler)
             }
         case .download:
-            let isSubframe = navigationAction.targetFrame?.isMainFrame == false
-            startDownload(in: webView, isSubframe: isSubframe) { decisionHandler($0 ? .download : .cancel) }
+            // A frame inside the page asks, or is the target: a subframe's download (audit W7, review WB1).
+            let isSubframe = navigationAction.targetFrame?.isMainFrame == false || Self.sourceFrame(of: navigationAction)?
+                .isMainFrame == false
+            let origin = requester(of: navigationAction, in: webView)
+            startDownload(in: webView, isSubframe: isSubframe, origin: origin) { decisionHandler($0 ? .download : .cancel) }
         }
     }
 
     /// A response WebKit cannot display, or an attachment, becomes a download (if the page may download it: `+Downloads`).
+    /// The website asking is that of the displayed document, never the file's address (often a CDN, review WB1).
     func webView(
         _ webView: WKWebView,
         decidePolicyFor navigationResponse: WKNavigationResponse,
@@ -192,7 +224,10 @@ extension NavigationCoordinator: WKNavigationDelegate {
             decisionHandler(.allow)
             return
         }
-        startDownload(in: webView, isSubframe: !navigationResponse.isForMainFrame) { decisionHandler($0 ? .download : .cancel) }
+        let origin = displayedDocument(of: webView).flatMap(SiteOrigin.init(url:))
+        startDownload(in: webView, isSubframe: !navigationResponse.isForMainFrame, origin: origin) {
+            decisionHandler($0 ? .download : .cancel)
+        }
     }
 
     func webView(_ webView: WKWebView, navigationAction _: WKNavigationAction, didBecome download: WKDownload) {
@@ -223,7 +258,7 @@ extension NavigationCoordinator: WKUIDelegate {
         WebConfigurationFactory.giveOwnContentController(to: configuration)
         let features = PopupWindowFeatures(windowFeatures)
         if let intent = takePageMenuIntent(of: webView, for: navigationAction, features: features) {
-            return openWindow(for: intent, configuration: configuration, url: navigationAction.request.url, from: webView, in: tabHost)
+            return openWindow(for: intent, configuration: configuration, navigationAction: navigationAction, from: webView, in: tabHost)
         }
         guard features.opensPopupWindow, let popupWindows = tabHost.popupWindows else {
             return tabHost.openWindow(configuration: configuration, from: webView, inBackground: false)

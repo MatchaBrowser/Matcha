@@ -22,7 +22,7 @@ extension BrowserTab {
         guard webView != nil, !displayedAddress.isPending, loadFailure.error == nil else {
             return .none
         }
-        if let host = displayedAddress.url?.host()?.lowercased(), acceptedCertificateHosts.contains(host) {
+        if usesAcceptedCertificate {
             return .invalidCertificate
         }
         return PageSecurity.of(displayedAddress.url, hasOnlySecureContent: hasOnlySecureContent)

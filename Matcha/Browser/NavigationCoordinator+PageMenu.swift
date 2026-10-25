@@ -31,9 +31,26 @@ extension NavigationCoordinator: PageMenuDelegate {
                 PageSourceSchemeHandler.of(webView.configuration)?.authorize(viewer, in: webView.configuration.websiteDataStore)
                 tabHost.openLink(viewer, configuration: webView.configuration, from: webView, inBackground: false)
             }
-        case .goBack, .goForward:
-            break
+        case .goBack:
+            page.goBack()
+        case .goForward:
+            page.goForward()
         }
+    }
+
+    /// True for a navigation to the source viewer that doesn't come from the app (`NavigationPolicy.allowsSourceViewer`,
+    /// review WB3): it is cancelled.
+    func opensSourceViewerForAPage(_ navigationAction: WKNavigationAction, in webView: WKWebView) -> Bool {
+        guard let url = navigationAction.request.url, url.scheme?.lowercased() == PageSource.scheme else {
+            return false
+        }
+        return !NavigationPolicy.allowsSourceViewer(
+            url,
+            type: navigationAction.navigationType,
+            targetsMainFrame: navigationAction.targetFrame?.isMainFrame == true,
+            requested: tabHost?.page(for: webView)?.displayedAddress.requested,
+            displayed: displayedDocument(of: webView),
+        )
     }
 
     /// Context menu choice of `webView` that this window must follow, if there is one; it is then forgotten.
@@ -51,19 +68,26 @@ extension NavigationCoordinator: PageMenuDelegate {
         return webView.pageMenuIntent.take(for: request, at: now())
     }
 
-    /// View of the window requested for `intent`; nil if the page opens elsewhere (Peek, another app).
+    /// View of the window requested for `intent`; nil if the page opens elsewhere (Peek, another app). A link to another
+    /// app: a mail or phone link opens at once, any other waits in the page's banner, which names the app (review WB4).
     func openWindow(
         for intent: PageMenuIntent,
         configuration: WKWebViewConfiguration,
-        url: URL?,
+        navigationAction: WKNavigationAction,
         from webView: WKWebView,
         in tabHost: any TabHost,
     ) -> WKWebView? {
+        let url = navigationAction.request.url
         if let url, !handles(url, in: webView) {
-            open(externally: url)
+            if NavigationPolicy.schemesOpenedFromMenu.contains(url.scheme?.lowercased() ?? "") {
+                open(externally: url)
+            } else {
+                requestOpening(url, from: webView, origin: requester(of: navigationAction, in: webView))
+            }
             return nil
         }
-        let opensInPeek = intent.destination == .peek && url.map { NavigationPolicy.opensElsewhere($0, from: webView.url) } == true
+        let page = displayedDocument(of: webView)
+        let opensInPeek = intent.destination == .peek && url.map { NavigationPolicy.opensElsewhere($0, from: page) } == true
         if opensInPeek, let url, tabHost.openInPeek(url, from: webView, openingPoint: intent.openingPoint) {
             return nil
         }

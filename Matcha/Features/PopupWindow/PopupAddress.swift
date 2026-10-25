@@ -8,7 +8,8 @@ nonisolated struct PopupAddress: Equatable, Sendable {
     typealias Security = PageSecurity
 
     /// The host (without “www.”, with the port if it is not the default one) for a site; the file name for a local
-    /// file; `about:blank`; otherwise only the scheme (`data:`), never the content of a `data:` address.
+    /// file; `about:blank`; the website that made a `blob:` page (`blob:example.com`, review WB15), never its path;
+    /// otherwise only the scheme (`data:`), never the content of a `data:` address.
     let text: String
     let security: Security
 }
@@ -32,6 +33,8 @@ nonisolated extension PopupAddress {
             text = "\(origin.scheme)://\(origin.displayHost)"
         } else if scheme == "about" {
             text = url.absoluteString
+        } else if scheme == "blob", let inner = URL(string: String(url.absoluteString.dropFirst(5))), let origin = SiteOrigin(url: inner) {
+            text = "blob:\(origin.displayName)"
         } else {
             text = scheme.isEmpty ? "" : "\(scheme):"
         }

@@ -98,13 +98,14 @@ final class TabManager {
         layout.place(of: tab.id)
     }
 
-    /// Opens a tab at the top of the today tabs and loads `url` in it if provided; `source`: the page whose link it is.
+    /// Opens a tab at the top of the today tabs and loads `url` in it if provided; `source`: the page whose link it is;
+    /// `isFromAnotherApp`: a link received from another app.
     @discardableResult
-    func newTab(url: URL? = nil, select: Bool = true, from source: URL? = nil) -> BrowserTab {
+    func newTab(url: URL? = nil, select: Bool = true, from source: URL? = nil, isFromAnotherApp: Bool = false) -> BrowserTab {
         let configuration = pages.makeConfiguration(websiteDataStore: websiteDataStore)
         let tab = insertTab(configuration: configuration, after: nil, select: select)
         if let url {
-            tab.load(url, from: source)
+            tab.load(url, from: source, isFromAnotherApp: isFromAnotherApp)
         }
         return tab
     }

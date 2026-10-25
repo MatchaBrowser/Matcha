@@ -13,7 +13,7 @@ extension MiniWindowManager {
         case .space:
             let space = displayedSpace
             actInMainWindow(on: space)
-            let tabs = urls.map { space.tabManager.newTab(url: $0) }
+            let tabs = urls.map { space.tabManager.newTab(url: $0, isFromAnotherApp: true) }
             if let last = tabs.last {
                 reveal(last, in: space) { openMainWindow?() }
             }

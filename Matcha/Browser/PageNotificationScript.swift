@@ -1,29 +1,38 @@
 import Foundation
-import OSLog
 import WebKit
 
 /// Matcha's own `Notification` in the pages: WebKit offers no public API to grant notifications (its own answers
-/// “denied” to every request while still saying “default”, so websites ask again on every load). Injected at the start
-/// of each document, in the page's world (the page must see it), it replaces `Notification`,
-/// `navigator.permissions.query({ name: 'notifications' })` and `ServiceWorkerRegistration.showNotification` (from the
-/// page; a service worker's own notifications stay out of reach), and talks to the app through
-/// `PageNotificationMessageHandler`. The permission it shows comes from a state script added by the app before each
-/// navigation (`stateSource`): the decisions of the profile, known from the start of the document. A request is only
-/// sent right after a click or a key press, as in Safari; a cross-origin frame or an insecure page reads “denied”.
+/// “denied” to every request while still saying “default”, so websites ask again on every load). Two scripts, injected
+/// at the start of each document (review WB2):
+/// - in an isolated world (`world`), the script that talks to the app (`PageNotificationMessageHandler`, reachable from
+///   this world only) and holds the decisions of the profile, given before each navigation (`stateSource`). It sends a
+///   request only from the main frame, right after a click or a key press (`navigator.userActivation`, read where the
+///   page can't redefine it); a cross-origin frame or an insecure page reads “denied”;
+/// - in the page's world, a thin layer that the page sees: `Notification`, `navigator.permissions.query({ name:
+///   'notifications' })` and `ServiceWorkerRegistration.showNotification` (from the page; a service worker's own
+///   notifications stay out of reach). It talks to the isolated script through DOM events with names drawn at each
+///   launch, and only learns the permission of its own origin.
+/// The page can fool its own layer, never the isolated script nor the checks of the app (`NavigationCoordinator+
+/// Notifications`).
 @MainActor
 enum PageNotificationScript {
+    static let world = WKContentWorld.world(name: "MatchaPageNotifications")
     static let handlerName = "matchaNotifications"
-    /// Property of `window` through which the app reaches the script (states, events); random for each launch.
-    static let bridgeName = "__matchaNotifications" + UUID().uuidString.replacingOccurrences(of: "-", with: "")
+    /// Property of `window`, in the isolated world, through which the app reaches the script (states, events).
+    static let bridgeName = "matchaNotifications"
+    /// DOM events from the page's layer to the isolated script, and back; random for each launch.
+    private static let toWorld = "e" + UUID().uuidString.replacingOccurrences(of: "-", with: "").lowercased()
+    private static let toPage = "e" + UUID().uuidString.replacingOccurrences(of: "-", with: "").lowercased()
 
-    /// Hooks the script and its recipient onto `controller` (once per controller, like the sound script).
+    /// Hooks the scripts and their recipient onto `controller` (once per controller, like the sound script).
     static func install(in controller: WKUserContentController) {
-        controller.addScriptMessageHandler(PageNotificationMessageHandler(), contentWorld: .page, name: handlerName)
-        controller.addUserScript(WKUserScript(source: source, injectionTime: .atDocumentStart, forMainFrameOnly: false, in: .page))
+        controller.addScriptMessageHandler(PageNotificationMessageHandler(), contentWorld: world, name: handlerName)
+        controller.addUserScript(WKUserScript(source: worldSource, injectionTime: .atDocumentStart, forMainFrameOnly: false, in: world))
+        controller.addUserScript(WKUserScript(source: pageSource, injectionTime: .atDocumentStart, forMainFrameOnly: false, in: .page))
     }
 
-    /// State script: notifications available or not (private window), and the decision of each origin, read by the
-    /// script injected before it.
+    /// State script, in the isolated world: notifications available or not (private window), and the decision of each
+    /// origin, read by the script injected before it. The page never sees it.
     static func stateSource(isAvailable: Bool, states: [String: PageNotificationPermission]) -> String {
         let object = states.mapValues(\.rawValue)
         let json = (try? JSONSerialization.data(withJSONObject: object, options: [.sortedKeys]))
@@ -31,19 +40,21 @@ enum PageNotificationScript {
         return "window['\(bridgeName)']?.setStates(\(isAvailable), \(json));"
     }
 
-    /// Function body that sends `type` (“click”) to the notification `id` of the page (`callAsyncJavaScript`).
+    /// Function body, run in `world`, that sends `type` (“click”) to the notification `id` of the page
+    /// (`callAsyncJavaScript`).
     static let dispatchBody = "window[bridge]?.dispatch(id, type);"
 
-    static let source = """
+    static let worldSource = """
     (() => {
         const handler = window.webkit?.messageHandlers?.\(handlerName);
-        if (!handler || typeof window.Notification === 'undefined') {
+        if (!handler) {
             return;
         }
         const origin = self.origin;
+        const isMainFrame = window.top === window;
         const isTopOrigin = (() => {
             try {
-                return window.top === window || window.top.location.origin === origin;
+                return isMainFrame || window.top.location.origin === origin;
             } catch {
                 return false;
             }
@@ -51,7 +62,77 @@ enum PageNotificationScript {
         let available = false;
         let states = {};
         const permission = () => (available && window.isSecureContext && isTopOrigin ? states[origin] ?? 'default' : 'denied');
+        const send = (detail) => window.dispatchEvent(new CustomEvent('\(toPage)', { detail: JSON.stringify(detail) }));
+        window.addEventListener('\(toWorld)', (event) => {
+            let message;
+            try {
+                message = JSON.parse(event.detail);
+            } catch {
+                return;
+            }
+            const reply = (result) => send({ call: message?.call, result });
+            switch (message?.type) {
+            case 'permission':
+                reply(permission());
+                break;
+            case 'request':
+                if (permission() !== 'default' || !isMainFrame || navigator.userActivation?.isActive !== true) {
+                    reply(permission());
+                    break;
+                }
+                handler.postMessage({ type: 'request' }).then((answer) => {
+                    if (answer === 'granted' || answer === 'denied') {
+                        states[origin] = answer;
+                    }
+                    reply(permission());
+                }, () => reply(permission()));
+                break;
+            case 'show':
+                if (permission() !== 'granted') {
+                    reply(false);
+                    break;
+                }
+                handler.postMessage({
+                    type: 'show',
+                    id: String(message.id),
+                    title: String(message.title),
+                    body: String(message.body ?? ''),
+                    tag: String(message.tag ?? ''),
+                    silent: message.silent === true,
+                }).then((ok) => reply(ok === true), () => reply(false));
+                break;
+            case 'close':
+                handler.postMessage({ type: 'close', id: String(message.id) }).catch(() => {});
+                break;
+            default:
+                reply(null);
+            }
+        }, true);
+        Object.defineProperty(window, '\(bridgeName)', {
+            value: Object.freeze({
+                setStates(isAvailable, newStates) {
+                    available = isAvailable === true;
+                    states = { ...newStates };
+                },
+                dispatch(id, type) {
+                    send({ event: String(type), id: String(id) });
+                },
+            }),
+        });
+    })();
+    """
+
+    static let pageSource = """
+    (() => {
+        if (typeof window.Notification === 'undefined') {
+            return;
+        }
+        const dispatch = window.dispatchEvent.bind(window);
+        const Custom = window.CustomEvent;
+        const { parse, stringify } = JSON;
+        const waiting = new Map();
         const shown = new Map();
+        let calls = 0;
         const fire = (target, type) => {
             const event = new Event(type);
             target.dispatchEvent(event);
@@ -59,6 +140,40 @@ enum PageNotificationScript {
             if (typeof listener === 'function') {
                 listener.call(target, event);
             }
+        };
+        window.addEventListener('\(toPage)', (event) => {
+            let message;
+            try {
+                message = parse(event.detail);
+            } catch {
+                return;
+            }
+            if (typeof message?.event === 'string') {
+                const notification = shown.get(message.id);
+                if (notification) {
+                    fire(notification, message.event);
+                }
+                return;
+            }
+            const callback = waiting.get(message?.call);
+            if (callback) {
+                waiting.delete(message.call);
+                callback(message.result);
+            }
+        }, true);
+        const post = (message, callback) => {
+            const call = ++calls;
+            if (callback) {
+                waiting.set(call, callback);
+            }
+            dispatch(new Custom('\(toWorld)', { detail: stringify({ ...message, call }) }));
+            return call;
+        };
+        const ask = (message) => new Promise((resolve) => post(message, resolve));
+        const permission = () => {
+            let result = 'denied';
+            waiting.delete(post({ type: 'permission' }, (answer) => { result = answer; }));
+            return ['granted', 'denied', 'default'].includes(result) ? result : 'denied';
         };
         class Notification extends EventTarget {
             #id = Math.random().toString(36).slice(2, 12) + Date.now().toString(36);
@@ -80,8 +195,8 @@ enum PageNotificationScript {
                     return;
                 }
                 shown.set(this.#id, this);
-                handler.postMessage({ type: 'show', id: this.#id, title: this.#title, body: this.body, tag: this.tag, silent: this.silent })
-                    .then((ok) => fire(this, ok ? 'show' : 'error'), () => fire(this, 'error'));
+                ask({ type: 'show', id: this.#id, title: this.#title, body: this.body, tag: this.tag, silent: this.silent })
+                    .then((ok) => fire(this, ok === true ? 'show' : 'error'));
             }
             get title() { return this.#title; }
             get body() { return String(this.#options.body ?? ''); }
@@ -98,7 +213,7 @@ enum PageNotificationScript {
             get actions() { return []; }
             close() {
                 if (shown.delete(this.#id)) {
-                    handler.postMessage({ type: 'close', id: this.#id }).catch(() => {});
+                    post({ type: 'close', id: this.#id });
                     setTimeout(() => fire(this, 'close'));
                 }
             }
@@ -106,14 +221,12 @@ enum PageNotificationScript {
             static get maxActions() { return 0; }
             static async requestPermission(callback) {
                 let result = permission();
-                if (result === 'default' && navigator.userActivation?.isActive !== false) {
-                    try {
-                        const answer = await handler.postMessage({ type: 'request' });
-                        if (answer === 'granted' || answer === 'denied') {
-                            states[origin] = answer;
-                            result = answer;
-                        }
-                    } catch {}
+                if (result === 'default') {
+                    // Sent at once, still within the click: the isolated script checks it.
+                    const answer = await ask({ type: 'request' });
+                    if (answer === 'granted' || answer === 'denied' || answer === 'default') {
+                        result = answer;
+                    }
                 }
                 if (typeof callback === 'function') {
                     callback(result);
@@ -147,42 +260,6 @@ enum PageNotificationScript {
             };
             registration.getNotifications = () => Promise.resolve([]);
         }
-        Object.defineProperty(window, '\(bridgeName)', {
-            value: Object.freeze({
-                setStates(isAvailable, newStates) {
-                    available = isAvailable === true;
-                    states = { ...newStates };
-                },
-                dispatch(id, type) {
-                    const notification = shown.get(id);
-                    if (notification) {
-                        fire(notification, type);
-                    }
-                },
-            }),
-        });
     })();
     """
-}
-
-/// Receives the messages of the notification script and hands them to the navigation delegate of the page that sends
-/// them (`NavigationCoordinator+Notifications`), which answers. A malformed message, or one from a page without a
-/// delegate, gets a refusal.
-final class PageNotificationMessageHandler: NSObject, WKScriptMessageHandlerWithReply {
-    func userContentController(
-        _: WKUserContentController,
-        didReceive message: WKScriptMessage,
-        replyHandler: @escaping @MainActor @Sendable (Any?, String?) -> Void,
-    ) {
-        guard let parsed = PageNotificationMessage(body: message.body) else {
-            Logger.notifications.notice("Malformed notification script message: refused")
-            replyHandler(nil, "Malformed message")
-            return
-        }
-        guard let webView = message.webView, let coordinator = webView.navigationDelegate as? NavigationCoordinator else {
-            replyHandler(nil, "No page")
-            return
-        }
-        coordinator.receive(parsed, from: message.frameInfo, in: webView) { replyHandler($0, nil) }
-    }
 }

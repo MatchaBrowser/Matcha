@@ -61,6 +61,69 @@ struct BrowserTabTests {
         #expect(tab.displayTitle == "example.test")
     }
 
+    /// Review WB12: a restored tab loads again only a website, a local file, the viewer, an extension page or a blank one.
+    @Test(arguments: [
+        ("https://example.com/", true),
+        ("file:///Users/moi/page.html", true),
+        ("about:blank", true),
+        ("about:blank#un", true),
+        ("about:blank%23un", true),
+        ("matcha-source:https://example.com/", true),
+        ("webkit-extension://abc/options.html", true),
+        ("javascript:alert(1)", false),
+        ("data:text/html,<p>x</p>", false),
+        ("blob:https://example.com/123", false),
+        ("about:srcdoc", false),
+        ("zoommtg://zoom.us/join", false),
+    ])
+    func `a restored tab only loads addresses of known kinds`(address: String, isRestored: Bool) throws {
+        let url = try #require(URL(string: address))
+        let stored = StoredTab(id: UUID(), url: url, pinnedURL: url, lastActivity: .now, interactionState: Data([1]))
+        let tab = BrowserTab(
+            restoring: stored,
+            configuration: WebConfigurationFactory().makeConfiguration(websiteDataStore: .nonPersistent()),
+        )
+        #expect(tab.url == (isRestored ? url : nil))
+        #expect(tab.pinnedURL == (isRestored ? url : nil))
+        #expect((tab.savedInteractionState != nil) == isRestored)
+    }
+
+    /// Review WB20: a tab unloaded on a failure goes back to its address, and ⌘R loads that one.
+    @Test func `unloading forgets the failed load`() throws {
+        let tab = makeTab()
+        let missing = URL(filePath: "/tmp/absent-\(UUID().uuidString).html")
+        tab.load(missing)
+        #expect(tab.loadFailure.error != nil)
+        let pinned = try #require(URL(string: "https://example.com/"))
+        tab.unload(resettingTo: pinned, title: "Exemple")
+        #expect(tab.loadFailure.error == nil)
+        #expect(tab.displayedURL == pinned)
+    }
+
+    /// Review WB19: a restored tab keeps its title and address while its page doesn't answer.
+    @Test func `a restored tab keeps its title and address until its page shows`() async throws {
+        let configuration = TestPages.configuration()
+        configuration.setURLSchemeHandler(SilentPages(), forURLScheme: SilentPages.scheme)
+        let silent = try #require(URL(string: "\(SilentPages.scheme)://hors-ligne/page"))
+        let tab = BrowserTab(
+            restoring: StoredTab(id: UUID(), url: silent, title: "Ancien titre", lastActivity: .now),
+            configuration: configuration,
+        )
+        _ = tab.loadedWebView
+        try await waitUntil { tab.isLoading }
+        #expect(tab.title == "Ancien titre")
+        #expect(tab.url == silent)
+    }
+
+    /// Review WB19: a navigation state WebKit can't read loads the saved address.
+    @Test func `an unreadable navigation state loads the saved address`() async throws {
+        let url = TestPages.url("restaure")
+        let stored = StoredTab(id: UUID(), url: url, title: "restaure", lastActivity: .now, interactionState: Data([1, 2, 3]))
+        let tab = BrowserTab(restoring: stored, configuration: TestPages.configuration())
+        _ = tab.loadedWebView
+        try await waitUntil { tab.webView?.url == url && !tab.isLoading }
+    }
+
     @Test func `starts unloaded`() {
         let tab = makeTab()
         #expect(!tab.isLoaded)

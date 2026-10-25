@@ -51,9 +51,14 @@ extension NavigationCoordinator {
         guard let page = tabHost?.page(for: webView), !page.pageDialogs.isSuppressed else {
             return nil
         }
-        let origin = frame.securityOrigin
-        let site = SiteOrigin(scheme: origin.protocol, host: origin.host, port: origin.port)?.displayName
-        let dialog = PageDialog(kind: kind, message: message, site: site, offersSuppression: page.pageDialogs.shown > 0)
+        let site = frame.securityOrigin.siteOrigin?.displayName
+        let dialog = PageDialog(
+            kind: kind,
+            message: message,
+            site: site,
+            isFromEmbeddedFrame: !frame.isMainFrame,
+            offersSuppression: page.pageDialogs.shown > 0,
+        )
         page.pageDialogs.didShow()
         let answer = await dialogs.present(dialog, for: webView)
         if answer?.suppressesFurther == true {

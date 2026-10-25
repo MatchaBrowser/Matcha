@@ -48,15 +48,22 @@ final class PageNotificationCenter {
     }
 
     /// Before a navigation of `webView`: the decisions (origin key → permission) that the script will read in the next
-    /// documents; `isAvailable` false: “denied” everywhere (private window). A new state script is added only if they
-    /// changed: WebKit can't remove one, the last one added wins.
+    /// documents, in its isolated world: the page and its frames never see them (review WB10); `isAvailable` false:
+    /// “denied” everywhere (private window). A new state script is added only if they changed: WebKit can't remove one,
+    /// the last one added wins.
     func prepare(_ webView: WKWebView, isAvailable: Bool, states: [String: PageNotificationPermission]) {
         let controller = webView.configuration.userContentController
         if let prepared = preparedStates.object(forKey: controller), prepared.isAvailable == isAvailable, prepared.states == states {
             return
         }
         let source = PageNotificationScript.stateSource(isAvailable: isAvailable, states: states)
-        controller.addUserScript(WKUserScript(source: source, injectionTime: .atDocumentStart, forMainFrameOnly: false, in: .page))
+        let script = WKUserScript(
+            source: source,
+            injectionTime: .atDocumentStart,
+            forMainFrameOnly: false,
+            in: PageNotificationScript.world,
+        )
+        controller.addUserScript(script)
         preparedStates.setObject(PreparedStates(isAvailable: isAvailable, states: states), forKey: controller)
     }
 
@@ -136,7 +143,7 @@ final class PageNotificationCenter {
                 PageNotificationScript.dispatchBody,
                 arguments: ["bridge": PageNotificationScript.bridgeName, "id": entry.scriptID, "type": "click"],
                 in: entry.frame,
-                contentWorld: .page,
+                contentWorld: PageNotificationScript.world,
             )
         }
     }

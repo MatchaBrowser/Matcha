@@ -57,8 +57,14 @@ final class BrowserTab: Identifiable {
     let loadFailure = PageLoadFailure()
     /// JavaScript dialogs of the page's document (audit K1).
     let pageDialogs = PageDialogState()
-    /// Websites whose invalid certificate the user accepted, loaded in this tab (“Not Secure”, audit K5).
-    var acceptedCertificateHosts: Set<String> = []
+    /// The displayed document came over a certificate the user accepted for its website (“Not Secure”, audit K5); read
+    /// from the document's own connection, whichever tab accepted it (`NavigationCoordinator+Authentication`, WB5).
+    var usesAcceptedCertificate = false
+    /// A new web view of a tab that already has a title or an address (restored, unloaded) hasn't shown a document
+    /// yet: its empty title and missing address don't replace the tab's (review WB19).
+    @ObservationIgnored private(set) var awaitsFirstDocument = false
+    /// What the tab's local file may read, granted at its first load (`FileReadAccess`); nil for a website.
+    private(set) var fileReadAccess: URL?
     /// The displayed website may send notifications (`NavigationCoordinator+Notifications`): never put to sleep.
     var canSendNotifications = false
     /// The page's zoom (`WKWebView.pageZoom`, task 5.4), copied here for the menus: it only changes through
@@ -94,32 +100,30 @@ final class BrowserTab: Identifiable {
     }
 
     /// Tab restored from the saved data: it displays `url` and `title`, and only creates its web view
-    /// (which will load `url`) the first time it is shown.
-    convenience init(restoring stored: StoredTab, configuration: WKWebViewConfiguration) {
+    /// (which will load `url`) the first time it is shown. From saved data (`isSaved`: launch, sync), an address of
+    /// another kind (`StoredTab.restorable`, review WB12) comes back as an empty tab, without its history; a tab closed
+    /// in this session (kept in memory) comes back as it was.
+    convenience init(restoring stored: StoredTab, configuration: WKWebViewConfiguration, isSaved: Bool = true) {
         self.init(id: stored.id, configuration: configuration)
-        setURL(stored.url)
-        displayedAddress.reset(to: stored.url)
+        let served = Self.servedSchemes(of: configuration, among: [stored.url, stored.pinnedURL])
+        let restorable = { (url: URL?) in isSaved ? StoredTab.restorable(url, servedSchemes: served) : url }
+        let url = restorable(stored.url)
+        setURL(url)
+        displayedAddress.reset(to: url)
         title = stored.title
-        pendingURL = stored.url
-        pinnedURL = stored.pinnedURL
+        pendingURL = url
+        pinnedURL = restorable(stored.pinnedURL)
         pinnedTitle = stored.pinnedTitle
         lastActivity = stored.lastActivity
-        savedInteractionState = stored.interactionState
-        pendingInteractionState = stored.interactionState
-        // A source viewer the user had opened stays readable after a relaunch.
-        if let url = stored.url {
+        let state = url == nil ? nil : stored.interactionState
+        savedInteractionState = state
+        pendingInteractionState = state
+        fileReadAccess = stored.fileReadAccess
+        // A source viewer the user had opened stays readable after a relaunch: only the app saves such an address, a
+        // page can't navigate to one (review WB3).
+        if let url {
             PageSourceSchemeHandler.of(configuration)?.authorize(url, in: configuration.websiteDataStore)
         }
-    }
-
-    var isLoaded: Bool {
-        webView != nil
-    }
-
-    /// Displayed as loaded in the sidebar (full title, close button): web view present, or put to sleep to save
-    /// memory, which must not change anything in the display (task 5.6).
-    var appearsLoaded: Bool {
-        webView != nil || suspension.isSuspended
     }
 
     /// The tab's web view, created if needed; an unloaded tab then reloads its address, a sleeping tab its page and
@@ -129,6 +133,8 @@ final class BrowserTab: Identifiable {
         if let webView {
             return webView
         }
+        // A failure shown belongs to the previous view (review WB20).
+        loadFailure.clear()
         let webView = BrowserWebView(frame: .zero, configuration: configuration)
         webView.allowsBackForwardNavigationGestures = true
         webView.allowsMagnification = true
@@ -146,15 +152,23 @@ final class BrowserTab: Identifiable {
         }
         // Before the observation, whose first notification gives the new view's empty address.
         let shownURL = displayedURL
+        awaitsFirstDocument = title != nil || url != nil
         observe(webView)
         if let state = pendingInteractionState {
             // Restoration: page, history and scrolling, without reloading from the address. The tab's own page, shown
             // while it comes back.
+            let savedURL = pendingURL ?? url
             pendingInteractionState = nil
             pendingURL = nil
             webView.interactionState = state
             if let shownURL {
                 displayedAddress.userDidRequest(shownURL)
+            }
+            // A state WebKit can't read restores no history (the list is restored at once, the page loads later): the
+            // saved address loads instead (review WB19).
+            if webView.backForwardList.currentItem == nil, let savedURL {
+                Logger.browser.notice("Unreadable navigation state: the tab loads its address")
+                load(savedURL, in: webView)
             }
         } else if let pendingURL {
             self.pendingURL = nil
@@ -169,6 +183,8 @@ final class BrowserTab: Identifiable {
     /// will load `url` when it is reopened.
     func unload(resettingTo url: URL?, title: String?) {
         releaseWebView()
+        // The failure was the released view's: ⌘R loads `url` again, not the address that failed (review WB20).
+        loadFailure.clear()
         history.reset()
         suspension.reset()
         pendingURL = url
@@ -222,6 +238,7 @@ final class BrowserTab: Identifiable {
 
     /// A new document is displayed, or the load ended: the address shown is the web view's again (audit W4).
     func documentDidChange() {
+        awaitsFirstDocument = false
         displayedAddress.documentDidChange(to: webView?.url)
         loadFailure.clear()
         updateCanGoBack()
@@ -243,15 +260,16 @@ final class BrowserTab: Identifiable {
         }
     }
 
-    /// Loads `url`; `source`: the page whose link it is, if any (a local file then reads less, `FileReadAccess`).
-    func load(_ url: URL, from source: URL? = nil) {
+    /// Loads `url`; `source`: the page whose link it is, if any; `isFromAnotherApp`: received from another app. A local
+    /// file then reads less (`FileReadAccess`).
+    func load(_ url: URL, from source: URL? = nil, isFromAnotherApp: Bool = false) {
         let webView = makeWebViewIfNeeded()
         // A page other than the one put to sleep: no more snapshot on top; a crashed page leaves its message.
         suspension.endRestoring()
         crash.pageWillNavigate()
         displayedAddress.userDidRequest(url)
         loadFailure.clear()
-        load(url, in: webView, from: source)
+        load(url, in: webView, from: source, isFromAnotherApp: isFromAnotherApp)
     }
 
     /// The page's zoom (100% = 1); kept for the web view recreated after an unload.
@@ -283,7 +301,7 @@ final class BrowserTab: Identifiable {
         crash.end()
     }
 
-    private func load(_ url: URL, in webView: WKWebView, from source: URL? = nil) {
+    private func load(_ url: URL, in webView: WKWebView, from source: URL? = nil, isFromAnotherApp: Bool = false) {
         if url.isFileURL {
             // Moved, or chosen before a relaunch outside the Downloads folder: WebKit would show nothing (review ON14).
             guard FileManager.default.isReadableFile(atPath: url.path) else {
@@ -291,7 +309,11 @@ final class BrowserTab: Identifiable {
                 keepFailedAddress(url)
                 return
             }
-            webView.loadFileURL(url, allowingReadAccessTo: FileReadAccess.readableURL(for: url, openedFrom: source))
+            // The access granted the first time, for “Try Again”, a reload after a crash or an unload, a relaunch.
+            let access = fileReadAccess.flatMap { FileReadAccess.covers($0, url) ? $0 : nil }
+                ?? FileReadAccess.readableURL(for: url, openedFrom: source, isFromAnotherApp: isFromAnotherApp)
+            fileReadAccess = access
+            webView.loadFileURL(url, allowingReadAccessTo: access)
         } else {
             webView.load(URLRequest(url: url))
         }
@@ -339,20 +361,5 @@ final class BrowserTab: Identifiable {
                 tab.hasOnlySecureContent = webView.hasOnlySecureContent
             }),
         ]
-    }
-
-    /// Makes a KVO handler that copies the web view's state into the tab.
-    /// WebKit sends its KVO notifications on the main thread. A view already replaced is ignored.
-    private func sync<Value>(
-        _ apply: @escaping @MainActor @Sendable (BrowserTab, WKWebView) -> Void,
-    ) -> @Sendable (WKWebView, NSKeyValueObservedChange<Value>) -> Void {
-        { [weak self] webView, _ in
-            MainActor.assumeIsolated {
-                guard let self, self.webView === webView else {
-                    return
-                }
-                apply(self, webView)
-            }
-        }
     }
 }

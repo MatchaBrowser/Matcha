@@ -8,7 +8,7 @@ protocol PageMenuDelegate: AnyObject {
     /// True if “Open Link in Peek” makes sense in `webView`: a tab of the sidebar (not Peek, where a link already loads
     /// in place, nor a mini window or a sign-in window, which have no Peek).
     func pageMenuOffersPeek(in webView: WKWebView) -> Bool
-    /// Save As…, Print…, View Page Source, chosen in the page menu of `webView`.
+    /// Back, Forward, Save As…, Print…, View Page Source, chosen in the page menu of `webView`.
     func pageMenu(perform command: PageCommand, in webView: WKWebView)
 }
 

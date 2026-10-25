@@ -2,8 +2,10 @@ import OSLog
 import WebKit
 
 /// Notifications of the pages (`PageNotificationScript`): the decision is the profile's, per origin, like the camera's
-/// (`SitePermissionKind.notifications`), asked in the page's banner. Only the main page of a website (http or https)
-/// may ask and notify, never a frame from another site; nothing in a private window, where nothing is remembered.
+/// (`SitePermissionKind.notifications`), asked in the page's banner. Checked here too, whatever the scripts say (review
+/// WB2): only the main frame of a website in a secure context (https, or http on this Mac) may ask, once at a time;
+/// a frame of the same website may notify, never one of another site; nothing in a private window, where nothing is
+/// remembered.
 extension NavigationCoordinator {
     /// Message of the notification script of `frame`; `reply` settles the script's promise.
     func receive(
@@ -52,11 +54,11 @@ extension NavigationCoordinator {
         return scope
     }
 
-    /// Website of `frame` if it may use notifications: that of the main page, in http or https.
+    /// Website of `frame` if it may use notifications: that of the displayed document (never the one being loaded), in a
+    /// secure context.
     private func notificationOrigin(of frame: WKFrameInfo, in webView: WKWebView) -> SiteOrigin? {
-        let frameOrigin = frame.securityOrigin
-        guard let origin = SiteOrigin(scheme: frameOrigin.protocol, host: frameOrigin.host, port: frameOrigin.port),
-              origin.isWeb, origin == SiteOrigin.web(of: webView.url)
+        guard let origin = frame.securityOrigin.siteOrigin, origin.isSecureContext,
+              origin == SiteOrigin.web(of: displayedDocument(of: webView))
         else {
             return nil
         }
@@ -70,9 +72,14 @@ extension NavigationCoordinator {
         in webView: WKWebView,
         reply: @escaping @MainActor @Sendable (PageNotificationPermission) -> Void,
     ) {
-        guard notificationScope(for: webView) != nil, let origin = notificationOrigin(of: frame, in: webView) else {
-            Logger.notifications.notice("Notification request denied: private window or frame of another site")
+        guard notificationScope(for: webView) != nil, frame.isMainFrame, let origin = notificationOrigin(of: frame, in: webView) else {
+            Logger.notifications.notice("Notification request denied: private window, insecure page or frame")
             reply(.denied)
+            return
+        }
+        if tabHost?.page(for: webView)?.permissionPrompts.isAsking([.notifications], origin: origin) == true {
+            // Already in the banner: a page can't pile up the same request.
+            reply(.default)
             return
         }
         let response = PermissionResponse { [weak self, weak webView] granted in

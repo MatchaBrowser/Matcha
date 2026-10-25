@@ -7,9 +7,11 @@ import WebKit
 ///
 /// Only viewers opened by the app are served: “View Page Source” and the restoration of a viewer tab authorize their
 /// address for the profile's data store (`authorize`). A page can't use the scheme to send requests with the user's
-/// cookies or to read files: an address it builds itself only gets an explanation, without network or disk, and the
-/// viewer is never served inside another page (frame, image). One for the app, held by `WebConfigurationFactory`; a page
-/// finds it in its configuration (`of(_:)`).
+/// cookies or to read files: its navigations to the scheme (link, script, window, redirection) are cancelled before
+/// they start (`NavigationPolicy.allowsSourceViewer`, review WB3), so its address is never saved; an address the user
+/// types without the menu only gets an explanation, without network or disk; the viewer is never served inside another
+/// page (frame, image). One for the app, held by `WebConfigurationFactory`; a page finds it in its configuration
+/// (`of(_:)`).
 @MainActor
 final class PageSourceSchemeHandler: NSObject, WKURLSchemeHandler {
     /// The handler of `configuration`, if it has one.
@@ -25,19 +27,26 @@ final class PageSourceSchemeHandler: NSObject, WKURLSchemeHandler {
     ]
 
     private var loads: [ObjectIdentifier: Task<Void, Never>] = [:]
-    /// Viewer addresses opened by the app, by data store.
-    private var authorized: [ObjectIdentifier: Set<URL>] = [:]
+    /// Viewer addresses opened by the app, by data store; forgotten with the store, which a new private one never
+    /// inherits (review WB3).
+    private let authorized = NSMapTable<WKWebsiteDataStore, Viewers>.weakToStrongObjects()
+
+    private final class Viewers {
+        var urls: Set<URL> = []
+    }
 
     /// Allows `viewer` to be loaded in the web views that use `store`.
     func authorize(_ viewer: URL, in store: WKWebsiteDataStore) {
         guard PageSource.pageURL(fromViewer: viewer) != nil else {
             return
         }
-        authorized[ObjectIdentifier(store), default: []].insert(viewer)
+        let viewers = authorized.object(forKey: store) ?? Viewers()
+        viewers.urls.insert(viewer)
+        authorized.setObject(viewers, forKey: store)
     }
 
     func isAuthorized(_ viewer: URL, in store: WKWebsiteDataStore) -> Bool {
-        authorized[ObjectIdentifier(store)]?.contains(viewer) == true
+        authorized.object(forKey: store)?.urls.contains(viewer) == true
     }
 
     func webView(_ webView: WKWebView, start urlSchemeTask: any WKURLSchemeTask) {

@@ -63,6 +63,19 @@ nonisolated struct SiteOrigin: Hashable, Sendable {
         scheme == "http" || scheme == "https"
     }
 
+    /// A website in a secure context (`window.isSecureContext`, review WB2): https, or http on this Mac (`localhost`,
+    /// `*.localhost`, 127.0.0.0/8, `::1`).
+    var isSecureContext: Bool {
+        if scheme == "https" {
+            return true
+        }
+        guard scheme == "http" else {
+            return false
+        }
+        let isLoopbackIPv4 = host.hasPrefix("127.") && host.split(separator: ".").count == 4 && host.allSatisfy { $0.isNumber || $0 == "." }
+        return host == "localhost" || host.hasSuffix(".localhost") || host == "::1" || isLoopbackIPv4
+    }
+
     /// Displayed host: without “www.”, with the port if it is not the default one.
     var displayHost: String {
         let domain = host.hasPrefix("www.") ? String(host.dropFirst(4)) : host

@@ -28,13 +28,18 @@ struct PageNotificationTests {
         session.spaces[0].tabManager
     }
 
-    /// Selected tab showing `head` (scripts run while the document is read) at the address of `origin`.
-    private func open(head: String = "", in manager: TabManager? = nil) async throws -> BrowserTab {
+    /// Selected tab showing `head` (scripts run while the document is read) and `body` at `address` (that of `origin`).
+    private func open(
+        head: String = "",
+        body: String = "",
+        address: String = "https://notify.example.com/",
+        in manager: TabManager? = nil,
+    ) async throws -> BrowserTab {
         let manager = manager ?? self.manager
         let tab = manager.insertTab(configuration: TestPages.configuration(), after: nil, select: true)
         window.show(tab.loadedWebView)
-        let html = "<html><head><title>notifications</title>\(head)</head><body></body></html>"
-        tab.loadedWebView.loadHTMLString(html, baseURL: URL(string: "https://notify.example.com/"))
+        let html = "<html><head><title>notifications</title>\(head)</head><body>\(body)</body></html>"
+        tab.loadedWebView.loadHTMLString(html, baseURL: URL(string: address))
         try await waitUntil { tab.title == "notifications" && !tab.isLoading }
         return tab
     }
@@ -135,6 +140,45 @@ struct PageNotificationTests {
         _ = try await evaluate("Notification.requestPermission().then((answer) => { window.answer = answer; }); return true", in: page)
         try await waitUntilTrue("return window.answer === 'denied'", in: page)
         #expect(page.permissionPrompts.current == nil)
+    }
+
+    /// Review WB2: the page can't reach the app's recipient, which lives in an isolated world.
+    @Test func `a page can't write to the app directly`() async throws {
+        let tab = try await open()
+        #expect(try await evaluate("return typeof window.webkit?.messageHandlers?.matchaNotifications", in: tab) as? String == "undefined")
+        #expect(try await evaluate("return Object.keys(window).some((key) => key.includes('atcha'))", in: tab) as? Bool == false)
+    }
+
+    /// Review WB2: a burst of requests after one click gives one banner.
+    @Test func `a burst of requests waits once in the banner`() async throws {
+        let tab = try await open()
+        _ = try await evaluate("""
+        window.answers = [];
+        for (let i = 0; i < 5; i++) {
+            Notification.requestPermission().then((answer) => { window.answers.push(answer); });
+        }
+        return true
+        """, in: tab)
+        try await waitUntilTrue("return window.answers.length === 4", in: tab)
+        #expect(tab.permissionPrompts.requests.count == 1)
+        tab.permissionPrompts.answer(.alwaysAllow)
+        try await waitUntilTrue("return window.answers.length === 5 && window.answers[4] === 'granted'", in: tab)
+    }
+
+    /// Review WB2: a frame of another site (here, an opaque origin) and an insecure page read “denied” and never ask.
+    @Test func `a frame of another site or an http page can't ask`() async throws {
+        let request = "Notification.requestPermission().then((answer) => parent.postMessage(Notification.permission + answer, '*'))"
+        let frame = "<script>\(request);</script>"
+        let encoded = try #require(frame.addingPercentEncoding(withAllowedCharacters: .alphanumerics))
+        let head = "<script>window.addEventListener('message', (event) => { window.frameAnswer = event.data; });</script>"
+        let tab = try await open(head: head, body: "<iframe src='data:text/html,\(encoded)'></iframe>")
+        try await waitUntilTrue("return window.frameAnswer === 'denieddenied'", in: tab)
+
+        let insecure = try await open(address: "http://notify.example.com/")
+        #expect(try await evaluate("return Notification.permission", in: insecure) as? String == "denied")
+        _ = try await evaluate("Notification.requestPermission().then((answer) => { window.answer = answer; }); return true", in: insecure)
+        try await waitUntilTrue("return window.answer === 'denied'", in: insecure)
+        #expect(tab.permissionPrompts.current == nil && insecure.permissionPrompts.current == nil)
     }
 }
 

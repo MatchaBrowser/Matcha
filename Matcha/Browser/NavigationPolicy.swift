@@ -11,11 +11,14 @@ nonisolated struct NavigationRequest: Sendable {
     var buttonNumber: Int
     /// True if the navigation targets the main frame or a new window, false for a subframe.
     var targetsMainFrame: Bool
+    /// True if the main page asks for it (or the app), false for a frame inside it (`sourceFrame`, review WB1).
+    var isFromMainFrame = true
     /// True if the web view can load this scheme (http, https, about, data, blob, registered scheme…).
     var isSchemeHandledByWebView: Bool
     /// True if the navigation asks for a new window (`target=_blank`, `window.open`): no target frame.
     var opensNewWindow = false
-    /// Address of the page displayed by the web view: anchor in the same page, link to another site.
+    /// Address of the document displayed by the web view, never the one being loaded (review WB1): anchor in the
+    /// same page, link to another site.
     var pageURL: URL?
     /// True if the page asks for a download (`download` link): the navigation becomes a download.
     var shouldPerformDownload = false
@@ -59,6 +62,12 @@ nonisolated enum NavigationPolicy {
     /// Schemes never opened by the app in a new tab or in Peek: their content depends on the page that contains them.
     static let schemesKeptInPlace: Set<String> = ["about", "blob", "data", "javascript"]
     static let webSchemes: Set<String> = ["http", "https"]
+    /// Schemes never handed to another app, even with the user's consent (audit W2, review WB4): they mount a file
+    /// share or open a remote session in the Finder, Terminal or Screen Sharing, behind a link whose text can pass for a
+    /// web address. FTP included: WebKit no longer loads it, the Finder would mount the server.
+    static let refusedSchemes: Set<String> = ["afp", "cifs", "ftp", "ftps", "nfs", "sftp", "smb", "ssh", "telnet", "vnc", "x-man-page"]
+    /// Schemes a choice in the page's menu opens at once (review WB4); any other app waits in the page's banner.
+    static let schemesOpenedFromMenu: Set<String> = ["mailto", "tel"]
     private static let linkModifiers: NSEvent.ModifierFlags = [.shift, .command, .option, .control]
 
     static func decide(_ request: NavigationRequest) -> NavigationDecision {
@@ -66,8 +75,9 @@ nonisolated enum NavigationPolicy {
             return .allow
         }
         if !request.isSchemeHandledByWebView {
-            // A subframe (ad…) is not allowed to launch another app.
-            return request.targetsMainFrame ? .openExternally(url) : .cancel
+            // A subframe (ad…) is not allowed to launch another app, even through the main frame or a new window.
+            let mayOpen = request.targetsMainFrame && request.isFromMainFrame && !isRefused(url)
+            return mayOpen ? .openExternally(url) : .cancel
         }
         // `download` link: downloaded whatever the click (⌘-click, Shift-click); a tab or Peek would stay empty.
         if request.shouldPerformDownload {
@@ -89,6 +99,28 @@ nonisolated enum NavigationPolicy {
         case .tab:
             return peekDecision(for: request, url: url, modifiers: modifiers)
         }
+    }
+
+    /// True if a navigation to the source viewer `url` (`matcha-source:`) comes from the app (review WB3): in the main
+    /// frame, the load the user asked for in this tab (“View Page Source”, address bar, restored tab), a reload of the
+    /// displayed viewer, or a move in the tab's history. Never a page's link, script, window or redirection: the viewer
+    /// sends its request with the profile's cookies, and its address would be authorized at the next launch.
+    static func allowsSourceViewer(_ url: URL, type: WKNavigationType, targetsMainFrame: Bool, requested: URL?, displayed: URL?) -> Bool {
+        guard targetsMainFrame else {
+            return false
+        }
+        switch type {
+        case .backForward:
+            return true
+        case .reload:
+            return url == displayed
+        default:
+            return url == requested
+        }
+    }
+
+    static func isRefused(_ url: URL) -> Bool {
+        refusedSchemes.contains(url.scheme?.lowercased() ?? "")
     }
 
     /// True if the app itself may load the link in a new tab or in Peek (audit W6): a web address, or a link to a page

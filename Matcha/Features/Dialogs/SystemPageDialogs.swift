@@ -11,9 +11,7 @@ final class SystemPageDialogs: PageDialogPresenting {
             return nil
         }
         let alert = NSAlert()
-        alert.messageText = dialog.site.map {
-            String(localized: "\($0) says", comment: "Title of a website's JavaScript dialog; %@ is the website")
-        } ?? String(localized: "This page says", comment: "Title of a JavaScript dialog of a page without a website (local file)")
+        alert.messageText = Self.title(of: dialog)
         alert.informativeText = dialog.message
         alert.addButton(withTitle: String(localized: "OK"))
         if dialog.kind != .alert {
@@ -28,16 +26,27 @@ final class SystemPageDialogs: PageDialogPresenting {
             field = textField
         }
         alert.showsSuppressionButton = dialog.offersSuppression
-        alert.suppressionButton?.title = String(
-            localized: "Don't allow this page to show more dialogs",
-            comment: "Checkbox of a website's JavaScript dialog, from its second dialog on",
-        )
+        alert.suppressionButton?.title = Self.suppressionTitle
         let response = await alert.beginSheetModal(for: window)
         return PageDialogAnswer(
             isConfirmed: response == .alertFirstButtonReturn,
             text: field?.stringValue,
             suppressesFurther: alert.suppressionButton?.state == .on,
         )
+    }
+
+    /// The website asking; without one, a frame inside the page never passes for the page (review WB7).
+    private static func title(of dialog: PageDialog) -> String {
+        if let site = dialog.site {
+            return String(localized: "\(site) says", comment: "Title of a website's JavaScript dialog; %@ is the website")
+        }
+        if dialog.isFromEmbeddedFrame {
+            return String(
+                localized: "An embedded page says",
+                comment: "Title of a JavaScript dialog of a frame without a website (data: address, sandboxed frame)",
+            )
+        }
+        return String(localized: "This page says", comment: "Title of a JavaScript dialog of a page without a website (local file)")
     }
 
     func chooseFiles(allowsMultipleSelection: Bool, allowsDirectories: Bool, for webView: WKWebView) async -> [URL]? {
@@ -55,7 +64,7 @@ final class SystemPageDialogs: PageDialogPresenting {
         return panel.urls
     }
 
-    func credential(for login: LoginRequest, for webView: WKWebView) async -> URLCredential? {
+    func credential(for login: LoginRequest, for webView: WKWebView) async -> LoginAnswer? {
         guard let window = webView.window, window.isVisible else {
             return nil
         }
@@ -88,10 +97,21 @@ final class SystemPageDialogs: PageDialogPresenting {
         fields.addSubview(password)
         alert.accessoryView = fields
         alert.window.initialFirstResponder = login.user == nil ? user : password
-        guard await alert.beginSheetModal(for: window) == .alertFirstButtonReturn else {
-            return nil
-        }
-        return URLCredential(user: user.stringValue, password: password.stringValue, persistence: .forSession)
+        alert.showsSuppressionButton = login.offersSuppression
+        alert.suppressionButton?.title = Self.suppressionTitle
+        let isConfirmed = await alert.beginSheetModal(for: window) == .alertFirstButtonReturn
+        return LoginAnswer(
+            credential: isConfirmed ? URLCredential(user: user.stringValue, password: password.stringValue, persistence: .forSession) : nil,
+            suppressesFurther: alert.suppressionButton?.state == .on,
+        )
+    }
+
+    /// Checkbox of a page's dialogs and login sheets, from the second one on (audit K1, review WB6).
+    private static var suppressionTitle: String {
+        String(
+            localized: "Don't allow this page to show more dialogs",
+            comment: "Checkbox of a website's JavaScript dialog, from its second dialog on",
+        )
     }
 
     /// The area the server names (its words, quoted), a refused attempt, and a warning if the password travels

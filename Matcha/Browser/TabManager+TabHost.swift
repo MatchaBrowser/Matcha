@@ -24,9 +24,10 @@ extension TabManager: TabHost {
     /// After the source tab; from the Peek, after its source tab. Selected in the window that shows it.
     func openLink(_ url: URL, configuration: WKWebViewConfiguration, from webView: WKWebView, inBackground: Bool) {
         acting(for: webView) {
+            // The document on screen, never one being loaded (review WB11): a local file reads less.
             insertTab(configuration: configuration, after: insertionAnchor(for: webView), select: !inBackground).load(
                 url,
-                from: webView.url,
+                from: page(for: webView)?.documentURL ?? webView.backForwardList.currentItem?.url,
             )
         }
     }

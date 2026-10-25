@@ -2177,6 +2177,35 @@
         }
       }
     },
+    "An embedded page says" : {
+      "comment" : "Title of a JavaScript dialog of a frame without a website (data: address, sandboxed frame)",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Eine eingebettete Seite meldet"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Una página insertada dice"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Une page intégrée indique"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Una pagina incorporata dice"
+          }
+        }
+      }
+    },
     "An invitation code is required, or the one entered isn't valid." : {
       "comment" : "Settings > Sync: error invitation_required",
       "localizations" : {
@@ -4613,30 +4642,31 @@
         }
       }
     },
-    "Cookies, local storage, caches, and other website data for all profiles. You will be signed out." : {
+    "Cookies, local storage, caches, and other website data for all profiles. You will be signed out; a password typed in a login sheet is kept until you quit Matcha." : {
+      "comment" : "Settings > Privacy: what “Clear…” removes",
       "localizations" : {
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Cookies, lokaler Speicher, Caches und andere Websitedaten aller Profile. Du wirst abgemeldet."
+            "value" : "Cookies, lokaler Speicher, Caches und andere Websitedaten aller Profile. Du wirst abgemeldet; ein in einem Anmeldefenster eingegebenes Passwort bleibt erhalten, bis du Matcha beendest."
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Cookies, almacenamiento local, cachés y otros datos de sitios web de todos los perfiles. Se cerrará tu sesión."
+            "value" : "Cookies, almacenamiento local, cachés y otros datos de sitios web de todos los perfiles. Se cerrará tu sesión; una contraseña escrita en una ventana de inicio de sesión se conserva hasta que salgas de Matcha."
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Cookies, stockage local, caches et autres données des sites, pour tous les profils. Vous serez déconnecté."
+            "value" : "Cookies, stockage local, caches et autres données des sites, pour tous les profils. Vous serez déconnecté ; un mot de passe saisi dans une feuille d'identification est gardé jusqu'à ce que vous quittiez Matcha."
           }
         },
         "it" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Cookie, archiviazione locale, cache e altri dati dei siti web di tutti i profili. Verrai disconnesso."
+            "value" : "Cookie, archiviazione locale, cache e altri dati dei siti web di tutti i profili. Verrai disconnesso; una password inserita in una finestra di accesso viene conservata finché non esci da Matcha."
           }
         }
       }
@@ -8730,6 +8760,35 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "I link su cui fai clic in Mail, Messaggi o altre app si aprono in Matcha quando è il tuo browser predefinito."
+          }
+        }
+      }
+    },
+    "Local File" : {
+      "comment" : "Address bar: the page is a local file, not a website",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lokale Datei"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Archivo local"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fichier local"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "File locale"
           }
         }
       }
@@ -18091,6 +18150,35 @@
         }
       }
     },
+    "This page is a file on this Mac, not a website." : {
+      "comment" : "Help tag of “Local File” in the address bar",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Diese Seite ist eine Datei auf diesem Mac, keine Website."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Esta página es un archivo de este Mac, no un sitio web."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cette page est un fichier de ce Mac, pas un site web."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Questa pagina è un file di questo Mac, non un sito web."
+          }
+        }
+      }
+    },
     "This page says" : {
       "comment" : "Title of a JavaScript dialog of a page without a website (local file)",
       "localizations" : {
@@ -19739,59 +19827,60 @@
         }
       }
     },
-    "You will be signed out of all websites. This action cannot be undone." : {
+    "You will be signed out of all websites; a password typed in a login sheet is kept until you quit Matcha. This action cannot be undone." : {
+      "comment" : "Settings > Privacy: confirmation message before clearing the data of all websites",
       "localizations" : {
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Du wirst von allen Websites abgemeldet. Diese Aktion kann nicht widerrufen werden."
+            "value" : "Du wirst von allen Websites abgemeldet; ein in einem Anmeldefenster eingegebenes Passwort bleibt erhalten, bis du Matcha beendest. Diese Aktion kann nicht widerrufen werden."
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Se cerrará tu sesión en todos los sitios web. Esta acción no se puede deshacer."
+            "value" : "Se cerrará tu sesión en todos los sitios web; una contraseña escrita en una ventana de inicio de sesión se conserva hasta que salgas de Matcha. Esta acción no se puede deshacer."
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Vous serez déconnecté de tous les sites. Cette action est irréversible."
+            "value" : "Vous serez déconnecté de tous les sites ; un mot de passe saisi dans une feuille d'identification est gardé jusqu'à ce que vous quittiez Matcha. Cette action est irréversible."
           }
         },
         "it" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Verrai disconnesso da tutti i siti web. Questa azione non può essere annullata."
+            "value" : "Verrai disconnesso da tutti i siti web; una password inserita in una finestra di accesso viene conservata finché non esci da Matcha. Questa azione non può essere annullata."
           }
         }
       }
     },
-    "You will be signed out of this website. The page will reload." : {
+    "You will be signed out of this website; a password typed in a login sheet is kept until you quit Matcha. The page will reload." : {
       "comment" : "Site settings: confirmation message before clearing the data of one website",
       "localizations" : {
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Du wirst von dieser Website abgemeldet. Die Seite wird neu geladen."
+            "value" : "Du wirst von dieser Website abgemeldet; ein in einem Anmeldefenster eingegebenes Passwort bleibt erhalten, bis du Matcha beendest. Die Seite wird neu geladen."
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Se cerrará tu sesión en este sitio web. La página se volverá a cargar."
+            "value" : "Se cerrará tu sesión en este sitio web; una contraseña escrita en una ventana de inicio de sesión se conserva hasta que salgas de Matcha. La página se volverá a cargar."
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Vous serez déconnecté de ce site. La page sera rechargée."
+            "value" : "Vous serez déconnecté de ce site ; un mot de passe saisi dans une feuille d'identification est gardé jusqu'à ce que vous quittiez Matcha. La page sera rechargée."
           }
         },
         "it" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Verrai disconnesso da questo sito web. La pagina verrà ricaricata."
+            "value" : "Verrai disconnesso da questo sito web; una password inserita in una finestra di accesso viene conservata finché non esci da Matcha. La pagina verrà ricaricata."
           }
         }
       }

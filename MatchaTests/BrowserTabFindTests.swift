@@ -36,6 +36,20 @@ struct BrowserTabFindTests {
         #expect(await tab.search("zzqqxx", direction: .forward) == false)
     }
 
+    /// Review WB13: ⌘E reads the real selection, even when the page redefines `getSelection`.
+    @Test func `use selection reads the page's real selection`() async throws {
+        let tab =
+            try await page(
+                "<p id='p'>texte choisi</p><script>window.getSelection = () => ({ toString: () => 'leurre', rangeCount: 0 });</script>",
+            )
+        _ = try await tab.loadedWebView.evaluateJavaScript(
+            "document.getSelection().selectAllChildren(document.getElementById('p')); true",
+            contentWorld: .defaultClient,
+        )
+        #expect(try await tab.loadedWebView.evaluateJavaScript("getSelection().toString()") as? String == "leurre")
+        #expect(await PageFindResponder.selectedText(in: tab.loadedWebView) == "texte choisi")
+    }
+
     @Test func `a growing query keeps the match in place`() async throws {
         let tab = try await page("<p>pomme poste</p>")
         #expect(await tab.search("p", direction: .forward) == true)

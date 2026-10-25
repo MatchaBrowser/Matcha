@@ -40,10 +40,10 @@ struct SiteDataClearConfirmation: ViewModifier {
             }
             Button("Cancel", role: .cancel) {}
         } message: { _ in
-            Text(
-                "You will be signed out of this website. The page will reload.",
-                comment: "Site settings: confirmation message before clearing the data of one website",
-            )
+            Text("""
+            You will be signed out of this website; a password typed in a login sheet is kept until you quit Matcha. \
+            The page will reload.
+            """, comment: "Site settings: confirmation message before clearing the data of one website")
         }
     }
 }

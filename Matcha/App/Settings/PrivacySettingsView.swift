@@ -23,7 +23,11 @@ struct PrivacySettingsView: View {
                         .foregroundStyle(.secondary)
                 }
             } footer: {
-                Text("Cookies, local storage, caches, and other website data for all profiles. You will be signed out.")
+                // WebKit offers no public way to forget the passwords of login sheets (review WB17): they stay for the session.
+                Text("""
+                Cookies, local storage, caches, and other website data for all profiles. You will be signed out; \
+                a password typed in a login sheet is kept until you quit Matcha.
+                """, comment: "Settings > Privacy: what “Clear…” removes")
                     .font(.caption)
                     .foregroundStyle(.secondary)
             }
@@ -45,7 +49,10 @@ struct PrivacySettingsView: View {
                 Task { await clearWebsiteData() }
             }
         } message: {
-            Text("You will be signed out of all websites. This action cannot be undone.")
+            Text("""
+            You will be signed out of all websites; a password typed in a login sheet is kept until you quit Matcha. \
+            This action cannot be undone.
+            """, comment: "Settings > Privacy: confirmation message before clearing the data of all websites")
         }
     }
 

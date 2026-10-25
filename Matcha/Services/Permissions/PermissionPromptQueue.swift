@@ -11,6 +11,8 @@ import OSLog
 final class PermissionPromptQueue {
     private(set) var requests: [SitePermissionRequest] = []
     private(set) var actions: [SiteActionRequest] = []
+    /// When the user last refused each request to do something, in this document (review WB23).
+    @ObservationIgnored private var declined: [SiteAction: Date] = [:]
 
     /// Displayed permission request.
     var current: SitePermissionRequest? {
@@ -31,14 +33,28 @@ final class PermissionPromptQueue {
         requests.append(request)
     }
 
+    /// True if a request for exactly `kinds` from `origin` is waiting (review WB2).
+    func isAsking(_ kinds: Set<SitePermissionKind>, origin: SiteOrigin) -> Bool {
+        requests.contains { $0.origin == origin && $0.requested == kinds }
+    }
+
     /// False if the same request is already waiting: it is dropped.
     @discardableResult
     func enqueue(_ request: SiteActionRequest) -> Bool {
-        guard !actions.contains(where: { $0.action == request.action }) else {
+        guard !isWaiting(for: request.action) else {
             return false
         }
         actions.append(request)
         return true
+    }
+
+    func isWaiting(for action: SiteAction) -> Bool {
+        actions.contains { $0.action == action }
+    }
+
+    /// When the user refused `action` in this document; nil if they didn't.
+    func declineDate(of action: SiteAction) -> Date? {
+        declined[action]
     }
 
     /// Answer from the banner to the displayed request to do something; “Always” is remembered for the website.
@@ -52,6 +68,7 @@ final class PermissionPromptQueue {
             scope.allow(request.action, origin: origin)
         }
         if answer == .decline {
+            declined[request.action] = .now
             request.decline()
         } else {
             request.perform()
@@ -78,6 +95,7 @@ final class PermissionPromptQueue {
 
     /// Denies everything that is pending: the page changed document or is closing.
     func denyAll() {
+        declined = [:]
         let pendingActions = actions
         actions = []
         pendingActions.forEach { $0.decline() }

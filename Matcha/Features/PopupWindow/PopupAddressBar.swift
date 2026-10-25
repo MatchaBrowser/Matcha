@@ -1,9 +1,8 @@
 import SwiftUI
 
 /// Address bar of a sign-in window (task 5.8), read-only: the page's site and, for a site, whether the connection
-/// is encrypted (padlock, which shows the certificate) or not (“Not Secure”). You must see who you are giving your password to: the page
-/// only
-/// chooses the window title, never this bar. The full address is in the help tag.
+/// is encrypted (padlock, which shows the certificate) or not (“Not Secure”). You must see who you are giving your
+/// password to: the page only chooses the window title, never this bar. The full address is in the help tag.
 struct PopupAddressBar: View {
     static let height = 30.0
 
@@ -14,7 +13,8 @@ struct PopupAddressBar: View {
         HStack(spacing: 6) {
             Text(verbatim: address.text)
                 .lineLimit(1)
-                .truncationMode(.middle)
+                // Cut at the start: the end of a host names the website (“…signin-verify.net”, review WB8).
+                .truncationMode(.head)
                 .accessibilityLabel(Text("Address", comment: "Accessibility label of the address pill"))
                 .accessibilityValue(Text(verbatim: address.text))
                 .accessibilityIdentifier("popupAddress")

@@ -58,7 +58,8 @@ struct AddressPill: View {
         if let url = tab?.displayedURL {
             Text(verbatim: AddressDisplay.short(for: url))
                 .lineLimit(1)
-                .truncationMode(.middle)
+                // Cut at the start: the end of a host names the website (“…signin-verify.net”, review WB8).
+                .truncationMode(.head)
                 // The domain goes first; “Not Secure” gives way.
                 .layoutPriority(1)
         } else {
