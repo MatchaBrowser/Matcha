@@ -60,8 +60,8 @@ final class OpenTabsProvider: CommandProvider {
             guard let place = tabManager.place(of: tab),
                   place != .favorite || listsFavorites,
                   !isCurrent || tab.id != windowModel.selectedTab?.id,
-                  // An unloaded pinned tab shows its original address.
-                  let url = tab.url ?? tab.pinnedURL,
+                  // The address shown (review TR1); an unloaded pinned tab shows its original address.
+                  let url = tab.displayedURL ?? tab.pinnedURL,
                   seen.insert(tab.id).inserted
             else {
                 continue
@@ -79,7 +79,7 @@ final class OpenTabsProvider: CommandProvider {
     /// Tabs of a window of its own tabs, referenced by its identifier; `label`: nil for this window's own.
     private func candidates(in tabs: WindowTabs, label: String?, seen: inout Set<UUID>) -> [CommandCandidate] {
         tabs.tabManager.tabs.compactMap { tab in
-            guard label != nil || tab.id != windowModel.selectedTab?.id, let url = tab.url, seen.insert(tab.id).inserted else {
+            guard label != nil || tab.id != windowModel.selectedTab?.id, let url = tab.displayedURL, seen.insert(tab.id).inserted else {
                 return nil
             }
             return CommandCandidate(

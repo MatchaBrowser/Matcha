@@ -18,7 +18,7 @@ struct SiteSettingsPanel: View {
     }
 
     var body: some View {
-        let origin = SiteOrigin.web(of: tab?.url)
+        let origin = SiteOrigin.web(of: tab?.documentURL)
         VStack(alignment: .leading, spacing: 8) {
             header(origin)
             if let origin, let tab, let scope = tabManager.sitePermissions {
@@ -92,7 +92,7 @@ struct SiteSettingsPanel: View {
 
     /// The site; otherwise the page's short address (local file); without a page, the panel's name.
     private func title(_ origin: SiteOrigin?) -> Text {
-        let name = origin?.displayName ?? AddressDisplay.short(for: tab?.url)
+        let name = origin?.displayName ?? AddressDisplay.short(for: tab?.documentURL)
         guard !name.isEmpty else {
             return Text("Site Settings", comment: "Button next to the address: permissions and data of the website shown")
         }

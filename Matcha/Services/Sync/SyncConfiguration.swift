@@ -1,4 +1,5 @@
 import Foundation
+import OSLog
 
 /// Sync configuration of this Mac, not synced (`SYNC.md` § 1): the mode, the server and the account, and why this Mac
 /// is signed out while sync stays on. Kept in `UserDefaults`, read leniently. Pure type.
@@ -46,12 +47,24 @@ nonisolated struct SyncConfiguration: Codable, Equatable, Sendable {
     }
 
     static func load(from defaults: UserDefaults) -> SyncConfiguration {
-        defaults.data(forKey: defaultsKey).flatMap { try? SyncCoding.decoder().decode(SyncConfiguration.self, from: $0) }
-            ?? SyncConfiguration()
+        guard let data = defaults.data(forKey: defaultsKey) else {
+            return SyncConfiguration()
+        }
+        do {
+            return try SyncCoding.decoder().decode(SyncConfiguration.self, from: data)
+        } catch {
+            Logger.sync.error("Sync configuration unreadable: \(error.logSummary, privacy: .public)")
+            return SyncConfiguration()
+        }
     }
 
+    /// A configuration that can't be encoded keeps the previous one, rather than erasing it (review TR4).
     func save(to defaults: UserDefaults) {
-        defaults.set(try? SyncCoding.encoder().encode(self), forKey: Self.defaultsKey)
+        do {
+            try defaults.set(SyncCoding.encoder().encode(self), forKey: Self.defaultsKey)
+        } catch {
+            Logger.sync.error("Sync configuration not saved: \(error.logSummary, privacy: .public)")
+        }
     }
 
     /// Identifier typed by the user, as client and server compare it: without spaces around, in lowercase

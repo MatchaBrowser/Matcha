@@ -51,7 +51,7 @@ struct TabRowView: View {
         .tabDraggable(tab)
         .sidebarRowDropDestination(tabManager: tabManager, drop: drop, part: $dropPart)
         .insertionLine(for: dropPart)
-        .help(tab.url?.absoluteString ?? tab.displayTitle)
+        .help(tab.displayedURL?.absoluteString ?? tab.displayTitle)
         .accessibilityElement(children: .ignore)
         .accessibilityLabel(tab.displayTitle)
         .accessibilityAddTraits(isSelected ? [.isButton, .isSelected] : .isButton)

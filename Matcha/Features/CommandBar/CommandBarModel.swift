@@ -77,7 +77,9 @@ final class CommandBarModel {
     /// ⌘L and the address pill: editing of the displayed tab, or a new tab if there is none.
     func editCurrentTab(_ settings: CommandBarSettings) {
         if let tab = windowModel.selectedTab {
-            present(.currentTab(tab.id), text: tab.url?.absoluteString ?? "", pristineURL: tab.url, settings: settings)
+            // The address shown, never a load the page started (review TR1).
+            let url = tab.displayedURL
+            present(.currentTab(tab.id), text: url?.absoluteString ?? "", pristineURL: url, settings: settings)
         } else {
             present(.newTab, text: "", pristineURL: nil, settings: settings)
         }

@@ -52,10 +52,12 @@ struct BrowserTabTests {
         #expect(tab.canGoBack)
     }
 
+    /// The host of the displayed document (review TR1): the navigation delegate tells the tab it changed.
     @Test func `display title falls back to host`() async throws {
-        let tab = makeTab()
+        let manager = TabManager(websiteDataStore: .nonPersistent())
+        let tab = manager.newTab()
         tab.loadedWebView.loadHTMLString("<p>Sans titre</p>", baseURL: URL(string: "https://example.test/page"))
-        try await waitUntil { tab.url != nil && !tab.isLoading }
+        try await waitUntil { tab.displayedURL != nil && !tab.isLoading }
         #expect(tab.displayTitle == "example.test")
     }
 

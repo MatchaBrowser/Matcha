@@ -23,7 +23,7 @@ struct SyncAvatarSection: View {
     var body: some View {
         Section {
             HStack(spacing: 14) {
-                AccountAvatarView(image: sync.avatar, size: 48)
+                AccountAvatarView(image: sync.avatarImage, size: 48)
                 if isWorking {
                     ProgressView()
                         .controlSize(.small)

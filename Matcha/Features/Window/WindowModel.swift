@@ -228,7 +228,7 @@ final class WindowModel {
     /// otherwise the displayed tab). Without an address, nothing is copied or confirmed.
     @discardableResult
     func copySelectedTabURL(to pasteboard: NSPasteboard = .general) -> Bool {
-        guard let url = frontTab?.url else {
+        guard let url = frontTab?.displayedURL else {
             return false
         }
         copyLink(url, to: pasteboard)

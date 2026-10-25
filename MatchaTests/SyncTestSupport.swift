@@ -248,7 +248,7 @@ final class MemorySyncStore: SyncLocalStore {
         for change in changes {
             applied.append(change)
             switch change {
-            case let .upsert(_, .deviceTabs):
+            case .upsert(_, .deviceTabs):
                 // Like `MatchaSyncStore`: the other Macs' tabs are only shown, never applied.
                 continue
             case let .upsert(id, fields):

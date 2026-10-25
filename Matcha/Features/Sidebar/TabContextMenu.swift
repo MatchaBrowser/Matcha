@@ -20,11 +20,11 @@ struct TabContextMenu: View {
         SplitMenuItems(tab: tab, tabManager: tabManager)
         Button("Duplicate Tab") { tabManager.duplicate(tab) }
         Button("Copy Link") {
-            if let url = tab.url {
+            if let url = tab.displayedURL {
                 copyLink(url)
             }
         }
-        .disabled(tab.url == nil)
+        .disabled(tab.displayedURL == nil)
         Divider()
         closeItems(place: place, group: group)
         // The tab's split stays whole.

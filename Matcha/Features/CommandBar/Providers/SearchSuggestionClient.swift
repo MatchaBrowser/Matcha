@@ -25,7 +25,18 @@ nonisolated struct SearchSuggestionClient: Sendable {
             self.load = load
         } else {
             let session = URLSession(configuration: Self.makeConfiguration())
-            self.load = { request in try await session.data(for: request) }
+            // Read as it comes: never more than `maximumSize` (review TR2).
+            self.load = { request in
+                let (bytes, response) = try await session.bytes(for: request)
+                do {
+                    return try await (
+                        BoundedRead.data(of: bytes, expectedLength: response.expectedContentLength, limit: Self.maximumSize),
+                        response,
+                    )
+                } catch is BoundedRead.TooLarge {
+                    throw SearchSuggestionError.tooLarge
+                }
+            }
         }
     }
 

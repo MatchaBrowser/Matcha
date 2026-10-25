@@ -6,6 +6,6 @@ struct FaviconView: View {
     var size = 16.0
 
     var body: some View {
-        SiteIcon(favicon: tab.favicon, host: tab.url?.host(), size: size)
+        SiteIcon(favicon: tab.favicon, host: tab.displayedURL?.host(), size: size)
     }
 }

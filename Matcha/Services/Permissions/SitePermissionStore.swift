@@ -82,8 +82,7 @@ final class SitePermissionStore {
         guard let context else {
             return
         }
-        let records = (try? context.fetch(FetchDescriptor<SitePermissionRecord>())) ?? []
-        records.filter { $0.profileID == profileID }.forEach(context.delete)
+        Self.records(in: context).filter { $0.profileID == profileID }.forEach(context.delete)
         save(context)
     }
 
@@ -94,8 +93,22 @@ final class SitePermissionStore {
         in context: ModelContext,
     ) -> [SitePermissionRecord] {
         // Few decisions: an in-memory filter is enough and avoids a predicate on an optional identifier.
-        let records = (try? context.fetch(FetchDescriptor<SitePermissionRecord>(sortBy: [SortDescriptor(\.date, order: .reverse)]))) ?? []
-        return records.filter { $0.profileID == profileID && $0.originKey == origin.key && $0.kindValue == kind.rawValue }
+        let sorted = FetchDescriptor<SitePermissionRecord>(sortBy: [SortDescriptor(\.date, order: .reverse)])
+        return Self.records(in: context, sorted)
+            .filter { $0.profileID == profileID && $0.originKey == origin.key && $0.kindValue == kind.rawValue }
+    }
+
+    /// The saved records; none after a read failure, which is logged rather than taken for an absence (review TR4).
+    private static func records(
+        in context: ModelContext,
+        _ descriptor: FetchDescriptor<SitePermissionRecord> = FetchDescriptor(),
+    ) -> [SitePermissionRecord] {
+        do {
+            return try context.fetch(descriptor)
+        } catch {
+            Logger.permissions.error("Saved decisions unreadable: \(error.logSummary, privacy: .public)")
+            return []
+        }
     }
 
     private func save(_ context: ModelContext) {
@@ -111,8 +124,7 @@ final class SitePermissionStore {
         guard let context else {
             return []
         }
-        let records = (try? context.fetch(FetchDescriptor<SitePermissionRecord>())) ?? []
-        return records.compactMap { record in
+        return records(in: context).compactMap { record in
             guard let origin = SiteOrigin(key: record.originKey),
                   let kind = SitePermissionKind(rawValue: record.kindValue),
                   let decision = SitePermissionDecision(rawValue: record.decisionValue)

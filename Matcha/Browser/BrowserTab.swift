@@ -16,7 +16,8 @@ final class BrowserTab: Identifiable {
     /// The tab's web view; nil when it is unloaded.
     private(set) var webView: WKWebView?
     private(set) var title: String?
-    /// The web view's address: that of a load as soon as it starts (saving, history, sync).
+    /// The web view's address: that of a load as soon as it starts. For saving, history and sync only: what is shown or
+    /// copied reads `displayedURL`, what acts on the displayed page reads `documentURL` (audit W4, review TR1).
     private(set) var url: URL?
     /// Address to show (address pill, Peek, sign-in windows, security): the displayed document's (audit W4).
     private(set) var displayedAddress = DisplayedAddress()

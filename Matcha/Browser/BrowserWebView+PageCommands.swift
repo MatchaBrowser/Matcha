@@ -38,8 +38,9 @@ extension BrowserWebView {
         item.isEnabled = switch command {
         case .goBack: canGoBack
         case .goForward: canGoForward
-        case .saveAs, .print: url != nil
-        case .viewSource: PageSource.viewerURL(for: url) != nil
+        // The document on screen (its history entry), not a load that started (review TR1).
+        case .saveAs, .print: backForwardList.currentItem?.url != nil
+        case .viewSource: PageSource.viewerURL(for: backForwardList.currentItem?.url) != nil
         }
         if showsImage {
             item.image = NSImage(systemSymbolName: command.symbolName, accessibilityDescription: nil)

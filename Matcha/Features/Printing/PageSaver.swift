@@ -28,7 +28,7 @@ enum PageSaver {
     }
 
     static func start(for page: BrowserTab) {
-        guard let webView = page.webView, let window = webView.window, window.attachedSheet == nil, let url = page.url else {
+        guard let webView = page.webView, let window = webView.window, window.attachedSheet == nil, let url = page.documentURL else {
             NSSound.beep()
             return
         }

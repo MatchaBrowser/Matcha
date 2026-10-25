@@ -27,7 +27,7 @@ extension NavigationCoordinator: PageMenuDelegate {
         case .print:
             dialogs.print(page)
         case .viewSource:
-            if let viewer = PageSource.viewerURL(for: page.url) {
+            if let viewer = PageSource.viewerURL(for: page.documentURL) {
                 PageSourceSchemeHandler.of(webView.configuration)?.authorize(viewer, in: webView.configuration.websiteDataStore)
                 tabHost.openLink(viewer, configuration: webView.configuration, from: webView, inBackground: false)
             }

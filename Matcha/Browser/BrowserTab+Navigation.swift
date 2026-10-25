@@ -3,15 +3,16 @@ import WebKit
 
 /// Displayed title and navigation commands of the page (buttons, menus, shortcuts).
 extension BrowserTab {
-    /// Title to display: the page's title, otherwise the host, otherwise “New Tab”.
+    /// Title to display: the page's title, otherwise the host of the address shown, otherwise “New Tab”; never the host
+    /// of a load that isn't displayed yet (review TR1).
     var displayTitle: String {
         if let title, !title.isEmpty {
             return title
         }
-        if let host = url?.host(), !host.isEmpty {
+        if let host = displayedURL?.host(), !host.isEmpty {
             return host
         }
-        return url?.absoluteString ?? String(localized: "New Tab")
+        return displayedURL?.absoluteString ?? String(localized: "New Tab")
     }
 
     /// Navigation commands lead away from the page woken from sleep: no more snapshot on top of it; a crashed page

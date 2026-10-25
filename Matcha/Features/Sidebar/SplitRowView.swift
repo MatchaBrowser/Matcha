@@ -134,7 +134,7 @@ private struct SplitSegmentView: View {
         .contentShape(Rectangle())
         .onTapGesture { TabActivation.activate(tab, in: tabManager) }
         .contextMenu { TabContextMenu(tab: tab, tabManager: tabManager) }
-        .help(tab.url?.absoluteString ?? tab.displayTitle)
+        .help(tab.displayedURL?.absoluteString ?? tab.displayTitle)
         .accessibilityElement(children: .ignore)
         .accessibilityLabel(Text(verbatim: tab.displayTitle))
         .accessibilityAddTraits(isActive ? [.isButton, .isSelected] : .isButton)

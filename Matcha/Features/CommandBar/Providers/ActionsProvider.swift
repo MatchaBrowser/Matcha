@@ -27,7 +27,7 @@ final class ActionsProvider: CommandProvider {
             // A private window has only one Space.
             !context.isPrivate
         case .copyURL:
-            windowModel.selectedTab?.url != nil
+            windowModel.selectedTab?.displayedURL != nil
         case .settings:
             true
         }

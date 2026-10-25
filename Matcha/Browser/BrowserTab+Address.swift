@@ -4,9 +4,16 @@ import WebKit
 
 /// Address and security shown for the tab's page (audit W4 and W5).
 extension BrowserTab {
-    /// Address to show: the displayed document's, the one the user asked for while it loads, or the one that failed.
+    /// Address to show or copy: the displayed document's, the one the user asked for while it loads, or the one that
+    /// failed.
     var displayedURL: URL? {
         loadFailure.error?.url ?? displayedAddress.url
+    }
+
+    /// Address of the document on screen, for what acts on it (site settings, zoom, saving, source); never a load that
+    /// isn't displayed yet (review TR1).
+    var documentURL: URL? {
+        displayedAddress.committed
     }
 
     /// Security of the displayed page; nothing while a load asked for by the user is pending, after a failed load, or

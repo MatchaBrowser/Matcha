@@ -1,4 +1,5 @@
 import Foundation
+import OSLog
 import SwiftData
 
 /// The session after changes received from another Mac (task 7.4), already written to the records.
@@ -66,7 +67,14 @@ extension BrowserSession {
 
     private func reloadSpaces() {
         let context = container.mainContext
-        let records = (try? context.fetch(FetchDescriptor<SpaceRecord>())) ?? []
+        let records: [SpaceRecord]
+        do {
+            records = try context.fetch(FetchDescriptor<SpaceRecord>())
+        } catch {
+            // The received Spaces open at the next reload (review TR4).
+            Logger.app.error("Spaces unreadable after sync: \(error.logSummary, privacy: .public)")
+            return
+        }
         // Moved to another profile: its tabs change cookies, so the Space reopens from its records (already up to date:
         // saving it now would mix the favorites of both profiles).
         for space in spaces where space.openedProfileID != space.record.profile?.id {

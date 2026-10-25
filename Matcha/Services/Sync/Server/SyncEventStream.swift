@@ -84,7 +84,8 @@ final class SyncEventStream {
         isConnected = true
         onChanges?()
         var event: String?
-        for try await line in bytes.lines {
+        // Lines of a reasonable length: a server that never ends one can't make the memory grow (review TR2).
+        for try await line in BoundedLines(base: bytes, limit: Self.maximumLineLength) {
             if line.hasPrefix("event:") {
                 event = line.dropFirst(6).trimmingCharacters(in: .whitespaces)
                 if event == "expired" {
@@ -104,12 +105,12 @@ final class SyncEventStream {
         throw URLError(.networkConnectionLost)
     }
 
-    /// Error answer of the stream, read from its first bytes.
+    /// Longest line of the stream, and of the error answer read.
+    static let maximumLineLength = 65536
+
+    /// Error answer of the stream, read from its first bytes only.
     private static func error(in bytes: URLSession.AsyncBytes, response: HTTPURLResponse) async throws -> SyncServerError {
-        var data = Data()
-        for try await byte in bytes where data.count < 65536 {
-            data.append(byte)
-        }
+        let data = try await BoundedRead.prefix(of: bytes, limit: maximumLineLength)
         return SyncAPIClient.error(from: data, response: response)
     }
 

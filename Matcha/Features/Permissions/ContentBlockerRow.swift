@@ -10,7 +10,7 @@ struct ContentBlockerRow: View {
     let scope: ContentBlockerScope
 
     private var site: String? {
-        ContentBlockerExceptions.site(for: tab.url)
+        ContentBlockerExceptions.site(for: tab.documentURL)
     }
 
     var body: some View {

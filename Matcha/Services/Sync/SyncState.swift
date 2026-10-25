@@ -1,4 +1,5 @@
 import Foundation
+import OSLog
 
 /// This Mac's sync state for one account (`SYNC.md` § 5), kept from one launch to the next: device identifier, read
 /// cursor, clock, what the server has of each record and what this Mac had of it then, changes waiting to be sent, and
@@ -130,15 +131,30 @@ nonisolated struct SyncStateFile: Sendable {
         case unreadable
     }
 
+    /// A missing file is a first sync; a file that can't be read or decoded is unreadable, never taken for a missing
+    /// one (review TR4).
     func load() -> Loaded {
-        guard let url, let data = try? Data(contentsOf: url) else {
+        guard let url else {
             return .missing
+        }
+        let data: Data
+        do {
+            data = try Data(contentsOf: url)
+        } catch CocoaError.fileReadNoSuchFile {
+            return .missing
+        } catch {
+            Logger.sync.error("Sync state unreadable: \(error.logSummary, privacy: .public)")
+            return .unreadable
         }
         do {
             return try .state(SyncCoding.decoder().decode(SyncState.self, from: data))
         } catch {
             let aside = url.deletingPathExtension().appendingPathExtension("unreadable-\(Int(Date.now.timeIntervalSince1970)).json")
-            try? FileManager.default.moveItem(at: url, to: aside)
+            do {
+                try FileManager.default.moveItem(at: url, to: aside)
+            } catch {
+                Logger.sync.error("Unreadable sync state not set aside: \(error.logSummary, privacy: .public)")
+            }
             return .unreadable
         }
     }
