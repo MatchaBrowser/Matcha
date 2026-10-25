@@ -49,22 +49,29 @@ final class ExtensionInstaller {
         }
     }
 
-    /// Prepares an app's Safari extension: the app vouches for it, so installing it again is an update.
+    /// Prepares an app's Safari extension: the app vouches for it, so installing it again is an update; only the same
+    /// signed extension updates the installed one (review EX4), never another one with a similar identifier.
     func prepare(_ appExtension: SafariAppExtension) async throws -> ExtensionInstallCandidate {
-        guard let identifier = ExtensionIdentifier.forAppExtension(bundleIdentifier: appExtension.bundleIdentifier),
-              let bundle = Bundle(url: appExtension.extensionURL)
+        let identity = await SafariExtensionFinder.identity(ofAppExtensionAt: appExtension.extensionURL)
+        let installed = installedIdentifier(of: appExtension, identity: identity)
+        let taken = Set(manager.installedIdentifiers)
+        guard let identifier = installed ?? ExtensionIdentifier.forAppExtension(
+            bundleIdentifier: appExtension.bundleIdentifier,
+            avoiding: taken,
+        ),
+            let bundle = Bundle(url: appExtension.extensionURL)
         else {
             throw ExtensionInstallError.unreadable
         }
         do {
             let webExtension = try await WKWebExtension(appExtensionBundle: bundle)
-            let isInstalled = manager.installedIdentifiers.contains(identifier)
             var candidate = ExtensionInstallCandidate(
                 identifier: identifier,
                 webExtension: webExtension,
                 source: .appExtension(appExtension),
-                mode: isInstalled ? .update(previousVersion: installedVersion(of: identifier)) : .new,
+                mode: installed != nil ? .update(previousVersion: installedVersion(of: identifier)) : .new,
             )
+            candidate.appExtensionIdentity = identity
             await describeUpdate(&candidate)
             return candidate
         } catch {
@@ -72,15 +79,45 @@ final class ExtensionInstaller {
         }
     }
 
+    /// The installed extension that `appExtension` is: the same signed identity, or the same `.appex` for one installed
+    /// before its identity was kept.
+    private func installedIdentifier(of appExtension: SafariAppExtension, identity: String?) -> String? {
+        manager.installedIdentifiers.first { identifier in
+            guard let state = manager.store.state(for: identifier), let path = state.appExtensionPath else {
+                return false
+            }
+            if let known = state.appExtensionIdentity {
+                return known == identity
+            }
+            return path == appExtension.extensionURL.path
+        }
+    }
+
     /// Installs `candidate` (accepted by the user) and loads it. An update replaces the installed version and keeps its
     /// data and the user's refusals (audit E2); a replacement then uninstalls the extension it replaces, data included
     /// (audit E1). If the new version can't be loaded, the previous one comes back, folder and decisions (audit E6).
+    /// Never at the same time as another operation on this extension (review EX21).
     func install(_ candidate: ExtensionInstallCandidate, allowsPrivateWindows: Bool) async throws {
+        try await manager.serialized(candidate.identifier) { [self] in
+            try await performInstall(candidate, allowsPrivateWindows: allowsPrivateWindows)
+        }
+    }
+
+    private func performInstall(_ candidate: ExtensionInstallCandidate, allowsPrivateWindows: Bool) async throws {
         let identifier = candidate.identifier
         let previous = manager.store.state(for: identifier)
         let wasLoaded = manager.contexts[identifier] != nil
         manager.unload(identifier: identifier)
-        let swap = try placeFiles(of: candidate)
+        let swap: FolderSwap?
+        do {
+            swap = try placeFiles(of: candidate)
+        } catch {
+            // Files not put in place: the installed version is still there, and loads again (review EX20).
+            if wasLoaded {
+                await reload(identifier)
+            }
+            throw error
+        }
         do {
             manager.store.setState(
                 state(for: candidate, previous: candidate.isUpdate ? previous : nil, allowsPrivateWindows: allowsPrivateWindows),
@@ -101,7 +138,7 @@ final class ExtensionInstaller {
             }
             throw error
         }
-        swap?.finish()
+        await swap?.finish()
         manager.refreshInstalledFolders()
         if case let .replacement(replaced, _) = candidate.mode {
             await manager.uninstall(identifier: replaced)
@@ -136,10 +173,13 @@ final class ExtensionInstaller {
         )
         if case let .appExtension(appExtension) = candidate.source {
             state.appExtensionPath = appExtension.extensionURL.path
-            state.appExtensionIdentity = SafariExtensionFinder.safariIdentifier(ofAppExtensionAt: appExtension.extensionURL)
+            state.appExtensionIdentity = candidate.appExtensionIdentity
+            // An address websites can't guess (review EX8); an update keeps the one its pages' data is under.
+            state.baseURLHost = previous == nil ? ExtensionIdentifier.random() : previous?.baseURLHost
         } else {
             state.appExtensionPath = nil
             state.appExtensionIdentity = nil
+            state.baseURLHost = nil
         }
         state.hasAccessToPrivateData = allowsPrivateWindows
         state.isEnabled = true
@@ -153,7 +193,7 @@ final class ExtensionInstaller {
         guard case let .package(root, staging, _) = candidate.source else {
             return nil
         }
-        defer { try? FileManager.default.removeItem(at: staging) }
+        defer { Task { await FileRemoval.remove(staging) } }
         guard let directory = manager.directory else {
             throw ExtensionInstallError.unreadable
         }
@@ -163,7 +203,7 @@ final class ExtensionInstaller {
     /// Discards `candidate` (refused): its temporary folder is erased.
     func discard(_ candidate: ExtensionInstallCandidate) {
         if case let .package(_, staging, _) = candidate.source {
-            try? FileManager.default.removeItem(at: staging)
+            Task { await FileRemoval.remove(staging) }
         }
     }
 

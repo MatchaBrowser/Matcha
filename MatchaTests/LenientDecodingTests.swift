@@ -24,7 +24,7 @@ struct LenientDecodingTests {
         defaults.set(Data(json.utf8), forKey: ExtensionStateStore.defaultsKey)
 
         let store = ExtensionStateStore(defaults: defaults)
-        #expect(store.identifiers == ["bon"])
+        #expect(store.state(for: "abime") == nil)
         #expect(store.state(for: "bon")?.isEnabled == false)
         #expect(defaults.data(forKey: ExtensionStateStore.unreadableKey) == Data(json.utf8))
     }

@@ -52,9 +52,10 @@ extension ExtensionWindows: ExtensionHost {
         guard let model = browserWindow(for: nil, context: context) else {
             throw ExtensionError.noBrowserWindow
         }
-        // At the top of the Today tabs, in the requested order (opened from last to first); the first one is active.
+        // At the top of the Today tabs, in the requested order (opened from last to first); the first one is active. The
+        // extensions' view of the windows is updated once, at the end (review EX18).
         let urls: [URL?] = configuration.tabURLs.isEmpty ? [nil] : configuration.tabURLs
-        let first = urls.reversed().map { openTab($0, in: model, after: nil, isActive: false, isPinned: false) }.last
+        let first = urls.reversed().map { openTab($0, in: model, after: nil, isActive: false, isPinned: false, updates: false) }.last
         if let first {
             model.activate()
             model.tabManager.select(first)
@@ -70,6 +71,11 @@ extension ExtensionWindows: ExtensionHost {
     }
 
     func openPage(_ url: URL, for context: WKWebExtensionContext?) -> Bool {
+        // An extension's page (options) opens only at an address it may open (review EX12).
+        if let context, !ExtensionURLPolicy.allows(url, from: context.baseURL) {
+            Logger.extensions.notice("Extension page refused: address not allowed")
+            return false
+        }
         let model = context.map { browserWindow(for: nil, context: $0) }
             ?? browserWindows.compactMap(\.model).first { !$0.session.isPrivate }
         guard let model else {
@@ -105,7 +111,14 @@ extension ExtensionWindows: ExtensionHost {
     /// Opens `url` (none: an empty tab) in the Space displayed by `model`, at the top of the Today tabs, or after
     /// `parent` if it belongs to this Space; active (selected) and pinned on request.
     @discardableResult
-    func openTab(_ url: URL?, in model: WindowModel, after parent: BrowserTab?, isActive: Bool, isPinned: Bool) -> BrowserTab {
+    func openTab(
+        _ url: URL?,
+        in model: WindowModel,
+        after parent: BrowserTab?,
+        isActive: Bool,
+        isPinned: Bool,
+        updates: Bool = true,
+    ) -> BrowserTab {
         let tabManager = model.tabManager
         // Selected in that window, even if another one shows the same Space.
         model.activate()
@@ -119,7 +132,9 @@ extension ExtensionWindows: ExtensionHost {
         if isPinned {
             tabManager.setPlace(tab, to: .pinned)
         }
-        update()
+        if updates {
+            update()
+        }
         Logger.extensions.info("Tab opened for an extension")
         return tab
     }

@@ -188,7 +188,8 @@ struct ExtensionInstallerTests {
         let candidate = try await installer.prepare(fileAt: fixture("test-extension-package.zip"))
         #expect(!stagingIsEmpty())
         installer.discard(candidate)
-        #expect(stagingIsEmpty())
+        // Deleted off the main thread (review EX19).
+        try await waitUntil { stagingIsEmpty() }
         #expect(manager.installedIdentifiers.isEmpty)
     }
 

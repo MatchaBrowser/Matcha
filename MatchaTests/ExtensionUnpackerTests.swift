@@ -38,7 +38,7 @@ struct ExtensionUnpackerTests {
         let large = root.appending(path: "large.crx")
         #expect(FileManager.default.createFile(atPath: large.path, contents: nil))
         let handle = try FileHandle(forWritingTo: large)
-        try handle.truncate(atOffset: UInt64(ExtensionUnpacker.maximumSize + 1))
+        try handle.truncate(atOffset: UInt64(ExtensionLimits.maximumFileSize + 1))
         try handle.close()
 
         await #expect(throws: ExtensionUnpacker.Failure.tooLarge) {
@@ -46,7 +46,7 @@ struct ExtensionUnpackerTests {
         }
     }
 
-    @Test func `a folder swap keeps the previous folder until it is confirmed or undone`() throws {
+    @Test func `a folder swap keeps the previous folder until it is confirmed or undone`() async throws {
         defer { try? FileManager.default.removeItem(at: root) }
         let destination = root.appending(path: "Extensions/ext")
         try FileManager.default.createDirectory(at: destination, withIntermediateDirectories: true)
@@ -64,7 +64,7 @@ struct ExtensionUnpackerTests {
         #expect(try Data(contentsOf: destination.appending(path: "version")) == Data("1".utf8))
 
         let confirmed = try FolderSwap(placing: newFolder("3"), at: destination)
-        confirmed.finish()
+        await confirmed.finish()
         #expect(try Data(contentsOf: destination.appending(path: "version")) == Data("3".utf8))
         #expect(try FileManager.default.contentsOfDirectory(atPath: root.appending(path: "Extensions").path) == ["ext"])
     }

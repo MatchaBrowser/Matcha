@@ -7,9 +7,9 @@ import WebKit
 @MainActor
 @Observable
 final class ExtensionToolbar {
-    /// Changes at each update of an action (icon, title, badge): the buttons follow it. WebKit's actions aren't
-    /// observable.
-    private(set) var actionRevision = 0
+    /// Revision of each extension's action, by identifier, changed at each update (icon, title, badge): only that
+    /// extension's buttons follow it (review EX18). WebKit's actions aren't observable.
+    @ObservationIgnored private var actionRevisions: [String: ExtensionActionRevision] = [:]
     /// Changes when the buttons to show change (button hidden or shown, private windows).
     private(set) var buttonsRevision = 0
     @ObservationIgnored private unowned let manager: ExtensionManager
@@ -44,8 +44,20 @@ final class ExtensionToolbar {
 
     /// Action of extension `identifier` for tab `tab` (icon, title, badge, popup), if it is loaded.
     func action(of identifier: String, for tab: BrowserTab?) -> WKWebExtension.Action? {
-        _ = actionRevision
-        return manager.contexts[identifier]?.action(for: tab.flatMap { manager.host?.extensionTab(for: $0) })
+        guard let context = manager.contexts[identifier] else {
+            return nil
+        }
+        _ = revision(of: identifier).value
+        return context.action(for: tab.flatMap { manager.host?.extensionTab(for: $0) })
+    }
+
+    private func revision(of identifier: String) -> ExtensionActionRevision {
+        if let revision = actionRevisions[identifier] {
+            return revision
+        }
+        let revision = ExtensionActionRevision()
+        actionRevisions[identifier] = revision
+        return revision
     }
 
     /// Click on the button of extension `identifier` for tab `tab`: its popover opens below the button, or the
@@ -61,9 +73,11 @@ final class ExtensionToolbar {
         context.performAction(for: extensionTab)
     }
 
-    /// An action changed.
-    func actionDidUpdate() {
-        actionRevision &+= 1
+    /// An action of `context` changed.
+    func actionDidUpdate(for context: WKWebExtensionContext) {
+        if let identifier = manager.identifier(of: context) {
+            revision(of: identifier).value &+= 1
+        }
     }
 
     /// The buttons to show have changed.
@@ -75,4 +89,11 @@ final class ExtensionToolbar {
     static func name(of context: WKWebExtensionContext) -> String {
         context.webExtension.displayShortName ?? context.webExtension.displayName ?? context.uniqueIdentifier
     }
+}
+
+/// Revision of one extension's action (`ExtensionToolbar`).
+@MainActor
+@Observable
+final class ExtensionActionRevision {
+    var value = 0
 }

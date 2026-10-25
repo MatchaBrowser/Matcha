@@ -1,4 +1,5 @@
 import SwiftUI
+import WebKit
 
 /// Row of an installed extension (task 6.4): icon, name, version and origin, menu (options, button next to the
 /// address, private windows, remove) and switch. An extension that cannot be found (app deleted) only has
@@ -57,6 +58,18 @@ struct InstalledExtensionRow: View {
         .accessibilityIdentifier("installedExtensionRow")
     }
 
+    /// Short form of a granted website: its host (“*.example.com”), the pattern itself without a host (`file:`, review
+    /// EX25), or nil for all websites.
+    static func siteName(of pattern: String) -> String? {
+        guard let matchPattern = try? WKWebExtension.MatchPattern(string: pattern) else {
+            return pattern
+        }
+        if matchPattern.matchesAllHosts {
+            return nil
+        }
+        return matchPattern.host.flatMap { $0.isEmpty ? nil : $0 } ?? pattern
+    }
+
     /// Websites the extension was given, each one can be taken back (audit E5).
     private var siteAccess: some View {
         Menu {
@@ -67,7 +80,7 @@ struct InstalledExtensionRow: View {
                 Button {
                     model.revokeSite(pattern, for: item.id)
                 } label: {
-                    if let site = ExtensionPromptPolicy.siteName(of: pattern) {
+                    if let site = Self.siteName(of: pattern) {
                         Text("Remove Access to \(site)", comment: "Extension menu: takes back the access to a website; %@ is the website")
                     } else {
                         Text("Remove Access to All Websites", comment: "Extension menu: takes back the access to every website")

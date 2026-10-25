@@ -26,7 +26,21 @@ nonisolated struct ExtensionManifestFile {
 
     /// Name of the extension in its default language.
     var name: String? {
-        ExtensionIdentifier.name(in: manifest, messages: messages)
+        Self.name(in: manifest, messages: messages)
+    }
+
+    /// Name from the manifest, or its translated text (`__MSG_key__`, key matched case-insensitively) taken from
+    /// `messages` (`_locales/<default_locale>/messages.json`).
+    static func name(in manifest: [String: Any], messages: [String: Any]?) -> String? {
+        guard let raw = manifest["name"] as? String else {
+            return nil
+        }
+        guard raw.hasPrefix("__MSG_"), raw.hasSuffix("__"), raw.count > 8 else {
+            return raw
+        }
+        let key = raw.dropFirst(6).dropLast(2).lowercased()
+        let entry = messages?.first { $0.key.lowercased() == key }?.value as? [String: Any]
+        return entry?["message"] as? String
     }
 
     /// Firefox identifier of the extension (`browser_specific_settings.gecko.id`), if given.

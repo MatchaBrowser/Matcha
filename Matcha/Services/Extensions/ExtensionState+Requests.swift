@@ -2,8 +2,9 @@ import Foundation
 
 extension ExtensionState {
     /// Decisions after installing a version that asks for `permissions` and `patterns` (audit E2): what it asks for is
-    /// granted, except what the user refused; grants for what it no longer asks for (nor offers as optional) are
-    /// dropped; expired decisions go. A new installation starts from no decision: everything it asks for is granted.
+    /// granted, except what the user refused or removed in Settings (review EX3); grants for what it no longer asks for
+    /// (nor offers as optional) are dropped; expired decisions go. A new installation starts from no decision:
+    /// everything it asks for is granted.
     mutating func applyRequests(
         permissions: Set<String>,
         patterns: Set<String>,
@@ -17,7 +18,7 @@ extension ExtensionState {
         for permission in permissions where deniedPermissions[permission] == nil {
             grantedPermissions[permission] = .distantFuture
         }
-        for pattern in patterns where deniedMatchPatterns[pattern] == nil {
+        for pattern in patterns where deniedMatchPatterns[pattern] == nil && !revokedMatchPatterns.contains(pattern) {
             grantedMatchPatterns[pattern] = .distantFuture
         }
     }

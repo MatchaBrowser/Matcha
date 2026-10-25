@@ -13,8 +13,9 @@ nonisolated enum ZipWriter {
 
     /// Maximum size of a file, and of the archive (no zip64).
     static let maximumFileSize = Int(UInt32.max)
-    /// Most entries in an archive without zip64 (a 16-bit count, audit E7).
-    static let maximumEntries = Int(UInt16.max)
+    /// Most entries: those an extension may have (`ExtensionLimits`, review EX23), below the 16-bit count of an
+    /// archive without zip64 (audit E7).
+    static let maximumEntries = ExtensionLimits.maximumEntries
 
     /// Archive of the content of `folder`, with paths relative to it; `tooLarge` beyond `limit` bytes, as soon as it is
     /// known (review SY16): a folder whose files weigh more than ten times the limit isn't even read.
@@ -118,10 +119,10 @@ nonisolated enum ZipWriter {
     }
 
     private static func le16(_ value: UInt16) -> Data {
-        withUnsafeBytes(of: value.littleEndian) { Data($0) }
+        LittleEndian.bytes(value)
     }
 
     private static func le32(_ value: UInt32) -> Data {
-        withUnsafeBytes(of: value.littleEndian) { Data($0) }
+        LittleEndian.bytes(value)
     }
 }

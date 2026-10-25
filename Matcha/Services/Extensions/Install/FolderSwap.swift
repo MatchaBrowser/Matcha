@@ -30,10 +30,10 @@ nonisolated struct FolderSwap {
         }
     }
 
-    /// The new folder stays: the old one is deleted.
-    func finish() {
+    /// The new folder stays: the old one is deleted, off the main thread (review EX19).
+    func finish() async {
         if let backup {
-            try? FileManager.default.removeItem(at: backup)
+            await FileRemoval.remove(backup)
         }
     }
 

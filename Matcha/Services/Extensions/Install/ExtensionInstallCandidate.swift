@@ -29,6 +29,8 @@ struct ExtensionInstallCandidate: Identifiable {
     let mode: Mode
     /// Publisher proven by the file's signature (`CRXSignature`); nil if it can't be proven.
     var publisher: String?
+    /// For an app's Safari extension: its signed identity, read once, off the main thread (review EX7).
+    var appExtensionIdentity: String?
     /// For an update: what the installed version couldn't do, and whether it had private windows.
     var addedSummary: [ExtensionPermissionSummary.Line] = []
     var allowedPrivateWindows = false

@@ -89,8 +89,8 @@ struct ExtensionActionButton: View {
 
     /// Text badge of the action (number of blocked ads, of passwords…); brighter if it has not been seen.
     @ViewBuilder private func badge(_ action: WKWebExtension.Action?) -> some View {
-        if let action, !action.badgeText.isEmpty {
-            Text(verbatim: action.badgeText)
+        if let action, !ExtensionDisplayName.badge(action.badgeText).isEmpty {
+            Text(verbatim: ExtensionDisplayName.badge(action.badgeText))
                 .font(.system(size: 8, weight: .bold))
                 .foregroundStyle(.white)
                 .lineLimit(1)

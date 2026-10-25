@@ -21,9 +21,9 @@ extension ExtensionInstaller {
         if let publisher, let match = installed.first(where: { manager.store.state(for: $0)?.publisher == publisher }) {
             return (match, .update(previousVersion: installedVersion(of: match)))
         }
+        // Only an identifier of the random form: an older one could be that of an uninstalled extension (review EX10).
         let identifier = preferredIdentifier.flatMap { identifier in
-            ExtensionInstallDirectory.isValidIdentifier(identifier) && !identifier.hasPrefix("safari-")
-                && !manager.installedIdentifiers.contains(identifier) ? identifier : nil
+            ExtensionIdentifier.isRandom(identifier) && !manager.installedIdentifiers.contains(identifier) ? identifier : nil
         } ?? ExtensionIdentifier.random()
         if let name, let match = installed.first(where: { installedName(of: $0)?.caseInsensitiveCompare(name) == .orderedSame }) {
             return (identifier, .replacement(identifier: match, previousVersion: installedVersion(of: match)))

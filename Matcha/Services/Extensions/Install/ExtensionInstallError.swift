@@ -11,7 +11,7 @@ nonisolated enum ExtensionInstallError: Error, Equatable, LocalizedError {
     case unreadable
     /// Manifest rejected by WebKit (unsupported manifest version, required field missing…).
     case invalidManifest(String)
-    /// Larger than `ExtensionUnpacker.maximumSize`, or too many files.
+    /// Larger than `ExtensionLimits` allow, or too many files.
     case tooLarge
     /// An unpacked folder with a symbolic link or an alias (audit E3).
     case containsLink
@@ -23,7 +23,8 @@ nonisolated enum ExtensionInstallError: Error, Equatable, LocalizedError {
             self = error
         case ExtensionPackage.Failure.unknownFormat:
             self = .unknownFormat
-        case ExtensionUnpacker.Failure.tooLarge:
+        case ExtensionUnpacker.Failure.tooLarge, ZipArchive.Failure.tooLarge:
+            // Too large, said as such, never “damaged” (review EX22).
             self = .tooLarge
         case ExtensionUnpacker.Failure.link:
             self = .containsLink

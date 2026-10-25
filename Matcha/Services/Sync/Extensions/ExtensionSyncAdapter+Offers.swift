@@ -15,7 +15,7 @@ extension ExtensionSyncAdapter {
     func prepareOffer(_ fields: SyncExtensionFields) async throws -> ExtensionInstallCandidate {
         switch fields.source.kind {
         case .appExtension:
-            guard let appExtension = findAppExtension(of: fields) else {
+            guard let appExtension = await findAppExtension(of: fields) else {
                 throw OfferError.appMissing
             }
             return try await installer.prepare(appExtension)
@@ -29,12 +29,12 @@ extension ExtensionSyncAdapter {
         }
     }
 
-    /// Safari extension of the offer, if its app is on this Mac.
-    func findAppExtension(of fields: SyncExtensionFields) -> SafariAppExtension? {
+    /// Safari extension of the offer, if its app is on this Mac; looked for off the main thread (review EX7).
+    func findAppExtension(of fields: SyncExtensionFields) async -> SafariAppExtension? {
         guard let bundleIdentifier = fields.source.bundleIdentifier else {
             return nil
         }
-        return SafariExtensionFinder.find().first { $0.bundleIdentifier == bundleIdentifier }
+        return await SafariExtensionFinder.findInBackground().first { $0.bundleIdentifier == bundleIdentifier }
     }
 
     /// The offered extension was just installed: its package is the one received (nothing to send back), it is no

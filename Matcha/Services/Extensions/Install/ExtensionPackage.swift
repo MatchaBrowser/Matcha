@@ -42,7 +42,8 @@ nonisolated enum ExtensionPackage {
         guard archiveStart < data.count else {
             throw Failure.invalidCRX
         }
-        return data.subdata(in: data.startIndex + archiveStart ..< data.endIndex)
+        // A slice: the archive isn't copied (review EX17).
+        return data[(data.startIndex + archiveStart)...]
     }
 
     private static func starts(_ data: Data, with bytes: [UInt8]) -> Bool {
@@ -50,10 +51,6 @@ nonisolated enum ExtensionPackage {
     }
 
     private static func uint32(_ data: Data, at offset: Int) -> UInt32? {
-        guard offset + 4 <= data.count else {
-            return nil
-        }
-        let start = data.startIndex + offset
-        return (0 ..< 4).reduce(UInt32(0)) { $0 | UInt32(data[start + $1]) << (8 * $1) }
+        LittleEndian.uint32(data, at: offset)
     }
 }

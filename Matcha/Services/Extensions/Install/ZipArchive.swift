@@ -3,8 +3,9 @@ import Foundation
 
 /// Reading of a zip archive (task 6.4): `.zip`, Firefox `.xpi`, or the content of a Chrome `.crx` (`ExtensionPackage`).
 /// Only files stored as is or compressed with “deflate” are accepted; an encrypted or zip64 archive is refused, as is
-/// any entry that would leave the folder (absolute path, `..`); symbolic links are ignored. Sizes are bounded against
-/// oversized archives. Pure type.
+/// any entry that would leave the folder (absolute path, `..`), and two entries that would be the same file on disk
+/// (same path, or the same but for case or Unicode form, review EX14); symbolic links are ignored. Sizes are bounded
+/// against oversized archives (`ExtensionLimits`). Pure type.
 nonisolated struct ZipArchive {
     enum Failure: Error, Equatable {
         case notAnArchive
@@ -29,24 +30,26 @@ nonisolated struct ZipArchive {
         }
     }
 
-    /// Maximum total uncompressed size.
-    static let maximumTotalSize = 512 * 1024 * 1024
-    /// Maximum number of entries.
-    static let maximumEntryCount = 20000
-
     let entries: [Entry]
     private let data: Data
 
     init(data: Data) throws {
         self.data = data
         entries = try Self.readCentralDirectory(of: data)
-        guard entries.count <= Self.maximumEntryCount,
-              entries.reduce(0, { $0 + $1.uncompressedSize }) <= Self.maximumTotalSize
+        guard entries.count <= ExtensionLimits.maximumEntries,
+              entries.reduce(0, { $0 + $1.uncompressedSize }) <= ExtensionLimits.maximumUnpackedSize
         else {
             throw Failure.tooLarge
         }
+        // APFS is case-insensitive and compares names in a normalized form: “MANIFEST.JSON” would overwrite
+        // “manifest.json”.
+        var seen: Set<String> = []
         for entry in entries where !entry.isSymbolicLink {
-            _ = try Self.safeComponents(of: entry.path)
+            let components = try Self.safeComponents(of: entry.path)
+            let key = components.joined(separator: "/").precomposedStringWithCanonicalMapping.lowercased()
+            guard components.isEmpty || seen.insert(key).inserted else {
+                throw Failure.unsafePath(entry.path)
+            }
         }
     }
 
@@ -213,19 +216,17 @@ nonisolated struct ZipArchive {
     }
 
     private static func uint16(_ data: Data, at offset: Int) throws -> UInt16 {
-        guard offset >= 0, offset + 2 <= data.count else {
+        guard let value = LittleEndian.uint16(data, at: offset) else {
             throw Failure.corrupted
         }
-        let start = data.startIndex + offset
-        return UInt16(data[start]) | UInt16(data[start + 1]) << 8
+        return value
     }
 
     private static func uint32(_ data: Data, at offset: Int) throws -> UInt32 {
-        guard offset >= 0, offset + 4 <= data.count else {
+        guard let value = LittleEndian.uint32(data, at: offset) else {
             throw Failure.corrupted
         }
-        let start = data.startIndex + offset
-        return (0 ..< 4).reduce(UInt32(0)) { $0 | UInt32(data[start + $1]) << (8 * $1) }
+        return value
     }
 }
 

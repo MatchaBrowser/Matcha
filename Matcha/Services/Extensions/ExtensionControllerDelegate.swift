@@ -84,8 +84,9 @@ final class ExtensionControllerDelegate: NSObject, WKWebExtensionControllerDeleg
 
     // MARK: Permissions
 
-    /// All or nothing: the whole request is granted if the user accepts; otherwise nothing, and the refusal is
-    /// remembered for a day (`ExtensionPromptPolicy`, audit E5): the extension can't ask again and again.
+    /// All or nothing: the whole request is granted if the user accepts; otherwise nothing, and a refusal the user made
+    /// is remembered for a day (`ExtensionPromptPolicy`, audit E5): the extension can't ask again and again. A request
+    /// that wasn't shown is only answered no (review EX6).
     func webExtensionController(
         _: WKWebExtensionController,
         promptForPermissions permissions: Set<WKWebExtension.Permission>,
@@ -94,12 +95,12 @@ final class ExtensionControllerDelegate: NSObject, WKWebExtensionControllerDeleg
         completionHandler: @escaping @Sendable (Set<WKWebExtension.Permission>, Date?) -> Void,
     ) {
         let request = ExtensionPermissionRequest(extensionName: manager.displayName(of: context), permissions: permissions.map(\.rawValue))
-        manager.ask(request, for: context) { allowed in
-            if !allowed {
+        manager.ask(request, for: context) { answer in
+            if answer == .denied {
                 let expiration = ExtensionPromptPolicy.denialExpiration(from: .now)
                 permissions.forEach { context.setPermissionStatus(.deniedExplicitly, for: $0, expirationDate: expiration) }
             }
-            completionHandler(allowed ? permissions : [], nil)
+            completionHandler(answer == .allowed ? permissions : [], nil)
         }
     }
 
@@ -115,12 +116,12 @@ final class ExtensionControllerDelegate: NSObject, WKWebExtensionControllerDeleg
             matchPatterns: matchPatterns.map(\.string),
             includesAllWebsites: matchPatterns.contains(where: \.matchesAllHosts),
         )
-        manager.ask(request, for: context) { allowed in
-            if !allowed {
+        manager.ask(request, for: context) { answer in
+            if answer == .denied {
                 let expiration = ExtensionPromptPolicy.denialExpiration(from: .now)
                 matchPatterns.forEach { context.setPermissionStatus(.deniedExplicitly, for: $0, expirationDate: expiration) }
             }
-            completionHandler(allowed ? matchPatterns : [], nil)
+            completionHandler(answer == .allowed ? matchPatterns : [], nil)
         }
     }
 
@@ -132,12 +133,12 @@ final class ExtensionControllerDelegate: NSObject, WKWebExtensionControllerDeleg
         completionHandler: @escaping @Sendable (Set<URL>, Date?) -> Void,
     ) {
         let request = ExtensionPermissionRequest(extensionName: manager.displayName(of: context), urls: urls)
-        manager.ask(request, for: context) { allowed in
-            if !allowed {
+        manager.ask(request, for: context) { answer in
+            if answer == .denied {
                 let expiration = ExtensionPromptPolicy.denialExpiration(from: .now)
                 urls.forEach { context.setPermissionStatus(.deniedExplicitly, for: $0, expirationDate: expiration) }
             }
-            completionHandler(allowed ? urls : [], nil)
+            completionHandler(answer == .allowed ? urls : [], nil)
         }
     }
 
@@ -193,8 +194,8 @@ final class ExtensionControllerDelegate: NSObject, WKWebExtensionControllerDeleg
     func webExtensionController(
         _: WKWebExtensionController,
         didUpdate _: WKWebExtension.Action,
-        forExtensionContext _: WKWebExtensionContext,
+        forExtensionContext context: WKWebExtensionContext,
     ) {
-        manager.toolbar.actionDidUpdate()
+        manager.toolbar.actionDidUpdate(for: context)
     }
 }

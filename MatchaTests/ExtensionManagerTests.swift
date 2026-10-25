@@ -210,6 +210,8 @@ struct ExtensionManagerTests {
         prompter.answer(false)
         #expect(answers.values == [[], []])
         #expect(context.permissionStatus(for: .cookies) == .deniedExplicitly)
+        // Review EX6: the request never shown isn't remembered as a refusal.
+        #expect(context.permissionStatus(for: .storage) != .deniedExplicitly)
         let expiration = try #require(context.deniedPermissions[.cookies])
         #expect(abs(expiration.timeIntervalSinceNow - ExtensionPromptPolicy.denialDuration) < 60)
 
@@ -219,6 +221,11 @@ struct ExtensionManagerTests {
         manager.revokeSite(pattern.string, identifier: context.uniqueIdentifier)
         #expect(context.permissionStatus(for: pattern) != .grantedExplicitly)
         #expect(manager.store.state(for: context.uniqueIdentifier)?.grantedMatchPatterns[pattern.string] == nil)
+        // Review EX3: remembered as removed, until a new grant.
+        #expect(manager.store.state(for: context.uniqueIdentifier)?.revokedMatchPatterns.contains(pattern.string) == true)
+        context.setPermissionStatus(.grantedExplicitly, for: pattern)
+        manager.saveState(of: context, identifier: context.uniqueIdentifier)
+        #expect(manager.store.state(for: context.uniqueIdentifier)?.revokedMatchPatterns.isEmpty == true)
     }
 
     @Test func `decisions are restored at the next load`() async throws {

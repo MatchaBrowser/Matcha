@@ -28,6 +28,13 @@ nonisolated struct ExtensionState: Codable, Equatable, Sendable {
     /// Signed identity of an app's Safari extension at installation (“bundle identifier (team)”, audit E7): a bundle
     /// found later at the same place with another identity isn't loaded.
     var appExtensionIdentity: String?
+    /// Websites the user removed in Settings (review EX3): the extension may ask for them again, but an update never
+    /// grants them back by itself. A new grant lifts the removal.
+    var revokedMatchPatterns: Set<String> = []
+    /// Host of the extension's address (`webkit-extension://<host>/`), drawn at random when an app's Safari extension is
+    /// installed (review EX8): websites can't guess it to probe its resources. Nil: its identifier (an extension from a
+    /// file, whose identifier is already random, or a Safari extension installed before, whose pages keep their data).
+    var baseURLHost: String?
 
     init() {}
 
@@ -48,6 +55,8 @@ nonisolated struct ExtensionState: Codable, Equatable, Sendable {
         publisher = try container.decodeIfPresent(String.self, forKey: .publisher)
         version = try container.decodeIfPresent(String.self, forKey: .version)
         appExtensionIdentity = try container.decodeIfPresent(String.self, forKey: .appExtensionIdentity)
+        revokedMatchPatterns = try container.decodeIfPresent(Set<String>.self, forKey: .revokedMatchPatterns) ?? []
+        baseURLHost = try container.decodeIfPresent(String.self, forKey: .baseURLHost)
     }
 
     /// Without the decisions expired at `date`.
