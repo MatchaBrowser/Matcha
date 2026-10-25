@@ -4,11 +4,11 @@ import Testing
 
 struct CommandTextTests {
     private func display(_ address: String) -> String {
-        CommandText.displayURL(URL(string: address)!)
+        CommandText.displayURL(testURL(address))
     }
 
     private func key(_ address: String) -> String {
-        CommandText.urlKey(URL(string: address)!)
+        CommandText.urlKey(testURL(address))
     }
 
     @Test func `fold ignores case accents and width`() {

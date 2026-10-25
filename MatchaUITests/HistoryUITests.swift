@@ -131,7 +131,7 @@ final class HistoryUITests: XCTestCase {
     func testPrivateWindowRecordsNothing() throws {
         let app = launchApp()
         XCTAssertTrue(waitForBrowserWindow(of: app))
-        try XCTSkipUnless(FileManager.default.isReadableFile(atPath: Self.localDocsPath), "Postfix documentation missing")
+        try requireResource(FileManager.default.isReadableFile(atPath: Self.localDocsPath), "Postfix documentation missing")
         let privateWindow = openPrivateWindow(in: app)
         openCommandBar(in: app, window: privateWindow)
         app.typeText("file://\(Self.localDocsPath)\n")

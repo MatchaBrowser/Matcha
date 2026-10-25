@@ -7,6 +7,7 @@ import WebKit
 /// right away in the same view, hidden page reloaded when it is shown. Without a window (`TabManager.lifecycle`
 /// nil), a tab displayed by the Space is visible; window tracking is checked by `PageCrashVisibilityTests`.
 @MainActor
+@Suite(.webKit)
 struct NavigationCoordinatorCrashTests {
     private let manager = TabManager(websiteDataStore: .nonPersistent())
     private let pages = CountingTestPages()

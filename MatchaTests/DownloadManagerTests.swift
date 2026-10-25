@@ -22,7 +22,8 @@ struct DownloadManagerTests {
     }
 
     private func reserve(_ item: DownloadItem, suggested: String = "rapport.pdf") -> URL? {
-        let response = URLResponse(url: item.sourceURL!, mimeType: "application/pdf", expectedContentLength: 10, textEncodingName: nil)
+        let source = required(item.sourceURL, else: testURL("https://example.com/"))
+        let response = URLResponse(url: source, mimeType: "application/pdf", expectedContentLength: 10, textEncodingName: nil)
         return downloads.reserveDestination(for: item, suggestedFilename: suggested, response: response)
     }
 

@@ -5,6 +5,7 @@ import WebKit
 
 /// History in the command bar (task 5.5): that of the profile of the displayed Space, or of the mini window.
 @MainActor
+@Suite(.webKit)
 struct HistoryCommandBarTests {
     private let session: BrowserSession
     private let windowModel: WindowModel
@@ -18,7 +19,7 @@ struct HistoryCommandBarTests {
 
     private func record(_ address: String, title: String, in space: SpaceSession) throws {
         let history = try #require(session.history)
-        history.recordVisit(url: URL(string: address)!, title: title, profileID: space.record.profile?.id, spaceID: space.id)
+        history.recordVisit(url: testURL(address), title: title, profileID: space.record.profile?.id, spaceID: space.id)
     }
 
     private func historyTitles(_ rows: [CommandRow]) -> [String] {

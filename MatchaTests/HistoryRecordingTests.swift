@@ -7,6 +7,7 @@ import WebKit
 /// Visits recorded by the common navigation delegate (task 5.5), with real web views: simulated web pages
 /// (`loadSimulatedRequest`), without network.
 @MainActor
+@Suite(.webKit)
 struct HistoryRecordingTests {
     private let container: ModelContainer
     private let clock = TestClock()
@@ -37,10 +38,10 @@ struct HistoryRecordingTests {
     /// Loads a simulated page and waits until it has finished loading (the delegate has received `didFinish`).
     private func load(_ address: String, title: String, in tab: BrowserTab) async throws {
         let url = try #require(URL(string: address))
+        let finished = tab.history.finishedLoads
         tab.loadedWebView.loadSimulatedRequest(URLRequest(url: url), responseHTML: "<title>\(title)</title><p>page</p>")
-        try await waitUntil { tab.url == url && !tab.isLoading }
-        // `didFinish` arrives with the end of the load; one more turn for the delegate.
-        try await Task.sleep(for: .milliseconds(50))
+        // `didFinish` handled, the page recorded or not (review TS2).
+        try await waitUntil { tab.url == url && !tab.isLoading && tab.history.finishedLoads > finished }
     }
 
     @Test func `a finished page is recorded with its title, profile and space`() async throws {
@@ -77,8 +78,7 @@ struct HistoryRecordingTests {
         tab.load(blankPage("vide"))
         try await waitUntil { tab.url == blankPage("vide") && !tab.isLoading }
         tab.load(TestPages.url("locale"))
-        try await waitUntil { tab.title == "locale" && !tab.isLoading }
-        try await Task.sleep(for: .milliseconds(100))
+        try await waitUntil { tab.title == "locale" && !tab.isLoading && tab.history.finishedLoads == 2 }
         #expect(records.isEmpty)
     }
 
@@ -86,7 +86,6 @@ struct HistoryRecordingTests {
         // Private window: the Space has no history.
         let privateManager = TabManager(websiteDataStore: .nonPersistent())
         let tab = try await open("https://example.com/", title: "Privé", in: privateManager)
-        try await Task.sleep(for: .milliseconds(100))
         #expect(records.isEmpty)
         #expect(tab.title == "Privé")
     }
@@ -101,8 +100,7 @@ struct HistoryRecordingTests {
         for (let i = 0; i < 5; i++) { history.replaceState({}, '', '/recherche?q=' + i); }
         document.title = 'Recherche'; true
         """)
-        try await waitUntil { records.count == 2 }
-        try await Task.sleep(for: .milliseconds(150))
+        try await waitUntil { records.count == 2 && !tab.history.hasPendingChange }
         #expect(records.map(\.urlKey) == ["app.example", "app.example/recherche?q=4"])
         #expect(records.last?.title == "Recherche")
 
@@ -110,7 +108,8 @@ struct HistoryRecordingTests {
         clock.advance(120)
         _ = try await tab.loadedWebView.evaluateJavaScript("location.hash = 'section'; true")
         try await waitUntil { tab.url?.fragment == "section" }
-        try await Task.sleep(for: .milliseconds(150))
+        // The address change is looked at when it arrives: a fragment alone waits for nothing.
+        #expect(!tab.history.hasPendingChange)
         #expect(records.count == 2)
 
         _ = try await tab.loadedWebView.evaluateJavaScript("history.pushState({}, '', '/article'); true")
@@ -129,8 +128,8 @@ struct HistoryRecordingTests {
 
         clock.advance(10)
         _ = try await tab.loadedWebView.evaluateJavaScript("document.title = '(1) Nouveau message'; true")
+        // The title is looked at as soon as it changes.
         try await waitUntil { tab.title == "(1) Nouveau message" }
-        try await Task.sleep(for: .milliseconds(50))
         #expect(records.first?.title == "Tardif")
     }
 

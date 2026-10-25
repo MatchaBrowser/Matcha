@@ -131,7 +131,7 @@ final class SystemPageDialogs: PageDialogPresenting {
 
     /// The area the server names (its words, quoted), a refused attempt, and a warning if the password travels
     /// unencrypted.
-    private static func explanation(of login: LoginRequest) -> String {
+    static func explanation(of login: LoginRequest) -> String {
         var lines: [String] = []
         if let realm = login.realm, !realm.isEmpty {
             lines.append(String(

@@ -7,6 +7,7 @@ import WebKit
 /// views and the pages of `TestPages`. The window is requested from the delegate the way WebKit does for “… in New
 /// Window” (checked: `.other`, without button or key, without size).
 @MainActor
+@Suite(.webKit)
 struct NavigationCoordinatorPageMenuTests {
     private let manager = TabManager(websiteDataStore: .nonPersistent())
 

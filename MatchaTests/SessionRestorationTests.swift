@@ -5,6 +5,7 @@ import Testing
 import WebKit
 
 @MainActor
+@Suite(.webKit)
 struct SessionRestorationTests {
     /// Tab that went through two local pages: “un” then “deux”, back available.
     private func tabWithHistory() async throws -> BrowserTab {

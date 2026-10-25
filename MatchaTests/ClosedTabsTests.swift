@@ -5,6 +5,7 @@ import WebKit
 
 /// History > Reopen Closed Tab (⇧⌘T, audit H2): what the user closed comes back at its place, a whole “Clear” at once.
 @MainActor
+@Suite(.webKit)
 struct ClosedTabsTests {
     private let manager = TabManager(websiteDataStore: .nonPersistent())
 

@@ -7,6 +7,7 @@ import WebKit
 
 /// Snapshot of a page before its suspension (task 5.6): reduced size, JPEG, snapshot of a view outside any window.
 @MainActor
+@Suite(.webKit)
 struct TabSnapshotTests {
     /// Solid image of `width` × `height` pixels.
     private func image(width: Int, height: Int) throws -> CGImage {

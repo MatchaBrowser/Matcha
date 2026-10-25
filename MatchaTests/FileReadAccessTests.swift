@@ -5,6 +5,7 @@ import WebKit
 
 /// What a local page may read (audit W6): its folder when the user opens it, never more than the linking page's; the
 /// file alone when another app sends it, links resolved, and the tab keeps it (review WB11).
+@Suite(.webKit)
 struct FileReadAccessTests {
     private let file = URL(filePath: "/Users/moi/Documents/docs/guide/page.html")
 

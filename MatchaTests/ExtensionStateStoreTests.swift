@@ -4,11 +4,9 @@ import Testing
 
 @MainActor
 struct ExtensionStateStoreTests {
+    private let testDefaults = TestDefaults("ExtensionStateStoreTests")
     private func defaults() throws -> UserDefaults {
-        let name = "ExtensionStateStoreTests-\(UUID().uuidString)"
-        let defaults = try #require(UserDefaults(suiteName: name))
-        defaults.removePersistentDomain(forName: name)
-        return defaults
+        testDefaults.make()
     }
 
     @Test func `states survive a new store on the same defaults`() throws {

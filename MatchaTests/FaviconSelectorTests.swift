@@ -6,7 +6,7 @@ struct FaviconSelectorTests {
     private let page = URL(string: "https://www.example.com/articles/1?x=2#haut")!
 
     private func candidate(_ path: String, rel: String = "icon", sizes: String = "", type: String = "") -> FaviconCandidate {
-        FaviconCandidate(url: URL(string: path, relativeTo: page)!.absoluteURL, rel: rel, sizes: sizes, type: type)
+        FaviconCandidate(url: testURL(path, relativeTo: page).absoluteURL, rel: rel, sizes: sizes, type: type)
     }
 
     @Test func `largest icon comes first and favicon ico last`() {

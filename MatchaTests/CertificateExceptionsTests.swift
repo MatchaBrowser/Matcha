@@ -7,6 +7,7 @@ import WebKit
 /// “Visit This Website Anyway” after a certificate error (audit K5): that certificate, that website, until the app
 /// quits; the page then says “Not Secure”.
 @MainActor
+@Suite(.webKit)
 struct CertificateExceptionsTests {
     /// Two self-signed certificates made for these tests (`openssl req -x509`, EC P-256), with no key kept.
     private static let first =

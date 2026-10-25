@@ -6,6 +6,7 @@ import WebKit
 /// Links to other apps (audit W2): nothing opens without the user. Every link to another app waits in the page's
 /// banner, which names the app; “Always Open” is remembered for the website and that kind of link.
 @MainActor
+@Suite(.webKit)
 struct ExternalAppTests {
     private let manager = TabManager(websiteDataStore: .nonPersistent())
 

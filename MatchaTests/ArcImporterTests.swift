@@ -6,6 +6,7 @@ import Testing
 /// Import of an Arc sidebar into an in-memory session (task 7.1): Spaces, folders, pinned tabs, open tabs,
 /// profiles, favorites.
 @MainActor
+@Suite(.webKit)
 struct ArcImporterTests {
     private let session: BrowserSession
     private let sidebar: ArcSidebar

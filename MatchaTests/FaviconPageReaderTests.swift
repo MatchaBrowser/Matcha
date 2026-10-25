@@ -5,13 +5,12 @@ import WebKit
 
 /// Icons read from inside the page (`FaviconPageReader`): an SVG comes back drawn as a bitmap by WebKit, a bitmap as is.
 @MainActor
+@Suite(.webKit)
 struct FaviconPageReaderTests {
     private func loadedWebView() async throws -> WKWebView {
         let webView = WKWebView(frame: CGRect(x: 0, y: 0, width: 200, height: 200), configuration: WKWebViewConfiguration())
         webView.loadHTMLString("<html><body></body></html>", baseURL: URL(string: "about:blank"))
-        for _ in 0 ..< 100 where webView.isLoading || webView.url == nil {
-            try await Task.sleep(for: .milliseconds(20))
-        }
+        try await waitUntil { !webView.isLoading && webView.url != nil }
         return webView
     }
 

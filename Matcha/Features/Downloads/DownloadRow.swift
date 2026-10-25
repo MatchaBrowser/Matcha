@@ -114,8 +114,12 @@ struct DownloadRow: View {
         }
     }
 
-    /// “12 MB of 40 MB” during the download, the size once finished (or “File not found”), otherwise the state.
     private var status: String {
+        Self.status(of: item)
+    }
+
+    /// “12 MB of 40 MB” during the download, the size once finished (or “File not found”), otherwise the state.
+    static func status(of item: DownloadItem) -> String {
         switch item.state {
         case .downloading:
             let completed = DownloadProgressSummary.byteCount(item.completedBytes)

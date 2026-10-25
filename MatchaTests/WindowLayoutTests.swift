@@ -1,4 +1,4 @@
-import CoreGraphics
+import AppKit
 import Foundation
 @testable import Matcha
 import Testing
@@ -16,6 +16,29 @@ struct WindowLayoutTests {
         // Between screens or just off one: the nearest.
         #expect(BrowserWindowFrame.screenIndex(of: CGPoint(x: 3000, y: 1200), in: screens) == 1)
         #expect(BrowserWindowFrame.screenIndex(of: CGPoint(x: 10, y: 10), in: []) == nil)
+    }
+
+    /// Review ON17 and TS12: the top left corner where asked; past the top of the screens, back under it.
+    @Test func `a placed window has its top left corner at the point, kept on the screen`() throws {
+        let screen = try #require(NSScreen.main)
+        let window = NSWindow(
+            contentRect: NSRect(x: 0, y: 0, width: 400, height: 300),
+            styleMask: [.titled],
+            backing: .buffered,
+            defer: true,
+        )
+        let corner = CGPoint(x: screen.visibleFrame.minX + 100, y: screen.visibleFrame.maxY - 100)
+        BrowserWindowFrame.place(window, topLeft: corner)
+        #expect(window.frame.minX == corner.x)
+        #expect(window.frame.maxY == corner.y)
+
+        // Past the top of the screen: on the nearest one (another screen may be above), under its top.
+        let far = CGPoint(x: corner.x, y: screen.frame.maxY + 500)
+        BrowserWindowFrame.place(window, topLeft: far)
+        let screens = NSScreen.screens
+        let nearest = try #require(BrowserWindowFrame.screenIndex(of: far, in: screens.map(\.frame)).map { screens[$0] })
+        #expect(nearest.frame.intersects(window.frame))
+        #expect(window.frame.maxY <= nearest.frame.maxY)
     }
 
     /// Review ON21: the pointer lands in the new window's sidebar, under the band of the window buttons.

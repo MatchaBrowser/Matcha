@@ -19,12 +19,12 @@ struct SearchSuggestionClientTests {
     ) -> SearchSuggestionClient {
         SearchSuggestionClient { request in
             await recorder.record(request)
-            let response = HTTPURLResponse(
-                url: request.url!,
+            let response = required(HTTPURLResponse(
+                url: required(request.url, else: testURL("https://suggestions.test/")),
                 statusCode: status,
                 httpVersion: "HTTP/1.1",
                 headerFields: ["Content-Type": "application/json; charset=utf-8"],
-            )!
+            ), else: HTTPURLResponse())
             return (body, response)
         }
     }

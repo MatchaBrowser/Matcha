@@ -4,11 +4,9 @@ import Testing
 
 /// “Free memory of inactive tabs after” setting (task 5.6).
 struct TabSuspensionSettingsTests {
+    private let testDefaults = TestDefaults("TabSuspensionSettingsTests")
     private func emptyDefaults() -> UserDefaults {
-        let name = "TabSuspensionSettingsTests-\(UUID().uuidString)"
-        let defaults = UserDefaults(suiteName: name)!
-        defaults.removePersistentDomain(forName: name)
-        return defaults
+        testDefaults.make()
     }
 
     @Test func `options are offered in order with their durations`() {

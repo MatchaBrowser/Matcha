@@ -31,15 +31,20 @@ final class FaviconService {
     /// Domains whose icon has been successfully refreshed since launch.
     private var refreshedHosts: Set<String> = []
 
-    /// `directory`: folder of the disk cache, or nil for an in-memory cache only.
-    init(directory: URL?) {
+    /// `directory`: folder of the disk cache, or nil for an in-memory cache only; `configuration`: that of the
+    /// downloads (`makeConfiguration`), replaced in tests.
+    init(directory: URL?, configuration: URLSessionConfiguration = makeConfiguration()) {
         disk = directory.map(FaviconDiskCache.init(directory:))
-        session = URLSession(configuration: Self.makeConfiguration())
+        session = URLSession(configuration: configuration)
     }
 
-    /// No cookies, credentials or cache: an icon request tells a website nothing about the profile.
+    /// No cookies, credentials or cache: an icon request tells a website nothing about the profile. In the unit tests'
+    /// host app, no request reaches the network (`OfflineURLProtocol`, review TS4).
     nonisolated static func makeConfiguration() -> URLSessionConfiguration {
         let configuration = URLSessionConfiguration.ephemeral
+        if TestEnvironment.isUnitTestHost() {
+            configuration.protocolClasses = [OfflineURLProtocol.self]
+        }
         configuration.httpCookieAcceptPolicy = .never
         configuration.httpShouldSetCookies = false
         configuration.httpCookieStorage = nil

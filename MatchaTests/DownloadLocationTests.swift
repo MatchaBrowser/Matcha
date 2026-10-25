@@ -4,10 +4,9 @@ import Testing
 
 /// Downloads folder (task 5.1): the real ~/Downloads, or the UI tests' subfolder.
 struct DownloadLocationTests {
+    private let testDefaults = TestDefaults("DownloadLocationTests")
     private func defaults(_ values: [String: Any]) throws -> UserDefaults {
-        let name = "DownloadLocationTests-\(UUID().uuidString)"
-        let defaults = try #require(UserDefaults(suiteName: name))
-        defaults.removePersistentDomain(forName: name)
+        let defaults = testDefaults.make()
         for (key, value) in values {
             defaults.set(value, forKey: key)
         }

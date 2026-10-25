@@ -3,9 +3,10 @@ import Foundation
 import Testing
 
 struct MiniWindowSettingsTests {
-    @Test func `launch argument strings and missing values are read`() throws {
-        let defaults = try #require(UserDefaults(suiteName: "MiniWindowSettingsTests"))
-        defaults.removePersistentDomain(forName: "MiniWindowSettingsTests")
+    private let testDefaults = TestDefaults("MiniWindowSettingsTests")
+
+    @Test func `launch argument strings and missing values are read`() {
+        let defaults = testDefaults.make()
         #expect(MiniWindowSettings.current(defaults).showsSearchSuggestions)
         #expect(MiniWindowSettings.current(defaults).searchEngine == BrowserSettings.searchEngine)
 
@@ -14,6 +15,5 @@ struct MiniWindowSettingsTests {
         defaults.set("bing", forKey: BrowserSettings.Key.searchEngine)
         #expect(!MiniWindowSettings.current(defaults).showsSearchSuggestions)
         #expect(MiniWindowSettings.current(defaults).searchEngine == .bing)
-        defaults.removePersistentDomain(forName: "MiniWindowSettingsTests")
     }
 }

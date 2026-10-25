@@ -5,6 +5,7 @@ import Testing
 import WebKit
 
 @MainActor
+@Suite(.webKit)
 struct MiniWindowHandOffTests {
     private let session: BrowserSession
 

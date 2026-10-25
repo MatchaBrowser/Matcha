@@ -6,6 +6,7 @@ import WebKit
 /// “View Page Source”: viewer address, reading the text, a page that shows it without running anything, and only for
 /// the viewers opened by the app (audit W1).
 @MainActor
+@Suite(.webKit)
 struct PageSourceTests {
     @Test func `the viewer address leads back to its page`() throws {
         let page = try #require(URL(string: "https://example.com/a/b?x=1&y=é"))
@@ -174,8 +175,8 @@ struct PageSourceTests {
     }
 
     private static func archive(of webView: WKWebView) async throws -> Data {
-        try await withCheckedThrowingContinuation { continuation in
-            webView.createWebArchiveData { continuation.resume(with: $0) }
-        }
+        try await awaitCallback { done in
+            webView.createWebArchiveData { done($0) }
+        }.get()
     }
 }

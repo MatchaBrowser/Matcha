@@ -5,6 +5,7 @@ import Testing
 /// Saved compiled lists (task 6.2): store identifiers (version included, parts), version to reuse, stale
 /// identifiers (never those of another prefix), saving in the settings.
 struct CompiledBlocklistTests {
+    private let testDefaults = TestDefaults("CompiledBlocklistTests")
     private let entry = BlocklistEntry(identifier: "easylist", name: "EasyList", version: "2026.10.18", file: "a.json")
 
     private func record(version: String = "2026.10.18", parts: Int = 1) -> CompiledBlocklist {
@@ -60,10 +61,8 @@ struct CompiledBlocklistTests {
         #expect(stale == ["matcha-blocklist.easylist.2026.10.11", "matcha-blocklist.retiree.1.part-2"])
     }
 
-    @Test func `records are saved in the settings and read back`() throws {
-        let suiteName = "CompiledBlocklistTests-\(UUID().uuidString)"
-        let defaults = try #require(UserDefaults(suiteName: suiteName))
-        defer { defaults.removePersistentDomain(forName: suiteName) }
+    @Test func `records are saved in the settings and read back`() {
+        let defaults = testDefaults.make()
         #expect(CompiledBlocklist.load(from: defaults).isEmpty)
         let records = [record(), record(version: "3", parts: 2)]
         CompiledBlocklist.save(records, to: defaults)

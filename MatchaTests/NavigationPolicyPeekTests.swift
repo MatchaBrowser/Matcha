@@ -37,7 +37,7 @@ struct NavigationPolicyPeekTests {
     }
 
     private func peek(_ text: String = link) -> NavigationDecision {
-        .openInPeek(URL(string: text)!)
+        .openInPeek(testURL(text))
     }
 
     // MARK: Shift-click

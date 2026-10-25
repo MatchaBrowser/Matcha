@@ -9,6 +9,7 @@ import WebKit
 /// Printing and PDF export of a real page (task 5.4): print operation set up (title, view frame), printing to a PDF
 /// file that is not blank, single-page PDF of the whole page, file name and writing.
 @MainActor
+@Suite(.webKit)
 struct PagePrintingTests {
     /// Local page `name` whose body is `body`, in an 800 × 600 pt web view that is never shown.
     private func page(_ name: String, body: String) async throws -> BrowserTab {

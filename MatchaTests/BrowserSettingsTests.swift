@@ -4,11 +4,9 @@ import Foundation
 import Testing
 
 struct BrowserSettingsTests {
+    private let testDefaults = TestDefaults("BrowserSettingsTests")
     private func emptyDefaults() -> UserDefaults {
-        let name = "BrowserSettingsTests-\(UUID().uuidString)"
-        let defaults = UserDefaults(suiteName: name)!
-        defaults.removePersistentDomain(forName: name)
-        return defaults
+        testDefaults.make()
     }
 
     /// Off by default: tabs come back at the next launch (audit R7).

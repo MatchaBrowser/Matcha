@@ -1,5 +1,6 @@
 import Foundation
 @testable import Matcha
+import Testing
 
 /// Keeps the answers given to WebKit by permission requests (true: granted).
 @MainActor
@@ -13,9 +14,9 @@ final class PermissionRecorder {
 
 /// Origins for the permission tests.
 nonisolated enum TestOrigins {
-    static let meet = SiteOrigin(scheme: "https", host: "meet.example.com", port: nil)!
-    static let other = SiteOrigin(scheme: "https", host: "other.example.org", port: nil)!
-    static let local = SiteOrigin(scheme: "http", host: "localhost", port: 8080)!
+    static let meet = testOrigin("https", "meet.example.com")
+    static let other = testOrigin("https", "other.example.org")
+    static let local = testOrigin("http", "localhost", port: 8080)
 }
 
 @MainActor

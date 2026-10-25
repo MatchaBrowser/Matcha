@@ -6,24 +6,22 @@ import OSLog
 /// closes the stream when the access token expires, after `event: expired`: the token is renewed (one renewal at a
 /// time) and the stream reconnects right away, unless the previous renewal was less than 30 seconds ago: a server that
 /// says `expired` at each connection gets the growing delay (review SY18). Any other cut (network, answer other than
-/// `200`, no `ping` for 90 seconds) reconnects after a growing delay, from 1 second to 5 minutes.
+/// `200`, no `ping` for 90 seconds) reconnects after a growing delay, from 1 second to 5 minutes
+/// (`SyncReconnectDelay`). The lines are read by `SyncEventReader`.
 @MainActor
 final class SyncEventStream {
-    static let maximumDelay: Duration = .seconds(5 * 60)
-    /// Two renewals closer than this: the second reconnection waits.
-    static let minimumRenewalInterval: Duration = .seconds(30)
-
     private let client: SyncAPIClient
     /// Requests without data for 90 seconds end (the server sends a `ping` every 30 seconds).
-    private let session = SyncAPIClient.makeSession(timeout: 90)
+    private let session: URLSession
     private var task: Task<Void, Never>?
     /// Something changed on the server, or the stream (re)connected: read the changes.
     var onChanges: (() -> Void)?
     /// The session ended (revoked device, deleted account, unknown tokens): the stream stops.
     var onSessionEnded: ((SyncServerError) -> Void)?
 
-    init(client: SyncAPIClient) {
+    init(client: SyncAPIClient, session: URLSession = SyncAPIClient.makeSession(timeout: 90)) {
         self.client = client
+        self.session = session
     }
 
     func start() {
@@ -43,19 +41,14 @@ final class SyncEventStream {
     }
 
     private func run() async {
-        var delay: Duration = .seconds(1)
-        var lastRenewal: ContinuousClock.Instant?
+        var delays = SyncReconnectDelay()
         while !Task.isCancelled {
             do {
                 try await listen()
-                let now = ContinuousClock.now
-                if let lastRenewal, now - lastRenewal < Self.minimumRenewalInterval {
-                    try? await Task.sleep(for: delay)
-                    delay = min(delay * 2, Self.maximumDelay)
-                } else {
-                    delay = .seconds(1)
+                let wait = delays.afterRenewal(at: .now)
+                if wait > .zero {
+                    try? await Task.sleep(for: wait)
                 }
-                lastRenewal = now
             } catch let error as SyncServerError where error.endsSession {
                 onSessionEnded?(error)
                 return
@@ -64,8 +57,7 @@ final class SyncEventStream {
                     return
                 }
                 Logger.sync.notice("Event stream cut: \(error.logSummary, privacy: .public)")
-                try? await Task.sleep(for: delay)
-                delay = min(delay * 2, Self.maximumDelay)
+                try? await Task.sleep(for: delays.afterCut())
             }
         }
     }
@@ -91,21 +83,17 @@ final class SyncEventStream {
             return
         }
         onChanges?()
-        var event: String?
+        var reader = SyncEventReader()
         // Lines of a reasonable length: a server that never ends one can't make the memory grow (review TR2).
         for try await line in BoundedLines(base: bytes, limit: Self.maximumLineLength) {
-            if line.hasPrefix("event:") {
-                event = line.dropFirst(6).trimmingCharacters(in: .whitespaces)
-                if event == "expired" {
-                    _ = try await renew(after: token)
-                    return
-                }
-            } else {
-                // `: ping` comments only keep the connection alive.
-                if line.hasPrefix("data:"), event == "changes" {
-                    onChanges?()
-                }
-                event = nil
+            switch reader.read(line) {
+            case .expired:
+                _ = try await renew(after: token)
+                return
+            case .changes:
+                onChanges?()
+            case .none:
+                break
             }
         }
         throw URLError(.networkConnectionLost)

@@ -4,6 +4,7 @@ import Testing
 
 /// Review TR4: a file that can't be read is told apart from a missing one, and never erased by a failed save.
 struct QuietFailureTests {
+    private let testDefaults = TestDefaults("QuietFailureTests")
     private let folder = FileManager.default.temporaryDirectory.appending(path: "QuietFailureTests-\(UUID().uuidString)")
 
     init() throws {
@@ -21,8 +22,8 @@ struct QuietFailureTests {
         #expect(FileManager.default.fileExists(atPath: unreadable.path))
     }
 
-    @Test func `an undecodable sync configuration gives the default one`() throws {
-        let defaults = try #require(UserDefaults(suiteName: "QuietFailureTests-\(UUID().uuidString)"))
+    @Test func `an undecodable sync configuration gives the default one`() {
+        let defaults = testDefaults.make()
         defaults.set(Data("not json".utf8), forKey: SyncConfiguration.defaultsKey)
         #expect(SyncConfiguration.load(from: defaults) == SyncConfiguration())
 

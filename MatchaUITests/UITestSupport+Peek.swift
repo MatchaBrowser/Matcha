@@ -10,7 +10,7 @@ extension XCTestCase {
     /// Opens the Postfix documentation in a new tab; the test is skipped if it is missing.
     @MainActor
     func openLocalDocs(in app: XCUIApplication) throws {
-        try XCTSkipUnless(FileManager.default.isReadableFile(atPath: Self.localDocsPath), "Postfix documentation missing")
+        try requireResource(FileManager.default.isReadableFile(atPath: Self.localDocsPath), "Postfix documentation missing")
         openAddress("file://" + Self.localDocsPath, in: app)
         XCTAssertTrue(tabRow(titled: "Postfix Documentation", in: app).waitForExistence(timeout: 10))
     }

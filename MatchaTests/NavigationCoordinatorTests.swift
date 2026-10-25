@@ -5,6 +5,7 @@ import WebKit
 
 /// Integration tests with real web views and the local pages of `TestPages`.
 @MainActor
+@Suite(.webKit)
 struct NavigationCoordinatorTests {
     private let manager = TabManager(websiteDataStore: .nonPersistent())
 

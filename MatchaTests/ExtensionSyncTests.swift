@@ -6,6 +6,7 @@ import WebKit
 /// Synced extensions (task 7.4, `SYNC.md` § 2.5): two simulated Macs (temporary folders), an in-memory server, the
 /// test extension of the installation tests.
 @MainActor
+@Suite(.webKit)
 struct ExtensionSyncTests {
     private let root: URL
     private let server = InMemorySyncServer()
@@ -75,6 +76,8 @@ struct ExtensionSyncTests {
         #expect(await server.blobs.keys.contains(package.blobID))
 
         let file = try await mac.adapter.downloadPackage(package, using: transport)
+        // Its folder (`SyncedExtension-…`), as the app erases it after installing (review TS3).
+        defer { try? FileManager.default.removeItem(at: file.deletingLastPathComponent()) }
         let archive = try ZipArchive(data: Data(contentsOf: file))
         let manifest = try #require(archive.entries.first { $0.path == "manifest.json" })
         let installed = try #require(mac.manager.directory?.appendingPathComponent("\(identifier)/manifest.json"))
@@ -173,10 +176,7 @@ struct ExtensionSyncTests {
         second.adapter.didInstallOffer(fields)
 
         second.adapter.remove(identifier: identifier)
-        for _ in 0 ..< 100 where second.manager.installedIdentifiers.contains(identifier) {
-            try await Task.sleep(for: .milliseconds(20))
-        }
-        #expect(second.manager.installedIdentifiers.isEmpty)
+        try await waitUntil { second.manager.installedIdentifiers.isEmpty }
 
         await first.manager.uninstall(identifier: identifier)
         await first.adapter.deleteObsoletePackages(using: transport)

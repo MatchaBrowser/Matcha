@@ -7,6 +7,7 @@ import Testing
 /// Spaces, folders, favorites, pinned tabs and settings of the first one, and sees its today tabs.
 @MainActor
 struct MatchaSyncTests {
+    private let testDefaults = TestDefaults("MatchaSyncTests")
     private let server = InMemorySyncServer()
 
     /// A Mac: its session, its settings, its engine.
@@ -24,7 +25,7 @@ struct MatchaSyncTests {
     /// `device`: this Mac in sync, which then publishes its today tabs (`deviceTabs`).
     private func makeMac(device: SyncDeviceDescription? = nil) throws -> Mac {
         let session = try BrowserSession(container: BrowserSchema.makeContainer(inMemory: true))
-        let defaults = try #require(UserDefaults(suiteName: "MatchaSyncTests-\(UUID().uuidString)"))
+        let defaults = testDefaults.make()
         let engine = SyncEngine(
             store: MatchaSyncStore(session: session, defaults: defaults, identifiers: .testAccount, device: device),
             transport: InMemorySyncTransport(server: server),

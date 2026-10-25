@@ -7,6 +7,7 @@ import WebKit
 /// creating a `WKSecurityOrigin`: the tests go through `requestPermission`, which the delegate method calls after
 /// conversion. A real `getUserMedia` request would bring up the macOS access prompt: manual check.
 @MainActor
+@Suite(.webKit)
 struct NavigationCoordinatorPermissionTests {
     private let session: BrowserSession
     private let recorder = PermissionRecorder()
@@ -24,7 +25,7 @@ struct NavigationCoordinatorPermissionTests {
     }
 
     private var scope: SitePermissionScope {
-        manager.sitePermissions!
+        required(manager.sitePermissions, else: SitePermissionScope(store: SitePermissionStore(context: nil), profileID: nil))
     }
 
     /// Selected tab on the local page `name`, once loaded.

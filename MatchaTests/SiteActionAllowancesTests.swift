@@ -5,13 +5,12 @@ import Testing
 /// What websites may do without asking (audit W2): per profile, website and action; saved in the app's settings.
 @MainActor
 struct SiteActionAllowancesTests {
-    private let suiteName = "SiteActionAllowancesTests-\(UUID().uuidString)"
-    private let zoomSite = SiteOrigin(url: URL(string: "https://zoom.us/")!)!
+    private let testDefaults = TestDefaults("SiteActionAllowancesTests")
+    private let zoomSite = testOrigin("https", "zoom.us")
     private let profile = UUID()
 
-    @Test func `an allowance is kept per profile and comes back after a relaunch`() throws {
-        let defaults = try #require(UserDefaults(suiteName: suiteName))
-        defer { defaults.removePersistentDomain(forName: suiteName) }
+    @Test func `an allowance is kept per profile and comes back after a relaunch`() {
+        let defaults = testDefaults.make()
         let zoom = SiteAction.openApp(scheme: "zoommtg")
         let store = SiteActionAllowances(defaults: defaults)
         store.allow(zoom, origin: zoomSite, profileID: profile)
@@ -35,9 +34,8 @@ struct SiteActionAllowancesTests {
         #expect(!store.isAllowed(.openApp(scheme: "zoommtg"), origin: zoomSite, profileID: nil))
     }
 
-    @Test func `unreadable saved entries are ignored`() throws {
-        let defaults = try #require(UserDefaults(suiteName: suiteName))
-        defer { defaults.removePersistentDomain(forName: suiteName) }
+    @Test func `unreadable saved entries are ignored`() {
+        let defaults = testDefaults.make()
         defaults.set([
             ["profile": "", "site": "https://zoom.us", "action": "open:zoommtg"],
             ["profile": "", "site": "pas une origine", "action": "open:zoommtg"],

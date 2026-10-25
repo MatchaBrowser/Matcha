@@ -30,6 +30,11 @@ nonisolated enum PageSourceLoader {
         if page.isFileURL {
             return try (readFile(page), nil)
         }
+        return try await download(page, configuration: makeConfiguration(cookies: cookies, userAgent: userAgent))
+    }
+
+    /// Ephemeral session holding `cookies`, presented as `userAgent`.
+    static func makeConfiguration(cookies: [HTTPCookie], userAgent: String) -> URLSessionConfiguration {
         let configuration = URLSessionConfiguration.ephemeral
         configuration.timeoutIntervalForResource = timeout
         if let storage = configuration.httpCookieStorage {
@@ -37,6 +42,11 @@ nonisolated enum PageSourceLoader {
             cookies.forEach(storage.setCookie)
         }
         configuration.httpAdditionalHeaders = ["User-Agent": userAgent]
+        return configuration
+    }
+
+    /// The site's response to `page` and its encoding, refused past `maximumSize` bytes.
+    static func download(_ page: URL, configuration: URLSessionConfiguration) async throws -> (Data, String?) {
         let session = URLSession(configuration: configuration)
         defer { session.finishTasksAndInvalidate() }
         let (bytes, response) = try await session.bytes(from: page)

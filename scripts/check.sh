@@ -1,6 +1,6 @@
 #!/bin/bash
 # Every check a task must pass (CLAUDE.md, audit C7), in one command: formatting, lint, Debug build without any
-# warning, unit tests, translations. Run locally before each commit, and by GitHub Actions on each push
+# warning, translations, the scripts' tests, unit tests. Run locally before each commit, and by GitHub Actions on each push
 # (.github/workflows/check.yml).
 #
 #   scripts/check.sh            checks everything, changes nothing
@@ -8,7 +8,9 @@
 #
 # Needs SwiftFormat and SwiftLint (brew install swiftformat swiftlint). Extra xcodebuild settings can be given in
 # MATCHA_XCODEBUILD_FLAGS (GitHub Actions: no signing team on its machines), and options of the unit tests alone in
-# MATCHA_TEST_FLAGS (GitHub Actions: one test at a time).
+# MATCHA_TEST_FLAGS: one test at a time by default (review TS1: in parallel, the WebKit tests share the main thread and
+# their waits run out; in series, about 70 s on a Mac); MATCHA_TEST_FLAGS="-parallel-testing-enabled YES" to try
+# them in parallel.
 set -euo pipefail
 
 cd "$(dirname "$0")/.."
@@ -20,7 +22,7 @@ FIX=false
 # shellcheck disable=SC2206
 FLAGS=(${MATCHA_XCODEBUILD_FLAGS:-})
 # shellcheck disable=SC2206
-TEST_FLAGS=(${MATCHA_TEST_FLAGS:-})
+TEST_FLAGS=(${MATCHA_TEST_FLAGS:--parallel-testing-enabled NO})
 DESTINATION="platform=macOS,arch=arm64"
 LOGS="build/check"
 mkdir -p "$LOGS"
@@ -113,7 +115,22 @@ echo "✓ compilation sans avertissement"
 step "Traductions"
 scripts/check-localizations.sh
 
+step "Scripts"
+python3 -I scripts/test-appcast.py
+echo "✓ flux des mises à jour (appcast.py)"
+
 step "Tests unitaires"
+# The tests run in Matcha's own container (same app identifier): the temporary files they leave there are emptied
+# first (review TS3), unless Matcha runs (its downloads and installations in progress use them).
+CONTAINER="$HOME/Library/Containers/com.matchabrowser.matcha/Data"
+if [[ -d "$CONTAINER/tmp" ]] && ! pgrep -x Matcha > /dev/null; then
+    find "$CONTAINER/tmp" -mindepth 1 -maxdepth 1 -exec rm -rf {} +
+fi
+# Settings suites of the tests left by a test that stopped early (each one erases its own, `TestDefaults`); never
+# Matcha's own settings (`com.matchabrowser.matcha.plist`).
+if [[ -d "$CONTAINER/Library/Preferences" ]]; then
+    find "$CONTAINER/Library/Preferences" -maxdepth 1 -name '*Tests*.plist' -delete
+fi
 # Crash reports and test results written from now on are this run's (`report_test_failures`).
 touch "$LOGS/tests-started"
 xcodebuild -project Matcha.xcodeproj -scheme Matcha -destination "$DESTINATION" -derivedDataPath build \

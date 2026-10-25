@@ -6,6 +6,7 @@ import Testing
 /// structure of Arc's file: icon and emoji, solid color and gradient, added profile, nested folders, note, split
 /// view, internal address, duplicate favorites.
 @MainActor
+@Suite(.webKit)
 struct ArcSidebarParserTests {
     private func sample() throws -> ArcSidebar {
         let url = try #require(Bundle(for: TestPages.self).url(forResource: "arc-sidebar-sample.json", withExtension: nil))
@@ -65,6 +66,21 @@ struct ArcSidebarParserTests {
         #expect(throws: ArcSidebarParser.Failure.notArcSidebar) { try ArcSidebarParser.parse(Data(#"{"version": 1}"#.utf8)) }
         let noSpaces = #"{"sidebar": {"containers": [{"global": {}}, {"items": []}]}}"#
         #expect(throws: ArcSidebarParser.Failure.notArcSidebar) { try ArcSidebarParser.parse(Data(noSpaces.utf8)) }
+    }
+
+    /// Review TS12: the import reads the file off the main thread, and never one larger than any Arc sidebar.
+    @Test func `the import reads the file, never one past the limit`() async throws {
+        let sample = try #require(Bundle(for: TestPages.self).url(forResource: "arc-sidebar-sample.json", withExtension: nil))
+        #expect(try await ArcImportModel.read(sample).spaces.count == self.sample().spaces.count)
+
+        let large = FileManager.default.temporaryDirectory.appending(path: "ArcSidebarParserTests-\(UUID().uuidString).json")
+        defer { try? FileManager.default.removeItem(at: large) }
+        try Data(contentsOf: sample).write(to: large)
+        let handle = try FileHandle(forWritingTo: large)
+        // Sparse: past the limit without writing it.
+        try handle.truncate(atOffset: UInt64(ArcImportModel.maximumFileSize + 1))
+        try handle.close()
+        await #expect(throws: ArcSidebarParser.Failure.tooLarge) { try await ArcImportModel.read(large) }
     }
 
     @Test func `odd shapes are tolerated`() throws {

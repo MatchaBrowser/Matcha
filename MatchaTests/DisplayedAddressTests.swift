@@ -5,6 +5,7 @@ import WebKit
 
 /// Address shown for a page (audit W4): the displayed document's, or the one the user asked for while it loads.
 @MainActor
+@Suite(.webKit)
 struct DisplayedAddressTests {
     private let page = URL(string: "https://example.com/")!
     private let other = URL(string: "https://accounts.example.org:81/")!

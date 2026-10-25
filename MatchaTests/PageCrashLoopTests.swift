@@ -8,6 +8,7 @@ import WebKit
 /// waits for the user; the reload after a termination is not a history visit. Real web views, terminations reported
 /// to the delegate as WebKit does, test clock.
 @MainActor
+@Suite(.webKit)
 struct PageCrashLoopTests {
     private let manager = TabManager(websiteDataStore: .nonPersistent())
     private let pages = CountingTestPages()
@@ -100,21 +101,18 @@ struct PageCrashLoopTests {
         try await waitForReload(of: tab, requests: 3)
     }
 
-    /// Documentation shipped with macOS: a local page (`file:`), kept in the history, without network.
-    nonisolated static let localDocs = "/usr/share/doc/postfix/html/index.html"
-
     /// Like waking from suspension (task 5.6): neither the automatic reload nor the one from the message is a visit,
     /// even more than a minute after the visit (an ordinary reload would be a new one).
-    @Test(.enabled(if: FileManager.default.isReadableFile(atPath: localDocs)))
-    func `a reload after a crash is not a new visit`() async throws {
+    @Test func `a reload after a crash is not a new visit`() async throws {
+        let pages = LocalTestPages()
         let container = try BrowserSchema.makeContainer(inMemory: true)
         let store = HistoryStore(container: container, now: { [clock] in clock.now })
         manager.history = HistoryScope(store: store, profileID: UUID(), spaceID: UUID())
         func visits() -> Int {
             (try? container.mainContext.fetchCount(FetchDescriptor<HistoryRecord>())) ?? -1
         }
-        let tab = manager.newTab(url: URL(fileURLWithPath: Self.localDocs))
-        try await waitUntil { tab.title == "Postfix Documentation" && !tab.isLoading && visits() == 1 }
+        let tab = manager.newTab(url: pages.index)
+        try await waitUntil { tab.title == LocalTestPages.indexTitle && !tab.isLoading && visits() == 1 }
 
         clock.advance(120)
         try terminate(tab)
@@ -123,11 +121,11 @@ struct PageCrashLoopTests {
         try terminate(tab)
         #expect(tab.crash.isShowingProblem)
         clock.advance(120)
+        let finished = tab.history.finishedLoads
         tab.reload()
-        try await waitUntil { !tab.crash.isRecovering && !tab.isLoading }
-        try await Task.sleep(for: .milliseconds(100))
+        try await waitUntil { !tab.crash.isRecovering && !tab.isLoading && tab.history.finishedLoads > finished }
         #expect(visits() == 1)
-        #expect(tab.title == "Postfix Documentation")
+        #expect(tab.title == LocalTestPages.indexTitle)
 
         // Control: an ordinary reload, more than a minute later, is a visit.
         clock.advance(120)

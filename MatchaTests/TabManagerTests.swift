@@ -5,6 +5,7 @@ import Testing
 import WebKit
 
 @MainActor
+@Suite(.webKit)
 struct TabManagerTests {
     private let manager = TabManager(websiteDataStore: .nonPersistent())
 

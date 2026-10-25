@@ -61,7 +61,10 @@ struct DownloadPolicyTests {
     // MARK: WebKit response
 
     private func http(_ headers: [String: String], status: Int = 200) -> HTTPURLResponse {
-        HTTPURLResponse(url: URL(string: "https://example.com/r")!, statusCode: status, httpVersion: "HTTP/1.1", headerFields: headers)!
+        required(
+            HTTPURLResponse(url: testURL("https://example.com/r"), statusCode: status, httpVersion: "HTTP/1.1", headerFields: headers),
+            else: HTTPURLResponse(),
+        )
     }
 
     @Test func `headers are read from HTTP responses whatever their case`() {

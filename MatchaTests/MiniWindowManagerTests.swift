@@ -6,6 +6,7 @@ import WebKit
 
 /// Opening, command bar and closing of mini windows, with real panels (never shown) and real web views.
 @MainActor
+@Suite(.webKit)
 struct MiniWindowManagerTests {
     private let session: BrowserSession
     private let model: WindowModel

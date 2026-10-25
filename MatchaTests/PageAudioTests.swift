@@ -6,6 +6,7 @@ import WebKit
 /// Sound of a tab (task 5.10), with simulated messages: the icon follows the messages, turns off after the delay, and
 /// right away when the web view is released (suspension, unloading) or the page's process terminates.
 @MainActor
+@Suite(.webKit)
 struct PageAudioTests {
     private let tab = BrowserTab(configuration: WebConfigurationFactory().makeConfiguration(websiteDataStore: .nonPersistent()))
     private let playing = PageAudioReport(frame: "main", isAudible: true)
@@ -25,12 +26,13 @@ struct PageAudioTests {
         #expect(clock.now - start >= .milliseconds(250))
     }
 
-    @Test func `sound coming back during the delay keeps the icon`() async throws {
+    @Test func `sound coming back during the delay keeps the icon`() {
         tab.audio.silenceDelay = 0.3
         tab.audio.receive(playing)
         tab.audio.receive(silent)
         tab.audio.receive(playing)
-        try await Task.sleep(for: .seconds(1))
+        // Nothing left to switch the icon off (review TS2): no need to wait for the delay to pass.
+        #expect(!tab.audio.isSwitchOffScheduled)
         #expect(tab.isPlayingAudio)
     }
 

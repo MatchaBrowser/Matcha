@@ -5,7 +5,9 @@ import WebKit
 
 /// Web developer tools: inspectable pages, inspector inside the app if WebKit allows it.
 @MainActor
+@Suite(.webKit)
 struct WebInspectionTests {
+    private let testDefaults = TestDefaults("WebInspectionTests")
     @Test func `the setting makes pages inspectable, with the in-app inspector`() {
         let webView = BrowserWebView(frame: .zero, configuration: WKWebViewConfiguration())
         WebInspection.apply(to: webView, enabled: true)
@@ -20,8 +22,8 @@ struct WebInspectionTests {
         }
     }
 
-    @Test func `off by default outside Debug builds`() throws {
-        let defaults = try #require(UserDefaults(suiteName: "WebInspectionTests-\(UUID().uuidString)"))
+    @Test func `off by default outside Debug builds`() {
+        let defaults = testDefaults.make()
         #expect(WebInspection.isEnabled(in: defaults) == BrowserSettings.showsDeveloperTools)
         defaults.set(false, forKey: BrowserSettings.Key.showsDeveloperTools)
         #expect(!WebInspection.isEnabled(in: defaults))

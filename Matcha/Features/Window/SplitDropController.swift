@@ -52,17 +52,11 @@ final class SplitDropController: SidebarItemDropTarget {
 
     /// Edge of the pane of `webView` under the pointer, outside the floating sidebar.
     private func dropTarget(for info: any NSDraggingInfo, over webView: BrowserWebView) -> SplitDropTarget? {
-        guard canTakeTab,
-              let index = panes.firstIndex(where: { $0.webView === webView }),
-              widths.indices.contains(index)
-        else {
+        guard canTakeTab, let index = panes.firstIndex(where: { $0.webView === webView }) else {
             return nil
         }
-        let position = SplitGeometry.paneOrigins(widths: widths)[index] + webView.convert(info.draggingLocation, from: nil).x
-        guard position >= leadingInset else {
-            return nil
-        }
-        return SplitGeometry.dropTarget(atX: position, widths: widths)
+        let offset = webView.convert(info.draggingLocation, from: nil).x
+        return SplitGeometry.dropTarget(atX: offset, inPane: index, widths: widths, leadingInset: leadingInset)
     }
 
     private func setTarget(_ target: SplitDropTarget?) {

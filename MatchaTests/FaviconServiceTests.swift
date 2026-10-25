@@ -6,10 +6,11 @@ import WebKit
 
 /// Tests without network: the icons are served as `data:` URLs.
 @MainActor
+@Suite(.webKit)
 struct FaviconServiceTests {
     /// 1 × 1 pixel PNG image.
     static let pngBase64 = "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg=="
-    static let pngURL = URL(string: "data:image/png;base64,\(pngBase64)")!
+    static let pngURL = testURL("data:image/png;base64,\(pngBase64)")
 
     private let directory = FileManager.default.temporaryDirectory
         .appendingPathComponent("FaviconServiceTests-\(UUID().uuidString)", isDirectory: true)
@@ -50,10 +51,7 @@ struct FaviconServiceTests {
         manager.restore(tabs: [StoredTab(id: id, url: page, title: "Page", lastActivity: .now)], layout: layout)
         let tab = try #require(manager.tab(withID: id))
         #expect(!tab.isLoaded)
-        for _ in 0 ..< 100 where tab.favicon == nil {
-            try await Task.sleep(for: .milliseconds(10))
-        }
-        #expect(tab.favicon != nil)
+        try await waitUntil { tab.favicon != nil }
     }
 
     @Test func `skips candidates that are not images`() async throws {
@@ -74,6 +72,13 @@ struct FaviconServiceTests {
         let large = Data(count: FaviconService.maximumSize + 1).base64EncodedString()
         #expect(try await service.download(#require(URL(string: "data:image/png;base64,\(small)")))?.count == 10)
         #expect(try await service.download(#require(URL(string: "data:image/png;base64,\(large)"))) == nil)
+    }
+
+    /// Review TS4: in the tests' host app, an icon never comes from the real website.
+    @Test func `the tests never download icons from the network`() async throws {
+        let classes = FaviconService.makeConfiguration().protocolClasses ?? []
+        #expect(classes.contains { ObjectIdentifier($0) == ObjectIdentifier(OfflineURLProtocol.self) })
+        #expect(try await FaviconService(directory: nil).download(#require(URL(string: "https://apple.com/favicon.ico"))) == nil)
     }
 
     @Test func `icon requests carry no cookies`() {

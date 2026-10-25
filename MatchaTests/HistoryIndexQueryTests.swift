@@ -47,7 +47,7 @@ struct HistoryIndexQueryTests {
         let alphabet = Array("abcdefghijklmnopqrstuvwxyz0123456789 ./-éàç")
         for _ in 0 ..< 300 {
             let length = Int.random(in: 1 ... 6, using: &generator)
-            let text = String((0 ..< length).map { _ in alphabet.randomElement(using: &generator)! })
+            let text = String((0 ..< length).map { _ in required(alphabet.randomElement(using: &generator), else: "a") })
             let keys = Set(found(text, in: sample).map { CommandText.urlKey($0.url) })
             #expect(keys == bruteForce(text, in: sample), "« \(text) »")
         }

@@ -65,35 +65,13 @@ struct SyncAccountSection: View {
         }
     }
 
-    /// What the user should know: refused records, full account, clocks.
+    /// What the user should know: refused records, full account, clocks (`SyncWarnings`).
     private var warnings: [String] {
-        var warnings: [String] = []
-        if let state = sync.engineState {
-            let tooLarge = state.rejected.values.count { $0.code == SyncRejectionCode.payloadTooLarge }
-            if tooLarge > 0 {
-                warnings.append(String(localized: "\(tooLarge) items are too big to sync."))
-            }
-            if state.isQuotaExceeded {
-                warnings.append(String(localized: "The account's space is full: new changes wait on this Mac."))
-            }
-            if sync.configuration.isRecoveryKitUnsaved, sync.pendingRecoveryKit == nil {
-                warnings.append(String(
-                    localized: "Your recovery kit wasn't saved: make a new one in Manage Account.",
-                    comment: "Settings > Sync: warning when a new recovery key was made but its kit wasn't saved",
-                ))
-            }
-            if state.showsFutureDateWarning() {
-                warnings.append(String(localized: "The clock of one of your Macs seems to be ahead."))
-            }
-            if state.entries.values.contains(where: \.isUnreadable) {
-                warnings.append(String(localized: "Some synced data is unreadable and was left aside."))
-            }
-        }
-        if let offset = sync.clockOffset, abs(offset) > SyncService.clockWarningGap {
-            warnings.append(offset > SyncService.maximumClockLead
-                ? String(localized: "This Mac's clock is more than a day ahead: nothing is sent until it is corrected.")
-                : String(localized: "This Mac's clock is off. Check the date and time in System Settings."))
-        }
-        return warnings
+        SyncWarnings.list(
+            state: sync.engineState,
+            isRecoveryKitUnsaved: sync.configuration.isRecoveryKitUnsaved,
+            hasPendingKit: sync.pendingRecoveryKit != nil,
+            clockOffset: sync.clockOffset,
+        )
     }
 }

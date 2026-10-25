@@ -7,7 +7,7 @@ import WebKit
 /// views; the window is requested from the delegate as WebKit does for a menu item (`.other`, no button or key, no
 /// size). No window on screen.
 @MainActor
-@Suite(.serialized)
+@Suite(.webKit, .serialized)
 final class PageMenuHostsTests {
     private let session: BrowserSession
     private let model: WindowModel

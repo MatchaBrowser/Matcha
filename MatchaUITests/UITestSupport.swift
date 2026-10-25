@@ -270,10 +270,22 @@ extension XCTestCase {
             .press(forDuration: 0.5, thenDragTo: target, withVelocity: .slow, thenHoldForDuration: 0.5)
     }
 
+    /// A resource the test needs (a file shipped with macOS, the network): without it, the test is skipped; with
+    /// `TEST_RUNNER_MATCHA_STRICT_UI_TESTS=1` given to xcodebuild, it fails instead, never passes unnoticed (review TS5).
+    func requireResource(_ isAvailable: Bool, _ reason: String) throws {
+        guard !isAvailable else {
+            return
+        }
+        if ProcessInfo.processInfo.environment["MATCHA_STRICT_UI_TESTS"] == "1" {
+            throw MissingResource(reason: reason)
+        }
+        throw XCTSkip(reason)
+    }
+
     /// Tests that load a real page are skipped without Internet access.
     func skipIfOffline() throws {
         let reachable = expectation(description: "example.com answers")
-        var request = URLRequest(url: URL(string: "https://example.com/")!)
+        var request = try URLRequest(url: XCTUnwrap(URL(string: "https://example.com/")))
         request.timeoutInterval = 5
         URLSession.shared.dataTask(with: request) { data, _, _ in
             if data != nil {
@@ -281,6 +293,15 @@ extension XCTestCase {
             }
         }.resume()
         let online = XCTWaiter().wait(for: [reachable], timeout: 6) == .completed
-        try XCTSkipUnless(online, "No access to example.com")
+        try requireResource(online, "No access to example.com")
+    }
+}
+
+/// A resource a test needs is missing, in strict mode (`requireResource`).
+struct MissingResource: Error, CustomStringConvertible {
+    let reason: String
+
+    var description: String {
+        "Missing resource: \(reason)"
     }
 }

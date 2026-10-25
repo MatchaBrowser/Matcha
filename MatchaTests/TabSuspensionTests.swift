@@ -8,6 +8,7 @@ import WebKit
 /// Suspension of a tab (task 5.6) with real web views: the view is released, the tab keeps its page, its title and its
 /// history, and is recreated at the same page.
 @MainActor
+@Suite(.webKit)
 struct TabSuspensionTests {
     private let manager = TabManager(websiteDataStore: .nonPersistent())
 
@@ -142,32 +143,31 @@ struct TabSuspensionTests {
         #expect(tab.suspension.isSuspended)
     }
 
-    /// Documentation shipped with macOS: a local page (`file:`), kept in the history, without network.
-    nonisolated static let localDocs = "/usr/share/doc/postfix/html/index.html"
-
     /// Reloading a page woken from suspension is not a new visit (task 5.5); a local page comes back with its
     /// history.
-    @Test(.enabled(if: FileManager.default.isReadableFile(atPath: localDocs)))
-    func `a local page comes back without a new visit`() async throws {
+    @Test func `a local page comes back without a new visit`() async throws {
+        let pages = LocalTestPages()
         let container = try BrowserSchema.makeContainer(inMemory: true)
         manager.history = HistoryScope(store: HistoryStore(container: container), profileID: UUID(), spaceID: UUID())
         func visits() -> Int {
             (try? container.mainContext.fetchCount(FetchDescriptor<HistoryRecord>())) ?? -1
         }
-        let tab = manager.newTab(url: URL(fileURLWithPath: Self.localDocs))
-        try await waitUntil { tab.title == "Postfix Documentation" && !tab.isLoading && visits() == 1 }
-        tab.load(URL(fileURLWithPath: "/usr/share/doc/postfix/html/BASIC_CONFIGURATION_README.html"))
-        try await waitUntil { tab.title?.contains("Basic Configuration") == true && !tab.isLoading && visits() == 2 }
+        let tab = manager.newTab(url: pages.index)
+        try await waitUntil { tab.title == LocalTestPages.indexTitle && !tab.isLoading && visits() == 1 }
+        tab.load(pages.second)
+        try await waitUntil { tab.title == LocalTestPages.secondTitle && !tab.isLoading && visits() == 2 }
         manager.newTab()
 
         tab.suspend(snapshot: nil)
+        let finished = tab.history.finishedLoads
         manager.select(tab)
-        try await waitUntil { tab.webView?.title?.contains("Basic Configuration") == true && !tab.suspension.isRestoring }
-        try await Task.sleep(for: .milliseconds(100))
+        try await waitUntil {
+            tab.webView?.title == LocalTestPages.secondTitle && !tab.suspension.isRestoring && tab.history.finishedLoads > finished
+        }
         #expect(visits() == 2)
 
         tab.goBack()
-        try await waitUntil { tab.title == "Postfix Documentation" && !tab.isLoading }
+        try await waitUntil { tab.title == LocalTestPages.indexTitle && !tab.isLoading }
         // A page you come back to is a visit, as before the suspension.
         try await waitUntil { visits() == 3 }
     }

@@ -6,6 +6,7 @@ import Testing
 /// Sync encryption (task 7.5, `SYNC.md` § 3): RFC and NIST vectors, scheme vectors computed by another implementation
 /// (Python `cryptography`), and rejection of any modified or moved content.
 struct SyncCryptoTests {
+    private let testKeychain = TestKeychain()
     private func hex(_ text: String) -> Data {
         var data = Data()
         var index = text.startIndex
@@ -198,7 +199,7 @@ struct SyncCryptoTests {
     }
 
     @Test func `the keychain keeps the account key by server and by account`() throws {
-        let keychain = SyncKeychain(service: "com.matchabrowser.matcha.sync.tests.\(UUID().uuidString)")
+        let keychain = testKeychain.make()
         let server = SyncServerAddress(normalized: "https://sync.example.com/api")
         let other = SyncServerAddress(normalized: "https://other.example.com")
         let account = UUID()

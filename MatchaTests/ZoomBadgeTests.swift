@@ -5,6 +5,7 @@ import Testing
 /// Zoom badge next to the address pill (task 5.4): visible only outside 100%, VoiceOver announcement.
 /// The click (site back to 100%) is checked with real pages in `PageZoomIntegrationTests`.
 @MainActor
+@Suite(.webKit)
 struct ZoomBadgeTests {
     @Test func `the badge shows only away from 100 percent`() {
         #expect(!ZoomBadge.isShown(for: nil))

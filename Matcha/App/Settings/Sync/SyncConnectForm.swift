@@ -146,17 +146,7 @@ struct SyncConnectForm: View {
     }
 
     private var canSubmit: Bool {
-        guard !email.trimmingCharacters(in: .whitespaces).isEmpty else {
-            return false
-        }
-        switch step {
-        case .signIn:
-            return !password.isEmpty
-        case .create:
-            return SyncPasswordStrength(password).isAcceptable && password == confirmation
-        case .recover:
-            return SyncRecoveryKey(text: recoveryKey) != nil && SyncPasswordStrength(password).isAcceptable && password == confirmation
-        }
+        SyncFormRules.canSubmit(step, email: email, password: password, confirmation: confirmation, recoveryKey: recoveryKey)
     }
 
     private func checkServer() {

@@ -5,6 +5,7 @@ import WebKit
 
 /// Loading extensions and WebKit (task 6.3), with the test extension (`TestExtension`).
 @MainActor
+@Suite(.webKit)
 struct ExtensionManagerTests {
     @Test func `the test extension loads under a stable identifier`() async throws {
         let manager = TestExtension.manager()
@@ -166,10 +167,10 @@ struct ExtensionManagerTests {
         let (context, folder) = try await TestExtension.load(in: manager)
         defer { try? FileManager.default.removeItem(at: folder) }
         let requested: Set<WKWebExtension.Permission> = [.cookies, .storage]
-        let refused = await withCheckedContinuation { continuation in
+        let refused = try await awaitCallback { done in
             manager.controllerDelegate
                 .webExtensionController(manager.controller, promptForPermissions: requested, in: nil, for: context) { allowed, _ in
-                    continuation.resume(returning: allowed)
+                    Task { @MainActor in done(allowed) }
                 }
         }
         #expect(refused.isEmpty)
@@ -178,10 +179,10 @@ struct ExtensionManagerTests {
 
         prompter.answer = true
         let urls: Set<URL> = try [#require(URL(string: "https://example.com/a"))]
-        let allowed = await withCheckedContinuation { continuation in
+        let allowed = try await awaitCallback { done in
             manager.controllerDelegate
                 .webExtensionController(manager.controller, promptForPermissionToAccess: urls, in: nil, for: context) { allowed, _ in
-                    continuation.resume(returning: allowed)
+                    Task { @MainActor in done(allowed) }
                 }
         }
         #expect(allowed == urls)

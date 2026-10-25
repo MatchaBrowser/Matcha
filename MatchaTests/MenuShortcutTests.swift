@@ -7,10 +7,9 @@ import Testing
 /// Menu shortcuts that the user changes (Settings > Shortcuts, audit H1).
 @MainActor
 struct MenuShortcutTests {
+    private let testDefaults = TestDefaults("MenuShortcutTests")
     private func store() throws -> (MenuShortcutStore, UserDefaults) {
-        let name = "MenuShortcutTests-\(UUID().uuidString)"
-        let defaults = try #require(UserDefaults(suiteName: name))
-        defaults.removePersistentDomain(forName: name)
+        let defaults = testDefaults.make()
         return (MenuShortcutStore(defaults: defaults), defaults)
     }
 

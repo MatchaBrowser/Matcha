@@ -5,6 +5,7 @@ import WebKit
 
 /// WebKit replies awaited with a timeout (task 5.6): page audio, snapshots.
 @MainActor
+@Suite(.webKit)
 struct CallbackTimeoutTests {
     @Test func `an answer in time is returned`() async {
         let value = await CallbackTimeout.value(timeout: .seconds(5), fallback: true) { done in

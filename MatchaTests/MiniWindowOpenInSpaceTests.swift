@@ -6,6 +6,7 @@ import WebKit
 
 /// “Open in Space”: the page of a mini window moves into a Space and the main window shows it.
 @MainActor
+@Suite(.webKit)
 struct MiniWindowOpenInSpaceTests {
     private let session: BrowserSession
     private let model: WindowModel

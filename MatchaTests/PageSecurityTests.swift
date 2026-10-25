@@ -5,6 +5,7 @@ import WebKit
 
 /// Security shown next to the address (audit W5): padlock and certificate for https, “Not Secure” for http.
 @MainActor
+@Suite(.webKit)
 struct PageSecurityTests {
     @Test(arguments: [
         ("https://example.com/", true, PageSecurity.secure),

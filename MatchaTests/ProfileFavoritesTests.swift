@@ -142,4 +142,48 @@ struct ProfileFavoritesTests {
         #expect(second.tabManager.tab(withID: favorite.id) === favorite)
         #expect(first.tabManager.tab(withID: favorite.id) === favorite)
     }
+
+    // MARK: Tabs between windows (review TS10)
+
+    /// A pinned tab in a folder, dropped into the other window's today tabs: the same tab leaves the folder and its Space.
+    @Test func `a tab of a folder brought to the other Space leaves its folder`() throws {
+        let manager = first.tabManager
+        let tab = manager.newTab(url: testURL("about:blank#dossier"), select: false)
+        manager.setPlace(tab, to: .pinned)
+        let folder = manager.newFolder()
+        manager.move(tab, to: .pinned(folder: folder, index: 0))
+        #expect(manager.layout.pinned.folder(folder)?.items.map(\.id) == [tab.id])
+
+        let brought = try #require(session.bringTab(tab.id, into: second.tabManager))
+        #expect(brought === tab)
+        #expect(manager.tab(withID: tab.id) == nil)
+        #expect(manager.layout.pinned.folder(folder)?.items.isEmpty == true)
+        #expect(second.tabManager.todayTabs.first === tab)
+    }
+
+    /// A pane of a split brought to the other Space: it leaves the split, which is undone with a single pane left.
+    @Test func `a pane brought to the other Space undoes its split`() throws {
+        let manager = first.tabManager
+        let left = manager.newTab(url: testURL("about:blank#gauche"))
+        let right = manager.newTab(url: testURL("about:blank#droite"), select: false)
+        manager.select(left)
+        try #require(manager.openInSplit(right))
+        #expect(manager.layout.split(containing: left.id) != nil)
+
+        _ = try #require(session.bringTab(right.id, into: second.tabManager))
+        #expect(manager.layout.split(containing: left.id) == nil)
+        #expect(manager.tab(withID: left.id) === left)
+        #expect(second.tabManager.tab(withID: right.id) === right)
+    }
+
+    /// A tab brought to a Space of another profile is recreated there from its address; the original goes.
+    @Test func `a tab brought to another profile is recreated with its address`() throws {
+        let other = session.addProfile(named: "Travail")
+        let tab = first.tabManager.newTab(url: testURL("about:blank#profil"), select: false)
+        let brought = try #require(session.bringTab(tab.id, into: other.tabManager))
+        #expect(brought !== tab)
+        #expect(brought.url == tab.url)
+        #expect(first.tabManager.tab(withID: tab.id) == nil)
+        #expect(other.tabManager.tab(withID: brought.id) === brought)
+    }
 }

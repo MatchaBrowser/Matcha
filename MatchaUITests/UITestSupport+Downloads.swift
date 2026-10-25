@@ -28,10 +28,9 @@ extension XCTestCase {
 
     /// File to download; the test is skipped if there is none.
     func undisplayableFile() throws -> String {
-        guard let path = Self.undisplayableFiles.first(where: FileManager.default.isReadableFile(atPath:)) else {
-            throw XCTSkip("No file macOS can't display is shipped with macOS")
-        }
-        return path
+        let path = Self.undisplayableFiles.first(where: FileManager.default.isReadableFile(atPath:))
+        try requireResource(path != nil, "No file macOS can't display is shipped with macOS")
+        return path ?? ""
     }
 
     /// Opens `path` (local file) in a new tab of `window` (the app if nil): it gets downloaded.
