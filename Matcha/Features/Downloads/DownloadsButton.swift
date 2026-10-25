@@ -31,7 +31,23 @@ struct DownloadsButton: View {
         .buttonStyle(SidebarIconButtonStyle())
         .help("Downloads")
         .accessibilityLabel("Downloads")
+        .accessibilityValue(Text(verbatim: progressValue(of: active)))
         .accessibilityIdentifier("downloadsButton")
+    }
+
+    /// What VoiceOver says of the progress ring (review IU20): nothing without a download in progress.
+    private func progressValue(of active: [DownloadItem]) -> String {
+        guard !active.isEmpty else {
+            return ""
+        }
+        guard let fraction = DownloadProgressSummary.overallFraction(of: active.map { ($0.completedBytes, $0.totalBytes) }) else {
+            return String(localized: "Downloading", comment: "VoiceOver value of the Downloads button while a file of unknown size arrives")
+        }
+        let percent = fraction.formatted(.percent.precision(.fractionLength(0)))
+        return String(
+            localized: "Downloading, \(percent)",
+            comment: "VoiceOver value of the Downloads button during downloads; %@ is the overall progress, e.g. 45 %",
+        )
     }
 }
 

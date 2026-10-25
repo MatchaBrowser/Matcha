@@ -1,7 +1,17 @@
 import Foundation
 
-/// Actions that the active window offers to menu commands.
-struct WindowActions {
+/// Actions that the active window offers to menu commands. Two values that differ only by their closures are equal
+/// (`==`): a new drawing of the window gives new closures, and without that the menus were recomputed each time
+/// (review IU1). The closures read the window's current state; what they keep is in `target`.
+struct WindowActions: Equatable {
+    /// What the closures act on: the window's model, its `NSWindow`, the homepage of `goHome`.
+    struct Target: Equatable {
+        let model: ObjectIdentifier
+        let window: ObjectIdentifier?
+        let homeURL: URL?
+    }
+
+    let target: Target
     /// Opens the command bar (new tab), or a tab on the homepage if the settings ask for it.
     let newTab: () -> Void
     /// Opens the command bar on the address of the displayed tab (⌘L).
@@ -36,4 +46,16 @@ struct WindowActions {
     let isPrivate: Bool
     /// File > Import From > Arc… (task 7.1); nil in a private window.
     let importFromArc: (() -> Void)?
+
+    static func == (lhs: Self, rhs: Self) -> Bool {
+        lhs.target == rhs.target && lhs.state == rhs.state
+    }
+
+    /// What the menus show.
+    private var state: [AnyHashable] {
+        [
+            isCommandBarPresented, isSidebarVisible, isDownloadsPanelShown, copyURL != nil, goHome != nil, spaceID,
+            spaceNames, currentSpaceIndex, isPrivate, importFromArc != nil,
+        ]
+    }
 }

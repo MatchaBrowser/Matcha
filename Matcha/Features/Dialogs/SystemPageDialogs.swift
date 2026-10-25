@@ -3,7 +3,8 @@ import WebKit
 
 /// The system's dialogs and panels for a page (audits K1 to K3; “Save As…”, “Print…”), as sheets on its window:
 /// AppKit queues them if one is already open. The website asking is the title, never the page's text. A page in no
-/// visible window (tab in the background) gets “Cancel”.
+/// visible window (tab in the background) gets “Cancel”; a sheet whose page goes or changes document ends
+/// (`CancellableSheet`, review IU15).
 @MainActor
 final class SystemPageDialogs: PageDialogPresenting {
     func present(_ dialog: PageDialog, for webView: WKWebView) async -> PageDialogAnswer? {
@@ -21,13 +22,18 @@ final class SystemPageDialogs: PageDialogPresenting {
         if case let .prompt(defaultText) = dialog.kind {
             let textField = NSTextField(string: defaultText)
             textField.frame = NSRect(x: 0, y: 0, width: 300, height: 24)
+            // VoiceOver reads the question with the field (review IU21).
+            textField.setAccessibilityLabel(dialog.message)
             alert.accessoryView = textField
             alert.window.initialFirstResponder = textField
             field = textField
         }
         alert.showsSuppressionButton = dialog.offersSuppression
         alert.suppressionButton?.title = Self.suppressionTitle
-        let response = await alert.beginSheetModal(for: window)
+        guard let response = await CancellableSheet.response(of: alert.window, on: window, { await alert.beginSheetModal(for: window) })
+        else {
+            return nil
+        }
         return PageDialogAnswer(
             isConfirmed: response == .alertFirstButtonReturn,
             text: field?.stringValue,
@@ -58,7 +64,7 @@ final class SystemPageDialogs: PageDialogPresenting {
         panel.canChooseDirectories = allowsDirectories
         panel.allowsMultipleSelection = allowsMultipleSelection
         panel.prompt = String(localized: "Choose", comment: "Button of the panel where the user picks files to send to a website")
-        guard await panel.beginSheetModal(for: window) == .OK else {
+        guard await CancellableSheet.response(of: panel, on: window, { await panel.beginSheetModal(for: window) }) == .OK else {
             return nil
         }
         return panel.urls
@@ -89,6 +95,11 @@ final class SystemPageDialogs: PageDialogPresenting {
             localized: "Password",
             comment: "Field of the sheet where a website asks for a user name and password",
         )
+        // Named for VoiceOver even once filled (review IU21); ⇥ goes from one to the other, both ways (IU17).
+        user.setAccessibilityLabel(user.placeholderString)
+        password.setAccessibilityLabel(password.placeholderString)
+        user.nextKeyView = password
+        password.nextKeyView = user
         // Fixed frames: the alert sizes its accessory view from its frame (a stack view would shrink the fields).
         let fields = NSView(frame: NSRect(x: 0, y: 0, width: 240, height: 56))
         user.frame = NSRect(x: 0, y: 32, width: 240, height: 24)
@@ -99,7 +110,11 @@ final class SystemPageDialogs: PageDialogPresenting {
         alert.window.initialFirstResponder = login.user == nil ? user : password
         alert.showsSuppressionButton = login.offersSuppression
         alert.suppressionButton?.title = Self.suppressionTitle
-        let isConfirmed = await alert.beginSheetModal(for: window) == .alertFirstButtonReturn
+        guard let response = await CancellableSheet.response(of: alert.window, on: window, { await alert.beginSheetModal(for: window) })
+        else {
+            return nil
+        }
+        let isConfirmed = response == .alertFirstButtonReturn
         return LoginAnswer(
             credential: isConfirmed ? URLCredential(user: user.stringValue, password: password.stringValue, persistence: .forSession) : nil,
             suppressesFurther: alert.suppressionButton?.state == .on,

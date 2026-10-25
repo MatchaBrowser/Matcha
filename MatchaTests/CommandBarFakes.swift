@@ -24,6 +24,25 @@ final class FakeHistory: HistorySource {
     }
 }
 
+/// History that answers only on `resume(with:)`: a slow read of a large history.
+@MainActor
+final class HeldHistory: HistorySource {
+    private var waiting: [CheckedContinuation<[HistoryEntry], Never>] = []
+
+    var isWaiting: Bool {
+        !waiting.isEmpty
+    }
+
+    func entries(matching _: CommandQuery, limit _: Int) async -> [HistoryEntry] {
+        await withCheckedContinuation { waiting.append($0) }
+    }
+
+    func resume(with entries: [HistoryEntry]) {
+        waiting.forEach { $0.resume(returning: entries) }
+        waiting = []
+    }
+}
+
 /// Fake suggestion engine: records each requested text and answers `responses[text]` (otherwise
 /// nothing), or throws `error`. A text in `suspended` waits for `resume(_:with:)`.
 @MainActor

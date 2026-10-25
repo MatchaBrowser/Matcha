@@ -135,16 +135,18 @@ struct ContentCard: View {
         )
     }
 
-    /// The controller is not observed: reconfiguring it during rendering redraws nothing.
+    /// The controller is not observed: reconfiguring it during rendering redraws nothing. Its closures never capture the
+    /// view, which holds the controller in its state: a cycle that kept the window's state alive (review IU3).
     private func configureDropController(panes: [BrowserTab], widths: [Double]) {
         dropController.panes = panes
         dropController.widths = widths
         dropController.leadingInset = dropInset
         dropController.canTakeTab = canTakeTab
-        dropController.onTargetChange = { dropTarget = $0 }
+        let target = $dropTarget
+        dropController.onTargetChange = { target.wrappedValue = $0 }
         // A tab of another window is refused (review ON20): it joins a split from this window's sidebar.
-        dropController.onDrop = { id, target in
-            guard let tab = tabManager.tab(withID: id) else {
+        dropController.onDrop = { [weak tabManager, weak viewer] id, target in
+            guard let tabManager, let viewer, let tab = tabManager.tab(withID: id) else {
                 return false
             }
             tabManager.activate(viewer)

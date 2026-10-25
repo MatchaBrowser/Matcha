@@ -281,10 +281,11 @@ final class BrowserTab: Identifiable {
     }
 
     /// Releases the web view: observation, sound (icon included), loading, delegates; denies pending permission
-    /// requests, forgets find in page and the recovery from a process termination (message included).
+    /// requests, ends the page's sheets, forgets find in page and the recovery from a process termination (message
+    /// included).
     private func releaseWebView() {
         observations = []
-        permissionPrompts.denyAll()
+        endPageRequests()
         find.reset()
         audio.reset()
         if let webView {

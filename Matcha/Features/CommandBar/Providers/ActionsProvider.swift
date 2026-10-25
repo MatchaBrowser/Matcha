@@ -10,6 +10,10 @@ final class ActionsProvider: CommandProvider {
         self.windowModel = windowModel
     }
 
+    var answersAtOnce: Bool {
+        true
+    }
+
     func candidates(for _: CommandQuery, context: CommandContext) async -> [CommandCandidate] {
         available(in: context)
     }

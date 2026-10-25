@@ -8,6 +8,16 @@ import UniformTypeIdentifiers
 struct SyncAvatarSection: View {
     /// Colors offered for initials.
     static let colors = ["#0A84FF", "#30B0C7", "#34C759", "#FF9F0A", "#FF453A", "#BF5AF2", "#8E8E93"]
+    /// What VoiceOver says of each color: its name, as for the folders' colors, never its code (review IU21).
+    private static let colorNames: [String: LocalizedStringResource] = [
+        "#0A84FF": LocalizedStringResource("Blue", comment: "Folder color swatch"),
+        "#30B0C7": LocalizedStringResource("Turquoise", comment: "Folder color swatch"),
+        "#34C759": LocalizedStringResource("Green", comment: "Folder color swatch"),
+        "#FF9F0A": LocalizedStringResource("Orange", comment: "Folder color swatch"),
+        "#FF453A": LocalizedStringResource("Red", comment: "Folder color swatch"),
+        "#BF5AF2": LocalizedStringResource("Purple", comment: "Folder color swatch"),
+        "#8E8E93": LocalizedStringResource("Gray", comment: "Folder color swatch"),
+    ]
     /// Emoji offered in one click; “Other…” opens the Character Viewer.
     static let emojis = ["🍵", "🌿", "🦊", "🐱", "🐼", "🚀", "⭐️", "🎧"]
 
@@ -86,7 +96,7 @@ struct SyncAvatarSection: View {
                         }
                         .buttonStyle(.plain)
                         .help("Use the initials on this color")
-                        .accessibilityLabel(Text("Color \(swatch)"))
+                        .accessibilityLabel(Self.colorNames[swatch].map { Text($0) } ?? Text(verbatim: swatch))
                     }
                 }
             }

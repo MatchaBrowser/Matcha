@@ -12,9 +12,19 @@ extension TabManager {
         item.compactMap(tab(withID:)).max { $0.lastActivity < $1.lastActivity }
     }
 
-    /// Title of a tile or a row: the tab's, or those of a split's panes.
+    /// Longest title in the Tabs menu, in characters.
+    static let maximumMenuTitleLength = 60
+
+    /// Title of a tile or a row in the Tabs menu: the tab's, or those of a split's panes. The title it had when pinned
+    /// (it doesn't change with each page), cut to `maximumMenuTitleLength` characters (review IU5).
     func title(of item: SidebarOrder.Item) -> String {
-        item.compactMap(tab(withID:)).map(\.displayTitle).formatted(.list(type: .and))
+        let title = item.compactMap(tab(withID:)).map { tab in
+            tab.pinnedTitle.flatMap { $0.isEmpty ? nil : $0 } ?? tab.displayTitle
+        }.formatted(.list(type: .and))
+        guard title.count > Self.maximumMenuTitleLength else {
+            return title
+        }
+        return title.prefix(Self.maximumMenuTitleLength - 1).trimmingCharacters(in: .whitespaces) + "…"
     }
 
     /// ⌘1 to ⌘8: tile or row no. `number` of the favorites then the pinned tabs; nil beyond.

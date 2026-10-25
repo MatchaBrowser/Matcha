@@ -11,19 +11,31 @@ struct GeneralSettingsView: View {
     @AppStorage(BrowserSettings.Key.confirmBeforeQuitting) private var confirmBeforeQuitting = BrowserSettings.confirmBeforeQuitting
     @AppStorage(BrowserSettings.Key.opensPinnedLinksInPeek) private var opensPinnedLinksInPeek = BrowserSettings.opensPinnedLinksInPeek
     @AppStorage(BrowserSettings.Key.tabSuspensionDelay) private var tabSuspensionDelay = BrowserSettings.tabSuspensionDelay
+    /// Homepage being typed: saved on Return, when the field loses focus or when Settings close, not at each keystroke,
+    /// which recomputed every browser window (review IU1).
+    @State private var homePageDraft: String?
+    @FocusState private var isHomePageFocused: Bool
 
     var body: some View {
         Form {
             DefaultBrowserSection()
             Section {
-                TextField("Homepage", text: $homePage, prompt: Text("e.g. apple.com"))
+                TextField("Homepage", text: homePageField, prompt: Text("e.g. apple.com"))
+                    .focused($isHomePageFocused)
+                    .onSubmit(saveHomePage)
+                    .onChange(of: isHomePageFocused) { _, isFocused in
+                        if !isFocused {
+                            saveHomePage()
+                        }
+                    }
+                    .onDisappear(perform: saveHomePage)
                     .accessibilityIdentifier("homePageField")
                 Picker("New tabs open with", selection: $newTabPage) {
                     ForEach(NewTabPage.allCases) { page in
                         Text(page.title).tag(page)
                     }
                 }
-                .disabled(homePage.trimmingCharacters(in: .whitespaces).isEmpty)
+                .disabled((homePageDraft ?? homePage).trimmingCharacters(in: .whitespaces).isEmpty)
             }
             Section {
                 Picker("Search engine", selection: $searchEngine) {
@@ -91,5 +103,17 @@ struct GeneralSettingsView: View {
         if let url = URL(string: "x-apple.systempreferences:com.apple.Localization-Settings.extension") {
             NSWorkspace.shared.open(url)
         }
+    }
+
+    /// The draft while typing, otherwise the saved homepage.
+    private var homePageField: Binding<String> {
+        Binding { homePageDraft ?? homePage } set: { homePageDraft = $0 }
+    }
+
+    private func saveHomePage() {
+        if let homePageDraft, homePageDraft != homePage {
+            homePage = homePageDraft
+        }
+        homePageDraft = nil
     }
 }

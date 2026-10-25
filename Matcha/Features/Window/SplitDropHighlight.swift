@@ -25,6 +25,7 @@ struct SplitDropHighlight: View {
             }
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
-        .animation(.easeOut(duration: 0.12), value: target)
+        // “Reduce motion”: no animation (review IU22).
+        .motionAnimation(.easeOut(duration: 0.12), value: target)
     }
 }

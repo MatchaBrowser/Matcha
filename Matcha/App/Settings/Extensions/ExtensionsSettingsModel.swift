@@ -41,6 +41,10 @@ final class ExtensionsSettingsModel {
     /// Last failure (preparation, installation), in the user's language.
     var errorMessage: String?
     private(set) var isWorking = false
+    /// Icons and app names already read: `installed` and the rows are read at each drawing (review IU8).
+    @ObservationIgnored private var icons: [ObjectIdentifier: NSImage] = [:]
+    @ObservationIgnored private var appNames: [String: String] = [:]
+    @ObservationIgnored private var appIcons: [String: NSImage] = [:]
 
     init(manager: ExtensionManager, syncAdapter: ExtensionSyncAdapter) {
         self.manager = manager
@@ -54,12 +58,22 @@ final class ExtensionsSettingsModel {
         return identifiers.map(entry(for:)).sorted { $0.name.localizedStandardCompare($1.name) == .orderedAscending }
     }
 
-    /// True if the Safari extension `appExtension` is already installed.
+    /// True if the Safari extension `appExtension` is already installed: an installed extension comes from its `.appex`
+    /// (its identifier may have a suffix, review EX4).
     func isInstalled(_ appExtension: SafariAppExtension) -> Bool {
-        guard let identifier = ExtensionIdentifier.forAppExtension(bundleIdentifier: appExtension.bundleIdentifier) else {
-            return false
+        let path = appExtension.extensionURL.path
+        return manager.installedIdentifiers.contains { manager.store.state(for: $0)?.appExtensionPath == path }
+    }
+
+    /// Icon of the app of `appExtension`, read once.
+    func appIcon(of appExtension: SafariAppExtension) -> NSImage {
+        let path = appExtension.appURL.path
+        if let icon = appIcons[path] {
+            return icon
         }
-        return manager.installed[identifier] != nil || manager.store.state(for: identifier)?.appExtensionPath != nil
+        let icon = NSWorkspace.shared.icon(forFile: path)
+        appIcons[path] = icon
+        return icon
     }
 
     // MARK: Add
@@ -199,8 +213,8 @@ final class ExtensionsSettingsModel {
             id: identifier,
             name: webExtension?.displayName ?? identifier,
             version: webExtension?.displayVersion ?? webExtension?.version,
-            icon: webExtension?.icon(for: CGSize(width: 32, height: 32)),
-            appName: state?.appExtensionPath.flatMap(Self.appName(containing:)),
+            icon: webExtension.flatMap(icon(of:)),
+            appName: state?.appExtensionPath.flatMap(appName(containing:)),
             isMissing: webExtension == nil,
             isEnabled: manager.isEnabled(identifier),
             hasOptionsPage: manager.contexts[identifier]?.optionsPageURL != nil,
@@ -211,8 +225,28 @@ final class ExtensionsSettingsModel {
         )
     }
 
-    /// Name of the app that contains the `.appex` at `path`.
-    private static func appName(containing path: String) -> String? {
+    /// Icon of `webExtension`, read once.
+    private func icon(of webExtension: WKWebExtension) -> NSImage? {
+        let key = ObjectIdentifier(webExtension)
+        if let icon = icons[key] {
+            return icon
+        }
+        let icon = webExtension.icon(for: CGSize(width: 32, height: 32))
+        icons[key] = icon
+        return icon
+    }
+
+    /// Name of the app that contains the `.appex` at `path`, read once.
+    private func appName(containing path: String) -> String? {
+        if let name = appNames[path] {
+            return name
+        }
+        let name = Self.readAppName(containing: path)
+        appNames[path] = name
+        return name
+    }
+
+    private static func readAppName(containing path: String) -> String? {
         var url = URL(filePath: path)
         while url.pathComponents.count > 1 {
             if url.pathExtension == "app" {

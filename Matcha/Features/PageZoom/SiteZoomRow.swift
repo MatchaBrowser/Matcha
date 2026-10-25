@@ -73,5 +73,7 @@ struct SiteZoomRow: View {
         } else {
             tab.setPageZoom(next)
         }
+        // As after ⌘+ or ⌘-: VoiceOver says the new zoom (review IU20).
+        ZoomAnnouncement.post(next)
     }
 }

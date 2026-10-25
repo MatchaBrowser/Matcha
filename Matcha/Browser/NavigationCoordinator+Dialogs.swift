@@ -32,14 +32,13 @@ extension NavigationCoordinator {
         runOpenPanelWith parameters: WKOpenPanelParameters,
         initiatedByFrame _: WKFrameInfo,
     ) async -> [URL]? {
-        guard tabHost?.page(for: webView) != nil else {
+        guard let page = tabHost?.page(for: webView) else {
             return nil
         }
-        return await dialogs.chooseFiles(
-            allowsMultipleSelection: parameters.allowsMultipleSelection,
-            allowsDirectories: parameters.allowsDirectories,
-            for: webView,
-        )
+        let (multiple, directories) = (parameters.allowsMultipleSelection, parameters.allowsDirectories)
+        return await page.pageDialogs.present { [dialogs] in
+            await dialogs.chooseFiles(allowsMultipleSelection: multiple, allowsDirectories: directories, for: webView)
+        }
     }
 
     private func presentDialog(
@@ -60,7 +59,7 @@ extension NavigationCoordinator {
             offersSuppression: page.pageDialogs.shown > 0,
         )
         page.pageDialogs.didShow()
-        let answer = await dialogs.present(dialog, for: webView)
+        let answer = await page.pageDialogs.present { [dialogs] in await dialogs.present(dialog, for: webView) }
         if answer?.suppressesFurther == true {
             page.pageDialogs.suppress()
             Logger.browser.info("Page dialogs stopped by the user")

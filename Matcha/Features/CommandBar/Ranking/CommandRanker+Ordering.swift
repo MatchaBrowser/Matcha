@@ -31,8 +31,8 @@ private nonisolated struct RankedCandidate {
         self.match = match
         id = candidate.id
         address = candidate.url?.absoluteString ?? ""
-        foldedTitle = CommandText.fold(candidate.title)
-        urlKey = candidate.url.map(CommandText.urlKey)
+        foldedTitle = candidate.fields?.titles.first ?? CommandText.fold(candidate.title)
+        urlKey = candidate.fields?.urlKey ?? candidate.url.map(CommandText.urlKey)
         switch candidate.kind {
         case let .tab(_, _, spaceName, lastActivity):
             group = .tab

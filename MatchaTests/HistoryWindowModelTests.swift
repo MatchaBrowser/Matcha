@@ -22,4 +22,10 @@ struct HistoryWindowModelTests {
         model.searchText = "ici"
         #expect(model.refreshDelay == .milliseconds(100))
     }
+
+    /// Review IU14: opening many rows at once asks first.
+    @Test func `opening many rows asks first`() {
+        #expect(!HistoryOpenConfirmation.asks(count: HistoryOpenConfirmation.maximumWithoutAsking))
+        #expect(HistoryOpenConfirmation.asks(count: HistoryOpenConfirmation.maximumWithoutAsking + 1))
+    }
 }

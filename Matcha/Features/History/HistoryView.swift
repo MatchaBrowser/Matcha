@@ -29,12 +29,15 @@ struct HistoryView: View {
         .contextMenu(forSelectionType: HistoryRow.ID.self) { ids in
             menu(for: ids)
         } primaryAction: { ids in
-            open(model.rows(ids))
+            confirmOpen(model.rows(ids))
         }
         .onDeleteCommand {
             model.delete(model.selection)
         }
-        .overlay { placeholder }
+        // Apart from the list, which reads only the sections and the selection: a keystroke or a visit doesn't
+        // recompute it (review IU7).
+        .overlay { HistoryPlaceholder(model: model) }
+        .background { HistoryRefresh(model: model) }
         .searchable(text: $model.searchText, placement: .toolbar, prompt: Text("Search History"))
         .toolbar {
             ToolbarItem(placement: .primaryAction) {
@@ -50,41 +53,20 @@ struct HistoryView: View {
                 Task { self.window = window }
             }
         }
-        .task(id: model.refreshKey) {
-            let delay = model.refreshDelay
-            if delay > .zero {
-                try? await Task.sleep(for: delay)
-            }
-            guard !Task.isCancelled else {
-                return
-            }
-            await model.refresh()
-        }
+    }
+
+    /// `open`, after a confirmation for many rows.
+    private func confirmOpen(_ rows: [HistoryRow]) {
+        HistoryOpenConfirmation.confirm(count: rows.count, in: window) { open(rows) }
     }
 
     @ViewBuilder private func menu(for ids: Set<HistoryRow.ID>) -> some View {
         let rows = model.rows(ids)
         if !rows.isEmpty {
-            Button("Open in New Tab") { open(rows) }
+            Button("Open in New Tab") { confirmOpen(rows) }
             Button("Copy Link") { TabLinkCopier.copy(rows.map(\.url)) }
             Divider()
             Button("Delete") { model.delete(ids) }
-        }
-    }
-
-    @ViewBuilder private var placeholder: some View {
-        if !model.isReady {
-            ProgressView()
-        } else if model.sections.isEmpty {
-            if model.searchText.trimmingCharacters(in: .whitespaces).isEmpty {
-                ContentUnavailableView {
-                    Label("No History", systemImage: "clock")
-                } description: {
-                    Text("Pages you visit appear here.")
-                }
-            } else {
-                ContentUnavailableView.search(text: model.searchText)
-            }
         }
     }
 }
@@ -101,6 +83,46 @@ private struct HistoryDayHeader: View {
             Text("Yesterday", comment: "History section of the pages visited yesterday")
         case let .date(start):
             Text(start, format: .dateTime.weekday(.wide).day().month(.wide).year())
+        }
+    }
+}
+
+/// Recomputes the sections when the history, the profile or the searched text change.
+private struct HistoryRefresh: View {
+    let model: HistoryWindowModel
+
+    var body: some View {
+        Color.clear
+            .task(id: model.refreshKey) {
+                let delay = model.refreshDelay
+                if delay > .zero {
+                    try? await Task.sleep(for: delay)
+                }
+                guard !Task.isCancelled else {
+                    return
+                }
+                await model.refresh()
+            }
+    }
+}
+
+/// Over the list: a progress indicator until the first sections, “No History”, or no result for the search.
+private struct HistoryPlaceholder: View {
+    let model: HistoryWindowModel
+
+    var body: some View {
+        if !model.isReady {
+            ProgressView()
+        } else if model.sections.isEmpty {
+            if model.searchText.trimmingCharacters(in: .whitespaces).isEmpty {
+                ContentUnavailableView {
+                    Label("No History", systemImage: "clock")
+                } description: {
+                    Text("Pages you visit appear here.")
+                }
+            } else {
+                ContentUnavailableView.search(text: model.searchText)
+            }
         }
     }
 }

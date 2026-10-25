@@ -88,15 +88,16 @@ final class DownloadItem: Identifiable {
         state == .downloading
     }
 
-    /// Finished file that cannot be found: deleted or moved since.
-    var isFileMissing: Bool {
-        guard state == .finished else {
-            return false
+    /// Finished file that cannot be found: deleted or moved since. Looked at when the download finishes and when the
+    /// list is shown (`checkFile`), never at each drawing (review IU6).
+    private(set) var isFileMissing = false
+
+    /// Looks again whether the finished file is still there.
+    func checkFile() {
+        let isMissing = state == .finished && !(destinationURL.map { FileManager.default.fileExists(atPath: $0.path) } ?? false)
+        if isMissing != isFileMissing {
+            isFileMissing = isMissing
         }
-        guard let destinationURL else {
-            return true
-        }
-        return !FileManager.default.fileExists(atPath: destinationURL.path)
     }
 
     /// What the list keeps of this download; still in progress (app quitting), it is kept as interrupted.
@@ -145,6 +146,7 @@ final class DownloadItem: Identifiable {
         completedBytes = size
         totalBytes = size
         state = .finished
+        checkFile()
     }
 
     func markFailed(reason: String?) {

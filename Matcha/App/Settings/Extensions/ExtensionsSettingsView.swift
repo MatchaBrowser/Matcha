@@ -5,12 +5,25 @@ import SwiftUI
 /// `.crx`, Firefox `.xpi`, `.zip`) or an unpacked folder (and the link to Firefox add-ons). Each addition goes
 /// through the permissions screen.
 struct ExtensionsSettingsView: View {
-    @State private var model: ExtensionsSettingsModel
-    @State private var pendingRemoval: ExtensionsSettingsModel.Installed?
+    let manager: ExtensionManager
+    let syncAdapter: ExtensionSyncAdapter
+    /// Made once, when the tab appears: `init` runs again at each change of the Settings window, and a model made
+    /// there was thrown away each time (review IU8).
+    @State private var model: ExtensionsSettingsModel?
 
-    init(manager: ExtensionManager, syncAdapter: ExtensionSyncAdapter) {
-        _model = State(initialValue: ExtensionsSettingsModel(manager: manager, syncAdapter: syncAdapter))
+    var body: some View {
+        if let model {
+            ExtensionsSettingsForm(model: model)
+        } else {
+            Color.clear.onAppear { model = ExtensionsSettingsModel(manager: manager, syncAdapter: syncAdapter) }
+        }
     }
+}
+
+/// The tab's content (`ExtensionsSettingsView`).
+private struct ExtensionsSettingsForm: View {
+    @Bindable var model: ExtensionsSettingsModel
+    @State private var pendingRemoval: ExtensionsSettingsModel.Installed?
 
     var body: some View {
         Form {
@@ -28,7 +41,11 @@ struct ExtensionsSettingsView: View {
             SyncedExtensionsSection(model: model)
             Section {
                 ForEach(model.appExtensions) { appExtension in
-                    SafariExtensionRow(appExtension: appExtension, isInstalled: model.isInstalled(appExtension)) {
+                    SafariExtensionRow(
+                        appExtension: appExtension,
+                        icon: model.appIcon(of: appExtension),
+                        isInstalled: model.isInstalled(appExtension),
+                    ) {
                         model.add(appExtension)
                     }
                 }
@@ -117,12 +134,13 @@ struct ExtensionsSettingsView: View {
 /// Safari extension of an app: app icon, name, app, and “Add…” (or “Installed”).
 private struct SafariExtensionRow: View {
     let appExtension: SafariAppExtension
+    let icon: NSImage
     let isInstalled: Bool
     let add: () -> Void
 
     var body: some View {
         HStack(spacing: 10) {
-            Image(nsImage: NSWorkspace.shared.icon(forFile: appExtension.appURL.path))
+            Image(nsImage: icon)
                 .resizable()
                 .frame(width: 28, height: 28)
                 .accessibilityHidden(true)

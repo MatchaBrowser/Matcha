@@ -3,20 +3,29 @@ import SwiftUI
 import UniformTypeIdentifiers
 
 /// Row of the downloads list: icon, name, progress or state, and its buttons (cancel during the download, show in
-/// the Finder afterwards). A double-click on a finished file opens it: the only gesture that opens a downloaded
-/// file. A file deleted or moved since is “not found”: no button and no double-click.
+/// the Finder afterwards). A finished file opens with a double-click, its menu or VoiceOver's “Open” action (review
+/// IU19). A file deleted or moved since is “not found”: no button and nothing to open.
 struct DownloadRow: View {
     static let height = 58.0
 
     let item: DownloadItem
     let downloads: DownloadManager
 
+    /// Icon of the file, looked up once per state rather than at each drawing (review IU6).
+    @State private var icon: NSImage?
+
     var body: some View {
         HStack(spacing: 10) {
-            Image(nsImage: icon)
-                .resizable()
-                .frame(width: 32, height: 32)
-                .accessibilityHidden(true)
+            Group {
+                if let icon {
+                    Image(nsImage: icon)
+                        .resizable()
+                } else {
+                    Color.clear
+                }
+            }
+            .frame(width: 32, height: 32)
+            .accessibilityHidden(true)
             VStack(alignment: .leading, spacing: 3) {
                 Text(verbatim: item.fileName)
                     .lineLimit(1)
@@ -36,14 +45,39 @@ struct DownloadRow: View {
         .padding(.horizontal, 4)
         .frame(height: Self.height)
         .contentShape(Rectangle())
-        .onTapGesture(count: 2) {
-            if item.state == .finished, !item.isFileMissing, let url = item.destinationURL {
-                NSWorkspace.shared.open(url)
+        .onTapGesture(count: 2) { openFile() }
+        .contextMenu {
+            if let url = openableURL {
+                Button(Self.openTitle) { NSWorkspace.shared.open(url) }
+                Button("Show in Finder") { NSWorkspace.shared.activateFileViewerSelecting([url]) }
             }
         }
+        .task(id: iconKey) { icon = makeIcon() }
         .accessibilityElement(children: .contain)
         .accessibilityLabel(Text(verbatim: item.fileName))
+        .accessibilityActions {
+            if openableURL != nil {
+                Button(Self.openTitle) { openFile() }
+            }
+        }
         .accessibilityIdentifier("downloadRow")
+    }
+
+    private static let openTitle = String(
+        localized: "Open Download",
+        defaultValue: "Open",
+        comment: "Menu and VoiceOver action of a finished download: opens the file",
+    )
+
+    /// The finished file, if it is still there.
+    private var openableURL: URL? {
+        item.state == .finished && !item.isFileMissing ? item.destinationURL : nil
+    }
+
+    private func openFile() {
+        if let url = openableURL {
+            NSWorkspace.shared.open(url)
+        }
     }
 
     @ViewBuilder private var progressBar: some View {
@@ -105,9 +139,14 @@ struct DownloadRow: View {
         }
     }
 
+    /// What the icon depends on.
+    private var iconKey: String {
+        "\(item.state) \(item.isFileMissing) \(item.fileName)"
+    }
+
     /// Icon of the finished file (an app's own icon for an app), otherwise that of its type.
-    private var icon: NSImage {
-        if item.state == .finished, let url = item.destinationURL, FileManager.default.fileExists(atPath: url.path) {
+    private func makeIcon() -> NSImage {
+        if let url = openableURL {
             return NSWorkspace.shared.icon(forFile: url.path)
         }
         let pathExtension = DownloadFileName.split(item.fileName).extension.dropFirst()

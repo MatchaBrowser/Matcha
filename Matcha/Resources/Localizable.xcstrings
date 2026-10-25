@@ -824,6 +824,35 @@
         }
       }
     },
+    "%lld points" : {
+      "comment" : "VoiceOver value of the sidebar width handle; %lld is the width in points",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld Punkte"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld puntos"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld points"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld punti"
+          }
+        }
+      }
+    },
     "%lld rules" : {
       "comment" : "Settings > Privacy: number of rules of a blocklist",
       "localizations" : {
@@ -4217,35 +4246,6 @@
         }
       }
     },
-    "Color %@" : {
-      "comment" : "Settings > Sync: avatar: accessibility label of a color swatch (hex code)",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Farbe %@"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Color %@"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Couleur %@"
-          }
-        },
-        "it" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Colore %@"
-          }
-        }
-      }
-    },
     "Color %lld" : {
       "comment" : "Accessibility label of a theme color picker; the number is the color's position",
       "localizations" : {
@@ -5797,6 +5797,64 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Richiesta di download"
+          }
+        }
+      }
+    },
+    "Downloading" : {
+      "comment" : "VoiceOver value of the Downloads button while a file of unknown size arrives",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wird geladen"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Descargando"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Téléchargement en cours"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Download in corso"
+          }
+        }
+      }
+    },
+    "Downloading, %@" : {
+      "comment" : "VoiceOver value of the Downloads button during downloads; %@ is the overall progress, e.g. 45 %",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wird geladen, %@"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Descargando, %@"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Téléchargement en cours, %@"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Download in corso, %@"
           }
         }
       }
@@ -11042,6 +11100,35 @@
         }
       }
     },
+    "Open %lld pages in new tabs?" : {
+      "comment" : "History window: confirmation before opening many rows at once; %lld is the number of pages (more than 20)",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld Seiten in neuen Tabs öffnen?"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "¿Abrir %lld páginas en pestañas nuevas?"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ouvrir %lld pages dans de nouveaux onglets ?"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aprire %lld pagine in nuovi pannelli?"
+          }
+        }
+      }
+    },
     "Open addons.mozilla.org in a new tab" : {
       "localizations" : {
         "de" : {
@@ -11066,6 +11153,35 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Apri addons.mozilla.org in un nuovo pannello"
+          }
+        }
+      }
+    },
+    "Open All" : {
+      "comment" : "History window: button that opens all the selected pages",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Alle öffnen"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Abrir todo"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tout ouvrir"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Apri tutto"
           }
         }
       }
@@ -11095,6 +11211,42 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Apri come pannello"
+          }
+        }
+      }
+    },
+    "Open Download" : {
+      "comment" : "Menu and VoiceOver action of a finished download: opens the file",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Öffnen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Open"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Abrir"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ouvrir"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Apri"
           }
         }
       }

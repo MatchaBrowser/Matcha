@@ -29,7 +29,9 @@ extension BrowserWindowView {
     }
 
     var windowActions: WindowActions {
-        WindowActions(
+        let homeURL = homeURL
+        return WindowActions(
+            target: WindowActions.Target(model: ObjectIdentifier(model), window: window.map(ObjectIdentifier.init), homeURL: homeURL),
             newTab: openCommandBarForNewTab,
             editAddress: editAddress,
             isCommandBarPresented: commandBar.isPresented,
@@ -94,9 +96,13 @@ extension BrowserWindowView {
         }
     }
 
-    /// Action of the Home button, if it is displayed and a home page is set.
+    /// Action of the Home button, if it is displayed and a home page is set; made from the homepage alone, without
+    /// making all the window's actions again (review IU1).
     var homeButtonAction: (() -> Void)? {
-        showsHomeButton ? windowActions.goHome : nil
+        guard showsHomeButton, let url = homeURL else {
+            return nil
+        }
+        return { goHome(to: url) }
     }
 
     var homeURL: URL? {

@@ -19,15 +19,19 @@ struct CompactSidebar: View {
         VStack(spacing: 6) {
             ScrollView {
                 VStack(spacing: 4) {
-                    ForEach(Array(groups.enumerated()), id: \.offset) { index, tabs in
-                        if index > 0 {
-                            Divider()
-                                .frame(width: 24)
-                                .padding(.vertical, 2)
-                        }
-                        ForEach(tabs) { tab in
-                            CompactTabButton(tab: tab, tabManager: tabManager)
-                        }
+                    // Two explicit sections: an icon keeps its identity when the favorites empty (review IU10).
+                    let favorites = tabManager.favoriteTabs
+                    let today = tabManager.todayTabs
+                    ForEach(favorites) { tab in
+                        CompactTabButton(tab: tab, tabManager: tabManager)
+                    }
+                    if !favorites.isEmpty, !today.isEmpty {
+                        Divider()
+                            .frame(width: 24)
+                            .padding(.vertical, 2)
+                    }
+                    ForEach(today) { tab in
+                        CompactTabButton(tab: tab, tabManager: tabManager)
                     }
                     Button("New Tab", systemImage: "plus", action: newTab)
                         .labelStyle(.iconOnly)
@@ -48,11 +52,6 @@ struct CompactSidebar: View {
         .padding(.bottom, 8)
         .accessibilityElement(children: .contain)
         .accessibilityLabel(Text("Tabs"))
-    }
-
-    /// Favorites, then today tabs: the groups that have some. The pinned tabs stay in the sidebar.
-    private var groups: [[BrowserTab]] {
-        [tabManager.favoriteTabs, tabManager.todayTabs].filter { !$0.isEmpty }
     }
 
     /// One icon per Space; a click shows it.
@@ -121,6 +120,8 @@ private struct CompactTabButton: View {
             .accessibilityAddTraits(isSelected ? [.isButton, .isSelected] : .isButton)
             .accessibilityAction { TabActivation.activate(tab, in: tabManager) }
             .accessibilityAction(named: "Close Tab") { tabManager.close(tab) }
+            // Reached with ⇥ like a row of the sidebar (review IU18).
+            .sidebarRowKeyboard { TabActivation.activate(tab, in: tabManager) } move: { tabManager.moveStep(tab, by: $0) }
             .accessibilityIdentifier("compactTab")
             .tabAudioAccessibility(tab)
     }

@@ -27,6 +27,9 @@ struct SidebarDropZone: View {
             .sidebarDropDestination(tabManager: tabManager, destination: destination, isTargeted: $isTargeted)
             .accessibilityElement()
             .accessibilityLabel(accessibilityLabel)
+            // The zone at the end of a section is only there for a drag: VoiceOver doesn't read it between each
+            // section (review IU21); that of an empty section says where its tabs will go.
+            .accessibilityHidden(label == nil && !isTargeted)
     }
 
     /// “Drop into Favorites” in an empty section, “Drop here” otherwise.

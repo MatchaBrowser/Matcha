@@ -150,7 +150,9 @@ struct DownloadListTests {
         #expect(!running.isFileMissing)
 
         try FileManager.default.removeItem(at: #require(finished.destinationURL))
-
+        // Review IU6: looked at again when the list is shown, not at each drawing.
+        #expect(!finished.isFileMissing)
+        finished.checkFile()
         #expect(finished.isFileMissing)
         let withoutFile = item("perdu.zip", in: downloads)
         withoutFile.markFinished(size: 0)

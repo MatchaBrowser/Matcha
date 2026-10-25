@@ -10,6 +10,10 @@ final class OtherMacsTabsProvider: CommandProvider {
         self.otherMacs = otherMacs
     }
 
+    var answersAtOnce: Bool {
+        true
+    }
+
     func candidates(for _: CommandQuery, context: CommandContext) async -> [CommandCandidate] {
         guard let otherMacs, !context.isPrivate else {
             return []

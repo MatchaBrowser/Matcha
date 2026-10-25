@@ -41,6 +41,17 @@ struct TabManagerShortcutTests {
         #expect(manager.title(of: [tabs[2].id]) == tabs[2].displayTitle)
     }
 
+    /// Review IU5: the menu keeps the title the tab had when pinned, cut to a reasonable length.
+    @Test func `the menu title is the pinned one, cut`() {
+        let tab = openTabs(1)[0]
+        manager.setPlace(tab, to: .pinned)
+        tab.pinnedTitle = String(repeating: "Long ", count: 30)
+        let title = manager.title(of: [tab.id])
+        #expect(title.count <= TabManager.maximumMenuTitleLength && title.hasPrefix("Long Long") && title.hasSuffix("…"))
+        tab.pinnedTitle = "Courrier"
+        #expect(manager.title(of: [tab.id]) == "Courrier")
+    }
+
     @Test func `a split row picks its most recently selected pane`() throws {
         let tabs = openTabs(3)
         try #require(manager.openInSplit(tabs[1]))
