@@ -66,6 +66,15 @@ struct PageAudioIntegrationTests {
         try await waitUntil { tab.isPlayingAudio }
     }
 
+    /// Review WB9: a page that stops the media events before they reach the document still lights the icon.
+    @Test func `a page can't hide its sound by stopping the events`() async throws {
+        let types = "['play', 'playing', 'pause', 'ended', 'emptied', 'volumechange']"
+        let stop = "window.addEventListener(type, (e) => e.stopImmediatePropagation(), true)"
+        let blind = "<script>for (const type of \(types)) { \(stop); }</script>"
+        let tab = try await show(TestPages.url("musique", body: blind + AudioTestPages.audio()), title: "musique")
+        try await waitUntil { tab.isPlayingAudio }
+    }
+
     @Test func `a muted element or a zero volume shows no icon`() async throws {
         let tab = try await show(AudioTestPages.playingPage(attributes: "muted"), title: "musique")
         tab.audio.silenceDelay = 0.3

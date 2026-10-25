@@ -110,7 +110,7 @@ final class MiniWindowManager {
         let tab = BrowserTab(configuration: makeConfiguration(session.dataStore(for: profile)))
         let controller = show(tab, profileID: profile?.id)
         if let url {
-            tab.load(url)
+            tab.load(url, isFromAnotherApp: source == .link)
             controller.showWebView()
         } else {
             controller.showCommandBar(.newSearch)

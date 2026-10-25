@@ -42,6 +42,7 @@ extension TabManager {
                 pinnedTitle: tab.pinnedTitle,
                 lastActivity: tab.lastActivity,
                 interactionState: tab.savedInteractionState,
+                fileReadAccess: tab.fileReadAccess,
             )
         }
     }

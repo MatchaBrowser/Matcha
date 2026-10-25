@@ -76,6 +76,28 @@ struct ExternalAppTests {
         #expect(manager.tabs.count == 1)
     }
 
+    /// Review WB23: a page that loops on a refused link stays quiet, until a real click asks again.
+    @Test func `a refused link comes back only after a click`() async throws {
+        let body = "<script>setInterval(() => { location.href = 'mailto:moi@example.com' }, 50)</script>"
+        let (page, opened) = try await openPage(body: body)
+        try await waitUntil { page.permissionPrompts.currentAction != nil }
+        var lookups = 0
+        manager.coordinator.applicationForURL = { _ in
+            lookups += 1
+            return Self.mail
+        }
+        page.permissionPrompts.answerAction(.decline)
+        try await Task.sleep(for: .milliseconds(400))
+        #expect(page.permissionPrompts.currentAction == nil)
+        #expect(lookups == 0)
+
+        // A real click (a mouse button: a script's click has none).
+        let click = try FakeNavigationAction(url: #require(URL(string: "mailto:moi@example.com")), modifierFlags: [], buttonNumber: 1)
+        manager.coordinator.webView(page.loadedWebView, decidePolicyFor: click, decisionHandler: PolicyRecorder().record)
+        #expect(page.permissionPrompts.currentAction?.action == .openApp(scheme: "mailto"))
+        #expect(opened.urls.isEmpty)
+    }
+
     @Test func `a script run by a click on a button asks too`() async throws {
         let button = "<button id='b' onclick=\"location.href = 'mailto:moi@example.com'\">courriel</button>"
         let (page, opened) = try await openPage(body: button)

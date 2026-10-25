@@ -65,6 +65,7 @@ final class SpaceStore {
                 pinnedTitle: record.pinnedTitle,
                 lastActivity: record.lastActivity,
                 interactionState: record.interactionState,
+                fileReadAccess: record.fileReadAccess,
             )
         }
         return (tabs, SidebarLayout(positions: positions, folders: folders))
@@ -151,6 +152,7 @@ final class SpaceStore {
             update(record, \.pinnedURL, to: stored.pinnedURL)
             update(record, \.pinnedTitle, to: stored.pinnedTitle)
             update(record, \.lastActivity, to: stored.lastActivity)
+            update(record, \.fileReadAccess, to: stored.fileReadAccess)
             if savedStates[stored.id] != stored.interactionState {
                 record.interactionState = stored.interactionState
                 savedStates[stored.id] = stored.interactionState

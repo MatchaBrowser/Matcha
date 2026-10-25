@@ -70,9 +70,21 @@ struct CertificateExceptionsTests {
         try await waitUntil { tab.displayedURL == site && !tab.isLoading }
         #expect(tab.security != .invalidCertificate)
 
-        tab.acceptedCertificateHosts.insert("expire.example")
+        tab.usesAcceptedCertificate = true
         #expect(tab.security == .invalidCertificate)
         #expect(tab.security.hasCertificate)
+    }
+
+    /// Review WB5: read from the document's own certificate, whichever tab accepted it.
+    @Test func `a document over an accepted certificate is not secure, in any tab`() throws {
+        let exceptions = CertificateExceptions()
+        let first = try Self.trust(Self.first)
+        exceptions.accept(first, host: "expire.example")
+        #expect(NavigationCoordinator.usesAcceptedCertificate(first, host: "Expire.example", exceptions: exceptions))
+        #expect(try !NavigationCoordinator.usesAcceptedCertificate(Self.trust(Self.second), host: "expire.example", exceptions: exceptions))
+        #expect(!NavigationCoordinator.usesAcceptedCertificate(first, host: "autre.example", exceptions: exceptions))
+        #expect(!NavigationCoordinator.usesAcceptedCertificate(nil, host: "expire.example", exceptions: exceptions))
+        #expect(!NavigationCoordinator.usesAcceptedCertificate(first, host: "expire.example", exceptions: nil))
     }
 
     private static func trust(_ base64: String) throws -> SecTrust {

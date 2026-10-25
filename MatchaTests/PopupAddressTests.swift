@@ -24,7 +24,10 @@ struct PopupAddressTests {
     @Test func `other pages show what they are, without a security state`() {
         #expect(address("about:blank") == PopupAddress(text: "about:blank", security: .none))
         #expect(address("data:text/html,<h1>Connexion</h1>") == PopupAddress(text: "data:", security: .none))
-        #expect(address("blob:https://example.com/1234") == PopupAddress(text: "blob:", security: .none))
+        // Review WB15: the website that made it, never its path.
+        #expect(address("blob:https://www.example.com/1234") == PopupAddress(text: "blob:example.com", security: .none))
+        #expect(address("blob:http://localhost:3000/1234") == PopupAddress(text: "blob:http://localhost:3000", security: .none))
+        #expect(address("blob:null/1234") == PopupAddress(text: "blob:", security: .none))
         #expect(PopupAddress(url: URL(fileURLWithPath: "/tmp/page.html")) == PopupAddress(text: "page.html", security: .none))
         #expect(address("obtest://pages/connexion") == PopupAddress(text: "obtest://pages", security: .none))
         #expect(PopupAddress(url: nil) == PopupAddress(text: "", security: .none))

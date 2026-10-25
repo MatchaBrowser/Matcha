@@ -1,8 +1,23 @@
 import Foundation
 import WebKit
 
-/// Displayed title and navigation commands of the page (buttons, menus, shortcuts).
+/// Load state, displayed title and navigation commands of the page (buttons, menus, shortcuts).
 extension BrowserTab {
+    var isLoaded: Bool {
+        webView != nil
+    }
+
+    /// Displayed as loaded in the sidebar (full title, close button): web view present, or put to sleep to save
+    /// memory, which must not change anything in the display (task 5.6).
+    var appearsLoaded: Bool {
+        webView != nil || suspension.isSuspended
+    }
+
+    /// The schemes of `urls` that a handler of `configuration` serves (the source viewer).
+    static func servedSchemes(of configuration: WKWebViewConfiguration, among urls: [URL?]) -> Set<String> {
+        Set(urls.compactMap { $0?.scheme?.lowercased() }.filter { configuration.urlSchemeHandler(forURLScheme: $0) != nil })
+    }
+
     /// Title to display: the page's title, otherwise the host of the address shown, otherwise “New Tab”; never the host
     /// of a load that isn't displayed yet (review TR1).
     var displayTitle: String {

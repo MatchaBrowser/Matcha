@@ -52,13 +52,14 @@ extension BrowserWebView {
         guard let command = (sender.representedObject as? String).flatMap(PageCommand.init(rawValue:)) else {
             return
         }
-        switch command {
-        case .goBack:
+        // Through the page, like the toolbar's buttons (review WB21): a failure shown, a page woken from sleep or after a
+        // crash go back the same way. Without one, the view itself.
+        if let delegate = uiDelegate as? any PageMenuDelegate {
+            delegate.pageMenu(perform: command, in: self)
+        } else if command == .goBack {
             goBack()
-        case .goForward:
+        } else if command == .goForward {
             goForward()
-        case .saveAs, .print, .viewSource:
-            (uiDelegate as? any PageMenuDelegate)?.pageMenu(perform: command, in: self)
         }
         Logger.browser.info("Page menu: \(command.rawValue, privacy: .public)")
     }

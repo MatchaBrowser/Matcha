@@ -75,7 +75,8 @@ struct SiteSettingsPanel: View {
             title(origin)
                 .font(.subheadline.weight(.semibold))
                 .lineLimit(1)
-                .truncationMode(.middle)
+                // The end of a host names the website (review WB8).
+                .truncationMode(.head)
                 .accessibilityIdentifier("siteSettingsTitle")
             Spacer(minLength: 0)
             Button {

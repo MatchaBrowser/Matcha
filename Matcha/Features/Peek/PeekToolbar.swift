@@ -46,7 +46,8 @@ struct PeekToolbar: View {
                 Text(verbatim: shortAddress)
                     .font(.callout.weight(.medium))
                     .lineLimit(1)
-                    .truncationMode(.middle)
+                    // Cut at the start: the end of a host names the website (“…signin-verify.net”, review WB8).
+                    .truncationMode(.head)
             }
             .help(Text(verbatim: page.displayedURL?.absoluteString ?? ""))
             // Static text: on macOS, a plain group does not expose its value (the address).

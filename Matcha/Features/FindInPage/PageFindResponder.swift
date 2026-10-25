@@ -72,7 +72,8 @@ final class PageFindResponder {
         target() != nil
     }
 
-    /// ⌘J: the page scrolls to its selected text.
+    /// ⌘J: the page scrolls to its selected text. Run in an isolated world, where the page can't redefine
+    /// `getSelection` or `scrollIntoView` (review WB13).
     func jumpToSelection() {
         let script = """
         (() => {
@@ -80,7 +81,7 @@ final class PageFindResponder {
             if (selection.rangeCount) selection.getRangeAt(0).startContainer.parentElement?.scrollIntoView({block: 'center'});
         })()
         """
-        target()?.page.webView?.evaluateJavaScript(script)
+        target()?.page.webView?.evaluateJavaScript(script, in: nil, in: .defaultClient)
     }
 
     // MARK: Target
@@ -105,13 +106,24 @@ final class PageFindResponder {
 
     /// ⌘E: the selected text of the page becomes the searched text (never logged).
     private func useSelection(of page: BrowserTab) {
-        page.webView?.evaluateJavaScript("getSelection().toString()") { result, error in
-            if let error {
-                Logger.browser.error("Unreadable page selection: \(error.logSummary, privacy: .public)")
-            }
-            if let text = result as? String {
+        guard let webView = page.webView else {
+            return
+        }
+        Task {
+            if let text = await Self.selectedText(in: webView) {
                 page.find.useSelection(text)
             }
+        }
+    }
+
+    /// The text selected in the page, read in an isolated world: the page can't redefine `getSelection` there and
+    /// hand another text to the search (review WB13).
+    static func selectedText(in webView: WKWebView) async -> String? {
+        do {
+            return try await webView.evaluateJavaScript("getSelection().toString()", contentWorld: .defaultClient) as? String
+        } catch {
+            Logger.browser.error("Unreadable page selection: \(error.logSummary, privacy: .public)")
+            return nil
         }
     }
 }

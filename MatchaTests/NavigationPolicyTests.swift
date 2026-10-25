@@ -12,6 +12,7 @@ struct NavigationPolicyTests {
         modifiers: NSEvent.ModifierFlags = [],
         button: Int = 1,
         mainFrame: Bool = true,
+        fromMainFrame: Bool = true,
         handled: Bool = true,
     ) -> NavigationRequest {
         NavigationRequest(
@@ -20,6 +21,7 @@ struct NavigationPolicyTests {
             modifierFlags: modifiers,
             buttonNumber: button,
             targetsMainFrame: mainFrame,
+            isFromMainFrame: fromMainFrame,
             isSchemeHandledByWebView: handled,
         )
     }
@@ -99,6 +101,15 @@ struct NavigationPolicyTests {
     @Test func `foreign scheme from a subframe is cancelled`() throws {
         let url = try #require(URL(string: "itms-apps://apps.apple.com/app/id1"))
         #expect(NavigationPolicy.decide(request(url: url, type: .other, mainFrame: false, handled: false)) == .cancel)
+        // Review WB1: nor through the main frame or a new window (`window.open` in an ad frame).
+        #expect(NavigationPolicy.decide(request(url: url, type: .other, fromMainFrame: false, handled: false)) == .cancel)
+    }
+
+    /// Review WB4: file shares and remote sessions are never handed to another app.
+    @Test(arguments: ["smb://attaquant/partage", "afp://serveur/x", "vnc://hote", "ssh://hote", "ftp://hote/fichier", "SMB://hote"])
+    func `file shares and remote sessions are refused`(link: String) throws {
+        let url = try #require(URL(string: link))
+        #expect(NavigationPolicy.decide(request(url: url, handled: false)) == .cancel)
     }
 
     @Test func `foreign scheme wins over modifiers`() throws {

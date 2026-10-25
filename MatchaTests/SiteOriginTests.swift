@@ -64,4 +64,20 @@ struct SiteOriginTests {
         #expect(fromWebKit.host == "::1")
         #expect(fromWebKit.displayName == "http://[::1]:3000")
     }
+
+    /// Review WB2: what `window.isSecureContext` says of a website.
+    @Test(arguments: [
+        ("https://example.com", true),
+        ("http://localhost:8080", true),
+        ("http://app.localhost", true),
+        ("http://127.0.0.1:3000", true),
+        ("http://[::1]:3000", true),
+        ("http://example.com", false),
+        ("http://127.example.com", false),
+        ("http://192.168.1.1", false),
+    ])
+    func `a secure context is https, or http on this Mac`(address: String, isSecure: Bool) throws {
+        let origin = try #require(URL(string: address).flatMap(SiteOrigin.init(url:)))
+        #expect(origin.isSecureContext == isSecure)
+    }
 }

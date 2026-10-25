@@ -18,6 +18,7 @@ extension TabManager {
                 pinnedTitle: tab.pinnedTitle,
                 lastActivity: .now,
                 interactionState: tab.savedInteractionState,
+                fileReadAccess: tab.fileReadAccess,
             )
             return ClosedTab(stored: stored, place: place, todayIndex: layout.today.firstIndex(of: tab.id))
         }
@@ -34,7 +35,7 @@ extension TabManager {
         let ordered = group.sorted { ($0.todayIndex ?? .max) < ($1.todayIndex ?? .max) }
         let reopened = ordered.map { closed -> BrowserTab in
             let configuration = pages.makeConfiguration(websiteDataStore: websiteDataStore)
-            let tab = BrowserTab(restoring: closed.stored, configuration: configuration)
+            let tab = BrowserTab(restoring: closed.stored, configuration: configuration, isSaved: false)
             register(tab)
             updateLayout { $0.insertToday(tab.id, at: min(closed.todayIndex ?? 0, $0.today.count)) }
             if closed.place != .today {

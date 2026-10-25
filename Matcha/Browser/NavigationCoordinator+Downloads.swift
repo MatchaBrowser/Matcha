@@ -14,14 +14,14 @@ extension NavigationCoordinator {
         tabHost?.page(for: webView)?.pageDownloads.userDidClick(at: now())
     }
 
-    /// `decide` gets true if the download goes ahead, at once or once the user has answered.
-    func startDownload(in webView: WKWebView, isSubframe: Bool, decide: @escaping @MainActor (Bool) -> Void) {
+    /// `decide` gets true if the download goes ahead, at once or once the user has answered. `origin` is the website
+    /// asking: the banner names it, “Always Allow” is remembered for it (review WB1).
+    func startDownload(in webView: WKWebView, isSubframe: Bool, origin: SiteOrigin?, decide: @escaping @MainActor (Bool) -> Void) {
         guard let page = tabHost?.page(for: webView) else {
             decide(true)
             return
         }
         let downloads = page.pageDownloads
-        let origin = webView.url.flatMap(SiteOrigin.init(url:))
         let scope = tabHost?.sitePermissions(for: webView)
         let isAllowedForSite = origin.map { scope?.isAllowed(.downloadFiles, origin: $0) == true } ?? false
         let needsConsent = DownloadConsentPolicy.needsConsent(

@@ -158,6 +158,45 @@ struct NavigationCoordinatorPageMenuTests {
         #expect(manager.tabs.count == 2)
     }
 
+    /// Review WB4: from the menu, any app other than Mail or Phone waits in the banner; a file share never opens.
+    @Test func `from the menu, another app asks first and a file share never opens`() async throws {
+        let (page, _) = try await openPage()
+        var opened: [URL] = []
+        manager.coordinator.openExternally = { url in
+            opened.append(url)
+            return true
+        }
+        manager.coordinator.applicationForURL = { _ in URL(filePath: "/System/Library/CoreServices/Finder.app") }
+        try choose(.backgroundTab, in: page)
+        #expect(try requestWindow(#require(URL(string: "smb://attaquant/partage")), from: page) == nil)
+        #expect(page.permissionPrompts.currentAction == nil)
+
+        try choose(.backgroundTab, in: page)
+        let zoom = try #require(URL(string: "zoommtg://zoom.us/join"))
+        #expect(requestWindow(zoom, from: page) == nil)
+        #expect(opened.isEmpty)
+        #expect(page.permissionPrompts.currentAction?.action == .openApp(scheme: "zoommtg"))
+        page.permissionPrompts.answerAction(.allowOnce)
+        #expect(opened == [zoom])
+    }
+
+    /// Review WB21: Back in the page's menu goes through the tab, like the toolbar: it leaves a failure shown over the
+    /// page first.
+    @Test func `back in the menu leaves a failure shown over the page`() async throws {
+        let (page, _) = try await openPage()
+        let failed = try #require(URL(string: "https://absent.example/"))
+        page.provisionalLoadDidFail(NSError(
+            domain: NSURLErrorDomain,
+            code: NSURLErrorCannotFindHost,
+            userInfo: [NSURLErrorFailingURLErrorKey: failed],
+        ))
+        #expect(page.displayedURL == failed)
+
+        manager.coordinator.pageMenu(perform: .goBack, in: page.loadedWebView)
+        #expect(page.loadFailure.error == nil)
+        #expect(page.displayedURL == TestPages.url("ouvrant"))
+    }
+
     /// A sign-in window (given size) is never the one for the menu: the choice still waits for its own window.
     @Test func `a sign-in window is never taken for the choice`() async throws {
         let (page, _) = try await openPage()

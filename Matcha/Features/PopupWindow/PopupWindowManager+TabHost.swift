@@ -33,7 +33,10 @@ extension PopupWindowManager: TabHost {
             return
         }
         let tab = BrowserTab(configuration: configuration, openerID: controller.tab.id)
-        show(tab, features: PopupWindowFeatures(), opener: PopupOpener(host: self, webView: webView)).tab.load(url, from: webView.url)
+        show(tab, features: PopupWindowFeatures(), opener: PopupOpener(host: self, webView: webView)).tab.load(
+            url,
+            from: controller.tab.documentURL,
+        )
     }
 
     func openWindow(configuration: WKWebViewConfiguration, from webView: WKWebView, inBackground: Bool) -> WKWebView? {

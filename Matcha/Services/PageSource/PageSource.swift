@@ -8,12 +8,16 @@ nonisolated enum PageSource {
     /// Pages whose source code can be shown.
     static let sourceSchemes: Set<String> = ["http", "https", "file"]
 
-    /// Address of the source code viewer of `page`; nil for a page that has none (about:, data:…).
+    /// Address of the source code viewer of `page`, without its fragment (`#anchor`: the same source, and an address
+    /// that WebKit may hand to the viewer without it, review WB22); nil for a page that has none (about:, data:…).
     static func viewerURL(for page: URL?) -> URL? {
         guard let page, let scheme = page.scheme?.lowercased(), sourceSchemes.contains(scheme) else {
             return nil
         }
-        return URL(string: "\(Self.scheme):\(page.absoluteString)")
+        var components = URLComponents(url: page, resolvingAgainstBaseURL: false)
+        components?.fragment = nil
+        let address = components?.url?.absoluteString ?? page.absoluteString
+        return URL(string: "\(Self.scheme):\(address)")
     }
 
     /// Page whose source code `viewer` shows.

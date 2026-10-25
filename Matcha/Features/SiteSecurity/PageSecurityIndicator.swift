@@ -2,7 +2,8 @@ import SwiftUI
 
 /// Security of a page next to its address (audit W5): a padlock button that shows the certificate of an encrypted
 /// page; “Not Secure” for an unencrypted one, in red (and showing the certificate) for a website visited despite its
-/// invalid certificate (audit K5); nothing for a page that isn't a website. `prominent`: in red, where a
+/// invalid certificate (audit K5); “Local File” for a local file, whose name could pass for a website's
+/// (“www.paypal.com.html”, review WB14); nothing for another page that isn't a website. `prominent`: in red, where a
 /// password may be typed (sign-in windows).
 struct PageSecurityIndicator: View {
     let page: BrowserTab
@@ -63,8 +64,26 @@ struct PageSecurityIndicator: View {
             .accessibilityLabel(invalidCertificateHelp)
             .accessibilityIdentifier("invalidCertificateButton")
         case .none:
-            EmptyView()
+            if page.displayedURL?.isFileURL == true {
+                localFile
+            }
         }
+    }
+
+    private var localFile: some View {
+        HStack(spacing: 4) {
+            Image(systemName: "doc")
+                .font(.system(size: 11, weight: .medium))
+            if showsNotSecureText {
+                Text("Local File", comment: "Address bar: the page is a local file, not a website")
+                    .lineLimit(1)
+            }
+        }
+        .foregroundStyle(.secondary)
+        .help(Text("This page is a file on this Mac, not a website.", comment: "Help tag of “Local File” in the address bar"))
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel(Text("Local File", comment: "Address bar: the page is a local file, not a website"))
+        .accessibilityIdentifier("localFileLabel")
     }
 
     private var invalidCertificateHelp: Text {

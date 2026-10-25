@@ -16,11 +16,10 @@ extension NavigationCoordinator {
         type: WKMediaCaptureType,
         decisionHandler: @escaping @MainActor @Sendable (WKPermissionDecision) -> Void,
     ) {
-        let frameOrigin = frame.securityOrigin
         requestPermission(
             Self.kinds(of: type),
-            origin: SiteOrigin(scheme: origin.protocol, host: origin.host, port: origin.port),
-            frameOrigin: SiteOrigin(scheme: frameOrigin.protocol, host: frameOrigin.host, port: frameOrigin.port),
+            origin: origin.siteOrigin,
+            frameOrigin: frame.securityOrigin.siteOrigin,
             in: webView,
             response: PermissionResponse { decisionHandler($0 ? .grant : .deny) },
         )

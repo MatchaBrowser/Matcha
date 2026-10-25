@@ -18,6 +18,8 @@ final class TabRecord {
     var pinnedTitle: String?
     /// WebKit navigation state (back/forward history), for restoration.
     @Attribute(.externalStorage) var interactionState: Data?
+    /// What its local file may read (`BrowserTab.fileReadAccess`, review WB11); kept on this Mac only.
+    var fileReadAccess: URL?
     /// Split view (task 4.3) the tab is part of; nil outside a split. Never for a favorite.
     var splitGroupID: UUID?
     /// Width share of its pane in the split; 0: unknown (equal shares).

@@ -2,10 +2,11 @@ import Foundation
 
 /// Termination of the page's process (task 5.7): what the tab does about it, per the decision of `PageCrashPolicy`.
 extension BrowserTab {
-    /// Waking from sleep (task 5.6) or recovering after the process terminated (5.7): an empty title or a missing
-    /// address in the web view does not replace the tab's.
+    /// Waking from sleep (task 5.6), recovering after the process terminated (5.7), or a new web view before its first
+    /// document (restored or unloaded tab, review WB19): an empty title or a missing address in the web view does not
+    /// replace the tab's.
     var keepsTitleAndAddress: Bool {
-        suspension.isRestoring || crash.isRecovering
+        suspension.isRestoring || crash.isRecovering || awaitsFirstDocument
     }
 
     /// Called while WebKit notifies the delegate: the web view still has its address, title and navigation state.

@@ -8,10 +8,13 @@ import WebKit
 @MainActor
 struct PageSourceTests {
     @Test func `the viewer address leads back to its page`() throws {
-        let page = try #require(URL(string: "https://example.com/a/b?x=1&y=é#haut"))
+        let page = try #require(URL(string: "https://example.com/a/b?x=1&y=é"))
         let viewer = try #require(PageSource.viewerURL(for: page))
         #expect(viewer.scheme == "matcha-source")
         #expect(PageSource.pageURL(fromViewer: viewer) == page)
+        // Review WB22: the same source for the page's anchors.
+        let anchor = try #require(URL(string: "#haut", relativeTo: page)?.absoluteURL)
+        #expect(PageSource.viewerURL(for: anchor) == viewer)
         #expect(PageSource.viewerURL(for: URL(string: "about:blank")) == nil)
         #expect(PageSource.viewerURL(for: nil) == nil)
         #expect(try PageSource.pageURL(fromViewer: #require(URL(string: "matcha-source:javascript:alert(1)"))) == nil)
@@ -98,6 +101,46 @@ struct PageSourceTests {
         let configuration = WebConfigurationFactory().makeConfiguration(websiteDataStore: .nonPersistent())
         let tab = BrowserTab(restoring: StoredTab(id: UUID(), url: viewer, lastActivity: .now), configuration: configuration)
         #expect(try #require(PageSourceSchemeHandler.of(tab.configuration)).isAuthorized(viewer, in: tab.configuration.websiteDataStore))
+    }
+
+    /// Review WB3: a page can't send its tab to a viewer, even one the app authorized: no request with the profile's
+    /// cookies, no address saved for the next launch.
+    @Test func `a page can't open a viewer, by script or by link`() async throws {
+        let manager = TabManager(websiteDataStore: .nonPersistent())
+        let file = try Self.temporaryPage("<p>Bonjour</p>")
+        defer { try? FileManager.default.removeItem(at: file) }
+        let viewer = try #require(PageSource.viewerURL(for: file))
+        let tab = manager.insertTab(configuration: TestPages.configuration(), after: nil, select: true)
+        try #require(PageSourceSchemeHandler.of(tab.configuration)).authorize(viewer, in: tab.configuration.websiteDataStore)
+        let script = "location = '\(viewer.absoluteString)'; setTimeout(() => { document.title = 'done'; }, 300)"
+        tab.load(TestPages.url("page", body: "<a id='l' href='\(viewer.absoluteString)'>source</a><script>\(script)</script>"))
+        try await waitUntil { tab.title == "done" }
+        _ = try await tab.loadedWebView
+            .evaluateJavaScript("document.getElementById('l').click(); setTimeout(() => { document.title = 'clicked'; }, 300); true")
+        try await waitUntil { tab.title == "clicked" }
+        #expect(tab.url?.scheme == TestPages.scheme)
+
+        // The app opens it: loaded.
+        tab.load(viewer)
+        try await waitUntil { tab.displayedURL == viewer && tab.title?.hasPrefix("Source") == true && !tab.isLoading }
+    }
+
+    @Test func `only the app's load, a reload or the history open a viewer`() throws {
+        let viewer = try #require(URL(string: "matcha-source:https://example.com/"))
+        let other = try #require(URL(string: "https://example.com/"))
+        #expect(NavigationPolicy.allowsSourceViewer(viewer, type: .other, targetsMainFrame: true, requested: viewer, displayed: other))
+        #expect(NavigationPolicy.allowsSourceViewer(viewer, type: .reload, targetsMainFrame: true, requested: nil, displayed: viewer))
+        #expect(NavigationPolicy.allowsSourceViewer(viewer, type: .backForward, targetsMainFrame: true, requested: nil, displayed: other))
+        #expect(!NavigationPolicy.allowsSourceViewer(
+            viewer,
+            type: .linkActivated,
+            targetsMainFrame: true,
+            requested: nil,
+            displayed: other,
+        ))
+        #expect(!NavigationPolicy.allowsSourceViewer(viewer, type: .other, targetsMainFrame: true, requested: other, displayed: other))
+        #expect(!NavigationPolicy.allowsSourceViewer(viewer, type: .reload, targetsMainFrame: true, requested: nil, displayed: other))
+        #expect(!NavigationPolicy.allowsSourceViewer(viewer, type: .other, targetsMainFrame: false, requested: viewer, displayed: other))
     }
 
     @Test func `only regular files of a reasonable size are read`() throws {
