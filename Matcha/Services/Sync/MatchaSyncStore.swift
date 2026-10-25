@@ -1,9 +1,10 @@
 import Foundation
 import SwiftData
 
-/// Matcha's data as seen by sync (`SYNC.md` § 2.1): profiles, Spaces, folders and tabs (SwiftData records), site
-/// decisions, synced settings, site zoom and extensions. Received changes are written to the records
-/// (`SyncRecordWriter`), then the session picks them up (`BrowserSession.reload`). A read failure throws.
+/// Matcha's data as seen by sync (`SYNC.md` § 2.1): profiles, Spaces, folders, favorites and pinned tabs (SwiftData
+/// records), site decisions, synced settings, site zoom, extensions, and this Mac's today tabs for the other Macs to
+/// see. Received changes are written to the records (`SyncRecordWriter`), then the session picks them up
+/// (`BrowserSession.reload`). A read failure throws.
 @MainActor
 final class MatchaSyncStore: SyncLocalStore {
     let session: BrowserSession
@@ -11,12 +12,23 @@ final class MatchaSyncStore: SyncLocalStore {
     let identifiers: SyncIdentifiers
     /// Installed and offered extensions; nil: they do not travel (tests).
     let extensions: ExtensionSyncAdapter?
+    /// This Mac, whose today tabs the others see (`deviceTabs`); nil: they don't travel (tests).
+    let device: SyncDeviceDescription?
+    /// False while signing out: the next cycle sends the deletion of this Mac's tabs (`SYNC.md` § 2.4).
+    var publishesDeviceTabs = true
 
-    init(session: BrowserSession, defaults: UserDefaults, identifiers: SyncIdentifiers, extensions: ExtensionSyncAdapter? = nil) {
+    init(
+        session: BrowserSession,
+        defaults: UserDefaults,
+        identifiers: SyncIdentifiers,
+        extensions: ExtensionSyncAdapter? = nil,
+        device: SyncDeviceDescription? = nil,
+    ) {
         self.session = session
         self.defaults = defaults
         self.identifiers = identifiers
         self.extensions = extensions
+        self.device = device
     }
 
     func snapshot() throws -> [UUID: SyncFields] {
@@ -34,25 +46,37 @@ final class MatchaSyncStore: SyncLocalStore {
                 result[folder.id] = .folder(fields)
             }
         }
-        for tab in try fetch(TabRecord.self) where !tab.isLocalOnly {
+        let tabs = try fetch(TabRecord.self)
+        for tab in tabs where !tab.isLocalOnly {
             if let fields = tab.syncFields {
                 result[tab.id] = .tab(fields)
             }
         }
         addPreferences(to: &result)
+        try addDeviceTabs(tabs.filter { $0.place == .today }, to: &result)
         return result
     }
 
-    /// Favorites and pinned tabs whose original address isn't a web address stay on this Mac; today tabs showing such a
-    /// page keep the last address sent (`SYNC.md` § 2.4).
+    /// This Mac's today tabs, by Space in sidebar order, read-only for the other Macs (`SYNC.md` § 2.4).
+    private func addDeviceTabs(_ today: [TabRecord], to result: inout [UUID: SyncFields]) throws {
+        guard let device, publishesDeviceTabs else {
+            return
+        }
+        let bySpace = Dictionary(grouping: today) { $0.space?.id }
+        let spaces = try fetch(SpaceRecord.self).sorted { ($0.order, $0.id.uuidString) < ($1.order, $1.id.uuidString) }
+        let local = spaces.map { space in
+            let tabs = (bySpace[space.id] ?? []).sorted { ($0.order, $0.id.uuidString) < ($1.order, $1.id.uuidString) }
+            return SyncDeviceTabsFields.LocalSpace(id: space.id, name: space.name, tabs: tabs.map { ($0.url, $0.title) })
+        }
+        let fields = SyncDeviceTabsFields.publishing(deviceId: device.id, name: device.name, spaces: local)
+        result[identifiers.deviceTabs(device.id)] = .deviceTabs(fields)
+    }
+
+    /// Favorites and pinned tabs whose original address isn't a web address stay on this Mac (`SYNC.md` § 5).
     func exceptions() throws -> SyncLocalExceptions {
         var exceptions = SyncLocalExceptions()
-        for tab in try fetch(TabRecord.self) {
-            if tab.isLocalOnly {
-                exceptions.localRecords.insert(tab.id)
-            } else if tab.place == .today, tab.showsNonWebPage {
-                exceptions.nonWebPages.insert(tab.id)
-            }
+        for tab in try fetch(TabRecord.self) where tab.isLocalOnly {
+            exceptions.localRecords.insert(tab.id)
         }
         return exceptions
     }

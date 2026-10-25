@@ -1,21 +1,27 @@
 import Foundation
 
 /// Tabs of a single window, outside any Space (Arc's “This Window”): a tab dragged out of the sidebar opens a window
-/// with only itself, and leaves its Space. Same profile, history and settings as the Space it came from (`space`); never
-/// saved as such: “Move to…” puts them into a Space, closing the window closes them (⇧⌘T in their Space brings them
-/// back), and quitting the app puts them back into their Space (`BrowserSession+WindowTabs`).
+/// with only itself, and leaves its Space. Same profile, history and settings as the Space it came from. Saved at the
+/// top of that Space's today tabs as long as the window is open, so that a crash doesn't lose them (review ON7):
+/// “Move to…” puts them into a Space, closing the window closes them (⇧⌘T in their Space brings them back), and
+/// quitting the app puts them back into their Space (`BrowserSession.originSpace(of:)`).
 @MainActor
 final class WindowTabs: Identifiable {
     let id = UUID()
     let tabManager: TabManager
-    /// Space the tabs came from.
-    private(set) weak var space: SpaceSession?
+    /// Space the tabs came from, and its profile then: plain values, since that Space can be deleted or reopened in
+    /// another profile while the window is open (review ON5).
+    let spaceID: UUID
+    let profileID: UUID?
     /// Brings the window showing these tabs to the front (another window chose one of them); given by the window.
     var bringWindowToFront: (@MainActor () -> Void)?
+    /// Closes the window showing these tabs (their profile was deleted); given by the window.
+    var closeWindow: (@MainActor () -> Void)?
 
     init(tabManager: TabManager, space: SpaceSession) {
         self.tabManager = tabManager
-        self.space = space
+        spaceID = space.id
+        profileID = space.openedProfileID
     }
 
     /// Takes in `tab`, a today tab removed from its Space (same profile): same page, same web view.
@@ -35,13 +41,14 @@ final class WindowTabs: Identifiable {
     @discardableResult
     func move(to target: SpaceSession) -> BrowserTab? {
         let selectedID = tabManager.selectedTabID
-        let sameProfile = target.openedProfileID == space?.openedProfileID
+        // Same data store, so same profile and same cookies (as `TabTransferPlan`).
+        let sameProfile = target.tabManager.websiteDataStore === tabManager.websiteDataStore
         var selected: BrowserTab?
         for tab in tabManager.todayTabs.reversed() {
             let moved: BrowserTab?
             if sameProfile {
                 moved = tabManager.detach(tab)
-                moved.map(target.tabManager.attach)
+                moved.map { target.tabManager.attach($0) }
             } else {
                 let url = tab.url
                 tabManager.delete(tab)
@@ -54,8 +61,9 @@ final class WindowTabs: Identifiable {
         return selected
     }
 
-    /// The window closes: its tabs close, and ⇧⌘T in their Space brings them back.
-    func close() {
+    /// The window closes: its tabs close, and ⇧⌘T in `space` (their Space, `BrowserSession.originSpace(of:)`) brings
+    /// them back.
+    func close(into space: SpaceSession?) {
         let tabs = tabManager.todayTabs
         tabManager.rememberClosed(tabs)
         if let group = tabManager.closedTabs.popLast() {

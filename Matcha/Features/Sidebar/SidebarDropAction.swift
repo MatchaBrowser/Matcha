@@ -18,7 +18,8 @@ struct SidebarDropAction {
                 return bringTab(id, to: target)
             }
         case let .folder(id):
-            guard case .pinned = target else {
+            // A folder stays in its window's Space (review ON20).
+            guard case .pinned = target, tabManager.layout.pinned.folder(id) != nil else {
                 return false
             }
             withMotion(.easeOut(duration: 0.15)) { tabManager.moveFolder(id, to: target) }
@@ -36,10 +37,13 @@ struct SidebarDropAction {
 
     /// Tab of another window: it leaves it for this sidebar, at `target`, and this window shows it.
     private func bringTab(_ id: BrowserTab.ID, to target: SidebarDestination) -> Bool {
-        guard let windowModel, let tab = windowModel.session.bringTab(id, into: tabManager) else {
+        guard let windowModel else {
             return false
         }
-        withMotion(.easeOut(duration: 0.15)) { tabManager.move(tab, to: target) }
+        let brought = withMotion(.easeOut(duration: 0.15)) { windowModel.session.bringTab(id, into: tabManager, at: target) }
+        guard let tab = brought else {
+            return false
+        }
         // In this window, even if another one shows the same Space.
         windowModel.activate()
         TabActivation.activate(tab, in: tabManager)

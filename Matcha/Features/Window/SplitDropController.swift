@@ -15,7 +15,8 @@ final class SplitDropController: SidebarItemDropTarget {
     /// Can what is displayed take one more pane?
     var canTakeTab = false
     var onTargetChange: (SplitDropTarget?) -> Void = { _ in }
-    var onDrop: (UUID, SplitDropTarget) -> Void = { _, _ in }
+    /// True if the tab joined the split; false refuses the drop (the item goes back to its place).
+    var onDrop: (UUID, SplitDropTarget) -> Bool = { _, _ in false }
 
     private var current: SplitDropTarget?
 
@@ -46,8 +47,7 @@ final class SplitDropController: SidebarItemDropTarget {
         else {
             return false
         }
-        onDrop(id, target)
-        return true
+        return onDrop(id, target)
     }
 
     /// Edge of the pane of `webView` under the pointer, outside the floating sidebar.

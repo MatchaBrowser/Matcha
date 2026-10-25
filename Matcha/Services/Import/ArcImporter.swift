@@ -23,8 +23,7 @@ struct ImportSummary: Equatable {
 /// Imports an Arc sidebar (task 7.1): each Arc Space becomes a new Space (name, icon, colors, pinned tabs and folders,
 /// and its open tabs if requested), the profiles added in Arc become profiles, the favorites join those of their
 /// profile (without duplicate addresses). The new Spaces are saved with their content, then opened; the favorites of an
-/// already open profile join the Space that holds them (`favoritesHolder`), and the other Spaces of the profile take
-/// them back when they are displayed.
+/// already open profile join those of its Spaces (`favoritesManager`), which share them.
 @MainActor
 struct ArcImporter {
     let session: BrowserSession
@@ -183,8 +182,8 @@ struct ArcImporter {
         }
     }
 
-    /// Favorites of the profiles already there: at the end of those of the Space that holds them, without the addresses
-    /// already in favorites. Returns the number of favorites added.
+    /// Favorites of the profiles already there: at the end of their favorites, without the addresses already in
+    /// favorites. Returns the number of favorites added.
     private func importFavorites(
         _ favorites: [ArcSidebar.Profile: [ImportedTab]],
         profiles: [ArcSidebar.Profile: ProfileRecord],
@@ -193,13 +192,13 @@ struct ArcImporter {
         var added = 0
         for (key, tabs) in favorites {
             guard let profile = profiles[key], !created.contains(where: { $0 === profile }),
-                  let holder = session.favoritesHolder(of: profile.id)
+                  let manager = session.favoritesManager(of: profile.id)
             else {
                 continue
             }
-            let present = Set(holder.favoriteTabs.compactMap { $0.pinnedURL ?? $0.url })
+            let present = Set(manager.favoriteTabs.compactMap { $0.pinnedURL ?? $0.url })
             let new = Self.withoutDuplicates(tabs).filter { !present.contains($0.url) }
-            holder.appendFavorites(new.map { tab in
+            manager.appendFavorites(new.map { tab in
                 StoredTab(
                     id: UUID(),
                     url: tab.url,

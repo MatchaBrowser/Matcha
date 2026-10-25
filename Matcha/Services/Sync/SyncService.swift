@@ -29,11 +29,15 @@ final class SyncService {
     @ObservationIgnored let defaults: UserDefaults
     @ObservationIgnored let keychain: SyncKeychain
     @ObservationIgnored let extensions: ExtensionSyncAdapter?
+    /// Today tabs of the other Macs, shown by the command bar and the History menu; nil: not kept (tests).
+    @ObservationIgnored let otherMacs: OtherMacsTabs?
     /// Folder of the sync states, one file per server and account; nil: kept in memory (tests).
     @ObservationIgnored let directory: URL?
     @ObservationIgnored let apiSession: URLSession
     @ObservationIgnored var session: BrowserSession?
     @ObservationIgnored var client: SyncAPIClient?
+    /// Data of this Mac as the running engine sees it.
+    @ObservationIgnored var store: MatchaSyncStore?
     @ObservationIgnored var eventStream: SyncEventStream?
     /// Keys of `UserDefaults` whose change is a change of this Mac.
     @ObservationIgnored var watchedKeys = SyncedSettings.keys + [SiteZoomStore.defaultsKey, ExtensionStateStore.defaultsKey]
@@ -50,6 +54,7 @@ final class SyncService {
         defaults: UserDefaults,
         keychain: SyncKeychain = SyncKeychain(),
         extensions: ExtensionSyncAdapter?,
+        otherMacs: OtherMacsTabs? = nil,
         directory: URL?,
         apiSession: URLSession = SyncAPIClient.makeSession(),
     ) {
@@ -57,6 +62,7 @@ final class SyncService {
         self.keychain = keychain
         self.apiSession = apiSession
         self.extensions = extensions
+        self.otherMacs = otherMacs
         self.directory = directory
         configuration = SyncConfiguration.load(from: defaults)
         avatar = avatarCacheURL.flatMap { try? Data(contentsOf: $0) }
@@ -169,8 +175,17 @@ final class SyncService {
         self.client = client
         let info = configuration.serverInfo ?? SyncServerInfo(api: 1)
         let identifiers = SyncIdentifiers(accountKey: accountKey)
+        let device = SyncDeviceDescription(id: deviceID, name: Self.deviceName)
+        let localStore = MatchaSyncStore(
+            session: session,
+            defaults: defaults,
+            identifiers: identifiers,
+            extensions: extensions,
+            device: device,
+        )
+        self.store = localStore
         let engine = SyncEngine(
-            store: MatchaSyncStore(session: session, defaults: defaults, identifiers: identifiers, extensions: extensions),
+            store: localStore,
             transport: SyncServerTransport(client: client, accountKey: accountKey, server: info),
             identifiers: identifiers,
             file: SyncStateFile(url: stateURL(server: server, accountID: accountID)),
@@ -184,6 +199,7 @@ final class SyncService {
             Task { await self?.cycleDidFinish(error) }
         }
         self.coordinator = coordinator
+        refreshOtherMacs()
         coordinator.start(observing: session.container.mainContext, defaults: defaults, watchedKeys: watchedKeys)
         startEventStream(client: client, info: info)
         removeUnusedStates(keeping: stateURL(server: server, accountID: accountID))
@@ -197,6 +213,8 @@ final class SyncService {
     func deactivate() {
         coordinator?.stop()
         coordinator = nil
+        store = nil
+        refreshOtherMacs()
         eventStream?.stop()
         eventStream = nil
         client = nil
@@ -236,6 +254,7 @@ final class SyncService {
     /// gap is read again.
     private func cycleDidFinish(_ error: (any Error)?) async {
         lastError = error
+        refreshOtherMacs()
         if let error = error as? SyncServerError {
             if error.endsSession {
                 sessionEnded(error)

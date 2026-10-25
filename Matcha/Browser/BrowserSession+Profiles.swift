@@ -54,8 +54,15 @@ extension BrowserSession {
         guard allowingLast || profiles.count > 1, profiles.contains(where: { $0.id == profile.id }) else {
             return nil
         }
-        // Its sign-in windows (task 5.8) close first, so their pages stop using its data.
-        popupWindows?.closeWindows(using: dataStore(for: profile))
+        // Its sign-in windows (task 5.8) and its windows of their own tabs (review ON8) close first, so their pages
+        // stop using its data.
+        let store = dataStore(for: profile)
+        popupWindows?.closeWindows(using: store)
+        for tabs in windowTabs where tabs.tabManager.websiteDataStore === store {
+            tabs.tabManager.tabs.forEach(tabs.tabManager.discard)
+            removeWindowTabs(tabs)
+            tabs.closeWindow?()
+        }
         for space in spaces(of: profile) {
             space.close()
             removeSpace(space)
@@ -70,7 +77,7 @@ extension BrowserSession {
             ensureOneSpace()
         }
         forgetDataStore(of: identifier)
-        favoritesHolders[identifier] = nil
+        profileFavorites[identifier] = nil
         sitePermissions.removeAll(profileID: identifier)
         history?.removeAll(profileID: identifier)
         return identifier

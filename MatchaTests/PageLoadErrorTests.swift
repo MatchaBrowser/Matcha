@@ -65,4 +65,19 @@ struct PageLoadErrorTests {
         #expect(tab.displayedURL == page)
         #expect(!tab.canGoBack)
     }
+
+    /// Review ON14: a local file the app can no longer read (moved, or chosen before a relaunch outside the Downloads
+    /// folder) shows why, with the file panel, instead of a blank page; restored or opened.
+    @Test func `an unreadable local file shows why instead of a blank page`() {
+        let missing = FileManager.default.temporaryDirectory.appending(path: "missing-\(UUID().uuidString).html")
+        let tab = BrowserTab(configuration: WKWebViewConfiguration())
+        tab.load(missing)
+        #expect(tab.loadFailure.error?.kind == .fileUnreadable)
+        #expect(tab.url == missing)
+
+        let stored = StoredTab(id: UUID(), url: missing, title: "Notes", lastActivity: .now)
+        let restored = BrowserTab(restoring: stored, configuration: WKWebViewConfiguration())
+        restored.makeWebViewIfNeeded()
+        #expect(restored.loadFailure.error == PageLoadError(unreadableFile: missing))
+    }
 }

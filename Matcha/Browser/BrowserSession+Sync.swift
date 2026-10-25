@@ -34,9 +34,10 @@ extension BrowserSession {
     }
 
     /// Received deletion of a Space (`SYNC.md` § 2.3), even the last one: `ensureSyncDefaults` restores the invariants
-    /// afterwards. Its tabs and folders go with it.
+    /// afterwards. Its tabs and folders go with it. Its favorites are not saved: `MatchaSyncStore.apply` saved them
+    /// before writing the batch, and saving them now would write their state from before the batch over the favorites
+    /// it received (review ON3).
     func removeSpaceFromSync(_ space: SpaceSession) {
-        handOverFavorites(from: space)
         space.close()
         removeSpace(space)
         container.mainContext.delete(space.record)
@@ -69,7 +70,6 @@ extension BrowserSession {
         // Moved to another profile: its tabs change cookies, so the Space reopens from its records (already up to date:
         // saving it now would mix the favorites of both profiles).
         for space in spaces where space.openedProfileID != space.record.profile?.id {
-            handOverFavorites(from: space, saving: false)
             space.close()
             removeSpace(space)
             openSpace(space.record)

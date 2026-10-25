@@ -8,7 +8,7 @@ protocol SyncLocalStore: AnyObject {
     /// Current state of each synced record on this Mac.
     func snapshot() throws -> [UUID: SyncFields]
 
-    /// This Mac's records that don't travel, or not entirely (`SYNC.md` § 2.4 and § 5).
+    /// This Mac's records that don't travel (`SYNC.md` § 5).
     func exceptions() throws -> SyncLocalExceptions
 
     /// Applies `changes`, in the given order (parents first); returns the records put on hold because their parent is
@@ -36,13 +36,11 @@ extension SyncLocalStore {
     func finish(using _: any SyncTransport) async {}
 }
 
-/// What doesn't travel among this Mac's records (`SYNC.md` § 2.4 and § 5).
+/// What doesn't travel among this Mac's records (`SYNC.md` § 5).
 nonisolated struct SyncLocalExceptions: Equatable, Sendable {
     /// Favorites and pinned tabs whose address isn't a web address: absent from the snapshot, not sent, and their
     /// absence isn't a deletion.
     var localRecords: Set<UUID> = []
-    /// Today tabs showing a page that isn't a web address: their address and title stay the last ones sent.
-    var nonWebPages: Set<UUID> = []
 }
 
 /// Received change, to apply on this Mac.

@@ -1,13 +1,15 @@
 import Foundation
 
-/// Changes received from another Mac (task 7.4, `SYNC.md` § 2.4).
+/// Changes received from another Mac (task 7.4): favorites, pinned tabs and folders; today tabs stay on each Mac
+/// (`SYNC.md` § 2.4).
 extension TabManager {
     /// Takes back the saved tabs and layout, changed by sync. A tab already there keeps its web view; if it is not
     /// displayed and its address changed, it unloads and will load the new one the next time it is opened. A newly
     /// arrived tab is neither loaded nor selected. A displayed page does not change before the user's eyes: a
-    /// displayed tab closed elsewhere stays there, in its place, until the user closes it.
+    /// displayed tab closed elsewhere stays there, in its place, until the user closes it. A favorite counts as
+    /// displayed when a window of another Space of the profile shows it (review ON4).
     func reconcile(tabs stored: [StoredTab], layout newLayout: SidebarLayout) {
-        let displayed = Set(viewers.flatMap(\.displayedTabIDs))
+        let displayed = Set(viewers.flatMap(\.displayedTabIDs)).union(layout.favorites.filter { displays.holder(of: $0) != nil })
         var target = newLayout
         for id in displayed where target.place(of: id) == nil {
             switch layout.place(of: id) {

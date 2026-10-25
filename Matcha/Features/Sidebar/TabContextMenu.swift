@@ -68,8 +68,7 @@ struct TabContextMenu: View {
                     }
                 }
             }
-            // A private window's tabs stay in it: its session is its own.
-            if !windowModel.session.isPrivate {
+            if windowModel.canOpenInNewWindow {
                 Button("Open in New Window") {
                     openWindow(id: MatchaApp.browserWindowID, value: windowModel.detachToNewWindow(tab))
                 }

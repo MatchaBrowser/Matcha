@@ -14,9 +14,12 @@ final class SpaceStore {
     private var pendingSave: Task<Void, Never>?
     /// True once the Space is deleted: nothing is saved anymore.
     private var isStopped = false
-    /// True if this Space holds its profile's favorites: otherwise they are neither written nor deleted
-    /// (`BrowserSession+Favorites`). Always true outside a session (tests).
+    /// True if this Space saves its profile's favorites, the same in each of its Spaces: otherwise they are neither
+    /// written nor deleted here (`BrowserSession+Favorites`). Always true outside a session (tests).
     var savesFavorites: () -> Bool = { true }
+    /// Tabs of the windows of their own tabs that came from this Space (`WindowTabs`): saved at the top of its today
+    /// tabs as long as their window is open, so that a crash doesn't lose them (review ON7). None outside a session.
+    var windowTabs: () -> [StoredTab] = { [] }
     /// Navigation state last read or written for each tab: an unchanged one isn't written again (audit R8).
     private var savedStates: [UUID: Data?] = [:]
 
@@ -75,6 +78,7 @@ final class SpaceStore {
         withObservationTracking {
             _ = manager.layout
             _ = manager.storedTabs()
+            _ = windowTabs()
         } onChange: { [weak self, weak manager] in
             Task { @MainActor in
                 guard let self, let manager else {
@@ -93,7 +97,21 @@ final class SpaceStore {
         guard !isStopped else {
             return
         }
-        save(tabs: manager.storedTabs(), layout: manager.layout)
+        let (tabs, layout) = content(of: manager)
+        save(tabs: tabs, layout: layout)
+    }
+
+    /// The tabs of `manager` to save, with those of the windows of their own tabs at the top of the today tabs.
+    private func content(of manager: TabManager) -> (tabs: [StoredTab], layout: SidebarLayout) {
+        let detached = windowTabs()
+        guard !detached.isEmpty else {
+            return (manager.storedTabs(), manager.layout)
+        }
+        var layout = manager.layout
+        for (index, tab) in detached.enumerated() {
+            layout.insertToday(tab.id, at: index)
+        }
+        return (detached + manager.storedTabs(), layout)
     }
 
     /// Stops saving anything (Space deleted).
@@ -200,7 +218,12 @@ final class SpaceStore {
         (space.tabs ?? []) + (space.profile?.favorites ?? [])
     }
 
+    /// Record of a tab that is new to this Space: the one it had elsewhere (a favorite or a tab coming from another
+    /// Space, whose Space may save later: never two records for one tab), otherwise a new one.
     private func insertedTab(id: UUID) -> TabRecord {
+        if let existing = try? context.fetch(FetchDescriptor<TabRecord>(predicate: #Predicate { $0.id == id })).first {
+            return existing
+        }
         let record = TabRecord(id: id)
         context.insert(record)
         return record

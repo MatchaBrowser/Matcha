@@ -15,6 +15,9 @@ nonisolated struct PageLoadError: Equatable, Sendable {
         case certificate
         /// The website wants a user name and password that weren't given.
         case loginRequired
+        /// A local file the app can't read: moved, or chosen before a relaunch outside the Downloads folder, which macOS
+        /// only lets the app read until it quits (review ON14).
+        case fileUnreadable
         case other
     }
 
@@ -41,6 +44,15 @@ nonisolated struct PageLoadError: Equatable, Sendable {
         code = error.code
         detail = error.localizedDescription
         kind = error.domain == NSURLErrorDomain ? Self.kind(ofURLError: error.code) : .other
+    }
+
+    /// The local file `url` can't be read by the app.
+    init(unreadableFile url: URL) {
+        self.url = url
+        domain = NSCocoaErrorDomain
+        code = NSFileReadNoPermissionError
+        detail = ""
+        kind = .fileUnreadable
     }
 
     private static func isSilent(_ error: NSError) -> Bool {

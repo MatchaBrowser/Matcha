@@ -55,6 +55,9 @@ final class SyncRecordWriter {
         case let .webExtension(fields):
             extensions?.apply(fields)
             return true
+        case .deviceTabs:
+            // Never applied: shown as received, from the sync state (`OtherMacsTabs`, `SYNC.md` § 2.4).
+            return true
         }
     }
 
@@ -98,6 +101,10 @@ final class SyncRecordWriter {
 
     /// The tab is written once its profile (favorite) or its Space, and its folder, are found (`TabRecord.apply`).
     private func upsertTab(_ id: UUID, _ fields: SyncTabFields) -> Bool {
+        // A today tab of an older version (`SYNC.md` § 2.4): ignored, even for a favorite or a pinned tab of this Mac.
+        guard fields.place != .today else {
+            return true
+        }
         let place = fields.place.tabPlace
         let profile = place == .favorite ? fields.profileId.flatMap { profiles[$0] } : nil
         let space = place == .favorite ? nil : fields.spaceId.flatMap { spaces[$0] }

@@ -103,7 +103,7 @@ final nonisolated class SyncAPIClient: Sendable {
     /// `SyncServerError` read from an error answer.
     static func error(from data: Data, response: HTTPURLResponse) -> SyncServerError {
         let problem = try? JSONDecoder().decode(SyncProblem.self, from: data)
-        let retryAfter = response.value(forHTTPHeaderField: "Retry-After").flatMap(TimeInterval.init)
+        let retryAfter = SyncRetryAfter.seconds(from: response.value(forHTTPHeaderField: "Retry-After"))
         let fallback = response.statusCode >= 500 ? SyncServerError.serverError : SyncServerError.invalidRequest
         return SyncServerError(status: response.statusCode, code: problem?.code ?? fallback, retryAfter: retryAfter)
     }

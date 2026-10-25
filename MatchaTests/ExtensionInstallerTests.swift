@@ -122,6 +122,40 @@ struct ExtensionInstallerTests {
         installer.discard(fake)
     }
 
+    /// Review EX2: the package of an extension installed here, offered by another Mac, keeps its identifier and data.
+    @Test func `an offer for an installed extension updates it in place, even unsigned`() async throws {
+        defer { cleanUp() }
+        let first = try await installer.prepare(fileAt: fixture("test-extension-package.crx"))
+        try await installer.install(first, allowsPrivateWindows: true)
+
+        let offer = try await installer.prepare(fileAt: fixture("test-extension-package.xpi"), preferredIdentifier: first.identifier)
+        #expect(offer.identifier == first.identifier)
+        #expect(offer.mode == .update(previousVersion: first.webExtension.version))
+        #expect(offer.allowedPrivateWindows)
+        try await installer.install(offer, allowsPrivateWindows: true)
+        #expect(manager.installedIdentifiers == [first.identifier])
+        #expect(manager.contexts[first.identifier]?.isLoaded == true)
+        #expect(store.state(for: first.identifier)?.hasAccessToPrivateData == true)
+    }
+
+    /// Review EX2: an offered `.crx` signed by another publisher than the installed extension's still replaces it.
+    @Test func `an offer signed by another publisher replaces the installed extension`() async throws {
+        defer { cleanUp() }
+        let archive = try Data(contentsOf: fixture("test-extension-package.zip"))
+        try FileManager.default.createDirectory(at: root, withIntermediateDirectories: true)
+        let signed = root.appendingPathComponent("signed.crx")
+        try CRXBuilder.crx(archive: archive, developer: CRXBuilder.Developer()).write(to: signed)
+        let first = try await installer.prepare(fileAt: signed)
+        try await installer.install(first, allowsPrivateWindows: false)
+
+        let impostor = root.appendingPathComponent("impostor.crx")
+        try CRXBuilder.crx(archive: archive, developer: CRXBuilder.Developer()).write(to: impostor)
+        let offer = try await installer.prepare(fileAt: impostor, preferredIdentifier: first.identifier)
+        #expect(offer.identifier != first.identifier)
+        #expect(offer.mode == .replacement(identifier: first.identifier, previousVersion: first.webExtension.version))
+        installer.discard(offer)
+    }
+
     @Test func `an unpacked folder is copied, the original stays`() async throws {
         defer { cleanUp() }
         let source = try TestExtension.makeFolder(in: root)

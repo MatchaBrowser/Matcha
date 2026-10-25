@@ -12,6 +12,7 @@ nonisolated enum SyncFields: Equatable, Sendable {
     case setting(SyncSettingFields)
     case sitePermission(SyncSitePermissionFields)
     case siteZoom(SyncSiteZoomFields)
+    case deviceTabs(SyncDeviceTabsFields)
 
     var type: SyncRecordType {
         switch self {
@@ -23,6 +24,7 @@ nonisolated enum SyncFields: Equatable, Sendable {
         case .setting: .setting
         case .sitePermission: .sitePermission
         case .siteZoom: .siteZoom
+        case .deviceTabs: .deviceTabs
         }
     }
 
@@ -37,6 +39,7 @@ nonisolated enum SyncFields: Equatable, Sendable {
         case let .setting(fields): try? .encoding(fields)
         case let .sitePermission(fields): try? .encoding(fields)
         case let .siteZoom(fields): try? .encoding(fields)
+        case let .deviceTabs(fields): try? .encoding(fields)
         }
         return value ?? .emptyObject
     }
@@ -53,6 +56,7 @@ nonisolated enum SyncFields: Equatable, Sendable {
         case .setting: (try? json.decoded(as: SyncSettingFields.self)).flatMap { $0.isValid ? .setting($0) : nil }
         case .sitePermission: (try? json.decoded(as: SyncSitePermissionFields.self)).flatMap { $0.isValid ? .sitePermission($0) : nil }
         case .siteZoom: (try? json.decoded(as: SyncSiteZoomFields.self)).flatMap { $0.isValid ? .siteZoom($0) : nil }
+        case .deviceTabs: (try? json.decoded(as: SyncDeviceTabsFields.self)).map(SyncFields.deviceTabs)
         }
         guard let fields else {
             return nil
@@ -63,7 +67,7 @@ nonisolated enum SyncFields: Equatable, Sendable {
     /// Parent the record needs (profile, Space, folder), if it has one.
     var parentIDs: [UUID] {
         switch self {
-        case .profile, .webExtension, .setting, .siteZoom: []
+        case .profile, .webExtension, .setting, .siteZoom, .deviceTabs: []
         case let .space(fields): [fields.profileId]
         case let .folder(fields): [fields.spaceId, fields.parentId].compactMap(\.self)
         case let .tab(fields): [fields.profileId, fields.spaceId, fields.folderId].compactMap(\.self)

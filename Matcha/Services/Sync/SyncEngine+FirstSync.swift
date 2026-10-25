@@ -77,8 +77,9 @@ extension SyncEngine {
         for (id, fields) in before where !liveIDs.contains(id) {
             if Self.replaceableTypes.contains(fields.type) {
                 deletions.append(.delete(id, fields.type))
-            } else {
-                // Kept on this Mac without being sent: its reference is its current state.
+            } else if fields.type != .deviceTabs {
+                // Kept on this Mac without being sent: its reference is its current state. This Mac's tabs leave as a
+                // creation.
                 var entry = state.entries[id] ?? SyncEntry(type: fields.type.rawValue)
                 entry.local = fields.json
                 state.entries[id] = entry
@@ -88,12 +89,14 @@ extension SyncEngine {
     }
 
     /// Queues the deletion of what is synced but not on this Mac, except the records it must never touch (unreadable,
-    /// unknown type, newer format); the rest of this Mac will be sent as creations, newer than everything that was read
-    /// (`detectLocalChanges`).
+    /// unknown type, newer format; the tabs of the other Macs and the today tabs of an older version: `SYNC.md` § 2.4);
+    /// the rest of this Mac will be sent as creations, newer than everything that was read (`detectLocalChanges`).
     private func replaceRemoteData(liveIDs: [UUID]) throws {
         let local = try store.snapshot()
         for id in liveIDs where local[id] == nil {
-            guard let entry = state.entries[id], !entry.isIgnored, let type = entry.remote?.recordType else {
+            guard let entry = state.entries[id], !entry.isIgnored, let type = entry.remote?.recordType, type != .deviceTabs,
+                  !SyncLegacyTodayTabs.isTodayTab(entry.remote?.fields, type: entry.type)
+            else {
                 continue
             }
             let deletion = SyncContent.deletion(

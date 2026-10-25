@@ -51,10 +51,15 @@ struct SpaceThemeEditor: View {
         .accessibilityIdentifier("themePreset")
     }
 
+    /// Checks `index` both ways: after “Remove Color”, a picker still linked to the system color panel can read or write
+    /// the removed color (review ON15).
     private func colorBinding(at index: Int) -> Binding<Color> {
         Binding {
-            theme.colors[index].color
+            theme.colors.indices.contains(index) ? theme.colors[index].color : .clear
         } set: { color in
+            guard theme.colors.indices.contains(index) else {
+                return
+            }
             var colors = theme.colors
             colors[index] = ThemeColor(color)
             setColors(colors)

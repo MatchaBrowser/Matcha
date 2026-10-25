@@ -9,6 +9,8 @@ struct BrowserCommands: Commands {
     let shortcuts: MenuShortcutStore
     /// Tab shown by the Settings window (Help > Keyboard Shortcuts).
     let settingsSelection: SettingsSelection
+    /// History > Tabs from Your Other Macs.
+    let otherMacs: OtherMacsTabs
     @FocusedValue(\.tabManager) private var tabManager
     @FocusedValue(\.windowActions) private var windowActions
     @Environment(\.openWindow) private var openWindow
@@ -119,7 +121,7 @@ struct BrowserCommands: Commands {
                 if let mini = miniWindow {
                     mini.close()
                 } else {
-                    NSApp.keyWindow?.performClose(nil)
+                    WindowChrome.close(NSApp.keyWindow)
                 }
             }
             .keyboardShortcut(shortcuts.keyboardShortcut(for: .closeWindow))
@@ -197,7 +199,7 @@ struct BrowserCommands: Commands {
             TabCommands(miniWindows: miniWindows)
 
             // History menu: Homepage, Back, Forward, “Show All History” (task 5.5).
-            HistoryCommands(miniWindows: miniWindows, shortcuts: shortcuts)
+            HistoryCommands(miniWindows: miniWindows, shortcuts: shortcuts, otherMacs: otherMacs)
 
             // Help menu: Matcha's site and a problem report (audit H1).
             HelpCommands(miniWindows: miniWindows, settingsSelection: settingsSelection)
@@ -234,7 +236,7 @@ struct BrowserCommands: Commands {
                 tabManager.close(tab)
             }
         } else {
-            NSApp.keyWindow?.performClose(nil)
+            WindowChrome.close(NSApp.keyWindow)
         }
     }
 }

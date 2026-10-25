@@ -51,12 +51,10 @@ struct SyncRecordFieldsTests {
         let folder = inserted(FolderRecord(name: "Dossier"))
         folder.apply(SyncFolderFields(name: "Dossier", order: 0, isCollapsed: false, spaceId: space.id), space: space, parent: nil)
         let url = try #require(URL(string: "https://example.com/page"))
-        let date = Date(timeIntervalSince1970: 1_800_000_000)
 
         let favorite = SyncTabFields(place: .favorite, url: url, title: "Favori", order: 0, profileId: profile.id)
         let pinned = SyncTabFields(place: .pinned, url: url, title: "Épinglé", order: 1, spaceId: space.id, folderId: folder.id)
-        let today = SyncTabFields(place: .today, url: url, title: "Du jour", order: 2, spaceId: space.id, lastActivity: date)
-        for fields in [favorite, pinned, today] {
+        for fields in [favorite, pinned] {
             let tab = inserted(TabRecord())
             tab.apply(
                 fields,
@@ -67,6 +65,10 @@ struct SyncRecordFieldsTests {
             )
             #expect(tab.syncFields == fields, "\(fields.place)")
         }
+        // A today tab stays on this Mac (`SYNC.md` § 2.4).
+        let today = inserted(TabRecord(url: url, place: .today))
+        today.space = space
+        #expect(today.syncFields == nil)
     }
 
     @Test func `a pinned tab that left its origin keeps its page`() throws {

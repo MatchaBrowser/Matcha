@@ -38,4 +38,18 @@ struct CRXSignatureTests {
         #expect(CRXSignature.verifiedPublisher(of: Data("Cr24".utf8) + Data([2, 0, 0, 0, 4, 0, 0, 0, 1, 2, 3, 4])) == nil)
         #expect(ProtobufFields([0x0A, 0x05, 0x01]) == nil)
     }
+
+    /// Hostile headers (review EX1): a length beyond `Int.max`, a length that would overflow, truncated fixed fields.
+    @Test(arguments: [
+        [0x12, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0x01],
+        [0x12, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0x7F],
+        [0x09, 0x01, 0x02],
+        [0x0D, 0x01],
+    ] as [[UInt8]])
+    func `a hostile protobuf message is refused without crashing`(message: [UInt8]) {
+        #expect(ProtobufFields(message) == nil)
+        let header = Data(message)
+        let file = Data("Cr24".utf8) + Data([3, 0, 0, 0, UInt8(header.count), 0, 0, 0]) + header + archive
+        #expect(CRXSignature.verifiedPublisher(of: file) == nil)
+    }
 }

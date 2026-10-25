@@ -26,18 +26,24 @@ struct TabDragOutModifier: ViewModifier {
     /// Nothing took the tab: if it was dropped outside the app's windows (desktop, another app), a new window opens
     /// where it was dropped.
     private func openInNewWindowIfOutside() {
-        guard let windowModel, !windowModel.session.isPrivate,
-              windowModel.windowTabs == nil || windowModel.tabManager.tabs.count > 1
-        else {
+        guard let windowModel, windowModel.canOpenInNewWindow else {
             return
         }
         let point = NSEvent.mouseLocation
-        guard !NSApp.windows.contains(where: { $0.isVisible && $0.frame.contains(point) }) else {
+        // The front window under the pointer, on this desktop, whichever app it belongs to (review ON21): one of
+        // this app's windows took the drop, or refused it.
+        let front = NSWindow.windowNumber(at: point, belowWindowWithWindowNumber: 0)
+        guard NSApp.window(withWindowNumber: front) == nil else {
             return
         }
         var state = windowModel.detachToNewWindow(tab)
-        // The pointer lands on the new window's sidebar, near its top.
-        state.origin = CGPoint(x: point.x - 60, y: point.y + 16)
+        state.origin = Self.windowOrigin(forDropAt: point)
         openWindow(id: MatchaApp.browserWindowID, value: state)
+    }
+
+    /// Top left corner of the new window for a tab dropped at `point`: the pointer lands in its sidebar, under the band
+    /// of the window buttons (`SidebarTopBar.height`), not on the green button (review ON21).
+    nonisolated static func windowOrigin(forDropAt point: CGPoint) -> CGPoint {
+        CGPoint(x: point.x - 60, y: point.y + 48)
     }
 }

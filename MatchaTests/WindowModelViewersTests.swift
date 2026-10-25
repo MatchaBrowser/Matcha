@@ -114,4 +114,18 @@ struct WindowModelViewersTests {
         miniWindows.unlinkMainWindow(first)
         #expect(miniWindows.mainWindow?.windowModel === second)
     }
+
+    /// Review ON13: a window opened in the background by a page goes to the window that shows the page; it is never
+    /// selected in another window showing the Space.
+    @Test func `a window opened in the background by a page is never selected in another window`() throws {
+        let tab = tabManager.newTab()
+        let second = openSecondWindow()
+        second.activate()
+        #expect(second.selectedTab == nil)
+        let webView = try #require(tab.webView)
+        _ = tabManager.openWindow(configuration: webView.configuration, from: webView, inBackground: true)
+        #expect(second.selectedTab == nil)
+        #expect(first.selectedTab === tab)
+        #expect(tabManager.todayTabs.count == 2)
+    }
 }

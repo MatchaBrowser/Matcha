@@ -86,6 +86,35 @@ struct WindowTabsTests {
         #expect(space.tabManager.place(of: tab) == .today)
     }
 
+    /// Review ON5: the Space the tabs came from is deleted while their window is open.
+    @Test func `when their Space is deleted, the tabs go back to the first Space of their profile`() throws {
+        let other = session.addSpace(inProfileOf: space)
+        let window = open(BrowserWindowState(spaceID: other.id))
+        let tab = other.tabManager.newTab()
+        let detached = open(window.detachToNewWindow(tab))
+        let tabs = try #require(detached.windowTabs)
+        session.deleteSpace(other)
+        #expect(session.originSpace(of: tabs) === space)
+
+        session.returnWindowTabs()
+        #expect(session.windowTabs.isEmpty)
+        // Same profile: the same tab, moved, not recreated.
+        #expect(space.tabManager.tab(withID: tab.id) === tab)
+        #expect(space.tabManager.place(of: tab) == .today)
+    }
+
+    /// Review ON5: closing the window of a deleted Space still lets ⇧⌘T bring its tabs back.
+    @Test func `when their Space is deleted, closing the window keeps its tabs for reopening`() {
+        let other = session.addSpace(inProfileOf: space)
+        let window = open(BrowserWindowState(spaceID: other.id))
+        let tab = other.tabManager.newTab(url: URL(string: "about:blank"))
+        let detached = open(window.detachToNewWindow(tab))
+        session.deleteSpace(other)
+        detached.windowDidClose()
+        #expect(session.windowTabs.isEmpty)
+        #expect(space.tabManager.closedTabs.lastCount == 1)
+    }
+
     @Test func `a restored window whose tabs are gone shows its Space`() {
         let window = open(BrowserWindowState(spaceID: space.id, windowTabsID: UUID()))
         #expect(window.windowTabs == nil)

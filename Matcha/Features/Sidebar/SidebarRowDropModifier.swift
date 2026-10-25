@@ -1,3 +1,4 @@
+import AppKit
 import SwiftUI
 import UniformTypeIdentifiers
 
@@ -54,10 +55,14 @@ struct SidebarRowDropModifier: ViewModifier {
             show(nil)
         }
 
-        /// The item's data is read after the drop, as `dropDestination` does.
+        /// An item of this app is already on the drag pasteboard: the answer is the action's, so a refused item goes
+        /// back to its place (review ON20). Otherwise its data is read after the drop, as `dropDestination` does.
         func performDrop(info: DropInfo) -> Bool {
             let target = drop.destination(for: part(under: info))
             show(nil)
+            if let data = NSPasteboard(name: .drag).data(forType: BrowserWebView.sidebarItemType), let item = SidebarDragItem(data: data) {
+                return action.perform(item, at: target)
+            }
             guard let provider = info.itemProviders(for: [.matchaSidebarItem]).first else {
                 return false
             }

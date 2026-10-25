@@ -7,9 +7,11 @@ import UniformTypeIdentifiers
 enum OpenFilePanel {
     static let contentTypes: [UTType] = [.html, .webArchive, .pdf, .image, .svg, .plainText, .xml, .json]
 
-    static func choose(completion: @escaping @MainActor ([URL]) -> Void) {
+    /// `directory`: the folder shown first (a file to choose again, review ON14).
+    static func choose(in directory: URL? = nil, multiple: Bool = true, completion: @escaping @MainActor ([URL]) -> Void) {
         let panel = NSOpenPanel()
-        panel.allowsMultipleSelection = true
+        panel.directoryURL = directory
+        panel.allowsMultipleSelection = multiple
         panel.canChooseDirectories = false
         panel.allowedContentTypes = contentTypes
         let handler: (NSApplication.ModalResponse) -> Void = { response in

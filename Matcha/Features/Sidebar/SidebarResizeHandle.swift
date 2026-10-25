@@ -7,7 +7,9 @@ struct SidebarResizeHandle: View {
     @Binding var width: Double
 
     /// Width at the start of the current drag.
-    @State private var startWidth: Double?
+    @State private var drag = ResizeDrag<Double>()
+    /// Reset by SwiftUI at the end of a drag, even a cancelled one, unlike `onEnded` (review ON25).
+    @GestureState private var isDragging = false
 
     var body: some View {
         Color.clear
@@ -16,13 +18,18 @@ struct SidebarResizeHandle: View {
             .pointerStyle(.frameResize(position: .trailing))
             .gesture(
                 DragGesture(minimumDistance: 1, coordinateSpace: .global)
-                    .onChanged { drag in
-                        let start = startWidth ?? width
-                        startWidth = start
-                        width = SidebarMetrics.clampedWidth(start + drag.translation.width)
+                    .updating($isDragging) { _, dragging, _ in
+                        dragging = true
                     }
-                    .onEnded { _ in startWidth = nil },
+                    .onChanged { value in
+                        width = SidebarMetrics.clampedWidth(drag.begin(at: width) + value.translation.width)
+                    },
             )
+            .onChange(of: isDragging) { _, dragging in
+                if !dragging {
+                    drag.end()
+                }
+            }
             .accessibilityElement()
             .accessibilityLabel("Sidebar width")
             .accessibilityIdentifier("sidebarResizeHandle")

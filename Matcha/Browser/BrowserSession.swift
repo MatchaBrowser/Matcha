@@ -56,8 +56,10 @@ final class BrowserSession {
     private(set) var profiles: [ProfileRecord] = []
     /// Data store (cookies, storage) of each profile, by profile identifier.
     @ObservationIgnored private var dataStores: [UUID: WKWebsiteDataStore] = [:]
-    /// Space that holds the favorites of each profile (`BrowserSession+Favorites`).
-    @ObservationIgnored var favoritesHolders: [UUID: WeakTabManager] = [:]
+    /// Favorites of each profile, shared by its Spaces (`BrowserSession+Favorites`).
+    @ObservationIgnored var profileFavorites: [UUID?: ProfileFavorites] = [:]
+    /// Which window shows each tab, for all the Spaces and windows of the session (review ON2).
+    @ObservationIgnored let displays = TabDisplayRegistry()
     /// Tabs of the windows that show no Space (`BrowserSession+WindowTabs`); observed: tab sleeping follows them.
     var windowTabs: [WindowTabs] = []
     @ObservationIgnored private var terminationObserver: (any NSObjectProtocol)?
@@ -70,6 +72,8 @@ final class BrowserSession {
         var services = appServices
         if isPrivate {
             services.favicons = FaviconService(directory: nil)
+            // A private window shows nothing of the other Macs.
+            services.otherMacs = nil
         }
         self.services = services
         faviconService = services.favicons
@@ -196,22 +200,34 @@ final class BrowserSession {
         spaces.append(space)
     }
 
-    /// The Space's tabs follow the session's tab sleeping and blocker, and open their sign-in windows in it.
+    /// The Space's tabs follow the session's tab sleeping and blocker, open their sign-in windows in it, are shown by
+    /// its windows (`displays`), and share their profile's favorites with its other Spaces.
     private func connect(_ space: SpaceSession) {
         space.tabManager.lifecycle = tabLifecycle
         space.tabManager.popupWindows = popupWindows
         space.tabManager.contentBlocking = contentBlocking
-        // Only the Space that holds the profile's favorites saves them.
+        space.tabManager.displays = displays
+        favorites(of: space.openedProfileID).join(space.tabManager)
+        // Only one Space of the profile saves its favorites.
         space.store.savesFavorites = { [weak self, weak space] in
             guard let self, let space else {
                 return false
             }
-            return holdsFavorites(space)
+            return savesFavorites(space)
+        }
+        // The windows of their own tabs that came from it are saved with it (review ON7).
+        space.store.windowTabs = { [weak self, weak space] in
+            guard let self, let space else {
+                return []
+            }
+            return windowTabs.filter { originSpace(of: $0) === space }.flatMap { $0.tabManager.storedTabs() }
         }
     }
 
+    /// The Space leaves the session; the next Space of its profile saves the favorites from now on.
     func removeSpace(_ space: SpaceSession) {
         spaces.removeAll { $0 === space }
+        profileFavorites[space.openedProfileID]?.leave(space.tabManager)
     }
 
     /// Sorts the Spaces in the order of their records (equal ranks: the identifier breaks the tie).

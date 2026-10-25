@@ -19,7 +19,8 @@ nonisolated struct ProtobufFields {
             case 1:
                 index += 8
             case 2:
-                guard let length = Self.varint(bytes, &index).map(Int.init), length >= 0, index + length <= bytes.count else {
+                // Compared to what is left: a length near `Int.max` must neither trap nor overflow (review EX1).
+                guard let length = Self.varint(bytes, &index).flatMap({ Int(exactly: $0) }), length <= bytes.count - index else {
                     return nil
                 }
                 fields[field, default: []].append(Array(bytes[index ..< index + length]))

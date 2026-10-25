@@ -30,7 +30,11 @@ struct MiniWindowView: View {
                 siteZooms: manager.siteZooms,
                 close: controller.close,
                 editAddress: { controller.showCommandBar(.editAddress) },
-                openInSpace: { manager.openInSpace(controller) { openWindow(id: MatchaApp.browserWindowID) } },
+                openInSpace: {
+                    manager.openInSpace(controller) {
+                        manager.reopenMainWindow { openWindow(id: MatchaApp.browserWindowID) }
+                    }
+                },
             )
             page
                 .background(.background)

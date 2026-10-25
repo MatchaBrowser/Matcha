@@ -14,7 +14,9 @@ extension SyncRecordWriter {
         case .folder:
             deleteFolder(id)
         case .tab:
-            if let record = tabs.removeValue(forKey: id) {
+            // A today tab stays on this Mac (`SYNC.md` § 2.4): only a favorite or a pinned tab is deleted elsewhere.
+            if let record = tabs[id], record.place != .today {
+                tabs[id] = nil
                 touch(record)
                 context.delete(record)
             }
@@ -22,6 +24,8 @@ extension SyncRecordWriter {
             deletePreference(id, type)
         case .webExtension:
             deleteExtension(id)
+        case .deviceTabs:
+            break
         }
     }
 

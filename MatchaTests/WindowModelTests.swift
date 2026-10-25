@@ -241,4 +241,18 @@ struct WindowModelTests {
         #expect(pasteboard.string(forType: .string) == "about:blank?menu")
         #expect(model.copyConfirmation.isVisible)
     }
+
+    /// Review ON19: the floating sidebar stays while the pointer is in one of its presentations.
+    @Test func `the floating sidebar stays while one of its presentations is open`() {
+        let model = WindowModel(session: session, defaults: nil)
+        #expect(!model.holdsFloatingSidebar)
+        model.deletedSpace = model.space
+        #expect(model.holdsFloatingSidebar)
+        model.deletedSpace = nil
+        model.tabManager.renamingFolderID = UUID()
+        #expect(model.holdsFloatingSidebar)
+        model.tabManager.renamingFolderID = nil
+        model.editedSpaceID = model.space.id
+        #expect(model.holdsFloatingSidebar)
+    }
 }

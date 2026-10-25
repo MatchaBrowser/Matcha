@@ -76,7 +76,7 @@ struct BrowserWindowView: View {
 
     /// Hidden sidebar shown: hovered. The downloads panel is part of it: it reappears with it.
     private var isFloatingSidebarShown: Bool {
-        !isSidebarVisible && isFloatingSidebarHovered
+        !isSidebarVisible && (isFloatingSidebarHovered || model.holdsFloatingSidebar)
     }
 
     /// Hidden sidebar reduced to a column of icons (setting), under a bar with the window's buttons.
@@ -87,6 +87,16 @@ struct BrowserWindowView: View {
     /// As in Arc, the window's buttons disappear with the sidebar; the column of icons keeps them, in its bar.
     private var showsWindowButtons: Bool {
         isSidebarVisible || isFloatingSidebarShown || showsCompactSidebar
+    }
+
+    /// Width hidden by the floating sidebar (`floatingWidth`, nil when it isn't shown) at the start of the card, where a
+    /// tab dropped doesn't join a split: the card starts after the column of icons in that mode (review ON22), after
+    /// its margin otherwise.
+    static func splitDropInset(floatingWidth: Double?, showsCompactSidebar: Bool) -> Double {
+        guard let floatingWidth else {
+            return 0
+        }
+        return max(0, floatingWidth - (showsCompactSidebar ? CompactSidebar.width : cardMargin))
     }
 
     /// Margins of the card: none on the side of the sidebar, nor under the bar of the column of icons.
@@ -161,7 +171,7 @@ struct BrowserWindowView: View {
         }
         .onChange(of: model.hasNoOwnTabsLeft) { _, isEmpty in
             if isEmpty {
-                window?.performClose(nil)
+                WindowChrome.close(window)
             }
         }
         // “Move to…”: the window shows a Space from now on.
@@ -200,14 +210,14 @@ struct BrowserWindowView: View {
         // “Clear…” in the site settings (task 5.2): the alert belongs to the window.
         .modifier(SiteDataClearConfirmation(model: model))
         .modifier(ArcImportPresenter(model: model))
-        // Questions of sync (first sync, mass deletion…), answered in the main window.
-        .asksSyncQuestions()
+        // Questions of sync (first sync, mass deletion…), asked once: in the last active window, never a private one.
+        .asksSyncQuestions(miniWindows?.asksSyncQuestions(in: model) == true)
         // Mini windows send their pages to this window (task 4.5).
-        .linkedToMiniWindows(session: session, model: model, window: window) { [commandBar] in commandBar.dismiss() }
+        .linkedToMiniWindows(session: session, model: model, window: window) { [weak commandBar] in commandBar?.dismiss() }
         // Window and tabs as seen by extensions (task 6.3).
         .seenByExtensions(model: model, window: window)
         // Edit > Find on the front page (audit H1).
-        .findsInPages(model: model, window: window) { [commandBar] in commandBar.dismiss() }
+        .findsInPages(model: model, window: window) { [weak commandBar] in commandBar?.dismiss() }
         .environment(model)
         // The sidebar's rows show this window's selection.
         .environment(model.viewer)
@@ -225,7 +235,7 @@ struct BrowserWindowView: View {
             goHome: homeButtonAction,
             editAddress: editAddress,
             // The floating sidebar covers the start of the card: the split drop zone starts after it.
-            dropInset: isFloatingSidebarShown ? max(0, width - Self.cardMargin) : 0,
+            dropInset: Self.splitDropInset(floatingWidth: isFloatingSidebarShown ? width : nil, showsCompactSidebar: showsCompactSidebar),
         )
         // At the bottom: the top of the card hosts the address bar (setting) and, higher up, the command bar.
         .overlay(alignment: .bottom) { CopyConfirmationView(model: model.copyConfirmation) }

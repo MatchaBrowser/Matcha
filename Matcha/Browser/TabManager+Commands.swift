@@ -25,11 +25,10 @@ extension TabManager {
     /// `anchor` (at the top without one).
     @discardableResult
     func insertCopy(of tab: BrowserTab, after anchor: BrowserTab?, select: Bool) -> BrowserTab {
-        // Same configuration: same profile. The interaction state carries the back/forward history; that of a
-        // sleeping tab (task 5.6) is its kept state.
+        // Same configuration: same profile. The interaction state carries the back/forward history; that of a tab
+        // without a web view (asleep, task 5.6; restored and never shown, review ON11) is its kept state.
         let copy = insertTab(configuration: tab.configuration, after: anchor, select: select)
-        let suspendedState = tab.suspension.isSuspended ? tab.savedInteractionState : nil
-        if let state = tab.webView?.interactionState ?? suspendedState {
+        if let state = tab.webView?.interactionState ?? tab.savedInteractionState {
             copy.webView?.interactionState = state
         } else if let url = tab.url {
             copy.load(url)

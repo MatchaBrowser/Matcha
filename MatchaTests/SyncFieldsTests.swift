@@ -15,16 +15,15 @@ struct SyncFieldsTests {
         try SyncCoding.decoder().decode(SyncJSON.self, from: Data(text.utf8))
     }
 
-    private func emptyTodayTab() -> SyncTabFields {
-        SyncTabFields(place: .today, url: nil, title: nil, order: 0, profileId: nil, spaceId: space, folderId: nil, lastActivity: nil)
+    private func emptyPinnedTab() -> SyncTabFields {
+        SyncTabFields(place: .pinned, url: nil, title: nil, order: 0, profileId: nil, spaceId: space, folderId: nil)
     }
 
     private func sidebarFields() throws -> [SyncFields] {
         let theme = SpaceTheme(name: "matcha", colors: [.white, .black])
-        var tab = emptyTodayTab()
+        var tab = emptyPinnedTab()
         tab.url = URL(string: "https://example.com/a?b=1")
         tab.title = "Exemple"
-        tab.lastActivity = SyncCoding.date(milliseconds: 1_760_000_000_123)
         return [
             .profile(SyncProfileFields(name: "Personnel", order: 0)),
             .space(SyncSpaceFields(name: "Perso", symbol: "emoji:🍵", theme: theme, order: 2, profileId: profile)),
@@ -39,7 +38,7 @@ struct SyncFieldsTests {
                 backgroundColor: nil,
             )),
             .tab(tab),
-            .tab(emptyTodayTab()),
+            .tab(emptyPinnedTab()),
         ]
     }
 
@@ -170,19 +169,5 @@ struct SyncFieldsTests {
         #expect(SyncedSettings.defaultsValue(of: .number(60)) as? Int == 60)
         #expect(SyncedSettings.keys.contains("homePage"))
         #expect(!SyncedSettings.keys.contains("blocksAdsAndTrackers"))
-    }
-
-    @Test func `a today tab that only changed page waits to be stable`() {
-        let tab = emptyTodayTab()
-        var navigated = tab
-        navigated.url = URL(string: "https://example.com")
-        navigated.title = "Exemple"
-        #expect(navigated.differsOnlyByPage(from: tab))
-        var moved = navigated
-        moved.order = 4
-        #expect(!moved.differsOnlyByPage(from: tab))
-        var pinned = navigated
-        pinned.place = .pinned
-        #expect(!pinned.differsOnlyByPage(from: tab))
     }
 }

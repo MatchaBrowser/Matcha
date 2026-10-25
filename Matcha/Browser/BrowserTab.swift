@@ -284,6 +284,12 @@ final class BrowserTab: Identifiable {
 
     private func load(_ url: URL, in webView: WKWebView, from source: URL? = nil) {
         if url.isFileURL {
+            // Moved, or chosen before a relaunch outside the Downloads folder: WebKit would show nothing (review ON14).
+            guard FileManager.default.isReadableFile(atPath: url.path) else {
+                loadFailure.show(PageLoadError(unreadableFile: url), serverTrust: nil, certificateExceptions: nil)
+                keepFailedAddress(url)
+                return
+            }
             webView.loadFileURL(url, allowingReadAccessTo: FileReadAccess.readableURL(for: url, openedFrom: source))
         } else {
             webView.load(URLRequest(url: url))

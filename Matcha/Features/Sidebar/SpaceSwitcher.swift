@@ -5,8 +5,6 @@ import SwiftUI
 struct SpaceSwitcher: View {
     let model: WindowModel
 
-    @State private var renamedSpace: SpaceSession?
-    @State private var deletedSpace: SpaceSession?
     @State private var newName = ""
 
     var body: some View {
@@ -42,20 +40,20 @@ struct SpaceSwitcher: View {
             }
         }
         .frame(height: 28)
-        .alert("Rename Space", isPresented: Binding { renamedSpace != nil } set: {
+        .alert("Rename Space", isPresented: Binding { model.renamedSpace != nil } set: {
             if !$0 {
-                renamedSpace = nil
+                model.renamedSpace = nil
             }
         }) {
             TextField("Name", text: $newName)
             Button("Rename") {
-                if let renamedSpace {
+                if let renamedSpace = model.renamedSpace {
                     model.session.renameSpace(renamedSpace, to: newName)
                 }
             }
             Button("Cancel", role: .cancel) {}
         }
-        .modifier(SpaceDeletionAlert(model: model, space: $deletedSpace))
+        .modifier(SpaceDeletionAlert(model: model, space: Binding { model.deletedSpace } set: { model.deletedSpace = $0 }))
     }
 
     private func spaceButton(_ space: SpaceSession) -> some View {
@@ -114,14 +112,14 @@ struct SpaceSwitcher: View {
     @ViewBuilder private func menu(for space: SpaceSession) -> some View {
         Button("Rename…") {
             newName = space.record.name
-            renamedSpace = space
+            model.renamedSpace = space
         }
         Button("Edit Theme…") { model.editSpace(space) }
         Button("Change Icon…") { model.editSpace(space) }
         Divider()
         Button("Delete Space") {
             if SpaceDeletionAlert.closingTabCount(of: space) > 0 {
-                deletedSpace = space
+                model.deletedSpace = space
             } else {
                 withMotion(.easeInOut(duration: 0.3)) { model.deleteSpace(space) }
             }

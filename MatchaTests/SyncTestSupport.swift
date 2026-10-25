@@ -248,6 +248,9 @@ final class MemorySyncStore: SyncLocalStore {
         for change in changes {
             applied.append(change)
             switch change {
+            case let .upsert(_, .deviceTabs):
+                // Like `MatchaSyncStore`: the other Macs' tabs are only shown, never applied.
+                continue
             case let .upsert(id, fields):
                 if fields.parentIDs.contains(where: { items[$0] == nil }) {
                     waiting.insert(id)
@@ -306,23 +309,14 @@ final class SimulatedMac {
     }
 
     @discardableResult
-    func addTodayTab(in space: UUID, url: String? = nil, order: Double = 0) -> UUID {
+    func addPinnedTab(in space: UUID, url: String? = nil, order: Double = 0) -> UUID {
         let id = UUID()
-        store.items[id] = .tab(todayTab(in: space, url: url, order: order))
+        store.items[id] = .tab(pinnedTab(in: space, url: url, order: order))
         return id
     }
 
-    func todayTab(in space: UUID, url: String?, order: Double = 0) -> SyncTabFields {
-        SyncTabFields(
-            place: .today,
-            url: url.flatMap(URL.init(string:)),
-            title: url,
-            order: order,
-            profileId: nil,
-            spaceId: space,
-            folderId: nil,
-            lastActivity: nil,
-        )
+    func pinnedTab(in space: UUID, url: String?, order: Double = 0) -> SyncTabFields {
+        SyncTabFields(place: .pinned, url: url.flatMap(URL.init(string:)), title: url, order: order, spaceId: space)
     }
 
     func rename(_ id: UUID, to name: String) {

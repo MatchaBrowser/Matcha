@@ -18,8 +18,8 @@ struct ContentCard: View {
 
     /// Fractions during a drag of the divider: view state only, kept at the end.
     @State private var liveFractions: [Double]?
-    /// Widths at the start of the current drag.
-    @State private var dragStartWidths: [Double]?
+    /// Widths at the start of the current drag of a divider.
+    @State private var dividerDrag = ResizeDrag<[Double]>()
     @State private var dropTarget: SplitDropTarget?
     /// Receiver of tabs dropped on the pages, reconfigured on each render.
     @State private var dropController = SplitDropController()
@@ -70,7 +70,7 @@ struct ContentCard: View {
         }
         .onChange(of: split?.id) {
             liveFractions = nil
-            dragStartWidths = nil
+            dividerDrag.end()
         }
         // ⌘W, menus, split formed or undone, other Space: the selected page takes the keyboard back if nobody has
         // it.
@@ -117,8 +117,7 @@ struct ContentCard: View {
     private func divider(after index: Int, in split: SplitGroup, widths: [Double]) -> SplitDivider {
         SplitDivider(
             onDrag: { translation in
-                let start = dragStartWidths ?? widths
-                dragStartWidths = start
+                let start = dividerDrag.begin(at: widths)
                 liveFractions = SplitGeometry.fractions(draggingDivider: index, by: translation, startWidths: start)
             },
             onDragEnded: {
@@ -126,7 +125,7 @@ struct ContentCard: View {
                     tabManager.setSplitFractions(split.id, liveFractions)
                 }
                 liveFractions = nil
-                dragStartWidths = nil
+                dividerDrag.end()
             },
             onReset: { tabManager.setSplitFractions(split.id, SplitGroup.equalFractions(count: widths.count)) },
             onStep: { step in
@@ -143,12 +142,17 @@ struct ContentCard: View {
         dropController.leadingInset = dropInset
         dropController.canTakeTab = canTakeTab
         dropController.onTargetChange = { dropTarget = $0 }
+        // A tab of another window is refused (review ON20): it joins a split from this window's sidebar.
         dropController.onDrop = { id, target in
+            guard let tab = tabManager.tab(withID: id) else {
+                return false
+            }
             tabManager.activate(viewer)
-            guard let tab = tabManager.tab(withID: id), tabManager.openInSplit(tab, at: target.insertionIndex) else {
-                return
+            guard tabManager.openInSplit(tab, at: target.insertionIndex) else {
+                return false
             }
             TabActivation.activate(tab, in: tabManager)
+            return true
         }
     }
 

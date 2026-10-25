@@ -31,6 +31,10 @@ final class WindowModel {
     /// changing Space recreates the sidebar (`.id` of the Space), which would lose its state before opening the
     /// popover.
     var editedSpaceID: UUID?
+    /// Space being renamed, or whose deletion awaits confirmation (alerts of the sidebar footer): held here so that the
+    /// floating sidebar stays shown while they are open (review ON19).
+    var renamedSpace: SpaceSession?
+    var deletedSpace: SpaceSession?
     /// Import from Arc started from this window (task 7.1).
     let arcImport = ArcImportModel()
     /// Where to remember the last displayed Space, shown by the next new window; nil to remember nothing (tests).
@@ -229,5 +233,20 @@ final class WindowModel {
         }
         copyLink(url, to: pasteboard)
         return true
+    }
+}
+
+extension WindowModel {
+    /// The floating sidebar stays shown while one of its presentations is open (review ON19): the pointer leaves it
+    /// to use them (Space editor, folder customization and its color panel, renaming, alerts of a Space).
+    var holdsFloatingSidebar: Bool {
+        editedSpaceID != nil || customizedFolderID != nil || renamedSpace != nil || deletedSpace != nil
+            || tabManager.renamingFolderID != nil
+    }
+
+    /// A tab of this window can leave it for a window of its own (menu, drag out): never in a private window, whose
+    /// session is its own; nor the only tab of a window of its own tabs, which would close it (review ON18).
+    var canOpenInNewWindow: Bool {
+        !session.isPrivate && (windowTabs == nil || tabManager.tabs.count > 1)
     }
 }
