@@ -8,6 +8,8 @@ extension SitePermissionKind {
             String(localized: "Camera", comment: "Website permission: the camera")
         case .microphone:
             String(localized: "Microphone", comment: "Website permission: the microphone")
+        case .notifications:
+            String(localized: "Notifications", comment: "Website permission: sending notifications")
         }
     }
 
@@ -17,6 +19,8 @@ extension SitePermissionKind {
             "video"
         case .microphone:
             "mic"
+        case .notifications:
+            "bell"
         }
     }
 }

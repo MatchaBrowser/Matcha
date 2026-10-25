@@ -4,7 +4,8 @@ import WebKit
 /// Site permissions (task 5.2): camera and microphone. A decision remembered for the profile answers at once;
 /// otherwise the request waits in the banner of the page that made it (tab, Peek or mini window), with no timeout
 /// and no automatic answer. The key is the origin of the main page; the banner names the requesting frame if it is
-/// from another site. Location (macOS 27) and notifications: postponed, `DECISIONS.md`.
+/// from another site. Notifications go through the same banner (`+Notifications`); location (macOS 27): postponed,
+/// `DECISIONS.md`.
 extension NavigationCoordinator {
     /// `origin` is that of the main page (WebKit header: “The origin of the page”), `frame` the frame whose script
     /// makes the request.

@@ -56,6 +56,8 @@ struct MatchaApp: App {
         }
         // Edit > Find: the active mini window's page first.
         environment.pageFind.miniWindows = miniWindows
+        // Click on a website's notification: its page comes back to the front, wherever it is.
+        environment.pageNotifications.revealer = miniWindows
         _environment = State(initialValue: environment)
         _session = State(initialValue: session)
         _miniWindows = State(initialValue: miniWindows)

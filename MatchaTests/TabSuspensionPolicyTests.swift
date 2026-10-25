@@ -15,6 +15,7 @@ struct TabSuspensionPolicyTests {
         capture: Bool = false,
         audio: Bool = false,
         popup: Bool = false,
+        notifies: Bool = false,
     ) -> TabLifecycleCandidate {
         TabLifecycleCandidate(
             id: id,
@@ -24,6 +25,7 @@ struct TabSuspensionPolicyTests {
             isCapturingMedia: capture,
             isPlayingAudio: audio,
             hasOpenPopupWindow: popup,
+            canSendNotifications: notifies,
         )
     }
 
@@ -45,6 +47,8 @@ struct TabSuspensionPolicyTests {
         #expect(!TabSuspensionPolicy.isEligible(candidate(hiddenFor: 40, audio: true)))
         // Task 5.8: the originating page of an open sign-in window keeps its `window.opener` link.
         #expect(!TabSuspensionPolicy.isEligible(candidate(hiddenFor: 40, popup: true)))
+        // A website allowed to send notifications could no longer send any once asleep.
+        #expect(!TabSuspensionPolicy.isEligible(candidate(hiddenFor: 40, notifies: true)))
     }
 
     @Test func `inactivity takes tabs hidden longer than the delay, oldest first`() {

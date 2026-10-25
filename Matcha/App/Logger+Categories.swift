@@ -20,8 +20,10 @@ nonisolated extension Logger {
     static let miniWindow = Logger(subsystem: subsystem, category: "MiniWindow")
     /// Downloads; never a full address or a file name, only the host, private.
     static let downloads = Logger(subsystem: subsystem, category: "Downloads")
-    /// Site permissions (camera, microphone) and site data; never a full address, only the host.
+    /// Site permissions (camera, microphone, notifications) and site data; never a full address, only the host.
     static let permissions = Logger(subsystem: subsystem, category: "Permissions")
+    /// Notifications of the websites; never an address, a title or a text, only the host, private.
+    static let notifications = Logger(subsystem: subsystem, category: "Notifications")
     /// Browsing history; never an address or a title, only numbers.
     static let history = Logger(subsystem: subsystem, category: "History")
     /// Tab memory (suspension of hidden tabs); never an address, only numbers.

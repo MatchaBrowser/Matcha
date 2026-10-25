@@ -58,6 +58,8 @@ final class BrowserTab: Identifiable {
     let pageDialogs = PageDialogState()
     /// Websites whose invalid certificate the user accepted, loaded in this tab (“Not Secure”, audit K5).
     var acceptedCertificateHosts: Set<String> = []
+    /// The displayed website may send notifications (`NavigationCoordinator+Notifications`): never put to sleep.
+    var canSendNotifications = false
     /// The page's zoom (`WKWebView.pageZoom`, task 5.4), copied here for the menus: it only changes through
     /// `setPageZoom`. Pinch zoom (`magnification`) is separate.
     private(set) var pageZoom = ZoomLevels.actualSize

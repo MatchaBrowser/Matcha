@@ -16,6 +16,8 @@ nonisolated struct TabLifecycleCandidate: Equatable, Sendable {
     /// Sign-in window opened by the page, still open (task 5.8): asleep, the page would no longer be its
     /// `window.opener`, and the sign-in would fail.
     let hasOpenPopupWindow: Bool
+    /// The displayed website may send notifications: asleep, it could no longer send any.
+    var canSendNotifications = false
 }
 
 /// What triggers a check.
@@ -30,8 +32,9 @@ nonisolated enum TabSuspensionReason: String, Sendable {
 
 /// Rules of tab sleeping (task 5.6). Never: a displayed tab (all the panes of a split, the originating tab of a Peek),
 /// one without a web view, one waiting for a permission answer, one using the camera or the microphone, one that opened
-/// a sign-in window that is still open (task 5.8), or one playing sound: according to its speaker icon (task 5.10),
-/// otherwise checked afterwards with WebKit. “Never” in the settings: nothing, even during a memory warning.
+/// a sign-in window that is still open (task 5.8), one whose website may send notifications, or one playing sound:
+/// according to its speaker icon (task 5.10), otherwise checked afterwards with WebKit. “Never” in the settings: nothing, even during a
+/// memory warning.
 nonisolated enum TabSuspensionPolicy {
     /// During a simple warning, a tab hidden for a shorter time is spared: people often go back to the tab they just
     /// left.
@@ -39,7 +42,7 @@ nonisolated enum TabSuspensionPolicy {
 
     static func isEligible(_ candidate: TabLifecycleCandidate) -> Bool {
         candidate.hiddenSince != nil && candidate.isLoaded && !candidate.hasPendingPermissionPrompt && !candidate.isCapturingMedia
-            && !candidate.isPlayingAudio && !candidate.hasOpenPopupWindow
+            && !candidate.isPlayingAudio && !candidate.hasOpenPopupWindow && !candidate.canSendNotifications
     }
 
     /// Tabs to examine, from the one hidden longest ago to the most recent; `delay` nil (“Never”): none. Sound that the

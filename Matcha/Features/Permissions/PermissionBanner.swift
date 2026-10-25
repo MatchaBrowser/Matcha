@@ -2,8 +2,8 @@ import SwiftUI
 
 /// Banner for a page's requests, at the top of its card (or of the peek, or of a mini window's page): it slides down
 /// and pushes the page, without covering it. One request at a time: permissions first (task 5.2: the site, what it
-/// asks for, and “Don't Allow”, “Allow Once”, “Always Allow”), then opening another app (audit W2). Nothing answers on
-/// the user's behalf.
+/// asks for, and “Don't Allow”, “Allow Once”, “Always Allow”; for notifications, “Don't Allow” and “Allow”, both
+/// remembered), then opening another app (audit W2). Nothing answers on the user's behalf.
 struct PermissionBanner: View {
     let prompts: PermissionPromptQueue
 
@@ -74,10 +74,18 @@ private struct PermissionBannerContent: View {
         }
     }
 
+    /// Notifications are asked on their own (`Notification.requestPermission()`), never with the camera.
+    private var isNotificationRequest: Bool {
+        request.asked.contains(.notifications)
+    }
+
     /// “meet.google.com wants to use your camera and microphone.”: names only what is requested.
     private var prompt: Text {
         let site = request.origin.map { Text(verbatim: $0.displayName).bold() }
             ?? Text("This page", comment: "Permission banner: the page asking, when it has no website name (local file)")
+        if isNotificationRequest {
+            return Text("\(site) wants to send you notifications.", comment: "Permission banner; %@ is the website")
+        }
         switch (request.asked.contains(.camera), request.asked.contains(.microphone)) {
         case (true, true):
             return Text("\(site) wants to use your camera and microphone.", comment: "Permission banner; %@ is the website")
@@ -95,6 +103,20 @@ private struct PermissionBannerContent: View {
             Text("Don't Allow", comment: "Permission banner: refuse, and remember it for this website")
         }
         .accessibilityIdentifier("permissionDenyButton")
+        if isNotificationRequest {
+            // Always remembered: allowed for this page only, the website would lose it as soon as it is reloaded.
+            Button {
+                answer(.alwaysAllow)
+            } label: {
+                Text("Allow", comment: "Permission banner: allow the website to send notifications, and remember it")
+            }
+            .accessibilityIdentifier("permissionAlwaysAllowButton")
+        } else {
+            allowButtons
+        }
+    }
+
+    @ViewBuilder private var allowButtons: some View {
         Button {
             answer(.allowOnce)
         } label: {
