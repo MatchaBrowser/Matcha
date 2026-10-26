@@ -35,13 +35,17 @@ struct HistoryRecordingTests {
         return tab
     }
 
-    /// Loads a simulated page and waits until it has finished loading (the delegate has received `didFinish`).
+    /// Loads a simulated page and waits until it has finished loading (the delegate has received `didFinish`) and the
+    /// tab shows its title.
     private func load(_ address: String, title: String, in tab: BrowserTab) async throws {
         let url = try #require(URL(string: address))
         let finished = tab.history.finishedLoads
         tab.loadedWebView.loadSimulatedRequest(URLRequest(url: url), responseHTML: "<title>\(title)</title><p>page</p>")
-        // `didFinish` handled, the page recorded or not (review TS2).
-        try await waitUntil { tab.url == url && !tab.isLoading && tab.history.finishedLoads > finished }
+        // `didFinish` handled, the page recorded or not (review TS2). The tab's title can come after it (seen on a slow
+        // machine): it is waited for too.
+        try await waitUntil {
+            tab.url == url && !tab.isLoading && tab.history.finishedLoads > finished && (title.isEmpty || tab.title == title)
+        }
     }
 
     @Test func `a finished page is recorded with its title, profile and space`() async throws {

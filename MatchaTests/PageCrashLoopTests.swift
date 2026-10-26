@@ -123,9 +123,11 @@ struct PageCrashLoopTests {
         clock.advance(120)
         let finished = tab.history.finishedLoads
         tab.reload()
-        try await waitUntil { !tab.crash.isRecovering && !tab.isLoading && tab.history.finishedLoads > finished }
+        // The title can come after the end of the load (slow machine): waited for too.
+        try await waitUntil {
+            !tab.crash.isRecovering && !tab.isLoading && tab.history.finishedLoads > finished && tab.title == LocalTestPages.indexTitle
+        }
         #expect(visits() == 1)
-        #expect(tab.title == LocalTestPages.indexTitle)
 
         // Control: an ordinary reload, more than a minute later, is a visit.
         clock.advance(120)
