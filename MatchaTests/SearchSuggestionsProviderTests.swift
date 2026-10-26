@@ -55,6 +55,15 @@ struct SearchSuggestionsProviderTests {
         #expect(engine.requests.isEmpty)
     }
 
+    /// Review A7: the engine chosen for suggestions is asked, the search engine otherwise.
+    @Test func `suggestions come from the engine chosen for them`() async {
+        _ = await provider.candidates(for: query("pain", engine: .google), context: context)
+        var chosen = context
+        chosen.suggestionEngine = .duckDuckGo
+        _ = await provider.candidates(for: query("pain", engine: .google), context: chosen)
+        #expect(engine.engines == [.google, .duckDuckGo])
+    }
+
     @Test func `fetch errors give no suggestions`() async {
         for error: any Error in [URLError(.timedOut), SearchSuggestionError.status(503), SearchSuggestionError.malformed] {
             engine.error = error

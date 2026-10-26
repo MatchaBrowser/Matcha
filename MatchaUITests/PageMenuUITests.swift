@@ -1,8 +1,8 @@
 import XCTest
 
 /// Page context menu (5.9): “Open Link in New Tab”, “Open Link in Peek” and “Open Image in New Tab”, from a tab,
-/// the Peek and a mini window. Pages: the Postfix documentation shipped with macOS (no network). These tests move
-/// the real mouse.
+/// the Peek and a mini window. Pages: the stand-in of the Postfix documentation written by the tests
+/// (`UITestPages`, no network). These tests move the real mouse.
 final class PageMenuUITests: XCTestCase {
     private static let newTabItem = "Ouvrir le lien dans un nouvel onglet"
     private static let peekItem = "Ouvrir dans un aperçu"
@@ -109,8 +109,7 @@ final class PageMenuUITests: XCTestCase {
 
     /// From a mini window: a background tab in the main window, like ⌘-click; no Peek.
     @MainActor
-    func testOpenLinkInNewTabFromAMiniWindowAddsATabToTheSidebar() throws {
-        try requireResource(FileManager.default.isReadableFile(atPath: Self.localDocsPath), "Postfix documentation missing")
+    func testOpenLinkInNewTabFromAMiniWindowAddsATabToTheSidebar() {
         let app = launchApp()
         XCTAssertTrue(waitForBrowserWindow(of: app))
         let mini = openMiniWindow(in: app)

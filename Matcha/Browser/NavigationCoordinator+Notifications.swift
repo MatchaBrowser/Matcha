@@ -25,25 +25,31 @@ extension NavigationCoordinator: PageNotificationReceiving {
         }
     }
 
-    /// Before a navigation of the main frame: the decisions of the profile, read by the script of the next documents.
-    func prepareNotifications(for webView: WKWebView) {
+    /// Before a navigation of the main frame to `destination`: the decision of its website, read by the script of the
+    /// next documents (review WB10: only this one).
+    func prepareNotifications(for webView: WKWebView, destination: URL?) {
         guard let notificationCenter else {
             return
         }
         let scope = notificationScope(for: webView)
-        notificationCenter.prepare(webView, isAvailable: scope != nil, states: scope.map(Self.notificationStates(of:)) ?? [:])
+        let origin = SiteOrigin.web(of: destination)
+        let permission = PageNotificationPermission(origin.flatMap { scope?.decision(.notifications, for: $0) })
+        notificationCenter.prepare(webView, isAvailable: scope != nil, origin: origin?.key, permission: permission)
+    }
+
+    /// The decision of `origin` changed in the settings while `page` shows it (`BrowserSession`, review IU16): its
+    /// displayed document reads it at once (review WB10).
+    func notificationDecisionDidChange(_ decision: SitePermissionDecision?, origin: SiteOrigin, on page: BrowserTab) {
+        guard let notificationCenter, let webView = page.webView, notificationScope(for: webView) != nil else {
+            return
+        }
+        notificationCenter.update(webView, origin: origin.key, permission: PageNotificationPermission(decision))
     }
 
     /// New document: the page may notify, and is then never put to sleep (task 5.6), if its website is allowed.
     func notificationsDocumentDidChange(in webView: WKWebView, page: BrowserTab) {
         let origin = SiteOrigin.web(of: webView.url)
         page.canSendNotifications = origin.map { notificationScope(for: webView)?.decision(.notifications, for: $0) == .allow } ?? false
-    }
-
-    /// Decisions of the profile of `scope`: origin key → permission read by the pages.
-    static func notificationStates(of scope: SitePermissionScope) -> [String: PageNotificationPermission] {
-        let entries = scope.store.entries.filter { $0.profileID == scope.profileID && $0.kind == .notifications }
-        return Dictionary(entries.map { ($0.origin.key, PageNotificationPermission($0.decision)) }) { first, _ in first }
     }
 
     /// Decisions of the profile of `webView`; nil without a notification center or in a private window.

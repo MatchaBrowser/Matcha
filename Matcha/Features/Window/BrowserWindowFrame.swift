@@ -8,7 +8,7 @@ import AppKit
 enum BrowserWindowFrame {
     static let autosaveName = "browser"
     /// Shift of a cascaded window, about the height of a title bar.
-    static let cascadeOffset = 24.0
+    nonisolated static let cascadeOffset = 24.0
 
     /// Takes the saved frame and keeps it up to date, unless another browser window does.
     static func remember(_ window: NSWindow) {
@@ -26,10 +26,12 @@ enum BrowserWindowFrame {
         guard let front = NSApp.orderedWindows.first(where: { $0 !== window && isBrowserWindow($0) }) else {
             return
         }
-        var frame = front.frame
-        frame.origin.x += cascadeOffset
-        frame.origin.y -= cascadeOffset
-        window.setFrame(window.constrainFrameRect(frame, to: front.screen), display: true)
+        window.setFrame(window.constrainFrameRect(cascadedFrame(from: front.frame), to: front.screen), display: true)
+    }
+
+    /// `frame` moved just below and to the right (screen coordinates: y goes up).
+    nonisolated static func cascadedFrame(from frame: CGRect) -> CGRect {
+        frame.offsetBy(dx: cascadeOffset, dy: -cascadeOffset)
     }
 
     /// Top left corner at `origin` (screen coordinates), the frame kept on the screen of `origin`, not on the one

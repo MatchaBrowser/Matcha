@@ -41,6 +41,22 @@ struct WindowLayoutTests {
         #expect(window.frame.maxY <= nearest.frame.maxY)
     }
 
+    /// Review TS12: a new window opens just below and to the right of the front one, at its size; only the windows of
+    /// the browser group count.
+    @Test func `a cascaded window opens below and to the right of the front one`() {
+        let front = CGRect(x: 100, y: 300, width: 1200, height: 800)
+        let cascaded = BrowserWindowFrame.cascadedFrame(from: front)
+        #expect(cascaded.size == front.size)
+        // 24 pt to the right, 24 pt lower (y goes up on screen).
+        #expect(cascaded.origin == CGPoint(x: 124, y: 276))
+
+        let window = NSWindow(contentRect: .zero, styleMask: [.titled], backing: .buffered, defer: true)
+        window.identifier = NSUserInterfaceItemIdentifier("\(MatchaApp.browserWindowID)-AppWindow-1")
+        #expect(BrowserWindowFrame.isBrowserWindow(window))
+        window.identifier = NSUserInterfaceItemIdentifier("com_apple_SwiftUI_Settings_window")
+        #expect(!BrowserWindowFrame.isBrowserWindow(window))
+    }
+
     /// Review ON21: the pointer lands in the new window's sidebar, under the band of the window buttons.
     @Test func `after a drag out, the pointer lands under the window buttons`() {
         let point = CGPoint(x: 900, y: 700)

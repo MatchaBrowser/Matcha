@@ -8,6 +8,7 @@ struct GeneralSettingsView: View {
     @AppStorage(BrowserSettings.Key.newTabPage) private var newTabPage = BrowserSettings.newTabPage
     @AppStorage(BrowserSettings.Key.searchEngine) private var searchEngine = BrowserSettings.searchEngine
     @AppStorage(BrowserSettings.Key.showsSearchSuggestions) private var showsSearchSuggestions = BrowserSettings.showsSearchSuggestions
+    @AppStorage(BrowserSettings.Key.searchSuggestionSource) private var suggestionSource = BrowserSettings.searchSuggestionSource
     @AppStorage(BrowserSettings.Key.confirmBeforeQuitting) private var confirmBeforeQuitting = BrowserSettings.confirmBeforeQuitting
     @AppStorage(BrowserSettings.Key.opensPinnedLinksInPeek) private var opensPinnedLinksInPeek = BrowserSettings.opensPinnedLinksInPeek
     @AppStorage(BrowserSettings.Key.tabSuspensionDelay) private var tabSuspensionDelay = BrowserSettings.tabSuspensionDelay
@@ -46,8 +47,19 @@ struct GeneralSettingsView: View {
                 .accessibilityIdentifier("searchEnginePicker")
                 Toggle("Show search engine suggestions", isOn: $showsSearchSuggestions)
                     .accessibilityIdentifier("searchSuggestionsToggle")
+                // Review A7: another engine may suggest, the search stays with the search engine.
+                Picker(selection: $suggestionSource) {
+                    ForEach(SuggestionSource.allCases, id: \.self) { source in
+                        suggestionSourceTitle(source).tag(source)
+                    }
+                } label: {
+                    Text("Suggestions from", comment: "Settings > General: which search engine suggests searches in the command bar")
+                }
+                .disabled(!showsSearchSuggestions)
+                .accessibilityIdentifier("suggestionSourcePicker")
             } footer: {
-                Text("What you type in the command bar is sent to \(searchEngine.name) to suggest searches. Never in private windows.")
+                let suggestionEngine = suggestionSource.engine(for: searchEngine)
+                Text("What you type in the command bar is sent to \(suggestionEngine.name) to suggest searches. Never in private windows.")
                     .font(.caption)
                     .foregroundStyle(.secondary)
             }
@@ -108,6 +120,16 @@ struct GeneralSettingsView: View {
     /// The draft while typing, otherwise the saved homepage.
     private var homePageField: Binding<String> {
         Binding { homePageDraft ?? homePage } set: { homePageDraft = $0 }
+    }
+
+    /// “Search engine (Google)”, or the name of another engine.
+    private func suggestionSourceTitle(_ source: SuggestionSource) -> Text {
+        source == .searchEngine
+            ? Text(
+                "Search engine (\(searchEngine.name))",
+                comment: "Settings > General, Suggestions from: the chosen search engine; %@ is its name",
+            )
+            : Text(verbatim: source.engine(for: searchEngine).name)
     }
 
     private func saveHomePage() {

@@ -75,18 +75,23 @@ private struct ExtensionsSettingsForm: View {
                 }
                 HStack(alignment: .firstTextBaseline) {
                     VStack(alignment: .leading, spacing: 2) {
-                        Text("Firefox extensions work too: get the .xpi file from the extension's versions page on addons.mozilla.org.")
+                        // The App Store version sends to no other store (review A2).
+                        if !Distribution.isAppStore {
+                            Text("Firefox extensions work too: get the .xpi file from the extension's versions page on addons.mozilla.org.")
+                        }
                         Text("When an extension also exists for Safari, prefer the Safari version.")
                     }
                     .font(.caption)
                     .foregroundStyle(.secondary)
                     .fixedSize(horizontal: false, vertical: true)
                     Spacer(minLength: 8)
-                    Button("Firefox Add-ons") { model.openFirefoxAddOns() }
-                        .buttonStyle(.link)
-                        .font(.caption)
-                        .help("Open addons.mozilla.org in a new tab")
-                        .accessibilityIdentifier("extensionsFirefoxAddOnsButton")
+                    if !Distribution.isAppStore {
+                        Button("Firefox Add-ons") { model.openFirefoxAddOns() }
+                            .buttonStyle(.link)
+                            .font(.caption)
+                            .help("Open addons.mozilla.org in a new tab")
+                            .accessibilityIdentifier("extensionsFirefoxAddOnsButton")
+                    }
                 }
                 if let message = model.errorMessage {
                     Text(message)

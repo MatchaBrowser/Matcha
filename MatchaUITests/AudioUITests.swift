@@ -1,11 +1,10 @@
 import XCTest
 
 /// Sound (task 5.10): a background tab that plays sound shows a speaker; clicking it pauses its page without
-/// selecting or closing the tab. Page without network: a Photos Memories track shipped with macOS, opened as a file
-/// (WebKit turns it into a page that plays it by itself); test skipped if there is none.
+/// selecting or closing the tab. Page without network: a quiet tone written by the test (`UITestPages`), opened as a
+/// file (WebKit turns it into a page that plays it by itself).
 /// **This test plays a few seconds of music** (turn the volume down) and moves the real mouse.
 final class AudioUITests: XCTestCase {
-    private static let musicDirectory = "/System/Library/Photos/Resources/FlexAudio"
     /// Accessibility value of a tab that plays sound, in French.
     private static let playing = "Lecture audio en cours"
 
@@ -14,8 +13,8 @@ final class AudioUITests: XCTestCase {
     }
 
     @MainActor
-    func testSpeakerPausesABackgroundTabWithoutSelectingIt() throws {
-        let music = try musicFile()
+    func testSpeakerPausesABackgroundTabWithoutSelectingIt() {
+        let music = UITestPages.tone
         let app = launchApp()
         XCTAssertTrue(waitForBrowserWindow(of: app))
         openAddress("file://" + music, in: app)
@@ -44,20 +43,6 @@ final class AudioUITests: XCTestCase {
         XCTAssertTrue(row.isSelected)
         Thread.sleep(forTimeInterval: 3)
         XCTAssertNotEqual(row.value as? String, Self.playing)
-    }
-
-    /// First track found; the test is skipped without it.
-    private func musicFile() throws -> String {
-        let bundles = (try? FileManager.default.contentsOfDirectory(atPath: Self.musicDirectory)) ?? []
-        for bundle in bundles.sorted() where bundle.hasSuffix(".smsbundle") {
-            let directory = Self.musicDirectory + "/" + bundle
-            let files = (try? FileManager.default.contentsOfDirectory(atPath: directory)) ?? []
-            if let file = files.sorted().first(where: { $0.hasSuffix(".m4a") }) {
-                return directory + "/" + file
-            }
-        }
-        try requireResource(false, "No Photos music in \(Self.musicDirectory)")
-        return ""
     }
 
     /// Waits until the row no longer says “Playing Audio” (no value, or empty).

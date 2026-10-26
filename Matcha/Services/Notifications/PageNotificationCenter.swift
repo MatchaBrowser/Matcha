@@ -22,7 +22,7 @@ final class PageNotificationCenter {
     private let system: any SystemNotifications
     /// Shown notifications, from the oldest to the most recent.
     private var delivered: [Delivered] = []
-    /// Last decisions given to the script of each page (content controller).
+    /// What the state scripts of each page (content controller) already give its documents.
     private let preparedStates = NSMapTable<WKUserContentController, PreparedStates>.weakToStrongObjects()
 
     /// Where a notification comes from: its page, its web view and the frame that sent it.
@@ -41,13 +41,9 @@ final class PageNotificationCenter {
     }
 
     private final class PreparedStates {
-        let isAvailable: Bool
-        let states: [String: PageNotificationPermission]
-
-        init(isAvailable: Bool, states: [String: PageNotificationPermission]) {
-            self.isAvailable = isAvailable
-            self.states = states
-        }
+        var isAvailable: Bool?
+        /// Decision of each website already given; a website missing is “default”.
+        var states: [String: PageNotificationPermission] = [:]
     }
 
     init(system: any SystemNotifications) {
@@ -55,24 +51,47 @@ final class PageNotificationCenter {
         system.onActivate = { [weak self] in self?.activate($0) }
     }
 
-    /// Before a navigation of `webView`: the decisions (origin key → permission) that the script will read in the next
-    /// documents, in its isolated world: the page and its frames never see them (review WB10); `isAvailable` false:
-    /// “denied” everywhere (private window). A new state script is added only if they changed: WebKit can't remove one,
-    /// the last one added wins.
-    func prepare(_ webView: WKWebView, isAvailable: Bool, states: [String: PageNotificationPermission]) {
+    /// Before a navigation of `webView` to the website `origin` (its key): its decision, which the script will read in
+    /// the next documents, in its isolated world; `isAvailable` false: “denied” everywhere (private window). Only the
+    /// destination's decision, never the profile's others (review WB10). A state script is added only when it changes
+    /// what the page's scripts already give: WebKit can only remove all the scripts of a page at once, the extensions'
+    /// included; they run in order, the last one wins.
+    func prepare(_ webView: WKWebView, isAvailable: Bool, origin: String?, permission: PageNotificationPermission) {
         let controller = webView.configuration.userContentController
-        if let prepared = preparedStates.object(forKey: controller), prepared.isAvailable == isAvailable, prepared.states == states {
+        let prepared = preparedStates.object(forKey: controller) ?? PreparedStates()
+        let website = isAvailable ? origin : nil
+        let changesState = website.map { (prepared.states[$0] ?? .default) != permission } ?? false
+        guard prepared.isAvailable != isAvailable || changesState else {
             return
         }
-        let source = PageNotificationScript.stateSource(isAvailable: isAvailable, states: states)
-        let script = WKUserScript(
+        let source = PageNotificationScript.stateSource(
+            isAvailable: isAvailable,
+            origin: changesState ? website : nil,
+            permission: permission,
+        )
+        controller.addUserScript(WKUserScript(
             source: source,
             injectionTime: .atDocumentStart,
             forMainFrameOnly: false,
             in: PageNotificationScript.world,
+        ))
+        prepared.isAvailable = isAvailable
+        if changesState, let website {
+            prepared.states[website] = permission
+        }
+        preparedStates.setObject(prepared, forKey: controller)
+    }
+
+    /// The decision of `origin` (its key) changed in the settings while `webView` shows it: the displayed document reads
+    /// it at once, the next ones from their state script.
+    func update(_ webView: WKWebView, origin: String, permission: PageNotificationPermission) {
+        prepare(webView, isAvailable: true, origin: origin, permission: permission)
+        webView.callAsyncJavaScript(
+            PageNotificationScript.stateBody,
+            arguments: ["bridge": PageNotificationScript.bridgeName, "origin": origin, "state": permission.rawValue],
+            in: nil,
+            in: PageNotificationScript.world,
         )
-        controller.addUserScript(script)
-        preparedStates.setObject(PreparedStates(isAvailable: isAvailable, states: states), forKey: controller)
     }
 
     /// Asks macOS, the first time, whether Matcha may show notifications.

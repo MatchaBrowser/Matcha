@@ -12,6 +12,8 @@ final class PageAudio {
     @ObservationIgnored private var state = PageAudioState()
     /// Scheduled switch-off of the icon.
     @ObservationIgnored private var expiry: Task<Void, Never>?
+    /// Wait until the switch-off; replaced in tests, which then decide when the delay has passed (review TS16).
+    @ObservationIgnored var sleep: @MainActor (Duration) async throws -> Void = { try await Task.sleep(for: $0) }
 
     /// True while the switch-off of the icon is scheduled (tests).
     var isSwitchOffScheduled: Bool {
@@ -46,8 +48,9 @@ final class PageAudio {
             return
         }
         let delay = max(0, deadline.timeIntervalSinceNow)
+        let sleep = sleep
         expiry = Task { [weak self] in
-            try? await Task.sleep(for: .seconds(delay))
+            try? await sleep(.seconds(delay))
             guard !Task.isCancelled, let self else {
                 return
             }

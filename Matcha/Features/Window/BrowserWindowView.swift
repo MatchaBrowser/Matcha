@@ -29,6 +29,7 @@ struct BrowserWindowView: View {
     @AppStorage(BrowserSettings.Key.addressBarPosition) var addressBarPosition = BrowserSettings.addressBarPosition
     @AppStorage(BrowserSettings.Key.showsNavigationButtons) var showsNavigationButtons = BrowserSettings.showsNavigationButtons
     @AppStorage(BrowserSettings.Key.showsSearchSuggestions) var showsSearchSuggestions = BrowserSettings.showsSearchSuggestions
+    @AppStorage(BrowserSettings.Key.searchSuggestionSource) var suggestionSource = BrowserSettings.searchSuggestionSource
     @AppStorage(BrowserSettings.Key.hiddenSidebarStyle) private var hiddenSidebarStyle = BrowserSettings.hiddenSidebarStyle
     @Environment(\.openSettings) var openSettings
     @Environment(\.openWindow) var openWindow

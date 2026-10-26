@@ -10,6 +10,8 @@ final class PageHistory {
     weak var page: BrowserTab?
     /// Wait before keeping an address changed by the page; shortened in tests.
     var sameDocumentDelay = HistoryRecordingPolicy.sameDocumentDelay
+    /// How that wait passes; replaced in tests, which then decide when it has passed (review TS16).
+    var sleep: @MainActor (Duration) async throws -> Void = { try await Task.sleep(for: $0) }
 
     private var scope: HistoryScope?
     private var lastVisit: HistoryRecordingPolicy.PageVisit?
@@ -65,8 +67,9 @@ final class PageHistory {
             return
         }
         let delay = sameDocumentDelay
+        let sleep = sleep
         pendingChange = Task { [weak self] in
-            try? await Task.sleep(for: delay)
+            try? await sleep(delay)
             guard !Task.isCancelled, let self else {
                 return
             }

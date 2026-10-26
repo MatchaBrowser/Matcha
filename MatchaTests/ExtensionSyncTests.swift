@@ -166,6 +166,49 @@ struct ExtensionSyncTests {
         }
     }
 
+    /// Review SY33: a package sent is pending until its record has left; one that no record cites then is an orphan,
+    /// deleted from the server (a session that ended between the package and its record).
+    @Test func `a pending package is kept once its record has left, an orphan is deleted`() async throws {
+        let mac = try await macWithExtension()
+        defer { cleanUp(mac) }
+        let package = try #require(mac.synced.packages[identifier])
+        #expect(mac.synced.pendingBlobs == [package.blobID])
+        let orphan = UUID()
+        try await transport.putBlob(Data(repeating: 2, count: 64), id: orphan)
+        mac.synced.pendingBlobs.insert(orphan)
+
+        await mac.adapter.deleteObsoletePackages(using: transport, recordsSent: false)
+        #expect(mac.synced.pendingBlobs.count == 2)
+        await mac.adapter.deleteObsoletePackages(using: transport, recordsSent: true)
+        #expect(mac.synced.pendingBlobs.isEmpty)
+        #expect(await Set(server.blobs.keys) == [package.blobID])
+    }
+
+    /// Review SY33: a package not on the server (yet) says so, each click tries again; after ten, the extension is to
+    /// reinstall. Found again, the count goes.
+    @Test func `a package missing from the server is tried again, then shown to reinstall`() async throws {
+        let first = try await macWithExtension()
+        let second = makeMac("B")
+        defer { cleanUp(first, second) }
+        let fields = try #require(first.adapter.fields()[identifier])
+        let package = try #require(first.synced.packages[identifier])
+        let sealed = try #require(await server.blobs[package.blobID])
+        await server.deleteBlob(id: package.blobID)
+        second.adapter.apply(fields)
+
+        for attempt in 1 ... ExtensionSyncAdapter.maximumMissingAttempts {
+            await #expect(throws: SyncTransportError.blobNotFound) {
+                try await second.adapter.prepareOffer(fields)
+            }
+            #expect(second.adapter.missingAttempts(of: fields) == attempt)
+        }
+        #expect(ExtensionInstallError(SyncTransportError.blobNotFound) == .packageNotOnServer)
+
+        await server.replaceBlob(sealed, id: package.blobID)
+        _ = try await second.adapter.prepareOffer(fields)
+        #expect(second.adapter.missingAttempts(of: fields) == 0)
+    }
+
     @Test func `an extension uninstalled on one Mac goes everywhere, its package with it`() async throws {
         let first = try await macWithExtension()
         let second = makeMac("B")

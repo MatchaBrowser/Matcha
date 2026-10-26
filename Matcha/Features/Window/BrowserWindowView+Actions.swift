@@ -10,6 +10,7 @@ extension BrowserWindowView {
             newTabPage: newTabPage,
             homePage: homePage,
             showsSearchSuggestions: showsSearchSuggestions,
+            suggestionSource: suggestionSource,
         )
     }
 

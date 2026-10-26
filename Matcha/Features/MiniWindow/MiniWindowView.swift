@@ -11,6 +11,7 @@ struct MiniWindowView: View {
 
     @AppStorage(BrowserSettings.Key.searchEngine) private var searchEngine = BrowserSettings.searchEngine
     @AppStorage(BrowserSettings.Key.showsSearchSuggestions) private var showsSearchSuggestions = BrowserSettings.showsSearchSuggestions
+    @AppStorage(BrowserSettings.Key.searchSuggestionSource) private var suggestionSource = BrowserSettings.searchSuggestionSource
     @Environment(\.openWindow) private var openWindow
 
     private var tab: BrowserTab {
@@ -64,12 +65,13 @@ struct MiniWindowView: View {
     }
 
     /// The mini window's page (AppKit container, never recreated), or a prompt as long as it has loaded nothing, or
-    /// the message of a page that crashed several times in a row (task 5.7); above it, its find bar (task 5.3) and
-    /// the banner of its permission requests (task 5.2).
+    /// the message of a page that crashed several times in a row (task 5.7); above it, its find bar (task 5.3), the
+    /// banner of its permission requests (task 5.2) and that of the files a local page can't show (review WB11).
     private var page: some View {
         VStack(spacing: 0) {
             FindBar(page: tab)
             PermissionBanner(prompts: tab.permissionPrompts)
+            LocalFilesBanner(page: tab)
             ZStack {
                 MiniWebViewContainerView(container: controller.container)
                 if tab.url == nil {
@@ -90,7 +92,13 @@ struct MiniWindowView: View {
     }
 
     private var settings: CommandBarSettings {
-        CommandBarSettings(searchEngine: searchEngine, newTabPage: .blank, homePage: "", showsSearchSuggestions: showsSearchSuggestions)
+        CommandBarSettings(
+            searchEngine: searchEngine,
+            newTabPage: .blank,
+            homePage: "",
+            showsSearchSuggestions: showsSearchSuggestions,
+            suggestionSource: suggestionSource,
+        )
     }
 }
 

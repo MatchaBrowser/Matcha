@@ -5,7 +5,8 @@ import XCTest
 extension ScreenshotUITests {
     /// If `MATCHA_SCREENSHOT_FIND` is set: this text is searched (⌘F) in the displayed tab, one match found
     /// (`29-recherche-trouvee`), then “zzqqxx” (`30-recherche-introuvable`), and the bar closes (⎋). Without
-    /// `MATCHA_SCREENSHOT_URLS`, the Postfix documentation shipped with macOS is opened first (no network).
+    /// `MATCHA_SCREENSHOT_URLS`, the stand-in of the Postfix documentation written by the tests is opened first
+    /// (`UITestPages`, no network).
     func captureFindBar(in app: XCUIApplication, window: XCUIElement) throws {
         let environment = ProcessInfo.processInfo.environment
         guard let text = environment["MATCHA_SCREENSHOT_FIND"] else {

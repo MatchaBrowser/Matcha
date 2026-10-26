@@ -49,13 +49,16 @@ final class HeldHistory: HistorySource {
 @MainActor
 final class FakeSuggestionEngine {
     private(set) var requests: [String] = []
+    /// Engine asked for each request.
+    private(set) var engines: [SearchEngine] = []
     var responses: [String: [String]] = [:]
     var error: (any Error)?
     var suspended: Set<String> = []
     private var waiting: [String: CheckedContinuation<[String], Never>] = [:]
 
-    func fetch(_ text: String, _: SearchEngine) async throws -> [String] {
+    func fetch(_ text: String, _ engine: SearchEngine) async throws -> [String] {
         requests.append(text)
+        engines.append(engine)
         if let error {
             throw error
         }

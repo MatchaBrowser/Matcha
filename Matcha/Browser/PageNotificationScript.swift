@@ -5,7 +5,8 @@ import WebKit
 /// “denied” to every request while still saying “default”, so websites ask again on every load). Two scripts, injected
 /// at the start of each document (review WB2):
 /// - in an isolated world (`world`), the script that talks to the app (`PageNotificationMessageHandler`, reachable from
-///   this world only) and holds the decisions of the profile, given before each navigation (`stateSource`). It sends a
+///   this world only) and holds the decisions of the websites this page has shown, the destination's given before each
+///   navigation (`stateSource`) and a change in the settings at once (`stateBody`, review WB10). It sends a
 ///   request only from the main frame, right after a click or a key press (`navigator.userActivation`, read where the
 ///   page can't redefine it); a cross-origin frame or an insecure page reads “denied”;
 /// - in the page's world, a thin layer that the page sees: `Notification`, `navigator.permissions.query({ name:
@@ -31,14 +32,16 @@ enum PageNotificationScript {
         controller.addUserScript(WKUserScript(source: pageSource, injectionTime: .atDocumentStart, forMainFrameOnly: false, in: .page))
     }
 
-    /// State script, in the isolated world: notifications available or not (private window), and the decision of each
-    /// origin, read by the script injected before it. The page never sees it.
-    static func stateSource(isAvailable: Bool, states: [String: PageNotificationPermission]) -> String {
-        let object = states.mapValues(\.rawValue)
-        let json = (try? JSONSerialization.data(withJSONObject: object, options: [.sortedKeys]))
-            .flatMap { String(data: $0, encoding: .utf8) } ?? "{}"
-        return "window['\(bridgeName)']?.setStates(\(isAvailable), \(json));"
+    /// State script, in the isolated world: notifications available or not (private window) and, with an `origin`
+    /// (key of a website), its decision, read by the script injected before it. The page never sees it.
+    static func stateSource(isAvailable: Bool, origin: String?, permission: PageNotificationPermission) -> String {
+        let quoted = origin.flatMap { try? JSONEncoder().encode($0) }.flatMap { String(data: $0, encoding: .utf8) } ?? "null"
+        return "window['\(bridgeName)']?.setState(\(isAvailable), \(quoted), '\(permission.rawValue)');"
     }
+
+    /// Function body, run in `world` (`callAsyncJavaScript`): the decision `state` of `origin` changed for the
+    /// displayed document.
+    static let stateBody = "window[bridge]?.setState(true, origin, state);"
 
     /// Function body, run in `world`, that sends `type` (“click”) to the notification `id` of the page
     /// (`callAsyncJavaScript`).
@@ -110,9 +113,11 @@ enum PageNotificationScript {
         }, true);
         Object.defineProperty(window, '\(bridgeName)', {
             value: Object.freeze({
-                setStates(isAvailable, newStates) {
+                setState(isAvailable, website, state) {
                     available = isAvailable === true;
-                    states = { ...newStates };
+                    if (typeof website === 'string' && ['granted', 'denied', 'default'].includes(state)) {
+                        states[website] = state;
+                    }
                 },
                 dispatch(id, type) {
                     send({ event: String(type), id: String(id) });

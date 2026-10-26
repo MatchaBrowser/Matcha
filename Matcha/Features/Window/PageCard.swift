@@ -60,11 +60,13 @@ struct PageCard: View {
                     Divider()
                 }
             }
-            // Find in page (task 5.3), then permission requests (task 5.2): bar and banner push the page down. The
-            // bar stays at the top: an incoming banner does not move the field being typed in.
+            // Find in page (task 5.3), then permission requests (task 5.2) and the files a local page can't show
+            // (review WB11): bar and banners push the page down. The bar stays at the top: an incoming banner does not
+            // move the field being typed in.
             if let tab {
                 FindBar(page: tab, activate: activate)
                 PermissionBanner(prompts: tab.permissionPrompts)
+                LocalFilesBanner(page: tab)
             }
             page
                 // Area that the peek (Shift-click) dims, below the address bar (task 4.4).
