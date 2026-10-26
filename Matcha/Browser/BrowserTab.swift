@@ -57,6 +57,8 @@ final class BrowserTab: Identifiable {
     let loadFailure = PageLoadFailure()
     /// JavaScript dialogs of the page's document (audit K1).
     let pageDialogs = PageDialogState()
+    /// A local page that refers to files it can't read (banner, review WB11).
+    let localFiles = PageLocalFiles()
     /// The displayed document came over a certificate the user accepted for its website (“Not Secure”, audit K5); read
     /// from the document's own connection, whichever tab accepted it (`NavigationCoordinator+Authentication`, WB5).
     var usesAcceptedCertificate = false
@@ -269,6 +271,13 @@ final class BrowserTab: Identifiable {
         displayedAddress.userDidRequest(url)
         loadFailure.clear()
         load(url, in: webView, from: source, isFromAnotherApp: isFromAnotherApp)
+    }
+
+    /// A local file the user chose again (banner of `localFiles`, “Choose File…” of an unreadable file): it reads its
+    /// folder, as with ⌘O, whatever the tab was granted before.
+    func openChosenFile(_ url: URL) {
+        fileReadAccess = nil
+        load(url)
     }
 
     /// The page's zoom (100% = 1); kept for the web view recreated after an unload.

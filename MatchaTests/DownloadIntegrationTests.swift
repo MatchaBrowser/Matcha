@@ -9,14 +9,6 @@ import WebKit
 @MainActor
 @Suite(.webKit)
 struct DownloadIntegrationTests {
-    /// Files shipped with macOS that WebKit does not display (the first one present is used); the UI test uses the
-    /// same ones.
-    static let undisplayableFiles = [
-        "/usr/share/firmware/bluetooth/20702_8289.dfu",
-        "/usr/share/man/man1/less.1.gz",
-        "/usr/share/tokenizer/th/matrix.bin",
-    ]
-
     private let manager: TabManager
     private let folder: TemporaryDownloadsFolder
     private let downloads: DownloadManager
@@ -96,8 +88,14 @@ struct DownloadIntegrationTests {
 
     /// Response that WebKit cannot display (`canShowMIMEType` false): downloaded through the response policy.
     @Test func `file WebKit cannot show is downloaded`() async throws {
-        let path = try #require(Self.undisplayableFiles.first(where: FileManager.default.isReadableFile(atPath:)))
-        let size = try #require(try FileManager.default.attributesOfItem(atPath: path)[.size] as? Int)
+        // A file of a type WebKit can't show, written here (review TS5): never one shipped with macOS.
+        let source = FileManager.default.temporaryDirectory.appending(path: "DownloadIntegrationTests-\(UUID().uuidString)")
+        defer { try? FileManager.default.removeItem(at: source) }
+        try FileManager.default.createDirectory(at: source, withIntermediateDirectories: true)
+        let file = source.appending(path: "firmware.dfu")
+        try Data(repeating: 7, count: 4096).write(to: file)
+        let path = file.path
+        let size = 4096
 
         manager.newTab(url: URL(fileURLWithPath: path))
         let item = try #require(try await waitForDownloads(1).first)

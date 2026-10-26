@@ -108,7 +108,11 @@ final class CommandBarModel {
     }
 
     private func makeContext(_ settings: CommandBarSettings) -> CommandContext {
-        CommandContext(isPrivate: windowModel.session.isPrivate, showsSearchSuggestions: settings.showsSearchSuggestions)
+        CommandContext(
+            isPrivate: windowModel.session.isPrivate,
+            showsSearchSuggestions: settings.showsSearchSuggestions,
+            suggestionEngine: settings.suggestionEngine,
+        )
     }
 
     // MARK: Input and selection

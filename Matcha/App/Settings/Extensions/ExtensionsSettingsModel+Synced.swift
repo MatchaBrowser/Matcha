@@ -11,6 +11,9 @@ extension ExtensionsSettingsModel {
         case appMissing
         /// Package missing: too large, or sync stopped.
         case packageUnavailable
+        /// Not found on the server after many attempts: lost, to reinstall from its file; “Try Again” stays
+        /// (`SYNC.md` § 4.7, review SY33).
+        case packageLost
     }
 
     /// Pending extensions from the other Macs, by name.
@@ -28,9 +31,20 @@ extension ExtensionsSettingsModel {
         case .appExtension:
             appExtensions.contains { $0.bundleIdentifier == offer.source.bundleIdentifier } ? .ready : .appMissing
         case .package:
-            syncAdapter.transport?.supportsBlobs == true && SyncedPackage(source: offer.source, version: offer.version) != nil
-                ? .ready : .packageUnavailable
+            if !canDownloadPackage(of: offer) {
+                .packageUnavailable
+            } else if syncAdapter.missingAttempts(of: offer) >= ExtensionSyncAdapter.maximumMissingAttempts {
+                .packageLost
+            } else {
+                .ready
+            }
         }
+    }
+
+    /// The package of `offer` can be downloaded: this version syncs packages, the server keeps them, the offer cites one.
+    private func canDownloadPackage(of offer: SyncExtensionFields) -> Bool {
+        Distribution.syncsExtensionPackages && syncAdapter.transport?.supportsBlobs == true
+            && SyncedPackage(source: offer.source, version: offer.version) != nil
     }
 
     /// Prepares the offered extension for the permissions screen.

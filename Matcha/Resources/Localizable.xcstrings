@@ -1369,6 +1369,35 @@
         }
       }
     },
+    "A web page opened from the Finder or another app then shows the images next to it, and can read the other files of its folder. Off, it reads only itself; File > Open File… (⌘O) shows its images." : {
+      "comment" : "Settings > Privacy: explanation of the setting of the local pages opened from other apps",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Eine aus dem Finder oder einer anderen App geöffnete Webseite zeigt dann die Bilder daneben und kann die anderen Dateien ihres Ordners lesen. Aus: Sie liest nur sich selbst; Ablage > Datei öffnen … (⌘O) zeigt ihre Bilder."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Una página web abierta desde el Finder u otra app muestra entonces las imágenes que tiene al lado y puede leer los demás archivos de su carpeta. Desactivado, solo se lee a sí misma; Archivo > Abrir archivo… (⌘O) muestra sus imágenes."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Une page web ouverte depuis le Finder ou une autre app affiche alors les images voisines, et peut lire les autres fichiers de son dossier. Désactivé, elle ne lit qu'elle-même ; Fichier > Ouvrir un fichier… (⌘O) affiche ses images."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Una pagina web aperta dal Finder o da un'altra app mostra allora le immagini accanto e può leggere gli altri file della sua cartella. Disattivato, legge solo sé stessa; File > Apri file… (⌘O) mostra le sue immagini."
+          }
+        }
+      }
+    },
     "About Matcha" : {
       "comment" : "Matcha menu: opens the About panel, with the version of this build",
       "localizations" : {
@@ -3868,6 +3897,35 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Fai clic su una scorciatoia, poi premi quella nuova: ⌫ la rimuove, ⎋ annulla. Trova, l'ortografia e gli altri comandi standard seguono macOS: modificali in Impostazioni di Sistema > Tastiera."
+          }
+        }
+      }
+    },
+    "Close" : {
+      "comment" : "Banner of a local page that can't show its images: hide the banner",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Schließen"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cerrar"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fermer"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Chiudi"
           }
         }
       }
@@ -6709,6 +6767,64 @@
         }
       }
     },
+    "Files Not Shown" : {
+      "comment" : "Accessibility label of the banner of a local page that can't show the files next to it",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dateien nicht angezeigt"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Archivos no mostrados"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fichiers non affichés"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "File non mostrati"
+          }
+        }
+      }
+    },
+    "Files opened from other apps can read their folder" : {
+      "comment" : "Settings > Privacy: a local page opened from the Finder or another app may read the files next to it",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aus anderen Apps geöffnete Dateien dürfen ihren Ordner lesen"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Los archivos abiertos desde otras apps pueden leer su carpeta"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Les fichiers ouverts depuis d'autres apps peuvent lire leur dossier"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "I file aperti da altre app possono leggere la loro cartella"
+          }
+        }
+      }
+    },
     "Filled Folder" : {
       "comment" : "Icon choice (SF Symbol)",
       "localizations" : {
@@ -8444,6 +8560,34 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Il suo pacchetto non è disponibile. Installala dal suo file."
+          }
+        }
+      }
+    },
+    "Its package wasn't found on the sync server. Install it from its file, or try again." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ihr Paket wurde auf dem Sync-Server nicht gefunden. Installiere sie aus ihrer Datei oder versuche es erneut."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Su paquete no está en el servidor de sincronización. Instálala desde su archivo o vuelve a intentarlo."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Son paquet est introuvable sur le serveur de synchronisation. Installez-la depuis son fichier, ou réessayez."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Il suo pacchetto non è sul server di sincronizzazione. Installala dal suo file o riprova."
           }
         }
       }
@@ -11682,6 +11826,35 @@
         }
       }
     },
+    "Open…" : {
+      "comment" : "Banner of a local page that can't show its images: opens the file panel, as File > Open File…",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Öffnen …"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Abrir…"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ouvrir…"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Apri…"
+          }
+        }
+      }
+    },
     "Opens %@" : {
       "comment" : "A website may open this app without asking; %@ is the app",
       "localizations" : {
@@ -14536,6 +14709,35 @@
         }
       }
     },
+    "Search engine (%@)" : {
+      "comment" : "Settings > General, Suggestions from: the chosen search engine; %@ is its name",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Suchmaschine (%@)"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Motor de búsqueda (%@)"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Moteur de recherche (%@)"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Motore di ricerca (%@)"
+          }
+        }
+      }
+    },
     "Search History" : {
       "comment" : "Placeholder of the search field of the History window",
       "localizations" : {
@@ -16033,6 +16235,35 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Forte"
+          }
+        }
+      }
+    },
+    "Suggestions from" : {
+      "comment" : "Settings > General: which search engine suggests searches in the command bar",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vorschläge von"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sugerencias de"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Suggestions de"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Suggerimenti da"
           }
         }
       }
@@ -17868,6 +18099,35 @@
         }
       }
     },
+    "This extension isn't on the sync server yet. Try again in a moment, or install it from its file." : {
+      "comment" : "Extension install error: the package sent by another Mac can't be found on the sync server",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Diese Erweiterung ist noch nicht auf dem Sync-Server. Versuche es gleich noch einmal oder installiere sie aus ihrer Datei."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Esta extensión aún no está en el servidor de sincronización. Vuelve a intentarlo en un momento o instálala desde su archivo."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cette extension n'est pas encore sur le serveur de synchronisation. Réessayez dans un instant, ou installez-la depuis son fichier."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Questa estensione non è ancora sul server di sincronizzazione. Riprova tra poco o installala dal suo file."
+          }
+        }
+      }
+    },
     "This File Can’t Be Imported" : {
       "comment" : "Alert title when the chosen file isn't Arc's sidebar",
       "localizations" : {
@@ -18331,6 +18591,35 @@
         }
       }
     },
+    "This page opened from another app can't show the files next to it, such as its images. To show them, open it with ⌘O." : {
+      "comment" : "Banner of a local page received from another app (Finder…): the images of its folder are not shown",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Diese aus einer anderen App geöffnete Seite kann die Dateien daneben, etwa ihre Bilder, nicht anzeigen. Öffne sie mit ⌘O, um sie zu sehen."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Esta página abierta desde otra app no puede mostrar los archivos que tiene al lado, como sus imágenes. Para verlos, ábrela con ⌘O."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ouverte depuis une autre app, cette page ne peut pas afficher les fichiers voisins, comme ses images. Pour les afficher, ouvrez-la avec ⌘O."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Questa pagina aperta da un'altra app non può mostrare i file accanto, come le sue immagini. Per vederli, aprila con ⌘O."
+          }
+        }
+      }
+    },
     "This page says" : {
       "comment" : "Title of a JavaScript dialog of a page without a website (local file)",
       "localizations" : {
@@ -18645,6 +18934,35 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Questa finestra"
+          }
+        }
+      }
+    },
+    "To Reinstall" : {
+      "comment" : "An extension from another Mac whose package was never found on the sync server",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Neu installieren"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Reinstalar"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "À réinstaller"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Da reinstallare"
           }
         }
       }

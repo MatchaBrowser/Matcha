@@ -30,6 +30,11 @@ nonisolated enum FileReadAccess {
         return file == access || file.hasPrefix(access + "/")
     }
 
+    /// True if `access` lets the page `file` read nothing but itself (review WB11).
+    static func isLimitedToItself(_ access: URL, file: URL) -> Bool {
+        resolved(access) == resolved(file)
+    }
+
     /// Path with its symbolic links resolved, without a final “/” (review WB11): a link inside a folder can lead
     /// anywhere. The links of the deepest folder that exists: the system resolves nothing in a path that doesn't.
     private static func resolved(_ url: URL) -> String {

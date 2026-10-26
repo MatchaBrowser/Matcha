@@ -51,6 +51,28 @@ struct IncomingLinksTests {
         #expect(manager.windows.isEmpty)
     }
 
+    /// Review WB11: a local file received from another app reads only itself, unless the setting says otherwise; one
+    /// chosen with ⌘O from a mini window reads its folder.
+    @Test func `a local file from another app reads only itself, unless the setting says otherwise`() throws {
+        let file = FileManager.default.temporaryDirectory.appending(path: "IncomingLinksTests-\(UUID().uuidString).html")
+        try Data("<p>reçu</p>".utf8).write(to: file)
+        defer { try? FileManager.default.removeItem(at: file) }
+        let folder = file.deletingLastPathComponent()
+        manager.openMainWindow = {}
+        manager.openFromOtherApp([file], destination: .space)
+        manager.openFromOtherApp([file], destination: .space, isChosenByUser: true)
+        let defaults = testDefaults.make()
+        defaults.set(true, forKey: BrowserSettings.Key.filesFromOtherAppsReadFolder)
+        let withSetting = MiniWindowManager(session: session, defaults: defaults)
+        withSetting.openMainWindow = {}
+        withSetting.openFromOtherApp([file], destination: .space)
+
+        let accesses = session.spaces[0].tabManager.todayTabs.compactMap(\.fileReadAccess)
+        #expect(accesses.count == 3)
+        #expect(accesses.filter { $0 == file }.count == 1)
+        #expect(accesses.filter { $0 == folder }.count == 2)
+    }
+
     @Test func `with the main window closed, it opens again to show the link`() {
         var reopened = 0
         manager.openMainWindow = { reopened += 1 }

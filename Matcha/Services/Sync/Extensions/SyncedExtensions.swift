@@ -19,6 +19,8 @@ final class SyncedExtensions {
         var names: [String: String] = [:]
         var packageFailures: [String: SyncedPackageFailure] = [:]
         var adopted: Set<String> = []
+        var pendingBlobs: Set<UUID> = []
+        var missingPackages: [UUID: Int] = [:]
 
         init(
             packages: [String: SyncedPackage],
@@ -29,6 +31,8 @@ final class SyncedExtensions {
             names: [String: String],
             packageFailures: [String: SyncedPackageFailure],
             adopted: Set<String>,
+            pendingBlobs: Set<UUID>,
+            missingPackages: [UUID: Int],
         ) {
             self.packages = packages
             self.offers = offers
@@ -38,6 +42,8 @@ final class SyncedExtensions {
             self.names = names
             self.packageFailures = packageFailures
             self.adopted = adopted
+            self.pendingBlobs = pendingBlobs
+            self.missingPackages = missingPackages
         }
 
         init(from decoder: any Decoder) throws {
@@ -50,6 +56,8 @@ final class SyncedExtensions {
             names = container.lenient([String: String].self, forKey: .names) ?? [:]
             packageFailures = container.lenient([String: SyncedPackageFailure].self, forKey: .packageFailures) ?? [:]
             adopted = container.lenient(Set<String>.self, forKey: .adopted) ?? []
+            pendingBlobs = container.lenient(Set<UUID>.self, forKey: .pendingBlobs) ?? []
+            missingPackages = container.lenient([UUID: Int].self, forKey: .missingPackages) ?? [:]
         }
     }
 
@@ -91,6 +99,17 @@ final class SyncedExtensions {
     /// Extensions just installed from an offer: their state here becomes the reference of their record, so their
     /// first sync sends nothing back (review SY1).
     var adopted: Set<String> = [] {
+        didSet { save() }
+    }
+
+    /// Packages sent whose record hasn't been applied yet (“pending”, `SYNC.md` § 4.7): one that no record cites once
+    /// they have left is an orphan, deleted from the server (review SY33).
+    var pendingBlobs: Set<UUID> = [] {
+        didSet { save() }
+    }
+
+    /// Packages of offers not found on the server (`404`), with the number of attempts (`SYNC.md` § 4.7, review SY33).
+    var missingPackages: [UUID: Int] = [:] {
         didSet { save() }
     }
 
@@ -148,6 +167,8 @@ final class SyncedExtensions {
         names = saved?.names ?? [:]
         packageFailures = saved?.packageFailures ?? [:]
         adopted = saved?.adopted ?? []
+        pendingBlobs = saved?.pendingBlobs ?? []
+        missingPackages = saved?.missingPackages ?? [:]
         isLoading = false
     }
 
@@ -169,6 +190,8 @@ final class SyncedExtensions {
             names: names,
             packageFailures: packageFailures,
             adopted: adopted,
+            pendingBlobs: pendingBlobs,
+            missingPackages: missingPackages,
         )
         do {
             try FileManager.default.createDirectory(at: url.deletingLastPathComponent(), withIntermediateDirectories: true)

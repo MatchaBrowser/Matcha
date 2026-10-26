@@ -3,8 +3,8 @@ import XCTest
 /// Page zoom (task 5.4): ⌘+, ⌘=, ⌘-, ⌘0 and the “115 %” badge next to the address pill (absent at 100 %, a click
 /// goes back to 100 %), grayed-out menus, zoom remembered for the site (here local files, which form a single
 /// site) on another page and in another tab, Peek, mini window, address bar above the page, “Zoom” row of the site
-/// settings (network: example.com). Pages: the Postfix documentation shipped with macOS (no network; tests
-/// skipped if it is missing). These tests move the real mouse.
+/// settings (network: example.com). Pages: the stand-in of the Postfix documentation written by the tests
+/// (`UITestPages`, no network). These tests move the real mouse.
 final class PageZoomUITests: XCTestCase {
     override func setUpWithError() throws {
         continueAfterFailure = false
@@ -82,7 +82,7 @@ final class PageZoomUITests: XCTestCase {
         zoom("+", expecting: 150, in: app)
 
         // Another tab of the same site: same zoom.
-        openAddress("file:///usr/share/doc/postfix/html/postconf.5.html", in: app)
+        openAddress("file://" + UITestPages.path("postconf.5.html"), in: app)
         XCTAssertTrue(waitForValue(of: addressPill(in: app)) { $0 == "postconf.5.html" })
         XCTAssertTrue(waitForPercent(150, of: zoomBadge(in: app), inValue: true))
         zoom("-", expecting: 125, in: app)
@@ -121,8 +121,7 @@ final class PageZoomUITests: XCTestCase {
 
     /// Mini window: the badge is in its toolbar; the browser window behind shows none.
     @MainActor
-    func testZoomInMiniWindowShowsTheBadgeInItsToolbar() throws {
-        try requireResource(FileManager.default.isReadableFile(atPath: Self.localDocsPath), "Postfix documentation missing")
+    func testZoomInMiniWindowShowsTheBadgeInItsToolbar() {
         let app = launchApp()
         XCTAssertTrue(waitForBrowserWindow(of: app))
         let mini = openMiniWindow(in: app)

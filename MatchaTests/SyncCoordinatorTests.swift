@@ -60,9 +60,12 @@ struct SyncCoordinatorTests {
         let (coordinator, session) = try await startedCoordinator()
         defer { coordinator.stop() }
         let synced = coordinator.lastSyncDate
+        let checks = coordinator.localChecks
         session.spaces[0].tabManager.newTab()
         session.saveAll()
-        try await Task.sleep(for: .milliseconds(400))
+        // The save is looked at, without the network (review TS2: a signal, not a fixed wait).
+        try await waitUntil { coordinator.localChecks > checks }
+        #expect(!coordinator.lastCheckFoundChanges)
         #expect(coordinator.lastSyncDate == synced)
     }
 

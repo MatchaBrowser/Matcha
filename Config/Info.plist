@@ -10,6 +10,9 @@
 		<key>NSAllowsArbitraryLoadsInWebContent</key>
 		<true/>
 	</dict>
+	<!-- Category in the Finder and the App Store (audit A1): a web browser is a productivity app. -->
+	<key>LSApplicationCategoryType</key>
+	<string>public.app-category.productivity</string>
 	<!-- Export compliance (audit A4), read by App Store Connect only: sync encrypts the browsing data end to end
 	     (SYNC.md § 3), which is not one of the exempt uses (authentication, the system's HTTPS alone). -->
 	<key>ITSAppUsesNonExemptEncryption</key>

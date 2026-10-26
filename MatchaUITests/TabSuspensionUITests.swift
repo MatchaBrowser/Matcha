@@ -2,10 +2,10 @@ import XCTest
 
 /// Memory (task 5.6): a hidden tab goes to sleep without changing in the sidebar, then comes back to its page
 /// with its history. Short delay given at launch (`tabSuspensionDelaySeconds`, Debug only); the “suspended”
-/// accessibility value of a tab row only exists in Debug. Pages: the Postfix documentation shipped with macOS
-/// (no network); test skipped if it is missing. This test moves the real mouse.
+/// accessibility value of a tab row only exists in Debug. Pages: the stand-in of the Postfix documentation written
+/// by the tests (`UITestPages`, no network). This test moves the real mouse.
 final class TabSuspensionUITests: XCTestCase {
-    private static let overviewPath = "/usr/share/doc/postfix/html/OVERVIEW.html"
+    private static let overviewPath = UITestPages.path("OVERVIEW.html")
 
     override func setUpWithError() throws {
         continueAfterFailure = false

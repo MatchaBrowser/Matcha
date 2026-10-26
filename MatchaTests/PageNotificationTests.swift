@@ -119,17 +119,32 @@ struct PageNotificationTests {
         try await waitUntil { system.removed == ["\(thread)#boite"] }
     }
 
-    /// Review TS11: the states given to the pages are the profile's notification decisions only.
-    @Test func `the pages read only their profile's notification decisions`() {
-        let store = SitePermissionStore(context: nil)
-        let profile = UUID()
+    /// Review WB10: a page's scripts only get the decision of the website it goes to, and a new state script only when
+    /// that decision changes for it.
+    @Test func `a page gets only the decision of the website it goes to`() throws {
         let other = testOrigin("https", "other.example.com")
-        store.set(.allow, for: .notifications, origin: origin, profileID: profile)
-        store.set(.deny, for: .notifications, origin: other, profileID: profile)
-        store.set(.allow, for: .camera, origin: TestOrigins.meet, profileID: profile)
-        store.set(.allow, for: .notifications, origin: TestOrigins.meet, profileID: UUID())
-        let states = NavigationCoordinator.notificationStates(of: SitePermissionScope(store: store, profileID: profile))
-        #expect(states == [origin.key: .granted, other.key: .denied])
+        manager.sitePermissions?.set(.allow, for: .notifications, origin: origin)
+        manager.sitePermissions?.set(.deny, for: .notifications, origin: other)
+        let tab = manager.insertTab(configuration: TestPages.configuration(), after: nil, select: true)
+        let webView = tab.loadedWebView
+        let controller = webView.configuration.userContentController
+        func stateScripts() -> [String] {
+            controller.userScripts.map(\.source).filter { $0.contains(".setState(") }
+        }
+        let coordinator = manager.coordinator
+        coordinator.prepareNotifications(for: webView, destination: testURL("https://notify.example.com/boite"))
+        #expect(stateScripts().count == 1)
+        #expect(try #require(stateScripts().last).contains("notify.example.com"))
+        #expect(stateScripts().allSatisfy { !$0.contains("other.example.com") })
+
+        // Same website again, or one without a decision: nothing new.
+        coordinator.prepareNotifications(for: webView, destination: testURL("https://notify.example.com/autre"))
+        coordinator.prepareNotifications(for: webView, destination: testURL("https://rien.example.com/"))
+        #expect(stateScripts().count == 1)
+
+        coordinator.prepareNotifications(for: webView, destination: testURL("https://other.example.com/"))
+        #expect(stateScripts().count == 2)
+        #expect(try #require(stateScripts().last).contains("'denied'"))
     }
 
     /// Review IU16: a decision changed in the site settings reaches the open pages of the website at once.
@@ -139,9 +154,12 @@ struct PageNotificationTests {
         let profileID = manager.sitePermissions?.profileID
         session.notificationDecisionDidChange(.allow, origin: origin, profileID: profileID)
         #expect(tab.canSendNotifications)
+        // The displayed document reads it at once (review WB10).
+        try await waitUntilTrue("return Notification.permission === 'granted'", in: tab)
         session.notificationDecisionDidChange(.allow, origin: origin, profileID: UUID())
         session.notificationDecisionDidChange(nil, origin: origin, profileID: profileID)
         #expect(!tab.canSendNotifications)
+        try await waitUntilTrue("return Notification.permission === 'default'", in: tab)
     }
 
     /// Review SV7: the same tag in two profiles gives two notifications, each bringing back its own page.

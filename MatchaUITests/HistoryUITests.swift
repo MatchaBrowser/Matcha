@@ -1,7 +1,7 @@
 import XCTest
 
 /// History (5.5): ⌘Y window, search, deletion, clearing, opening a row, private window and command bar. Pages:
-/// the Postfix documentation shipped with macOS (no network); tests skipped if it is missing. These tests move
+/// the stand-in of the Postfix documentation written by the tests (`UITestPages`, no network). These tests move
 /// the real mouse.
 final class HistoryUITests: XCTestCase {
     override func setUpWithError() throws {
@@ -44,7 +44,9 @@ final class HistoryUITests: XCTestCase {
         XCTAssertTrue(historyRow(titled: "Postfix Documentation", in: window).exists)
         // The most recent first.
         XCTAssertEqual(historyRows(in: window).firstMatch.label, "Postfix Basic Configuration")
-        XCTAssertEqual(historyRows(in: window).firstMatch.value as? String, "BASIC_CONFIGURATION_README.html")
+        // Its value: the address, then the time of the visit (review IU20).
+        let value = historyRows(in: window).firstMatch.value as? String
+        XCTAssertTrue(value?.hasPrefix("BASIC_CONFIGURATION_README.html, ") == true, value ?? "no value")
 
         // Case- and accent-insensitive search, on the title and the address.
         let search = window.searchFields.firstMatch
@@ -128,10 +130,9 @@ final class HistoryUITests: XCTestCase {
     }
 
     @MainActor
-    func testPrivateWindowRecordsNothing() throws {
+    func testPrivateWindowRecordsNothing() {
         let app = launchApp()
         XCTAssertTrue(waitForBrowserWindow(of: app))
-        try requireResource(FileManager.default.isReadableFile(atPath: Self.localDocsPath), "Postfix documentation missing")
         let privateWindow = openPrivateWindow(in: app)
         openCommandBar(in: app, window: privateWindow)
         app.typeText("file://\(Self.localDocsPath)\n")

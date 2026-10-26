@@ -1,7 +1,7 @@
 import XCTest
 
 /// Find in page (5.3): ⌘F, search as you type, “Not Found”, ⌘G and ⇧⌘G, ⎋, tab switch, Peek. Pages: the
-/// Postfix documentation shipped with macOS (no network; tests skipped if it is missing). These tests move the
+/// stand-in of the Postfix documentation written by the tests (`UITestPages`, no network). These tests move the
 /// real mouse.
 final class FindInPageUITests: XCTestCase {
     override func setUpWithError() throws {

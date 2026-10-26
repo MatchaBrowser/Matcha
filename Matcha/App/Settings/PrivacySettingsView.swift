@@ -2,10 +2,13 @@ import OSLog
 import SwiftUI
 import WebKit
 
-/// Privacy settings: clear cookies and site data, permission decisions remembered per site, ad and tracker blocker
-/// (setting, lists, exceptions, credits; task 6.2, hidden while it is set aside).
+/// Privacy settings: clear cookies and site data, what a local page received from another app may read (review WB11),
+/// permission decisions remembered per site, ad and tracker blocker (setting, lists, exceptions, credits; task 6.2,
+/// hidden while it is set aside).
 struct PrivacySettingsView: View {
     @Environment(BrowserSession.self) private var session
+    @AppStorage(BrowserSettings.Key.filesFromOtherAppsReadFolder)
+    private var filesFromOtherAppsReadFolder = BrowserSettings.filesFromOtherAppsReadFolder
     @State private var isConfirmingClear = false
     @State private var isClearing = false
     @State private var lastCleared: Date?
@@ -28,6 +31,22 @@ struct PrivacySettingsView: View {
                 Cookies, local storage, caches, and other website data for all profiles. You will be signed out; \
                 a password typed in a login sheet is kept until you quit Matcha.
                 """, comment: "Settings > Privacy: what “Clear…” removes")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+            }
+            Section {
+                Toggle(isOn: $filesFromOtherAppsReadFolder) {
+                    Text(
+                        "Files opened from other apps can read their folder",
+                        comment: "Settings > Privacy: a local page opened from the Finder or another app may read the files next to it",
+                    )
+                }
+                .accessibilityIdentifier("filesFromOtherAppsReadFolderToggle")
+            } footer: {
+                Text("""
+                A web page opened from the Finder or another app then shows the images next to it, and can read the \
+                other files of its folder. Off, it reads only itself; File > Open File… (⌘O) shows its images.
+                """, comment: "Settings > Privacy: explanation of the setting of the local pages opened from other apps")
                     .font(.caption)
                     .foregroundStyle(.secondary)
             }

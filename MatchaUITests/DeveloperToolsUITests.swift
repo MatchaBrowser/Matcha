@@ -1,14 +1,12 @@
 import XCTest
 
 /// Web developer tools (Settings > Advanced): “Inspect Element” in the page menu opens the web inspector in Matcha;
-/// with the setting off, the item goes away. Local page without network (Postfix documentation).
+/// with the setting off, the item goes away. Local page without network (`UITestPages`).
 final class DeveloperToolsUITests: XCTestCase {
-    private let page = "file:///usr/share/doc/postfix/html/index.html"
+    private let page = "file://" + UITestPages.index
 
     override func setUpWithError() throws {
         continueAfterFailure = false
-        let isAvailable = FileManager.default.fileExists(atPath: "/usr/share/doc/postfix/html/index.html")
-        try requireResource(isAvailable, "Postfix documentation missing")
     }
 
     /// Opens the page, then the context menu on its title; returns the “Inspect Element” item (possibly missing).
