@@ -1,7 +1,7 @@
 #!/bin/bash
 # Every check a task must pass (CLAUDE.md, audit C7), in one command: formatting, lint, Debug build without any
-# warning, translations, the scripts' tests, unit tests. Run locally before each commit, and by GitHub Actions on each push
-# (.github/workflows/check.yml).
+# warning, translations, the scripts' tests, unit tests (their targets without warning either). Run locally before
+# each commit, and by GitHub Actions on each push (.github/workflows/check.yml).
 #
 #   scripts/check.sh            checks everything, changes nothing
 #   scripts/check.sh --fix      formats the code first (swiftformat), then checks
@@ -10,7 +10,7 @@
 # MATCHA_XCODEBUILD_FLAGS (GitHub Actions: no signing team on its machines), and options of the unit tests alone in
 # MATCHA_TEST_FLAGS: one test at a time by default (review TS1: in parallel, the WebKit tests share the main thread and
 # their waits run out; in series, about 70 s on a Mac); MATCHA_TEST_FLAGS="-parallel-testing-enabled YES" to try
-# them in parallel.
+# them in parallel. MATCHA_CHECK_RELEASE=1 also builds the Release configuration (GitHub Actions, review DI4).
 set -euo pipefail
 
 cd "$(dirname "$0")/.."
@@ -29,6 +29,21 @@ mkdir -p "$LOGS"
 
 step() {
     printf '\n▸ %s\n' "$1"
+}
+
+# Warnings of the log $1, as the compiler and the tools write them (never a line the tests print), except the App
+# Intents metadata step's (a framework the app doesn't use: not ours). The files they name are touched: an incremental
+# build doesn't compile them again, and would not show them a second time (review DI9). Xcode can't make them errors
+# on the command line: it builds the packages with `-suppress-warnings`.
+warnings_of() {
+    local found
+    found=$(grep -E "^(/[^ ]*: |[a-z]+: )?warning: " "$1" | grep -v "appintents" | sort -u || true)
+    [[ -z "$found" ]] && return 1
+    echo "$found"
+    grep -oE "^/[^:]+\.swift" <<< "$found" | sort -u | while IFS= read -r file; do
+        [[ "$file" == "$PWD/"* && -f "$file" ]] && touch "$file"
+    done
+    return 0
 }
 
 # Why the unit tests failed. When the host app crashes or quits, every unfinished test fails: its crash comes first,
@@ -105,15 +120,32 @@ xcodebuild -project Matcha.xcodeproj -scheme Matcha -configuration Debug -destin
     echo "✗ compilation en échec (journal : $LOGS/build.log)"
     exit 1
 }
-# The App Intents metadata step warns about a framework the app doesn't use: not ours.
-if grep -E "warning:" "$LOGS/build.log" | grep -v "appintents" | sort -u | grep .; then
+if warnings_of "$LOGS/build.log"; then
     echo "✗ avertissements de compilation (journal : $LOGS/build.log)"
     exit 1
 fi
 echo "✓ compilation sans avertissement"
 
+if [[ "${MATCHA_CHECK_RELEASE:-}" == 1 ]]; then
+    step "Compilation Release, sans avertissement"
+    # The configuration of the published images: whole module, without the code of `#if DEBUG`.
+    xcodebuild -project Matcha.xcodeproj -scheme Matcha -configuration Release -destination "$DESTINATION" \
+        -derivedDataPath build ${FLAGS[@]+"${FLAGS[@]}"} build > "$LOGS/release.log" 2>&1 || {
+        grep -E "error:" "$LOGS/release.log" | sort -u
+        echo "✗ compilation Release en échec (journal : $LOGS/release.log)"
+        exit 1
+    }
+    if warnings_of "$LOGS/release.log"; then
+        echo "✗ avertissements de la compilation Release (journal : $LOGS/release.log)"
+        exit 1
+    fi
+    echo "✓ compilation Release sans avertissement"
+fi
+
 step "Traductions"
-scripts/check-localizations.sh
+# The Debug build made above: left to itself, the script would read the configuration whose file list is the newest,
+# possibly the Release of an earlier run (Xcode only writes that list again when files are added or removed).
+CONFIGURATION=Debug scripts/check-localizations.sh
 
 step "Scripts"
 python3 -I scripts/test-appcast.py
@@ -139,6 +171,11 @@ xcodebuild -project Matcha.xcodeproj -scheme Matcha -destination "$DESTINATION" 
     echo "✗ tests en échec (journal : $LOGS/tests.log ; détail : xcrun xcresulttool, build/Logs/Test)"
     exit 1
 }
+# The test targets are compiled by this step only (review DI9).
+if warnings_of "$LOGS/tests.log"; then
+    echo "✗ avertissements dans les cibles de tests (journal : $LOGS/tests.log)"
+    exit 1
+fi
 echo "✓ tests unitaires"
 
 printf '\n✓ Tout est en ordre.\n'

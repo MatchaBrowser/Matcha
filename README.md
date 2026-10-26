@@ -71,7 +71,8 @@ open build/Build/Products/Debug/Matcha.app
 ### Checks
 
 `scripts/check.sh` runs what the continuous integration runs: formatting (SwiftFormat), style (SwiftLint), a build
-without warnings, the translations and the unit tests. It needs `brew install swiftformat swiftlint xcbeautify`.
+without warnings, the translations, the scripts' tests and the unit tests; the continuous integration also builds the
+Release configuration (`MATCHA_CHECK_RELEASE=1`). It needs `brew install swiftformat swiftlint xcbeautify`.
 Without a signing team, give it the same settings as above:
 
 ```bash
@@ -95,6 +96,10 @@ MatchaTests/    unit tests (Swift Testing)
 MatchaUITests/  UI tests (XCTest)
 scripts/        checks, packaging and publishing
 ```
+
+The comments name documents such as `SYNC.md` (the sync format and the server's API), `DECISIONS.md` or
+`TESTS_MANUELS.md` (manual checks): they are the maintainer's working documents, in French, kept on purpose outside
+the repository.
 
 ## Contributing
 

@@ -37,8 +37,16 @@ nonisolated enum FaviconPageReader {
                     const canvas = document.createElement('canvas');
                     canvas.width = side;
                     canvas.height = side;
-                    canvas.getContext('2d').drawImage(image, 0, 0, side, side);
-                    return canvas.toDataURL('image/png').split(',')[1];
+                    // Drawn in memory, without the GPU: its pixels are read back at once, and a Mac without GPU
+                    // rendering (a virtual machine) still gets them.
+                    canvas.getContext('2d', { willReadFrequently: true }).drawImage(image, 0, 0, side, side);
+                    // A canvas that got no pixels gives “data:,”: no icon, the next one is tried.
+                    const png = canvas.toDataURL('image/png');
+                    const prefix = 'data:image/png;base64,';
+                    if (!png.startsWith(prefix) || png.length === prefix.length) {
+                        continue;
+                    }
+                    return png.slice(prefix.length);
                 } finally {
                     URL.revokeObjectURL(objectURL);
                 }
@@ -74,6 +82,7 @@ nonisolated enum FaviconPageReader {
                 done(try? result.get() as? String)
             }
         }
-        return result.flatMap { Data(base64Encoded: $0) }
+        // An empty answer is no icon either.
+        return result.flatMap { Data(base64Encoded: $0) }.flatMap { $0.isEmpty ? nil : $0 }
     }
 }

@@ -10,6 +10,10 @@
 		<key>NSAllowsArbitraryLoadsInWebContent</key>
 		<true/>
 	</dict>
+	<!-- Export compliance (audit A4), read by App Store Connect only: sync encrypts the browsing data end to end
+	     (SYNC.md § 3), which is not one of the exempt uses (authentication, the system's HTTPS alone). -->
+	<key>ITSAppUsesNonExemptEncryption</key>
+	<true/>
 	<!-- Full version of a published build (“1.0.0-beta.1”), shown by About Matcha (AboutVersion): given by
 	     scripts/package.sh and scripts/release.sh, empty otherwise. -->
 	<key>MatchaReleaseVersion</key>
