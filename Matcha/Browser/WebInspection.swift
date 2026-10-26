@@ -7,14 +7,17 @@ import WebKit
 ///
 /// Exception to the public API rule, wanted by the user (`DECISIONS.md`, 2026-10-18): WebKit only offers the in-app
 /// inspector through its private `developerExtrasEnabled` preference. It is only set if `WKPreferences` still knows
-/// it; otherwise, nothing breaks and only inspection from Safari (`isInspectable`, public) remains.
+/// it; otherwise, nothing breaks and only inspection from Safari (`isInspectable`, public) remains. Left out of the
+/// App Store build, even its selector's name (review A1): there, only inspection from Safari remains.
 @MainActor
 enum WebInspection {
     /// The setting changed: the web views pick it up.
     static let didChange = Notification.Name("MatchaWebInspectionDidChange")
 
-    /// Private WebKit setter behind the `developerExtrasEnabled` key.
-    private static let developerExtrasSetter = NSSelectorFromString("_setDeveloperExtrasEnabled:")
+    #if !APP_STORE
+        /// Private WebKit setter behind the `developerExtrasEnabled` key.
+        private static let developerExtrasSetter = NSSelectorFromString("_setDeveloperExtrasEnabled:")
+    #endif
 
     static func isEnabled(in defaults: UserDefaults = .standard) -> Bool {
         defaults.object(forKey: BrowserSettings.Key.showsDeveloperTools) == nil
@@ -24,7 +27,11 @@ enum WebInspection {
 
     /// True if this WebKit allows the in-app inspector.
     static var offersInAppInspector: Bool {
-        WKPreferences().responds(to: developerExtrasSetter)
+        #if APP_STORE
+            false
+        #else
+            WKPreferences().responds(to: developerExtrasSetter)
+        #endif
     }
 
     static func apply(to webView: WKWebView, enabled: Bool = isEnabled()) {
@@ -33,9 +40,11 @@ enum WebInspection {
     }
 
     static func apply(to preferences: WKPreferences, enabled: Bool = isEnabled()) {
-        guard preferences.responds(to: developerExtrasSetter) else {
-            return
-        }
-        preferences.setValue(enabled, forKey: "developerExtrasEnabled")
+        #if !APP_STORE
+            guard preferences.responds(to: developerExtrasSetter) else {
+                return
+            }
+            preferences.setValue(enabled, forKey: "developerExtrasEnabled")
+        #endif
     }
 }

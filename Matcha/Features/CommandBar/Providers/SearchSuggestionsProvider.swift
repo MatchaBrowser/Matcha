@@ -3,7 +3,8 @@ import OSLog
 
 /// Search engine suggestions, requested 150 ms after the last keystroke: a more recent keystroke cancels the task,
 /// hence the wait, and nothing is sent. Only for a text read as a search (and that does not look like an address),
-/// setting enabled, outside a private window. The typed text is never logged.
+/// setting enabled, outside a private window; from the engine chosen for suggestions, otherwise the search engine
+/// (review A7). The typed text is never logged.
 @MainActor
 final class SearchSuggestionsProvider: CommandProvider {
     typealias Fetch = @MainActor (String, SearchEngine) async throws -> [String]
@@ -49,13 +50,14 @@ final class SearchSuggestionsProvider: CommandProvider {
         guard Self.allowsRequest(for: query, context: context) else {
             return []
         }
+        let engine = context.suggestionEngine ?? query.searchEngine
         do {
             try await sleep(Self.delay)
             try Task.checkCancellation()
-            let texts = try await fetch(query.trimmed, query.searchEngine)
+            let texts = try await fetch(query.trimmed, engine)
             return texts.map { CommandCandidate(kind: .suggestion, title: $0, url: nil) }
         } catch {
-            Self.log(error, engine: query.searchEngine)
+            Self.log(error, engine: engine)
             return []
         }
     }

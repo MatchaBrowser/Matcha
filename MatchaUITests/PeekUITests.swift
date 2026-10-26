@@ -1,7 +1,7 @@
 import XCTest
 
 /// Peek (4.4): Shift-click, closing (⎋, ⌘W, ×, click beside it, another tab, command bar), “Open as Tab” and
-/// split view. Pages: the Postfix documentation shipped with macOS (no network).
+/// split view. Pages: the stand-in of the Postfix documentation written by the tests (`UITestPages`, no network).
 /// These tests move the real mouse and hold the Shift key.
 final class PeekUITests: XCTestCase {
     override func setUpWithError() throws {
@@ -69,7 +69,8 @@ final class PeekUITests: XCTestCase {
         // End of the opening animation: the bar is in place.
         Thread.sleep(forTimeInterval: 0.6)
         let sourceIsVisible = sourceFrame.midY > window.frame.minY && sourceFrame.midY < window.frame.maxY
-        let target = CGPoint(x: address.frame.minX - 6, y: sourceIsVisible ? sourceFrame.midY : address.frame.midY)
+        // `peekAddress` is the address inside its capsule (10 pt of margin, since W5): left of the capsule, on the scrim.
+        let target = CGPoint(x: address.frame.minX - 22, y: sourceIsVisible ? sourceFrame.midY : address.frame.midY)
         window.coordinate(withNormalizedOffset: .zero)
             .withOffset(CGVector(dx: target.x - window.frame.minX, dy: target.y - window.frame.minY))
             .click()

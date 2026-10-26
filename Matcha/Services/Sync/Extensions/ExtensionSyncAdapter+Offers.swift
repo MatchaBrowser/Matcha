@@ -11,6 +11,16 @@ extension ExtensionSyncAdapter {
         case packageUnavailable
     }
 
+    /// After this many attempts, a package still missing from the server is taken for lost: the extension is shown
+    /// “to reinstall” (`SYNC.md` § 4.7).
+    nonisolated static let maximumMissingAttempts = 10
+
+    /// The offer's package wasn't found on the server that many times; reset by a success, and by a record that cites
+    /// another package (counted by package).
+    func missingAttempts(of fields: SyncExtensionFields) -> Int {
+        SyncedPackage(source: fields.source, version: fields.version).flatMap { synced.missingPackages[$0.blobID] } ?? 0
+    }
+
     /// Prepares the offered extension `fields`: the one from its app on this Mac, or its downloaded package.
     func prepareOffer(_ fields: SyncExtensionFields) async throws -> ExtensionInstallCandidate {
         switch fields.source.kind {
@@ -20,10 +30,20 @@ extension ExtensionSyncAdapter {
             }
             return try await installer.prepare(appExtension)
         case .package:
-            guard let transport, transport.supportsBlobs, let package = SyncedPackage(source: fields.source, version: fields.version) else {
+            guard Distribution.syncsExtensionPackages, let transport, transport.supportsBlobs,
+                  let package = SyncedPackage(source: fields.source, version: fields.version)
+            else {
                 throw OfferError.packageUnavailable
             }
-            let file = try await downloadPackage(package, using: transport)
+            let file: URL
+            do {
+                file = try await downloadPackage(package, using: transport)
+                synced.missingPackages[package.blobID] = nil
+            } catch SyncTransportError.blobNotFound {
+                // The record may come before its package, or cite a lost one: each click here tries again.
+                synced.missingPackages[package.blobID, default: 0] += 1
+                throw SyncTransportError.blobNotFound
+            }
             defer { try? FileManager.default.removeItem(at: file.deletingLastPathComponent()) }
             return try await installer.prepare(fileAt: file, preferredIdentifier: fields.identifier)
         }

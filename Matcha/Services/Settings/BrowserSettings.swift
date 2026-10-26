@@ -14,11 +14,13 @@ nonisolated enum BrowserSettings {
         static let hiddenSidebarStyle = "hiddenSidebarStyle"
         static let showsNavigationButtons = "showsNavigationButtons"
         static let showsSearchSuggestions = "showsSearchSuggestions"
+        static let searchSuggestionSource = "searchSuggestionSource"
         static let opensPinnedLinksInPeek = "opensPinnedLinksInPeek"
         static let tabSuspensionDelay = "tabSuspensionDelay"
         static let blocksAdsAndTrackers = "blocksAdsAndTrackers"
         static let externalLinkDestination = "externalLinkDestination"
         static let showsDeveloperTools = "showsDeveloperTools"
+        static let filesFromOtherAppsReadFolder = "filesFromOtherAppsReadFolder"
     }
 
     static let searchEngine = SearchEngine.defaultEngine
@@ -35,6 +37,8 @@ nonisolated enum BrowserSettings {
     static let showsNavigationButtons = true
     /// Search engine suggestions in the command bar (never in a private window).
     static let showsSearchSuggestions = true
+    /// Who suggests them: the search engine, until the user chooses another one (review A7).
+    static let searchSuggestionSource = SuggestionSource.defaultSource
     /// Links from a favorite or a pinned tab to another site open in the peek (task 4.4), as in Arc; off by
     /// default: a plain click keeps its behavior until you choose otherwise.
     static let opensPinnedLinksInPeek = false
@@ -50,6 +54,9 @@ nonisolated enum BrowserSettings {
     #endif
     /// Links from other apps (task 8.2): in a mini window, like Little Arc.
     static let externalLinkDestination = ExternalLinkDestination.miniWindow
+    /// A local page received from another app reads only itself (review WB11): any process can send one. On, it reads
+    /// its folder, as a page opened with ⌘O.
+    static let filesFromOtherAppsReadFolder = false
 
     /// Address of the homepage typed in the settings, interpreted as in the address bar;
     /// nil if it is empty.
@@ -64,6 +71,13 @@ nonisolated enum BrowserSettings {
             return confirmBeforeQuitting
         }
         return defaults.bool(forKey: Key.confirmBeforeQuitting)
+    }
+
+    /// Value of the setting of the files received from other apps in `defaults`, or its default value.
+    static func readsFolderOfFilesFromOtherApps(in defaults: UserDefaults = .standard) -> Bool {
+        defaults.object(forKey: Key.filesFromOtherAppsReadFolder) == nil
+            ? filesFromOtherAppsReadFolder
+            : defaults.bool(forKey: Key.filesFromOtherAppsReadFolder)
     }
 
     /// Value of the peek setting in `defaults`, or its default value. `bool(forKey:)` also reads the

@@ -119,7 +119,7 @@ final class NavigationCoordinator: NSObject {
     ) {
         if navigationAction.targetFrame?.isMainFrame == true {
             tabHost?.contentBlocking?.prepare(webView, for: navigationAction.request.url)
-            prepareNotifications(for: webView)
+            prepareNotifications(for: webView, destination: navigationAction.request.url)
         }
         decisionHandler(.allow)
     }
@@ -151,6 +151,7 @@ extension NavigationCoordinator: WKNavigationDelegate {
         tab.permissionPrompts.denyAll()
         tab.pageDownloads.documentDidChange()
         tab.pageDialogs.documentDidChange()
+        tab.localFiles.documentDidChange()
         tab.audio.reset()
         notificationsDocumentDidChange(in: webView, page: tab)
         tabHost.faviconService.showCachedIcon(on: tab, host: webView.url?.host())
@@ -168,6 +169,7 @@ extension NavigationCoordinator: WKNavigationDelegate {
         tab.documentDidChange()
         updateCertificateException(of: tab, in: webView)
         tabHost.faviconService.refreshIcon(of: tab)
+        tab.localFiles.pageDidFinishLoading(in: webView, access: tab.fileReadAccess)
         // Recorded at each loaded page: a crash does not lose the history.
         tab.captureInteractionState()
         // Visit recorded in the profile's history (task 5.5), never for a private window.

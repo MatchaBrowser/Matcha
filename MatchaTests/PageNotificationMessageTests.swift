@@ -44,13 +44,17 @@ struct PageNotificationMessageTests {
         #expect(PageNotificationPermission(.deny) == .denied)
         #expect(PageNotificationPermission(nil) == .default)
 
+        // Only the destination's website, quoted for JavaScript (review WB10).
         let bridge = PageNotificationScript.bridgeName
-        let source = PageNotificationScript.stateSource(isAvailable: true, states: [
-            "https://mail.example.com": .granted,
-            "http://localhost:8080": .denied,
-        ])
-        let states = #"{"http:\/\/localhost:8080":"denied","https:\/\/mail.example.com":"granted"}"#
-        #expect(source == "window['\(bridge)']?.setStates(true, \(states));")
-        #expect(PageNotificationScript.stateSource(isAvailable: false, states: [:]) == "window['\(bridge)']?.setStates(false, {});")
+        let source = PageNotificationScript.stateSource(isAvailable: true, origin: "https://mail.example.com", permission: .granted)
+        #expect(source == #"window['\#(bridge)']?.setState(true, "https:\/\/mail.example.com", 'granted');"#)
+        let quote = PageNotificationScript.stateSource(
+            isAvailable: true,
+            origin: "https://x.example\"); alert(1); (\"",
+            permission: .denied,
+        )
+        #expect(quote.contains(#""https:\/\/x.example\"); alert(1); (\"""#))
+        #expect(PageNotificationScript.stateSource(isAvailable: false, origin: nil, permission: .default)
+            == "window['\(bridge)']?.setState(false, null, 'default');")
     }
 }

@@ -110,14 +110,15 @@ final class MiniWindowManager {
     // MARK: Opening
 
     /// ⌥⌘N, File menu: an empty mini window, bar open, in the profile of the displayed Space (never private).
-    /// `url` (task 8.2: links coming from other apps): the page loads, the bar stays closed.
+    /// `url` (task 8.2: links coming from other apps): the page loads, the bar stays closed; `isFromAnotherApp`: a local
+    /// file then reads only itself (`FileReadAccess`).
     @discardableResult
-    func openNew(loading url: URL? = nil, source: Source) -> MiniWindowController {
+    func openNew(loading url: URL? = nil, source: Source, isFromAnotherApp: Bool = false) -> MiniWindowController {
         let profile = displayedSpace.record.profile
         let tab = BrowserTab(configuration: makeConfiguration(session.dataStore(for: profile)))
         let controller = show(tab, profileID: profile?.id)
         if let url {
-            tab.load(url, isFromAnotherApp: source == .link)
+            tab.load(url, isFromAnotherApp: isFromAnotherApp)
             controller.showWebView()
         } else {
             controller.showCommandBar(.newSearch)

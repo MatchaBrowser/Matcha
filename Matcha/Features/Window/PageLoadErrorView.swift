@@ -23,7 +23,7 @@ struct PageLoadErrorView: View {
                         // Chosen again, the file can be read until the app quits.
                         Button {
                             OpenFilePanel.choose(in: error.url.deletingLastPathComponent(), multiple: false) { urls in
-                                urls.first.map { page.load($0) }
+                                urls.first.map(page.openChosenFile)
                             }
                         } label: {
                             Text("Choose File…", comment: "Button of the page shown when a local file can't be read: opens the file panel")

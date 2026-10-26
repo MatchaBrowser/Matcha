@@ -1,16 +1,18 @@
 import Foundation
 import XCTest
 
-/// Helpers for the Peek tests (task 4.4). Pages: the Postfix documentation shipped with macOS, without
-/// network. “Basic configuration” (on `index.html`) leads to `BASIC_CONFIGURATION_README.html`, whose
-/// “main.cf” links lead to `postconf.5.html`. `index.html` has only one “All main.cf parameters” link.
+/// Helpers for the Peek tests (task 4.4). Pages: the stand-in of the Postfix documentation written by the tests
+/// (`UITestPages`, review TS5), without network. “Basic configuration” (on `index.html`) leads to
+/// `BASIC_CONFIGURATION_README.html`, whose “main.cf” links lead to `postconf.5.html`. `index.html` has only one
+/// “All main.cf parameters” link.
 extension XCTestCase {
-    static let localDocsPath = "/usr/share/doc/postfix/html/index.html"
+    static var localDocsPath: String {
+        UITestPages.index
+    }
 
-    /// Opens the Postfix documentation in a new tab; the test is skipped if it is missing.
+    /// Opens the documentation in a new tab.
     @MainActor
     func openLocalDocs(in app: XCUIApplication) throws {
-        try requireResource(FileManager.default.isReadableFile(atPath: Self.localDocsPath), "Postfix documentation missing")
         openAddress("file://" + Self.localDocsPath, in: app)
         XCTAssertTrue(tabRow(titled: "Postfix Documentation", in: app).waitForExistence(timeout: 10))
     }

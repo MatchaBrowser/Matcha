@@ -214,7 +214,7 @@ struct BrowserCommands: Commands {
                 let tabs = urls.map { tabManager.newTab(url: $0) }
                 tabs.last.map(windowActions.showTab)
             } else {
-                miniWindows.openFromOtherApp(urls, destination: .space)
+                miniWindows.openFromOtherApp(urls, destination: .space, isChosenByUser: true)
             }
         }
     }

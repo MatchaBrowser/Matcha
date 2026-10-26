@@ -4,8 +4,9 @@ import OSLog
 import WebKit
 
 /// Packages of extensions installed from a file (`SYNC.md` § 2.5 and § 4.7): the archive of the installed folder,
-/// encrypted with its own key, uploaded before the record that references it; a new version has a new package, the
-/// old one is deleted afterwards.
+/// encrypted with its own key, noted as pending, uploaded before the record that references it; a new version has a new
+/// package, the old one is deleted afterwards, and so is a package that no record cites once they have left (orphan,
+/// review SY33).
 extension ExtensionSyncAdapter {
     /// 20 MiB at most: beyond that, the extension travels without its package (the other Mac shows it as “to
     /// reinstall”).
@@ -15,7 +16,7 @@ extension ExtensionSyncAdapter {
     /// received update is never installed here: it waits for the user's click (`SYNC.md` § 2.5). A version too large
     /// isn't archived again; a refused upload waits, longer each time (review SY16).
     func preparePackages(using transport: any SyncTransport, now: Date = .now) async {
-        guard transport.supportsBlobs, let directory = manager.directory else {
+        guard Distribution.syncsExtensionPackages, transport.supportsBlobs, let directory = manager.directory else {
             return
         }
         for identifier in manager.installedIdentifiers where manager.store.state(for: identifier)?.appExtensionPath == nil {
@@ -38,6 +39,8 @@ extension ExtensionSyncAdapter {
                     )
                     continue
                 }
+                // Noted first: sent, then lost before its record (quit, crash), it is found again and deleted.
+                synced.pendingBlobs.insert(package.blobID)
                 try await transport.putBlob(sealed, id: package.blobID)
                 if let old = synced.packages[identifier]?.blobID {
                     synced.obsoleteBlobs.append(old)
@@ -58,8 +61,10 @@ extension ExtensionSyncAdapter {
         }
     }
 
-    /// After a sync: deletes from the server the replaced packages or those of uninstalled extensions; never while an
-    /// extension's record waits to leave, which may still cite the old package (`SYNC.md` § 4.7, review SY33).
+    /// After a sync: deletes from the server the replaced packages, those of uninstalled extensions and the orphans;
+    /// never while an extension's record waits to leave, which may still cite them (`SYNC.md` § 4.7, review SY33). Once
+    /// the records have left, a pending package that one cites is applied, any other is an orphan; the first sync after
+    /// a launch finds those of a session that ended between the package and its record.
     func deleteObsoletePackages(using transport: any SyncTransport, recordsSent: Bool = true) async {
         guard recordsSent else {
             return
@@ -68,6 +73,12 @@ extension ExtensionSyncAdapter {
         for (identifier, package) in synced.packages where !installed.contains(identifier) {
             synced.packages[identifier] = nil
             synced.obsoleteBlobs.append(package.blobID)
+        }
+        if !synced.pendingBlobs.isEmpty {
+            let cited = Set(synced.packages.values.map(\.blobID))
+            let orphans = synced.pendingBlobs.subtracting(cited).subtracting(synced.obsoleteBlobs)
+            synced.obsoleteBlobs.append(contentsOf: orphans.sorted { $0.uuidString < $1.uuidString })
+            synced.pendingBlobs = []
         }
         for id in synced.obsoleteBlobs {
             do {

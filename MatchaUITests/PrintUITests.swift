@@ -2,7 +2,7 @@ import XCTest
 
 /// Printing and PDF export (task 5.4): ⌘P opens the macOS print panel as a sheet on the window, and “Export as
 /// PDF…” the save panel, named after the page; ⎋ closes them without printing or saving anything. Page: the
-/// Postfix documentation shipped with macOS (no network; tests skipped if it is missing). These tests move the
+/// stand-in of the Postfix documentation written by the tests (`UITestPages`, no network). These tests move the
 /// real mouse.
 final class PrintUITests: XCTestCase {
     override func setUpWithError() throws {

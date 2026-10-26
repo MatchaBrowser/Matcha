@@ -1,8 +1,8 @@
 import Foundation
 import XCTest
 
-/// Helpers for the downloads tests (task 5.1), without network: a file shipped with macOS that WebKit doesn't
-/// display, opened from the command bar, is downloaded.
+/// Helpers for the downloads tests (task 5.1), without network: a file written by the tests that WebKit doesn't
+/// display (`UITestPages`), opened from the command bar, is downloaded.
 ///
 /// The app writes to ~/Downloads/MatchaUITests (arguments `downloadsSubfolder` and `resetDownloadsSubfolder`),
 /// never next to the user's files. The test runner is sandboxed by Xcode, read-only on the whole disk: it reads
@@ -12,13 +12,6 @@ extension XCTestCase {
     static let downloadsTestFolderName = "MatchaUITests"
     /// Launch settings: downloads in the test folder, emptied at launch.
     static let downloadsTestSettings = ["downloadsSubfolder": downloadsTestFolderName, "resetDownloadsSubfolder": "YES"]
-    /// Files shipped with macOS that WebKit doesn't display; the first one present is used (the same as in
-    /// `DownloadIntegrationTests`).
-    static let undisplayableFiles = [
-        "/usr/share/firmware/bluetooth/20702_8289.dfu",
-        "/usr/share/man/man1/less.1.gz",
-        "/usr/share/tokenizer/th/matrix.bin",
-    ]
 
     /// ~/Downloads/MatchaUITests, in the real home folder (the sandboxed runner's one is its container).
     var downloadsTestFolder: URL {
@@ -26,11 +19,9 @@ extension XCTestCase {
         return URL(fileURLWithPath: home).appendingPathComponent("Downloads").appendingPathComponent(Self.downloadsTestFolderName)
     }
 
-    /// File to download; the test is skipped if there is none.
+    /// File to download, written by the tests.
     func undisplayableFile() throws -> String {
-        let path = Self.undisplayableFiles.first(where: FileManager.default.isReadableFile(atPath:))
-        try requireResource(path != nil, "No file macOS can't display is shipped with macOS")
-        return path ?? ""
+        UITestPages.undisplayable
     }
 
     /// Opens `path` (local file) in a new tab of `window` (the app if nil): it gets downloaded.

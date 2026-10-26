@@ -35,6 +35,13 @@ struct FileReadAccessTests {
         #expect(FileReadAccess.readableURL(for: file, openedFrom: nil, isFromAnotherApp: true) == file)
     }
 
+    @Test func `an access limited to the page itself is told apart from its folder`() {
+        #expect(FileReadAccess.isLimitedToItself(file, file: file))
+        #expect(FileReadAccess.isLimitedToItself(URL(filePath: "/Users/moi/Documents/docs/guide/./page.html"), file: file))
+        #expect(!FileReadAccess.isLimitedToItself(file.deletingLastPathComponent(), file: file))
+        #expect(!FileReadAccess.isLimitedToItself(URL(filePath: "/Users/moi/Documents/docs/guide/autre.html"), file: file))
+    }
+
     @Test func `a link to a folder elsewhere doesn't pass for a folder inside the page's`() throws {
         let root = FileManager.default.temporaryDirectory.appending(path: "FileReadAccessTests-\(UUID().uuidString)")
         defer { try? FileManager.default.removeItem(at: root) }

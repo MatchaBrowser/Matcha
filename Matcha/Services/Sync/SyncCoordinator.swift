@@ -35,6 +35,10 @@ final class SyncCoordinator {
     @ObservationIgnored private var needsLocalCheck = false
     /// No cycle before this date: the server asked to wait.
     @ObservationIgnored private(set) var notBefore: Date?
+    /// Local checks done, and whether the last one found something to send: what the tests wait for rather than a
+    /// fixed time (review TS2).
+    @ObservationIgnored private(set) var localChecks = 0
+    @ObservationIgnored private(set) var lastCheckFoundChanges = false
     /// Returning to the foreground syncs at most this often.
     static let foregroundInterval: TimeInterval = 60
     @ObservationIgnored private var watchedValues: NSDictionary?
@@ -162,6 +166,8 @@ final class SyncCoordinator {
         }
         do {
             let (hasChanges, next) = try engine.localChangesToSend()
+            localChecks += 1
+            lastCheckFoundChanges = hasChanges
             if hasChanges {
                 syncSoon(after: .zero)
             } else if let next {

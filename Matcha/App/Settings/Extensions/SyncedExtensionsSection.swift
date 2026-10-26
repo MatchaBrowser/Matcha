@@ -61,6 +61,14 @@ private struct SyncedExtensionRow: View {
                     .font(.caption)
                     .foregroundStyle(.secondary)
                     .help("Its package isn't available. Install it from its file.")
+            case .packageLost:
+                Text("To Reinstall", comment: "An extension from another Mac whose package was never found on the sync server")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+                    .help("Its package wasn't found on the sync server. Install it from its file, or try again.")
+                Button("Try Again") { model.addOffer(offer) }
+                    .disabled(model.isWorking)
+                    .accessibilityIdentifier("syncedExtensionRetryButton")
             }
         }
         .accessibilityElement(children: .contain)

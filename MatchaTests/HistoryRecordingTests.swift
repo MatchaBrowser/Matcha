@@ -117,6 +117,22 @@ struct HistoryRecordingTests {
         #expect(records.last?.urlKey == "app.example/article")
     }
 
+    /// Review TS16: the test says when the delay has passed; nothing is recorded before.
+    @Test func `an address changed by the page waits for the delay`() async throws {
+        let tab = try await open("https://app.example/", title: "Accueil")
+        try await waitUntil { records.count == 1 }
+        let delay = GatedSleep()
+        tab.history.sleep = delay.sleep
+        clock.advance(5)
+        _ = try await tab.loadedWebView.evaluateJavaScript("history.pushState({}, '', '/article'); true")
+        try await waitUntil { delay.waitingCount == 1 && tab.history.hasPendingChange }
+        #expect(records.count == 1)
+
+        delay.open()
+        try await waitUntil { records.count == 2 && !tab.history.hasPendingChange }
+        #expect(records.last?.urlKey == "app.example/article")
+    }
+
     @Test func `a title set after loading renames the visit only shortly after`() async throws {
         let tab = try await open("https://example.com/", title: "")
         try await waitUntil { records.count == 1 }

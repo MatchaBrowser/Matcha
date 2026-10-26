@@ -118,7 +118,11 @@ final class MiniCommandBarModel: CommandBarPanelModel {
 
     /// Never private: a mini window always uses the profile of a Space.
     private static func context(_ settings: CommandBarSettings) -> CommandContext {
-        CommandContext(isPrivate: false, showsSearchSuggestions: settings.showsSearchSuggestions)
+        CommandContext(
+            isPrivate: false,
+            showsSearchSuggestions: settings.showsSearchSuggestions,
+            suggestionEngine: settings.suggestionEngine,
+        )
     }
 
     // MARK: Input and selection

@@ -14,16 +14,19 @@ struct PageAudioTests {
 
     @Test func `the icon follows the page and goes out after the delay`() async throws {
         #expect(tab.audio.silenceDelay == 2)
-        tab.audio.silenceDelay = 0.3
+        // The test says when the delay has passed (review TS16).
+        let delay = GatedSleep()
+        tab.audio.sleep = delay.sleep
         tab.audio.receive(playing)
         #expect(tab.isPlayingAudio)
 
-        let clock = ContinuousClock()
-        let start = clock.now
         tab.audio.receive(silent)
+        try await waitUntil { delay.waitingCount == 1 }
         #expect(tab.isPlayingAudio)
+        #expect(tab.audio.isSwitchOffScheduled)
+        delay.open()
         try await waitUntil { !tab.isPlayingAudio }
-        #expect(clock.now - start >= .milliseconds(250))
+        #expect(!tab.audio.isSwitchOffScheduled)
     }
 
     @Test func `sound coming back during the delay keeps the icon`() {

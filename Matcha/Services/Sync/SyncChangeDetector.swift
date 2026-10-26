@@ -28,9 +28,11 @@ nonisolated struct SyncChangeDetector: Sendable {
     private var lastSent: [UUID: Date] = [:]
 
     /// Changes in `snapshot` compared with `state`, sorted by type then by identifier, and the date at which to look
-    /// at a waiting change again (nil if there is none).
+    /// at a waiting change again (nil if there is none). `encoded`: the snapshot's fields already as JSON
+    /// (`SyncJSONCache`, review SY13); without it, each record is encoded here.
     mutating func changes(
         in snapshot: [UUID: SyncFields],
+        encoded: [UUID: SyncJSON?]? = nil,
         exceptions: SyncLocalExceptions = SyncLocalExceptions(),
         state: SyncState,
         now: Date,
@@ -47,7 +49,11 @@ nonisolated struct SyncChangeDetector: Sendable {
                 continue
             }
             let current = snapshot[id]
-            let currentJSON = current?.encodedJSON
+            let currentJSON: SyncJSON? = if let encoded, current != nil {
+                encoded[id].flatMap(\.self)
+            } else {
+                current?.encodedJSON
+            }
             // Fields that can't be encoded: neither sent as empty nor taken for a deletion (review SY28).
             if current != nil, currentJSON == nil {
                 continue

@@ -61,6 +61,10 @@ final class SyncEngine {
     /// This Mac's fields as this cycle last read them (`detectLocalChanges`); nil before. A record that differs when a
     /// received change is applied was changed here meanwhile (review SY23).
     var detectedSnapshot: [UUID: SyncJSON]?
+    /// JSON of this Mac's records, encoded again only when they change (review SY13).
+    private var jsonCache = SyncJSONCache()
+    /// The state as last written: an unchanged state isn't written again (review SY13).
+    private var savedState: SyncState?
     /// Changes sent again on top of the server's content after a conflict won (review SY5): once applied, their
     /// content carries the other Mac's fields, applied here too.
     var remerged: Set<UUID> = []
@@ -81,6 +85,7 @@ final class SyncEngine {
         switch file.load() {
         case let .state(loaded):
             state = loaded
+            savedState = loaded
         case .missing:
             state = SyncState()
         case .unreadable:
@@ -151,7 +156,14 @@ final class SyncEngine {
             return (true, nil)
         }
         var probe = detector
-        let (changes, next) = try probe.changes(in: store.snapshot(), exceptions: store.exceptions(), state: state, now: now())
+        let snapshot = try store.snapshot()
+        let (changes, next) = try probe.changes(
+            in: snapshot,
+            encoded: jsonCache.encoded(snapshot),
+            exceptions: store.exceptions(),
+            state: state,
+            now: now(),
+        )
         return (!changes.isEmpty, next)
     }
 
@@ -165,9 +177,10 @@ final class SyncEngine {
                 state.entries[id, default: SyncEntry(type: fields.type.rawValue)].local = fields.json
             }
         }
-        let (changes, next) = detector.changes(in: snapshot, exceptions: exceptions, state: state, now: now())
+        let encoded = jsonCache.encoded(snapshot)
+        let (changes, next) = detector.changes(in: snapshot, encoded: encoded, exceptions: exceptions, state: state, now: now())
         nextCheck = next
-        detectedSnapshot = snapshot.mapValues(\.json)
+        detectedSnapshot = encoded.mapValues { $0 ?? .emptyObject }
         changes.forEach(record)
     }
 
@@ -275,13 +288,15 @@ final class SyncEngine {
     }
 
     /// Saves the state; never once the cycle is cancelled: signing out may have just deleted the file, which would
-    /// otherwise come back in clear text (`SYNC.md` § 5, review SY7).
+    /// otherwise come back in clear text (`SYNC.md` § 5, review SY7). On the main thread, and only if it changed since
+    /// the last write (review SY13): a write finished later could land after that deletion.
     func save() {
-        guard !Task.isCancelled else {
+        guard !Task.isCancelled, state != savedState else {
             return
         }
         do {
             try file.save(state)
+            savedState = state
         } catch {
             Logger.sync.error("Sync state not saved: \(error.logSummary, privacy: .public)")
         }

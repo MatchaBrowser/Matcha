@@ -228,6 +228,8 @@ struct SyncFieldsTests {
         #expect(SyncedSettings.value("0", for: "tabSuspensionDelay") == .number(0))
         #expect(SyncedSettings.value("bing", for: "searchEngine") == .string("bing"))
         #expect(SyncedSettings.value("bing", for: "sidebarWidth") == nil)
+        #expect(SyncedSettings.value("duckDuckGo", for: "searchSuggestionSource") == .string("duckDuckGo"))
+        #expect(SyncedSettings.value("yahoo", for: "searchSuggestionSource") == nil)
         #expect(SyncedSettings.defaultsValue(of: .number(60)) as? Int == 60)
         #expect(SyncedSettings.keys.contains("homePage"))
         #expect(!SyncedSettings.keys.contains("blocksAdsAndTrackers"))

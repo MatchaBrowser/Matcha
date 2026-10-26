@@ -15,6 +15,8 @@ nonisolated enum ExtensionInstallError: Error, Equatable, LocalizedError {
     case tooLarge
     /// An unpacked folder with a symbolic link or an alias (audit E3).
     case containsLink
+    /// The package of an extension from another Mac isn't on the sync server (yet), review SY33.
+    case packageNotOnServer
 
     /// Error reported while reading the package, the archive, or by WebKit.
     init(_ error: any Error) {
@@ -28,6 +30,8 @@ nonisolated enum ExtensionInstallError: Error, Equatable, LocalizedError {
             self = .tooLarge
         case ExtensionUnpacker.Failure.link:
             self = .containsLink
+        case SyncTransportError.blobNotFound:
+            self = .packageNotOnServer
         case is ExtensionPackage.Failure, is ZipArchive.Failure:
             self = .unreadable
         case let error as NSError where error.domain == WKWebExtension.errorDomain:
@@ -53,6 +57,11 @@ nonisolated enum ExtensionInstallError: Error, Equatable, LocalizedError {
             String(
                 localized: "This folder contains links to other files or folders. Matcha only installs a folder without links.",
                 comment: "Extension install error: an unpacked folder with symbolic links or aliases",
+            )
+        case .packageNotOnServer:
+            String(
+                localized: "This extension isn't on the sync server yet. Try again in a moment, or install it from its file.",
+                comment: "Extension install error: the package sent by another Mac can't be found on the sync server",
             )
         }
     }
