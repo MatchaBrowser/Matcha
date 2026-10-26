@@ -1,39 +1,112 @@
 # A GitHub release published (by hand, its tag v1.2.0 or v1.2.0-beta.1): the checks of check.yml, then a universal
-# disk image signed ad hoc (scripts/package.sh), added with its SHA-256 to that release. The release itself (title,
-# notes) is left as it is. Neither signed by Apple nor notarized: macOS asks to confirm the first opening. The signed
-# and notarized path, with Developer ID, is scripts/release.sh, run on a Mac that has the certificate.
+# disk image, not notarized (scripts/package.sh), added with its SHA-256 to that release under its own name,
+# Matcha-<version>-unnotarized.dmg. The release itself (title, notes) is left as it is. Signed with Developer ID when
+# the repository has the certificate (secrets DEVELOPER_ID_CERTIFICATE and DEVELOPER_ID_CERTIFICATE_PASSWORD, review
+# DI7), ad hoc otherwise; macOS asks to confirm the first opening either way. A release published by
+# scripts/release.sh already holds its notarized image (Matcha-<version>.dmg): nothing is built for it (review DI2).
 name: Image disque
 
 on:
   release:
     types: [published]
 
+# Each job asks for more if it needs it (review DI5).
+permissions:
+  contents: read
+
+# One image at a time per release; a running one is never cancelled.
+concurrency:
+  group: image-${{ github.event.release.tag_name }}
+  cancel-in-progress: false
+
 jobs:
+  notarized:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    outputs:
+      present: ${{ steps.assets.outputs.present }}
+    env:
+      TAG: ${{ github.event.release.tag_name }}
+    steps:
+      - name: Image notarisée déjà jointe ?
+        id: assets
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          version="${TAG#v}"
+          if gh release view "$TAG" --repo "$GITHUB_REPOSITORY" --json assets --jq '.assets[].name' \
+              | grep -qx "Matcha-$version.dmg"; then
+            echo "present=true" >> "$GITHUB_OUTPUT"
+            echo "Release publiée par scripts/release.sh : rien à construire."
+          else
+            echo "present=false" >> "$GITHUB_OUTPUT"
+          fi
+
   check:
+    needs: notarized
+    if: needs.notarized.outputs.present != 'true'
     uses: ./.github/workflows/check.yml
 
   package:
-    needs: check
-    runs-on: macos-26
+    needs: [notarized, check]
+    if: needs.notarized.outputs.present != 'true'
+    # Same machine and Xcode as check.yml (review DI6): the image is built with the SDK the tests ran with.
+    runs-on: xcode-27
     timeout-minutes: 60
     permissions:
       # Adding the files to the release.
       contents: write
     env:
       TAG: ${{ github.event.release.tag_name }}
+      XCODE: /Applications/Xcode_27.1.app
     steps:
-      - uses: actions/checkout@v7
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           # The build number counts the commits.
           fetch-depth: 0
+          # The token that can write to the release stays out of .git/config (review DI5).
+          persist-credentials: false
 
-      - name: Xcode le plus récent de la machine
+      - name: Xcode fixé
         run: |
-          xcode="$(ls -d /Applications/Xcode*.app | sort -V | tail -1)"
-          sudo xcode-select -s "$xcode"
+          sudo xcode-select -s "$XCODE"
           xcodebuild -version
 
+      - name: Certificat Developer ID
+        id: identity
+        # In a keychain of this job only, deleted at its end. Without the secret (a fork), the image is signed ad hoc.
+        env:
+          CERTIFICATE: ${{ secrets.DEVELOPER_ID_CERTIFICATE }}
+          CERTIFICATE_PASSWORD: ${{ secrets.DEVELOPER_ID_CERTIFICATE_PASSWORD }}
+        run: |
+          if [[ -z "$CERTIFICATE" ]]; then
+            echo "Pas de certificat Developer ID : image signée ad hoc."
+            exit 0
+          fi
+          keychain="$RUNNER_TEMP/signing.keychain-db"
+          password="$(uuidgen)"
+          security create-keychain -p "$password" "$keychain"
+          security set-keychain-settings -lut 3600 "$keychain"
+          security unlock-keychain -p "$password" "$keychain"
+          base64 --decode <<< "$CERTIFICATE" > "$RUNNER_TEMP/certificate.p12"
+          security import "$RUNNER_TEMP/certificate.p12" -k "$keychain" -P "$CERTIFICATE_PASSWORD" -T /usr/bin/codesign
+          rm "$RUNNER_TEMP/certificate.p12"
+          # The intermediate authority of the certificate: an exported .p12 holds the certificate and its key only.
+          curl -fsSL -o "$RUNNER_TEMP/DeveloperIDG2CA.cer" https://www.apple.com/certificateauthority/DeveloperIDG2CA.cer
+          security import "$RUNNER_TEMP/DeveloperIDG2CA.cer" -k "$keychain" || true
+          security set-key-partition-list -S apple-tool:,apple: -s -k "$password" "$keychain" > /dev/null
+          security list-keychains -d user -s "$keychain" $(security list-keychains -d user | tr -d '"')
+          identity="$(security find-identity -v -p codesigning "$keychain" \
+            | awk '/"Developer ID Application: / && !found { print $2; found = 1 }')"
+          if [[ -z "$identity" ]]; then
+            echo "::error::Le secret DEVELOPER_ID_CERTIFICATE ne contient pas de certificat Developer ID Application."
+            exit 1
+          fi
+          echo "identity=$identity" >> "$GITHUB_OUTPUT"
+
       - name: Image disque
+        env:
+          MATCHA_SIGNING_IDENTITY: ${{ steps.identity.outputs.identity }}
         run: scripts/package.sh "${TAG#v}"
 
       - name: Ajout à la release
@@ -41,13 +114,18 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           version="${TAG#v}"
-          dmg="build/package/$version/Matcha-$version.dmg"
-          # --clobber: a release published again gets the new image in place of the old one.
-          gh release upload "$TAG" "$dmg" "$dmg.sha256" --clobber
+          dmg="build/package/$version/Matcha-$version-unnotarized.dmg"
+          # --clobber: a release published again gets the new image in place of the old one; never the notarized
+          # image, which has another name.
+          gh release upload "$TAG" "$dmg" "$dmg.sha256" --repo "$GITHUB_REPOSITORY" --clobber
+
+      - name: Trousseau supprimé
+        if: always()
+        run: security delete-keychain "$RUNNER_TEMP/signing.keychain-db" 2> /dev/null || true
 
       - name: Journaux
         if: failure()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         with:
           name: journaux-image-disque
           path: |

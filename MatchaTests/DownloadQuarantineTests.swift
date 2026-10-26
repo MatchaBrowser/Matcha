@@ -36,8 +36,10 @@ struct DownloadQuarantineTests {
         #expect(DownloadQuarantine.recordedURL(nil) == nil)
     }
 
-    /// File created by the (sandboxed) app: the sandbox quarantines it by itself, nothing is rewritten.
-    @Test func `a file created in the sandbox is already quarantined`() throws {
+    /// File created by the test host, sandboxed: the sandbox quarantines it by itself, nothing is rewritten. The host's
+    /// sandbox has wider exceptions than the published app's (review DI8): the downloads of that app are checked by
+    /// hand, on the image of scripts/package.sh (TESTS_MANUELS.md).
+    @Test func `a file created by the sandboxed host is already quarantined`() throws {
         let folder = FileManager.default.temporaryDirectory.appendingPathComponent("Quarantine-\(UUID().uuidString)")
         try FileManager.default.createDirectory(at: folder, withIntermediateDirectories: true)
         defer { try? FileManager.default.removeItem(at: folder) }

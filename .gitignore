@@ -16,5 +16,6 @@ matcha-icon/
 # Index créé par l'éditeur dans le projet
 Matcha.xcodeproj/-Xcc/
 
-.CLAUDE/
+# Working documents of the maintainer, kept outside the repository on purpose (README, review DI10)
+.claude/
 .vscode/

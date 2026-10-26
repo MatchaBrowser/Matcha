@@ -55,6 +55,9 @@ for path in catalogs:
     print(title(f"── {path.split('/')[-1]} ({language}) ──"))
     for key in sorted(catalog["strings"], key=str.casefold):
         entry = catalog["strings"][key]
+        # Never translated (a name, a symbol): neither shown nor counted (review DI11).
+        if entry.get("shouldTranslate") is False:
+            continue
         localizations = entry.get("localizations", {})
         source = units(localizations.get(source_language)) or [(None, key, "translated")]
         target = units(localizations.get(language))
@@ -72,7 +75,7 @@ for path in catalogs:
             label = f"[{form}] " if form else ""
             arrow = f"{dim(label + english)}  →  {text if text is not None else ''}"
             lines.append(arrow + (f"  {warn('[' + problem + ']')}" if problem else ""))
-        if entry.get("shouldTranslate") is False or not lines:
+        if not lines:
             continue
         shown += 1
         print("\n".join(lines))

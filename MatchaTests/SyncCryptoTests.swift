@@ -217,7 +217,9 @@ struct SyncCryptoTests {
         #expect(SyncKeychain.name(of: .refreshToken, server: server, accountID: account).hasPrefix("https://sync.example.com/api|"))
     }
 
-    @Test func `this machine has a mark, read in the sandbox`() {
+    /// Read here by the test host, whose sandbox has wider exceptions than the published app's (review DI8): the app's
+    /// own reading is checked by hand, on the image of scripts/package.sh (TESTS_MANUELS.md).
+    @Test func `this machine has a stable mark`() {
         let mark = SyncMachineMark.current()
         #expect(mark?.count == 64)
         #expect(mark == SyncMachineMark.current())
