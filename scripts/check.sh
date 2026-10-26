@@ -143,7 +143,9 @@ if [[ "${MATCHA_CHECK_RELEASE:-}" == 1 ]]; then
 fi
 
 step "Traductions"
-scripts/check-localizations.sh
+# The Debug build made above: left to itself, the script would read the configuration whose file list is the newest,
+# possibly the Release of an earlier run (Xcode only writes that list again when files are added or removed).
+CONFIGURATION=Debug scripts/check-localizations.sh
 
 step "Scripts"
 python3 -I scripts/test-appcast.py
