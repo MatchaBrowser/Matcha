@@ -111,9 +111,10 @@ struct PageTranslationIntegrationTests {
         let tab = try await open("long", body: paragraphs)
         let steps = StepRecorder()
         translate(tab, steps: steps)
-        try await waitUntil { tab.translation.state == .translated }
+        // The page counts as translated from its first step on: the last paragraph comes with the last step.
+        try await waitUntilAsync { try await text(of: "p449", in: tab) == "PARAGRAPH 449" }
+        #expect(tab.translation.state == .translated)
         #expect(steps.counts == Array(repeating: TranslationLimits.maximumBlocksPerCollect, count: 9))
-        #expect(try await text(of: "p449", in: tab) == "PARAGRAPH 449")
     }
 
     @Test func `translating again starts from the original text`() async throws {
