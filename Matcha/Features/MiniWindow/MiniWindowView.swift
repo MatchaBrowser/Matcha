@@ -60,6 +60,9 @@ struct MiniWindowView: View {
         }
         // Invisible title, read by VoiceOver, Mission Control and the Window menu; followed apart (review IU4).
         .background { MiniWindowTitle(tab: tab, panel: controller.panel) }
+        // Translation sessions of the page (task 9.3).
+        .background { TranslationSessionsView(host: controller.translationHost) }
+        .environment(controller.translationHost)
         // Engine or suggestions changed in Settings while the bar stays open.
         .onChange(of: settings) { _, settings in controller.commandBar.apply(settings) }
     }

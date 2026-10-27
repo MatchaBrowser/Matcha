@@ -11,6 +11,9 @@ nonisolated enum CommandActionID: String, CaseIterable, Sendable {
     case newSpace
     case copyURL
     case settings
+    /// Translates the page in front (task 9.3), or shows its original.
+    case translatePage
+    case showOriginal
 }
 
 /// Raw result provided by a bar source, before matching and ranking.

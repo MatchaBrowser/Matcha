@@ -21,6 +21,7 @@ nonisolated enum MenuShortcut: String, CaseIterable, Sendable {
     case actualSize
     case zoomIn
     case zoomOut
+    case translatePage
     case toggleSidebar
     case toggleDownloads
     case newSpace
@@ -45,7 +46,9 @@ nonisolated enum MenuShortcut: String, CaseIterable, Sendable {
         case .closeTab, .closeWindow, .saveAs, .exportPDF, .print: .file
         case .copyURL:
             .edit
-        case .reloadPage, .reloadFromOrigin, .stopLoading, .actualSize, .zoomIn, .zoomOut, .toggleSidebar, .toggleDownloads:
+        case .reloadPage, .reloadFromOrigin, .stopLoading, .actualSize, .zoomIn, .zoomOut, .translatePage:
+            .view
+        case .toggleSidebar, .toggleDownloads:
             .view
         case .newSpace:
             .spaces
@@ -76,6 +79,7 @@ nonisolated enum MenuShortcut: String, CaseIterable, Sendable {
         case .actualSize: ShortcutKey("0")
         case .zoomIn: ShortcutKey("+")
         case .zoomOut: ShortcutKey("-")
+        case .translatePage: nil
         case .toggleSidebar: ShortcutKey("s", [.command, .control])
         case .toggleDownloads: ShortcutKey("l", [.command, .option])
         case .newSpace: nil

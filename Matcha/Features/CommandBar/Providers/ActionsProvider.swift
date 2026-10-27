@@ -34,6 +34,10 @@ final class ActionsProvider: CommandProvider {
             windowModel.selectedTab?.displayedURL != nil
         case .settings:
             true
+        case .translatePage:
+            PageTranslationActions.canTranslate(windowModel.frontTab) && windowModel.frontTab?.translation.isTranslated == false
+        case .showOriginal:
+            windowModel.frontTab?.translation.isTranslated == true
         }
     }
 }

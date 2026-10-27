@@ -33,6 +33,12 @@ final class BrowserWebView: WKWebView {
     /// Sound of the tab this web view belongs to (task 5.10), recipient of the messages of the sound script; nil once
     /// the view is released by its tab.
     weak var audio: PageAudio?
+    /// Translation of the page of this web view while it is translated (task 9.2), recipient of the messages of the
+    /// translation script; set and cleared by the translation itself.
+    weak var translation: PageTranslation?
+    /// Translation sessions of the window showing this view (task 9.3), for “Translate to …” of the page menu; set
+    /// by that window.
+    weak var translationHost: (any PageTranslationHosting)?
     /// Recipient of the messages of the notification script: the tab's navigation delegate (review CO1).
     weak var notifications: (any PageNotificationReceiving)?
 

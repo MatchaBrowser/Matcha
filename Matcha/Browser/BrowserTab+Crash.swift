@@ -10,12 +10,12 @@ extension BrowserTab {
     }
 
     /// Called while WebKit notifies the delegate: the web view still has its address, title and navigation state.
-    /// Pending permission requests are denied, find in page is forgotten and the sound icon is turned off (there is no
-    /// page anymore); zoom, icon, title and address remain.
+    /// Pending permission requests are denied, find in page and the translation are forgotten and the sound icon is
+    /// turned off (there is no page anymore); zoom, icon, title and address remain.
     func webContentProcessDidTerminate(_ action: PageCrashAction) {
         permissionPrompts.denyAll()
         find.pageDidTerminate()
-        audio.reset()
+        endPageActivity()
         switch action {
         case .reload:
             // On the next turn of the main loop: WebKit first finishes handling the termination (it clears the view's

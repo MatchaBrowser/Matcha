@@ -101,6 +101,7 @@ extension WindowModel {
     /// Space leaves it its selection, for the next one.
     func windowDidClose() {
         closePeek()
+        translationHost.cancelAll()
         // Its own tabs close with it (⇧⌘T in their Space brings them back).
         if let windowTabs {
             windowTabs.close(into: session.originSpace(of: windowTabs))

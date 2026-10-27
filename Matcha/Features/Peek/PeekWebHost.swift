@@ -7,15 +7,19 @@ import WebKit
 /// added at creation: when it leaves for the card (“Open as Tab”), the container never takes it back.
 struct PeekWebHost: NSViewRepresentable {
     let webView: WKWebView
+    /// Translation sessions of the window, for the page menu (task 9.3).
+    let translationHost: (any PageTranslationHosting)?
     let onCancel: () -> Void
 
     func makeNSView(context _: Context) -> PeekWebContainer {
+        (webView as? BrowserWebView)?.translationHost = translationHost
         let container = PeekWebContainer(webView: webView)
         container.onCancel = onCancel
         return container
     }
 
     func updateNSView(_ container: PeekWebContainer, context _: Context) {
+        (webView as? BrowserWebView)?.translationHost = translationHost
         container.onCancel = onCancel
     }
 }

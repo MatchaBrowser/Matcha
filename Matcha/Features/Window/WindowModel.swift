@@ -37,6 +37,8 @@ final class WindowModel {
     var deletedSpace: SpaceSession?
     /// Import from Arc started from this window (task 7.1).
     let arcImport = ArcImportModel()
+    /// Translation sessions of the window's pages (task 9.3).
+    let translationHost: TranslationHost
     /// Where to remember the last displayed Space, shown by the next new window; nil to remember nothing (tests).
     @ObservationIgnored private let defaults: UserDefaults?
     /// This window's viewer of each Space it has shown: its selected tab there.
@@ -58,6 +60,7 @@ final class WindowModel {
         self.session = session
         self.defaults = defaults
         self.windowTabs = windowTabs
+        translationHost = TranslationHost(languages: session.services.translationLanguages)
         currentSpaceID = spaceID ?? defaults?.string(forKey: Self.currentSpaceKey).flatMap(UUID.init(uuidString:))
     }
 

@@ -33,6 +33,7 @@ struct SidebarView: View {
                 HStack(spacing: 4) {
                     AddressPill(tab: model.selectedTab, edit: editAddress)
                     ZoomBadge(page: model.selectedTab, siteZooms: tabManager.siteZooms)
+                    TranslateButton(page: model.selectedTab)
                     SiteSettingsButton(tab: model.selectedTab, isPresented: model.isSiteSettingsPresented) {
                         setSiteSettingsPresented(!model.isSiteSettingsPresented)
                     }

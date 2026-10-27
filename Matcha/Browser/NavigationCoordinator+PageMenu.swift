@@ -16,7 +16,7 @@ extension NavigationCoordinator: PageMenuDelegate {
     }
 
     /// Save As… and Print…: on the page of `webView`; View Page Source: in a new foreground tab, after it (like a link
-    /// opened in a new tab), same profile.
+    /// opened in a new tab), same profile; Translate: with the translation sessions of its window (task 9.3).
     func pageMenu(perform command: PageCommand, in webView: WKWebView) {
         guard let tabHost, let page = tabHost.page(for: webView) else {
             return
@@ -35,7 +35,27 @@ extension NavigationCoordinator: PageMenuDelegate {
             page.goBack()
         case .goForward:
             page.goForward()
+        case .translate:
+            guard let host = (webView as? BrowserWebView)?.translationHost else {
+                return
+            }
+            if page.translation.isTranslated {
+                host.showOriginal(page)
+            } else {
+                host.translate(page, into: nil)
+            }
         }
+    }
+
+    func pageMenuTranslation(in webView: WKWebView) -> PageTranslation? {
+        tabHost?.page(for: webView)?.translation
+    }
+
+    func pageMenu(translateInto language: Locale.Language, in webView: WKWebView) {
+        guard let page = tabHost?.page(for: webView) else {
+            return
+        }
+        (webView as? BrowserWebView)?.translationHost?.translate(page, into: language)
     }
 
     /// True for a navigation to the source viewer that doesn't come from the app (`NavigationPolicy.allowsSourceViewer`,

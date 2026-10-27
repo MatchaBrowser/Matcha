@@ -25,6 +25,7 @@ struct MiniWindowToolbar: View {
             AddressPill(tab: tab, edit: editAddress)
                 .frame(minWidth: 120, maxWidth: 280)
             ZoomBadge(page: tab, siteZooms: siteZooms)
+            TranslateButton(page: tab)
             // The window's background shows here: dragging this area moves the window.
             Spacer(minLength: 12)
             openButton

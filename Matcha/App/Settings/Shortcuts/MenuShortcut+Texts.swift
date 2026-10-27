@@ -24,6 +24,7 @@ extension MenuShortcut {
         case .actualSize: String(localized: "Actual Size")
         case .zoomIn: String(localized: "Zoom In")
         case .zoomOut: String(localized: "Zoom Out")
+        case .translatePage: String(localized: "Translate Page or Show Original", comment: "Settings > Shortcuts: the View menu item")
         case .toggleSidebar: String(localized: "Show or Hide Sidebar", comment: "Settings > Shortcuts: the View menu item")
         case .toggleDownloads: String(localized: "Show or Hide Downloads", comment: "Settings > Shortcuts: the View menu item")
         case .newSpace: String(localized: "New Space")

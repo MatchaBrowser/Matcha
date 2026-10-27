@@ -200,6 +200,7 @@ final class PageMenuIntegrationTests {
         #expect(Array(driver.identifiers[..<reload]) == ["MatchaMenuItemIdentifierGoBack", "MatchaMenuItemIdentifierGoForward"])
         #expect(driver.identifiers.contains("MatchaMenuItemIdentifierSaveAs"))
         #expect(driver.identifiers.contains("MatchaMenuItemIdentifierPrint"))
+        #expect(driver.identifiers.contains("MatchaMenuItemIdentifierTranslate"))
         #expect(driver.identifiers.contains("MatchaMenuItemIdentifierViewSource"))
     }
 }

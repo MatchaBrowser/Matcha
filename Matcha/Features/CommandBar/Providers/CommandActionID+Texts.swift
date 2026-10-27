@@ -8,6 +8,8 @@ nonisolated extension CommandActionID {
         case .newSpace: String(localized: "New Space")
         case .copyURL: String(localized: "Copy URL", comment: "Edit menu (⇧⌘C) and command bar action")
         case .settings: String(localized: "Settings", comment: "Command bar action")
+        case .translatePage: String(localized: "Translate Page")
+        case .showOriginal: String(localized: "Show Original")
         }
     }
 
@@ -23,6 +25,8 @@ nonisolated extension CommandActionID {
         case .newSpace: "rectangle.stack.badge.plus"
         case .copyURL: "link"
         case .settings: "gearshape"
+        case .translatePage: "translate"
+        case .showOriginal: "arrow.uturn.backward"
         }
     }
 
@@ -45,6 +49,18 @@ nonisolated extension CommandActionID {
                 localized: "commandBar.keywords.settings",
                 defaultValue: "settings preferences options",
                 comment: "Search words for the “Settings” action, space-separated, never displayed; keep the English words",
+            )
+        case .translatePage:
+            String(
+                localized: "commandBar.keywords.translatePage",
+                defaultValue: "translate translation language",
+                comment: "Search words for the “Translate Page” action, space-separated, never displayed; keep the English words",
+            )
+        case .showOriginal:
+            String(
+                localized: "commandBar.keywords.showOriginal",
+                defaultValue: "original untranslated translation language",
+                comment: "Search words for the “Show Original” action, space-separated, never displayed; keep the English words",
             )
         }
     }

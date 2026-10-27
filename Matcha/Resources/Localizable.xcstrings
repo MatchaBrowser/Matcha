@@ -4470,6 +4470,76 @@
         }
       }
     },
+    "commandBar.keywords.showOriginal" : {
+      "comment" : "Search words for the “Show Original” action, space-separated, never displayed; keep the English words",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "original originalsprache übersetzung original untranslated translation language"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "original untranslated translation language"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "original idioma traducción original untranslated translation language"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "original langue traduction original untranslated translation language"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "originale lingua traduzione original untranslated translation language"
+          }
+        }
+      }
+    },
+    "commandBar.keywords.translatePage" : {
+      "comment" : "Search words for the “Translate Page” action, space-separated, never displayed; keep the English words",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "übersetzen übersetzung sprache translate translation language"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "translate translation language"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "traducir traducción idioma translate translation language"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "traduire traduction langue translate translation language"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "traduci traduzione lingua translate translation language"
+          }
+        }
+      }
+    },
     "Communicate with apps on your Mac" : {
       "localizations" : {
         "de" : {
@@ -9428,6 +9498,35 @@
         }
       }
     },
+    "Matcha can't translate the language of this page." : {
+      "comment" : "Translation popover: the Mac can't translate the page's language",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Matcha kann die Sprache dieser Seite nicht übersetzen."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Matcha no puede traducir el idioma de esta página."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Matcha ne peut pas traduire la langue de cette page."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Matcha non può tradurre la lingua di questa pagina."
+          }
+        }
+      }
+    },
     "Matcha can't verify that this file comes from the developer of “%@”. Replacing it erases its data." : {
       "comment" : "Extension install sheet: a file with the name of an installed extension, from an unproven developer",
       "localizations" : {
@@ -9453,6 +9552,35 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Matcha non può verificare che questo file provenga dallo sviluppatore di “%@”. Sostituirla cancella i suoi dati."
+          }
+        }
+      }
+    },
+    "Matcha couldn't recognize the language of this page." : {
+      "comment" : "Translation popover: the page's language wasn't recognized",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Matcha konnte die Sprache dieser Seite nicht erkennen."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Matcha no ha podido reconocer el idioma de esta página."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Matcha n'a pas reconnu la langue de cette page."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Matcha non è riuscito a riconoscere la lingua di questa pagina."
           }
         }
       }
@@ -11999,6 +12127,35 @@
         }
       }
     },
+    "Page language" : {
+      "comment" : "Translation popover, before the target language, when the page's language isn't known",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sprache der Seite"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Idioma de la página"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Langue de la page"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lingua della pagina"
+          }
+        }
+      }
+    },
     "Page Source" : {
       "comment" : "Format of File > Save As… for a web page",
       "localizations" : {
@@ -12024,6 +12181,35 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Sorgente pagina"
+          }
+        }
+      }
+    },
+    "Page translated" : {
+      "comment" : "Title of the translation popover once the page is translated",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Seite übersetzt"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Página traducida"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Page traduite"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pagina tradotta"
           }
         }
       }
@@ -15544,6 +15730,35 @@
         }
       }
     },
+    "Show Original" : {
+      "comment" : "View menu, command bar and translation popover: puts a translated page back in its language",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Original anzeigen"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mostrar original"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Afficher l'original"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mostra originale"
+          }
+        }
+      }
+    },
     "Show Previous Tab" : {
       "comment" : "Tabs menu (⌃⇧⇥): selects the previous tab in sidebar order",
       "localizations" : {
@@ -17377,6 +17592,35 @@
         }
       }
     },
+    "The languages of this translation aren't downloaded yet. Try again once macOS has downloaded them." : {
+      "comment" : "Translation popover: the languages are being downloaded by macOS, or the download was declined",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Die Sprachen dieser Übersetzung sind noch nicht geladen. Versuche es erneut, sobald macOS sie geladen hat."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Los idiomas de esta traducción aún no están descargados. Vuelve a intentarlo cuando macOS los haya descargado."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Les langues de cette traduction ne sont pas encore téléchargées. Réessayez une fois que macOS les a téléchargées."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Le lingue di questa traduzione non sono ancora scaricate. Riprova quando macOS le avrà scaricate."
+          }
+        }
+      }
+    },
     "The Last Hour" : {
       "comment" : "Clear History: period",
       "localizations" : {
@@ -18504,6 +18748,35 @@
         }
       }
     },
+    "This page couldn't be translated." : {
+      "comment" : "Translation popover: the translation failed for another reason",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Diese Seite konnte nicht übersetzt werden."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No se ha podido traducir esta página."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Impossible de traduire cette page."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Impossibile tradurre questa pagina."
+          }
+        }
+      }
+    },
     "This page had a problem" : {
       "comment" : "Title of the message shown in place of a page whose content stopped working several times in a row",
       "localizations" : {
@@ -18529,6 +18802,35 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Si è verificato un problema con questa pagina"
+          }
+        }
+      }
+    },
+    "This page has no text to translate." : {
+      "comment" : "Translation popover: nothing to translate on the page",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Diese Seite enthält keinen Text zum Übersetzen."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Esta página no tiene texto para traducir."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cette page n'a pas de texte à traduire."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Questa pagina non contiene testo da tradurre."
           }
         }
       }
@@ -18587,6 +18889,35 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Questa pagina è un file di questo Mac, non un sito web."
+          }
+        }
+      }
+    },
+    "This page is already in %@." : {
+      "comment" : "Translation popover; %@ is a language as written in a sentence (“French”, “français”)",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Diese Seite ist bereits auf %@."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Esta página ya está en %@."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cette page est déjà en %@."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Questa pagina è già in %@."
           }
         }
       }
@@ -19108,6 +19439,296 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Strumenti"
+          }
+        }
+      }
+    },
+    "Translate" : {
+      "comment" : "Button of the translation popover: translates the page",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Übersetzen"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Traducir"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Traduire"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Traduci"
+          }
+        }
+      }
+    },
+    "Translate Page" : {
+      "comment" : "View menu, command bar and button next to the address: translates the page in front",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Seite übersetzen"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Traducir página"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Traduire la page"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Traduci pagina"
+          }
+        }
+      }
+    },
+    "Translate Page or Show Original" : {
+      "comment" : "Settings > Shortcuts: the View menu item",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Seite übersetzen oder Original anzeigen"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Traducir página o mostrar original"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Traduire la page ou afficher l'original"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Traduci pagina o mostra originale"
+          }
+        }
+      }
+    },
+    "Translate this page?" : {
+      "comment" : "Title of the translation popover before the page is translated",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Diese Seite übersetzen?"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "¿Traducir esta página?"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Traduire cette page ?"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vuoi tradurre questa pagina?"
+          }
+        }
+      }
+    },
+    "Translate to" : {
+      "comment" : "Translation popover: accessibility label of the target language menu",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Übersetzen in"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Traducir al"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Traduire en"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Traduci in"
+          }
+        }
+      }
+    },
+    "Translate to %@" : {
+      "comment" : "Context menu of a web page: translates it; %@ is a language as written in a sentence (“French”, “français”)",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Auf %@ übersetzen"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Traducir al %@"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Traduire en %@"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Traduci in %@"
+          }
+        }
+      }
+    },
+    "Translate to Another Language" : {
+      "comment" : "Context menu of a web page: submenu of the languages it can be translated into",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "In eine andere Sprache übersetzen"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Traducir a otro idioma"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Traduire dans une autre langue"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Traduci in un'altra lingua"
+          }
+        }
+      }
+    },
+    "Translated Page" : {
+      "comment" : "Button next to the address of a translated page; opens its translation popover",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Übersetzte Seite"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Página traducida"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Page traduite"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pagina tradotta"
+          }
+        }
+      }
+    },
+    "Translating…" : {
+      "comment" : "Title of the translation popover while the page is being translated",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wird übersetzt …"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Traduciendo…"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Traduction…"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Traduzione…"
+          }
+        }
+      }
+    },
+    "Translation failed" : {
+      "comment" : "Title of the translation popover when the page couldn't be translated",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Übersetzung fehlgeschlagen"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Error de traducción"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Échec de la traduction"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Traduzione non riuscita"
           }
         }
       }
