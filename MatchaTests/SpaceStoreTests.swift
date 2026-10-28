@@ -63,6 +63,24 @@ struct SpaceStoreTests {
         #expect(store.space.folders?.first?.name == "Travail")
     }
 
+    /// Names of pinned tabs and favorites: saved, read back, and cleared when given back to the page's title.
+    @Test func `tab names are saved and loaded back`() async throws {
+        let store = makeStore()
+        let tabs = try await fillManager()
+        manager.renameTab(tabs[0], to: "Favori")
+        manager.renameTab(tabs[1], to: "Courrier")
+        store.saveNow(manager)
+
+        let (stored, _) = SpaceStore(space: store.space, context: container.mainContext).load()
+        let names = stored.reduce(into: [UUID: String]()) { $0[$1.id] = $1.customTitle }
+        #expect(names == [tabs[0].id: "Favori", tabs[1].id: "Courrier"])
+
+        manager.renameTab(tabs[1], to: "")
+        store.saveNow(manager)
+        let record = try #require(store.space.tabs?.first { $0.id == tabs[1].id })
+        #expect(record.customTitle == nil)
+    }
+
     /// Icon and colors of the folders (subfolders included): stored as short text, read back identically; “Reset”
     /// clears the fields.
     @Test func `folder appearances are saved and loaded back`() async throws {

@@ -35,6 +35,10 @@ final class BrowserTab: Identifiable {
     /// Original address and title of a pinned or favorite tab: it goes back to them when closed.
     var pinnedURL: URL?
     var pinnedTitle: String?
+    /// Name the user gave a pinned tab or a favorite, shown in place of the page's title (`displayTitle`); never empty,
+    /// nil for the page's title. It stays when the tab goes back to its original address, and goes with the tab
+    /// becoming a today tab again (`TabManager+Names`).
+    var customTitle: String?
     /// Last time the tab was selected (restoring the selection, command bar ranking).
     var lastActivity = Date.now
     /// Navigation state kept for restoration (back/forward history, scrolling).
@@ -119,6 +123,7 @@ final class BrowserTab: Identifiable {
         pendingURL = url
         pinnedURL = restorable(stored.pinnedURL)
         pinnedTitle = stored.pinnedTitle
+        customTitle = stored.customTitle
         lastActivity = stored.lastActivity
         let state = url == nil ? nil : stored.interactionState
         savedInteractionState = state
@@ -140,14 +145,7 @@ final class BrowserTab: Identifiable {
         }
         // A failure shown belongs to the previous view (review WB20).
         loadFailure.clear()
-        let webView = BrowserWebView(frame: .zero, configuration: configuration)
-        webView.allowsBackForwardNavigationGestures = true
-        webView.allowsMagnification = true
-        webView.navigationDelegate = delegate
-        webView.uiDelegate = delegate
-        webView.notifications = delegate
-        webView.pageZoom = pageZoom
-        webView.audio = audio
+        let webView = newWebView()
         // Reusable copy for the next views (reload, duplication).
         configuration = webView.configuration
         self.webView = webView

@@ -102,6 +102,26 @@ struct MatchaSyncStoreTests {
         }
     }
 
+    /// A pinned tab's name leaves with it; a received name, or its removal, shows at once, even on a displayed tab.
+    @Test func `names of pinned tabs leave and arrive`() throws {
+        let tab = home.tabManager.newTab(url: URL(string: "https://example.com/courrier"))
+        home.tabManager.setPlace(tab, to: .pinned)
+        home.tabManager.renameTab(tab, to: "Courrier")
+        home.saveNow()
+        guard case var .tab(fields) = try store.snapshot()[tab.id] else {
+            Issue.record("Pinned tab missing from the snapshot")
+            return
+        }
+        #expect(fields.customTitle == "Courrier")
+
+        fields.customTitle = "Mail"
+        _ = try store.apply([.upsert(tab.id, .tab(fields))])
+        #expect(home.tabManager.tab(withID: tab.id)?.displayTitle == "Mail")
+        fields.customTitle = nil
+        _ = try store.apply([.upsert(tab.id, .tab(fields))])
+        #expect(home.tabManager.tab(withID: tab.id)?.customTitle == nil)
+    }
+
     @Test func `a change waits for its missing parent`() throws {
         let unknownSpace = UUID()
         let tab = UUID()

@@ -16,6 +16,8 @@ final class TabRecord {
     /// Original address and title of a pinned tab or a favorite.
     var pinnedURL: URL?
     var pinnedTitle: String?
+    /// Name the user gave a pinned tab or a favorite, shown in place of the page's title; nil: the page's title.
+    var customTitle: String?
     /// WebKit navigation state (back/forward history), for restoration.
     @Attribute(.externalStorage) var interactionState: Data?
     /// What its local file may read (`BrowserTab.fileReadAccess`, review WB11); kept on this Mac only.

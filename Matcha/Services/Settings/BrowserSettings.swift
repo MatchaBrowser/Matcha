@@ -16,6 +16,7 @@ nonisolated enum BrowserSettings {
         static let showsSearchSuggestions = "showsSearchSuggestions"
         static let searchSuggestionSource = "searchSuggestionSource"
         static let opensPinnedLinksInPeek = "opensPinnedLinksInPeek"
+        static let renamesTabsOnDoubleClick = "renamesTabsOnDoubleClick"
         static let tabSuspensionDelay = "tabSuspensionDelay"
         static let blocksAdsAndTrackers = "blocksAdsAndTrackers"
         static let externalLinkDestination = "externalLinkDestination"
@@ -42,6 +43,9 @@ nonisolated enum BrowserSettings {
     /// Links from a favorite or a pinned tab to another site open in the peek (task 4.4), as in Arc; off by
     /// default: a plain click keeps its behavior until you choose otherwise.
     static let opensPinnedLinksInPeek = false
+    /// A double click on a pinned tab or a favorite renames it, as in Arc; off by default: the context menu renames
+    /// (`TabDoubleClickRename`).
+    static let renamesTabsOnDoubleClick = false
     /// Memory freed after 30 minutes without being displayed (task 5.6).
     static let tabSuspensionDelay = TabSuspensionDelay.thirtyMinutes
     /// Ad and tracker blocker (task 6.2), on as soon as lists are bundled.

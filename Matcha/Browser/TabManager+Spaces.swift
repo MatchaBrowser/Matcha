@@ -42,6 +42,7 @@ extension TabManager {
                 title: tab.title,
                 pinnedURL: tab.pinnedURL,
                 pinnedTitle: tab.pinnedTitle,
+                customTitle: tab.customTitle,
                 lastActivity: tab.lastActivity,
                 interactionState: tab.savedInteractionState,
                 fileReadAccess: tab.fileReadAccess,
@@ -92,7 +93,8 @@ extension TabManager {
     }
 
     /// Takes in a tab coming from another Space, at `destination` (the top of the today tabs by default). A pinned
-    /// tab or a favorite that stays one keeps its original address (review ON12); a today tab forgets it.
+    /// tab or a favorite that stays one keeps its original address (review ON12) and its name; a today tab forgets
+    /// them.
     func attach(_ tab: BrowserTab, at destination: SidebarDestination = .today(index: 0)) {
         register(tab)
         updateLayout {
@@ -102,6 +104,7 @@ extension TabManager {
         if case .today = destination {
             tab.pinnedURL = nil
             tab.pinnedTitle = nil
+            tab.customTitle = nil
         } else if tab.pinnedURL == nil {
             tab.pinnedURL = tab.url
             tab.pinnedTitle = tab.title

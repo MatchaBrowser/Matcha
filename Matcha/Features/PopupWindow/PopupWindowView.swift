@@ -36,6 +36,6 @@ struct PopupWindowView: View {
     /// Title of a sign-in window: empty until a document is displayed, never the host of a load the page started,
     /// above the opener's content (review TR1).
     static func windowTitle(of tab: BrowserTab) -> String {
-        tab.displayedURL == nil ? "" : tab.displayTitle
+        tab.displayedURL == nil ? "" : tab.pageTitle
     }
 }

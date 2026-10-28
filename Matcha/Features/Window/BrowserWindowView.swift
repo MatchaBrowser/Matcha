@@ -31,6 +31,7 @@ struct BrowserWindowView: View {
     @AppStorage(BrowserSettings.Key.showsSearchSuggestions) var showsSearchSuggestions = BrowserSettings.showsSearchSuggestions
     @AppStorage(BrowserSettings.Key.searchSuggestionSource) var suggestionSource = BrowserSettings.searchSuggestionSource
     @AppStorage(BrowserSettings.Key.hiddenSidebarStyle) private var hiddenSidebarStyle = BrowserSettings.hiddenSidebarStyle
+    @AppStorage(BrowserSettings.Key.renamesTabsOnDoubleClick) private var renamesOnDoubleClick = BrowserSettings.renamesTabsOnDoubleClick
     @Environment(\.openSettings) var openSettings
     @Environment(\.openWindow) var openWindow
     /// Absent from private windows.
@@ -216,6 +217,8 @@ struct BrowserWindowView: View {
         .task { await session.removeOrphanDataStores() }
         // “Clear…” in the site settings (task 5.2): the alert belongs to the window.
         .modifier(SiteDataClearConfirmation(model: model))
+        // “Rename…” of a favorite, a pane of a split or an icon of the column.
+        .modifier(TabRenameAlert(model: model))
         .modifier(ArcImportPresenter(model: model))
         // Questions of sync (first sync, mass deletion…), asked once: in the last active window, never a private one.
         .asksSyncQuestions(miniWindows?.asksSyncQuestions(in: model) == true)
@@ -229,8 +232,9 @@ struct BrowserWindowView: View {
         .background { TranslationSessionsView(host: model.translationHost) }
         .environment(model)
         .environment(model.translationHost)
-        // The sidebar's rows show this window's selection.
+        // The sidebar's rows show this window's selection, and read the double-click option once for all.
         .environment(model.viewer)
+        .environment(\.renamesTabsOnDoubleClick, renamesOnDoubleClick)
         .focusedSceneValue(\.tabManager, tabManager)
         .focusedSceneValue(\.windowActions, windowActions)
         .focusedSceneValue(\.translationHost, model.translationHost)

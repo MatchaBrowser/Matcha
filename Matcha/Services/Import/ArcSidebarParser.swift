@@ -5,9 +5,9 @@ import Foundation
 /// of pairs (identifier, object):
 /// - a Space has a title, `containerIDs` (`"pinned"` and `"unpinned"`, each followed by the identifier of its
 ///   container), `customInfo.iconType` (icon or emoji), `customInfo.windowTheme` (colors) and `profile`;
-/// - an item has a title, `childrenIds` and `data`: `tab` (`savedURL`, `savedTitle`), `list` (folder), `itemContainer`
-///   (root of a container), `arcDocument` (Arc note, left out); another kind that has children (split view…) is
-///   replaced by its children.
+/// - an item has a title (for a tab, the name the user gave it, or null), `childrenIds` and `data`: `tab` (`savedURL`,
+///   `savedTitle`: the page's title), `list` (folder), `itemContainer` (root of a container), `arcDocument` (Arc note,
+///   left out); another kind that has children (split view…) is replaced by its children.
 /// - `topAppsContainerIDs` gives, per profile, the container of its favorites.
 /// Only `http`, `https` and `file` addresses are kept. A forged file can't exhaust the app (audit E7): folders deeper
 /// than `maximumDepth` and items beyond `maximumItems` are skipped. Pure type.
@@ -109,8 +109,9 @@ nonisolated enum ArcSidebarParser {
                     return []
                 }
                 let savedTitle = (tab["savedTitle"] as? String)?.trimmingCharacters(in: .whitespacesAndNewlines)
-                let name = [title, savedTitle].compactMap(\.self).first { !$0.isEmpty } ?? url.host() ?? url.absoluteString
-                return [.tab(ImportedTab(title: name, url: url))]
+                let pageTitle = savedTitle.flatMap { $0.isEmpty ? nil : $0 } ?? url.host() ?? url.absoluteString
+                let name = title.flatMap { $0.isEmpty || $0 == pageTitle ? nil : $0 }
+                return [.tab(ImportedTab(title: pageTitle, url: url, customTitle: name))]
             }
             if data["list"] != nil {
                 return [.folder(name: title ?? "", children: children(of: id))]

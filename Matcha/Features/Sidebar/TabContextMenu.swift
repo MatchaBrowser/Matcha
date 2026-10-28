@@ -4,6 +4,9 @@ import SwiftUI
 struct TabContextMenu: View {
     let tab: BrowserTab
     let tabManager: TabManager
+    /// The tab's name is edited in its row (a pinned tab's); elsewhere (favorite tile, pane of a split, icon of the
+    /// column), in an alert of the window (`TabRenameAlert`).
+    var renamesInRow = false
 
     @Environment(WindowModel.self) private var windowModel: WindowModel?
     @Environment(\.openWindow) private var openWindow
@@ -14,6 +17,9 @@ struct TabContextMenu: View {
         // A window of its own tabs has neither favorites, nor pinned tabs, nor folders.
         if windowModel?.windowTabs == nil {
             placeItems(place: place, group: group)
+            if tabManager.canRename(tab) {
+                renameItems
+            }
         }
         moveItems
         Divider()
@@ -54,6 +60,18 @@ struct TabContextMenu: View {
             Button("New Folder") { tabManager.newFolder() }
         } else {
             Button("Pin Tab") { tabManager.setPlace(tab, to: .pinned) }
+        }
+    }
+
+    /// Name of a pinned tab or a favorite (`TabManager+Names`); “Use Page Title” forgets it.
+    @ViewBuilder private var renameItems: some View {
+        if renamesInRow {
+            Button("Rename") { tabManager.renamingTabID = tab.id }
+        } else if let windowModel {
+            Button("Rename…") { windowModel.showRenameAlert(for: tab) }
+        }
+        if tab.customTitle != nil {
+            Button("Use Page Title") { tabManager.renameTab(tab, to: "") }
         }
     }
 

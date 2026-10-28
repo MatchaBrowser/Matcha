@@ -1,8 +1,8 @@
 import Foundation
 
 /// A tab with its synced fields, both ways side by side (audit C6). Favorite and pinned tab: their original address
-/// and title travel, only web addresses, without user name nor password. A today tab stays on this Mac (`SYNC.md`
-/// § 2.4).
+/// and title travel, only web addresses, without user name nor password, and the name the user gave them. A today tab
+/// stays on this Mac (`SYNC.md` § 2.4).
 extension TabRecord {
     /// Nil for a today tab, a tab without a place, or without its profile (favorite) or its Space (pinned tab): it
     /// isn't sent.
@@ -16,6 +16,7 @@ extension TabRecord {
                 place: .favorite,
                 url: SyncWebURL.shared(originURL),
                 title: pinnedTitle ?? title,
+                customTitle: customTitle,
                 order: Double(order),
                 profileId: profileID,
             )
@@ -27,6 +28,7 @@ extension TabRecord {
                 place: .pinned,
                 url: SyncWebURL.shared(originURL),
                 title: pinnedTitle ?? title,
+                customTitle: customTitle,
                 order: Double(order),
                 spaceId: spaceID,
                 folderId: folder?.id,
@@ -50,10 +52,10 @@ extension TabRecord {
         return !SyncWebURL.isWeb(originURL)
     }
 
-    /// Their original address changes; their current address follows it if they had not left the old one; a local one
-    /// keeps its address and title. A today tab here that becomes a favorite or a pinned tab elsewhere takes its new
-    /// place and address. `isNew`: just created, it won't select itself. Never called for a received today tab
-    /// (`SyncRecordWriter`).
+    /// Their original address and their name change; their current address follows it if they had not left the old one;
+    /// a local one keeps its address, title and name. A today tab here that becomes a favorite or a pinned tab
+    /// elsewhere takes its new place and address. `isNew`: just created, it won't select itself. Never called for a
+    /// received today tab (`SyncRecordWriter`).
     func apply(
         _ fields: SyncTabFields,
         isNew: Bool,
@@ -66,6 +68,7 @@ extension TabRecord {
             let followsOrigin = isNew || place == .today || url == pinnedURL
             pinnedURL = fields.url
             pinnedTitle = fields.title
+            customTitle = fields.customTitle
             if followsOrigin {
                 url = fields.url
                 title = fields.title

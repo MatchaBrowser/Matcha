@@ -152,6 +152,6 @@ private struct PageTitleLabel: ViewModifier {
     let tab: BrowserTab?
 
     func body(content: Content) -> some View {
-        content.accessibilityLabel(Text(verbatim: tab?.displayTitle ?? ""))
+        content.accessibilityLabel(Text(verbatim: tab?.pageTitle ?? ""))
     }
 }

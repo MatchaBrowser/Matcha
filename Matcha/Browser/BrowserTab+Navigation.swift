@@ -24,9 +24,18 @@ extension BrowserTab {
         Set(urls.compactMap { $0?.scheme?.lowercased() }.filter { configuration.urlSchemeHandler(forURLScheme: $0) != nil })
     }
 
-    /// Title to display: the page's title, otherwise the host of the address shown, otherwise “New Tab”; never the host
-    /// of a load that isn't displayed yet (review TR1).
+    /// Title to display in the sidebar, the command bar and the menus: the name the user gave the tab, otherwise
+    /// `pageTitle`.
     var displayTitle: String {
+        if let customTitle, !customTitle.isEmpty {
+            return customTitle
+        }
+        return pageTitle
+    }
+
+    /// The page's title (window title, printing), otherwise the host of the address shown, otherwise “New Tab”; never
+    /// the host of a load that isn't displayed yet (review TR1).
+    var pageTitle: String {
         if let title, !title.isEmpty {
             return title
         }

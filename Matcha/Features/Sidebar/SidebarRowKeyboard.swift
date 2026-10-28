@@ -9,7 +9,7 @@ struct SidebarRowKeyboard: ViewModifier {
     let move: (Int) -> Bool
     /// Favorites are tiles side by side: left and right.
     var isHorizontal = false
-    /// False while a field of the row is edited (folder name): the keys stay with it.
+    /// False while a field of the row is edited (name of a folder or a pinned tab): the keys stay with it.
     var isEnabled = true
 
     func body(content: Content) -> some View {

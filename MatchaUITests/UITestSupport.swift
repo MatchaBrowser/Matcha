@@ -78,6 +78,7 @@ extension XCTestCase {
         "showsHomeButton": "NO",
         "addressBarPosition": "sidebar",
         "showsNavigationButtons": "YES",
+        "renamesTabsOnDoubleClick": "NO",
         // Never any request to the search engine during the tests.
         "showsSearchSuggestions": "NO",
         // Links of Favorites and pinned tabs stay in their tab (the app's default value).

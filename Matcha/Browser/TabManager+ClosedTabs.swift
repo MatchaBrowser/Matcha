@@ -16,6 +16,7 @@ extension TabManager {
                 title: tab.title,
                 pinnedURL: tab.pinnedURL,
                 pinnedTitle: tab.pinnedTitle,
+                customTitle: tab.customTitle,
                 lastActivity: .now,
                 interactionState: tab.savedInteractionState,
                 fileReadAccess: tab.fileReadAccess,

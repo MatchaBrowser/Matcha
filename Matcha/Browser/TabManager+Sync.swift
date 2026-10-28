@@ -37,6 +37,8 @@ extension TabManager {
     private func update(_ tab: BrowserTab, from entry: StoredTab, isDisplayed: Bool) {
         tab.pinnedURL = entry.pinnedURL
         tab.pinnedTitle = entry.pinnedTitle
+        // A name changes even on a displayed tab: its page stays.
+        tab.customTitle = entry.customTitle
         guard !isDisplayed, tab.url != entry.url || !tab.isLoaded && tab.title != entry.title else {
             return
         }
