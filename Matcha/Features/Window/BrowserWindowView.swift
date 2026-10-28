@@ -225,11 +225,15 @@ struct BrowserWindowView: View {
         .seenByExtensions(model: model, window: window)
         // Edit > Find on the front page (audit H1).
         .findsInPages(model: model, window: window) { [weak commandBar] in commandBar?.dismiss() }
+        // Translation sessions of the window's pages (task 9.3): hidden views, and macOS's download questions.
+        .background { TranslationSessionsView(host: model.translationHost) }
         .environment(model)
+        .environment(model.translationHost)
         // The sidebar's rows show this window's selection.
         .environment(model.viewer)
         .focusedSceneValue(\.tabManager, tabManager)
         .focusedSceneValue(\.windowActions, windowActions)
+        .focusedSceneValue(\.translationHost, model.translationHost)
     }
 
     /// Card of the pages, with the “URL Copied” confirmation.

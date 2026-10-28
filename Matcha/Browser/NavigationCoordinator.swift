@@ -139,7 +139,7 @@ final class NavigationCoordinator: NSObject {
 extension NavigationCoordinator: WKNavigationDelegate {
     /// New page displayed (tab, Peek or mini window): known icon of its domain, or a placeholder badge until something
     /// better comes, and zoom of its site (task 5.4). The permission requests of the old page no longer apply: refused;
-    /// its sound stopped with it (task 5.10).
+    /// its sound stopped with it (task 5.10); the new document is in its own language (task 9.2).
     func webView(_ webView: WKWebView, didCommit _: WKNavigation!) {
         guard let tabHost, let tab = tabHost.page(for: webView) else {
             return
@@ -153,6 +153,7 @@ extension NavigationCoordinator: WKNavigationDelegate {
         tab.pageDialogs.documentDidChange()
         tab.localFiles.documentDidChange()
         tab.audio.reset()
+        tab.translation.documentDidChange()
         notificationsDocumentDidChange(in: webView, page: tab)
         tabHost.faviconService.showCachedIcon(on: tab, host: webView.url?.host())
         tabHost.siteZooms?.pageDidCommit(tab, url: webView.url)
@@ -170,6 +171,8 @@ extension NavigationCoordinator: WKNavigationDelegate {
         updateCertificateException(of: tab, in: webView)
         tabHost.faviconService.refreshIcon(of: tab)
         tab.localFiles.pageDidFinishLoading(in: webView, access: tab.fileReadAccess)
+        // Its language, to offer its translation (task 9.3).
+        tab.translation.pageDidFinishLoading(in: webView)
         // Recorded at each loaded page: a crash does not lose the history.
         tab.captureInteractionState()
         // Visit recorded in the profile's history (task 5.5), never for a private window.

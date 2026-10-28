@@ -55,6 +55,8 @@ struct MatchaApp: App {
             // Sync (tasks 7.7 and 7.9): never with a test store.
             environment.sync.start(session: session)
         }
+        // Languages the Mac can translate (task 9.3), read in the background.
+        Task { await environment.translationLanguages.load() }
         // Edit > Find: the active mini window's page first.
         environment.pageFind.miniWindows = miniWindows
         // Click on a website's notification: its page comes back to the front, wherever it is.

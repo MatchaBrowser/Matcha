@@ -1,7 +1,8 @@
 import WebKit
 
 /// Builds the WebKit configuration shared by all web views, with the sound script (task 5.10), the notification script
-/// (`PageNotificationScript`), the source viewer and the extension controller (task 6.3, private windows included:
+/// (`PageNotificationScript`), the recipient of the translation script (`PageTranslationScript`), the source viewer and the extension
+/// controller (task 6.3, private windows included:
 /// extensions only have access to them if the user allows it). Each page has its own content controller
 /// (`pageConfiguration`): the blocker (task 6.2) sets or removes its lists there page by page; WebKit injects the
 /// extensions' scripts into it. One for the app (`AppEnvironment`); the tests make theirs, without extensions.
@@ -55,11 +56,12 @@ final class WebConfigurationFactory {
         return configuration
     }
 
-    /// Content controller of a page, with the sound and notification scripts.
+    /// Content controller of a page, with the sound and notification scripts and the translation script's recipient.
     static func makeUserContentController() -> WKUserContentController {
         let controller = WKUserContentController()
         PageAudioScript.install(in: controller)
         PageNotificationScript.install(in: controller)
+        PageTranslationScript.install(in: controller)
         return controller
     }
 

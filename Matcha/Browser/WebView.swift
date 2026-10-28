@@ -11,14 +11,21 @@ struct WebView: NSViewRepresentable {
     let webView: WKWebView
     /// Recipient of the sidebar items dropped on the page (split view); nil: refused.
     var sidebarDropTarget: (any SidebarItemDropTarget)?
+    /// Translation sessions of the window, for the page menu (task 9.3).
+    var translationHost: (any PageTranslationHosting)?
 
     func makeNSView(context _: Context) -> TabWebContainer {
-        (webView as? BrowserWebView)?.sidebarDropTarget = sidebarDropTarget
+        update(webView)
         return TabWebContainer(webView: webView)
     }
 
     func updateNSView(_: TabWebContainer, context _: Context) {
+        update(webView)
+    }
+
+    private func update(_ webView: WKWebView) {
         (webView as? BrowserWebView)?.sidebarDropTarget = sidebarDropTarget
+        (webView as? BrowserWebView)?.translationHost = translationHost
     }
 
     static func dismantleNSView(_ container: TabWebContainer, coordinator _: ()) {

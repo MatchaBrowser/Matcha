@@ -28,6 +28,7 @@ struct PageCard: View {
     var siteZooms: SiteZoomStore?
 
     @Environment(WindowModel.self) private var windowModel: WindowModel?
+    @Environment(TranslationHost.self) private var translationHost: TranslationHost?
 
     var body: some View {
         VStack(spacing: 0) {
@@ -102,7 +103,7 @@ struct PageCard: View {
         if isShownElsewhere {
             ShownElsewhereView(showHere: showHere)
         } else if let tab, tab.url != nil, let webView = tab.webView {
-            WebView(webView: webView, sidebarDropTarget: sidebarDropTarget)
+            WebView(webView: webView, sidebarDropTarget: sidebarDropTarget, translationHost: translationHost)
                 .id(ObjectIdentifier(webView))
                 // Tab woken from sleep (task 5.6): its snapshot, while the page reloads. It is there from the first
                 // render (no blank page) and fades out.

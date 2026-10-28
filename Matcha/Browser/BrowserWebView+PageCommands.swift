@@ -3,8 +3,8 @@ import OSLog
 import WebKit
 
 /// Menu of a page (right-click outside a link, an image or selected text), as in Chrome: Back, Forward, Reload;
-/// Save As…, Print…; View Page Source (and “Inspect Element” with the developer tools). See
-/// `PageMenuPlan.pageLayout`.
+/// Save As…, Print…, “Translate to ‹language›” (“Show Original” on a translated page, task 9.3); View Page Source (and
+/// “Inspect Element” with the developer tools). See `PageMenuPlan.pageLayout`.
 extension BrowserWebView {
     /// Rewrites `menu` if it is the menu of a page; false otherwise.
     func addPageCommands(to menu: NSMenu) -> Bool {
@@ -22,6 +22,8 @@ extension BrowserWebView {
                 menu.addItem(originals[index])
             case .separator:
                 menu.addItem(.separator())
+            case .command(.translate):
+                translationMenuItems(showsImage: showsImages).forEach(menu.addItem)
             case let .command(command):
                 menu.addItem(menuItem(for: command, showsImage: showsImages))
             }
@@ -29,7 +31,7 @@ extension BrowserWebView {
         return true
     }
 
-    private func menuItem(for command: PageCommand, showsImage: Bool) -> NSMenuItem {
+    func menuItem(for command: PageCommand, showsImage: Bool) -> NSMenuItem {
         let item = NSMenuItem(title: command.title, action: #selector(performPageCommand(_:)), keyEquivalent: "")
         item.identifier = NSUserInterfaceItemIdentifier(command.identifier)
         item.target = self
@@ -41,6 +43,8 @@ extension BrowserWebView {
         // The document on screen (its history entry), not a load that started (review TR1).
         case .saveAs, .print: backForwardList.currentItem?.url != nil
         case .viewSource: PageSource.viewerURL(for: backForwardList.currentItem?.url) != nil
+        // Set by `translationMenuItems`.
+        case .translate: false
         }
         if showsImage {
             item.image = NSImage(systemSymbolName: command.symbolName, accessibilityDescription: nil)
@@ -72,6 +76,7 @@ private extension PageCommand {
         case .goForward: String(localized: "Forward")
         case .saveAs: String(localized: "Save As…", comment: "Context menu of a web page: saves it as a web archive or its source")
         case .print: String(localized: "Print…")
+        case .translate: String(localized: "Translate Page")
         case .viewSource: String(localized: "View Page Source", comment: "Context menu of a web page: opens its source in a new tab")
         }
     }
@@ -82,6 +87,7 @@ private extension PageCommand {
         case .goForward: "chevron.forward"
         case .saveAs: "square.and.arrow.down"
         case .print: "printer"
+        case .translate: "translate"
         case .viewSource: "chevron.left.forwardslash.chevron.right"
         }
     }

@@ -37,4 +37,6 @@ nonisolated extension Logger {
     static let imports = Logger(subsystem: subsystem, category: "Import")
     /// Sync: numbers and states only; never content, an address or a name.
     static let sync = Logger(subsystem: subsystem, category: "Sync")
+    /// Translation of the pages: methods, counts and languages; never a text or an address.
+    static let translation = Logger(subsystem: subsystem, category: "Translation")
 }

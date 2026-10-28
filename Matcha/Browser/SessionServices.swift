@@ -19,6 +19,8 @@ struct SessionServices {
     var notifications: PageNotificationCenter?
     /// Today tabs of the account's other Macs, offered by the command bar; nil: none.
     var otherMacs: OtherMacsTabs?
+    /// Languages of the pages' translation (task 9.3).
+    var translationLanguages: TranslationLanguages
     /// Sign-in windows of a session; nil: a window opened with a size becomes a tab.
     var makePopupWindows: @MainActor (PopupWindowSettings) -> (any PopupWindowHosting)?
     /// A page closes its Peek (`window.close()`): the interface also gives keyboard focus back to the page under it
@@ -33,6 +35,7 @@ struct SessionServices {
         dialogs: any PageDialogPresenting = UnavailablePageDialogs(),
         notifications: PageNotificationCenter? = nil,
         otherMacs: OtherMacsTabs? = nil,
+        translationLanguages: TranslationLanguages = TranslationLanguages(),
         makePopupWindows: @escaping @MainActor (PopupWindowSettings) -> (any PopupWindowHosting)? = { _ in nil },
         closePeek: @escaping @MainActor (TabManager) -> Void = { $0.closePeek() },
     ) {
@@ -43,6 +46,7 @@ struct SessionServices {
         self.dialogs = dialogs
         self.notifications = notifications
         self.otherMacs = otherMacs
+        self.translationLanguages = translationLanguages
         self.makePopupWindows = makePopupWindows
         self.closePeek = closePeek
     }

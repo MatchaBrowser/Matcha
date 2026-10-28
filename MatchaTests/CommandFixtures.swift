@@ -45,6 +45,8 @@ func action(_ id: CommandActionID) -> CommandCandidate {
     case .newSpace: ("New Space", "new create add space")
     case .copyURL: ("Copy URL", "copy link address url")
     case .settings: ("Settings", "settings preferences options")
+    case .translatePage: ("Translate Page", "translate translation language")
+    case .showOriginal: ("Show Original", "original untranslated translation language")
     }
     let keywords = texts.keywords.split(separator: " ").map(String.init)
     return CommandCandidate(kind: .action(id, keywords: keywords), title: texts.title, url: nil)

@@ -32,6 +32,19 @@ final class FakePageMenuDelegate: NSObject, WKUIDelegate, PageMenuDelegate {
     func pageMenu(perform command: PageCommand, in _: WKWebView) {
         performed.append(command)
     }
+
+    /// Translation of the page, as the delegate tells the menu.
+    var translation: PageTranslation?
+    /// Languages chosen in “Translate to Another Language”.
+    private(set) var translatedInto: [String] = []
+
+    func pageMenuTranslation(in _: WKWebView) -> PageTranslation? {
+        translation
+    }
+
+    func pageMenu(translateInto language: Locale.Language, in _: WKWebView) {
+        translatedInto.append(language.minimalIdentifier)
+    }
 }
 
 /// Page context menu (task 5.9) on a fake menu that reproduces the identifiers, action and state of WebKit's
@@ -175,27 +188,82 @@ struct BrowserWebViewPageMenuTests {
 
     // MARK: Page menu
 
-    @Test func `the page menu gets back, forward, save, print and source`() {
+    @Test func `the page menu gets back, forward, save, print, translate and source`() {
         let menu = webKitMenu(["WKMenuItemIdentifierReload"])
         webView.rewritePageMenu(menu)
         let identifiers = menu.items.map { $0.isSeparatorItem ? nil : $0.identifier?.rawValue }
         #expect(identifiers == [
             "MatchaMenuItemIdentifierGoBack", "MatchaMenuItemIdentifierGoForward", "WKMenuItemIdentifierReload", nil,
-            "MatchaMenuItemIdentifierSaveAs", "MatchaMenuItemIdentifierPrint", nil, "MatchaMenuItemIdentifierViewSource",
+            "MatchaMenuItemIdentifierSaveAs", "MatchaMenuItemIdentifierPrint", "MatchaMenuItemIdentifierTranslate", nil,
+            "MatchaMenuItemIdentifierViewSource",
         ])
         // Page without history or address: nothing is possible.
         #expect(menu.items.filter { $0.identifier?.rawValue.hasPrefix("MatchaMenuItemIdentifier") == true }.allSatisfy { !$0.isEnabled })
         #expect(menu.items[0].image != nil)
     }
 
-    @Test func `save, print and source go to the delegate`() throws {
+    @Test func `save, print, translate and source go to the delegate`() throws {
         let menu = webKitMenu(["WKMenuItemIdentifierReload"])
         webView.rewritePageMenu(menu)
-        for identifier in ["MatchaMenuItemIdentifierSaveAs", "MatchaMenuItemIdentifierPrint", "MatchaMenuItemIdentifierViewSource"] {
+        for identifier in [
+            "MatchaMenuItemIdentifierSaveAs", "MatchaMenuItemIdentifierPrint", "MatchaMenuItemIdentifierTranslate",
+            "MatchaMenuItemIdentifierViewSource",
+        ] {
             // Disabled on this page without an address: their action is sent directly.
             let item = try #require(menu.items.first { $0.identifier?.rawValue == identifier })
             try NSApp.sendAction(#require(item.action), to: item.target, from: item)
         }
-        #expect(delegate.performed == [.saveAs, .print, .viewSource])
+        #expect(delegate.performed == [.saveAs, .print, .translate, .viewSource])
     }
+
+    @Test func `translate names the target language of the window, or shows the original`() throws {
+        // Held here: the web view only keeps a weak reference.
+        let host = FakePageTranslationHost(target: Locale.Language(identifier: "en"))
+        webView.translationHost = host
+        let menu = webKitMenu(["WKMenuItemIdentifierReload"])
+        webView.rewritePageMenu(menu)
+        let item = try #require(menu.items.first { $0.identifier?.rawValue == "MatchaMenuItemIdentifierTranslate" })
+        let english = TranslationLanguageName.inSentence(Locale.Language(identifier: "en"))
+        #expect(item.title == String(localized: "Translate to \(english)"))
+        // No page: nothing to translate, no other language offered.
+        #expect(!item.isEnabled)
+        #expect(!menu.items.contains { $0.identifier?.rawValue == "MatchaMenuItemIdentifierTranslateOther" })
+
+        // A translated page (as its delegate tells): “Show Original”, enabled.
+        let translation = PageTranslation()
+        translation.translate(in: webView) { _ in [:] }
+        delegate.translation = translation
+        let translated = webKitMenu(["WKMenuItemIdentifierReload"])
+        webView.rewritePageMenu(translated)
+        let original = try #require(translated.items.first { $0.identifier?.rawValue == "MatchaMenuItemIdentifierTranslate" })
+        #expect(original.title == String(localized: "Show Original"))
+        #expect(original.isEnabled)
+        translation.reset()
+
+        // A window that can't translate: the item stays, disabled.
+        webView.translationHost = nil
+        let without = webKitMenu(["WKMenuItemIdentifierReload"])
+        webView.rewritePageMenu(without)
+        let disabled = try #require(without.items.first { $0.identifier?.rawValue == "MatchaMenuItemIdentifierTranslate" })
+        #expect(disabled.title == String(localized: "Translate Page"))
+        #expect(!disabled.isEnabled)
+    }
+}
+
+/// Translation sessions of a window, for the page menu: its target language and the pages it was asked to translate.
+@MainActor
+final class FakePageTranslationHost: PageTranslationHosting {
+    let targetLanguage: Locale.Language?
+    var languageChoices: [Locale.Language] = []
+    private(set) var translated: [BrowserTab.ID] = []
+
+    init(target: Locale.Language?) {
+        targetLanguage = target
+    }
+
+    func translate(_ page: BrowserTab, into _: Locale.Language?) {
+        translated.append(page.id)
+    }
+
+    func showOriginal(_: BrowserTab) {}
 }

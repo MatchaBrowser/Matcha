@@ -127,6 +127,13 @@ struct CommandBarExecutor {
             log("settings")
             openSettings()
             return nil
+        case .translatePage, .showOriginal:
+            log(action.rawValue)
+            // The page in front: the peek if it is open (task 9.3).
+            if let page = windowModel.frontTab {
+                PageTranslationActions.toggle(page, host: windowModel.translationHost)
+            }
+            return windowModel.selectedTab
         }
     }
 

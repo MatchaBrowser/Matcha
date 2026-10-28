@@ -22,6 +22,7 @@ struct AddressToolbar: View {
             NavigationButtons(tab: tab, showsHistoryButtons: showsNavigationButtons, goHome: goHome)
             AddressPill(tab: tab, edit: editAddress)
             ZoomBadge(page: tab, siteZooms: siteZooms)
+            TranslateButton(page: tab)
             ExtensionButtonsRow(tab: tab, isPrivate: isPrivate)
             if let toggleSiteSettings {
                 SiteSettingsButton(tab: tab, isPresented: isSiteSettingsPresented, action: toggleSiteSettings)

@@ -59,6 +59,8 @@ final class BrowserTab: Identifiable {
     let pageDialogs = PageDialogState()
     /// A local page that refers to files it can't read (banner, review WB11).
     let localFiles = PageLocalFiles()
+    /// Translation of the page (task 9.2).
+    let translation = PageTranslation()
     /// The displayed document came over a certificate the user accepted for its website (“Not Secure”, audit K5); read
     /// from the document's own connection, whichever tab accepted it (`NavigationCoordinator+Authentication`, WB5).
     var usesAcceptedCertificate = false
@@ -286,14 +288,14 @@ final class BrowserTab: Identifiable {
         webView?.pageZoom = zoom
     }
 
-    /// Releases the web view: observation, sound (icon included), loading, delegates; denies pending permission
-    /// requests, ends the page's sheets, forgets find in page and the recovery from a process termination (message
-    /// included).
+    /// Releases the web view: observation, sound (icon included), translation, loading, delegates; denies pending
+    /// permission requests, ends the page's sheets, forgets find in page and the recovery from a process termination
+    /// (message included).
     private func releaseWebView() {
         observations = []
         endPageRequests()
         find.reset()
-        audio.reset()
+        endPageActivity()
         if let webView {
             (webView as? BrowserWebView)?.audio = nil
             // Suspended rather than paused: if the view outlives the tab, its page cannot play again either.

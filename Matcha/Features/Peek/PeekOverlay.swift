@@ -20,6 +20,7 @@ struct PeekOverlay: View {
     let pageCorners: RectangleCornerRadii
 
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
+    @Environment(TranslationHost.self) private var translationHost: TranslationHost?
     @Environment(\.colorScheme) private var colorScheme
 
     var body: some View {
@@ -80,7 +81,7 @@ struct PeekOverlay: View {
             // Find in page (task 5.3) and permission requests (task 5.2) of the peek's page.
             FindBar(page: peek.tab)
             PermissionBanner(prompts: peek.tab.permissionPrompts)
-            PeekWebHost(webView: webView) { PeekActions.close(in: tabManager) }
+            PeekWebHost(webView: webView, translationHost: translationHost) { PeekActions.close(in: tabManager) }
                 // Page crashed several times in a row (task 5.7): the message, until reload.
                 .overlay {
                     if peek.tab.crash.isShowingProblem {

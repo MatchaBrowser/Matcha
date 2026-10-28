@@ -33,6 +33,8 @@ final class AppEnvironment {
     let pageFind = PageFindResponder()
     /// Notifications of the websites, shown by macOS.
     let pageNotifications = PageNotificationCenter(system: UserNotificationsBridge())
+    /// Languages of the pages' translation (task 9.3).
+    let translationLanguages = TranslationLanguages(defaults: .standard)
 
     init() {
         let extensions = Self.makeExtensionManager()
@@ -88,6 +90,7 @@ final class AppEnvironment {
             dialogs: pageDialogs,
             notifications: pageNotifications,
             otherMacs: otherMacs,
+            translationLanguages: translationLanguages,
             makePopupWindows: { PopupWindowManager(settings: $0) },
             closePeek: { PeekActions.close(in: $0) },
         )

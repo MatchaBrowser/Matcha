@@ -16,6 +16,8 @@ final class MiniWindowController: NSObject, Identifiable {
     let container = MiniWebViewContainer()
     /// “URL Copied” confirmation of this mini window (⇧⌘C, “Copy URL” row).
     let copyConfirmation = CopyConfirmationModel()
+    /// Translation sessions of the page (task 9.3).
+    let translationHost: TranslationHost
     private weak var manager: MiniWindowManager?
     /// The page has gone into a Space: closing must not release it.
     private(set) var isHandedOff = false
@@ -30,6 +32,7 @@ final class MiniWindowController: NSObject, Identifiable {
             history: manager.session.history.map { ProfileHistory(store: $0, profileID: profileID) },
         )
         panel = MiniWindowPanel(frame: frame)
+        translationHost = TranslationHost(languages: manager.session.services.translationLanguages)
         super.init()
         panel.delegate = self
         // ⎋ that nobody kept: a mini window without a page closes; with a page, nothing (the page stays).
@@ -48,6 +51,7 @@ final class MiniWindowController: NSObject, Identifiable {
     /// Shows the page's web view (created on the first load).
     func showWebView() {
         if let webView = tab.webView {
+            (webView as? BrowserWebView)?.translationHost = translationHost
             container.attach(webView)
         }
     }
@@ -142,6 +146,7 @@ extension MiniWindowController: NSWindowDelegate {
     func windowWillClose(_: Notification) {
         commandBar.dismiss()
         copyConfirmation.cancel()
+        translationHost.cancelAll()
         if !isHandedOff {
             container.detach()
             tab.unload(resettingTo: nil, title: nil)
