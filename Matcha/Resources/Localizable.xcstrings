@@ -5900,6 +5900,35 @@
         }
       }
     },
+    "Double-click a pinned tab or a favorite to rename it" : {
+      "comment" : "Settings > General: toggle (off by default); without it, tabs are renamed from their context menu",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Angehefteten Tab oder Favoriten per Doppelklick umbenennen"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hacer doble clic en una pestaña fijada o un favorito para renombrarlo"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Double-cliquer sur un onglet épinglé ou un favori pour le renommer"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fai doppio clic su un pannello fissato o un preferito per rinominarlo"
+          }
+        }
+      }
+    },
     "Download Request" : {
       "comment" : "Accessibility label of the banner where a website asks to download files",
       "localizations" : {
@@ -10306,7 +10335,7 @@
       }
     },
     "Name" : {
-      "comment" : "Placeholder of the Space name field in the Rename Space alert",
+      "comment" : "Placeholder of the name field in the Rename Space and Rename Tab alerts",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -14118,7 +14147,7 @@
       }
     },
     "Rename" : {
-      "comment" : "Pinned folder context menu; confirmation button of the Rename Space alert",
+      "comment" : "Context menu of a pinned folder and of a pinned tab (the name is edited in the row); confirmation button of the Rename Space and Rename Tab alerts",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -14175,8 +14204,37 @@
         }
       }
     },
+    "Rename Tab" : {
+      "comment" : "Title of the alert that renames a favorite, a pane of a split view or an icon of the compact sidebar",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tab umbenennen"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Renombrar pestaña"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Renommer l'onglet"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rinomina pannello"
+          }
+        }
+      }
+    },
     "Rename…" : {
-      "comment" : "Space context menu",
+      "comment" : "Context menu of a Space, and of a favorite, a pane of a split view or an icon of the compact sidebar (opens the Rename Tab alert)",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -16914,6 +16972,35 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Sistema"
+          }
+        }
+      }
+    },
+    "Tab name" : {
+      "comment" : "Accessibility label of the field that renames a pinned tab in its sidebar row",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Name des Tabs"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nombre de la pestaña"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nom de l'onglet"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nome del pannello"
           }
         }
       }
@@ -20278,6 +20365,35 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Usa ⌘ o ⌃ nella scorciatoia."
+          }
+        }
+      }
+    },
+    "Use Page Title" : {
+      "comment" : "Context menu of a renamed pinned tab or favorite: forgets its name, the page's title shows again",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Seitentitel verwenden"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Usar el título de la página"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Utiliser le titre de la page"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Usa il titolo della pagina"
           }
         }
       }

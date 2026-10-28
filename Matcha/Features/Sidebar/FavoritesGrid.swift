@@ -68,6 +68,7 @@ private struct FavoriteTile: View {
             }
             .contentShape(Rectangle())
             .onTapGesture { TabActivation.activate(tab, in: tabManager) }
+            .renamesOnDoubleClick(tab, tabManager: tabManager)
             .onHover { isHovered = $0 }
             .contextMenu { TabContextMenu(tab: tab, tabManager: tabManager) }
             .tabDraggable(tab)

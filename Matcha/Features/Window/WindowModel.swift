@@ -35,6 +35,9 @@ final class WindowModel {
     /// floating sidebar stays shown while they are open (review ON19).
     var renamedSpace: SpaceSession?
     var deletedSpace: SpaceSession?
+    /// Tab renamed in an alert (`TabRenameAlert`), and the name typed, held here for the same reason.
+    var renamedTab: BrowserTab?
+    var renamedTabName = ""
     /// Import from Arc started from this window (task 7.1).
     let arcImport = ArcImportModel()
     /// Translation sessions of the window's pages (task 9.3).
@@ -241,8 +244,8 @@ extension WindowModel {
     /// The floating sidebar stays shown while one of its presentations is open (review ON19): the pointer leaves it
     /// to use them (Space editor, folder customization and its color panel, renaming, alerts of a Space).
     var holdsFloatingSidebar: Bool {
-        editedSpaceID != nil || customizedFolderID != nil || renamedSpace != nil || deletedSpace != nil
-            || tabManager.renamingFolderID != nil
+        editedSpaceID != nil || customizedFolderID != nil || renamedSpace != nil || deletedSpace != nil || renamedTab != nil
+            || tabManager.renamingFolderID != nil || tabManager.renamingTabID != nil
     }
 
     /// A tab of this window can leave it for a window of its own (menu, drag out): never in a private window, whose

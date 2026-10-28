@@ -128,6 +128,7 @@ struct ArcImporter {
                 context.insert(record)
                 record.pinnedURL = tab.url
                 record.pinnedTitle = tab.title
+                record.customTitle = tab.customTitle
                 record.profile = profile
                 record.lastActivity = .distantPast
                 count += 1
@@ -139,7 +140,8 @@ struct ArcImporter {
     /// Arc's open tabs, for the Today tabs of the Space.
     private func openTabs(_ tabs: [ImportedTab], context: ModelContext) -> [TabRecord] {
         tabs.enumerated().map { order, tab in
-            let record = TabRecord(url: tab.url, title: tab.title, place: .today, order: order)
+            // A today tab has no name of its own: Arc's shows until the page loads.
+            let record = TabRecord(url: tab.url, title: tab.customTitle ?? tab.title, place: .today, order: order)
             context.insert(record)
             record.lastActivity = .distantPast
             return record
@@ -185,6 +187,7 @@ struct ArcImporter {
                 context.insert(record)
                 record.pinnedURL = tab.url
                 record.pinnedTitle = tab.title
+                record.customTitle = tab.customTitle
                 record.lastActivity = .distantPast
                 content.tabs.append(record)
                 folderTabs.append(record)
@@ -225,6 +228,7 @@ struct ArcImporter {
                     title: tab.title,
                     pinnedURL: tab.url,
                     pinnedTitle: tab.title,
+                    customTitle: tab.customTitle,
                     lastActivity: .distantPast,
                     interactionState: nil,
                 )

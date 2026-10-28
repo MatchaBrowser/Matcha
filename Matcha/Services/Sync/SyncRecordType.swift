@@ -27,7 +27,7 @@ nonisolated enum SyncRecordType: String, CaseIterable, Codable, Sendable {
         case .profile: ["name", "order"]
         case .space: ["name", "symbol", "theme", "order", "profileId"]
         case .folder: ["name", "order", "isCollapsed", "spaceId", "parentId", "icon", "textColor", "backgroundColor"]
-        case .tab: ["place", "url", "title", "order", "profileId", "spaceId", "folderId"]
+        case .tab: ["place", "url", "title", "customTitle", "order", "profileId", "spaceId", "folderId"]
         case .webExtension: Self.extensionFieldKeys
         case .setting: ["key", "value"]
         case .sitePermission: ["origin", "kind", "decision", "profileId"]

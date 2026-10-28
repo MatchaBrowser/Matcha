@@ -97,13 +97,15 @@ nonisolated enum SyncTabPlace: String, Codable, Sendable {
     case today
 }
 
-/// Fields of a tab (`SYNC.md` § 2.1): original address and title of a favorite or a pinned tab; `profileId` for a
-/// favorite, `spaceId` for a pinned tab. Only http and https addresses travel: any other makes the record ignored.
-/// `today` is only read, from older versions, to be ignored (§ 2.4).
+/// Fields of a tab (`SYNC.md` § 2.1): original address and title of a favorite or a pinned tab, and the name the user
+/// gave it (`customTitle`, never empty: nil for the page's title); `profileId` for a favorite, `spaceId` for a pinned
+/// tab. Only http and https addresses travel: any other makes the record ignored. `today` is only read, from older
+/// versions, to be ignored (§ 2.4).
 nonisolated struct SyncTabFields: Codable, Equatable, Sendable {
     var place: SyncTabPlace
     var url: URL?
     var title: String?
+    var customTitle: String?
     var order: Double
     var profileId: UUID?
     var spaceId: UUID?
@@ -113,6 +115,7 @@ nonisolated struct SyncTabFields: Codable, Equatable, Sendable {
         place: SyncTabPlace,
         url: URL?,
         title: String?,
+        customTitle: String? = nil,
         order: Double,
         profileId: UUID? = nil,
         spaceId: UUID? = nil,
@@ -121,6 +124,7 @@ nonisolated struct SyncTabFields: Codable, Equatable, Sendable {
         self.place = place
         self.url = url
         self.title = title
+        self.customTitle = customTitle
         self.order = order
         self.profileId = profileId
         self.spaceId = spaceId
@@ -145,6 +149,7 @@ nonisolated struct SyncTabFields: Codable, Equatable, Sendable {
             self.url = url
         }
         title = container.lenient(String.self, forKey: .title)
+        customTitle = container.lenient(String.self, forKey: .customTitle).flatMap { $0.isEmpty ? nil : $0 }
         order = container.order(forKey: .order)
         folderId = container.lenient(UUID.self, forKey: .folderId)
     }

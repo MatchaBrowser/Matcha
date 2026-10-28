@@ -28,12 +28,13 @@ struct ArcSidebarParserTests {
         #expect(sidebar.customProfiles == ["Profile 1"])
     }
 
-    @Test func `pinned items keep their folders, titles and order`() throws {
+    /// The title of an item is the name the user gave the tab in Arc; `savedTitle`, the page's.
+    @Test func `pinned items keep their folders, titles, names and order`() throws {
         let pinned = try sample().spaces[0].pinned
         #expect(try pinned == [
             .tab(ImportedTab(title: "Page A", url: url("https://example.com/a"))),
             .folder(name: "Dossier", children: [
-                .tab(ImportedTab(title: "Renommé", url: url("https://example.com/b"))),
+                .tab(ImportedTab(title: "Page B", url: url("https://example.com/b"), customTitle: "Renommé")),
                 .folder(name: "Sous-dossier", children: [
                     .tab(ImportedTab(title: "example.com", url: url("https://example.com/c"))),
                 ]),
@@ -96,7 +97,12 @@ struct ArcSidebarParserTests {
         """
         let sidebar = try ArcSidebarParser.parse(Data(json.utf8))
         #expect(sidebar.spaces.count == 1)
-        #expect(try sidebar.spaces[0].pinned == [.tab(ImportedTab(title: "Titre", url: url("https://example.org/")))])
+        // Without `savedTitle`, the page's title is the host; Arc's title stays the tab's name.
+        #expect(try sidebar.spaces[0].pinned == [.tab(ImportedTab(
+            title: "example.org",
+            url: url("https://example.org/"),
+            customTitle: "Titre",
+        ))])
         #expect(sidebar.spaces[0].openTabs.isEmpty)
         #expect(sidebar.favorites.isEmpty)
         #expect(sidebar.skippedItems == 1)

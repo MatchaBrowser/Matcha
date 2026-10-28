@@ -63,6 +63,7 @@ final class SpaceStore {
                 title: record.title,
                 pinnedURL: record.pinnedURL,
                 pinnedTitle: record.pinnedTitle,
+                customTitle: record.customTitle,
                 lastActivity: record.lastActivity,
                 interactionState: record.interactionState,
                 fileReadAccess: record.fileReadAccess,
@@ -152,6 +153,7 @@ final class SpaceStore {
             update(record, \.title, to: stored.title)
             update(record, \.pinnedURL, to: stored.pinnedURL)
             update(record, \.pinnedTitle, to: stored.pinnedTitle)
+            update(record, \.customTitle, to: stored.customTitle)
             update(record, \.lastActivity, to: stored.lastActivity)
             update(record, \.fileReadAccess, to: stored.fileReadAccess)
             if savedStates[stored.id] != stored.interactionState {

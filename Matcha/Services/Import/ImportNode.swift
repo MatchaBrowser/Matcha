@@ -1,9 +1,11 @@
 import Foundation
 
-/// Tab imported from another browser (tasks 7.1 and 7.2): its address and its title. Pure type.
+/// Tab imported from another browser (tasks 7.1 and 7.2): its address, its title, and the name the user gave it there
+/// (nil: the page's title). Pure type.
 nonisolated struct ImportedTab: Equatable, Sendable {
     var title: String
     var url: URL
+    var customTitle: String?
 }
 
 /// Imported item: a tab, or a folder and its content, in the original order. Pure type.

@@ -29,7 +29,7 @@ enum PagePrinter {
             NSSound.beep()
             return
         }
-        operation(for: webView, title: page.displayTitle).runModal(for: window, delegate: nil, didRun: nil, contextInfo: nil)
+        operation(for: webView, title: page.pageTitle).runModal(for: window, delegate: nil, didRun: nil, contextInfo: nil)
         Logger.browser.info("Printing the page")
     }
 }

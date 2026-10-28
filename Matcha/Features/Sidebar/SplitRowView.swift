@@ -136,6 +136,7 @@ private struct SplitSegmentView: View {
         }
         .contentShape(Rectangle())
         .onTapGesture { TabActivation.activate(tab, in: tabManager) }
+        .renamesOnDoubleClick(tab, tabManager: tabManager)
         .contextMenu { TabContextMenu(tab: tab, tabManager: tabManager) }
         .help(tab.displayedURL?.absoluteString ?? tab.displayTitle)
         // Reached with ⇥ like a row; a step moves the whole split (review IU18).

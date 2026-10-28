@@ -118,6 +118,6 @@ private struct MiniWindowTitle: View {
     }
 
     private var title: String {
-        tab.url == nil ? String(localized: "Mini Window") : tab.displayTitle
+        tab.url == nil ? String(localized: "Mini Window") : tab.pageTitle
     }
 }

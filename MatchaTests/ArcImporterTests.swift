@@ -40,15 +40,17 @@ struct ArcImporterTests {
         #expect(SpaceTheme.decoded(from: perso.record.themeData)?.colors.first == ThemeColor(red: 0.4, green: 0.5, blue: 0.6))
         #expect(spaces[1].record.symbol == "emoji:🍵")
         let pinned = pinnedRecords(of: perso)
-        #expect(Set(pinned.compactMap(\.pinnedTitle)) == ["Page A", "Renommé", "example.com"])
+        #expect(Set(pinned.compactMap(\.pinnedTitle)) == ["Page A", "Page B", "example.com"])
+        #expect(pinned.compactMap(\.customTitle) == ["Renommé"])
         let folders = perso.record.folders ?? []
         let outer = try #require(folders.first { $0.name == "Dossier" })
         let inner = try #require(folders.first { $0.name == "Sous-dossier" })
         #expect(outer.parent == nil)
         #expect(inner.parent === outer)
-        #expect(pinned.first { $0.pinnedTitle == "Renommé" }?.folder === outer)
+        #expect(pinned.first { $0.customTitle == "Renommé" }?.folder === outer)
         #expect(pinned.first { $0.pinnedTitle == "example.com" }?.folder === inner)
-        // The open Space got its saved content back.
+        // The open Space got its saved content back, the name given in Arc included.
+        #expect(perso.tabManager.tabs.contains { $0.displayTitle == "Renommé" && $0.pageTitle == "Page B" })
         #expect(perso.tabManager.tabs.count(where: { $0.pinnedURL != nil && $0.pinnedTitle != "Mail" && $0.pinnedTitle != "Agenda" }) == 3)
         // Nothing loads by itself: no imported tab is selected.
         #expect(perso.tabManager.selectedTab == nil)

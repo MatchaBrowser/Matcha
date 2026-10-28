@@ -28,6 +28,8 @@ final class TabManager {
 
     /// Folder whose name is being edited in the sidebar (UI state).
     var renamingFolderID: UUID?
+    /// Pinned tab whose name is being edited in its sidebar row (UI state, `TabManager+Names`).
+    var renamingTabID: BrowserTab.ID?
     /// Peek opened on top of the displayed pages (Shift-click, task 4.4): a page outside the sidebar.
     private(set) var peek: Peek?
     /// Tabs closed by the user, that ⇧⌘T brings back (audit H2); in memory only.
@@ -250,11 +252,12 @@ final class TabManager {
     }
 
     /// A tab that becomes pinned or a favorite keeps its current address and title as its origin;
-    /// once a today tab again, it forgets them.
+    /// once a today tab again, it forgets them, and its name.
     func updatePinnedOrigin(of tab: BrowserTab, previousPlace: TabPlace?) {
         if layout.place(of: tab.id) == .today {
             tab.pinnedURL = nil
             tab.pinnedTitle = nil
+            tab.customTitle = nil
         } else if previousPlace == .today || tab.pinnedURL == nil {
             tab.pinnedURL = tab.url
             tab.pinnedTitle = tab.title

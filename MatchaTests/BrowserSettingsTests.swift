@@ -28,6 +28,11 @@ struct BrowserSettingsTests {
         #expect(HiddenSidebarStyle.allCases.map(\.rawValue) == ["hidden", "icons"])
     }
 
+    /// A double click stays two clicks until the user chooses otherwise; the context menu renames.
+    @Test func `tabs are not renamed by a double click by default`() {
+        #expect(!BrowserSettings.renamesTabsOnDoubleClick)
+    }
+
     @Test func `pinned links stay in their tab by default`() {
         #expect(!BrowserSettings.opensPinnedLinksInPeek)
         #expect(!BrowserSettings.pinnedLinksOpenInPeek(in: emptyDefaults()))

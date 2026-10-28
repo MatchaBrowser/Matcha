@@ -52,7 +52,7 @@ struct SyncRecordFieldsTests {
         folder.apply(SyncFolderFields(name: "Dossier", order: 0, isCollapsed: false, spaceId: space.id), space: space, parent: nil)
         let url = try #require(URL(string: "https://example.com/page"))
 
-        let favorite = SyncTabFields(place: .favorite, url: url, title: "Favori", order: 0, profileId: profile.id)
+        let favorite = SyncTabFields(place: .favorite, url: url, title: "Favori", customTitle: "Courrier", order: 0, profileId: profile.id)
         let pinned = SyncTabFields(place: .pinned, url: url, title: "Épinglé", order: 1, spaceId: space.id, folderId: folder.id)
         for fields in [favorite, pinned] {
             let tab = inserted(TabRecord())
@@ -64,6 +64,7 @@ struct SyncRecordFieldsTests {
                 space: fields.place == .favorite ? nil : space,
             )
             #expect(tab.syncFields == fields, "\(fields.place)")
+            #expect(tab.customTitle == fields.customTitle)
         }
         // A today tab stays on this Mac (`SYNC.md` § 2.4).
         let today = inserted(TabRecord(url: url, place: .today))

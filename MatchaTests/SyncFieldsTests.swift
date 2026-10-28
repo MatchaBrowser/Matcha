@@ -24,6 +24,7 @@ struct SyncFieldsTests {
         var tab = emptyPinnedTab()
         tab.url = URL(string: "https://example.com/a?b=1")
         tab.title = "Exemple"
+        tab.customTitle = "Mon exemple"
         return [
             .profile(SyncProfileFields(name: "Personnel", order: 0)),
             .space(SyncSpaceFields(name: "Perso", symbol: "emoji:🍵", theme: theme, order: 2, profileId: profile)),
@@ -126,6 +127,18 @@ struct SyncFieldsTests {
         #expect(extensionFields.showsButton && !extensionFields.isEnabled)
     }
 
+    /// A tab's name (`customTitle`), added to `schema` 1: empty or unreadable, the tab has none and the rest applies.
+    @Test func `an empty or unreadable tab name is no name`() throws {
+        let parent = #""place":"pinned","order":0,"spaceId":"\#(space.uuidString)""#
+        for name in [#""""#, "7", "null"] {
+            guard case let .tab(fields) = try SyncFields(json: object(#"{"customTitle":"# + name + "," + parent + "}"), type: .tab) else {
+                Issue.record("Tab ignored for the name \(name)")
+                continue
+            }
+            #expect(fields.customTitle == nil && fields.spaceId == space)
+        }
+    }
+
     @Test func `unknown fields are ignored, and kept by a modification`() throws {
         let received = try object(##"{"name":"Perso","order":1,"pinnedColor":"#FF0000"}"##)
         let fields = try #require(SyncFields(json: received, type: .profile))
@@ -190,8 +203,8 @@ struct SyncFieldsTests {
                 backgroundColor: "#FFFFFF",
             )),
             .tab(SyncTabFields(
-                place: .pinned, url: URL(string: "https://example.com"), title: "T", order: 1, profileId: profile,
-                spaceId: space, folderId: profile,
+                place: .pinned, url: URL(string: "https://example.com"), title: "T", customTitle: "N", order: 1,
+                profileId: profile, spaceId: space, folderId: profile,
             )),
             .webExtension(SyncExtensionFields(
                 identifier: "x", name: "X", version: "1", source: source, isEnabled: true, allowsPrivateWindows: true,
@@ -223,6 +236,7 @@ struct SyncFieldsTests {
     @Test func `settings are read as UserDefaults keeps them`() {
         #expect(SyncedSettings.value(true as NSNumber, for: "showsHomeButton") == .bool(true))
         #expect(SyncedSettings.value("NO", for: "confirmBeforeQuitting") == .bool(false))
+        #expect(SyncedSettings.value(true as NSNumber, for: "renamesTabsOnDoubleClick") == .bool(true))
         #expect(SyncedSettings.value(1 as NSNumber, for: "showsHomeButton") == nil)
         #expect(SyncedSettings.value(30 as NSNumber, for: "tabSuspensionDelay") == .number(30))
         #expect(SyncedSettings.value("0", for: "tabSuspensionDelay") == .number(0))

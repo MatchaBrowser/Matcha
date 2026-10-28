@@ -7,6 +7,8 @@ nonisolated struct StoredTab: Hashable, Sendable {
     var title: String?
     var pinnedURL: URL?
     var pinnedTitle: String?
+    /// Name given by the user (`BrowserTab.customTitle`).
+    var customTitle: String?
     var lastActivity: Date
     /// WebKit navigation state (back/forward history, scrolling), opaque.
     var interactionState: Data?
