@@ -64,7 +64,7 @@ struct HistoryView: View {
         let rows = model.rows(ids)
         if !rows.isEmpty {
             Button("Open in New Tab") { confirmOpen(rows) }
-            Button("Copy Link") { TabLinkCopier.copy(rows.map(\.url)) }
+            Button("Copy Link") { Clipboard.system.copy(rows.map(\.url)) }
             Divider()
             Button("Delete") { model.delete(ids) }
         }

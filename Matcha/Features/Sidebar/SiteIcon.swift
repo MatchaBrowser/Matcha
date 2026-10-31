@@ -31,7 +31,7 @@ struct SiteIcon: View {
     }
 
     @ViewBuilder private func icon(_ favicon: Favicon) -> some View {
-        let image = Image(nsImage: favicon.image)
+        let image = Image(decorative: favicon.image, scale: 1)
             .resizable()
             .interpolation(.high)
             .scaledToFit()

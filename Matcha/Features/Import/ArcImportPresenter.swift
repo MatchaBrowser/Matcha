@@ -4,9 +4,10 @@ import SwiftUI
 /// the window shows the first imported Space.
 struct ArcImportPresenter: ViewModifier {
     let model: WindowModel
+    let arcImport: ArcImportModel
 
     func body(content: Content) -> some View {
-        @Bindable var arcImport = model.arcImport
+        @Bindable var arcImport = arcImport
         content
             .sheet(item: $arcImport.request) { request in
                 ArcImportSheet(

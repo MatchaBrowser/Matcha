@@ -318,11 +318,6 @@ extension SyncService {
     nonisolated static func bytes(_ key: SymmetricKey) -> Data {
         key.withUnsafeBytes { Data($0) }
     }
-
-    /// Name of this Mac shown in the list of devices.
-    nonisolated static var deviceName: String {
-        Host.current().localizedName ?? "Mac"
-    }
 }
 
 private extension String {

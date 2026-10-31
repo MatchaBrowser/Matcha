@@ -36,7 +36,12 @@ struct TabSuspensionTests {
     @Test func `suspending frees the web view and keeps the page as shown in the sidebar`() async throws {
         let tab = try await hiddenTabWithHistory()
         let url = tab.url
-        let favicon = Favicon(image: NSImage(size: NSSize(width: 16, height: 16)), tone: .neutral)
+        let image = try #require(NSImage(size: NSSize(width: 16, height: 16), flipped: false) { rect in
+            NSColor.red.setFill()
+            rect.fill()
+            return true
+        }.cgImage(forProposedRect: nil, context: nil, hints: nil))
+        let favicon = Favicon(image: image, tone: .neutral)
         tab.favicon = favicon
         tab.suspend(snapshot: nil)
 

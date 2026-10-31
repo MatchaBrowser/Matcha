@@ -4,11 +4,7 @@ import SwiftUI
 /// server: sign in or create an account, then the state of sync, the account's avatar (with a server that keeps it),
 /// the devices and the account. iCloud will come with its resumption (`FEATURES.md`).
 struct SyncSettingsView: View {
-    enum Mode: Hashable {
-        case off
-        case privateServer
-        case publicServer
-    }
+    typealias Mode = SyncFormRules.PaneMode
 
     @Environment(SyncService.self) private var sync
     @State private var choosesPrivateServer = false

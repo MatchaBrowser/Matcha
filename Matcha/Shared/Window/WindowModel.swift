@@ -1,20 +1,25 @@
-import AppKit
 import Foundation
 import Observation
 import OSLog
-import SwiftUI
 
 /// State of a window: the displayed Space and the tab selected in each Space (`WindowModel+Viewers`), the edge from
 /// which the chosen Space arrives (animation), the “URL Copied” confirmation, the downloads list, the site settings
-/// panel and the folder customization panel.
+/// panel and the folder customization panel. The same on every platform: what depends on the window itself is in the
+/// interface (`WindowModel+AppKit`).
 @MainActor
 @Observable
 final class WindowModel {
+    /// Side from which the chosen Space arrives.
+    enum TransitionEdge {
+        case leading
+        case trailing
+    }
+
     static let currentSpaceKey = "currentSpaceID"
 
     let session: BrowserSession
     private(set) var currentSpaceID: UUID?
-    private(set) var transitionEdge = Edge.trailing
+    private(set) var transitionEdge = TransitionEdge.trailing
     /// Confirmation shown for each address copied from this window.
     let copyConfirmation = CopyConfirmationModel()
     /// Downloads panel open (task 5.1), through the sidebar footer button or ⌥⌘L; only the user opens and closes it.
@@ -38,8 +43,6 @@ final class WindowModel {
     /// Tab renamed in an alert (`TabRenameAlert`), and the name typed, held here for the same reason.
     var renamedTab: BrowserTab?
     var renamedTabName = ""
-    /// Import from Arc started from this window (task 7.1).
-    let arcImport = ArcImportModel()
     /// Translation sessions of the window's pages (task 9.3).
     let translationHost: TranslationHost
     /// Where to remember the last displayed Space, shown by the next new window; nil to remember nothing (tests).
@@ -50,7 +53,8 @@ final class WindowModel {
     @ObservationIgnored var isOpen = false
     /// Closed: its viewers are released, it no longer takes any.
     @ObservationIgnored var isClosed = false
-    /// Makes the window's viewers active as soon as it becomes the key window, before the click that made it so.
+    /// Makes the window's viewers active as soon as it becomes the key window, before the click that made it so
+    /// (`track`, in the interface).
     @ObservationIgnored var keyObserver: (any NSObjectProtocol)?
     /// The window's own tabs, outside any Space (a tab dragged out of the sidebar: `detachToNewWindow`,
     /// `BrowserSession+WindowTabs`): the sidebar shows only them. The displayed Space is then the one they came from
@@ -224,18 +228,18 @@ final class WindowModel {
     }
 
     /// Copies `url` (context menu of a tab) and confirms “URL Copied” in this window.
-    func copyLink(_ url: URL, to pasteboard: NSPasteboard = .general) {
-        copyConfirmation.copy(url, to: pasteboard)
+    func copyLink(_ url: URL, to clipboard: Clipboard = .system) {
+        copyConfirmation.copy(url, to: clipboard)
     }
 
     /// ⇧⌘C and the “Copy URL” action of the command bar: the address of the frontmost page (the peek if it is open,
     /// otherwise the displayed tab). Without an address, nothing is copied or confirmed.
     @discardableResult
-    func copySelectedTabURL(to pasteboard: NSPasteboard = .general) -> Bool {
+    func copySelectedTabURL(to clipboard: Clipboard = .system) -> Bool {
         guard let url = frontTab?.displayedURL else {
             return false
         }
-        copyLink(url, to: pasteboard)
+        copyLink(url, to: clipboard)
         return true
     }
 }

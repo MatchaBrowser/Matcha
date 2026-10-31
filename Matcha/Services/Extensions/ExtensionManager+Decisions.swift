@@ -1,4 +1,3 @@
-import AppKit
 import WebKit
 
 /// User decisions about extensions (task 6.3): permissions, websites, private windows, remembered by
@@ -77,7 +76,7 @@ extension ExtensionManager {
         ]
         // All loaded extensions are read again (nothing is written for those that have not changed): the notification
         // does not cross the isolation boundary.
-        for name in names + [NSApplication.willTerminateNotification] {
+        for name in names + [AppLifecycle.willTerminate] {
             observers.append(NotificationObservation(of: name) { [weak self] _ in
                 MainActor.assumeIsolated {
                     self?.saveAllStates()

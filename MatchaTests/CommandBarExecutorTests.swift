@@ -24,7 +24,7 @@ struct CommandBarExecutorTests {
 
     private func executor(openSettings: @escaping () -> Void = {}) -> CommandBarExecutor {
         var executor = CommandBarExecutor(model: model, window: nil, openSettings: openSettings)
-        executor.pasteboard = pasteboard
+        executor.clipboard = Clipboard(pasteboard)
         executor.animate = { $0() }
         return executor
     }

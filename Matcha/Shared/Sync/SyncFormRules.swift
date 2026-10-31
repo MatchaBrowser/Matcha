@@ -4,14 +4,28 @@ import Foundation
 /// depending on the form, a password, a strong new password typed twice, or a recovery key. Also the choice at the top
 /// of the pane.
 enum SyncFormRules {
+    /// Choice at the top of the pane (`SyncSettingsView`).
+    enum PaneMode: Hashable {
+        case off
+        case privateServer
+        case publicServer
+    }
+
+    /// Form of a private server not signed in (`SyncConnectForm`).
+    enum ConnectStep: Hashable {
+        case signIn
+        case create
+        case recover
+    }
+
     /// A private server once signed in, configured, or just chosen; otherwise off.
-    static func mode(isActive: Bool, configured: SyncConfiguration.Mode, choosesPrivateServer: Bool) -> SyncSettingsView.Mode {
+    static func mode(isActive: Bool, configured: SyncConfiguration.Mode, choosesPrivateServer: Bool) -> PaneMode {
         isActive || configured == .privateServer || choosesPrivateServer ? .privateServer : .off
     }
 
     /// Sign in, create an account or recover it (`SyncConnectForm`).
     static func canSubmit(
-        _ step: SyncConnectForm.Step,
+        _ step: ConnectStep,
         email: String,
         password: String,
         confirmation: String,

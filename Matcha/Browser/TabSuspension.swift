@@ -1,9 +1,10 @@
-import AppKit
+import CoreGraphics
+import Foundation
 import Observation
 
 /// Snapshot laid over a page woken from sleep, while it reloads.
 struct TabCover {
-    let image: NSImage
+    let image: CGImage
     /// Width of the captured page, in points.
     let pageWidth: Double
 }
@@ -52,7 +53,7 @@ final class TabSuspension {
         }
         isSuspended = false
         isRestoring = true
-        if let snapshot, snapshot.url == url, let image = NSImage(data: snapshot.data) {
+        if let snapshot, snapshot.url == url, let image = snapshot.image {
             cover = TabCover(image: image, pageWidth: snapshot.pageWidth)
             coverURL = url
         }

@@ -119,7 +119,7 @@ struct TabContextMenu: View {
         if let windowModel {
             windowModel.copyLink(url)
         } else {
-            TabLinkCopier.copy(url)
+            Clipboard.system.copy(url)
         }
     }
 }

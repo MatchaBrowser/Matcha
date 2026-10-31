@@ -24,7 +24,7 @@ struct NavigationPolicyPeekTests {
         NavigationRequest(
             url: URL(string: url),
             navigationType: type,
-            modifierFlags: modifiers,
+            modifiers: KeyModifiers(modifiers),
             buttonNumber: button,
             targetsMainFrame: mainFrame,
             isSchemeHandledByWebView: handled,

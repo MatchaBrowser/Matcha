@@ -8,11 +8,7 @@ struct SyncConnectForm: View {
     /// The recovery kit to save (account created, or recovered with a new recovery key).
     let showKit: (SyncRecoveryKit) -> Void
 
-    enum Step: Hashable {
-        case signIn
-        case create
-        case recover
-    }
+    typealias Step = SyncFormRules.ConnectStep
 
     @State private var address = ""
     @State private var endpoint: SyncServerEndpoint?

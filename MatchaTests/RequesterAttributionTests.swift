@@ -37,8 +37,7 @@ struct RequesterAttributionTests {
     }
 
     init() {
-        manager.coordinator.openExternally = { _ in true }
-        manager.coordinator.applicationForURL = { _ in URL(filePath: "/System/Applications/Mail.app") }
+        manager.coordinator.externalApps = ExternalApps(open: { _ in true }, handler: { _ in ExternalApp(name: "Mail", icon: nil) })
     }
 
     /// A page of `TestPages` on `host`, whose title is `name`.

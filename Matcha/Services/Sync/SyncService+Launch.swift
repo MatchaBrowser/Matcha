@@ -1,4 +1,3 @@
-import AppKit
 import CryptoKit
 import Foundation
 
@@ -27,7 +26,7 @@ extension SyncService {
             return
         }
         activationObserver = NotificationCenter.default.addObserver(
-            forName: NSApplication.didBecomeActiveNotification,
+            forName: AppLifecycle.didBecomeActive,
             object: nil,
             queue: .main,
         ) { [weak self] _ in

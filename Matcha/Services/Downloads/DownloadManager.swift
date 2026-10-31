@@ -1,4 +1,3 @@
-import AppKit
 import Foundation
 import Observation
 import OSLog
@@ -32,7 +31,7 @@ final class DownloadManager: NSObject {
     init(directory: @escaping @MainActor () -> URL? = { DownloadLocation.directory() }) {
         self.directory = directory
         super.init()
-        terminationObserver = NotificationObservation(of: NSApplication.willTerminateNotification) { [weak self] _ in
+        terminationObserver = NotificationObservation(of: AppLifecycle.willTerminate) { [weak self] _ in
             MainActor.assumeIsolated {
                 self?.removePartialFiles()
                 self?.saveList(includingActive: true)

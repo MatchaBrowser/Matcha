@@ -8,7 +8,7 @@ import WebKit
 extension NavigationCoordinator {
     /// A real click on a link or a form button (a script's click has no mouse button).
     func recordClick(_ navigationAction: WKNavigationAction, in webView: WKWebView) {
-        guard [.linkActivated, .formSubmitted].contains(navigationAction.navigationType), navigationAction.buttonNumber != 0 else {
+        guard [.linkActivated, .formSubmitted].contains(navigationAction.navigationType), navigationAction.mouseButtons != 0 else {
             return
         }
         tabHost?.page(for: webView)?.pageDownloads.userDidClick(at: now())

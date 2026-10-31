@@ -51,7 +51,7 @@ struct DisplayedAddressSurfacesTests {
 
         let pasteboard = NSPasteboard(name: NSPasteboard.Name("DisplayedAddressSurfacesTests-\(UUID().uuidString)"))
         defer { pasteboard.releaseGlobally() }
-        #expect(window.copySelectedTabURL(to: pasteboard))
+        #expect(window.copySelectedTabURL(to: Clipboard(pasteboard)))
         #expect(pasteboard.string(forType: .string) == attacker.absoluteString)
         #expect(tab.url?.host() == "bank")
     }

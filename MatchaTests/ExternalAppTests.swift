@@ -83,7 +83,7 @@ struct ExternalAppTests {
         let (page, opened) = try await openPage(body: body)
         try await waitUntil { page.permissionPrompts.currentAction != nil }
         var lookups = 0
-        manager.coordinator.applicationForURL = { _ in
+        manager.coordinator.externalApps.handler = { _ in
             lookups += 1
             return Self.mail
         }
@@ -119,7 +119,7 @@ struct ExternalAppTests {
         #expect(opened.urls.isEmpty)
     }
 
-    private static let mail = URL(filePath: "/System/Applications/Mail.app")
+    private static let mail = ExternalApp(name: "Mail", icon: nil)
 
     /// Opened links, recorded instead of being handed to another app.
     private final class Opened {
@@ -127,7 +127,7 @@ struct ExternalAppTests {
     }
 
     private func request(_ action: SiteAction, perform: @escaping @MainActor () -> Void) -> SiteActionRequest {
-        SiteActionRequest(action: action, origin: nil, scope: nil, appName: "Zoom", appIcon: NSImage(), perform: perform)
+        SiteActionRequest(action: action, origin: nil, scope: nil, appName: "Zoom", appIcon: nil, perform: perform)
     }
 
     private func click(_ id: String, in page: BrowserTab) async throws {
@@ -135,12 +135,14 @@ struct ExternalAppTests {
     }
 
     /// Page with `body`; links open in `handler` (none: no app handles them).
-    private func openPage(body: String, handler: URL? = Self.mail) async throws -> (BrowserTab, Opened) {
+    private func openPage(body: String, handler: ExternalApp? = Self.mail) async throws -> (BrowserTab, Opened) {
         let opened = Opened()
-        manager.coordinator.openExternally = { opened.urls.append($0)
-            return true
-        }
-        manager.coordinator.applicationForURL = { _ in handler }
+        manager.coordinator.externalApps = ExternalApps(
+            open: { opened.urls.append($0)
+                return true
+            },
+            handler: { _ in handler },
+        )
         let page = manager.insertTab(configuration: TestPages.configuration(), after: nil, select: true)
         page.load(TestPages.url("ouvrant", body: body))
         try await waitUntil { page.title == "ouvrant" && !page.isLoading }

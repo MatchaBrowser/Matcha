@@ -56,3 +56,25 @@ custom_rules:
       - comment
       - doccomment
     message: "Pas de singleton : les services partagés viennent d'AppEnvironment (CLAUDE.md)"
+  # Multiplatform preparation (phase 10): the core and Shared/ use AppKit only in the core's AppKit/ folders, which an
+  # iOS app would replace with its own. The types are listed because `import WebKit` and `import SwiftUI` bring AppKit
+  # along on the Mac; what the list misses, a build for iOS will show.
+  appkit_outside_platform_folders:
+    included: '/Matcha/(Browser|Services|Models|Shared)/'
+    excluded: '/AppKit/'
+    regex: '\bimport (AppKit|Cocoa|IOKit)\b|\bNS(Application|App|Window|WindowController|View|ViewController|ViewRepresentable|ViewControllerRepresentable|HostingView|HostingController|Image|BitmapImageRep|Color|Font|Event|Menu|MenuItem|UserInterfaceItemIdentifier|Workspace|Pasteboard|DraggingInfo|DragOperation|Screen|Cursor|TrackingArea|Panel|Alert|SavePanel|OpenPanel|PrintOperation|PrintInfo|Responder|EdgeInsets|BezierPath|Appearance|Sound|Size|Point|Rect)\b|\bHost\.current\b'
+    excluded_match_kinds:
+      - comment
+      - doccomment
+      - string
+    message: "AppKit dans le cœur ou Shared/ : le mettre dans un dossier AppKit/ du cœur, derrière un type neutre (CLAUDE.md)"
+  # The interface stays in Features/ and App/: each platform draws its own, on the same core and Shared/ logic.
+  swiftui_outside_interface:
+    included: '/Matcha/(Browser|Services|Models|Shared)/'
+    excluded: '/AppKit/'
+    regex: '\bimport SwiftUI\b'
+    excluded_match_kinds:
+      - comment
+      - doccomment
+      - string
+    message: "SwiftUI hors de l'interface : le cœur et Shared/ restent sans vue, l'interface est dans Features/ et App/ (CLAUDE.md)"

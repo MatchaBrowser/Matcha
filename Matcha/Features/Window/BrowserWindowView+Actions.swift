@@ -51,7 +51,7 @@ extension BrowserWindowView {
             newSpace: { withMotion(.easeInOut(duration: 0.3)) { model.newSpace() } },
             showTab: showTab,
             isPrivate: session.isPrivate,
-            importFromArc: session.isPrivate ? nil : { model.arcImport.chooseFile(in: window) },
+            importFromArc: session.isPrivate ? nil : { models.arcImport.chooseFile(in: window) },
         )
     }
 

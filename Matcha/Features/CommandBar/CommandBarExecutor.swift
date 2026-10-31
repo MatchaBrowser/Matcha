@@ -18,7 +18,7 @@ struct CommandBarExecutor {
     let openSettings: () -> Void
     /// Shows a tab of a Space in the main window, brought to the front (reopened if needed); nil in a private window.
     var revealInSpace: ((BrowserTab, SpaceSession) -> Void)?
-    var pasteboard: NSPasteboard = .general
+    var clipboard = Clipboard.system
     /// Animated Space change (tests apply it as is).
     var animate: (() -> Void) -> Void = { change in withMotion(.easeInOut(duration: 0.3), change) }
 
@@ -121,7 +121,7 @@ struct CommandBarExecutor {
         case .copyURL:
             log("copyURL")
             // Same action as ⇧⌘C: copy and “URL Copied” confirmation.
-            windowModel.copySelectedTabURL(to: pasteboard)
+            windowModel.copySelectedTabURL(to: clipboard)
             return windowModel.selectedTab
         case .settings:
             log("settings")

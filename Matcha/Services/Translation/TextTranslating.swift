@@ -6,6 +6,6 @@ nonisolated protocol TextTranslating {
     func translate(_ texts: [String]) async throws -> [String?]
 
     /// Rich-text method: the attributes of the texts sent may come back on their translation.
-    @available(macOS 26.4, *)
+    @available(macOS 26.4, iOS 26.4, *)
     func translate(_ texts: [AttributedString]) async throws -> [AttributedString?]
 }

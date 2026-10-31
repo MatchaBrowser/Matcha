@@ -1,4 +1,3 @@
-import AppKit
 import Observation
 import OSLog
 import WebKit
