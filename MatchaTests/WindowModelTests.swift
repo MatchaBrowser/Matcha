@@ -178,7 +178,7 @@ struct WindowModelTests {
         tabManager.newTab(url: blankPage("two"))
         tabManager.select(first)
 
-        #expect(model.copySelectedTabURL(to: pasteboard))
+        #expect(model.copySelectedTabURL(to: Clipboard(pasteboard)))
         #expect(pasteboard.string(forType: .string) == "about:blank?one")
         #expect(pasteboard.readObjects(forClasses: [NSURL.self]) as? [URL] == [blankPage("one")])
         #expect(model.copyConfirmation.isVisible)
@@ -192,9 +192,9 @@ struct WindowModelTests {
         pasteboard.setString("avant", forType: .string)
 
         // No tab, then an empty tab.
-        #expect(!model.copySelectedTabURL(to: pasteboard))
+        #expect(!model.copySelectedTabURL(to: Clipboard(pasteboard)))
         model.space.tabManager.newTab()
-        #expect(!model.copySelectedTabURL(to: pasteboard))
+        #expect(!model.copySelectedTabURL(to: Clipboard(pasteboard)))
         #expect(pasteboard.string(forType: .string) == "avant")
         #expect(!model.copyConfirmation.isVisible)
         #expect(model.copyConfirmation.presentationCount == 0)
@@ -208,7 +208,7 @@ struct WindowModelTests {
         let peek = try #require(tabManager.openPeek(blankPage("apercu"), from: source))
         try await waitUntil { peek.tab.url != nil }
 
-        #expect(model.copySelectedTabURL(to: pasteboard))
+        #expect(model.copySelectedTabURL(to: Clipboard(pasteboard)))
         #expect(pasteboard.string(forType: .string) == "about:blank?apercu")
     }
 
@@ -239,7 +239,7 @@ struct WindowModelTests {
     @Test func `copying a link of any tab shows the confirmation`() {
         let pasteboard = NSPasteboard(name: NSPasteboard.Name("WindowModelTests-\(UUID().uuidString)"))
         defer { pasteboard.releaseGlobally() }
-        model.copyLink(blankPage("menu"), to: pasteboard)
+        model.copyLink(blankPage("menu"), to: Clipboard(pasteboard))
         #expect(pasteboard.string(forType: .string) == "about:blank?menu")
         #expect(model.copyConfirmation.isVisible)
     }

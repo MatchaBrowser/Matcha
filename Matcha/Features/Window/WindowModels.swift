@@ -25,6 +25,9 @@ final class WindowModels {
         windowTabs: session.windowTabs(withID: windowTabsID),
     )
 
+    /// Import from Arc started from this window (task 7.1).
+    lazy var arcImport = ArcImportModel()
+
     /// History of the displayed Space's profile, reread on each keystroke; none for a private window.
     lazy var commandBar: CommandBarModel = {
         let window = window

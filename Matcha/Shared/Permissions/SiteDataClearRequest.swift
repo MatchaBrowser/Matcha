@@ -1,4 +1,4 @@
-import SwiftUI
+import Foundation
 import WebKit
 
 /// Clearing a site's cookies and data, requested from the site settings panel (task 5.2): the tab and its site at

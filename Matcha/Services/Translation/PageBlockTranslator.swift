@@ -12,7 +12,7 @@ nonisolated struct PageBlockTranslator {
 
     @concurrent func translate(_ blocks: [TranslationBlock]) async throws -> [TranslationBlock.ID: [String]] {
         let blocks = blocks.filter(\.needsTranslation)
-        guard method == .richText, #available(macOS 26.4, *) else {
+        guard method == .richText, #available(macOS 26.4, iOS 26.4, *) else {
             return try await translatePlainText(blocks)
         }
         let rich = blocks.filter { block in
@@ -37,7 +37,7 @@ nonisolated struct PageBlockTranslator {
     }
 
     /// The blocks whose translation could be shared out between their pieces.
-    @available(macOS 26.4, *)
+    @available(macOS 26.4, iOS 26.4, *)
     private func translateRichText(_ blocks: [TranslationBlock]) async throws -> [TranslationBlock.ID: [String]] {
         var texts: [TranslationBlock.ID: [String]] = [:]
         let batches = TranslationLimits.batches(of: blocks) { $0.pieces.reduce(0) { $0 + $1.text.count } }

@@ -23,7 +23,7 @@ final nonisolated class SessionTextTranslator: TextTranslating {
     }
 
     /// One text at a time: a batch's answers come back without their attributes (measured on macOS 26.6).
-    @available(macOS 26.4, *)
+    @available(macOS 26.4, iOS 26.4, *)
     @concurrent func translate(_ texts: [AttributedString]) async throws -> [AttributedString?] {
         var answers: [AttributedString?] = []
         for text in texts {

@@ -1,4 +1,4 @@
-import AppKit
+import Foundation
 import Observation
 import OSLog
 
@@ -27,8 +27,8 @@ final class CopyConfirmationModel {
     /// Shows the confirmation and restarts the wait before hiding it.
     /// Copies `url` (as a URL and as text), then confirms: the same in a browser window and in a mini window (review
     /// CO4).
-    func copy(_ url: URL, to pasteboard: NSPasteboard = .general) {
-        TabLinkCopier.copy(url, to: pasteboard)
+    func copy(_ url: URL, to clipboard: Clipboard = .system) {
+        clipboard.copy(url)
         show()
         // Never the address itself.
         Logger.browser.info("Address copied")

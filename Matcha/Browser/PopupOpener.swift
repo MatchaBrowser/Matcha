@@ -1,4 +1,3 @@
-import AppKit
 import WebKit
 
 /// Page that opened a sign-in window (task 5.8), recorded at opening: its host and its web view (where the sign-in
@@ -11,7 +10,7 @@ struct PopupOpener {
     private(set) weak var host: (any TabHost)?
     private(set) weak var webView: WKWebView?
     private(set) weak var page: BrowserTab?
-    private(set) weak var window: NSWindow?
+    private(set) weak var window: PlatformWindow?
     let sitePermissions: SitePermissionScope?
     let history: HistoryScope?
 

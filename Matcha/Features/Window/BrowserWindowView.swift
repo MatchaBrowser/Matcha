@@ -219,7 +219,7 @@ struct BrowserWindowView: View {
         .modifier(SiteDataClearConfirmation(model: model))
         // “Rename…” of a favorite, a pane of a split or an icon of the column.
         .modifier(TabRenameAlert(model: model))
-        .modifier(ArcImportPresenter(model: model))
+        .modifier(ArcImportPresenter(model: model, arcImport: models.arcImport))
         // Questions of sync (first sync, mass deletion…), asked once: in the last active window, never a private one.
         .asksSyncQuestions(miniWindows?.asksSyncQuestions(in: model) == true)
         // Mini windows send their pages to this window (task 4.5).
@@ -271,7 +271,7 @@ struct BrowserWindowView: View {
                 sidebarToggle: SidebarToggle(isVisible: isSidebarVisible, toggle: toggleSidebar),
             )
             .id(space.id)
-            .transition(.push(from: model.transitionEdge))
+            .transition(.push(from: model.transitionEdge == .leading ? .leading : .trailing))
         }
         .clipped()
         .background {

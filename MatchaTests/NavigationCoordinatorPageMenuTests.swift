@@ -147,7 +147,7 @@ struct NavigationCoordinatorPageMenuTests {
     @Test func `a link to another app opens that app`() async throws {
         let (page, _) = try await openPage()
         var opened: [URL] = []
-        manager.coordinator.openExternally = { url in
+        manager.coordinator.externalApps.open = { url in
             opened.append(url)
             return true
         }
@@ -163,11 +163,13 @@ struct NavigationCoordinatorPageMenuTests {
     @Test func `from the menu, another app asks first and a file share never opens`() async throws {
         let (page, _) = try await openPage()
         var opened: [URL] = []
-        manager.coordinator.openExternally = { url in
-            opened.append(url)
-            return true
-        }
-        manager.coordinator.applicationForURL = { _ in URL(filePath: "/System/Library/CoreServices/Finder.app") }
+        manager.coordinator.externalApps = ExternalApps(
+            open: { url in
+                opened.append(url)
+                return true
+            },
+            handler: { _ in ExternalApp(name: "Finder", icon: nil) },
+        )
         try choose(.backgroundTab, in: page)
         #expect(try requestWindow(#require(URL(string: "smb://attaquant/partage")), from: page) == nil)
         #expect(page.permissionPrompts.currentAction == nil)

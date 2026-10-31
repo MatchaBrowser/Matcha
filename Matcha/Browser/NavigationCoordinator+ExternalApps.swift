@@ -1,4 +1,3 @@
-import AppKit
 import OSLog
 import WebKit
 
@@ -29,7 +28,7 @@ extension NavigationCoordinator {
             Logger.browser.notice("\(scheme, privacy: .public): link ignored, refused in this page without a click since")
             return
         }
-        guard let appURL = applicationForURL(url) else {
+        guard let app = externalApps.handler(url) else {
             Logger.browser.notice("No app handles \(scheme, privacy: .public): links")
             return
         }
@@ -42,8 +41,8 @@ extension NavigationCoordinator {
             action: action,
             origin: origin,
             scope: scope,
-            appName: FileManager.default.displayName(atPath: appURL.path),
-            appIcon: NSWorkspace.shared.icon(forFile: appURL.path),
+            appName: app.name,
+            appIcon: app.icon,
             perform: { [weak self] in self?.open(externally: url) },
         )
         if page.permissionPrompts.enqueue(request) {

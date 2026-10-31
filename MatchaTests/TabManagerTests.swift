@@ -187,7 +187,7 @@ struct TabManagerTests {
     @Test func `copy link writes url and text`() throws {
         let pasteboard = NSPasteboard(name: NSPasteboard.Name("matcha-tests-\(UUID().uuidString)"))
         let url = try #require(URL(string: "https://example.com/page?x=1"))
-        TabLinkCopier.copy(url, to: pasteboard)
+        Clipboard(pasteboard).copy(url)
         #expect(pasteboard.string(forType: .string) == "https://example.com/page?x=1")
         #expect(pasteboard.readObjects(forClasses: [NSURL.self]) as? [URL] == [url])
         pasteboard.releaseGlobally()

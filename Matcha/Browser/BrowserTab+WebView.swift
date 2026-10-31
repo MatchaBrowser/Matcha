@@ -5,7 +5,7 @@ extension BrowserTab {
     func newWebView() -> BrowserWebView {
         let webView = BrowserWebView(frame: .zero, configuration: configuration)
         webView.allowsBackForwardNavigationGestures = true
-        webView.allowsMagnification = true
+        webView.allowsPinchZoom()
         webView.navigationDelegate = delegate
         webView.uiDelegate = delegate
         webView.notifications = delegate

@@ -40,7 +40,7 @@ struct SiteActionBannerContent: View {
 
     @ViewBuilder private var icon: some View {
         if let appIcon = request.appIcon {
-            Image(nsImage: appIcon)
+            Image(decorative: appIcon, scale: 2)
                 .resizable()
                 .frame(width: 20, height: 20)
                 .accessibilityHidden(true)

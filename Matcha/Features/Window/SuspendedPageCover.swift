@@ -13,9 +13,9 @@ struct SuspendedPageCover: View {
     var body: some View {
         GeometryReader { proxy in
             if Self.fits(pageWidth: cover.pageWidth, in: proxy.size.width) {
-                let size = cover.image.size
-                let height = size.width > 0 ? proxy.size.width * size.height / size.width : proxy.size.height
-                Image(nsImage: cover.image)
+                let image = cover.image
+                let height = proxy.size.width * Double(image.height) / Double(image.width)
+                Image(decorative: image, scale: 1)
                     .resizable()
                     .interpolation(.high)
                     .frame(width: proxy.size.width, height: height)

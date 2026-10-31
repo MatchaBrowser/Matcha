@@ -1,4 +1,5 @@
-import AppKit
+import CoreGraphics
+import Foundation
 
 /// A website's request waiting in its page's banner until the user answers (audits W2 and W7).
 struct SiteActionRequest: Identifiable {
@@ -10,7 +11,7 @@ struct SiteActionRequest: Identifiable {
     let scope: SitePermissionScope?
     /// For a link to another app: its name (“Zoom”) and icon.
     var appName: String?
-    var appIcon: NSImage?
+    var appIcon: CGImage?
     /// Does what the website asked.
     let perform: @MainActor () -> Void
     /// The user said no, or the page went away without an answer.

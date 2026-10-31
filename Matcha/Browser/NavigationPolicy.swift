@@ -1,11 +1,10 @@
-import AppKit
 import WebKit
 
 /// What needs to be known about a navigation request to decide what to do with it.
 nonisolated struct NavigationRequest: Sendable {
     var url: URL?
     var navigationType: WKNavigationType
-    var modifierFlags: NSEvent.ModifierFlags
+    var modifiers: KeyModifiers
     /// Mouse buttons, as a mask (checked with WebKit): 1 left (and Return on a link), 2 right,
     /// 4 middle, 0 none (click simulated by the page).
     var buttonNumber: Int
@@ -68,7 +67,6 @@ nonisolated enum NavigationPolicy {
     static let refusedSchemes: Set<String> = ["afp", "cifs", "ftp", "ftps", "nfs", "sftp", "smb", "ssh", "telnet", "vnc", "x-man-page"]
     /// Schemes a choice in the page's menu opens at once (review WB4); any other app waits in the page's banner.
     static let schemesOpenedFromMenu: Set<String> = ["mailto", "tel"]
-    private static let linkModifiers: NSEvent.ModifierFlags = [.shift, .command, .option, .control]
 
     static func decide(_ request: NavigationRequest) -> NavigationDecision {
         guard let url = request.url else {
@@ -86,7 +84,7 @@ nonisolated enum NavigationPolicy {
         guard request.navigationType == .linkActivated, opensElsewhere(url, from: request.pageURL) else {
             return .allow
         }
-        let modifiers = request.modifierFlags.intersection(linkModifiers)
+        let modifiers = request.modifiers
         if modifiers.contains(.command) || request.buttonNumber == middleMouseButton {
             return .openInNewTab(url, inBackground: !modifiers.contains(.shift))
         }
@@ -137,7 +135,7 @@ nonisolated enum NavigationPolicy {
 
     /// Shift-click (except an anchor of the displayed page), and a link from a favorite or pinned tab to another site
     /// if the setting asks for it (left click without a key: never a click simulated by the page).
-    private static func peekDecision(for request: NavigationRequest, url: URL, modifiers: NSEvent.ModifierFlags) -> NavigationDecision {
+    private static func peekDecision(for request: NavigationRequest, url: URL, modifiers: KeyModifiers) -> NavigationDecision {
         if modifiers == .shift {
             return isAnchorOfShownPage(url, request) ? .allow : .openInPeek(url)
         }

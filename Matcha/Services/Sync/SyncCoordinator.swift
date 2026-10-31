@@ -1,4 +1,3 @@
-import AppKit
 import Foundation
 import Observation
 import OSLog
@@ -75,7 +74,7 @@ final class SyncCoordinator {
             center.addObserver(forName: UserDefaults.didChangeNotification, object: defaults, queue: .main) { [weak self] _ in
                 MainActor.assumeIsolated { self?.defaultsDidChange() }
             },
-            center.addObserver(forName: NSApplication.didBecomeActiveNotification, object: nil, queue: .main) { [weak self] _ in
+            center.addObserver(forName: AppLifecycle.didBecomeActive, object: nil, queue: .main) { [weak self] _ in
                 MainActor.assumeIsolated { self?.didBecomeActive() }
             },
         ]

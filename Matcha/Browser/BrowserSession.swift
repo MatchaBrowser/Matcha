@@ -1,4 +1,3 @@
-import AppKit
 import Foundation
 import Observation
 import OSLog
@@ -119,7 +118,7 @@ final class BrowserSession {
     /// App quitting: the tabs of the windows without a Space go back to their Space first, then everything is saved.
     private func observeTermination() -> any NSObjectProtocol {
         NotificationCenter.default
-            .addObserver(forName: NSApplication.willTerminateNotification, object: nil, queue: .main) { [weak self] _ in
+            .addObserver(forName: AppLifecycle.willTerminate, object: nil, queue: .main) { [weak self] _ in
                 MainActor.assumeIsolated {
                     self?.returnWindowTabs()
                     self?.saveAll()

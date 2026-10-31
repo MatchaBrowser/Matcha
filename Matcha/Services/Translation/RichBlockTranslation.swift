@@ -13,7 +13,7 @@ nonisolated enum RichBlockTranslation {
     }
 
     /// Text sent for `block`: its pieces in order, each one marked.
-    @available(macOS 26.4, *)
+    @available(macOS 26.4, iOS 26.4, *)
     static func source(for block: TranslationBlock) -> AttributedString {
         var source = AttributedString()
         for (index, piece) in block.pieces.enumerated() {

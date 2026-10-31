@@ -27,6 +27,11 @@ nonisolated struct TabSnapshot: Sendable {
         return (maximumWidth, max(Int(scaledHeight), 1))
     }
 
+    /// The snapshot as a bitmap, to lay over the page; nil if it can't be read.
+    var image: CGImage? {
+        BoundedImageDecoder.decode(data, limits: .snapshot)
+    }
+
     /// `jpegData` off the main thread.
     @concurrent
     static func encode(_ image: CGImage) async -> Data? {

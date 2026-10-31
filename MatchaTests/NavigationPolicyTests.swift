@@ -18,7 +18,7 @@ struct NavigationPolicyTests {
         NavigationRequest(
             url: url,
             navigationType: type,
-            modifierFlags: modifiers,
+            modifiers: KeyModifiers(modifiers),
             buttonNumber: button,
             targetsMainFrame: mainFrame,
             isFromMainFrame: fromMainFrame,

@@ -15,7 +15,7 @@ nonisolated enum TranslationFailure: Equatable, Sendable {
     case other
 
     init(_ error: any Error) {
-        if #available(macOS 26.0, *), TranslationError.notInstalled ~= error {
+        if #available(macOS 26.0, iOS 26.0, *), TranslationError.notInstalled ~= error {
             self = .notDownloaded
             return
         }

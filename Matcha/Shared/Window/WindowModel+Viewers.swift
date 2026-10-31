@@ -1,4 +1,3 @@
-import AppKit
 import Foundation
 
 /// Several windows (`DECISIONS.md`): each one shows a Space and has its own selected tab there (`TabViewer`), the
@@ -75,28 +74,6 @@ extension WindowModel {
         }
     }
 
-    /// Follows `window` becoming the key window, as soon as it does: before the click that made it so is handled.
-    func track(_ window: NSWindow?) {
-        windowTabs?.bringWindowToFront = { [weak window] in
-            if window?.isMiniaturized == true {
-                window?.deminiaturize(nil)
-            }
-            window?.makeKeyAndOrderFront(nil)
-        }
-        windowTabs?.closeWindow = { [weak window] in
-            window?.close()
-        }
-        keyObserver.map(NotificationCenter.default.removeObserver)
-        keyObserver = window.map { window in
-            NotificationCenter.default
-                .addObserver(forName: NSWindow.didBecomeKeyNotification, object: window, queue: nil) { [weak self] _ in
-                    MainActor.assumeIsolated {
-                        self?.windowDidBecomeKey()
-                    }
-                }
-        }
-    }
-
     /// The window closes: the peek it shows closes (sound, process), its viewers are released. The last window of a
     /// Space leaves it its selection, for the next one.
     func windowDidClose() {
@@ -122,15 +99,14 @@ extension WindowModel {
     // MARK: Moving tabs between windows
 
     /// Shows the tab `id` of the displayed Space in this window, taking it from the window that showed it (new window
-    /// of a detached tab).
+    /// of a detached tab). Giving the keyboard to its page is up to the interface (`TabActivation` on the Mac).
     func showTab(withID id: UUID) {
         let tabManager = space.tabManager
-        guard let tab = tabManager.tab(withID: id) else {
+        guard tabManager.tab(withID: id) != nil else {
             return
         }
         tabManager.activate(viewer)
         tabManager.setSelection(id, for: viewer)
-        TabActivation.focusPage(of: tab)
     }
 
     /// “Open in New Window”, tab dragged out of the window: the tab leaves the sidebar for a window of its own (Arc's

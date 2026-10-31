@@ -1,4 +1,3 @@
-import AppKit
 import WebKit
 
 /// What tab sleeping asks WebKit (task 5.6), replaceable in the tests: the sound, and the page snapshot. Both are
@@ -38,8 +37,8 @@ struct TabLifecycleProbes {
         let configuration = WKSnapshotConfiguration()
         configuration.afterScreenUpdates = false
         let image = await CallbackTimeout.value(timeout: timeout, fallback: nil as CGImage?) { done in
-            webView.takeSnapshot(with: configuration) { image, _ in
-                done(image?.cgImage(forProposedRect: nil, context: nil, hints: nil))
+            webView.takeSnapshotImage(with: configuration) { image in
+                done(image)
             }
         }
         // Scaling and JPEG encoding off the main thread (audit H4).

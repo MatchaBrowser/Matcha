@@ -1,4 +1,3 @@
-import AppKit
 import OSLog
 import WebKit
 
@@ -16,10 +15,8 @@ final class NavigationCoordinator: NSObject {
     /// Shows the notifications of the pages (`+Notifications`); nil: they read “denied”.
     var notificationCenter: PageNotificationCenter?
 
-    /// Hands a URL to the app that handles it; replaceable in tests.
-    var openExternally: (URL) -> Bool = { NSWorkspace.shared.open($0) }
-    /// App that opens a link (`+ExternalApps`); replaceable in tests.
-    var applicationForURL: (URL) -> URL? = { NSWorkspace.shared.urlForApplication(toOpen: $0) }
+    /// Other apps, which open the links the web view can't load (`+ExternalApps`); replaced in tests.
+    var externalApps = ExternalApps.system
     /// JavaScript dialogs, files to send, logins, saving and printing (`+Dialogs`, `+Authentication`, `+PageMenu`): the
     /// app's, given by its host; replaced in tests.
     var dialogs: any PageDialogPresenting = UnavailablePageDialogs()
@@ -36,8 +33,8 @@ final class NavigationCoordinator: NSObject {
         return NavigationRequest(
             url: url,
             navigationType: navigationAction.navigationType,
-            modifierFlags: navigationAction.modifierFlags,
-            buttonNumber: navigationAction.buttonNumber,
+            modifiers: navigationAction.keyModifiers,
+            buttonNumber: navigationAction.mouseButtons,
             targetsMainFrame: navigationAction.targetFrame?.isMainFrame ?? true,
             isFromMainFrame: Self.sourceFrame(of: navigationAction)?.isMainFrame ?? true,
             isSchemeHandledByWebView: url.map { handles($0, in: webView) } ?? true,
@@ -82,7 +79,7 @@ final class NavigationCoordinator: NSObject {
 
     func open(externally url: URL) {
         let scheme = url.scheme ?? "?"
-        if openExternally(url) {
+        if externalApps.open(url) {
             Logger.browser.info("\(scheme, privacy: .public): link handed to another app")
         } else {
             Logger.browser.notice("No app handles \(scheme, privacy: .public): links")

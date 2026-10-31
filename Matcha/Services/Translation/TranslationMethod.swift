@@ -11,7 +11,7 @@ nonisolated enum TranslationMethod: Equatable, Sendable {
 
     /// The method of this Mac, unless the plain-text one is forced.
     static func preferred(forcingPlainText: Bool = isPlainTextForced) -> TranslationMethod {
-        if !forcingPlainText, #available(macOS 26.4, *) {
+        if !forcingPlainText, #available(macOS 26.4, iOS 26.4, *) {
             return .richText
         }
         return .plainText

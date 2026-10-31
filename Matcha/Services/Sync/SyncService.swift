@@ -1,4 +1,3 @@
-import AppKit
 import CoreGraphics
 import CryptoKit
 import Foundation

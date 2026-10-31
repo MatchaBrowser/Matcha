@@ -1,4 +1,3 @@
-import AppKit
 import Foundation
 import OSLog
 import SwiftData
@@ -29,7 +28,7 @@ struct ImportSummary: Equatable {
 struct ArcImporter {
     let session: BrowserSession
     /// True if the SF symbol exists on this Mac (replaced in the tests).
-    var symbolExists: (String) -> Bool = { NSImage(systemSymbolName: $0, accessibilityDescription: nil) != nil }
+    var symbolExists: (String) -> Bool = SystemSymbol.exists
 
     /// Imports `sidebar`; returns the summary and the created Spaces, in order.
     func importSidebar(_ sidebar: ArcSidebar, options: ArcImportOptions) -> (summary: ImportSummary, spaces: [SpaceSession]) {

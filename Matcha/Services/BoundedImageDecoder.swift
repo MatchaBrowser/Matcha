@@ -24,6 +24,13 @@ nonisolated enum BoundedImageDecoder {
         )
         /// The account's avatar received from sync: an image of 256 pixels made by Matcha.
         static let avatar = Limits(types: Set([UTType.png, .jpeg].map(\.identifier)), maximumSourcePixels: 1024 * 1024, maximumSide: 256)
+        /// A tab's snapshot made by Matcha before sleep (`TabSnapshot`): JPEG at most 1200 pixels wide, as tall as
+        /// the page's view.
+        static let snapshot = Limits(
+            types: [UTType.jpeg.identifier],
+            maximumSourcePixels: TabSnapshot.maximumPixelWidth * 8192,
+            maximumSide: 8192,
+        )
         /// A photo chosen on this Mac for the avatar, cropped and reduced afterwards.
         static let photo = Limits(
             types: Set([UTType.png, .jpeg, .heic, .heif, .tiff, .gif, .webP, .bmp].map(\.identifier)),
