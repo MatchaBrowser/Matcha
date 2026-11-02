@@ -82,6 +82,12 @@ MATCHA_XCODEBUILD_FLAGS="CODE_SIGN_IDENTITY=- CODE_SIGN_STYLE=Manual DEVELOPMENT
 The UI tests (`MatchaUITests`) drive the mouse and the keyboard: run them from Xcode, without touching the Mac
 meanwhile.
 
+### Resource usage
+
+`python3 -I scripts/perf.py` shows the processor and the memory the open Matcha uses, process by process: the app,
+WebKit's (pages, extensions, network, graphics and media) and the macOS services working for it, with their total.
+`--watch 5` measures every 5 seconds, `--csv perf.csv` keeps the measures.
+
 ### Layout
 
 ```
@@ -94,7 +100,7 @@ Matcha/
   Resources/    string catalogs, credits
 MatchaTests/    unit tests (Swift Testing)
 MatchaUITests/  UI tests (XCTest)
-scripts/        checks, packaging and publishing
+scripts/        checks, measuring, packaging and publishing
 ```
 
 The comments name documents such as `SYNC.md` (the sync format and the server's API), `DECISIONS.md` or

@@ -150,6 +150,8 @@ CONFIGURATION=Debug scripts/check-localizations.sh
 step "Scripts"
 python3 -I scripts/test-appcast.py
 echo "✓ flux des mises à jour (appcast.py)"
+python3 -I scripts/test-perf.py
+echo "✓ mesure de la consommation (perf.py)"
 
 step "Tests unitaires"
 # The tests run in Matcha's own container (same app identifier): the temporary files they leave there are emptied
