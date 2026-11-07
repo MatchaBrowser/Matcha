@@ -74,7 +74,7 @@ struct PageCard: View {
                 .anchorPreference(key: PeekPageAreas.self, value: .bounds) { [$0] }
         }
         .pageCardFrame(cornerRadius: BrowserWindowView.cardCornerRadius, isMarked: isMarked)
-        .shadow(color: .black.opacity(0.18), radius: 3, y: 1)
+        .cardShadow(cornerRadius: BrowserWindowView.cardCornerRadius, color: .black.opacity(0.18), radius: 3, offsetY: 1)
         .accessibilityElement(children: .contain)
         .modifier(PageTitleLabel(tab: tab))
         .accessibilityValue(accessibilityValue)
