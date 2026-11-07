@@ -19,3 +19,5 @@ Matcha.xcodeproj/-Xcc/
 # Working documents of the maintainer, kept outside the repository on purpose (README, review DI10)
 .claude/
 .vscode/
+
+scripts/note-editor/node_modules/

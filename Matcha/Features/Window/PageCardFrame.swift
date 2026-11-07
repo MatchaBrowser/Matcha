@@ -16,4 +16,17 @@ extension View {
                     .allowsHitTesting(false)
             }
     }
+
+    /// Shadow of an opaque card with rounded corners (page card, peek), cast by a shape of the same outline placed
+    /// behind it. A `shadow` on the card itself lands on a layer that contains the web view, without a path: Core
+    /// Animation then renders the whole page off screen at every frame to find its outline, and videos flicker
+    /// (YouTube, Twitch).
+    func cardShadow(cornerRadius: Double, color: Color, radius: Double, offsetY: Double) -> some View {
+        background {
+            RoundedRectangle(cornerRadius: cornerRadius)
+                .fill(.background)
+                .shadow(color: color, radius: radius, y: offsetY)
+                .allowsHitTesting(false)
+        }
+    }
 }

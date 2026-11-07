@@ -98,7 +98,7 @@ struct PeekOverlay: View {
                 .strokeBorder(.hairline, lineWidth: 1)
                 .allowsHitTesting(false)
         }
-        .shadow(color: .black.opacity(0.35), radius: 30, y: 12)
+        .cardShadow(cornerRadius: BrowserWindowView.cardCornerRadius, color: .black.opacity(0.35), radius: 30, offsetY: 12)
         .frame(width: layout.pane.width, height: layout.pane.height)
         .position(x: layout.pane.midX, y: layout.pane.midY)
         // The whole area: the anchor point of the scaling refers to it.
