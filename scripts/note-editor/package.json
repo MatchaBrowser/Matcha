@@ -1,0 +1,14 @@
+{
+  "name": "matcha-note-editor",
+  "private": true,
+  "description": "Notes editor of Matcha (task 12.2): OpenBlock with its React menus, built by scripts/build-note-editor.sh",
+  "license": "UNLICENSED",
+  "dependencies": {
+    "react": "19.2.3",
+    "react-dom": "19.2.3"
+  },
+  "devDependencies": {
+    "esbuild": "0.25.12"
+  },
+  "packageManager": "pnpm@10.12.1"
+}

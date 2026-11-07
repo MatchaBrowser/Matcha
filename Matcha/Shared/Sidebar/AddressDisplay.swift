@@ -4,10 +4,13 @@ import Foundation
 /// bar.
 nonisolated enum AddressDisplay {
     /// The domain without “www.” (with the port if there is one), the file name for a `file:`
-    /// address, otherwise the whole address (`about:blank`).
+    /// address, “Note” for a note in a tab, otherwise the whole address (`about:blank`).
     static func short(for url: URL?) -> String {
         guard let url else {
             return ""
+        }
+        if NoteTab.noteID(in: url) != nil {
+            return String(localized: "Note", comment: "Address pill of a tab that shows a note")
         }
         if url.isFileURL {
             return url.lastPathComponent

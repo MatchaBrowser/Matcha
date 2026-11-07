@@ -13,6 +13,8 @@ struct WebView: NSViewRepresentable {
     var sidebarDropTarget: (any SidebarItemDropTarget)?
     /// Translation sessions of the window, for the page menu (task 9.3).
     var translationHost: (any PageTranslationHosting)?
+    /// Notes panel of the window, for “Add to Note” in the menu of a selection (task 12.6).
+    var noteQuotes: (any NoteQuoteReceiving)?
 
     func makeNSView(context _: Context) -> TabWebContainer {
         update(webView)
@@ -26,6 +28,7 @@ struct WebView: NSViewRepresentable {
     private func update(_ webView: WKWebView) {
         (webView as? BrowserWebView)?.sidebarDropTarget = sidebarDropTarget
         (webView as? BrowserWebView)?.translationHost = translationHost
+        (webView as? BrowserWebView)?.noteQuotes = noteQuotes
     }
 
     static func dismantleNSView(_ container: TabWebContainer, coordinator _: ()) {

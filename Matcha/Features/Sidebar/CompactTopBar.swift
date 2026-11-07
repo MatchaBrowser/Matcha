@@ -1,8 +1,9 @@
 import SwiftUI
 
 /// Bar across the top of the window when the hidden sidebar is reduced to icons (`CompactSidebar`): room for the
-/// window's buttons, the button that shows the sidebar again, back, forward, reload and Home, then the address when the
-/// settings put it in the sidebar. Its empty part moves the window; a double click zooms it (window background).
+/// window's buttons, the button that shows the sidebar again, back, forward, reload and Home, then the address and the
+/// notes button when the settings put the address in the sidebar. Its empty part moves the window; a double click zooms it (window
+/// background).
 struct CompactTopBar: View {
     let tab: BrowserTab?
     /// The address bar is in the sidebar (setting): it comes here, with the navigation.
@@ -24,6 +25,7 @@ struct CompactTopBar: View {
             if showsAddress {
                 AddressPill(tab: tab, edit: editAddress)
                     .frame(maxWidth: 420)
+                NotesButton(tab: tab)
             }
             Spacer(minLength: 0)
         }

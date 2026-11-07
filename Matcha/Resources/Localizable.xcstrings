@@ -88,6 +88,35 @@
         }
       }
     },
+    "%@ (conflict)" : {
+      "comment" : "Title of the copy of a note kept after a sync conflict; %@ is the note's title",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ (Konflikt)"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ (conflicto)"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ (conflit)"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ (conflitto)"
+          }
+        }
+      }
+    },
     "%@ is ready." : {
       "comment" : "Settings > Sync: the checked server answers (host name)",
       "localizations" : {
@@ -1600,6 +1629,93 @@
         }
       }
     },
+    "Add a Note" : {
+      "comment" : "Button next to the address of a page without a note; opens the notes panel",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Notiz hinzufügen"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Añadir una nota"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ajouter une note"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aggiungi una nota"
+          }
+        }
+      }
+    },
+    "Add a Note to %@" : {
+      "comment" : "Notes panel: button that makes a note for every page of a website; %@ is the site (example.com)",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Notiz zur ganzen Website %@ hinzufügen"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Añadir una nota a todo el sitio %@"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ajouter une note à tout le site %@"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aggiungi una nota a tutto il sito %@"
+          }
+        }
+      }
+    },
+    "Add a Note to This Page" : {
+      "comment" : "Notes panel: button that makes a note linked to the page shown",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Notiz zu dieser Seite hinzufügen"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Añadir una nota a esta página"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ajouter une note à cette page"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aggiungi una nota a questa pagina"
+          }
+        }
+      }
+    },
     "Add Color" : {
       "comment" : "Icon button: add a color to the Space theme",
       "localizations" : {
@@ -1682,6 +1798,35 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Aggiungi ai Preferiti"
+          }
+        }
+      }
+    },
+    "Add to Note" : {
+      "comment" : "Context menu of selected text: adds it to the note of the page",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zur Notiz hinzufügen"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Añadir a la nota"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ajouter à la note"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aggiungi alla nota"
           }
         }
       }
@@ -1913,6 +2058,35 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Tutta la cronologia"
+          }
+        }
+      }
+    },
+    "All Notes" : {
+      "comment" : "Notes library sidebar",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Alle Notizen"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Todas las notas"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Toutes les notes"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tutte le note"
           }
         }
       }
@@ -4074,6 +4248,35 @@
         }
       }
     },
+    "Close Notes" : {
+      "comment" : "Notes panel: tooltip of the close button",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Notizen schließen"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cerrar notas"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fermer les notes"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Chiudi note"
+          }
+        }
+      }
+    },
     "Close Other Tabs" : {
       "comment" : "Tab context menu",
       "localizations" : {
@@ -4398,6 +4601,41 @@
         }
       }
     },
+    "commandBar.keywords.newNote" : {
+      "comment" : "Search words for the “New Note” action, space-separated, never displayed; keep the English words",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "neu erstellen hinzufügen notiz schreiben new create add note write"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "new create add note write"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "nueva crear añadir nota escribir new create add note write"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "nouvelle créer ajouter note écrire new create add note write"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "nuova crea aggiungi nota scrivi new create add note write"
+          }
+        }
+      }
+    },
     "commandBar.keywords.newSpace" : {
       "comment" : "Search words for the “New Space” action, space-separated, never displayed; keep the English words",
       "extractionState" : "extracted_with_value",
@@ -4434,6 +4672,41 @@
         }
       }
     },
+    "commandBar.keywords.pageNote" : {
+      "comment" : "Search words for the “Note for This Page” action, space-separated, never displayed; keep the English words",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "notiz seite notizen bereich kommentieren note page notes panel annotate"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "note page notes panel annotate"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "nota página notas panel anotar note page notes panel annotate"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "note page notes panneau annoter note page notes panel annotate"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "nota pagina note riquadro annotare note page notes panel annotate"
+          }
+        }
+      }
+    },
     "commandBar.keywords.settings" : {
       "comment" : "Search words for the “Settings” action, space-separated, never displayed; keep the English words",
       "extractionState" : "extracted_with_value",
@@ -4466,6 +4739,41 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "impostazioni preferenze opzioni settings preferences"
+          }
+        }
+      }
+    },
+    "commandBar.keywords.showAllNotes" : {
+      "comment" : "Search words for the “Show All Notes” action, space-separated, never displayed; keep the English words",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "notizen bibliothek alle anzeigen notes library all show"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "notes library all show"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "notas biblioteca todas mostrar notes library all show"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "notes bibliothèque toutes afficher notes library all show"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "note libreria tutte mostra notes library all show"
           }
         }
       }
@@ -5379,6 +5687,93 @@
         }
       }
     },
+    "Delete Folder…" : {
+      "comment" : "Notes library: deletes a folder after a confirmation",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ordner löschen …"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Eliminar carpeta…"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Supprimer le dossier…"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Elimina cartella…"
+          }
+        }
+      }
+    },
+    "Delete Note" : {
+      "comment" : "Notes library: deletes a note",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Notiz löschen"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Eliminar nota"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Supprimer la note"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Elimina nota"
+          }
+        }
+      }
+    },
+    "Delete Note…" : {
+      "comment" : "Notes panel menu: deletes the note after a confirmation",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Notiz löschen …"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Eliminar nota…"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Supprimer la note…"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Elimina nota…"
+          }
+        }
+      }
+    },
     "Delete on All Macs" : {
       "comment" : "Sync question: confirms a mass deletion",
       "localizations" : {
@@ -5582,6 +5977,64 @@
         }
       }
     },
+    "Delete this folder and its notes?" : {
+      "comment" : "Notes library: question before deleting a folder",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Diesen Ordner und seine Notizen löschen?"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "¿Eliminar esta carpeta y sus notas?"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Supprimer ce dossier et ses notes ?"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Eliminare questa cartella e le sue note?"
+          }
+        }
+      }
+    },
+    "Delete this note?" : {
+      "comment" : "Notes panel: question before deleting the note",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Diese Notiz löschen?"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "¿Eliminar esta nota?"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Supprimer cette note ?"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Eliminare questa nota?"
+          }
+        }
+      }
+    },
     "Denied" : {
       "comment" : "Settings > Privacy: a website is not allowed to use the camera, the microphone or notifications",
       "localizations" : {
@@ -5636,6 +6089,35 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Rifiuta"
+          }
+        }
+      }
+    },
+    "Detach from Page" : {
+      "comment" : "Notes panel menu: the note stays in the library but leaves the page",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Von der Seite lösen"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Separar de la página"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Détacher de la page"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Scollega dalla pagina"
           }
         }
       }
@@ -6564,6 +7046,122 @@
         }
       }
     },
+    "Every Page of %@" : {
+      "comment" : "Notes panel menu: the note is shown on every page of a site; %@ is the site",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Alle Seiten von %@"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Todas las páginas de %@"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Toutes les pages de %@"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tutte le pagine di %@"
+          }
+        }
+      }
+    },
+    "Export" : {
+      "comment" : "Button of the folder chooser of “Export All Notes…”",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Exportieren"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Exportar"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Exporter"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Esporta"
+          }
+        }
+      }
+    },
+    "Export All Notes…" : {
+      "comment" : "Notes library: writes every note as Markdown files into a folder",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Alle Notizen exportieren …"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Exportar todas las notas…"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Exporter toutes les notes…"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Esporta tutte le note…"
+          }
+        }
+      }
+    },
+    "Export as Markdown…" : {
+      "comment" : "Notes menus: saves the note as a Markdown file",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Als Markdown exportieren …"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Exportar como Markdown…"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Exporter en Markdown…"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Esporta come Markdown…"
+          }
+        }
+      }
+    },
     "Export as PDF…" : {
       "comment" : "File menu: saves the whole page as a PDF file",
       "localizations" : {
@@ -7179,6 +7777,35 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Nome della cartella"
+          }
+        }
+      }
+    },
+    "Folders" : {
+      "comment" : "Notes library sidebar: section of the folders",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ordner"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Carpetas"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dossiers"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cartelle"
           }
         }
       }
@@ -7900,6 +8527,34 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Nasconderla completamente"
+          }
+        }
+      }
+    },
+    "Hide Notes" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Notizen ausblenden"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ocultar notas"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Masquer les notes"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nascondi note"
           }
         }
       }
@@ -8743,6 +9398,63 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "I suoi Space, pannelli, Preferiti, cookie e accessi verranno eliminati."
+          }
+        }
+      }
+    },
+    "Its subfolders and all their notes are deleted too. You can't undo this action." : {
+      "comment" : "Notes library: under the question before deleting a folder",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Seine Unterordner und alle ihre Notizen werden ebenfalls gelöscht. Diese Aktion kann nicht widerrufen werden."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "También se eliminan sus subcarpetas y todas sus notas. Esta acción no se puede deshacer."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ses sous-dossiers et toutes leurs notes sont aussi supprimés. Cette action est irréversible."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vengono eliminate anche le sue sottocartelle e tutte le loro note. Questa azione non può essere annullata."
+          }
+        }
+      }
+    },
+    "Keep the notes panel open when switching tabs" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Notizbereich beim Wechseln des Tabs geöffnet lassen"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mantener abierto el panel de notas al cambiar de pestaña"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Garder le panneau des notes ouvert en changeant d'onglet"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mantieni aperto il riquadro delle note quando cambi pannello"
           }
         }
       }
@@ -10218,6 +10930,35 @@
         }
       }
     },
+    "Move To" : {
+      "comment" : "Notes library: menu of the folders a note can go to",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bewegen nach"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mover a"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Déplacer vers"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sposta in"
+          }
+        }
+      }
+    },
     "Move to Space" : {
       "comment" : "Tab context menu: submenu listing the other Spaces",
       "localizations" : {
@@ -10243,6 +10984,35 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Sposta in"
+          }
+        }
+      }
+    },
+    "Move to Top Level" : {
+      "comment" : "Notes library: moves a subfolder to the root of the folders",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Auf oberste Ebene bewegen"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mover al nivel superior"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Placer au premier niveau"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sposta al livello principale"
           }
         }
       }
@@ -10335,7 +11105,7 @@
       }
     },
     "Name" : {
-      "comment" : "Placeholder of the name field in the Rename Space and Rename Tab alerts",
+      "comment" : "Field of the name of a folder of notes",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -10422,7 +11192,7 @@
       }
     },
     "New Folder" : {
-      "comment" : "Context menus; also the default name of a new pinned folder",
+      "comment" : "Default name of a new folder of notes",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -10474,6 +11244,35 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Nuova minifinestra"
+          }
+        }
+      }
+    },
+    "New Note" : {
+      "comment" : "Notes library: toolbar button",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Neue Notiz"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nueva nota"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nouvelle note"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nuova nota"
           }
         }
       }
@@ -10910,6 +11709,35 @@
         }
       }
     },
+    "No Folder" : {
+      "comment" : "Notes library: “Move To” menu, the root of the library",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kein Ordner"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sin carpeta"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aucun dossier"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nessuna cartella"
+          }
+        }
+      }
+    },
     "No History" : {
       "comment" : "Title of the empty History window",
       "localizations" : {
@@ -10992,6 +11820,122 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Nessun server di sincronizzazione Matcha risponde a questo indirizzo."
+          }
+        }
+      }
+    },
+    "No Note for This Page" : {
+      "comment" : "Notes panel: title when the page shown has no note",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Keine Notiz für diese Seite"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No hay ninguna nota para esta página"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aucune note pour cette page"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nessuna nota per questa pagina"
+          }
+        }
+      }
+    },
+    "No Note Selected" : {
+      "comment" : "Notes library: no note is chosen in the list",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Keine Notiz ausgewählt"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ninguna nota seleccionada"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aucune note sélectionnée"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nessuna nota selezionata"
+          }
+        }
+      }
+    },
+    "No Notes" : {
+      "comment" : "Notes library: the section chosen has no note",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Keine Notizen"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No hay notas"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aucune note"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nessuna nota"
+          }
+        }
+      }
+    },
+    "No Results" : {
+      "comment" : "Notes library: the search finds no note",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Keine Ergebnisse"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No hay resultados"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aucun résultat"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nessun risultato"
           }
         }
       }
@@ -11252,6 +12196,2038 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Non sicuro"
+          }
+        }
+      }
+    },
+    "Note" : {
+      "comment" : "Address pill of a tab that shows a note",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Notiz"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nota"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Note"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nota"
+          }
+        }
+      }
+    },
+    "Note Align Left" : {
+      "comment" : "Notes editor: tooltip of a formatting button",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Linksbündig"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Align Left"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Alinear a la izquierda"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aligner à gauche"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Allinea a sinistra"
+          }
+        }
+      }
+    },
+    "Note Align Right" : {
+      "comment" : "Notes editor: tooltip of a formatting button",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rechtsbündig"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Align Right"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Alinear a la derecha"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aligner à droite"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Allinea a destra"
+          }
+        }
+      }
+    },
+    "Note Bold" : {
+      "comment" : "Notes editor: tooltip of a formatting button",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fett (⌘B)"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Bold (⌘B)"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Negrita (⌘B)"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gras (⌘B)"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Grassetto (⌘B)"
+          }
+        }
+      }
+    },
+    "Note Bulleted List" : {
+      "comment" : "Notes editor, “/” menu: block",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aufzählung"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Bulleted List"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lista con viñetas"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Liste à puces"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Elenco puntato"
+          }
+        }
+      }
+    },
+    "Note Bulleted List Description" : {
+      "comment" : "Notes editor, “/” menu: description of Bulleted List",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Eine Aufzählung erstellen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Create a bulleted list"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Crear una lista con viñetas"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Créer une liste à puces"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Crea un elenco puntato"
+          }
+        }
+      }
+    },
+    "Note Callout" : {
+      "comment" : "Notes editor, “/” menu: block",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hinweis"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Callout"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Destacado"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Encadré"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Riquadro"
+          }
+        }
+      }
+    },
+    "Note Callout Description" : {
+      "comment" : "Notes editor, “/” menu: description of Callout",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wichtige Informationen hervorheben"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Highlight important information"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Resaltar información importante"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mettre en avant une information importante"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Metti in evidenza un'informazione importante"
+          }
+        }
+      }
+    },
+    "Note Center" : {
+      "comment" : "Notes editor: tooltip of a formatting button",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zentrieren"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Center"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Centrar"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Centrer"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Centra"
+          }
+        }
+      }
+    },
+    "Note Code Block" : {
+      "comment" : "Notes editor, “/” menu: block",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Codeblock"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Code Block"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bloque de código"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bloc de code"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Blocco di codice"
+          }
+        }
+      }
+    },
+    "Note Code Block Description" : {
+      "comment" : "Notes editor, “/” menu: description of Code Block",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Einen Codeblock anzeigen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Show a block of code"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mostrar un bloque de código"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Afficher un bloc de code"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mostra un blocco di codice"
+          }
+        }
+      }
+    },
+    "Note Divider" : {
+      "comment" : "Notes editor, “/” menu: block",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Trennlinie"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Divider"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Separador"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Séparateur"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Separatore"
+          }
+        }
+      }
+    },
+    "Note Divider Description" : {
+      "comment" : "Notes editor, “/” menu: description of Divider",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zwei Abschnitte trennen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Separate two sections"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Separar dos secciones"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Séparer deux parties"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Separa due sezioni"
+          }
+        }
+      }
+    },
+    "Note Error" : {
+      "comment" : "Notes editor, “/” menu: block (a callout)",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fehler"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Error"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Error"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Erreur"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Errore"
+          }
+        }
+      }
+    },
+    "Note Error Description" : {
+      "comment" : "Notes editor, “/” menu: description of Error",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Eine Fehlermeldung anzeigen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Show an error message"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mostrar un mensaje de error"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Afficher un message d'erreur"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mostra un messaggio di errore"
+          }
+        }
+      }
+    },
+    "Note for This Page" : {
+      "comment" : "Command bar action: opens the notes panel on the page's note",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Notiz zu dieser Seite"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nota de esta página"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Note de cette page"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nota di questa pagina"
+          }
+        }
+      }
+    },
+    "Note Group Basic" : {
+      "comment" : "Notes editor, “/” menu: section",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Grundelemente"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Basic Blocks"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bloques básicos"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Blocs de base"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Blocchi di base"
+          }
+        }
+      }
+    },
+    "Note Group Layout" : {
+      "comment" : "Notes editor, “/” menu: section",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Layout"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Layout"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Diseño"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mise en page"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Layout"
+          }
+        }
+      }
+    },
+    "Note Group Lists" : {
+      "comment" : "Notes editor, “/” menu: section",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Listen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Lists"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Listas"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Listes"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Elenchi"
+          }
+        }
+      }
+    },
+    "Note Heading 1" : {
+      "comment" : "Notes editor, “/” menu: block",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Überschrift 1"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Heading 1"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Encabezado 1"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Titre 1"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Titolo 1"
+          }
+        }
+      }
+    },
+    "Note Heading 1 Description" : {
+      "comment" : "Notes editor, “/” menu: description of Heading 1",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Große Abschnittsüberschrift"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Large section heading"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Encabezado de sección grande"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Grand titre de section"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Titolo di sezione grande"
+          }
+        }
+      }
+    },
+    "Note Heading 2" : {
+      "comment" : "Notes editor, “/” menu: block",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Überschrift 2"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Heading 2"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Encabezado 2"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Titre 2"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Titolo 2"
+          }
+        }
+      }
+    },
+    "Note Heading 2 Description" : {
+      "comment" : "Notes editor, “/” menu: description of Heading 2",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mittlere Abschnittsüberschrift"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Medium section heading"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Encabezado de sección mediano"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Titre de section moyen"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Titolo di sezione medio"
+          }
+        }
+      }
+    },
+    "Note Heading 3" : {
+      "comment" : "Notes editor, “/” menu: block",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Überschrift 3"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Heading 3"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Encabezado 3"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Titre 3"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Titolo 3"
+          }
+        }
+      }
+    },
+    "Note Heading 3 Description" : {
+      "comment" : "Notes editor, “/” menu: description of Heading 3",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kleine Abschnittsüberschrift"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Small section heading"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Encabezado de sección pequeño"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Petit titre de section"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Titolo di sezione piccolo"
+          }
+        }
+      }
+    },
+    "Note Inline Code" : {
+      "comment" : "Notes editor: tooltip of a formatting button (code within a line of text)",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Code im Text"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Inline Code"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Código en línea"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Code dans le texte"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Codice in linea"
+          }
+        }
+      }
+    },
+    "Note Italic" : {
+      "comment" : "Notes editor: tooltip of a formatting button",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kursiv (⌘I)"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Italic (⌘I)"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cursiva (⌘I)"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Italique (⌘I)"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Corsivo (⌘I)"
+          }
+        }
+      }
+    },
+    "Note Large Table" : {
+      "comment" : "Notes editor, “/” menu: block",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tabelle 4 × 4"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Table 4 × 4"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tabla 4 × 4"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tableau 4 × 4"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tabella 4 × 4"
+          }
+        }
+      }
+    },
+    "Note Large Table Description" : {
+      "comment" : "Notes editor, “/” menu: description of Table 4 × 4",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Eine große Tabelle mit 4 × 4 Zellen einfügen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Insert a large 4 × 4 table"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Insertar una tabla grande de 4 × 4"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Insérer un grand tableau de 4 × 4"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Inserisci una grande tabella 4 × 4"
+          }
+        }
+      }
+    },
+    "Note Numbered List" : {
+      "comment" : "Notes editor, “/” menu: block",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nummerierte Liste"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Numbered List"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lista numerada"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Liste numérotée"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Elenco numerato"
+          }
+        }
+      }
+    },
+    "Note Numbered List Description" : {
+      "comment" : "Notes editor, “/” menu: description of Numbered List",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Eine nummerierte Liste erstellen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Create a numbered list"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Crear una lista numerada"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Créer une liste numérotée"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Crea un elenco numerato"
+          }
+        }
+      }
+    },
+    "Note Options" : {
+      "comment" : "Notes panel: tooltip of the menu of the note",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Notizoptionen"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Opciones de la nota"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Options de la note"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Opzioni della nota"
+          }
+        }
+      }
+    },
+    "Note Placeholder" : {
+      "comment" : "Notes editor: text shown in an empty note",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "„/“ für Befehle eingeben"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Type “/” for commands"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Escribe «/» para ver los comandos"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tapez « / » pour les commandes"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Digita «/» per i comandi"
+          }
+        }
+      }
+    },
+    "Note Quote" : {
+      "comment" : "Notes editor, “/” menu: block",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zitat"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Quote"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cita"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Citation"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Citazione"
+          }
+        }
+      }
+    },
+    "Note Quote Description" : {
+      "comment" : "Notes editor, “/” menu: description of Quote",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ein Zitat hervorheben"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Capture a quotation"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Destacar una cita"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mettre en valeur une citation"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Metti in evidenza una citazione"
+          }
+        }
+      }
+    },
+    "Note Side Column" : {
+      "comment" : "Notes editor, “/” menu: block (a narrow column on the left and a wide one)",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Seitenspalte"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Side Column"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Columna lateral"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Colonne latérale"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Colonna laterale"
+          }
+        }
+      }
+    },
+    "Note Side Column Description" : {
+      "comment" : "Notes editor, “/” menu: description of Side Column",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Eine schmale Spalte neben der Hauptspalte"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "A narrow column next to the main one"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Una columna estrecha junto a la principal"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Une colonne étroite à côté de la principale"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Una colonna stretta accanto a quella principale"
+          }
+        }
+      }
+    },
+    "Note Small Table" : {
+      "comment" : "Notes editor, “/” menu: block",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tabelle 2 × 2"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Table 2 × 2"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tabla 2 × 2"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tableau 2 × 2"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tabella 2 × 2"
+          }
+        }
+      }
+    },
+    "Note Small Table Description" : {
+      "comment" : "Notes editor, “/” menu: description of Table 2 × 2",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Eine kleine Tabelle mit 2 × 2 Zellen einfügen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Insert a small 2 × 2 table"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Insertar una tabla pequeña de 2 × 2"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Insérer un petit tableau de 2 × 2"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Inserisci una piccola tabella 2 × 2"
+          }
+        }
+      }
+    },
+    "Note Strikethrough" : {
+      "comment" : "Notes editor: tooltip of a formatting button",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Durchgestrichen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Strikethrough"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tachado"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Barré"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Barrato"
+          }
+        }
+      }
+    },
+    "Note Success" : {
+      "comment" : "Notes editor, “/” menu: block (a callout)",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Erfolg"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Success"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Éxito"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Réussite"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Successo"
+          }
+        }
+      }
+    },
+    "Note Success Description" : {
+      "comment" : "Notes editor, “/” menu: description of Success",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Eine Erfolgsmeldung anzeigen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Show a success message"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mostrar un mensaje de éxito"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Afficher un message de réussite"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mostra un messaggio di successo"
+          }
+        }
+      }
+    },
+    "Note Table" : {
+      "comment" : "Notes editor, “/” menu: block",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tabelle"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Table"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tabla"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tableau"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tabella"
+          }
+        }
+      }
+    },
+    "Note Table Description" : {
+      "comment" : "Notes editor, “/” menu: description of Table",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Eine Tabelle mit 3 × 3 Zellen einfügen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Insert a 3 × 3 table"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Insertar una tabla de 3 × 3"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Insérer un tableau de 3 × 3"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Inserisci una tabella 3 × 3"
+          }
+        }
+      }
+    },
+    "Note Three Columns" : {
+      "comment" : "Notes editor, “/” menu: block",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "3 Spalten"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "3 Columns"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "3 columnas"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "3 colonnes"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "3 colonne"
+          }
+        }
+      }
+    },
+    "Note Three Columns Description" : {
+      "comment" : "Notes editor, “/” menu: description of 3 Columns",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "In drei Spalten aufteilen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Split into three columns"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dividir en tres columnas"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Diviser en trois colonnes"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dividi in tre colonne"
+          }
+        }
+      }
+    },
+    "Note To-Do List" : {
+      "comment" : "Notes editor, “/” menu: block",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "To-do-Liste"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "To-Do List"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lista de tareas"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Liste de tâches"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Elenco attività"
+          }
+        }
+      }
+    },
+    "Note To-Do List Description" : {
+      "comment" : "Notes editor, “/” menu: description of To-Do List",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aufgaben mit Kontrollkästchen verfolgen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Track tasks with checkboxes"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Seguir tareas con casillas"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Suivre des tâches avec des cases à cocher"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Segui le attività con caselle di spunta"
+          }
+        }
+      }
+    },
+    "Note Two Columns" : {
+      "comment" : "Notes editor, “/” menu: block",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "2 Spalten"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "2 Columns"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "2 columnas"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "2 colonnes"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "2 colonne"
+          }
+        }
+      }
+    },
+    "Note Two Columns Description" : {
+      "comment" : "Notes editor, “/” menu: description of 2 Columns",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "In zwei Spalten aufteilen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Split into two columns"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dividir en dos columnas"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Diviser en deux colonnes"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dividi in due colonne"
+          }
+        }
+      }
+    },
+    "Note Underline" : {
+      "comment" : "Notes editor: tooltip of a formatting button",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Unterstrichen (⌘U)"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Underline (⌘U)"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Subrayado (⌘U)"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Souligné (⌘U)"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sottolineato (⌘U)"
+          }
+        }
+      }
+    },
+    "Note Warning" : {
+      "comment" : "Notes editor, “/” menu: block (a callout)",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Warnung"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Warning"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Advertencia"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Avertissement"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Avviso"
+          }
+        }
+      }
+    },
+    "Note Warning Description" : {
+      "comment" : "Notes editor, “/” menu: description of Warning",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Eine Warnung anzeigen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Show a warning message"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mostrar un mensaje de advertencia"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Afficher un message d'avertissement"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mostra un messaggio di avviso"
+          }
+        }
+      }
+    },
+    "Notes" : {
+      "comment" : "Notes panel: title of the header when the page has no note\nTitle of the notes library window\nVoiceOver label of the notes panel",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Notizen"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Notas"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Notes"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Note"
+          }
+        }
+      }
+    },
+    "Notes aren't kept in private windows." : {
+      "comment" : "Tab of a note in a private window",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "In privaten Fenstern werden keine Notizen gespeichert."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Las notas no se guardan en las ventanas privadas."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Les notes ne sont pas gardées dans les fenêtres privées."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Le note non vengono conservate nelle finestre private."
+          }
+        }
+      }
+    },
+    "Notes can only be linked to web pages." : {
+      "comment" : "Notes panel: the page shown is not a website",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Notizen können nur mit Webseiten verknüpft werden."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Las notas solo pueden vincularse a páginas web."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Les notes ne peuvent être liées qu'à des pages web."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Le note possono essere collegate solo a pagine web."
+          }
+        }
+      }
+    },
+    "Notes panel width" : {
+      "comment" : "VoiceOver label of the notes panel's width handle",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Breite des Notizbereichs"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Anchura del panel de notas"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Largeur du panneau des notes"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Larghezza del riquadro delle note"
+          }
+        }
+      }
+    },
+    "Notes too long to be synced, kept on this Mac: %lld" : {
+      "comment" : "Settings > Sync: notes larger than sync takes; %lld is their number",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zu lange Notizen für die Synchronisierung, auf diesem Mac behalten: %lld"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Notas demasiado largas para sincronizarse, guardadas en este Mac: %lld"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Notes trop longues pour la synchronisation, gardées sur ce Mac : %lld"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Note troppo lunghe per la sincronizzazione, conservate su questo Mac: %lld"
           }
         }
       }
@@ -11668,7 +14644,7 @@
       }
     },
     "Open in New Tab" : {
-      "comment" : "History window: context menu item",
+      "comment" : "Notes panel and library menu: shows the note in a tab of its own",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -11926,6 +14902,35 @@
         }
       }
     },
+    "Open Page" : {
+      "comment" : "Notes library: opens the page of a linked note in a new tab",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Seite öffnen"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Abrir página"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ouvrir la page"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Apri pagina"
+          }
+        }
+      }
+    },
     "Open the Downloads folder in the Finder" : {
       "comment" : "Help tag of the Show Downloads Folder button of the empty downloads panel",
       "localizations" : {
@@ -12156,6 +15161,35 @@
         }
       }
     },
+    "Otherwise, the panel closes when you switch tabs. Following a link in the same tab keeps it open." : {
+      "comment" : "Settings > General: note under the notes panel toggle",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Andernfalls wird der Bereich beim Wechseln des Tabs geschlossen. Folgst du einem Link im selben Tab, bleibt er geöffnet."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Si no, el panel se cierra al cambiar de pestaña. Seguir un enlace en la misma pestaña lo mantiene abierto."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sinon, le panneau se ferme quand vous changez d'onglet. Suivre un lien dans le même onglet le laisse ouvert."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Altrimenti, il riquadro si chiude quando cambi pannello. Seguire un link nello stesso pannello lo lascia aperto."
+          }
+        }
+      }
+    },
     "Page language" : {
       "comment" : "Translation popover, before the target language, when the page's language isn't known",
       "localizations" : {
@@ -12181,6 +15215,35 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Lingua della pagina"
+          }
+        }
+      }
+    },
+    "Page Notes" : {
+      "comment" : "Notes library sidebar: notes linked to a page or a site",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Seitennotizen"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Notas de páginas"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Notes de pages"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Note delle pagine"
           }
         }
       }
@@ -14175,6 +17238,35 @@
         }
       }
     },
+    "Rename Folder" : {
+      "comment" : "Notes library: title of the alert that renames a folder",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ordner umbenennen"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Renombrar carpeta"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Renommer le dossier"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rinomina cartella"
+          }
+        }
+      }
+    },
     "Rename Space" : {
       "comment" : "Title of the Rename Space alert",
       "localizations" : {
@@ -15011,6 +18103,35 @@
         }
       }
     },
+    "Search Notes" : {
+      "comment" : "Notes library: search field",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Notizen durchsuchen"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Buscar en las notas"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rechercher dans les notes"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cerca nelle note"
+          }
+        }
+      }
+    },
     "Search or enter address" : {
       "comment" : "Placeholder of the command bar field and of the address pill without a page",
       "localizations" : {
@@ -15387,6 +18508,35 @@
         }
       }
     },
+    "Show All Notes" : {
+      "comment" : "View menu: opens the notes library window",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Alle Notizen anzeigen"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mostrar todas las notas"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Afficher toutes les notes"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mostra tutte le note"
+          }
+        }
+      }
+    },
     "Show Back, Forward, and Reload buttons" : {
       "localizations" : {
         "de" : {
@@ -15702,6 +18852,63 @@
         }
       }
     },
+    "Show Note" : {
+      "comment" : "Button next to the address of a page that has a note; opens the notes panel",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Notiz anzeigen"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mostrar nota"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Afficher la note"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mostra nota"
+          }
+        }
+      }
+    },
+    "Show Notes" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Notizen einblenden"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mostrar notas"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Afficher les notes"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mostra note"
+          }
+        }
+      }
+    },
     "Show notifications" : {
       "localizations" : {
         "de" : {
@@ -15755,6 +18962,35 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Mostra o nascondi download"
+          }
+        }
+      }
+    },
+    "Show or Hide Notes" : {
+      "comment" : "Settings > Shortcuts: the View menu item (notes panel)",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Notizen ein- oder ausblenden"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mostrar u ocultar notas"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Afficher ou masquer les notes"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mostra o nascondi note"
           }
         }
       }
@@ -15928,6 +19164,35 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Mostra le icone dei pannelli"
+          }
+        }
+      }
+    },
+    "Show the Note On" : {
+      "comment" : "Notes panel menu: section title before the scope choices",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Notiz anzeigen auf"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mostrar la nota en"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Afficher la note sur"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mostra la nota su"
           }
         }
       }
@@ -18777,6 +22042,122 @@
         }
       }
     },
+    "This note is too long to be saved. Shorten it to save your changes." : {
+      "comment" : "Notes panel: banner above a note larger than the store takes",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Diese Notiz ist zu lang zum Sichern. Kürze sie, um deine Änderungen zu sichern."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Esta nota es demasiado larga para guardarse. Acórtala para guardar los cambios."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cette note est trop longue pour être enregistrée. Raccourcissez-la pour enregistrer vos modifications."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Questa nota è troppo lunga per essere salvata. Accorciala per salvare le modifiche."
+          }
+        }
+      }
+    },
+    "This note is too long to be synced to your other Macs. It stays on this Mac." : {
+      "comment" : "Banner above a note larger than sync takes",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Diese Notiz ist zu lang, um mit deinen anderen Macs synchronisiert zu werden. Sie bleibt auf diesem Mac."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Esta nota es demasiado larga para sincronizarse con tus otros Mac. Se queda en este Mac."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cette note est trop longue pour être synchronisée avec vos autres Mac. Elle reste sur ce Mac."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Questa nota è troppo lunga per essere sincronizzata con gli altri tuoi Mac. Resta su questo Mac."
+          }
+        }
+      }
+    },
+    "This note was deleted." : {
+      "comment" : "Tab of a note that no longer exists",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Diese Notiz wurde gelöscht."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Esta nota se ha eliminado."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cette note a été supprimée."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Questa nota è stata eliminata."
+          }
+        }
+      }
+    },
+    "This note was written by a newer version of Matcha. It can't be changed here." : {
+      "comment" : "Notes panel: banner above a note this version can't read (shown read-only)",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Diese Notiz wurde mit einer neueren Version von Matcha geschrieben. Sie kann hier nicht geändert werden."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Esta nota se escribió con una versión más reciente de Matcha. No se puede modificar aquí."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cette note a été écrite par une version plus récente de Matcha. Elle ne peut pas être modifiée ici."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Questa nota è stata scritta con una versione più recente di Matcha. Non può essere modificata qui."
+          }
+        }
+      }
+    },
     "This page" : {
       "comment" : "Permission banner: the page asking, when it has no website name (local file)",
       "localizations" : {
@@ -19005,6 +22386,35 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Questa pagina è già in %@."
+          }
+        }
+      }
+    },
+    "This Page Only" : {
+      "comment" : "Notes panel menu: the note is linked to the page shown only",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nur diese Seite"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Solo esta página"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cette page seulement"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Solo questa pagina"
           }
         }
       }
@@ -19352,6 +22762,35 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Questa finestra"
+          }
+        }
+      }
+    },
+    "Title" : {
+      "comment" : "Notes panel: label of the note's title field",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Titel"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Título"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Titre"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Titolo"
           }
         }
       }
@@ -20197,6 +23636,35 @@
         }
       }
     },
+    "Untitled" : {
+      "comment" : "Placeholder of a note's empty title",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ohne Titel"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sin título"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sans titre"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Senza titolo"
+          }
+        }
+      }
+    },
     "Untitled Space" : {
       "comment" : "Arc import preview: Arc Space without a name",
       "localizations" : {
@@ -21034,6 +24502,35 @@
         }
       }
     },
+    "You can't undo this action." : {
+      "comment" : "Notes panel: under the question before deleting the note",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Diese Aktion kann nicht widerrufen werden."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Esta acción no se puede deshacer."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cette action est irréversible."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Questa azione non può essere annullata."
+          }
+        }
+      }
+    },
     "You will be signed out of all websites; a password typed in a login sheet is kept until you quit Matcha. This action cannot be undone." : {
       "comment" : "Settings > Privacy: confirmation message before clearing the data of all websites",
       "localizations" : {
@@ -21295,31 +24792,31 @@
         }
       }
     },
-    "Your Spaces, folders, Favorites, pinned and today tabs, extensions and settings, on all your Macs. Everything is encrypted on this Mac with your master password: the server can't read it." : {
+    "Your Spaces, folders, Favorites, pinned and today tabs, notes, extensions and settings, on all your Macs. Everything is encrypted on this Mac with your master password: the server can't read it." : {
       "comment" : "Settings > Sync: what sync does",
       "localizations" : {
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Deine Spaces, Ordner, Favoriten, angehefteten und heutigen Tabs, Erweiterungen und Einstellungen, auf all deinen Macs. Alles wird auf diesem Mac mit deinem Master-Passwort verschlüsselt: Der Server kann es nicht lesen."
+            "value" : "Deine Spaces, Ordner, Favoriten, angehefteten und heutigen Tabs, Notizen, Erweiterungen und Einstellungen, auf all deinen Macs. Alles wird auf diesem Mac mit deinem Master-Passwort verschlüsselt: Der Server kann es nicht lesen."
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Tus Spaces, carpetas, favoritos, pestañas fijadas y de hoy, extensiones y ajustes, en todos tus Mac. Todo se cifra en este Mac con tu contraseña maestra: el servidor no puede leerlo."
+            "value" : "Tus Spaces, carpetas, favoritos, pestañas fijadas y de hoy, notas, extensiones y ajustes, en todos tus Mac. Todo se cifra en este Mac con tu contraseña maestra: el servidor no puede leerlo."
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Vos Spaces, dossiers, favoris, onglets épinglés et du jour, extensions et réglages, sur tous vos Mac. Tout est chiffré sur ce Mac avec votre mot de passe maître : le serveur ne peut pas le lire."
+            "value" : "Vos Spaces, dossiers, favoris, onglets épinglés et du jour, notes, extensions et réglages, sur tous vos Mac. Tout est chiffré sur ce Mac avec votre mot de passe maître : le serveur ne peut pas le lire."
           }
         },
         "it" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "I tuoi Space, cartelle, preferiti, pannelli fissati e di oggi, estensioni e impostazioni, su tutti i tuoi Mac. Tutto è cifrato su questo Mac con la tua password principale: il server non può leggerlo."
+            "value" : "I tuoi Space, cartelle, preferiti, pannelli fissati e di oggi, note, estensioni e impostazioni, su tutti i tuoi Mac. Tutto è cifrato su questo Mac con la tua password principale: il server non può leggerlo."
           }
         }
       }

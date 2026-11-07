@@ -195,7 +195,7 @@ struct SyncFieldsTests {
         let theme = try #require(SpaceTheme.presets.first)
         let source = SyncExtensionSource.package(blobID: UUID(), blobKey: "k", sha256: "s", size: 1, fileName: "x.zip")
         let tab = try SyncDeviceTabsFields.Tab(url: #require(URL(string: "https://example.com")), title: "Exemple")
-        let samples: [SyncFields] = [
+        let samples: [SyncFields] = try [
             .profile(SyncProfileFields(name: "P", order: 1)),
             .space(SyncSpaceFields(name: "S", symbol: "star", theme: theme, order: 1, profileId: profile)),
             .folder(SyncFolderFields(
@@ -214,6 +214,12 @@ struct SyncFieldsTests {
             .setting(SyncSettingFields(key: "showsHomeButton", value: .bool(true))),
             .sitePermission(SyncSitePermissionFields(origin: "https://example.com", kind: "camera", decision: "deny", profileId: profile)),
             .siteZoom(SyncSiteZoomFields(site: "example.com", level: 1.25)),
+            .noteFolder(SyncNoteFolderFields(name: "N", order: 1, profileId: profile, parentId: space)),
+            .note(SyncNoteFields(
+                title: "T", content: "[]", profileId: profile, folderId: space,
+                link: NoteLink(url: #require(URL(string: "https://example.com")), scope: .page, title: "E"), createdAt: .now,
+                updatedAt: .now,
+            )),
             .deviceTabs(SyncDeviceTabsFields(deviceId: profile, name: "Mac", spaces: [.init(spaceId: space, name: "S", tabs: [tab])])),
         ]
         #expect(Set(samples.map(\.type)) == Set(SyncRecordType.allCases))

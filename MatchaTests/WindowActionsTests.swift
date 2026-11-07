@@ -7,7 +7,12 @@ import Testing
 struct WindowActionsTests {
     private let owner = NSObject()
 
-    private func actions(homeURL: URL? = nil, isSidebarVisible: Bool = true, spaceNames: [String] = ["Perso"]) -> WindowActions {
+    private func actions(
+        homeURL: URL? = nil,
+        isSidebarVisible: Bool = true,
+        isNotesPanelShown: Bool = false,
+        spaceNames: [String] = ["Perso"],
+    ) -> WindowActions {
         WindowActions(
             target: WindowActions.Target(model: ObjectIdentifier(owner), window: nil, homeURL: homeURL),
             newTab: {},
@@ -18,6 +23,8 @@ struct WindowActionsTests {
             isSidebarVisible: isSidebarVisible,
             toggleDownloads: {},
             isDownloadsPanelShown: false,
+            toggleNotesPanel: {},
+            isNotesPanelShown: isNotesPanelShown,
             copyURL: {},
             goHome: homeURL.map { _ in {} },
             spaceID: nil,
@@ -36,6 +43,7 @@ struct WindowActionsTests {
         let redrawn = actions()
         #expect(drawn == redrawn)
         #expect(actions() != actions(isSidebarVisible: false))
+        #expect(actions() != actions(isNotesPanelShown: true))
         #expect(actions() != actions(spaceNames: ["Perso", "Travail"]))
         // `goHome` keeps its address: another homepage is another action.
         let home = try #require(URL(string: "https://example.com/"))

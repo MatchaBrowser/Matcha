@@ -12,6 +12,7 @@ nonisolated struct CommandRanker: Sendable {
         var tabs = 4
         var history = 4
         var actions = 2
+        var notes = 3
         /// Tabs, history and actions together.
         var local = 6
         var suggestions = 4
@@ -58,7 +59,7 @@ nonisolated struct CommandRanker: Sendable {
             switch candidate.kind {
             case .suggestion: false
             case .history: candidate.url != nil
-            case .tab, .otherMacTab, .action: seen.insert(candidate.id).inserted
+            case .tab, .otherMacTab, .note, .action: seen.insert(candidate.id).inserted
             }
         }
     }
@@ -70,7 +71,7 @@ nonisolated struct CommandRanker: Sendable {
             return nil
         }
         switch candidate.kind {
-        case .tab, .otherMacTab, .history:
+        case .tab, .otherMacTab, .history, .note:
             return CommandMatcher.match(query, fields: fields)
         case .action where query.folded.count >= 2:
             return CommandMatcher.match(query, fields: fields, minimumTier: .wordPrefix)

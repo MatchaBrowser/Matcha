@@ -145,15 +145,15 @@ struct CommandProvidersTests {
 
     @Test func `private windows offer no new space`() {
         #expect(actions(CommandContext(isPrivate: true, showsSearchSuggestions: true)) == [.settings])
-        #expect(actions() == [.newSpace, .settings])
+        #expect(actions() == [.newSpace, .settings, .newNote, .showAllNotes])
     }
 
     @Test func `copy url needs an address`() {
-        #expect(actions() == [.newSpace, .settings])
+        #expect(actions() == [.newSpace, .settings, .newNote, .showAllNotes])
         shownTabs.newTab()
-        #expect(actions() == [.newSpace, .settings])
+        #expect(actions() == [.newSpace, .settings, .newNote, .showAllNotes])
         shownTabs.newTab(url: blankPage("one"))
-        #expect(actions() == [.newSpace, .copyURL, .settings])
+        #expect(actions() == [.newSpace, .copyURL, .settings, .newNote, .showAllNotes])
     }
 
     @Test func `settings is always offered`() async {

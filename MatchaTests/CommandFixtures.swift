@@ -47,6 +47,9 @@ func action(_ id: CommandActionID) -> CommandCandidate {
     case .settings: ("Settings", "settings preferences options")
     case .translatePage: ("Translate Page", "translate translation language")
     case .showOriginal: ("Show Original", "original untranslated translation language")
+    case .newNote: ("New Note", "new create add note write")
+    case .pageNote: ("Note for This Page", "note page notes panel annotate")
+    case .showAllNotes: ("Show All Notes", "notes library all show")
     }
     let keywords = texts.keywords.split(separator: " ").map(String.init)
     return CommandCandidate(kind: .action(id, keywords: keywords), title: texts.title, url: nil)

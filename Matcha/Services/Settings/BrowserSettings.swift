@@ -17,6 +17,7 @@ nonisolated enum BrowserSettings {
         static let searchSuggestionSource = "searchSuggestionSource"
         static let opensPinnedLinksInPeek = "opensPinnedLinksInPeek"
         static let renamesTabsOnDoubleClick = "renamesTabsOnDoubleClick"
+        static let keepsNotesPanelOpen = "keepsNotesPanelOpen"
         static let tabSuspensionDelay = "tabSuspensionDelay"
         static let blocksAdsAndTrackers = "blocksAdsAndTrackers"
         static let externalLinkDestination = "externalLinkDestination"
@@ -46,6 +47,8 @@ nonisolated enum BrowserSettings {
     /// A double click on a pinned tab or a favorite renames it, as in Arc; off by default: the context menu renames
     /// (`TabDoubleClickRename`).
     static let renamesTabsOnDoubleClick = false
+    /// The notes panel stays open from one tab to the next (task 12.3); off, it closes when another tab is selected.
+    static let keepsNotesPanelOpen = true
     /// Memory freed after 30 minutes without being displayed (task 5.6).
     static let tabSuspensionDelay = TabSuspensionDelay.thirtyMinutes
     /// Ad and tracker blocker (task 6.2), on as soon as lists are bundled.
@@ -82,6 +85,11 @@ nonisolated enum BrowserSettings {
         defaults.object(forKey: Key.filesFromOtherAppsReadFolder) == nil
             ? filesFromOtherAppsReadFolder
             : defaults.bool(forKey: Key.filesFromOtherAppsReadFolder)
+    }
+
+    /// Value of the notes panel setting in `defaults`, or its default value.
+    static func notesPanelStaysOpen(in defaults: UserDefaults = .standard) -> Bool {
+        defaults.object(forKey: Key.keepsNotesPanelOpen) == nil ? keepsNotesPanelOpen : defaults.bool(forKey: Key.keepsNotesPanelOpen)
     }
 
     /// Value of the peek setting in `defaults`, or its default value. `bool(forKey:)` also reads the

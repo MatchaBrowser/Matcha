@@ -12,6 +12,8 @@ extension BrowserSession {
         var spaceContents: Set<UUID> = []
         /// Profiles whose favorites changed.
         var favorites: Set<UUID> = []
+        /// Notes or their folders changed (task 12.8).
+        var notes = false
     }
 
     /// Brings the profiles, the Spaces and their tabs in line with the records: a received Space opens, a Space moved
@@ -20,6 +22,9 @@ extension BrowserSession {
     func reload(after changes: SyncChanges) {
         if changes.profiles {
             refreshProfiles()
+        }
+        if changes.notes {
+            notes.reload()
         }
         if changes.spaces {
             reloadSpaces()

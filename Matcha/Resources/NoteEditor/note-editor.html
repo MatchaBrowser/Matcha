@@ -1,0 +1,15 @@
+<!doctype html>
+<!-- Page of the notes editor (task 12.2), served by NoteEditorSchemeHandler; note-editor.js and note-editor.css come
+     from scripts/build-note-editor.sh. The policy is also sent as a header: keep both the same. -->
+<html>
+<head>
+<meta charset="utf-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src matcha-note:; style-src matcha-note: 'unsafe-inline'; img-src data:; connect-src 'none'; media-src 'none'; frame-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'">
+<meta name="color-scheme" content="light dark">
+<link rel="stylesheet" href="note-editor.css">
+</head>
+<body>
+<div id="root"></div>
+<script src="note-editor.js"></script>
+</body>
+</html>

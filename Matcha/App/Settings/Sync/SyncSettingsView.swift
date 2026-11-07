@@ -7,6 +7,7 @@ struct SyncSettingsView: View {
     typealias Mode = SyncFormRules.PaneMode
 
     @Environment(SyncService.self) private var sync
+    @Environment(BrowserSession.self) private var session: BrowserSession?
     @State private var choosesPrivateServer = false
     @State private var confirmsTurningOff = false
     @State private var kit: SyncRecoveryKit?
@@ -23,7 +24,7 @@ struct SyncSettingsView: View {
                 .accessibilityIdentifier("syncModePicker")
             } footer: {
                 Text("""
-                Your Spaces, folders, Favorites, pinned and today tabs, extensions and settings, on all your Macs. \
+                Your Spaces, folders, Favorites, pinned and today tabs, notes, extensions and settings, on all your Macs. \
                 Everything is encrypted on this Mac with your master password: the server can't read it.
                 """, comment: "Settings > Sync: what sync does")
                     .font(.caption)
@@ -32,6 +33,19 @@ struct SyncSettingsView: View {
             if mode == .privateServer {
                 if sync.isActive {
                     SyncAccountSection(sync: sync) { kit = $0 }
+                    let tooLarge = session?.notes.notes.count(where: \.isTooLargeToSync) ?? 0
+                    if tooLarge > 0 {
+                        Section {
+                            Label(
+                                String(
+                                    localized: "Notes too long to be synced, kept on this Mac: \(tooLarge)",
+                                    comment: "Settings > Sync: notes larger than sync takes; %lld is their number",
+                                ),
+                                systemImage: "exclamationmark.triangle",
+                            )
+                            .foregroundStyle(.orange)
+                        }
+                    }
                     if sync.supportsAvatar {
                         SyncAvatarSection(sync: sync)
                     }

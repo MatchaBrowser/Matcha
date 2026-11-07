@@ -52,6 +52,10 @@ struct BrowserCommands: Commands {
         windowActions?.isDownloadsPanelShown == true ? "Hide Downloads" : "Show Downloads"
     }
 
+    private var notesToggleTitle: LocalizedStringKey {
+        windowActions?.isNotesPanelShown == true ? "Hide Notes" : "Show Notes"
+    }
+
     var body: some Commands {
         // Matcha > About Matcha, with the version of this build.
         AboutCommands()
@@ -158,6 +162,22 @@ struct BrowserCommands: Commands {
             }
             .keyboardShortcut(shortcuts.keyboardShortcut(for: .toggleDownloads))
             .disabled(windowActions == nil || miniWindow != nil)
+
+            // View > “Show Notes” (⌃⌘N, task 12.3): the note of the page shown, to the right of the card. Not in a
+            // private window (no notes there) nor a mini window.
+            Button(notesToggleTitle) {
+                windowActions?.toggleNotesPanel?()
+            }
+            .keyboardShortcut(shortcuts.keyboardShortcut(for: .toggleNotesPanel))
+            .disabled(windowActions?.toggleNotesPanel == nil || miniWindow != nil)
+
+            // View > “Show All Notes” (task 12.4): the library, for the profile of the main window. Not from a private
+            // window, which has no notes.
+            Button(MenuShortcut.showAllNotes.title) {
+                openWindow(id: MatchaApp.notesWindowID)
+            }
+            .keyboardShortcut(shortcuts.keyboardShortcut(for: .showAllNotes))
+            .disabled(windowActions?.isPrivate == true)
         }
 
         CommandGroup(after: .toolbar) {

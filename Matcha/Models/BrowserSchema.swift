@@ -7,6 +7,7 @@ enum BrowserSchema {
     /// (checked by `BrowserSchemaTests`, on a store created with the old schema).
     static let models: [any PersistentModel.Type] = [
         ProfileRecord.self, SpaceRecord.self, FolderRecord.self, TabRecord.self, SitePermissionRecord.self, HistoryRecord.self,
+        NoteFolderRecord.self, NoteRecord.self,
     ]
 
     /// Local container (sync goes through a server, `SYNC.md`, not CloudKit's mirroring); in memory for tests.

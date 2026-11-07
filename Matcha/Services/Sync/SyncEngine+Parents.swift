@@ -14,9 +14,22 @@ extension SyncEngine {
     func parentAdjustment(of fields: SyncFields) -> ParentAdjustment {
         switch fields {
         case let .space(space):
-            return isDeleted(space.profileId) ? .deleted : .none
+            isDeleted(space.profileId) ? .deleted : .none
         case let .sitePermission(permission):
-            return isDeleted(permission.profileId) ? .deleted : .none
+            isDeleted(permission.profileId) ? .deleted : .none
+        case .folder, .tab:
+            sidebarParentAdjustment(of: fields)
+        case .noteFolder, .note:
+            noteParentAdjustment(of: fields)
+        case .profile, .webExtension, .setting, .siteZoom, .deviceTabs:
+            .none
+        }
+    }
+
+    /// A folder or a pinned tab: deleted with its Space (or a favorite with its profile), at the root of its Space when
+    /// its folder is deleted.
+    private func sidebarParentAdjustment(of fields: SyncFields) -> ParentAdjustment {
+        switch fields {
         case var .folder(folder):
             if isDeleted(folder.spaceId) {
                 return .deleted
@@ -38,7 +51,33 @@ extension SyncEngine {
             }
             tab.folderId = nil
             return .reparented(.tab(tab), restoredKeys: ["folderId": .string(folder.uuidString)])
-        case .profile, .webExtension, .setting, .siteZoom, .deviceTabs:
+        default:
+            return .none
+        }
+    }
+
+    /// A note or a folder of notes: deleted with its profile, at the root when its folder is deleted.
+    private func noteParentAdjustment(of fields: SyncFields) -> ParentAdjustment {
+        switch fields {
+        case var .noteFolder(folder):
+            if isDeleted(folder.profileId) {
+                return .deleted
+            }
+            guard let parent = folder.parentId, isDeleted(parent) else {
+                return .none
+            }
+            folder.parentId = nil
+            return .reparented(.noteFolder(folder), restoredKeys: ["parentId": .string(parent.uuidString)])
+        case var .note(note):
+            if isDeleted(note.profileId) {
+                return .deleted
+            }
+            guard let folder = note.folderId, isDeleted(folder) else {
+                return .none
+            }
+            note.folderId = nil
+            return .reparented(.note(note), restoredKeys: ["folderId": .string(folder.uuidString)])
+        default:
             return .none
         }
     }

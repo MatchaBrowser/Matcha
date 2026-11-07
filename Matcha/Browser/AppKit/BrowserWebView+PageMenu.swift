@@ -31,6 +31,7 @@ extension BrowserWebView {
         if addPageCommands(to: menu) {
             return
         }
+        addNoteQuoteItem(to: menu)
         let offersPeek = (uiDelegate as? any PageMenuDelegate)?.pageMenuOffersPeek(in: self) ?? false
         let replacements = PageMenuPlan.replacements(for: menu.items.map { $0.identifier?.rawValue }, offersPeek: offersPeek)
         guard !replacements.isEmpty else {

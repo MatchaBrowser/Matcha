@@ -8,7 +8,7 @@ import SwiftUI
 /// - open tab: selected in its Space, then that Space is shown (animated) if it was not; from a window of its own tabs,
 ///   in the main window (`revealInSpace`); a tab of another window of its own tabs: in that window, brought to the
 ///   front;
-/// - actions: new Space (animated), URL copy (like ⇧⌘C), Settings;
+/// - actions: new Space (animated), URL copy (like ⇧⌘C), Settings, notes (new note in a tab, the page's note, the library);
 /// - Return with no text in new tab mode: an empty tab.
 /// The page of the opened or chosen tab then takes the keyboard.
 @MainActor
@@ -16,6 +16,8 @@ struct CommandBarExecutor {
     let model: CommandBarModel
     let window: NSWindow?
     let openSettings: () -> Void
+    /// Opens the notes library window (task 12.7).
+    var openNotesLibrary: () -> Void = {}
     /// Shows a tab of a Space in the main window, brought to the front (reopened if needed); nil in a private window.
     var revealInSpace: ((BrowserTab, SpaceSession) -> Void)?
     var clipboard = Clipboard.system
@@ -126,6 +128,22 @@ struct CommandBarExecutor {
         case .settings:
             log("settings")
             openSettings()
+            return nil
+        case .newNote:
+            log("newNote")
+            let store = windowModel.session.notes
+            guard let note = store.createNote(profileID: windowModel.space.record.profile?.id), let url = NoteTab.url(for: note.id) else {
+                return nil
+            }
+            return windowModel.tabManager.newTab(url: url)
+        case .pageNote:
+            log("pageNote")
+            let panel = windowModel.notesPanel
+            animate { panel.open() }
+            return nil
+        case .showAllNotes:
+            log("showAllNotes")
+            openNotesLibrary()
             return nil
         case .translatePage, .showOriginal:
             log(action.rawValue)

@@ -27,6 +27,9 @@ struct WindowActions: Equatable {
     let toggleDownloads: () -> Void
     /// Downloads panel visible (open, in a shown sidebar): the menu offers to hide it.
     let isDownloadsPanelShown: Bool
+    /// Opens or closes the notes panel of the page shown (⌃⌘N, task 12.3); nil in a private window.
+    let toggleNotesPanel: (() -> Void)?
+    let isNotesPanelShown: Bool
     /// Copies the address of the displayed tab and confirms “URL Copied” (⇧⌘C), like the command bar
     /// action; nil if the displayed tab has no address.
     let copyURL: (() -> Void)?
@@ -54,7 +57,8 @@ struct WindowActions: Equatable {
     /// What the menus show.
     private var state: [AnyHashable] {
         [
-            isCommandBarPresented, isSidebarVisible, isDownloadsPanelShown, copyURL != nil, goHome != nil, spaceID,
+            isCommandBarPresented, isSidebarVisible, isDownloadsPanelShown, toggleNotesPanel != nil, isNotesPanelShown,
+            copyURL != nil, goHome != nil, spaceID,
             spaceNames, currentSpaceIndex, isPrivate, importFromArc != nil,
         ]
     }

@@ -29,6 +29,8 @@ nonisolated extension StoredTab {
         }
         // `about:blank`, with a fragment that WebKit may give encoded (`about:blank%23b`).
         let isBlank = url.absoluteString.lowercased().hasPrefix("about:blank")
-        return restorableSchemes.contains(scheme) || servedSchemes.contains(scheme) || isBlank ? url : nil
+        // A note in a tab (task 12.5): never loaded by a web view.
+        let isNote = NoteTab.noteID(in: url) != nil
+        return restorableSchemes.contains(scheme) || servedSchemes.contains(scheme) || isBlank || isNote ? url : nil
     }
 }

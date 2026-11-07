@@ -2,7 +2,8 @@ import AppKit
 import SwiftUI
 import WebKit
 
-/// Browser window: Space background, sidebar on the left, page in a card on the right, and the command bar on top.
+/// Browser window: Space background, sidebar on the left, page in a card on the right, the notes panel after it if it
+/// is open, and the command bar on top.
 /// The sidebar can be hidden (⌃⌘S); it then reappears over the page when hovering the left edge. There can be several,
 /// each on its Space and its tab (`WindowModel+Viewers`).
 struct BrowserWindowView: View {
@@ -135,6 +136,10 @@ struct BrowserWindowView: View {
                         .transition(.move(edge: .leading))
                 }
                 content
+                if model.notesPanel.isOpen {
+                    WindowNotesPanel(model: model.notesPanel, paddingEdges: cardPaddingEdges.subtracting(.leading))
+                        .transition(.move(edge: .trailing))
+                }
             }
         }
         .overlay(alignment: .leading) { sidebarOverlay }
@@ -230,6 +235,8 @@ struct BrowserWindowView: View {
         .findsInPages(model: model, window: window) { [weak commandBar] in commandBar?.dismiss() }
         // Translation sessions of the window's pages (task 9.3): hidden views, and macOS's download questions.
         .background { TranslationSessionsView(host: model.translationHost) }
+        // Notes panel of the page shown (task 12.3).
+        .followsPageForNotes(model)
         .environment(model)
         .environment(model.translationHost)
         // The sidebar's rows show this window's selection, and read the double-click option once for all.
