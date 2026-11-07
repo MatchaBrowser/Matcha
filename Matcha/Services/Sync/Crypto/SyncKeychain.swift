@@ -14,8 +14,14 @@ nonisolated struct SyncKeychain: Sendable {
     /// Items of an account.
     enum Item: String, CaseIterable, Sendable {
         case accountKey
+        /// Outlives an expired session, so that the same account signs in again with its password only
+        /// (`SYNC.md` § 3.8).
+        case secretKey
         case accessToken
         case refreshToken
+
+        /// What an expired session takes away: everything but the Secret Key.
+        static let session: [Item] = [.accountKey, .accessToken, .refreshToken]
     }
 
     /// Service of the items (a different one for tests).

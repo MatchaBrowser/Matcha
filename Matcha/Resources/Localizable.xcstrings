@@ -1340,6 +1340,35 @@
         }
       }
     },
+    "A new Mac asks for your master password and your Secret Key. If you forget the password, the recovery key is the only way to get your synced data back. Matcha can't recover them for you. Keep this kit somewhere safe, away from this Mac." : {
+      "comment" : "Recovery kit sheet: explanation",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ein neuer Mac fragt nach deinem Master-Passwort und deinem Geheimschlüssel. Wenn du das Passwort vergisst, ist der Wiederherstellungsschlüssel der einzige Weg zurück zu deinen synchronisierten Daten. Matcha kann sie nicht für dich wiederherstellen. Bewahre dieses Kit sicher auf, nicht auf diesem Mac."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Un Mac nuevo pide tu contraseña maestra y tu clave secreta. Si olvidas la contraseña, la clave de recuperación es la única forma de recuperar tus datos sincronizados. Matcha no puede recuperarlas por ti. Guarda este kit en un lugar seguro, fuera de este Mac."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Un nouveau Mac demande votre mot de passe maître et votre clé secrète. Si vous oubliez le mot de passe, la clé de secours est le seul moyen de retrouver vos données synchronisées. Matcha ne peut pas les récupérer pour vous. Rangez ce kit en lieu sûr, ailleurs que sur ce Mac."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Un nuovo Mac chiede la password principale e la chiave segreta. Se dimentichi la password, la chiave di recupero è l'unico modo per recuperare i dati sincronizzati. Matcha non può recuperarle per te. Conserva questo kit in un posto sicuro, lontano da questo Mac."
+          }
+        }
+      }
+    },
     "A new recovery key replaces the old one, which stops working. Save the new kit." : {
       "comment" : "Settings > Sync: new recovery kit sheet",
       "localizations" : {
@@ -8765,35 +8794,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Icona"
-          }
-        }
-      }
-    },
-    "If you forget your master password, this kit is the only way to get your synced data back. Matcha can't recover it for you. Keep it somewhere safe, away from this Mac." : {
-      "comment" : "Recovery kit sheet: explanation",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Wenn du dein Master-Passwort vergisst, ist dieses Kit der einzige Weg zurück zu deinen synchronisierten Daten. Matcha kann es nicht für dich wiederherstellen. Bewahre es sicher auf, nicht auf diesem Mac."
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Si olvidas tu contraseña maestra, este kit es la única forma de recuperar tus datos sincronizados. Matcha no puede recuperarla por ti. Guárdalo en un lugar seguro, fuera de este Mac."
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Si vous oubliez votre mot de passe maître, ce kit est le seul moyen de retrouver vos données synchronisées. Matcha ne peut pas le récupérer pour vous. Rangez-le en lieu sûr, ailleurs que sur ce Mac."
-          }
-        },
-        "it" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Se dimentichi la password principale, questo kit è l'unico modo per recuperare i dati sincronizzati. Matcha non può recuperarla per te. Conservalo in un posto sicuro, lontano da questo Mac."
           }
         }
       }
@@ -18161,6 +18161,35 @@
         }
       }
     },
+    "Secret Key" : {
+      "comment" : "Recovery kit: the Secret Key, which signs in a new Mac with the password",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Geheimschlüssel"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Clave secreta"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Clé secrète"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Chiave segreta"
+          }
+        }
+      }
+    },
     "Secure Connection — Show Certificate" : {
       "comment" : "Help tag of the padlock in the address bar",
       "localizations" : {
@@ -20886,31 +20915,31 @@
         }
       }
     },
-    "The email or the password is incorrect." : {
+    "The email, the password or the Secret Key is incorrect." : {
       "comment" : "Settings > Sync: error invalid_credentials",
       "localizations" : {
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Die E-Mail-Adresse oder das Passwort ist falsch."
+            "value" : "Die E-Mail-Adresse, das Passwort oder der Geheimschlüssel ist falsch."
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "El correo o la contraseña no son correctos."
+            "value" : "El correo, la contraseña o la clave secreta no son correctos."
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "L'adresse e-mail ou le mot de passe est incorrect."
+            "value" : "L'adresse e-mail, le mot de passe ou la clé secrète est incorrect."
           }
         },
         "it" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "L'email o la password non sono corretti."
+            "value" : "L'email, la password o la chiave segreta non sono corretti."
           }
         }
       }
@@ -21085,6 +21114,35 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "La password deve avere almeno 12 caratteri."
+          }
+        }
+      }
+    },
+    "The Secret Key is incorrect. Check it against your recovery kit." : {
+      "comment" : "Settings > Sync: sign-in footer, the Secret Key typed has a wrong checksum",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Der Geheimschlüssel ist falsch. Vergleiche ihn mit deinem Wiederherstellungskit."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "La clave secreta no es correcta. Compárala con tu kit de recuperación."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "La clé secrète est incorrecte. Comparez-la avec votre kit de secours."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "La chiave segreta non è corretta. Confrontala con il tuo kit di recupero."
           }
         }
       }
@@ -24705,31 +24763,31 @@
         }
       }
     },
-    "Your other Macs will be disconnected and will ask for the new password." : {
+    "Your other Macs will be disconnected. They will ask for the new password and the new Secret Key, from the kit you save next." : {
       "comment" : "Settings > Sync: account recovery footer",
       "localizations" : {
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Deine anderen Macs werden getrennt und fragen nach dem neuen Passwort."
+            "value" : "Deine anderen Macs werden getrennt. Sie fragen nach dem neuen Passwort und dem neuen Geheimschlüssel aus dem Kit, das du als Nächstes sicherst."
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Tus otros Mac se desconectarán y pedirán la nueva contraseña."
+            "value" : "Tus otros Mac se desconectarán. Pedirán la nueva contraseña y la nueva clave secreta, que estará en el kit que guardarás a continuación."
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Vos autres Mac seront déconnectés et demanderont le nouveau mot de passe."
+            "value" : "Vos autres Mac seront déconnectés. Ils demanderont le nouveau mot de passe et la nouvelle clé secrète, qui figurera dans le kit que vous enregistrerez ensuite."
           }
         },
         "it" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Gli altri Mac verranno disconnessi e chiederanno la nuova password."
+            "value" : "Gli altri Mac verranno disconnessi. Chiederanno la nuova password e la nuova chiave segreta, presente nel kit che salverai subito dopo."
           }
         }
       }
@@ -24788,6 +24846,35 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Il tuo kit di recupero non è stato salvato: creane uno nuovo in Gestisci account."
+          }
+        }
+      }
+    },
+    "Your Secret Key is in your recovery kit." : {
+      "comment" : "Settings > Sync: sign-in footer",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dein Geheimschlüssel steht in deinem Wiederherstellungskit."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tu clave secreta está en tu kit de recuperación."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Votre clé secrète figure dans votre kit de secours."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "La tua chiave segreta è nel tuo kit di recupero."
           }
         }
       }

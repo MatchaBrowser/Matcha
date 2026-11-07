@@ -1,11 +1,11 @@
 import SwiftUI
 
 /// Settings > Sync, private server not signed in (task 7.9): the server's address, checked by `GET /v1/server`, then
-/// sign in, create an account (master password typed twice, with its strength gauge and the warning that Matcha can't
-/// recover it) or recover the account with the recovery key.
+/// sign in (master password and Secret Key, `SYNC.md` § 3.4), create an account (master password typed twice, with its
+/// strength gauge and the warning that Matcha can't recover it) or recover the account with the recovery key.
 struct SyncConnectForm: View {
     let sync: SyncService
-    /// The recovery kit to save (account created, or recovered with a new recovery key).
+    /// The recovery kit to save (account created or recovered).
     let showKit: (SyncRecoveryKit) -> Void
 
     typealias Step = SyncFormRules.ConnectStep
@@ -17,6 +17,7 @@ struct SyncConnectForm: View {
     @State private var password = ""
     @State private var confirmation = ""
     @State private var invitation = ""
+    @State private var secretKey = ""
     @State private var recoveryKey = ""
     @State private var replacesRecoveryKey = true
     @State private var isWorking = false
@@ -29,13 +30,16 @@ struct SyncConnectForm: View {
                 accountSection(endpoint)
             }
         }
-        // The address and the email of the account this Mac was signed in to.
+        // The address, the email and the Secret Key of the account this Mac was signed in to.
         .onAppear {
             if address.isEmpty, let server = sync.configuration.server {
                 address = server.normalized
             }
             if email.isEmpty, let known = sync.configuration.email {
                 email = known
+            }
+            if secretKey.isEmpty, let remembered = sync.rememberedSecretKey() {
+                secretKey = remembered.displayed
             }
         }
     }
@@ -96,6 +100,10 @@ struct SyncConnectForm: View {
                 .textContentType(.password)
                 .onSubmit(submit)
                 .accessibilityIdentifier("syncPasswordField")
+            TextField("Secret Key", text: $secretKey, prompt: Text(verbatim: "S1-R30W-5GY4-…"))
+                .font(.system(.body, design: .monospaced))
+                .onSubmit(submit)
+                .accessibilityIdentifier("syncSecretKeyField")
         case .create:
             SyncNewPasswordFields(password: $password, confirmation: $confirmation)
             if endpoint.info.requiresInvitation {
@@ -126,10 +134,21 @@ struct SyncConnectForm: View {
             Text(verbatim: errorMessage)
                 .font(.caption)
                 .foregroundStyle(.red)
-        } else if step == .recover {
-            Text("Your other Macs will be disconnected and will ask for the new password.")
+        } else if step == .signIn, SyncSecretKey.isMistyped(secretKey) {
+            Text("The Secret Key is incorrect. Check it against your recovery kit.")
+                .font(.caption)
+                .foregroundStyle(.red)
+        } else if step == .signIn {
+            Text("Your Secret Key is in your recovery kit.")
                 .font(.caption)
                 .foregroundStyle(.secondary)
+        } else if step == .recover {
+            Text("""
+            Your other Macs will be disconnected. They will ask for the new password and the new Secret Key, from the \
+            kit you save next.
+            """)
+            .font(.caption)
+            .foregroundStyle(.secondary)
         }
     }
 
@@ -142,7 +161,13 @@ struct SyncConnectForm: View {
     }
 
     private var canSubmit: Bool {
-        SyncFormRules.canSubmit(step, email: email, password: password, confirmation: confirmation, recoveryKey: recoveryKey)
+        SyncFormRules.canSubmit(step, .init(
+            email: email,
+            password: password,
+            confirmation: confirmation,
+            secretKey: secretKey,
+            recoveryKey: recoveryKey,
+        ))
     }
 
     private func checkServer() {
@@ -161,7 +186,10 @@ struct SyncConnectForm: View {
         run {
             switch step {
             case .signIn:
-                try await sync.signIn(on: endpoint, email: email, password: password)
+                guard let key = SyncSecretKey(text: secretKey) else {
+                    return
+                }
+                try await sync.signIn(on: endpoint, email: email, password: password, secretKey: key)
             case .create:
                 let kit = try await sync.createAccount(on: endpoint, email: email, password: password, invitation: invitation)
                 showKit(kit)
@@ -176,7 +204,7 @@ struct SyncConnectForm: View {
                     newPassword: password,
                     newRecoveryKey: replacesRecoveryKey,
                 )
-                kit.map(showKit)
+                showKit(kit)
             }
             password = ""
             confirmation = ""

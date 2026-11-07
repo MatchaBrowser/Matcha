@@ -70,14 +70,15 @@ struct SyncCryptoTests {
         let password = "Café crème, 2026 !"
         #expect(SyncPassword.normalized(password) == hex("43616665cc8120637265cc806d652c20323032362021"))
         let kdf = SyncKDF(algorithm: "pbkdf2-sha256", iterations: 600_000, salt: bytes(0 ..< 16))
-        let keys = try SyncAccountKeys.passwordKeys(password: password, kdf: kdf)
-        #expect(raw(keys.authKey) == hex("5181174923363be5cfc1ddd47761224fe7653b627bb8a16b9b56e44cbf3bb477"))
-        #expect(raw(keys.wrapKey) == hex("ef4e8ca94c79a8831d0be6956954257ea820aae32daad637623c33d573978bbd"))
+        let secretKey = try #require(SyncSecretKey(bytes: bytes(192 ..< 208)))
+        let keys = try SyncAccountKeys.passwordKeys(password: password, secretKey: secretKey, kdf: kdf)
+        #expect(raw(keys.authKey) == hex("d94bc1963ac1345732a0eb09202dee9e542972270152c458421000350e1ba3ad"))
+        #expect(raw(keys.wrapKey) == hex("61399e6410861ea6bd2318e9e8b5d39d5027c31e523594d6646f8d7bc8743319"))
 
         let accountKey = SymmetricKey(data: bytes(32 ..< 64))
         #expect(raw(SyncAccountKeys.dataKey(accountKey: accountKey)) ==
             hex("681021aae32d4b8896879d3b68426f203ffe80a3505f4f88688e393b71c8da7c"))
-        let wrapped = try #require(Data(base64Encoded: "ZGVmZ2hpamtsbW5vtSkcc3+EmMJgIoX82mvpDSrkO645VA8Tv2uuthfFNFVN2Rq2ZgR73kssLbiYmJgk"))
+        let wrapped = try #require(Data(base64Encoded: "ZGVmZ2hpamtsbW5vrzohIHoua8Z7PmihYPbuN0DnoW0wyqWuacVOBxzldHBGR2mAHwQ2Rgit/x09qoz6"))
         #expect(try SyncCrypto
             .seal(bytes(32 ..< 64), key: keys.wrapKey, aad: SyncAccountKeys.accountKeyAAD, nonce: nonce(100 ..< 112)) == wrapped)
         #expect(try raw(SyncAccountKeys.unwrap(wrapped, with: keys.wrapKey)) == bytes(32 ..< 64))
@@ -101,6 +102,26 @@ struct SyncCryptoTests {
         #expect(SyncRecoveryKey(text: "810M-4GT4-8N34-EJ29-995M-RKAE-9X85-2MJU") == nil)
         let random = SyncRecoveryKey.random()
         #expect(SyncRecoveryKey(text: random.displayed) == random)
+    }
+
+    /// `SYNC.md` § 3.2: “S1-”, then the key and its checksum in Crockford base 32; a mistyped key is refused here.
+    @Test func `the Secret Key carries a checksum that catches typing mistakes`() throws {
+        let key = try #require(SyncSecretKey(bytes: bytes(192 ..< 208)))
+        #expect(SyncSecretKey.checksum(of: key.bytes) == hex("d4f376ea"))
+        #expect(key.displayed == "S1-R30W-5GY4-RQ3C-FJ69-SB5W-SKEE-SZAF-6XQA")
+        #expect(SyncSecretKey(text: "s1 r30w 5gy4 rq3c fj69 sb5w skee szaf 6xqa") == key)
+        #expect(SyncSecretKey(text: "R30W5GY4RQ3CFJ69SB5WSKEESZAF6XQA") == key)
+        #expect(SyncSecretKey(text: "SL-R3OW-5GY4-RQ3C-FJ69-SB5W-SKEE-SZAF-6XQA") == key)
+        #expect(SyncSecretKey(text: "S1-R30W-5GY4-RQ3C-FJ69-SB5W-SKEE-SZAF-6XQB") == nil)
+        #expect(SyncSecretKey(text: "S1-R30W-5GY4-RQ3C-FJ69-SB5W-SKEE-SZAF-6XQU") == nil)
+        #expect(SyncSecretKey(text: "S1-R30W-5GY4-RQ3C") == nil)
+        // A recovery key typed in the Secret Key's field.
+        #expect(SyncSecretKey(text: "810M-4GT4-8N34-EJ29-995M-RKAE-9X85-2MJK") == nil)
+        #expect(SyncSecretKey.isMistyped("S1-R30W-5GY4-RQ3C-FJ69-SB5W-SKEE-SZAF-6XQB"))
+        #expect(!SyncSecretKey.isMistyped("S1-R30W-5GY4"))
+        #expect(!SyncSecretKey.isMistyped(key.displayed))
+        let random = SyncSecretKey.random()
+        #expect(SyncSecretKey(text: random.displayed) == random)
     }
 
     @Test func `a record is sealed to its identifier and refused anywhere else`() throws {
@@ -157,20 +178,28 @@ struct SyncCryptoTests {
 
     @Test func `weak passwords and parameters are refused`() {
         let kdf = SyncKDF.random()
-        #expect(throws: SyncCryptoError.passwordTooShort) { try SyncAccountKeys.passwordKeys(password: "court", kdf: kdf) }
+        let secretKey = SyncSecretKey.random()
+        #expect(throws: SyncCryptoError.passwordTooShort) {
+            try SyncAccountKeys.passwordKeys(password: "court", secretKey: secretKey, kdf: kdf)
+        }
         var weak = kdf
         weak.iterations = 100_000
-        #expect(throws: SyncCryptoError.weakKDF) { try SyncAccountKeys.passwordKeys(password: "assez long pour passer", kdf: weak) }
+        #expect(throws: SyncCryptoError.weakKDF) {
+            try SyncAccountKeys.passwordKeys(password: "assez long pour passer", secretKey: secretKey, kdf: weak)
+        }
         var other = kdf
         other.algorithm = "argon2id"
-        #expect(throws: SyncCryptoError.weakKDF) { try SyncAccountKeys.passwordKeys(password: "assez long pour passer", kdf: other) }
+        #expect(throws: SyncCryptoError.weakKDF) {
+            try SyncAccountKeys.passwordKeys(password: "assez long pour passer", secretKey: secretKey, kdf: other)
+        }
         #expect(kdf.salt.count == 16 && kdf.salt != SyncKDF.random().salt)
     }
 
-    @Test func `a new account opens with its password or its recovery key`() throws {
+    @Test func `a new account opens with its password and Secret Key, or its recovery key`() throws {
         let password = "un mot de passe bien long"
         let creation = try SyncAccountKeys.creation(password: password)
-        let login = try SyncAccountKeys.passwordKeys(password: password, kdf: creation.kdf)
+        let typedSecret = try #require(SyncSecretKey(text: creation.secretKey.displayed.lowercased()))
+        let login = try SyncAccountKeys.passwordKeys(password: password, secretKey: typedSecret, kdf: creation.kdf)
         #expect(raw(login.authKey) == creation.authKey)
         #expect(try raw(SyncAccountKeys.unwrap(creation.wrappedAccountKey, with: login.wrapKey)) == raw(creation.accountKey))
 
@@ -179,8 +208,12 @@ struct SyncCryptoTests {
         #expect(raw(recovery.authKey) == creation.recoveryAuthKey)
         #expect(try raw(SyncAccountKeys.unwrap(creation.recoveryWrappedAccountKey, with: recovery.wrapKey)) == raw(creation.accountKey))
 
-        let wrongPassword = try SyncAccountKeys.passwordKeys(password: "un autre mot de passe long", kdf: creation.kdf)
+        let wrongPassword = try SyncAccountKeys.passwordKeys(password: "un autre long", secretKey: typedSecret, kdf: creation.kdf)
         #expect(throws: SyncCryptoError.unreadable) { try SyncAccountKeys.unwrap(creation.wrappedAccountKey, with: wrongPassword.wrapKey) }
+        // The right password without its Secret Key opens nothing, and proves nothing to the server.
+        let wrongSecret = try SyncAccountKeys.passwordKeys(password: password, secretKey: .random(), kdf: creation.kdf)
+        #expect(raw(wrongSecret.authKey) != creation.authKey)
+        #expect(throws: SyncCryptoError.unreadable) { try SyncAccountKeys.unwrap(creation.wrappedAccountKey, with: wrongSecret.wrapKey) }
     }
 
     @Test func `the account's avatar is sealed to the account, as the server's client does`() throws {

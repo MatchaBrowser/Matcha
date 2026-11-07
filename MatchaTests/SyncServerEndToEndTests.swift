@@ -53,13 +53,14 @@ struct SyncServerEndToEndTests {
         let email = "e2e-\(UUID().uuidString.prefix(8).lowercased())@example.com"
         let kit = try await first.sync.createAccount(on: endpoint, email: email, password: password, invitation: nil)
         #expect(SyncRecoveryKey(text: kit.recoveryKey) != nil)
+        let secretKey = try #require(SyncSecretKey(text: kit.secretKey))
         first.sync.recoveryKitSaved()
         try await waitUntil(timeout: .seconds(20)) { first.sync.coordinator?.lastSyncDate != nil }
         let picture = try #require(AvatarImage.initials("JM", color: "#34C759"))
         try await first.sync.setAvatar(picture)
 
         // Second Mac, with only its first-launch data: it takes the synced data.
-        try await second.sync.signIn(on: endpoint, email: email, password: password)
+        try await second.sync.signIn(on: endpoint, email: email, password: password, secretKey: secretKey)
         try await waitUntil(timeout: .seconds(20)) { second.session.spaces.first?.record.name == "Maison" }
         let mirror = try #require(second.session.spaces.first)
         try await waitUntil(timeout: .seconds(20)) { mirror.tabManager.tab(withID: pinned.id) != nil }

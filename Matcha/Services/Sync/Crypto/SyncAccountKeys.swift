@@ -39,33 +39,36 @@ nonisolated enum SyncPassword {
 }
 
 /// Keys of a sync account (`SYNC.md` § 3.2). Neither the password, nor the master key, nor the recovery key is ever
-/// saved; only the account key stays in this Mac's keychain.
+/// saved; only the account key and the Secret Key stay in this Mac's keychain.
 nonisolated enum SyncAccountKeys {
     static let accountKeyAAD = Data("matcha.account-key.v1".utf8)
 
-    /// Keys derived from the password: `authKey` proves knowledge of it, `wrapKey` wraps the account key.
+    /// Keys derived from the password and the Secret Key: `authKey` proves knowledge of both, `wrapKey` wraps the
+    /// account key.
     struct PasswordKeys {
         let authKey: SymmetricKey
         let wrapKey: SymmetricKey
     }
 
-    /// Computes the master key (slow: PBKDF2) and its subkeys; rejects a password that is too short or parameters
-    /// that are too weak.
-    static func passwordKeys(password: String, kdf: SyncKDF) throws -> PasswordKeys {
+    /// Computes the master key (slow: PBKDF2), then the subkeys of master key ‖ Secret Key; rejects a password that is
+    /// too short or parameters that are too weak.
+    static func passwordKeys(password: String, secretKey: SyncSecretKey, kdf: SyncKDF) throws -> PasswordKeys {
         guard SyncPassword.isLongEnough(password) else {
             throw SyncCryptoError.passwordTooShort
         }
         guard kdf.isAcceptable else {
             throw SyncCryptoError.weakKDF
         }
-        let passwordKey = try SymmetricKey(data: SyncCrypto.pbkdf2(
+        // The `masterKey` of SYNC.md.
+        let passwordKey = try SyncCrypto.pbkdf2(
             password: SyncPassword.normalized(password),
             salt: kdf.salt,
             iterations: kdf.iterations,
-        ))
+        )
+        let keyMaterial = SymmetricKey(data: passwordKey + secretKey.bytes)
         return PasswordKeys(
-            authKey: SyncCrypto.subkey(of: passwordKey, info: "matcha.auth.v1"),
-            wrapKey: SyncCrypto.subkey(of: passwordKey, info: "matcha.wrap.v1"),
+            authKey: SyncCrypto.subkey(of: keyMaterial, info: "matcha.auth.v1"),
+            wrapKey: SyncCrypto.subkey(of: keyMaterial, info: "matcha.wrap.v1"),
         )
     }
 
@@ -101,20 +104,22 @@ nonisolated enum SyncAccountKeys {
         return SymmetricKey(data: bytes)
     }
 
-    /// Data for creating an account (`SYNC.md` § 3.3): salt, account key and recovery key drawn at random.
+    /// Data for creating an account (`SYNC.md` § 3.3): salt, Secret Key, account key and recovery key drawn at random.
     struct Creation {
         let kdf: SyncKDF
         let authKey: Data
         let wrappedAccountKey: Data
         let recoveryAuthKey: Data
         let recoveryWrappedAccountKey: Data
+        let secretKey: SyncSecretKey
         let accountKey: SymmetricKey
         let recoveryKey: SyncRecoveryKey
     }
 
     static func creation(password: String, iterations: Int = SyncKDF.minimumIterations) throws -> Creation {
         let kdf = SyncKDF.random(iterations: iterations)
-        let keys = try passwordKeys(password: password, kdf: kdf)
+        let secretKey = SyncSecretKey.random()
+        let keys = try passwordKeys(password: password, secretKey: secretKey, kdf: kdf)
         let accountKey = SymmetricKey(size: .bits256)
         let recoveryKey = SyncRecoveryKey.random()
         let recovery = recoveryKeys(recoveryKey)
@@ -124,6 +129,7 @@ nonisolated enum SyncAccountKeys {
             wrappedAccountKey: wrap(accountKey, with: keys.wrapKey),
             recoveryAuthKey: recovery.authKey.withUnsafeBytes { Data($0) },
             recoveryWrappedAccountKey: wrap(accountKey, with: recovery.wrapKey),
+            secretKey: secretKey,
             accountKey: accountKey,
             recoveryKey: recoveryKey,
         )

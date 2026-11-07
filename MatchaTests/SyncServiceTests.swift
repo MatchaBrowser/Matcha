@@ -132,7 +132,8 @@ struct SyncServiceTests {
         #expect(account.server.recordCount >= 2)
     }
 
-    /// Revoked elsewhere: sync stops, the tokens and the key leave the keychain, the browsing data stays.
+    /// Revoked elsewhere: sync stops, the tokens and the key leave the keychain, the browsing data stays. The Secret Key
+    /// stays for the next sign-in (`SYNC.md` § 3.8), until the sign-out.
     @Test func `a revoked Mac stops syncing and keeps its data`() async throws {
         let account = try await signUp()
         account.service.recoveryKitSaved()
@@ -141,8 +142,10 @@ struct SyncServiceTests {
         #expect(account.service.configuration.signedOutReason == .deviceRevoked)
         #expect(try account.keychain.data(for: .accountKey, server: account.address, accountID: account.server.accountID) == nil)
         #expect(account.session.spaces.count == 1)
+        #expect(account.service.rememberedSecretKey()?.displayed == account.kit.secretKey)
 
         await account.service.signOut()
+        #expect(try account.keychain.data(for: .secretKey, server: account.address, accountID: account.server.accountID) == nil)
         #expect(account.service.configuration == SyncConfiguration())
     }
 

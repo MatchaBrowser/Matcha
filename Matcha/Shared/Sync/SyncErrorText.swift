@@ -31,7 +31,8 @@ enum SyncErrorText {
     /// Messages of the server's codes (`SYNC.md` § 4.8).
     private static var messages: [String: String] {
         [
-            SyncServerError.invalidCredentials: String(localized: "The email or the password is incorrect."),
+            // The server can't tell a wrong password from a wrong Secret Key (SYNC.md § 3.4).
+            SyncServerError.invalidCredentials: String(localized: "The email, the password or the Secret Key is incorrect."),
             SyncServerError.registrationClosed: String(localized: "This server doesn't accept new accounts."),
             SyncServerError.invitationRequired: String(localized: "An invitation code is required, or the one entered isn't valid."),
             SyncServerError.emailTaken: String(localized: "An account already uses this email."),

@@ -4,7 +4,8 @@ import OSLog
 
 /// The sync account (`SYNC.md` § 3.3 to § 3.7 and § 4.3 to § 4.5): server check, account creation, sign-in and
 /// sign-out, forgotten password, password, recovery key and identifier changes, deletion, devices. The master password
-/// and the recovery key never leave these calls; the master key is derived off the main thread.
+/// and the recovery key never leave these calls; the master key is derived off the main thread. The Secret Key is
+/// kept in the keychain with the account key.
 extension SyncService {
     /// Checks the typed address: a server of the API v1 at that address, or under `/api` (the reference server).
     func checkServer(_ text: String) async throws -> SyncServerEndpoint {
@@ -59,8 +60,13 @@ extension SyncService {
             recovery: SyncKeyEnvelope(authKey: creation.recoveryAuthKey, wrappedAccountKey: creation.recoveryWrappedAccountKey),
             device: SyncDeviceDescription(id: device.id, name: Self.deviceName),
         ))
-        try keep(response, accountKey: creation.accountKey, endpoint: endpoint, email: email, deviceID: device.id)
-        let kit = SyncRecoveryKit(server: server, email: email, recoveryKey: creation.recoveryKey.displayed)
+        try keep(response, keys: (creation.accountKey, creation.secretKey), endpoint: endpoint, email: email, deviceID: device.id)
+        let kit = SyncRecoveryKit(
+            server: server,
+            email: email,
+            secretKey: creation.secretKey.displayed,
+            recoveryKey: creation.recoveryKey.displayed,
+        )
         awaitSaving(kit)
         return kit
     }
@@ -87,12 +93,13 @@ extension SyncService {
         }
     }
 
-    /// Signs in to an existing account (`SYNC.md` § 3.4); a reconnection to the same account resumes its sync state.
-    func signIn(on endpoint: SyncServerEndpoint, email: String, password: String) async throws {
+    /// Signs in to an existing account with its password and Secret Key (`SYNC.md` § 3.4); a reconnection to the same
+    /// account resumes its sync state.
+    func signIn(on endpoint: SyncServerEndpoint, email: String, password: String, secretKey: SyncSecretKey) async throws {
         let email = SyncConfiguration.normalizedEmail(email)
         let client = try SyncAPIClient(address: endpoint.address, session: apiSession, clientVersion: Self.clientVersion)
         let kdf = try await client.prelogin(email: email)
-        let keys = try await Self.derive { try SyncAccountKeys.passwordKeys(password: password, kdf: kdf) }
+        let keys = try await Self.derive { try SyncAccountKeys.passwordKeys(password: password, secretKey: secretKey, kdf: kdf) }
         let device = try deviceIdentity()
         let response = try await client.login(SyncLoginRequest(
             email: email,
@@ -100,7 +107,7 @@ extension SyncService {
             device: SyncDeviceDescription(id: device.id, name: Self.deviceName),
         ))
         let accountKey = try Self.unwrap(response.wrappedAccountKey, with: keys.wrapKey)
-        try keep(response, accountKey: accountKey, endpoint: endpoint, email: email, deviceID: device.id)
+        try keep(response, keys: (accountKey, secretKey), endpoint: endpoint, email: email, deviceID: device.id)
         try startSignedIn()
     }
 
@@ -123,14 +130,15 @@ extension SyncService {
     // MARK: Forgotten password
 
     /// Recovers the account with its recovery key and a new master password (`SYNC.md` § 3.7); the other devices are
-    /// disconnected. With `newRecoveryKey`, the recovery key is replaced and the new kit returned.
+    /// disconnected. A new Secret Key is always drawn: the old one may have been lost, or left with a stolen Mac. The
+    /// returned kit, to save, has it, and the recovery key typed, or a new one with `newRecoveryKey`.
     func recover(
         on endpoint: SyncServerEndpoint,
         email: String,
         recoveryKey: SyncRecoveryKey,
         newPassword: String,
         newRecoveryKey: Bool,
-    ) async throws -> SyncRecoveryKit? {
+    ) async throws -> SyncRecoveryKit {
         let email = SyncConfiguration.normalizedEmail(email)
         let server = endpoint.address
         let client = try SyncAPIClient(address: server, session: apiSession, clientVersion: Self.clientVersion)
@@ -138,7 +146,8 @@ extension SyncService {
         let started = try await client.recoverStart(SyncRecoverStartRequest(email: email, recoveryAuthKey: Self.bytes(recovery.authKey)))
         let accountKey = try Self.unwrap(started.recoveryWrappedAccountKey, with: recovery.wrapKey)
         let kdf = SyncKDF.random(iterations: endpoint.info.iterations)
-        let keys = try await Self.derive { try SyncAccountKeys.passwordKeys(password: newPassword, kdf: kdf) }
+        let secretKey = SyncSecretKey.random()
+        let keys = try await Self.derive { try SyncAccountKeys.passwordKeys(password: newPassword, secretKey: secretKey, kdf: kdf) }
         let replacement = newRecoveryKey ? SyncRecoveryKey.random() : nil
         let device = try deviceIdentity()
         let response = try await client.recoverFinish(SyncRecoverFinishRequest(
@@ -149,25 +158,28 @@ extension SyncService {
             recovery: replacement.map { try Self.envelope(of: accountKey, for: $0) },
             device: SyncDeviceDescription(id: device.id, name: Self.deviceName),
         ))
-        try keep(response, accountKey: accountKey, endpoint: endpoint, email: email, deviceID: device.id)
+        try keep(response, keys: (accountKey, secretKey), endpoint: endpoint, email: email, deviceID: device.id)
         try startSignedIn()
-        guard let replacement else {
-            return nil
-        }
-        let kit = SyncRecoveryKit(server: server, email: email, recoveryKey: replacement.displayed)
+        let kit = SyncRecoveryKit(
+            server: server,
+            email: email,
+            secretKey: secretKey.displayed,
+            recoveryKey: (replacement ?? recoveryKey).displayed,
+        )
         awaitSaving(kit)
         return kit
     }
 
     // MARK: Account changes
 
-    /// Changes the master password (`SYNC.md` § 3.6): only the account key is wrapped again; the other devices are
-    /// disconnected and ask for the new password.
+    /// Changes the master password (`SYNC.md` § 3.6): only the account key is wrapped again, the Secret Key stays; the
+    /// other devices are disconnected and ask for the new password.
     func changePassword(current: String, new: String) async throws {
         let (client, accountKey) = try signedInAccount()
+        let secretKey = try storedSecretKey()
         let authKey = try await currentAuthKey(password: current, client: client)
         let kdf = SyncKDF.random(iterations: configuration.serverInfo?.iterations ?? SyncKDF.minimumIterations)
-        let keys = try await Self.derive { try SyncAccountKeys.passwordKeys(password: new, kdf: kdf) }
+        let keys = try await Self.derive { try SyncAccountKeys.passwordKeys(password: new, secretKey: secretKey, kdf: kdf) }
         try await client.changePassword(SyncChangePasswordRequest(
             authKey: authKey,
             kdf: kdf,
@@ -176,9 +188,11 @@ extension SyncService {
         ))
     }
 
-    /// Replaces the recovery key; returns the new kit to save.
+    /// Replaces the recovery key; returns the new kit to save, with the same Secret Key (`SYNC.md` § 3.3): the way to
+    /// get the Secret Key again for a new Mac.
     func replaceRecoveryKey(password: String) async throws -> SyncRecoveryKit {
         let (client, accountKey) = try signedInAccount()
+        let secretKey = try storedSecretKey()
         let authKey = try await currentAuthKey(password: password, client: client)
         let recoveryKey = SyncRecoveryKey.random()
         try await client.changeRecovery(SyncChangeRecoveryRequest(
@@ -188,7 +202,7 @@ extension SyncService {
         guard let server = configuration.server, let email = configuration.email else {
             throw SyncClientError.signedOut
         }
-        let kit = SyncRecoveryKit(server: server, email: email, recoveryKey: recoveryKey.displayed)
+        let kit = SyncRecoveryKit(server: server, email: email, secretKey: secretKey.displayed, recoveryKey: recoveryKey.displayed)
         awaitSaving(kit)
         return kit
     }
@@ -233,12 +247,12 @@ extension SyncService {
 
     // MARK: Helpers
 
-    /// Keeps the session of `response`: account key and tokens in the keychain, the account in the configuration. The
-    /// device is the one this Mac drew (`deviceID`, `SYNC.md` § 2.7): a session for another one is refused, the server
-    /// can't give this Mac another device's identity (review SY19).
+    /// Keeps the session of `response`: account key, Secret Key and tokens in the keychain, the account in the
+    /// configuration. The device is the one this Mac drew (`deviceID`, `SYNC.md` § 2.7): a session for another one is
+    /// refused, the server can't give this Mac another device's identity (review SY19).
     private func keep(
         _ response: SyncSessionResponse,
-        accountKey: SymmetricKey,
+        keys: (account: SymmetricKey, secret: SyncSecretKey),
         endpoint: SyncServerEndpoint,
         email: String,
         deviceID: UUID,
@@ -248,7 +262,8 @@ extension SyncService {
             throw SyncClientError.unreadableAnswer
         }
         let (server, accountID) = (endpoint.address, response.accountId)
-        try keychain.set(Self.bytes(accountKey), for: .accountKey, server: server, accountID: accountID)
+        try keychain.set(Self.bytes(keys.account), for: .accountKey, server: server, accountID: accountID)
+        try keepSecretKey(keys.secret, server: server, accountID: accountID)
         try keychain.set(Data(response.accessToken.utf8), for: .accessToken, server: server, accountID: accountID)
         try keychain.set(Data(response.refreshToken.utf8), for: .refreshToken, server: server, accountID: accountID)
         configuration = SyncConfiguration()
@@ -286,13 +301,15 @@ extension SyncService {
         return (client, SymmetricKey(data: accountKey))
     }
 
-    /// `authKey` of the current password, which the sensitive operations require (`SYNC.md` § 4.1).
+    /// `authKey` of the current password and of the kept Secret Key, which the sensitive operations require
+    /// (`SYNC.md` § 4.1).
     private func currentAuthKey(password: String, client: SyncAPIClient) async throws -> Data {
         guard let email = configuration.email else {
             throw SyncClientError.signedOut
         }
+        let secretKey = try storedSecretKey()
         let kdf = try await client.prelogin(email: email)
-        let keys = try await Self.derive { try SyncAccountKeys.passwordKeys(password: password, kdf: kdf) }
+        let keys = try await Self.derive { try SyncAccountKeys.passwordKeys(password: password, secretKey: secretKey, kdf: kdf) }
         return Self.bytes(keys.authKey)
     }
 
