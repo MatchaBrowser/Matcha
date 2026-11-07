@@ -38,6 +38,10 @@ final class ActionsProvider: CommandProvider {
             PageTranslationActions.canTranslate(windowModel.frontTab) && windowModel.frontTab?.translation.isTranslated == false
         case .showOriginal:
             windowModel.frontTab?.translation.isTranslated == true
+        case .newNote, .showAllNotes:
+            !context.isPrivate && windowModel.notesPanel.isAvailable
+        case .pageNote:
+            !context.isPrivate && windowModel.notesPanel.isAvailable && SiteOrigin.web(of: windowModel.selectedTab?.documentURL) != nil
         }
     }
 }

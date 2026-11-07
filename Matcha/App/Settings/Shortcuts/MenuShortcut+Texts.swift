@@ -27,6 +27,8 @@ extension MenuShortcut {
         case .translatePage: String(localized: "Translate Page or Show Original", comment: "Settings > Shortcuts: the View menu item")
         case .toggleSidebar: String(localized: "Show or Hide Sidebar", comment: "Settings > Shortcuts: the View menu item")
         case .toggleDownloads: String(localized: "Show or Hide Downloads", comment: "Settings > Shortcuts: the View menu item")
+        case .toggleNotesPanel: String(localized: "Show or Hide Notes", comment: "Settings > Shortcuts: the View menu item (notes panel)")
+        case .showAllNotes: String(localized: "Show All Notes", comment: "View menu: opens the notes library window")
         case .newSpace: String(localized: "New Space")
         case .homepage: String(localized: "Homepage")
         case .reopenClosedTab: String(localized: "Reopen Closed Tab", comment: "History menu (⇧⌘T)")

@@ -39,6 +39,7 @@ extension SyncEngine {
         }
         let changes = candidates.compactMap { applications[$0]?.change }
         guard !changes.isEmpty else {
+            try applyNoteCopies()
             return
         }
         let waiting = try store.apply(SyncLocalChange.ordered(changes))
@@ -57,6 +58,7 @@ extension SyncEngine {
                 report.received += 1
             }
         }
+        try applyNoteCopies()
     }
 
     /// What applying `id` does; nil if nothing (unreadable, unknown format).
@@ -81,6 +83,8 @@ extension SyncEngine {
         var application = Application()
         if isChangedHere, entry.local != nil {
             application.keepsBaseline = true
+            // The text received that this Mac's change replaces is kept as a copy (`SYNC.md` § 2.10).
+            keepNoteText(of: remote.fields, against: current, resolution: .merged, id: id)
             let merged = current.map { SyncFieldMerge.merged(
                 remote: remote.fields,
                 local: $0,

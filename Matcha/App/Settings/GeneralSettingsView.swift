@@ -2,7 +2,7 @@ import AppKit
 import SwiftUI
 
 /// General settings: default browser and links from other apps, homepage, new tabs, search and suggestions, link
-/// peek, renaming tabs with a double click, memory of inactive tabs, quitting the app, language.
+/// peek, renaming tabs with a double click, the notes panel, memory of inactive tabs, quitting the app, language.
 struct GeneralSettingsView: View {
     @AppStorage(BrowserSettings.Key.homePage) private var homePage = BrowserSettings.homePage
     @AppStorage(BrowserSettings.Key.newTabPage) private var newTabPage = BrowserSettings.newTabPage
@@ -12,6 +12,7 @@ struct GeneralSettingsView: View {
     @AppStorage(BrowserSettings.Key.confirmBeforeQuitting) private var confirmBeforeQuitting = BrowserSettings.confirmBeforeQuitting
     @AppStorage(BrowserSettings.Key.opensPinnedLinksInPeek) private var opensPinnedLinksInPeek = BrowserSettings.opensPinnedLinksInPeek
     @AppStorage(BrowserSettings.Key.renamesTabsOnDoubleClick) private var renamesOnDoubleClick = BrowserSettings.renamesTabsOnDoubleClick
+    @AppStorage(BrowserSettings.Key.keepsNotesPanelOpen) private var keepsNotesPanelOpen = BrowserSettings.keepsNotesPanelOpen
     @AppStorage(BrowserSettings.Key.tabSuspensionDelay) private var tabSuspensionDelay = BrowserSettings.tabSuspensionDelay
     /// Homepage being typed: saved on Return, when the field loses focus or when Settings close, not at each keystroke,
     /// which recomputed every browser window (review IU1).
@@ -78,6 +79,17 @@ struct GeneralSettingsView: View {
             Section {
                 Toggle("Double-click a pinned tab or a favorite to rename it", isOn: $renamesOnDoubleClick)
                     .accessibilityIdentifier("doubleClickRenameToggle")
+            }
+            Section {
+                Toggle("Keep the notes panel open when switching tabs", isOn: $keepsNotesPanelOpen)
+                    .accessibilityIdentifier("keepsNotesPanelOpenToggle")
+            } footer: {
+                Text(
+                    "Otherwise, the panel closes when you switch tabs. Following a link in the same tab keeps it open.",
+                    comment: "Settings > General: note under the notes panel toggle",
+                )
+                .font(.caption)
+                .foregroundStyle(.secondary)
             }
             Section {
                 Picker("Free memory of inactive tabs after", selection: $tabSuspensionDelay) {

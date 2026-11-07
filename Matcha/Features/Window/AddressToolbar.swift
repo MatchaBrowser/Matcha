@@ -1,7 +1,7 @@
 import SwiftUI
 
 /// Full-width address bar at the top of a card: navigation and Home buttons, the address of this card's tab, its zoom
-/// badge, the extension buttons (task 6.5), then the site settings button.
+/// badge, the translation and notes buttons, the extension buttons (task 6.5), then the site settings button.
 struct AddressToolbar: View {
     let tab: BrowserTab?
     /// Opens the command bar on the address of the displayed tab.
@@ -23,6 +23,7 @@ struct AddressToolbar: View {
             AddressPill(tab: tab, edit: editAddress)
             ZoomBadge(page: tab, siteZooms: siteZooms)
             TranslateButton(page: tab)
+            NotesButton(tab: tab)
             ExtensionButtonsRow(tab: tab, isPrivate: isPrivate)
             if let toggleSiteSettings {
                 SiteSettingsButton(tab: tab, isPresented: isSiteSettingsPresented, action: toggleSiteSettings)

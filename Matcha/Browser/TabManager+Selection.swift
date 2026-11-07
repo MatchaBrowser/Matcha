@@ -60,7 +60,7 @@ extension TabManager {
     /// “Show Here”: the window of `viewer` takes the tabs it displays from the window that showed them.
     func showHere(_ viewer: TabViewer) {
         displays.claim(viewer.displayedTabIDs, for: viewer)
-        displayedTabs(in: viewer).forEach { $0.makeWebViewIfNeeded() }
+        displayedTabs(in: viewer).forEach { $0.loadIfNeeded() }
     }
 
     // MARK: Reading
@@ -114,7 +114,7 @@ extension TabManager {
             tab(withID: id)?.lastActivity = .now
         }
         displays.claim(shown.map(\.id), for: viewer)
-        shown.forEach { $0.makeWebViewIfNeeded() }
+        shown.forEach { $0.loadIfNeeded() }
     }
 
     /// Applies `change` to `tab`; in each window where it was selected, the selection moves to its neighbor in the

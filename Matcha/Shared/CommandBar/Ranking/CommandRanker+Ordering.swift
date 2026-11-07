@@ -5,6 +5,7 @@ private nonisolated struct RankedCandidate {
     enum Group {
         case tab
         case history
+        case note
         case action
     }
 
@@ -17,7 +18,7 @@ private nonisolated struct RankedCandidate {
     let foldedTitle: String
     /// Address key of tabs and history.
     let urlKey: String?
-    /// 5: tab of the displayed Space, 4: tab of another Space, 3: action, 2: tab of another Mac, 1: history.
+    /// 5: tab of the displayed Space, 4: tab of another Space, 3: action, 2: tab of another Mac or note, 1: history.
     let kindPriority: Int
     /// Tab: last activity; tab of another Mac: when that Mac wrote its tabs; history: frecency; action: opposite of
     /// its rank.
@@ -49,6 +50,11 @@ private nonisolated struct RankedCandidate {
             kindPriority = 1
             signal = Double(Frecency.score(visitCount: visitCount, lastVisit: lastVisit, now: now))
             secondarySignal = lastVisit.timeIntervalSinceReferenceDate
+        case let .note(modifiedAt, _):
+            group = .note
+            kindPriority = 2
+            signal = modifiedAt.timeIntervalSinceReferenceDate
+            secondarySignal = 0
         case let .action(action, _):
             group = .action
             kindPriority = 3
@@ -151,6 +157,11 @@ nonisolated extension CommandRanker {
                 id: candidate.id, style: .history, title: candidate.title,
                 subtitle: subtitle(CommandText.displayURL(url), title: candidate.title), url: url, target: .open(url),
             )
+        case .note:
+            guard let url = candidate.url else {
+                return nil
+            }
+            return CommandRow(id: candidate.id, style: .note, title: candidate.title, subtitle: nil, url: url, target: .open(url))
         case let .action(action, _):
             return CommandRow(
                 id: candidate.id,
@@ -208,6 +219,7 @@ nonisolated extension CommandRanker {
         switch group {
         case .tab: limits.tabs
         case .history: limits.history
+        case .note: limits.notes
         case .action: limits.actions
         }
     }

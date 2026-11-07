@@ -16,6 +16,8 @@ final class SyncRecordWriter {
     var spaces: [UUID: SpaceRecord]
     var folders: [UUID: FolderRecord]
     var tabs: [UUID: TabRecord]
+    var noteFolders: [UUID: NoteFolderRecord]
+    var notes: [UUID: NoteRecord]
     var changes = BrowserSession.SyncChanges()
 
     init(session: BrowserSession, defaults: UserDefaults, identifiers: SyncIdentifiers, extensions: ExtensionSyncAdapter?) throws {
@@ -28,6 +30,8 @@ final class SyncRecordWriter {
         spaces = try Self.byID(context.fetch(FetchDescriptor<SpaceRecord>()), id: \.id)
         folders = try Self.byID(context.fetch(FetchDescriptor<FolderRecord>()), id: \.id)
         tabs = try Self.byID(context.fetch(FetchDescriptor<TabRecord>()), id: \.id)
+        noteFolders = try Self.byID(context.fetch(FetchDescriptor<NoteFolderRecord>()), id: \.id)
+        notes = try Self.byID(context.fetch(FetchDescriptor<NoteRecord>()), id: \.id)
     }
 
     /// Creates or modifies `id`; false if its parent is missing.
@@ -42,19 +46,13 @@ final class SyncRecordWriter {
             return upsertFolder(id, fields)
         case let .tab(fields):
             return upsertTab(id, fields)
-        case let .setting(fields):
-            if let value = SyncedSettings.defaultsValue(of: fields.value) {
-                defaults.set(value, forKey: fields.key)
-            }
-            return true
-        case let .sitePermission(fields):
-            return upsertPermission(fields)
-        case let .siteZoom(fields):
-            session.siteZooms.setLevel(fields.level, forSite: fields.site)
-            return true
+        case .setting, .sitePermission, .siteZoom:
+            return upsertPreference(fields)
         case let .webExtension(fields):
             extensions?.apply(fields)
             return true
+        case .noteFolder, .note:
+            return upsertNoteRecord(id, fields)
         case .deviceTabs:
             // Never applied: shown as received, from the sync state (`OtherMacsTabs`, `SYNC.md` § 2.4).
             return true
@@ -124,6 +122,24 @@ final class SyncRecordWriter {
         record.apply(fields, isNew: existing == nil, folder: folder, profile: profile, space: space)
         touch(record)
         return true
+    }
+
+    /// A setting, a site decision or a zoom; false if the decision's profile is missing.
+    private func upsertPreference(_ fields: SyncFields) -> Bool {
+        switch fields {
+        case let .setting(fields):
+            if let value = SyncedSettings.defaultsValue(of: fields.value) {
+                defaults.set(value, forKey: fields.key)
+            }
+            return true
+        case let .sitePermission(fields):
+            return upsertPermission(fields)
+        case let .siteZoom(fields):
+            session.siteZooms.setLevel(fields.level, forSite: fields.site)
+            return true
+        default:
+            return true
+        }
     }
 
     /// Only refusals apply (`SYNC.md` § 2.6): a received `deny` replaces this Mac's decision; a received `allow` opens

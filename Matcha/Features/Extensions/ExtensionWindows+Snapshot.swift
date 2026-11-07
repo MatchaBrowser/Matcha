@@ -14,9 +14,10 @@ extension ExtensionWindows {
         /// Index in `keyWindows` of the active window found so far.
         private var focusRank = Int.max
 
-        /// Adds `tab` to the window being read; a tab already seen elsewhere is ignored.
+        /// Adds `tab` to the window being read; a tab already seen elsewhere, or a note tab, is ignored.
         mutating func add(_ tab: BrowserTab, owner: ExtensionTabOwner, isPinned: Bool, to tabIDs: inout [UUID]) {
-            guard tabs[tab.id] == nil else {
+            // A note tab (task 12.5) is no page: extensions don't see it.
+            guard tabs[tab.id] == nil, tab.noteID == nil else {
                 return
             }
             tabs[tab.id] = LiveTab(tab: tab, owner: owner)

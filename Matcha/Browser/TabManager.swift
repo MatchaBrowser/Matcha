@@ -134,7 +134,7 @@ final class TabManager {
     /// `insertTab`.
     func insert(_ tab: BrowserTab, after anchor: BrowserTab?, select: Bool) {
         tab.delegate = coordinator
-        tab.makeWebViewIfNeeded()
+        tab.loadIfNeeded()
         tabsByID[tab.id] = tab
         let anchorID = anchor?.id
         layout.insertToday(tab.id, at: layout.todayInsertionIndex(after: anchorID) { tabsByID[$0]?.openerID == anchorID })

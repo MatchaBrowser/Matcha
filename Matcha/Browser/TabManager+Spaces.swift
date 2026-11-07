@@ -30,7 +30,7 @@ extension TabManager {
     /// Creates the web view of the displayed tabs (the selected tab and its split), to display them (Space
     /// shown, launch).
     func loadSelectedTab() {
-        displayedTabs.forEach { $0.makeWebViewIfNeeded() }
+        displayedTabs.forEach { $0.loadIfNeeded() }
     }
 
     /// What to save of each placed tab.

@@ -19,6 +19,8 @@ final class BrowserWebView: WKWebView {
     /// Translation sessions of the window showing this view (task 9.3), for “Translate to …” of the page menu; set
     /// by that window.
     weak var translationHost: (any PageTranslationHosting)?
+    /// Notes panel of the window, for “Add to Note” in the menu of a selection (task 12.6); nil: not offered.
+    weak var noteQuotes: (any NoteQuoteReceiving)?
     /// Recipient of the messages of the notification script: the tab's navigation delegate (review CO1).
     weak var notifications: (any PageNotificationReceiving)?
 

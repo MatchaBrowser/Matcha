@@ -98,34 +98,42 @@ struct PageCard: View {
         isMarked ? Text("Active Pane", comment: "Accessibility value of the active page in a split view") : Text(verbatim: "")
     }
 
-    /// Page of the tab, or the welcome view.
+    /// Page of the tab, the note it shows, or the welcome view.
     @ViewBuilder private var page: some View {
         if isShownElsewhere {
             ShownElsewhereView(showHere: showHere)
+        } else if let tab, let noteID = tab.noteID {
+            // A note in a tab (task 12.5): its editor, never a web view.
+            NoteTabView(tab: tab, noteID: noteID, activate: activate)
         } else if let tab, tab.url != nil, let webView = tab.webView {
-            WebView(webView: webView, sidebarDropTarget: sidebarDropTarget, translationHost: translationHost)
-                .id(ObjectIdentifier(webView))
-                // Tab woken from sleep (task 5.6): its snapshot, while the page reloads. It is there from the first
-                // render (no blank page) and fades out.
-                .overlay {
-                    if let cover = tab.suspension.cover {
-                        SuspendedPageCover(cover: cover)
-                            .transition(.asymmetric(insertion: .identity, removal: .opacity))
-                    }
+            WebView(
+                webView: webView,
+                sidebarDropTarget: sidebarDropTarget,
+                translationHost: translationHost,
+                noteQuotes: windowModel?.notesPanel,
+            )
+            .id(ObjectIdentifier(webView))
+            // Tab woken from sleep (task 5.6): its snapshot, while the page reloads. It is there from the first
+            // render (no blank page) and fades out.
+            .overlay {
+                if let cover = tab.suspension.cover {
+                    SuspendedPageCover(cover: cover)
+                        .transition(.asymmetric(insertion: .identity, removal: .opacity))
                 }
-                .animation(.easeOut(duration: 0.2), value: tab.suspension.cover == nil)
-                // Page process stopped several times in a row (task 5.7): the message, until the reload.
-                .overlay {
-                    if tab.crash.isShowingProblem {
-                        PageProblemView(page: tab, activate: activate)
-                    }
+            }
+            .animation(.easeOut(duration: 0.2), value: tab.suspension.cover == nil)
+            // Page process stopped several times in a row (task 5.7): the message, until the reload.
+            .overlay {
+                if tab.crash.isShowingProblem {
+                    PageProblemView(page: tab, activate: activate)
                 }
-                // Load that failed (audit K5): why, until another load.
-                .overlay {
-                    if let error = tab.loadFailure.error {
-                        PageLoadErrorView(page: tab, error: error, activate: activate)
-                    }
+            }
+            // Load that failed (audit K5): why, until another load.
+            .overlay {
+                if let error = tab.loadFailure.error {
+                    PageLoadErrorView(page: tab, error: error, activate: activate)
                 }
+            }
         } else {
             ContentUnavailableView(emptyPageTitle, systemImage: "globe", description: Text(emptyPageDescription))
                 // Takes the full height, like the web view: otherwise the whole column is centered vertically.

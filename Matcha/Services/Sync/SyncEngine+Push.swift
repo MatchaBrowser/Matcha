@@ -44,6 +44,7 @@ extension SyncEngine {
                     let outcome = try await sendBatch(ids)
                     // Applied at once: a later batch that fails doesn't lose them (review SY6).
                     try applyAccepted(outcome.winners)
+                    try applyNoteCopies()
                     retries = retries || outcome.retries
                 } catch SyncTransportError.batchTooLarge {
                     // Too big for one request: in two halves; a single change that is too big stays on this Mac.
@@ -199,12 +200,50 @@ extension SyncEngine {
         }
         state.entries[id] = entry
         let mine = state.pending[id]?.content ?? change.content
+        let local = mine.deleted ? nil : state.pending[id]?.local ?? sent.local ?? mine.fields
         if content.isNewer(than: mine) || content.isFromNewerVersion {
+            keepNoteText(
+                of: local,
+                against: content.deleted ? nil : content.fields,
+                resolution: content.deleted ? .deleted : .replaced,
+                id: id,
+            )
             state.pending[id] = nil
             return .remoteWins
         }
+        if !content.deleted {
+            keepNoteText(of: content.fields, against: local, resolution: mine.deleted ? .deleted : .merged, id: id)
+        }
         remerge(id, onto: content)
         return .retry
+    }
+
+    /// The text of a note that this conflict would lose becomes a copy (`SYNC.md` § 2.10).
+    func keepNoteText(of loser: SyncJSON?, against winner: SyncJSON?, resolution: SyncNoteConflict.Resolution, id: UUID) {
+        let note = SyncRecordType.note.rawValue
+        guard state.entries[id]?.type == note || state.pending[id]?.content.type == note,
+              let copy = SyncNoteConflict.copy(
+                  of: loser,
+                  winner: winner,
+                  baseline: state.entries[id]?.local,
+                  resolution: resolution,
+                  now: now(),
+              )
+        else {
+            return
+        }
+        noteCopies[UUID()] = .note(copy)
+        Logger.sync.notice("Note conflict: the losing text is kept as a copy")
+    }
+
+    /// Writes the copies of notes kept by conflicts.
+    func applyNoteCopies() throws {
+        guard !noteCopies.isEmpty else {
+            return
+        }
+        let changes = noteCopies.map { SyncLocalChange.upsert($0.key, $0.value) }
+        noteCopies = [:]
+        _ = try store.apply(SyncLocalChange.ordered(changes))
     }
 
     /// Conflict won: the change leaves again on top of the server's content, with only this Mac's changed fields

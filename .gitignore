@@ -12,6 +12,8 @@ xcuserdata/
 # Outils locaux
 buildServer.json
 matcha-icon/
+# Paquets de l'éditeur des notes, installés par scripts/build-note-editor.sh
+scripts/note-editor/node_modules/
 
 # Index créé par l'éditeur dans le projet
 Matcha.xcodeproj/-Xcc/

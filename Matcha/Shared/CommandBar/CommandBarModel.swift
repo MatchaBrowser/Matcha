@@ -31,6 +31,7 @@ final class CommandBarModel {
                 OpenTabsProvider(windowModel: windowModel),
                 OtherMacsTabsProvider(otherMacs: otherMacs),
                 actions,
+                NotesProvider(windowModel: windowModel),
                 HistoryProvider(source: history),
                 suggestions,
             ],

@@ -126,6 +126,18 @@ struct FolderRowView: View {
             }
         }
         Button("New Subfolder") { tabManager.newFolder(in: folder.id) }
+        // A note in a pinned tab of this folder (task 12.5); not in a private window.
+        if let windowModel, windowModel.notesPanel.isAvailable {
+            Button {
+                tabManager.newNoteTab(
+                    inFolder: folder.id,
+                    store: windowModel.session.notes,
+                    profileID: windowModel.space.record.profile?.id,
+                )
+            } label: {
+                Text("New Note", comment: "Notes library: toolbar button")
+            }
+        }
         Divider()
         Button("Delete Folder") {
             withMotion(.easeOut(duration: 0.15)) {

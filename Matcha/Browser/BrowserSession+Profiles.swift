@@ -36,8 +36,8 @@ extension BrowserSession {
         spaces.filter { $0.record.profile?.id == profile.id }
     }
 
-    /// Deletes the profile, its Spaces, its favorites, its website data (cookies, storage), its permission decisions
-    /// and its history.
+    /// Deletes the profile, its Spaces, its favorites, its website data (cookies, storage), its permission decisions,
+    /// its history and its notes.
     /// The last profile cannot be deleted.
     func deleteProfile(_ profile: ProfileRecord) async {
         guard let identifier = removeProfile(profile) else {
@@ -46,7 +46,7 @@ extension BrowserSession {
         await removeWebsiteData(ofProfile: identifier)
     }
 
-    /// Deletes the profile, its Spaces, its favorites, its permission decisions and its history; returns its
+    /// Deletes the profile, its Spaces, its favorites, its permission decisions, its history and its notes; returns its
     /// identifier, or nil if it is the last profile. Its website data still has to be erased (`removeWebsiteData`).
     /// `allowingLast`: a deletion received by sync, which can remove the last profile; the first-launch one comes back
     /// afterwards (`ensureSyncDefaults`).
@@ -80,6 +80,7 @@ extension BrowserSession {
         profileFavorites[identifier] = nil
         sitePermissions.removeAll(profileID: identifier)
         history?.removeAll(profileID: identifier)
+        notes.removeAll(profileID: identifier)
         return identifier
     }
 

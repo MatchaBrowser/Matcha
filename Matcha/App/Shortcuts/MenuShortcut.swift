@@ -24,6 +24,8 @@ nonisolated enum MenuShortcut: String, CaseIterable, Sendable {
     case translatePage
     case toggleSidebar
     case toggleDownloads
+    case toggleNotesPanel
+    case showAllNotes
     case newSpace
     case homepage
     case reopenClosedTab
@@ -48,7 +50,7 @@ nonisolated enum MenuShortcut: String, CaseIterable, Sendable {
             .edit
         case .reloadPage, .reloadFromOrigin, .stopLoading, .actualSize, .zoomIn, .zoomOut, .translatePage:
             .view
-        case .toggleSidebar, .toggleDownloads:
+        case .toggleSidebar, .toggleDownloads, .toggleNotesPanel, .showAllNotes:
             .view
         case .newSpace:
             .spaces
@@ -57,7 +59,8 @@ nonisolated enum MenuShortcut: String, CaseIterable, Sendable {
         }
     }
 
-    /// As in Safari when it has the same command; ⌥⌘N for the mini window, as in Arc.
+    /// As in Safari when it has the same command; ⌥⌘N for the mini window, as in Arc; ⌃⌘N for the notes, like ⌃⌘S
+    /// for the sidebar.
     var defaultKey: ShortcutKey? {
         switch self {
         case .newTab: ShortcutKey("t")
@@ -82,6 +85,8 @@ nonisolated enum MenuShortcut: String, CaseIterable, Sendable {
         case .translatePage: nil
         case .toggleSidebar: ShortcutKey("s", [.command, .control])
         case .toggleDownloads: ShortcutKey("l", [.command, .option])
+        case .toggleNotesPanel: ShortcutKey("n", [.command, .control])
+        case .showAllNotes: ShortcutKey("n", [.command, .control, .shift])
         case .newSpace: nil
         case .homepage: ShortcutKey("h", [.command, .shift])
         case .reopenClosedTab: ShortcutKey("t", [.command, .shift])

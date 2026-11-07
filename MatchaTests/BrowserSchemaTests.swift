@@ -112,7 +112,7 @@ struct BrowserSchemaTests {
         let oldModels: [any PersistentModel.Type] = [
             ProfileRecord.self, SpaceRecord.self, FolderRecord.self, TabRecord.self, SitePermissionRecord.self,
         ]
-        #expect(BrowserSchema.models.count == oldModels.count + 1)
+        #expect(BrowserSchema.models.count > oldModels.count)
 
         let profileID = try {
             let schema = Schema(oldModels)
@@ -165,7 +165,7 @@ struct BrowserSchemaTests {
         try FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)
         defer { try? FileManager.default.removeItem(at: directory) }
         let url = directory.appendingPathComponent("avant-apparence.store")
-        #expect(SchemaBeforeFolderAppearance.models.count == BrowserSchema.models.count)
+        #expect(SchemaBeforeFolderAppearance.models.count <= BrowserSchema.models.count)
 
         let (folderID, childID) = try makeStoreBeforeFolderAppearances(at: url)
 

@@ -25,6 +25,14 @@ nonisolated enum PageMenuEntry: Equatable, Sendable {
 }
 
 nonisolated extension PageMenuPlan {
+    /// WebKit's “Copy”: in the menu of a selection only.
+    static let copyIdentifier = "WKMenuItemIdentifierCopy"
+
+    /// Place of “Add to Note” (task 12.6): right after “Copy”; nil if this is not the menu of a selection.
+    static func noteQuoteIndex(for identifiers: [String?]) -> Int? {
+        identifiers.firstIndex(of: copyIdentifier).map { $0 + 1 }
+    }
+
     /// WebKit's “Reload”: it is only in the menu of a page (not of a link, an image or text).
     static let reloadIdentifier = "WKMenuItemIdentifierReload"
     /// WebKit's “Back” and “Forward”, when it adds them: replaced by Matcha's, always present.

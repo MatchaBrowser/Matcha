@@ -69,7 +69,7 @@ nonisolated struct SyncIdentifiers: Sendable {
     }
 
     /// Identifier that a record with `fields` must have; nil for a type whose identifier is that of its model
-    /// (profile, Space, folder, tab). Checked on reception (`SYNC.md` § 2.2).
+    /// (profile, Space, folder, tab, note and its folder). Checked on reception (`SYNC.md` § 2.2).
     func expectedID(of fields: SyncFields) -> UUID? {
         switch fields {
         case let .setting(fields): setting(fields.key)
@@ -77,7 +77,7 @@ nonisolated struct SyncIdentifiers: Sendable {
         case let .sitePermission(fields): sitePermission(profileID: fields.profileId, origin: fields.origin, kind: fields.kind)
         case let .webExtension(fields): webExtension(fields)
         case let .deviceTabs(fields): deviceTabs(fields.deviceId)
-        case .profile, .space, .folder, .tab: nil
+        case .profile, .space, .folder, .tab, .noteFolder, .note: nil
         }
     }
 

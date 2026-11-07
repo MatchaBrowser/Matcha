@@ -12,6 +12,8 @@ nonisolated enum SyncFields: Equatable, Sendable {
     case setting(SyncSettingFields)
     case sitePermission(SyncSitePermissionFields)
     case siteZoom(SyncSiteZoomFields)
+    case noteFolder(SyncNoteFolderFields)
+    case note(SyncNoteFields)
     case deviceTabs(SyncDeviceTabsFields)
 
     var type: SyncRecordType {
@@ -24,6 +26,8 @@ nonisolated enum SyncFields: Equatable, Sendable {
         case .setting: .setting
         case .sitePermission: .sitePermission
         case .siteZoom: .siteZoom
+        case .noteFolder: .noteFolder
+        case .note: .note
         case .deviceTabs: .deviceTabs
         }
     }
@@ -45,6 +49,8 @@ nonisolated enum SyncFields: Equatable, Sendable {
         case let .setting(fields): try? .encoding(fields)
         case let .sitePermission(fields): try? .encoding(fields)
         case let .siteZoom(fields): try? .encoding(fields)
+        case let .noteFolder(fields): try? .encoding(fields)
+        case let .note(fields): try? .encoding(fields)
         case let .deviceTabs(fields): try? .encoding(fields)
         }
     }
@@ -58,15 +64,30 @@ nonisolated enum SyncFields: Equatable, Sendable {
         case .folder: (try? json.decoded(as: SyncFolderFields.self)).map(SyncFields.folder)
         case .tab: (try? json.decoded(as: SyncTabFields.self)).map(SyncFields.tab)
         case .webExtension: (try? json.decoded(as: SyncExtensionFields.self)).map(SyncFields.webExtension)
-        case .setting: (try? json.decoded(as: SyncSettingFields.self)).flatMap { $0.isValid ? .setting($0) : nil }
-        case .sitePermission: (try? json.decoded(as: SyncSitePermissionFields.self)).flatMap { $0.isValid ? .sitePermission($0) : nil }
-        case .siteZoom: (try? json.decoded(as: SyncSiteZoomFields.self)).flatMap { $0.isValid ? .siteZoom($0) : nil }
+        case .setting, .sitePermission, .siteZoom: Self.preferenceFields(json: json, type: type)
+        case .noteFolder, .note: Self.noteFields(json: json, type: type)
         case .deviceTabs: (try? json.decoded(as: SyncDeviceTabsFields.self)).map(SyncFields.deviceTabs)
         }
         guard let fields else {
             return nil
         }
         self = fields
+    }
+
+    /// A setting, a site decision or a zoom read from `json`; nil outside the known values (`SYNC.md` § 2.6).
+    private static func preferenceFields(json: SyncJSON, type: SyncRecordType) -> SyncFields? {
+        switch type {
+        case .setting: (try? json.decoded(as: SyncSettingFields.self)).flatMap { $0.isValid ? .setting($0) : nil }
+        case .sitePermission: (try? json.decoded(as: SyncSitePermissionFields.self)).flatMap { $0.isValid ? .sitePermission($0) : nil }
+        default: (try? json.decoded(as: SyncSiteZoomFields.self)).flatMap { $0.isValid ? .siteZoom($0) : nil }
+        }
+    }
+
+    /// A note or a folder of notes read from `json` (`SYNC.md` § 2.10).
+    private static func noteFields(json: SyncJSON, type: SyncRecordType) -> SyncFields? {
+        type == .note
+            ? (try? json.decoded(as: SyncNoteFields.self)).map(SyncFields.note)
+            : (try? json.decoded(as: SyncNoteFolderFields.self)).map(SyncFields.noteFolder)
     }
 
     /// Parent the record needs (profile, Space, folder), if it has one.
@@ -77,6 +98,8 @@ nonisolated enum SyncFields: Equatable, Sendable {
         case let .folder(fields): [fields.spaceId, fields.parentId].compactMap(\.self)
         case let .tab(fields): [fields.profileId, fields.spaceId, fields.folderId].compactMap(\.self)
         case let .sitePermission(fields): [fields.profileId]
+        case let .noteFolder(fields): [fields.profileId, fields.parentId].compactMap(\.self)
+        case let .note(fields): [fields.profileId, fields.folderId].compactMap(\.self)
         }
     }
 }

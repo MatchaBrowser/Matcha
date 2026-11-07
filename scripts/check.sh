@@ -152,6 +152,12 @@ python3 -I scripts/test-appcast.py
 echo "✓ flux des mises à jour (appcast.py)"
 python3 -I scripts/test-perf.py
 echo "✓ mesure de la consommation (perf.py)"
+# The notes editor's files are those scripts/build-note-editor.sh made: never edited by hand (task 12.2).
+shasum -a 256 --check --quiet scripts/note-editor/note-editor.sha256 || {
+    echo "✗ fichiers de l'éditeur des notes modifiés à la main : relancer scripts/build-note-editor.sh"
+    exit 1
+}
+echo "✓ éditeur des notes (empreintes de build-note-editor.sh)"
 
 step "Tests unitaires"
 # The tests run in Matcha's own container (same app identifier): the temporary files they leave there are emptied

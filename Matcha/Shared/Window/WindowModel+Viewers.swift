@@ -79,6 +79,7 @@ extension WindowModel {
     func windowDidClose() {
         closePeek()
         translationHost.cancelAll()
+        notesPanel.close()
         // Its own tabs close with it (⇧⌘T in their Space brings them back).
         if let windowTabs {
             windowTabs.close(into: session.originSpace(of: windowTabs))

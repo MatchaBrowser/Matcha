@@ -59,6 +59,8 @@ struct CommandBarRowView: View {
             )
         case .suggestion, .action:
             nil
+        case .note:
+            String(localized: "Note", comment: "Address pill of a tab that shows a note")
         case .openAddress, .tab, .otherMacTab, .history:
             row.subtitle
         }
@@ -78,6 +80,10 @@ struct CommandBarRowView: View {
             }
         case .openAddress, .otherMacTab, .history:
             siteIcon
+        case .note:
+            Image(systemName: "doc.text")
+                .font(.system(size: 13))
+                .foregroundStyle(.secondary)
         case let .action(action):
             Image(systemName: action.symbolName)
                 .font(.system(size: 13))

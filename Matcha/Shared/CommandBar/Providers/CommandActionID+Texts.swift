@@ -10,6 +10,9 @@ nonisolated extension CommandActionID {
         case .settings: String(localized: "Settings", comment: "Command bar action")
         case .translatePage: String(localized: "Translate Page")
         case .showOriginal: String(localized: "Show Original")
+        case .newNote: String(localized: "New Note", comment: "Notes library: toolbar button")
+        case .pageNote: String(localized: "Note for This Page", comment: "Command bar action: opens the notes panel on the page's note")
+        case .showAllNotes: String(localized: "Show All Notes", comment: "View menu: opens the notes library window")
         }
     }
 
@@ -27,6 +30,9 @@ nonisolated extension CommandActionID {
         case .settings: "gearshape"
         case .translatePage: "translate"
         case .showOriginal: "arrow.uturn.backward"
+        case .newNote: "square.and.pencil"
+        case .pageNote: "doc.text"
+        case .showAllNotes: "tray.full"
         }
     }
 
@@ -61,6 +67,24 @@ nonisolated extension CommandActionID {
                 localized: "commandBar.keywords.showOriginal",
                 defaultValue: "original untranslated translation language",
                 comment: "Search words for the “Show Original” action, space-separated, never displayed; keep the English words",
+            )
+        case .newNote:
+            String(
+                localized: "commandBar.keywords.newNote",
+                defaultValue: "new create add note write",
+                comment: "Search words for the “New Note” action, space-separated, never displayed; keep the English words",
+            )
+        case .pageNote:
+            String(
+                localized: "commandBar.keywords.pageNote",
+                defaultValue: "note page notes panel annotate",
+                comment: "Search words for the “Note for This Page” action, space-separated, never displayed; keep the English words",
+            )
+        case .showAllNotes:
+            String(
+                localized: "commandBar.keywords.showAllNotes",
+                defaultValue: "notes library all show",
+                comment: "Search words for the “Show All Notes” action, space-separated, never displayed; keep the English words",
             )
         }
     }

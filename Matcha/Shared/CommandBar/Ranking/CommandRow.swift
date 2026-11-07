@@ -22,6 +22,8 @@ nonisolated struct CommandRow: Identifiable, Equatable, Sendable {
         /// Tab of another Mac, opened here.
         case otherMacTab(deviceName: String)
         case history
+        /// Note of the profile, opened in a tab (task 12.7).
+        case note
         case suggestion
         case action(CommandActionID)
     }

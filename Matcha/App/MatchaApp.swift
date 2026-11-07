@@ -7,6 +7,7 @@ struct MatchaApp: App {
     static let browserWindowID = "browser"
     static let privateWindowID = "private"
     static let historyWindowID = "history"
+    static let notesWindowID = "notes"
 
     @NSApplicationDelegateAdaptor(AppDelegate.self) private var appDelegate
     @AppStorage(BrowserSettings.Key.appearance) private var appearance = BrowserSettings.appearance
@@ -120,6 +121,17 @@ struct MatchaApp: App {
                 .environment(miniWindows)
         }
         .defaultSize(width: 760, height: 560)
+        .defaultLaunchBehavior(.suppressed)
+        .restorationBehavior(.disabled)
+        .handlesExternalEvents(matching: [])
+        .commandsRemoved()
+
+        // Notes library (task 12.4): like the history window.
+        Window(Text("Notes", comment: "Title of the notes library window"), id: Self.notesWindowID) {
+            NotesLibraryWindow(session: session)
+                .environment(miniWindows)
+        }
+        .defaultSize(width: 980, height: 620)
         .defaultLaunchBehavior(.suppressed)
         .restorationBehavior(.disabled)
         .handlesExternalEvents(matching: [])

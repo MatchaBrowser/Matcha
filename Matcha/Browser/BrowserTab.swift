@@ -263,6 +263,11 @@ final class BrowserTab: Identifiable {
     /// Loads `url`; `source`: the page whose link it is, if any; `isFromAnotherApp`: received from another app. A local
     /// file then reads less (`FileReadAccess`).
     func load(_ url: URL, from source: URL? = nil, isFromAnotherApp: Bool = false) {
+        // A note (task 12.5): shown by its card, never by a web view.
+        if NoteTab.noteID(in: url) != nil {
+            showNote(at: url)
+            return
+        }
         let webView = makeWebViewIfNeeded()
         // A page other than the one put to sleep: no more snapshot on top; a crashed page leaves its message.
         suspension.endRestoring()
@@ -364,5 +369,47 @@ final class BrowserTab: Identifiable {
                 tab.hasOnlySecureContent = webView.hasOnlySecureContent
             }),
         ]
+    }
+}
+
+// MARK: Notes in tabs
+
+/// A tab that shows a note (task 12.5) instead of a page: kept in this file, which holds the tab's private state.
+extension BrowserTab {
+    /// Makes the web view of a tab about to be shown; a note tab has none (task 12.5).
+    func loadIfNeeded() {
+        if noteID == nil {
+            makeWebViewIfNeeded()
+        }
+    }
+
+    /// Note shown by the tab (`NoteTab`); nil for a page.
+    var noteID: UUID? {
+        NoteTab.noteID(in: url)
+    }
+
+    /// The tab shows the note at `url` (`NoteTab`): no web view, no history, no page state; its title is the note's
+    /// (`setNoteTitle`).
+    private func showNote(at url: URL) {
+        releaseWebView()
+        loadFailure.clear()
+        history.reset()
+        suspension.reset()
+        pendingURL = nil
+        pendingInteractionState = nil
+        savedInteractionState = nil
+        setURL(url)
+        displayedAddress.reset(to: url)
+        canGoBack = false
+        canGoForward = false
+        pageZoom = ZoomLevels.actualSize
+    }
+
+    /// Title of the note the tab shows (task 12.5).
+    func setNoteTitle(_ title: String) {
+        guard noteID != nil, self.title != title else {
+            return
+        }
+        self.title = title
     }
 }

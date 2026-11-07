@@ -68,6 +68,9 @@ final class SyncEngine {
     /// Changes sent again on top of the server's content after a conflict won (review SY5): once applied, their
     /// content carries the other Mac's fields, applied here too.
     var remerged: Set<UUID> = []
+    /// Copies of notes whose text a conflict would lose (`SyncNoteConflict`), written here before the cycle goes on;
+    /// unknown to the sync state, they leave at the next cycle as creations.
+    var noteCopies: [UUID: SyncFields] = [:]
 
     /// `deviceID`: this Mac's identifier, kept in the keychain; it replaces the one of the state file (a cloned Mac
     /// draws a new one, `SYNC.md` § 5).

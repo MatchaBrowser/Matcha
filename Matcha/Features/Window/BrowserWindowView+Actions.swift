@@ -19,6 +19,7 @@ extension BrowserWindowView {
             model: commandBar,
             window: window,
             openSettings: { openSettings() },
+            openNotesLibrary: { openWindow(id: MatchaApp.notesWindowID) },
             revealInSpace: miniWindows.map { manager in
                 { tab, space in
                     manager.actInMainWindow(on: space)
@@ -41,6 +42,8 @@ extension BrowserWindowView {
             isSidebarVisible: isSidebarVisible,
             toggleDownloads: toggleDownloads,
             isDownloadsPanelShown: isDownloadsPanelShown,
+            toggleNotesPanel: model.notesPanel.isAvailable ? { withMotion(.easeInOut(duration: 0.2)) { model.notesPanel.toggle() } } : nil,
+            isNotesPanelShown: model.notesPanel.isOpen,
             // `hasURL` and not `url`: the window is not recomputed on each address change.
             copyURL: model.frontTab?.hasURL == true ? { model.copySelectedTabURL() } : nil,
             goHome: homeURL.map { url in { goHome(to: url) } },

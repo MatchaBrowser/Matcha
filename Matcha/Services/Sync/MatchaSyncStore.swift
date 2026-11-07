@@ -52,6 +52,7 @@ final class MatchaSyncStore: SyncLocalStore {
                 result[tab.id] = .tab(fields)
             }
         }
+        try addNotes(to: &result)
         addPreferences(to: &result)
         try addDeviceTabs(tabs.filter { $0.place == .today }, to: &result)
         return result
@@ -78,6 +79,7 @@ final class MatchaSyncStore: SyncLocalStore {
         for tab in try fetch(TabRecord.self) where tab.isLocalOnly {
             exceptions.localRecords.insert(tab.id)
         }
+        try exceptions.localRecords.formUnion(localNotes())
         return exceptions
     }
 
@@ -153,12 +155,12 @@ final class MatchaSyncStore: SyncLocalStore {
         return waiting
     }
 
-    /// “Personal” profile and “Home” Space from the first launch, with no folder, favorite or pinned tab, and at most
-    /// one empty today tab.
+    /// “Personal” profile and “Home” Space from the first launch, with no folder, favorite, pinned tab or note, and at
+    /// most one empty today tab.
     var hasOnlyFirstLaunchData: Bool {
         guard let profiles = try? fetch(ProfileRecord.self), let spaces = try? fetch(SpaceRecord.self),
               let folders = try? fetch(FolderRecord.self), let tabs = try? fetch(TabRecord.self), profiles.count == 1, spaces.count == 1,
-              folders.isEmpty,
+              folders.isEmpty, (try? fetch(NoteRecord.self).isEmpty) == true, (try? fetch(NoteFolderRecord.self).isEmpty) == true,
               profiles[0].name == BrowserSession.defaultProfileName, spaces[0].name == BrowserSession.defaultSpaceName
         else {
             return false
@@ -167,7 +169,7 @@ final class MatchaSyncStore: SyncLocalStore {
         return placed.count <= 1 && placed.allSatisfy { $0.place == .today && $0.url == nil }
     }
 
-    private func fetch<Model: PersistentModel>(_: Model.Type) throws -> [Model] {
+    func fetch<Model: PersistentModel>(_: Model.Type) throws -> [Model] {
         try session.container.mainContext.fetch(FetchDescriptor<Model>())
     }
 }

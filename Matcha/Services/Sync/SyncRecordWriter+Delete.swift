@@ -24,6 +24,10 @@ extension SyncRecordWriter {
             deletePreference(id, type)
         case .webExtension:
             deleteExtension(id)
+        case .noteFolder:
+            deleteNoteFolder(id)
+        case .note:
+            deleteNote(id)
         case .deviceTabs:
             break
         }
@@ -47,6 +51,7 @@ extension SyncRecordWriter {
             breaker.parent = nil
             touch(breaker.space)
         }
+        repairNoteFolderCycles()
         if session.ensureSyncDefaults(profileID: identifiers.defaultProfile, spaceID: identifiers.defaultSpace) {
             noteProfilesChanged()
         }

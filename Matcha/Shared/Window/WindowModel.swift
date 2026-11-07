@@ -45,6 +45,8 @@ final class WindowModel {
     var renamedTabName = ""
     /// Translation sessions of the window's pages (task 9.3).
     let translationHost: TranslationHost
+    /// Notes panel of the page shown (task 12.3).
+    let notesPanel: NotesPanelModel
     /// Where to remember the last displayed Space, shown by the next new window; nil to remember nothing (tests).
     @ObservationIgnored private let defaults: UserDefaults?
     /// This window's viewer of each Space it has shown: its selected tab there.
@@ -68,7 +70,9 @@ final class WindowModel {
         self.defaults = defaults
         self.windowTabs = windowTabs
         translationHost = TranslationHost(languages: session.services.translationLanguages)
+        notesPanel = NotesPanelModel(store: session.notes)
         currentSpaceID = spaceID ?? defaults?.string(forKey: Self.currentSpaceKey).flatMap(UUID.init(uuidString:))
+        notesPanel.profileID = { [weak self] in self?.space.record.profile?.id }
     }
 
     isolated deinit {

@@ -58,6 +58,7 @@ nonisolated enum SyncedSettings {
         BrowserSettings.Key.searchSuggestionSource: .choice(Set(SuggestionSource.allCases.map(\.rawValue))),
         BrowserSettings.Key.opensPinnedLinksInPeek: .boolean,
         BrowserSettings.Key.renamesTabsOnDoubleClick: .boolean,
+        BrowserSettings.Key.keepsNotesPanelOpen: .boolean,
         BrowserSettings.Key.homePage: .text,
         BrowserSettings.Key.newTabPage: .choice(Set(NewTabPage.allCases.map(\.rawValue))),
         BrowserSettings.Key.addressBarPosition: .choice(Set(AddressBarPosition.allCases.map(\.rawValue))),

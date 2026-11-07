@@ -42,6 +42,8 @@ final class BrowserSession {
     @ObservationIgnored let siteZooms: SiteZoomStore
     /// Browsing history (task 5.5); nil for a private window: nothing is remembered.
     @ObservationIgnored let history: HistoryStore?
+    /// Notes (task 12.1); a private window has none, and none can be made there.
+    @ObservationIgnored let notes: NoteStore
     /// Sleeping of hidden tabs (task 5.6), started when the window opens; same rules in a private window.
     @ObservationIgnored let tabLifecycle = TabLifecycleService()
     /// Sign-in windows opened by the session's pages (task 5.8): private, and closed with it, for a private window; nil
@@ -85,6 +87,7 @@ final class BrowserSession {
         )
         siteZooms = SiteZoomStore(defaults: isPrivate || isInMemory ? nil : .standard)
         history = isPrivate ? nil : HistoryStore(container: container)
+        notes = NoteStore(context: isPrivate ? nil : context)
         popupWindows = services.makePopupWindows(PopupWindowSettings(
             services: services,
             downloadScope: downloadScope,
@@ -109,6 +112,7 @@ final class BrowserSession {
         }
         tabLifecycle.session = self
         spaces.forEach(connect)
+        observeNoteTitles()
         terminationObserver = observeTermination()
         history?.onVisitsRemoved = { [weak self] in
             Task { await self?.forgetUnusedIcons() }
