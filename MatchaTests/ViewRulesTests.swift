@@ -10,12 +10,17 @@ struct ViewRulesTests {
     private static let strong = "un mot de passe assez long, 2026"
 
     @Test func `account forms ask for what each step needs`() {
-        #expect(!SyncFormRules.canSubmit(.signIn, email: " ", password: "x", confirmation: "", recoveryKey: ""))
-        #expect(SyncFormRules.canSubmit(.signIn, email: "a@b.c", password: "x", confirmation: "", recoveryKey: ""))
-        #expect(!SyncFormRules.canSubmit(.create, email: "a@b.c", password: "court", confirmation: "court", recoveryKey: ""))
-        #expect(!SyncFormRules.canSubmit(.create, email: "a@b.c", password: Self.strong, confirmation: "autre", recoveryKey: ""))
-        #expect(SyncFormRules.canSubmit(.create, email: "a@b.c", password: Self.strong, confirmation: Self.strong, recoveryKey: ""))
-        #expect(!SyncFormRules.canSubmit(.recover, email: "a@b.c", password: Self.strong, confirmation: Self.strong, recoveryKey: "x"))
+        let secret = SyncSecretKey.random().displayed
+        #expect(!SyncFormRules.canSubmit(.signIn, .init(email: " ", password: "x", secretKey: secret)))
+        #expect(SyncFormRules.canSubmit(.signIn, .init(email: "a@b.c", password: "x", secretKey: secret)))
+        // A sign-in needs a valid Secret Key (SYNC.md § 3.4).
+        #expect(!SyncFormRules.canSubmit(.signIn, .init(email: "a@b.c", password: "x")))
+        #expect(!SyncFormRules.canSubmit(.signIn, .init(email: "a@b.c", password: "x", secretKey: "S1-R30W")))
+        #expect(!SyncFormRules.canSubmit(.create, .init(email: "a@b.c", password: "court", confirmation: "court")))
+        #expect(!SyncFormRules.canSubmit(.create, .init(email: "a@b.c", password: Self.strong, confirmation: "autre")))
+        #expect(SyncFormRules.canSubmit(.create, .init(email: "a@b.c", password: Self.strong, confirmation: Self.strong)))
+        let recovery = SyncFormRules.ConnectFields(email: "a@b.c", password: Self.strong, confirmation: Self.strong, recoveryKey: "x")
+        #expect(!SyncFormRules.canSubmit(.recover, recovery))
 
         #expect(!SyncFormRules.canConfirm(.deleteAccount, password: "", newPassword: "", confirmation: "", email: ""))
         #expect(SyncFormRules.canConfirm(.deleteAccount, password: "x", newPassword: "", confirmation: "", email: ""))

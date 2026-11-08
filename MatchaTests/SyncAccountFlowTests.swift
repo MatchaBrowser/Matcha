@@ -3,7 +3,8 @@ import Foundation
 import Testing
 
 /// The account flows of `SyncService` (`SYNC.md` § 3.4 to § 3.7, review TS8), between two Macs and a fake server:
-/// sign-in, password, identifier and recovery key changes, deletion, devices, forgotten password.
+/// sign-in with the password and the Secret Key, password, identifier and recovery key changes, deletion, devices,
+/// forgotten password.
 @MainActor
 struct SyncAccountFlowTests {
     private let testKeychain = TestKeychain()
@@ -19,27 +20,6 @@ struct SyncAccountFlowTests {
 
     init() {
         (host, urlSession) = MockURLProtocol.serve { [server] request, body in try server.handle(request, body) }
-    }
-
-    /// A Mac of its own: keychain (so its own device), settings and browsing data.
-    @MainActor
-    private struct Mac {
-        let service: SyncService
-        let keychain: SyncKeychain
-        let session: BrowserSession
-
-        var accountKey: Data? {
-            get throws {
-                guard let server = service.configuration.server, let accountID = service.configuration.accountID else {
-                    return nil
-                }
-                return try keychain.data(for: .accountKey, server: server, accountID: accountID)
-            }
-        }
-
-        var deviceID: UUID? {
-            try? keychain.device()?.id
-        }
     }
 
     private func makeMac() throws -> Mac {
@@ -69,11 +49,15 @@ struct SyncAccountFlowTests {
         return (mac, kit)
     }
 
-    /// A second Mac signed in to the account.
-    private func signIn(password: String = Self.password) async throws -> Mac {
+    /// A second Mac signed in to the account, with the Secret Key of `kit`.
+    private func signIn(_ kit: SyncRecoveryKit, password: String = Self.password) async throws -> Mac {
         let mac = try makeMac()
-        try await mac.service.signIn(on: endpoint(of: mac), email: Self.email, password: password)
+        try await mac.service.signIn(on: endpoint(of: mac), email: Self.email, password: password, secretKey: Self.secretKey(of: kit))
         return mac
+    }
+
+    private static func secretKey(of kit: SyncRecoveryKit) throws -> SyncSecretKey {
+        try #require(SyncSecretKey(text: kit.secretKey))
     }
 
     /// The next cycle of `mac` meets the end of its session, with `reason`.
@@ -84,19 +68,26 @@ struct SyncAccountFlowTests {
         #expect(try mac.accountKey == nil)
     }
 
-    @Test func `a second Mac signs in with the password only`() async throws {
-        let (first, _) = try await createAccount()
+    @Test func `a second Mac signs in with the password and the Secret Key`() async throws {
+        let (first, kit) = try await createAccount()
+        let secretKey = try Self.secretKey(of: kit)
+        #expect(try first.secretKey == secretKey.bytes)
         let second = try makeMac()
         let endpoint = try await endpoint(of: second)
         await #expect(throws: Self.invalidCredentials) {
-            try await second.service.signIn(on: endpoint, email: Self.email, password: "pas le bon mot de passe")
+            try await second.service.signIn(on: endpoint, email: Self.email, password: "pas le bon mot de passe", secretKey: secretKey)
+        }
+        // The right password with another Secret Key: refused the same way (SYNC.md § 3.4).
+        await #expect(throws: Self.invalidCredentials) {
+            try await second.service.signIn(on: endpoint, email: Self.email, password: Self.password, secretKey: .random())
         }
         #expect(!second.service.isActive)
         #expect(server.deviceNames.count == 1)
 
         // The identifier is normalized as at creation.
-        try await second.service.signIn(on: endpoint, email: " Jeremy@Example.COM", password: Self.password)
+        try await second.service.signIn(on: endpoint, email: " Jeremy@Example.COM", password: Self.password, secretKey: secretKey)
         #expect(second.service.isActive)
+        #expect(try second.secretKey == secretKey.bytes)
         #expect(second.service.configuration.accountID == server.accountID)
         #expect(try second.accountKey != nil)
         #expect(try second.accountKey == first.accountKey)
@@ -104,26 +95,31 @@ struct SyncAccountFlowTests {
         #expect(first.deviceID != second.deviceID)
     }
 
-    /// `SYNC.md` § 3.6: the account key stays, wrapped again; the other Macs are disconnected.
+    /// `SYNC.md` § 3.6: the account key and the Secret Key stay, the account key wrapped again; the other Macs are
+    /// disconnected, and sign in again with the new password only.
     @Test func `a new password signs the other Macs out`() async throws {
-        let (first, _) = try await createAccount()
-        let second = try await signIn()
+        let (first, kit) = try await createAccount()
+        let second = try await signIn(kit)
         await #expect(throws: Self.invalidCredentials) {
             try await first.service.changePassword(current: "pas le bon mot de passe", new: Self.newPassword)
         }
         try await first.service.changePassword(current: Self.password, new: Self.newPassword)
         #expect(first.service.isActive)
         try await expectSignedOut(second, .deviceRevoked)
+        let remembered = try #require(second.service.rememberedSecretKey())
+        #expect(try remembered == Self.secretKey(of: kit))
+        try await second.service.signIn(on: endpoint(of: second), email: Self.email, password: Self.newPassword, secretKey: remembered)
+        #expect(second.service.isActive)
 
         await #expect(throws: Self.invalidCredentials) {
-            _ = try await signIn(password: Self.password)
+            _ = try await signIn(kit, password: Self.password)
         }
-        let third = try await signIn(password: Self.newPassword)
+        let third = try await signIn(kit, password: Self.newPassword)
         #expect(try third.accountKey == first.accountKey)
     }
 
     @Test func `a new identifier is the account's from then on`() async throws {
-        let (first, _) = try await createAccount()
+        let (first, kit) = try await createAccount()
         await #expect(throws: Self.invalidCredentials) {
             try await first.service.changeEmail(password: "pas le bon mot de passe", to: "nouveau@example.com")
         }
@@ -133,17 +129,22 @@ struct SyncAccountFlowTests {
         #expect(first.service.isActive)
 
         await #expect(throws: Self.invalidCredentials) {
-            _ = try await signIn()
+            _ = try await signIn(kit)
         }
         let second = try makeMac()
-        try await second.service.signIn(on: endpoint(of: second), email: "nouveau@example.com", password: Self.password)
+        try await second.service.signIn(
+            on: endpoint(of: second),
+            email: "nouveau@example.com",
+            password: Self.password,
+            secretKey: Self.secretKey(of: kit),
+        )
         #expect(second.service.isActive)
     }
 
     /// The account goes with its data on the server; each Mac keeps its own (`SYNC.md` § 5).
     @Test func `a deleted account signs every Mac out`() async throws {
-        let (first, _) = try await createAccount()
-        let second = try await signIn()
+        let (first, kit) = try await createAccount()
+        let second = try await signIn(kit)
         await #expect(throws: Self.invalidCredentials) {
             try await first.service.deleteAccount(password: "pas le bon mot de passe")
         }
@@ -155,11 +156,12 @@ struct SyncAccountFlowTests {
         #expect(first.session.spaces.count == 1)
         try await expectSignedOut(second, .accountDeleted)
         #expect(second.session.spaces.count == 1)
+        #expect(second.service.rememberedSecretKey() == nil)
     }
 
     @Test func `devices are renamed and disconnected`() async throws {
-        let (first, _) = try await createAccount()
-        let second = try await signIn()
+        let (first, kit) = try await createAccount()
+        let second = try await signIn(kit)
         let secondID = try #require(second.deviceID)
         let devices = try await first.service.devices()
         #expect(Set(devices.map(\.id)) == Set([first.deviceID, secondID].compactMap(\.self)))
@@ -174,8 +176,8 @@ struct SyncAccountFlowTests {
         #expect(first.service.isActive)
     }
 
-    /// `SYNC.md` § 3.7: the recovery key opens the account again with a new password; the other Macs are disconnected,
-    /// and a new key replaces the old one.
+    /// `SYNC.md` § 3.7: the recovery key opens the account again with a new password and a new Secret Key; the other
+    /// Macs are disconnected, and a new key replaces the old one.
     @Test func `the recovery key recovers the account with a new password`() async throws {
         let (first, kit) = try await createAccount()
         let accountKey = try #require(try first.accountKey)
@@ -191,13 +193,13 @@ struct SyncAccountFlowTests {
                 newRecoveryKey: true,
             )
         }
-        let newKit = try #require(await second.service.recover(
+        let newKit = try await second.service.recover(
             on: endpoint,
             email: Self.email,
             recoveryKey: recoveryKey,
             newPassword: Self.newPassword,
             newRecoveryKey: true,
-        ))
+        )
         #expect(newKit.recoveryKey != kit.recoveryKey)
         #expect(second.service.isActive)
         #expect(second.service.configuration.isRecoveryKitUnsaved)
@@ -216,16 +218,38 @@ struct SyncAccountFlowTests {
             )
         }
         await #expect(throws: Self.invalidCredentials) {
-            _ = try await signIn(password: Self.password)
+            _ = try await signIn(newKit, password: Self.password)
         }
-        #expect(try await third.service.recover(
+        _ = try await third.service.recover(
             on: endpoint,
             email: Self.email,
             recoveryKey: #require(SyncRecoveryKey(text: newKit.recoveryKey)),
             newPassword: Self.password,
             newRecoveryKey: false,
-        ) == nil)
+        )
         #expect(try third.accountKey == accountKey)
+    }
+
+    /// `SYNC.md` § 3.7: a recovery always draws a new Secret Key, in the kit with the recovery key typed; the old Secret
+    /// Key no longer signs in.
+    @Test func `a recovery draws a new Secret Key`() async throws {
+        let (_, kit) = try await createAccount()
+        let second = try makeMac()
+        let newKit = try await second.service.recover(
+            on: endpoint(of: second),
+            email: Self.email,
+            recoveryKey: #require(SyncRecoveryKey(text: kit.recoveryKey)),
+            newPassword: Self.newPassword,
+            newRecoveryKey: false,
+        )
+        #expect(newKit.recoveryKey == kit.recoveryKey)
+        #expect(newKit.secretKey != kit.secretKey)
+        #expect(try second.secretKey == Self.secretKey(of: newKit).bytes)
+        await #expect(throws: Self.invalidCredentials) {
+            _ = try await signIn(kit, password: Self.newPassword)
+        }
+        let third = try await signIn(newKit, password: Self.newPassword)
+        #expect(third.service.isActive)
     }
 
     @Test func `a replaced recovery key leaves the old one useless`() async throws {
@@ -236,6 +260,8 @@ struct SyncAccountFlowTests {
         let newKit = try await first.service.replaceRecoveryKey(password: Self.password)
         #expect(newKit.email == Self.email)
         #expect(newKit.recoveryKey != kit.recoveryKey)
+        // The new kit gives the same Secret Key: the way to have it again for a new Mac.
+        #expect(newKit.secretKey == kit.secretKey)
         #expect(first.service.configuration.isRecoveryKitUnsaved)
         // Sync goes on while the new kit waits to be saved.
         #expect(first.service.isActive)
@@ -259,5 +285,38 @@ struct SyncAccountFlowTests {
             newRecoveryKey: false,
         )
         #expect(try second.accountKey == first.accountKey)
+    }
+}
+
+extension SyncAccountFlowTests {
+    /// A Mac of its own: keychain (so its own device), settings and browsing data.
+    @MainActor
+    struct Mac {
+        let service: SyncService
+        let keychain: SyncKeychain
+        let session: BrowserSession
+
+        var accountKey: Data? {
+            get throws {
+                try item(.accountKey)
+            }
+        }
+
+        var secretKey: Data? {
+            get throws {
+                try item(.secretKey)
+            }
+        }
+
+        var deviceID: UUID? {
+            try? keychain.device()?.id
+        }
+
+        private func item(_ item: SyncKeychain.Item) throws -> Data? {
+            guard let server = service.configuration.server, let accountID = service.configuration.accountID else {
+                return nil
+            }
+            return try keychain.data(for: item, server: server, accountID: accountID)
+        }
     }
 }

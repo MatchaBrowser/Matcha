@@ -82,10 +82,12 @@ nonisolated struct SyncConfiguration: Codable, Equatable, Sendable {
     }
 }
 
-/// What the user must keep to recover the account without the master password (`SYNC.md` § 3.3): the server's
-/// address, the identifier and the recovery key. Shown once, saved as a PDF or printed before continuing.
+/// What the user must keep (`SYNC.md` § 3.3): the server's address, the identifier, the Secret Key (with the master
+/// password, it signs in a new Mac) and the recovery key (it replaces both when the password is forgotten). Shown once,
+/// saved as a PDF or printed before continuing.
 nonisolated struct SyncRecoveryKit: Equatable, Sendable {
     let server: SyncServerAddress
     let email: String
+    let secretKey: String
     let recoveryKey: String
 }

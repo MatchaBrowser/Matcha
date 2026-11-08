@@ -264,11 +264,13 @@ final class SyncService {
     }
 
     /// The server ended the session (`SYNC.md` § 5): revoked device (state kept to resume), deleted account (state
-    /// deleted), unknown tokens.
+    /// deleted), unknown tokens. The Secret Key stays unless the account is gone (`SYNC.md` § 3.8): a new password
+    /// revokes the other devices, which sign in again with the password only.
     func sessionEnded(_ error: SyncServerError) {
         Logger.sync.notice("Sync session ended: \(error.code, privacy: .public)")
         if let server = configuration.server, let accountID = configuration.accountID {
-            keychain.removeAccount(server: server, accountID: accountID)
+            let items = error.code == SyncServerError.accountDeleted ? SyncKeychain.Item.allCases : SyncKeychain.Item.session
+            keychain.removeAccount(server: server, accountID: accountID, items: items)
         }
         switch error.code {
         case SyncServerError.accountDeleted:

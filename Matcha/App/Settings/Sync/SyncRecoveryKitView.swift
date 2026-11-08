@@ -2,8 +2,9 @@ import AppKit
 import SwiftUI
 import UniformTypeIdentifiers
 
-/// Recovery kit of the sync account (`SYNC.md` § 3.3): the server's address, the email and the recovery key, the only
-/// way back into the account without the master password. Saved as a PDF or printed before continuing.
+/// Recovery kit of the sync account (`SYNC.md` § 3.3): the server's address, the email, the Secret Key (with the master
+/// password, it signs in a new Mac) and the recovery key, the only way back into the account without the master
+/// password. Saved as a PDF or printed before continuing.
 struct SyncRecoveryKitView: View {
     let kit: SyncRecoveryKit
     /// Called once the kit is saved or printed.
@@ -16,8 +17,9 @@ struct SyncRecoveryKitView: View {
             Label("Save Your Recovery Kit", systemImage: "key.fill")
                 .font(.title2.weight(.semibold))
             Text("""
-            If you forget your master password, this kit is the only way to get your synced data back. Matcha can't \
-            recover it for you. Keep it somewhere safe, away from this Mac.
+            A new Mac asks for your master password and your Secret Key. If you forget the password, the recovery key is \
+            the only way to get your synced data back. Matcha can't recover them for you. Keep this kit somewhere safe, \
+            away from this Mac.
             """, comment: "Recovery kit sheet: explanation")
                 .fixedSize(horizontal: false, vertical: true)
             SyncRecoveryKitPage(kit: kit)
@@ -98,6 +100,8 @@ struct SyncRecoveryKitPage: View {
                 .font(.headline)
             row(Text("Server", comment: "Recovery kit: server address"), kit.server.normalized)
             row(Text("Email", comment: "Recovery kit: account identifier"), kit.email)
+            row(Text("Secret Key", comment: "Recovery kit: the Secret Key, which signs in a new Mac with the password"), kit.secretKey)
+                .font(.system(.body, design: .monospaced))
             row(Text("Recovery key", comment: "Recovery kit: the key"), kit.recoveryKey)
                 .font(.system(.body, design: .monospaced))
             Text("Created on \(Date.now.formatted(date: .long, time: .omitted))", comment: "Recovery kit: creation date")
