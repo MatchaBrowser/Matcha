@@ -21,6 +21,9 @@ SwiftUI and AppKit.
 - **Extensions**: Safari extensions of the apps you have installed, and extensions from a file (Chrome `.crx`,
   Firefox `.xpi`, `.zip` or a folder).
 - **Import from Arc**: Spaces, pinned tabs, folders and favorites.
+- **Vault**: passwords, one-time codes, cards, identities, documents, SSH keys and files, end-to-end encrypted and synced
+  through your sync server; logins fill from a list in the address pill (⌘\\), never from the page; Touch ID; import from
+  Chrome, Safari, Firefox, Bitwarden, 1Password or CXF.
 - Private windows, history, downloads, find in page, page zoom per site, site permissions (camera, microphone),
   printing and PDF export, sleeping of hidden tabs to save memory.
 - In English, French, German, Spanish and Italian.

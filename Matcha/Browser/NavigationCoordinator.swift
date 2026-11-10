@@ -151,6 +151,7 @@ extension NavigationCoordinator: WKNavigationDelegate {
         tab.localFiles.documentDidChange()
         tab.audio.reset()
         tab.translation.documentDidChange()
+        tab.vaultForms.pageChanged()
         notificationsDocumentDidChange(in: webView, page: tab)
         tabHost.faviconService.showCachedIcon(on: tab, host: webView.url?.host())
         tabHost.siteZooms?.pageDidCommit(tab, url: webView.url)

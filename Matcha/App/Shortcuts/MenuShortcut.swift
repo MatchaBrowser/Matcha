@@ -109,6 +109,8 @@ nonisolated enum MenuShortcut: String, CaseIterable, Sendable {
             ShortcutKey(","), ShortcutKey("q"), ShortcutKey("h"), ShortcutKey("h", [.command, .option]), ShortcutKey("m"),
             ShortcutKey("?"), ShortcutKey("f", [.command, .control]), ShortcutKey("="), ShortcutKey("`"),
             ShortcutKey(.space, [.command, .control]), ShortcutKey(.tab, .control), ShortcutKey(.tab, [.control, .shift]),
+            // The vault: its window, its lock and the filling (`VAULT.md` § 7.3, § 8.1).
+            ShortcutKey("p", [.command, .option]), ShortcutKey("l", [.command, .control]), ShortcutKey("\\"),
         ]
         for digit in "123456789" {
             keys.insert(ShortcutKey(digit))

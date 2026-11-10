@@ -24,6 +24,12 @@ final class AppEnvironment {
     let sync: SyncService
     /// Today tabs of the account's other Macs, filled by sync (`SYNC.md` § 2.4).
     let otherMacs = OtherMacsTabs()
+    /// The vault of the signed-in account (`VAULT.md`), and what locks it.
+    let vault = VaultService(defaults: .standard)
+    let vaultLockEvents = VaultLockEvents()
+    /// Where the vault copies its secrets: concealed, cleared after 90 seconds and at the lock (`VAULT.md` § 7.5).
+    let vaultClipboard = VaultClipboard.system
+    let vaultWindow = VaultWindowState()
     /// Tab shown by the Settings window.
     let settingsSelection = SettingsSelection()
     /// Shortcuts of the menu commands, and their recording (Settings > Shortcuts).
@@ -46,6 +52,25 @@ final class AppEnvironment {
         extensionSync = Self.makeExtensionSync(manager: extensions)
         sync = SyncService(defaults: .standard, extensions: extensionSync, otherMacs: otherMacs, directory: Self.syncDirectory)
         pages = WebConfigurationFactory { extensions.attach(to: $0) }
+        connectVault()
+    }
+
+    /// The vault follows the account of sync: started with it, opened by its flows, locked by the Mac's events.
+    private func connectVault() {
+        let (vault, sync, clipboard) = (vault, sync, vaultClipboard)
+        sync.vault = vault
+        sync.onVaultRootKey = { key in
+            Task { await vault.open(rootKey: key) }
+        }
+        vault.clockLead = { sync.clockOffset ?? 0 }
+        vault.onLock.append { clipboard.forget() }
+        vaultLockEvents.start(locking: vault)
+        // The pages talk to the filling only while the vault is on; the unit tests' host would read the user's own
+        // setting (same app identifier): its pages keep the filling.
+        if !TestEnvironment.isUnitTestHost() {
+            WebConfigurationFactory.setVaultFill(enabled: vault.isEnabled)
+            vault.onEnabledChange.append { WebConfigurationFactory.setVaultFill(enabled: $0) }
+        }
     }
 
     /// `Application Support` of the app; nil during tests (unit tests and test store): nothing is written there.

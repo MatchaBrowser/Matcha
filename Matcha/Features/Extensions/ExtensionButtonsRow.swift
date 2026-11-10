@@ -2,20 +2,27 @@ import SwiftUI
 import WebKit
 
 /// Extension buttons (task 6.5): one per loaded extension whose button is not hidden; in a private window, only those
-/// that have access to it. They target `tab` (displayed tab, peek included, or pane of the card).
-/// Nothing when there is no extension to show.
+/// that have access to it. They target `tab` (displayed tab, peek included, or pane of the card). The vault's button
+/// comes first while the vault is offered (`VaultToolbarButton`). Nothing when there is no button to show.
 struct ExtensionButtonsRow: View {
     let tab: BrowserTab?
     let isPrivate: Bool
     @Environment(ExtensionManager.self) private var manager
     @Environment(\.extensionWindows) private var windows
+    @Environment(VaultService.self) private var vault: VaultService?
 
     var body: some View {
-        let extensions = manager.toolbar.buttonExtensions(isPrivate: isPrivate)
-        if !extensions.isEmpty, let windows {
+        let extensions = windows == nil ? [] : manager.toolbar.buttonExtensions(isPrivate: isPrivate)
+        let shownVault = vault.flatMap { $0.isOffered ? $0 : nil }
+        if shownVault != nil || !extensions.isEmpty {
             HStack(spacing: 2) {
-                ForEach(extensions, id: \.identifier) { item in
-                    ExtensionActionButton(identifier: item.identifier, tab: tab, manager: manager, windows: windows)
+                if let shownVault {
+                    VaultToolbarButton(vault: shownVault)
+                }
+                if let windows {
+                    ForEach(extensions, id: \.identifier) { item in
+                        ExtensionActionButton(identifier: item.identifier, tab: tab, manager: manager, windows: windows)
+                    }
                 }
             }
             .labelStyle(.iconOnly)

@@ -8,7 +8,9 @@ extension View {
             .environment(environment.extensions)
             .environment(environment.settingsSelection)
             .environment(environment.sync)
+            .environment(environment.vault)
             .environment(\.extensionWindows, environment.extensionWindows)
+            .environment(\.vaultClipboard, environment.vaultClipboard)
             .environment(\.pageFind, environment.pageFind)
     }
 }
