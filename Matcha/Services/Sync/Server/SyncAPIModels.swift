@@ -39,6 +39,11 @@ nonisolated struct SyncServerInfo: Codable, Equatable, Sendable {
         features?.contains("blobs") == true
     }
 
+    /// The server keeps the envelopes of the vault root key and takes atomic pushes (`SYNC.md` § 4.2).
+    var hasVault: Bool {
+        features?.contains("vault") == true
+    }
+
     /// The server keeps the account's avatar (`SYNC.md` § 4.4); without it, the avatar setting is hidden.
     var hasAvatar: Bool {
         features?.contains("avatar") == true
@@ -78,10 +83,12 @@ nonisolated struct SyncDeviceDescription: Codable, Equatable, Sendable {
     var name: String
 }
 
-/// Account key wrapped by another key, and the key that proves it is known.
+/// Account key wrapped by another key, and the key that proves it is known; the vault root key too, wrapped by the
+/// same key (`VAULT.md` § 2.2), absent for an account without a vault.
 nonisolated struct SyncKeyEnvelope: Codable, Equatable, Sendable {
     var authKey: Data
     var wrappedAccountKey: Data
+    var wrappedVaultRootKey: Data?
 }
 
 /// Answer of the routes that open a session (`SYNC.md` § 4.3).
@@ -92,6 +99,8 @@ nonisolated struct SyncSessionResponse: Codable, Equatable, Sendable {
     var refreshToken: String
     var expiresIn: Int?
     var wrappedAccountKey: Data
+    /// Absent for an account without a vault (`SYNC.md` § 4.3).
+    var wrappedVaultRootKey: Data?
     var keyVersion: Int?
 }
 
@@ -109,6 +118,7 @@ nonisolated struct SyncCreateAccountRequest: Codable, Sendable {
     var kdf: SyncKDF
     var authKey: Data
     var wrappedAccountKey: Data
+    var wrappedVaultRootKey: Data?
     var recovery: SyncKeyEnvelope
     var device: SyncDeviceDescription
 }
@@ -138,6 +148,7 @@ nonisolated struct SyncRecoverStartResponse: Codable, Sendable {
     var recoveryToken: String
     var expiresIn: Int?
     var recoveryWrappedAccountKey: Data
+    var recoveryWrappedVaultRootKey: Data?
 }
 
 nonisolated struct SyncRecoverFinishRequest: Codable, Sendable {
@@ -145,6 +156,7 @@ nonisolated struct SyncRecoverFinishRequest: Codable, Sendable {
     var kdf: SyncKDF
     var authKey: Data
     var wrappedAccountKey: Data
+    var wrappedVaultRootKey: Data?
     var recovery: SyncKeyEnvelope?
     var device: SyncDeviceDescription
 }
@@ -177,6 +189,7 @@ nonisolated struct SyncChangePasswordRequest: Codable, Sendable {
     var kdf: SyncKDF
     var newAuthKey: Data
     var wrappedAccountKey: Data
+    var wrappedVaultRootKey: Data?
 }
 
 nonisolated struct SyncChangeRecoveryRequest: Codable, Sendable {
@@ -245,12 +258,14 @@ nonisolated struct SyncServerChange: Codable, Equatable, Sendable {
 }
 
 nonisolated struct SyncPushRequest: Codable, Sendable {
+    /// All the changes or none (`SYNC.md` § 4.6): the writes of the vault; omitted for an ordinary push.
+    var atomic: Bool?
     var changes: [SyncServerChange]
 }
 
 nonisolated struct SyncServerPushResult: Codable, Sendable {
     var id: UUID?
-    /// `applied`, `conflict` or `rejected`.
+    /// `applied`, `conflict`, `rejected`, or `aborted` in the answer to an atomic push.
     var status: String
     var version: Int?
     var current: SyncServerRecord?

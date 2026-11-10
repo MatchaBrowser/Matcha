@@ -68,6 +68,7 @@ struct PageCard: View {
                 FindBar(page: tab, activate: activate)
                 PermissionBanner(prompts: tab.permissionPrompts)
                 LocalFilesBanner(page: tab)
+                VaultSaveBar(forms: tab.vaultForms)
             }
             page
                 // Area that the peek (Shift-click) dims, below the address bar (task 4.4).

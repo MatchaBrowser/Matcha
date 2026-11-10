@@ -8,6 +8,7 @@ struct MatchaApp: App {
     static let privateWindowID = "private"
     static let historyWindowID = "history"
     static let notesWindowID = "notes"
+    static let vaultWindowID = "vault"
 
     @NSApplicationDelegateAdaptor(AppDelegate.self) private var appDelegate
     @AppStorage(BrowserSettings.Key.appearance) private var appearance = BrowserSettings.appearance
@@ -96,6 +97,9 @@ struct MatchaApp: App {
                 settingsSelection: environment.settingsSelection,
                 otherMacs: environment.otherMacs,
             )
+            VaultCommands(vault: environment.vault)
+            // File > Import From (task 7.1, `VAULT.md` § 10).
+            ImportCommands(vault: environment.vault, vaultWindow: environment.vaultWindow)
         }
         .onChange(of: appearance, initial: true) { appearance.apply() }
 
@@ -137,6 +141,16 @@ struct MatchaApp: App {
         .handlesExternalEvents(matching: [])
         .commandsRemoved()
 
+        // The vault (`VAULT.md`): like the notes library, never restored at launch.
+        Window(Text("Vault", comment: "Title of the vault's window"), id: Self.vaultWindowID) {
+            VaultWindow(vault: environment.vault, clipboard: environment.vaultClipboard, window: environment.vaultWindow)
+        }
+        .defaultSize(width: 980, height: 620)
+        .defaultLaunchBehavior(.suppressed)
+        .restorationBehavior(.disabled)
+        .handlesExternalEvents(matching: [])
+        .commandsRemoved()
+
         Settings {
             SettingsView(
                 selection: environment.settingsSelection,
@@ -144,6 +158,7 @@ struct MatchaApp: App {
                 extensionSync: environment.extensionSync,
                 menuShortcuts: environment.menuShortcuts,
                 shortcutRecorder: environment.shortcutRecorder,
+                vault: environment.vault,
             )
             .environment(session)
             .environment(miniWindows)
