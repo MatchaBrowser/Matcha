@@ -135,6 +135,12 @@ struct PageCard: View {
                     PageLoadErrorView(page: tab, error: error, activate: activate)
                 }
             }
+            // The vault's list under the login field just reached (`VAULT.md` § 8.1).
+            .overlay {
+                if tab.vaultForms.focusedField != nil {
+                    VaultFieldSuggestions(tab: tab)
+                }
+            }
         } else {
             ContentUnavailableView(emptyPageTitle, systemImage: "globe", description: Text(emptyPageDescription))
                 // Takes the full height, like the web view: otherwise the whole column is centered vertically.

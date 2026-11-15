@@ -20,8 +20,11 @@ final class VaultBrowserModel {
     var section = Section.all
     var searchText = ""
     var selection: UUID?
-    /// The item being created or changed; nil while showing.
-    var draft: VaultItemDraft?
+    /// The item being created or changed, as the form opened it; nil while showing. The form edits its own copy and
+    /// hands it to `save(_:)`: a field SwiftUI still writes while the form goes away writes to nothing.
+    private(set) var draft: VaultItemDraft?
+    /// Changes at each opening of the form, which then starts again from its draft.
+    private(set) var draftSession = UUID()
     /// The last error of a save, a trash or a deletion, to show.
     var error: (any Error)?
     /// The analysis of the logins, made when its section is shown.
@@ -96,25 +99,35 @@ final class VaultBrowserModel {
             draft.tags = [tag]
         }
         draft.favorite = section == .favorites
-        self.draft = draft
+        open(draft)
     }
 
     func startEditing() {
         guard let selection, let content = try? vault.content(of: selection) else {
             return
         }
-        draft = VaultItemDraft(id: selection, content: content)
+        open(VaultItemDraft(id: selection, content: content))
     }
 
-    /// Saves the draft; on success the item is selected and the draft closed.
-    func saveDraft() {
-        guard let draft else {
+    private func open(_ draft: VaultItemDraft) {
+        self.draft = draft
+        draftSession = UUID()
+    }
+
+    func closeDraft() {
+        draft = nil
+    }
+
+    /// Saves the form's copy; on success the item is selected and the form closed. A form already closed (the vault
+    /// locked meanwhile) saves nothing.
+    func save(_ edited: VaultItemDraft) {
+        guard draft != nil else {
             return
         }
         do {
-            let id = try vault.save(draft.content(), id: draft.id)
+            let id = try vault.save(edited.content(), id: edited.id)
             selection = id
-            self.draft = nil
+            draft = nil
             error = nil
         } catch {
             self.error = error

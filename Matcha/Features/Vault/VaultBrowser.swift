@@ -16,8 +16,9 @@ struct VaultBrowser: View {
             VaultItemList(model: model, importItems: { window.showsImport = true })
                 .navigationSplitViewColumnWidth(min: 240, ideal: 290, max: 420)
         } detail: {
-            if let draft = Binding($model.draft) {
-                VaultItemEditor(draft: draft, onSave: model.saveDraft, onCancel: { model.draft = nil })
+            if let draft = model.draft {
+                VaultItemEditor(draft: draft, onSave: model.save, onCancel: model.closeDraft)
+                    .id(model.draftSession)
             } else if let item = model.selectedItem {
                 VaultItemDetail(model: model, item: item, clipboard: clipboard)
                     .id(item.id)

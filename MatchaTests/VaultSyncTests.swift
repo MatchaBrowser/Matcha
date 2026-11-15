@@ -5,7 +5,7 @@ import Testing
 
 /// The vault between two Macs and a server (`VAULT.md` § 5): atomic writes, verification, merges without loss, repairs
 /// of what code with the data key only deletes, reconciliation of a server that shows an older vault, tombstones; and
-/// the vault turned off on a Mac.
+/// the vault turned off on a Mac; the form of the window.
 @MainActor
 struct VaultSyncTests {
     private let testKeychain = TestKeychain()
@@ -189,5 +189,31 @@ struct VaultSyncTests {
         await vault.open(rootKey: rootKey)
         #expect(vault.items.map(\.id) == [id])
         #expect(changes == [false, true])
+    }
+
+    /// The window's form edits its own copy (a field SwiftUI writes while the form closes then touches nothing): the
+    /// copy is what is saved, and a form closed meanwhile saves nothing.
+    @Test func `the form saves the copy it edited, and nothing once closed`() async throws {
+        let vault = try await makeMac()
+        let id = try await save(login("Example", password: "one"), on: vault)
+        let model = VaultBrowserModel(vault: vault)
+        let passwordField = VaultFieldSpec.login[1].id
+        model.selection = id
+        model.startEditing()
+        var edited = try #require(model.draft)
+        edited.values[passwordField] = "two"
+        model.save(edited)
+        await vault.writeTask?.value
+        #expect(model.draft == nil)
+        #expect(model.selection == id)
+        #expect(try password(of: id, in: vault) == "two")
+
+        model.startEditing()
+        edited = try #require(model.draft)
+        edited.values[passwordField] = "three"
+        model.closeDraft()
+        model.save(edited)
+        await vault.writeTask?.value
+        #expect(try password(of: id, in: vault) == "two")
     }
 }

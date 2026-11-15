@@ -80,7 +80,8 @@ struct VaultFillTests {
 
     private func send(_ tab: BrowserTab) async throws {
         _ = try await tab.loadedWebView.callAsyncJavaScript(
-            "document.getElementById('user').value = 'jeremy'; document.getElementById('pass').value = 'typed';"
+            // A valid address: an `email` field that isn't one keeps the form from being sent.
+            "document.getElementById('user').value = 'jeremy@example.com'; document.getElementById('pass').value = 'typed';"
                 + "document.getElementById('send').click();",
             contentWorld: .page,
         )
@@ -98,7 +99,7 @@ struct VaultFillTests {
         tab.vaultForms.isPrivate = false
         try await send(tab)
         try await waitUntil { tab.vaultForms.offer != nil }
-        #expect(tab.vaultForms.offer?.username == "jeremy")
+        #expect(tab.vaultForms.offer?.username == "jeremy@example.com")
         #expect(tab.vaultForms.offer?.password == "typed")
         #expect(tab.vaultForms.offer?.url.host() == "accounts.example.com")
     }

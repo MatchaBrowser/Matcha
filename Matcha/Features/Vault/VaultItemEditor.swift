@@ -1,11 +1,18 @@
 import SwiftUI
 
 /// The form of an item being created or changed: its title, the fields of its category, its addresses, tags, notes and
-/// custom fields. What the form doesn't show stays as it was (`VaultItemDraft`).
+/// custom fields. What the form doesn't show stays as it was (`VaultItemDraft`). It edits its own copy of the draft:
+/// a field being edited when the form closes (saved, cancelled, the vault locked) still writes, to this copy only.
 struct VaultItemEditor: View {
-    @Binding var draft: VaultItemDraft
-    let onSave: () -> Void
-    let onCancel: () -> Void
+    @State private var draft: VaultItemDraft
+    private let onSave: (VaultItemDraft) -> Void
+    private let onCancel: () -> Void
+
+    init(draft: VaultItemDraft, onSave: @escaping (VaultItemDraft) -> Void, onCancel: @escaping () -> Void) {
+        _draft = State(initialValue: draft)
+        self.onSave = onSave
+        self.onCancel = onCancel
+    }
 
     var body: some View {
         Form {
@@ -50,7 +57,7 @@ struct VaultItemEditor: View {
             ToolbarItemGroup(placement: .confirmationAction) {
                 Button(String(localized: "Cancel", comment: "Vault editor"), action: onCancel)
                     .keyboardShortcut(.cancelAction)
-                Button(String(localized: "Save", comment: "Vault editor"), action: onSave)
+                Button(String(localized: "Save", comment: "Vault editor")) { onSave(draft) }
                     .keyboardShortcut("s", modifiers: .command)
             }
         }
@@ -115,7 +122,7 @@ struct VaultURLsSection: View {
         Section(String(localized: "Websites", comment: "Vault: addresses of a login")) {
             ForEach(urls.indices, id: \.self) { index in
                 HStack {
-                    TextField(String(localized: "Address", comment: "Vault editor: a website address"), text: $urls[index])
+                    TextField(String(localized: "Address", comment: "Vault editor: a website address"), text: url(index))
                     Button(role: .destructive) { urls.remove(at: index) } label: { Image(systemName: "minus.circle") }
                         .buttonStyle(.borderless)
                 }
@@ -128,6 +135,15 @@ struct VaultURLsSection: View {
         .onAppear {
             if urls.isEmpty {
                 urls = [""]
+            }
+        }
+    }
+
+    /// The address of a row; a row removed while its field is being edited reads and writes nothing.
+    private func url(_ index: Int) -> Binding<String> {
+        Binding { urls.indices.contains(index) ? urls[index] : "" } set: { value in
+            if urls.indices.contains(index) {
+                urls[index] = value
             }
         }
     }
@@ -165,7 +181,12 @@ struct VaultCustomFieldsEditor: View {
         }
     }
 
+    /// A value of a row; a row removed while its field is being edited reads and writes nothing.
     private func string(_ index: Int, _ key: String) -> Binding<String> {
-        Binding { fields[index].string(key) } set: { fields[index].set(key, $0) }
+        Binding { fields.indices.contains(index) ? fields[index].string(key) : "" } set: { value in
+            if fields.indices.contains(index) {
+                fields[index].set(key, value)
+            }
+        }
     }
 }

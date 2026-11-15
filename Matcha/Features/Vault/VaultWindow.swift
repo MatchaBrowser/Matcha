@@ -33,7 +33,7 @@ struct VaultWindow: View {
         .background(VaultWindowSharing())
         .onChange(of: vault.status) { _, status in
             if status != .unlocked {
-                model.draft = nil
+                model.closeDraft()
             }
         }
         // An import asked from the menu and left locked doesn't come back at the next opening.

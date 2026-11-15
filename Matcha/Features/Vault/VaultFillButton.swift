@@ -33,8 +33,6 @@ struct VaultFillList: View {
     let done: () -> Void
     @Environment(\.openWindow) private var openWindow
     @Environment(\.vaultClipboard) private var clipboard
-    @State private var password = ""
-    @State private var error: (any Error)?
     /// A password for a sign-up form, drawn when the list opens (`VAULT.md` § 8.4).
     @State private var suggestion = (try? PasswordGenerator())?.generate() ?? ""
 
@@ -43,7 +41,7 @@ struct VaultFillList: View {
             if vault.isUnlocked {
                 candidates
             } else {
-                unlock
+                VaultQuickUnlock(vault: vault)
             }
             Divider()
             Button(String(localized: "Open the Vault", comment: "Vault filling: opens the vault's window")) {
@@ -95,25 +93,85 @@ struct VaultFillList: View {
         }
     }
 
-    @ViewBuilder private var unlock: some View {
-        Text("The vault is locked", comment: "Vault window: title of the lock screen")
-            .font(.headline)
-        SecureField(String(localized: "Master Password", comment: "Vault window: password field"), text: $password)
-            .onSubmit(unlockWithPassword)
-        if let error {
-            Text(VaultErrorText.message(for: error)).foregroundStyle(.red).font(.caption)
+    /// Fills the generated password; the save bar offers it after the form is sent.
+    private func fillNew(in frame: VaultPageForms.Frame) {
+        guard let webView = tab.webView else {
+            return
         }
-        HStack {
-            if vault.canUnlockWithTouchID(bootDate: Date.now.addingTimeInterval(-ProcessInfo.processInfo.systemUptime)) {
-                Button(String(localized: "Use Touch ID", comment: "Vault window: button of the lock screen")) {
-                    Task { try? await vault.unlockWithTouchID(reason: String(
-                        localized: "open the vault",
-                        comment: "Touch ID prompt: Matcha wants to…",
-                    )) }
-                }
+        let password = suggestion
+        done()
+        Task { _ = await VaultFiller.fillNewPassword(password, in: frame, webView: webView) }
+    }
+
+    private func fill(_ candidate: VaultFillCandidate, in frame: VaultPageForms.Frame) {
+        done()
+        VaultFillAction.fill(candidate, in: frame, tab: tab, vault: vault, clipboard: clipboard)
+    }
+}
+
+/// Fills a login chosen in a native list: the page gets the keyboard back, then its user name and password; its
+/// one-time code goes in the page's field for it, or is copied if there is none.
+@MainActor
+enum VaultFillAction {
+    static func fill(
+        _ candidate: VaultFillCandidate,
+        in frame: VaultPageForms.Frame,
+        tab: BrowserTab,
+        vault: VaultService,
+        clipboard: VaultClipboard?,
+    ) {
+        guard let webView = tab.webView, let values = try? vault.fillValues(of: candidate.id) else {
+            return
+        }
+        vault.noteActivity()
+        webView.focusPage()
+        Task {
+            _ = await VaultFiller.fill(frame, in: webView, username: values.username, password: values.password)
+            if let code = values.code, await !(VaultFiller.fillCode(code, in: frame, webView: webView)) {
+                clipboard?.copy(code)
             }
-            Button(String(localized: "Unlock", comment: "Vault window: button of the lock screen"), action: unlockWithPassword)
-                .disabled(password.isEmpty)
+        }
+    }
+}
+
+/// The vault's unlocking where a login is to be filled: its password, or Touch ID when it may.
+struct VaultQuickUnlock: View {
+    let vault: VaultService
+    @State private var password = ""
+    @State private var error: (any Error)?
+    /// Shown when asked (the pill's key, the list's row): the password is typed at once.
+    @FocusState private var isPasswordFocused: Bool
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            Text("The vault is locked", comment: "Vault window: title of the lock screen")
+                .font(.headline)
+            SecureField(String(localized: "Master Password", comment: "Vault window: password field"), text: $password)
+                .focused($isPasswordFocused)
+                .onSubmit(unlockWithPassword)
+                .onAppear { isPasswordFocused = true }
+            if let error {
+                Text(VaultErrorText.message(for: error)).foregroundStyle(.red).font(.caption)
+            }
+            HStack {
+                if Self.canUseTouchID(vault) {
+                    Button(String(localized: "Use Touch ID", comment: "Vault window: button of the lock screen")) {
+                        Self.unlockWithTouchID(vault)
+                    }
+                }
+                Button(String(localized: "Unlock", comment: "Vault window: button of the lock screen"), action: unlockWithPassword)
+                    .disabled(password.isEmpty)
+            }
+        }
+    }
+
+    static func canUseTouchID(_ vault: VaultService) -> Bool {
+        vault.canUnlockWithTouchID(bootDate: Date.now.addingTimeInterval(-ProcessInfo.processInfo.systemUptime))
+    }
+
+    static func unlockWithTouchID(_ vault: VaultService) {
+        Task {
+            try? await vault.unlockWithTouchID(reason: String(localized: "open the vault", comment: "Touch ID prompt: Matcha wants to…"))
         }
     }
 
@@ -125,31 +183,6 @@ struct VaultFillList: View {
                 (password, error) = ("", nil)
             } catch {
                 self.error = error
-            }
-        }
-    }
-
-    /// Fills the generated password; the save bar offers it after the form is sent.
-    private func fillNew(in frame: VaultPageForms.Frame) {
-        guard let webView = tab.webView else {
-            return
-        }
-        let password = suggestion
-        done()
-        Task { _ = await VaultFiller.fillNewPassword(password, in: frame, webView: webView) }
-    }
-
-    /// Fills the frame; a one-time code is filled if the page has a field for it, copied otherwise.
-    private func fill(_ candidate: VaultFillCandidate, in frame: VaultPageForms.Frame) {
-        guard let webView = tab.webView, let values = try? vault.fillValues(of: candidate.id) else {
-            return
-        }
-        vault.noteActivity()
-        done()
-        Task {
-            _ = await VaultFiller.fill(frame, in: webView, username: values.username, password: values.password)
-            if let code = values.code, await !(VaultFiller.fillCode(code, in: frame, webView: webView)) {
-                clipboard?.copy(code)
             }
         }
     }
