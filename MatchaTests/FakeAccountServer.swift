@@ -11,6 +11,8 @@ final class FakeAccountServer: @unchecked Sendable {
         var kdf: Any
         var authKey: String
         var wrappedAccountKey: String
+        /// Envelope of the vault root key (`VAULT.md` § 2.2); nil for an account without a vault.
+        var wrappedVaultRootKey: String?
         var recovery: [String: Any]
     }
 
@@ -65,6 +67,7 @@ final class FakeAccountServer: @unchecked Sendable {
                 kdf: object["kdf"] ?? [:],
                 authKey: object["authKey"] as? String ?? "",
                 wrappedAccountKey: object["wrappedAccountKey"] as? String ?? "",
+                wrappedVaultRootKey: object["wrappedVaultRootKey"] as? String,
                 recovery: object["recovery"] as? [String: Any] ?? [:],
             )
         }
@@ -88,18 +91,20 @@ final class FakeAccountServer: @unchecked Sendable {
     }
 
     private func recoverStart(_ object: [String: Any]) throws -> MockResponse {
-        let wrapped = lock.withLock { () -> String? in
+        let recovery = lock.withLock { () -> [String: Any]? in
             guard let account, account.email == object["email"] as? String,
                   account.recovery["authKey"] as? String == object["recoveryAuthKey"] as? String
             else {
                 return nil
             }
-            return account.recovery["wrappedAccountKey"] as? String
+            return account.recovery
         }
-        guard let wrapped else {
+        guard let recovery, let wrapped = recovery["wrappedAccountKey"] as? String else {
             return MockURLProtocol.problem(401, "invalid_credentials")
         }
-        return try MockURLProtocol.json(200, ["recoveryToken": "recovery", "expiresIn": 600, "recoveryWrappedAccountKey": wrapped])
+        var answer: [String: Any] = ["recoveryToken": "recovery", "expiresIn": 600, "recoveryWrappedAccountKey": wrapped]
+        answer["recoveryWrappedVaultRootKey"] = recovery["wrappedVaultRootKey"]
+        return try MockURLProtocol.json(200, answer)
     }
 
     private func recoverFinish(_ object: [String: Any]) throws -> MockResponse {
@@ -110,6 +115,7 @@ final class FakeAccountServer: @unchecked Sendable {
             account?.kdf = object["kdf"] ?? [:]
             account?.authKey = object["authKey"] as? String ?? ""
             account?.wrappedAccountKey = object["wrappedAccountKey"] as? String ?? ""
+            account?.wrappedVaultRootKey = object["wrappedVaultRootKey"] as? String
             if let recovery = object["recovery"] as? [String: Any] {
                 account?.recovery = recovery
             }
@@ -123,11 +129,11 @@ final class FakeAccountServer: @unchecked Sendable {
     private func session(for object: [String: Any], status: Int) throws -> MockResponse {
         let device = object["device"] as? [String: Any]
         let id = device?["id"] as? String ?? UUID().uuidString
-        let wrapped = lock.withLock { () -> String in
+        let (wrapped, vault) = lock.withLock { () -> (String, String?) in
             devices[id] = device?["name"] as? String ?? ""
-            return account?.wrappedAccountKey ?? ""
+            return (account?.wrappedAccountKey ?? "", account?.wrappedVaultRootKey)
         }
-        return try MockURLProtocol.json(status, [
+        var answer: [String: Any] = [
             "accountId": accountID.uuidString,
             "deviceId": id,
             "accessToken": "access-\(id)",
@@ -135,7 +141,9 @@ final class FakeAccountServer: @unchecked Sendable {
             "expiresIn": 900,
             "wrappedAccountKey": wrapped,
             "keyVersion": 1,
-        ])
+        ]
+        answer["wrappedVaultRootKey"] = vault
+        return try MockURLProtocol.json(status, answer)
     }
 
     // MARK: With a session
@@ -184,6 +192,7 @@ final class FakeAccountServer: @unchecked Sendable {
                 account?.kdf = object["kdf"] ?? [:]
                 account?.authKey = object["newAuthKey"] as? String ?? ""
                 account?.wrappedAccountKey = object["wrappedAccountKey"] as? String ?? ""
+                account?.wrappedVaultRootKey = object["wrappedVaultRootKey"] as? String
                 // The other devices are disconnected (`SYNC.md` § 3.6).
                 disconnect { $0 != token }
             case "/api/v1/account/recovery":

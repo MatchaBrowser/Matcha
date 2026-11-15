@@ -6,4 +6,6 @@ extension EnvironmentValues {
     @Entry var extensionWindows: ExtensionWindows?
     /// Edit > Find on the pages of the active window.
     @Entry var pageFind: PageFindResponder?
+    /// Where the vault copies its secrets (`VAULT.md` § 7.5); nil: nothing is copied (previews).
+    @Entry var vaultClipboard: VaultClipboard?
 }

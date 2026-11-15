@@ -16,6 +16,8 @@ final class WebConfigurationFactory {
 
     /// Content controllers already given to a page (`BrowserTab`).
     private static let pageControllers = NSHashTable<WKUserContentController>.weakObjects()
+    /// Every content controller made, given to a page or not yet: the vault's filling is turned on or off in all.
+    private static let madeControllers = NSHashTable<WKUserContentController>.weakObjects()
 
     /// Source viewer of the pages (`matcha-source:`).
     let pageSources: PageSourceSchemeHandler
@@ -62,7 +64,14 @@ final class WebConfigurationFactory {
         PageAudioScript.install(in: controller)
         PageNotificationScript.install(in: controller)
         PageTranslationScript.install(in: controller)
+        VaultFillScript.install(in: controller)
+        madeControllers.add(controller)
         return controller
+    }
+
+    /// Turns the vault's filling on or off in the pages, those already made included (`VaultService.setEnabled`).
+    static func setVaultFill(enabled: Bool) {
+        VaultFillScript.setEnabled(enabled, in: madeControllers.allObjects)
     }
 
     /// Configuration of a new page (`BrowserTab`): `configuration` as is if its content controller does not belong to

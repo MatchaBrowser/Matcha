@@ -378,6 +378,101 @@
         }
       }
     },
+    "%lld characters" : {
+      "comment" : "Vault generator: length",
+      "localizations" : {
+        "de" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld Zeichen"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld Zeichen"
+                }
+              }
+            }
+          }
+        },
+        "en" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld character"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld characters"
+                }
+              }
+            }
+          }
+        },
+        "es" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld carácter"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld caracteres"
+                }
+              }
+            }
+          }
+        },
+        "fr" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld caractère"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld caractères"
+                }
+              }
+            }
+          }
+        },
+        "it" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld carattere"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld caratteri"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "%lld favorites, added to those of their profile" : {
       "comment" : "Arc import preview: favorites to import, after those already in the profile",
       "localizations" : {
@@ -663,6 +758,101 @@
         }
       }
     },
+    "%lld items imported. Delete the file you imported from: it holds your passwords in clear text." : {
+      "comment" : "Vault import: done",
+      "localizations" : {
+        "de" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld Objekt importiert. Lösche die importierte Datei: Sie enthält deine Passwörter im Klartext."
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld Objekte importiert. Lösche die importierte Datei: Sie enthält deine Passwörter im Klartext."
+                }
+              }
+            }
+          }
+        },
+        "en" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld item imported. Delete the file you imported from: it holds your passwords in clear text."
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld items imported. Delete the file you imported from: it holds your passwords in clear text."
+                }
+              }
+            }
+          }
+        },
+        "es" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld elemento importado. Elimina el archivo importado: contiene tus contraseñas sin cifrar."
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld elementos importados. Elimina el archivo importado: contiene tus contraseñas sin cifrar."
+                }
+              }
+            }
+          }
+        },
+        "fr" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld élément importé. Supprimez le fichier importé : il contient vos mots de passe en clair."
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld éléments importés. Supprimez le fichier importé : il contient vos mots de passe en clair."
+                }
+              }
+            }
+          }
+        },
+        "it" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld elemento importato. Elimina il file importato: contiene le tue password in chiaro."
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld elementi importati. Elimina il file importato: contiene le tue password in chiaro."
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "%lld items left out: Arc notes and Arc pages" : {
       "comment" : "Arc import preview: Arc notes and arc:// pages can't be imported",
       "localizations" : {
@@ -751,6 +941,101 @@
                 "stringUnit" : {
                   "state" : "translated",
                   "value" : "%lld elementi esclusi: note e pagine di Arc"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "%lld items to import" : {
+      "comment" : "Vault import: summary",
+      "localizations" : {
+        "de" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld Objekt zu importieren"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld Objekte zu importieren"
+                }
+              }
+            }
+          }
+        },
+        "en" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld item to import"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld items to import"
+                }
+              }
+            }
+          }
+        },
+        "es" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld elemento por importar"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld elementos por importar"
+                }
+              }
+            }
+          }
+        },
+        "fr" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld élément à importer"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld éléments à importer"
+                }
+              }
+            }
+          }
+        },
+        "it" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld elemento da importare"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld elementi da importare"
                 }
               }
             }
@@ -977,6 +1262,35 @@
         }
       }
     },
+    "%lld s" : {
+      "comment" : "Vault: seconds left of a one-time code",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld s"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld s"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld s"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld s"
+          }
+        }
+      }
+    },
     "%lld Spaces" : {
       "comment" : "Number of Spaces of a profile (Settings > Profiles)",
       "localizations" : {
@@ -1167,6 +1481,196 @@
         }
       }
     },
+    "%lld things couldn't be imported: attachments, passkeys or unknown fields." : {
+      "comment" : "Vault import",
+      "localizations" : {
+        "de" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld Sache konnte nicht importiert werden: Anhänge, Passkeys oder unbekannte Felder."
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld Dinge konnten nicht importiert werden: Anhänge, Passkeys oder unbekannte Felder."
+                }
+              }
+            }
+          }
+        },
+        "en" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld thing couldn't be imported: attachments, passkeys or unknown fields."
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld things couldn't be imported: attachments, passkeys or unknown fields."
+                }
+              }
+            }
+          }
+        },
+        "es" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "No se ha podido importar %lld cosa: adjuntos, llaves de acceso o campos desconocidos."
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "No se han podido importar %lld cosas: adjuntos, llaves de acceso o campos desconocidos."
+                }
+              }
+            }
+          }
+        },
+        "fr" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld chose n'a pas pu être importée : pièces jointes, clés d'accès ou champs inconnus."
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld choses n'ont pas pu être importées : pièces jointes, clés d'accès ou champs inconnus."
+                }
+              }
+            }
+          }
+        },
+        "it" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Non è stato possibile importare %lld cosa: allegati, passkey o campi sconosciuti."
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Non è stato possibile importare %lld cose: allegati, passkey o campi sconosciuti."
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "%lld words" : {
+      "comment" : "Vault generator: number of words",
+      "localizations" : {
+        "de" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld Wort"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld Wörter"
+                }
+              }
+            }
+          }
+        },
+        "en" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld word"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld words"
+                }
+              }
+            }
+          }
+        },
+        "es" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld palabra"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld palabras"
+                }
+              }
+            }
+          }
+        },
+        "fr" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld mot"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld mots"
+                }
+              }
+            }
+          }
+        },
+        "it" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld parola"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld parole"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "1 hour" : {
       "comment" : "Option of “Free memory of inactive tabs after”",
       "localizations" : {
@@ -1279,6 +1783,35 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "30 minuti"
+          }
+        }
+      }
+    },
+    "100 MB at most per file." : {
+      "comment" : "Vault editor: limit of a file",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Höchstens 100 MB pro Datei."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "100 MB como máximo por archivo."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "100 Mo au plus par fichier."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Al massimo 100 MB per file."
           }
         }
       }
@@ -1423,6 +1956,64 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Un nuovo pannello dello Space attuale"
+          }
+        }
+      }
+    },
+    "A newer version of this item couldn't be verified yet: this is the last verified one." : {
+      "comment" : "Vault: an item whose cited version hasn't arrived",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Eine neuere Version dieses Objekts konnte noch nicht geprüft werden: Das ist die zuletzt geprüfte."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aún no se ha podido verificar una versión más reciente de este elemento: esta es la última verificada."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Une version plus récente de cet élément n'a pas encore pu être vérifiée : voici la dernière vérifiée."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Non è ancora stato possibile verificare una versione più recente di questo elemento: questa è l'ultima verificata."
+          }
+        }
+      }
+    },
+    "A strong password for this form" : {
+      "comment" : "Vault filling: a generated password for a sign-up form",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ein starkes Passwort für dieses Formular"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Una contraseña segura para este formulario"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Un mot de passe robuste pour ce formulaire"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Una password robusta per questo modulo"
           }
         }
       }
@@ -1658,6 +2249,64 @@
         }
       }
     },
+    "Add a Field" : {
+      "comment" : "Vault editor",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Feld hinzufügen"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Añadir un campo"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ajouter un champ"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aggiungi un campo"
+          }
+        }
+      }
+    },
+    "Add a File…" : {
+      "comment" : "Vault editor",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Datei hinzufügen …"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Añadir un archivo…"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ajouter un fichier…"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aggiungi un file…"
+          }
+        }
+      }
+    },
     "Add a Note" : {
       "comment" : "Button next to the address of a page without a note; opens the notes panel",
       "localizations" : {
@@ -1741,6 +2390,35 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Aggiungi una nota a questa pagina"
+          }
+        }
+      }
+    },
+    "Add a Website" : {
+      "comment" : "Vault editor",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Website hinzufügen"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Añadir un sitio web"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ajouter un site"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aggiungi un sito web"
           }
         }
       }
@@ -1889,7 +2567,7 @@
       }
     },
     "Address" : {
-      "comment" : "Accessibility label of the address pill",
+      "comment" : "Accessibility label of the address pill\nVault editor: a website address\nVault: field of an identity, the street\nVault: type of a custom field, a web address",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -2033,6 +2711,35 @@
         }
       }
     },
+    "After %lld min without use" : {
+      "comment" : "Settings > Vault: automatic lock",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nach %lld Min. ohne Nutzung"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tras %lld min sin uso"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Après %lld min sans utilisation"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dopo %lld min di inattività"
+          }
+        }
+      }
+    },
     "Airplane" : {
       "comment" : "Icon choice (SF Symbol)",
       "localizations" : {
@@ -2087,6 +2794,35 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Tutta la cronologia"
+          }
+        }
+      }
+    },
+    "All Items" : {
+      "comment" : "Vault window: sidebar",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Alle Objekte"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Todos los elementos"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tous les éléments"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tutti gli elementi"
           }
         }
       }
@@ -2698,6 +3434,35 @@
         }
       }
     },
+    "Authority" : {
+      "comment" : "Vault: field of a document, who issued it",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Behörde"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Autoridad"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Autorité"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Autorità"
+          }
+        }
+      }
+    },
     "Avatar" : {
       "comment" : "Settings > Sync: section of the account's avatar",
       "localizations" : {
@@ -2723,6 +3488,35 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Avatar"
+          }
+        }
+      }
+    },
+    "Avoid look-alike characters" : {
+      "comment" : "Vault generator: no 0 O 1 l I",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Verwechselbare Zeichen vermeiden"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Evitar caracteres parecidos"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Éviter les caractères ambigus"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Evita caratteri simili"
           }
         }
       }
@@ -3169,6 +3963,7 @@
       }
     },
     "Cancel" : {
+      "comment" : "Vault editor",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -3250,6 +4045,64 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Auto"
+          }
+        }
+      }
+    },
+    "Card" : {
+      "comment" : "Vault: category of an item, a credit or debit card",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Karte"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tarjeta"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Carte"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Carta"
+          }
+        }
+      }
+    },
+    "Categories" : {
+      "comment" : "Vault window: sidebar section",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kategorien"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Categorías"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Catégories"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Categorie"
           }
         }
       }
@@ -3658,6 +4511,35 @@
         }
       }
     },
+    "Choose a File…" : {
+      "comment" : "Vault import",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Datei auswählen …"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Elegir un archivo…"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Choisir un fichier…"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Scegli un file…"
+          }
+        }
+      }
+    },
     "Choose an emoji in the Character Viewer" : {
       "comment" : "Help tag of the Emoji & Symbols button (folder customization panel, Space editor)",
       "localizations" : {
@@ -3827,6 +4709,35 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Cerchio"
+          }
+        }
+      }
+    },
+    "City" : {
+      "comment" : "Vault: field of an identity",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ort"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ciudad"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ville"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Città"
           }
         }
       }
@@ -4877,6 +5788,35 @@
         }
       }
     },
+    "Comment" : {
+      "comment" : "Vault: field of an SSH key",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kommentar"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Comentario"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Commentaire"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Commento"
+          }
+        }
+      }
+    },
     "Communicate with apps on your Mac" : {
       "localizations" : {
         "de" : {
@@ -5136,6 +6076,35 @@
         }
       }
     },
+    "Copy" : {
+      "comment" : "Vault: button that copies a field",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kopieren"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Copiar"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Copier"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Copia"
+          }
+        }
+      }
+    },
     "Copy Link" : {
       "comment" : "Tab context menu",
       "localizations" : {
@@ -5190,6 +6159,64 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Copia URL"
+          }
+        }
+      }
+    },
+    "Country" : {
+      "comment" : "Vault: field of an identity",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Land"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "País"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pays"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Paese"
+          }
+        }
+      }
+    },
+    "Country of Issue" : {
+      "comment" : "Vault: field of a document",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ausstellungsland"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "País de expedición"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pays de délivrance"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Paese di rilascio"
           }
         }
       }
@@ -5542,6 +6569,93 @@
         }
       }
     },
+    "Date" : {
+      "comment" : "Vault: type of a custom field",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Datum"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fecha"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Date"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Data"
+          }
+        }
+      }
+    },
+    "Date of Birth" : {
+      "comment" : "Vault: field of a document",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Geburtsdatum"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fecha de nacimiento"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Date de naissance"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Data di nascita"
+          }
+        }
+      }
+    },
+    "Decrypt" : {
+      "comment" : "Vault editor: SSH key",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Entschlüsseln"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Descifrar"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Déchiffrer"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Decifra"
+          }
+        }
+      }
+    },
     "Default Browser" : {
       "comment" : "Settings > General: label of the default browser row",
       "localizations" : {
@@ -5572,7 +6686,7 @@
       }
     },
     "Delete" : {
-      "comment" : "Destructive button of the dialog that deletes a profile",
+      "comment" : "Vault: delete for good",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -5625,6 +6739,101 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Eliminare “%@”?"
+          }
+        }
+      }
+    },
+    "Delete %lld items for good?" : {
+      "comment" : "Vault: confirmation before emptying the trash",
+      "localizations" : {
+        "de" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld Objekt endgültig löschen?"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld Objekte endgültig löschen?"
+                }
+              }
+            }
+          }
+        },
+        "en" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Delete %lld item for good?"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Delete %lld items for good?"
+                }
+              }
+            }
+          }
+        },
+        "es" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "¿Eliminar %lld elemento definitivamente?"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "¿Eliminar %lld elementos definitivamente?"
+                }
+              }
+            }
+          }
+        },
+        "fr" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Supprimer définitivement %lld élément ?"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Supprimer définitivement %lld éléments ?"
+                }
+              }
+            }
+          }
+        },
+        "it" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Eliminare definitivamente %lld elemento?"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Eliminare definitivamente %lld elementi?"
+                }
+              }
+            }
           }
         }
       }
@@ -6035,6 +7244,35 @@
         }
       }
     },
+    "Delete this item for good?" : {
+      "comment" : "Vault: confirmation of a deletion from the trash",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dieses Objekt endgültig löschen?"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "¿Eliminar este elemento definitivamente?"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Supprimer définitivement cet élément ?"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Eliminare definitivamente questo elemento?"
+          }
+        }
+      }
+    },
     "Delete this note?" : {
       "comment" : "Notes panel: question before deleting the note",
       "localizations" : {
@@ -6060,6 +7298,35 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Eliminare questa nota?"
+          }
+        }
+      }
+    },
+    "Delete…" : {
+      "comment" : "Vault: delete for good, from the trash",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Löschen …"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Eliminar…"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Supprimer…"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Elimina…"
           }
         }
       }
@@ -6325,7 +7592,7 @@
       }
     },
     "Document" : {
-      "comment" : "Icon choice (SF Symbol)",
+      "comment" : "Icon choice (SF Symbol)\nVault: category of an item, a passport or an ID card",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -6349,6 +7616,35 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Documento"
+          }
+        }
+      }
+    },
+    "Document Number" : {
+      "comment" : "Vault: field of a document",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dokumentnummer"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Número de documento"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Numéro du document"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Numero del documento"
           }
         }
       }
@@ -6613,6 +7909,35 @@
         }
       }
     },
+    "Driving Licence" : {
+      "comment" : "Vault: kind of document",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Führerschein"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Permiso de conducir"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Permis de conduire"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Patente di guida"
+          }
+        }
+      }
+    },
     "Drop here" : {
       "comment" : "Accessibility label of the drop zone at the end of a sidebar section.",
       "localizations" : {
@@ -6816,7 +8141,7 @@
       }
     },
     "Edit" : {
-      "comment" : "Settings > Shortcuts: commands of the Edit menu",
+      "comment" : "Settings > Shortcuts: commands of the Edit menu\nVault: change an item",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -6903,7 +8228,7 @@
       }
     },
     "Email" : {
-      "comment" : "Recovery kit: account identifier",
+      "comment" : "Recovery kit: account identifier\nVault: type of a custom field",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -7018,6 +8343,35 @@
         }
       }
     },
+    "Empty Trash" : {
+      "comment" : "Vault window: button",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Papierkorb leeren"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vaciar la papelera"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vider la corbeille"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Svuota il cestino"
+          }
+        }
+      }
+    },
     "Enabled" : {
       "localizations" : {
         "de" : {
@@ -7042,6 +8396,64 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Attivata"
+          }
+        }
+      }
+    },
+    "Encrypted (.matchavault)" : {
+      "comment" : "Vault export: format",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Verschlüsselt (.matchavault)"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cifrado (.matchavault)"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Chiffré (.matchavault)"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cifrato (.matchavault)"
+          }
+        }
+      }
+    },
+    "Encrypted PEM keys aren't supported. Convert it with ssh-keygen -p first." : {
+      "comment" : "Vault editor: SSH key",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Verschlüsselte PEM-Schlüssel werden nicht unterstützt. Wandle ihn zuerst mit ssh-keygen -p um."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Las claves PEM cifradas no son compatibles. Conviértela antes con ssh-keygen -p."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Les clés PEM chiffrées ne sont pas prises en charge. Convertissez-la d'abord avec ssh-keygen -p."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Le chiavi PEM cifrate non sono supportate. Convertila prima con ssh-keygen -p."
           }
         }
       }
@@ -7075,6 +8487,35 @@
         }
       }
     },
+    "Erase This Value" : {
+      "comment" : "Vault: deletes an old value of a secret",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Diesen Wert löschen"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Borrar este valor"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Effacer cette valeur"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cancella questo valore"
+          }
+        }
+      }
+    },
     "Every Page of %@" : {
       "comment" : "Notes panel menu: the note is shown on every page of a site; %@ is the site",
       "localizations" : {
@@ -7100,6 +8541,35 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Tutte le pagine di %@"
+          }
+        }
+      }
+    },
+    "Expires" : {
+      "comment" : "Vault: field of a card or a document",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gültig bis"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Caduca"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Expire le"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Scadenza"
           }
         }
       }
@@ -7220,6 +8690,93 @@
         }
       }
     },
+    "Export the Vault" : {
+      "comment" : "Vault export: title",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tresor exportieren"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Exportar la bóveda"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Exporter le coffre"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Esporta la cassaforte"
+          }
+        }
+      }
+    },
+    "Export…" : {
+      "comment" : "Vault export: button",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Exportieren …"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Exportar…"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Exporter…"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Esporta…"
+          }
+        }
+      }
+    },
+    "Exported. Files aren't exported: save them from their items." : {
+      "comment" : "Vault export: done",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Exportiert. Dateien werden nicht exportiert: Sichere sie aus ihren Objekten."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Exportado. Los archivos no se exportan: guárdalos desde sus elementos."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Exporté. Les fichiers ne sont pas exportés : enregistrez-les depuis leurs éléments."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Esportato. I file non vengono esportati: salvali dai loro elementi."
+          }
+        }
+      }
+    },
     "Extension Prompt Allow" : {
       "comment" : "Extension permission alert: grant what the extension asks for",
       "extractionState" : "extracted_with_value",
@@ -7293,6 +8850,7 @@
       }
     },
     "Extensions" : {
+      "comment" : "Settings tab",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -7406,8 +8964,37 @@
         }
       }
     },
+    "Favorite" : {
+      "comment" : "Vault editor",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Favorit"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Favorito"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Favori"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Preferito"
+          }
+        }
+      }
+    },
     "Favorites" : {
-      "comment" : "Sidebar section name, read in the label of its empty drop zone",
+      "comment" : "Vault window: sidebar",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -7435,8 +9022,37 @@
         }
       }
     },
+    "Fields" : {
+      "comment" : "Vault editor: custom fields",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Felder"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Campos"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Champs"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Campi"
+          }
+        }
+      }
+    },
     "File" : {
-      "comment" : "Settings > Shortcuts: commands of the File menu",
+      "comment" : "Settings > Shortcuts: commands of the File menu\nVault: category of an item, an attached file",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -7489,6 +9105,35 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "File non trovato"
+          }
+        }
+      }
+    },
+    "Files" : {
+      "comment" : "Vault: files of an item",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dateien"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Archivos"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fichiers"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "File"
           }
         }
       }
@@ -7547,6 +9192,64 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "I file aperti da altre app possono leggere la loro cartella"
+          }
+        }
+      }
+    },
+    "Fill a Password" : {
+      "comment" : "Address pill: button of the vault's filling",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Passwort ausfüllen"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rellenar una contraseña"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Remplir un mot de passe"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Compila una password"
+          }
+        }
+      }
+    },
+    "Fill on" : {
+      "comment" : "Vault editor: how a login matches pages",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ausfüllen auf"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rellenar en"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Remplir sur"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Compila su"
           }
         }
       }
@@ -7638,6 +9341,35 @@
         }
       }
     },
+    "Fingerprint" : {
+      "comment" : "Vault: field of an SSH key",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fingerabdruck"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Huella"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Empreinte"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Impronta"
+          }
+        }
+      }
+    },
     "Firefox Add-ons" : {
       "localizations" : {
         "de" : {
@@ -7690,6 +9422,35 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Anche le estensioni di Firefox funzionano: scarica il file .xpi dalla pagina delle versioni dell'estensione su addons.mozilla.org."
+          }
+        }
+      }
+    },
+    "First Name" : {
+      "comment" : "Vault: field of an identity",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vorname"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nombre"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Prénom"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nome"
           }
         }
       }
@@ -7868,6 +9629,35 @@
         }
       }
     },
+    "Forget" : {
+      "comment" : "Settings > Vault: confirmation",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vergessen"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Olvidar"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Oublier"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dimentica"
+          }
+        }
+      }
+    },
     "Forget Decision" : {
       "comment" : "Settings > Privacy: forgets a website's saved decision (camera, microphone, notifications); it will ask again",
       "localizations" : {
@@ -7893,6 +9683,64 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Dimentica decisione"
+          }
+        }
+      }
+    },
+    "Forget the vault on this Mac?" : {
+      "comment" : "Settings > Vault: confirmation",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tresor auf diesem Mac vergessen?"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "¿Olvidar la bóveda en este Mac?"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Oublier le coffre sur ce Mac ?"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dimenticare la cassaforte su questo Mac?"
+          }
+        }
+      }
+    },
+    "Forget the Vault on This Mac…" : {
+      "comment" : "Settings > Vault",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tresor auf diesem Mac vergessen …"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Olvidar la bóveda en este Mac…"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Oublier le coffre sur ce Mac…"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dimentica la cassaforte su questo Mac…"
           }
         }
       }
@@ -8185,6 +10033,93 @@
         }
       }
     },
+    "Generate" : {
+      "comment" : "Vault editor: generate an SSH key",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Erzeugen"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Generar"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Générer"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Genera"
+          }
+        }
+      }
+    },
+    "Generate a Password" : {
+      "comment" : "Vault editor: opens the generator",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Passwort erzeugen"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Generar una contraseña"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Générer un mot de passe"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Genera una password"
+          }
+        }
+      }
+    },
+    "Generate Again" : {
+      "comment" : "Vault generator",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Neu erzeugen"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Volver a generar"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Générer à nouveau"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Genera di nuovo"
+          }
+        }
+      }
+    },
     "Get the App" : {
       "comment" : "Settings > Extensions: opens the App Store page of the app that contains a Safari extension",
       "localizations" : {
@@ -8471,6 +10406,64 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Cuore"
+          }
+        }
+      }
+    },
+    "Hidden" : {
+      "comment" : "Vault: type of a custom field, a secret",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Verborgen"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Oculto"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Masqué"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nascosto"
+          }
+        }
+      }
+    },
+    "Hide" : {
+      "comment" : "Vault: button that masks a secret",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ausblenden"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ocultar"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Masquer"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nascondi"
           }
         }
       }
@@ -8798,6 +10791,64 @@
         }
       }
     },
+    "Identity" : {
+      "comment" : "Vault: category of an item, a name and an address",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Identität"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Identidad"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Identité"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Identità"
+          }
+        }
+      }
+    },
+    "Identity Card" : {
+      "comment" : "Vault: kind of document",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Personalausweis"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Documento de identidad"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Carte d'identité"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Carta d'identità"
+          }
+        }
+      }
+    },
     "Ignore" : {
       "comment" : "Settings > Extensions: hides an extension offered by another Mac, on this Mac only",
       "localizations" : {
@@ -8857,7 +10908,7 @@
       }
     },
     "Import" : {
-      "comment" : "Arc import preview: button that imports",
+      "comment" : "Vault import: button",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -8881,6 +10932,64 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Importa"
+          }
+        }
+      }
+    },
+    "Import %@" : {
+      "comment" : "Vault import: tag of the items",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Import %@"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Importación %@"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Import %@"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Importazione %@"
+          }
+        }
+      }
+    },
+    "Import and Export" : {
+      "comment" : "Vault window: toolbar menu",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Importieren und exportieren"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Importar y exportar"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Importer et exporter"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Importa ed esporta"
           }
         }
       }
@@ -8943,6 +11052,122 @@
         }
       }
     },
+    "Import into the Vault" : {
+      "comment" : "Vault import: title",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "In den Tresor importieren"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Importar a la bóveda"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Importer dans le coffre"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Importa nella cassaforte"
+          }
+        }
+      }
+    },
+    "Import Passwords…" : {
+      "comment" : "Vault window: opens the import",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Passwörter importieren …"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Importar contraseñas…"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Importer des mots de passe…"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Importa password…"
+          }
+        }
+      }
+    },
+    "Import the passwords of another browser or password manager, or add an item with +." : {
+      "comment" : "Vault window: no item at all",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Importiere die Passwörter eines anderen Browsers oder Passwortmanagers oder füge mit + ein Objekt hinzu."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Importa las contraseñas de otro navegador o gestor de contraseñas, o añade un elemento con +."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Importez les mots de passe d'un autre navigateur ou gestionnaire de mots de passe, ou ajoutez un élément avec +."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Importa le password di un altro browser o gestore di password, oppure aggiungi un elemento con +."
+          }
+        }
+      }
+    },
+    "Import…" : {
+      "comment" : "Vault editor: import an SSH key from a file",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Importieren …"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Importar…"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Importer…"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Importa…"
+          }
+        }
+      }
+    },
     "In %@" : {
       "comment" : "App that contains a Safari extension, e.g. In Proton Pass for Safari",
       "localizations" : {
@@ -8972,6 +11197,35 @@
         }
       }
     },
+    "In a frame of %@" : {
+      "comment" : "Vault filling: logins for a frame of another site",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "In einem Rahmen von %@"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "En un marco de %@"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dans un cadre de %@"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "In un riquadro di %@"
+          }
+        }
+      }
+    },
     "In All Apps" : {
       "comment" : "Settings > Shortcuts: section of the global shortcut",
       "localizations" : {
@@ -8997,6 +11251,35 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "In tutte le app"
+          }
+        }
+      }
+    },
+    "In clear text (CXF)" : {
+      "comment" : "Vault export: format",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Im Klartext (CXF)"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sin cifrar (CXF)"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "En clair (CXF)"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "In chiaro (CXF)"
           }
         }
       }
@@ -9203,6 +11486,35 @@
         }
       }
     },
+    "Issued" : {
+      "comment" : "Vault: field of a document, its date of issue",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ausgestellt am"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Expedido"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Délivré le"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rilasciato il"
+          }
+        }
+      }
+    },
     "It only appears once you choose a homepage in the General tab." : {
       "comment" : "Settings > Appearance: note under “Show Home button”",
       "localizations" : {
@@ -9285,6 +11597,64 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Potrà:"
+          }
+        }
+      }
+    },
+    "It will be deleted on all your Macs. This can't be undone." : {
+      "comment" : "Vault: confirmation of a deletion from the trash",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Es wird auf all deinen Macs gelöscht. Das lässt sich nicht widerrufen."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Se eliminará en todos tus Mac. No se puede deshacer."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Il sera supprimé sur tous vos Mac. C'est définitif."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Verrà eliminato su tutti i tuoi Mac. L'operazione non è reversibile."
+          }
+        }
+      }
+    },
+    "Its copy on this Mac is deleted. Your items stay on the server and come back at the next unlock." : {
+      "comment" : "Settings > Vault: confirmation",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Seine Kopie auf diesem Mac wird gelöscht. Deine Objekte bleiben auf dem Server und kommen beim nächsten Entsperren zurück."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Se elimina su copia en este Mac. Tus elementos se quedan en el servidor y vuelven al próximo desbloqueo."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sa copie sur ce Mac est supprimée. Vos éléments restent sur le serveur et reviennent au prochain déverrouillage."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "La sua copia su questo Mac viene eliminata. I tuoi elementi restano sul server e tornano al prossimo sblocco."
           }
         }
       }
@@ -9488,6 +11858,35 @@
         }
       }
     },
+    "Key" : {
+      "comment" : "Vault editor: section of an SSH key",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Schlüssel"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Clave"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Clé"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Chiave"
+          }
+        }
+      }
+    },
     "Keyboard Shortcuts" : {
       "localizations" : {
         "de" : {
@@ -9512,6 +11911,64 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Scorciatoie da tastiera"
+          }
+        }
+      }
+    },
+    "Kind" : {
+      "comment" : "Vault editor: kind of document",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Art"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tipo"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Type"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tipo"
+          }
+        }
+      }
+    },
+    "Label" : {
+      "comment" : "Vault editor: name of a custom field",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bezeichnung"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Etiqueta"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nom"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Etichetta"
           }
         }
       }
@@ -9570,6 +12027,64 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Computer portatile"
+          }
+        }
+      }
+    },
+    "Last change %@" : {
+      "comment" : "Vault window: last write of the vault",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Letzte Änderung: %@"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Último cambio: %@"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dernière modification le %@"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ultima modifica: %@"
+          }
+        }
+      }
+    },
+    "Last Name" : {
+      "comment" : "Vault: field of an identity",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nachname"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Apellidos"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nom"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cognome"
           }
         }
       }
@@ -9806,6 +12321,122 @@
         }
       }
     },
+    "Lock" : {
+      "comment" : "Vault window: toolbar button that locks the vault",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sperren"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bloquear"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Verrouiller"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Blocca"
+          }
+        }
+      }
+    },
+    "Lock the vault" : {
+      "comment" : "Settings > Vault: automatic lock",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tresor sperren"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bloquear la bóveda"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Verrouiller le coffre"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Blocca la cassaforte"
+          }
+        }
+      }
+    },
+    "Lock the Vault" : {
+      "comment" : "Window menu: locks the vault",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tresor sperren"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bloquear la bóveda"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Verrouiller le coffre"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Blocca la cassaforte"
+          }
+        }
+      }
+    },
+    "Lock the Vault Now" : {
+      "comment" : "Settings > Vault",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tresor jetzt sperren"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bloquear la bóveda ahora"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Verrouiller le coffre maintenant"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Blocca la cassaforte ora"
+          }
+        }
+      }
+    },
     "Log In" : {
       "comment" : "Button of the sheet where a website asks for a user name and password",
       "localizations" : {
@@ -9860,6 +12491,64 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Accedi a %@"
+          }
+        }
+      }
+    },
+    "Login" : {
+      "comment" : "Vault: category of an item, a user name and password for a site",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Login"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Inicio de sesión"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Identifiant"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Login"
+          }
+        }
+      }
+    },
+    "Logins exported by Chrome, Safari or Firefox (CSV), Bitwarden (JSON), 1Password (1PUX), a CXF file, or a Matcha export." : {
+      "comment" : "Vault import: formats",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Anmeldedaten, exportiert von Chrome, Safari oder Firefox (CSV), Bitwarden (JSON), 1Password (1PUX), eine CXF-Datei oder ein Matcha-Export."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Inicios de sesión exportados por Chrome, Safari o Firefox (CSV), Bitwarden (JSON), 1Password (1PUX), un archivo CXF o una exportación de Matcha."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Identifiants exportés par Chrome, Safari ou Firefox (CSV), Bitwarden (JSON), 1Password (1PUX), un fichier CXF ou un export de Matcha."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Login esportati da Chrome, Safari o Firefox (CSV), Bitwarden (JSON), 1Password (1PUX), un file CXF o un'esportazione di Matcha."
           }
         }
       }
@@ -10038,6 +12727,35 @@
     },
     "Master password" : {
       "comment" : "Settings > Sync: password field",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Master-Passwort"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Contraseña maestra"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mot de passe maître"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Password principale"
+          }
+        }
+      }
+    },
+    "Master Password" : {
+      "comment" : "Vault window: password field",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -10322,6 +13040,35 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Matcha non è riuscito a riconoscere la lingua di questa pagina."
+          }
+        }
+      }
+    },
+    "Matcha doesn't know this file's format." : {
+      "comment" : "Vault import",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Matcha kennt das Format dieser Datei nicht."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Matcha no conoce el formato de este archivo."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Matcha ne connaît pas le format de ce fichier."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Matcha non conosce il formato di questo file."
           }
         }
       }
@@ -10640,6 +13387,35 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Microfono"
+          }
+        }
+      }
+    },
+    "Middle Name" : {
+      "comment" : "Vault: field of an identity",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zweiter Vorname"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Segundo nombre"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Deuxième prénom"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Secondo nome"
           }
         }
       }
@@ -11017,6 +13793,35 @@
         }
       }
     },
+    "Move to Trash" : {
+      "comment" : "Vault: delete an item",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "In den Papierkorb legen"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mover a la papelera"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mettre à la corbeille"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sposta nel cestino"
+          }
+        }
+      }
+    },
     "Move to…" : {
       "comment" : "Sidebar menu of a window of its own tabs: moves them into a Space",
       "localizations" : {
@@ -11105,7 +13910,7 @@
       }
     },
     "Name" : {
-      "comment" : "Field of the name of a folder of notes",
+      "comment" : "Field of the name of a folder of notes\nVault: field of a card or a document, the holder's name",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -11158,6 +13963,64 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Mai"
+          }
+        }
+      }
+    },
+    "Never for This Site" : {
+      "comment" : "Vault save bar",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nie für diese Website"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nunca para este sitio"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Jamais pour ce site"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mai per questo sito"
+          }
+        }
+      }
+    },
+    "Never while the Mac is awake" : {
+      "comment" : "Settings > Vault: automatic lock",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nie, solange der Mac aktiv ist"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nunca mientras el Mac esté activo"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Jamais tant que le Mac est actif"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mai finché il Mac è attivo"
           }
         }
       }
@@ -11216,6 +14079,35 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Nuova cartella"
+          }
+        }
+      }
+    },
+    "New Item" : {
+      "comment" : "Vault window: toolbar menu",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Neues Objekt"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nuevo elemento"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nouvel élément"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nuovo elemento"
           }
         }
       }
@@ -11767,6 +14659,64 @@
         }
       }
     },
+    "No Items" : {
+      "comment" : "Vault window: empty list",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Keine Objekte"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ningún elemento"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aucun élément"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nessun elemento"
+          }
+        }
+      }
+    },
+    "No login of the vault for this site." : {
+      "comment" : "Vault filling: nothing matches",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Keine Anmeldedaten im Tresor für diese Website."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No hay inicios de sesión en la bóveda para este sitio."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aucun identifiant du coffre pour ce site."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nessun login della cassaforte per questo sito."
+          }
+        }
+      }
+    },
     "No manifest.json file was found in this extension." : {
       "localizations" : {
         "de" : {
@@ -12026,6 +14976,35 @@
         }
       }
     },
+    "No Vault" : {
+      "comment" : "Vault window: title when the vault can't be used",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kein Tresor"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sin bóveda"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pas de coffre"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nessuna cassaforte"
+          }
+        }
+      }
+    },
     "No Website" : {
       "comment" : "Extension menu: the extension has access to no website",
       "localizations" : {
@@ -12171,6 +15150,35 @@
         }
       }
     },
+    "Not Now" : {
+      "comment" : "Vault: refuse Touch ID",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Später"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ahora no"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Plus tard"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Non ora"
+          }
+        }
+      }
+    },
     "Not Secure" : {
       "comment" : "Address bar: the page is not encrypted (http)",
       "localizations" : {
@@ -12196,6 +15204,35 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Non sicuro"
+          }
+        }
+      }
+    },
+    "Not secure (http)" : {
+      "comment" : "Vault password check: a login for an http address",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nicht sicher (http)"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No seguro (http)"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Non sécurisé (http)"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Non sicuro (http)"
           }
         }
       }
@@ -14088,7 +17125,7 @@
       }
     },
     "Notes" : {
-      "comment" : "Notes panel: title of the header when the page has no note\nTitle of the notes library window\nVoiceOver label of the notes panel",
+      "comment" : "Notes panel: title of the header when the page has no note\nTitle of the notes library window\nVault: notes of an item\nVoiceOver label of the notes panel",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -14261,6 +17298,35 @@
         }
       }
     },
+    "Number" : {
+      "comment" : "Vault: field of a card",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nummer"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Número"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Numéro"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Numero"
+          }
+        }
+      }
+    },
     "Ocean" : {
       "comment" : "Space theme preset",
       "localizations" : {
@@ -14319,6 +17385,35 @@
         }
       }
     },
+    "Off, Matcha neither fills nor saves passwords. Your items stay in your sync account and on your other Macs." : {
+      "comment" : "Settings > Vault: what turning the vault off does",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ausgeschaltet füllt und sichert Matcha keine Passwörter. Deine Objekte bleiben in deinem Synchronisierungskonto und auf deinen anderen Macs."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Desactivada, Matcha no rellena ni guarda contraseñas. Tus elementos siguen en tu cuenta de sincronización y en tus otros Mac."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Désactivé, Matcha ne remplit ni n'enregistre aucun mot de passe. Vos éléments restent dans votre compte de synchronisation et sur vos autres Mac."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Se disattivata, Matcha non compila né salva password. I tuoi elementi restano nel tuo account di sincronizzazione e sugli altri tuoi Mac."
+          }
+        }
+      }
+    },
     "OK" : {
       "comment" : "Button of a website's JavaScript dialog",
       "localizations" : {
@@ -14348,8 +17443,66 @@
         }
       }
     },
+    "Old Values" : {
+      "comment" : "Vault: the history of the secrets of an item",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Frühere Werte"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Valores anteriores"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Anciennes valeurs"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Valori precedenti"
+          }
+        }
+      }
+    },
+    "One-Time Code" : {
+      "comment" : "Vault: field of a login, the secret of a TOTP code or an otpauth address\nVault: type of a custom field",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Einmalcode"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Código de un solo uso"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Code à usage unique"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Codice monouso"
+          }
+        }
+      }
+    },
     "Open" : {
-      "comment" : "Banner where a website asks to open another app: open the link in that app",
+      "comment" : "Banner where a website asks to open another app: open the link in that app\nVault: open a file of an item",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -14988,6 +18141,122 @@
         }
       }
     },
+    "open the vault" : {
+      "comment" : "Touch ID prompt: Matcha wants to…",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "den Tresor öffnen"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "abrir la bóveda"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ouvrir le coffre"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "aprire la cassaforte"
+          }
+        }
+      }
+    },
+    "Open the Vault" : {
+      "comment" : "Vault filling: opens the vault's window",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tresor öffnen"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Abrir la bóveda"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ouvrir le coffre"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Apri la cassaforte"
+          }
+        }
+      }
+    },
+    "Open the vault with Touch ID" : {
+      "comment" : "Settings > Vault",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tresor mit Touch ID öffnen"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Abrir la bóveda con Touch ID"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ouvrir le coffre avec Touch ID"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Apri la cassaforte con Touch ID"
+          }
+        }
+      }
+    },
+    "Open the vault with Touch ID?" : {
+      "comment" : "Vault: offer after the first unlock",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tresor mit Touch ID öffnen?"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "¿Abrir la bóveda con Touch ID?"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ouvrir le coffre avec Touch ID ?"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aprire la cassaforte con Touch ID?"
+          }
+        }
+      }
+    },
     "Open…" : {
       "comment" : "Banner of a local page that can't show its images: opens the file panel, as File > Open File…",
       "localizations" : {
@@ -15099,6 +18368,35 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Arancione"
+          }
+        }
+      }
+    },
+    "Other" : {
+      "comment" : "Vault: category of an item, custom fields only",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sonstiges"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Otro"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Autre"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Altro"
           }
         }
       }
@@ -15567,8 +18865,95 @@
         }
       }
     },
+    "Passphrase" : {
+      "comment" : "Vault generator: random words",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Passphrase"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Frase de contraseña"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Phrase de passe"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Passphrase"
+          }
+        }
+      }
+    },
+    "Passphrase of the key" : {
+      "comment" : "Vault editor: SSH key",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Passphrase des Schlüssels"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Frase de contraseña de la clave"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Phrase de passe de la clé"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Passphrase della chiave"
+          }
+        }
+      }
+    },
+    "Passport" : {
+      "comment" : "Vault: kind of document",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Reisepass"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pasaporte"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Passeport"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Passaporto"
+          }
+        }
+      }
+    },
     "Password" : {
-      "comment" : "Field of the sheet where a website asks for a user name and password",
+      "comment" : "Field of the sheet where a website asks for a user name and password\nVault generator: random characters\nVault: field of a login",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -15592,6 +18977,93 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Password"
+          }
+        }
+      }
+    },
+    "Password Check" : {
+      "comment" : "Vault window: sidebar, weak, reused or insecure passwords",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Passwortprüfung"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Comprobación de contraseñas"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Contrôle des mots de passe"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Controllo password"
+          }
+        }
+      }
+    },
+    "Password of the export" : {
+      "comment" : "Vault import: password of a .matchavault",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Passwort des Exports"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Contraseña de la exportación"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mot de passe de l'export"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Password dell'esportazione"
+          }
+        }
+      }
+    },
+    "Password of the export: write it down, it is shown once." : {
+      "comment" : "Vault export",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Passwort des Exports: Schreib es auf, es wird nur einmal angezeigt."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Contraseña de la exportación: anótala, solo se muestra una vez."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mot de passe de l'export : notez-le, il n'est montré qu'une fois."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Password dell'esportazione: annotala, viene mostrata una sola volta."
           }
         }
       }
@@ -15621,6 +19093,35 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Sicurezza della password"
+          }
+        }
+      }
+    },
+    "Passwords File…" : {
+      "comment" : "File > Import From: imports passwords into the vault",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Passwortdatei …"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Archivo de contraseñas…"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fichier de mots de passe…"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "File di password…"
           }
         }
       }
@@ -15828,6 +19329,35 @@
         }
       }
     },
+    "Phone" : {
+      "comment" : "Vault: field of an identity\nVault: type of a custom field",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Telefon"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Teléfono"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Téléphone"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Telefono"
+          }
+        }
+      }
+    },
     "Photo" : {
       "comment" : "Icon choice (SF Symbol)",
       "localizations" : {
@@ -15853,6 +19383,35 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Foto"
+          }
+        }
+      }
+    },
+    "PIN" : {
+      "comment" : "Vault: field of a card",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "PIN"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "PIN"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Code PIN"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "PIN"
           }
         }
       }
@@ -15998,6 +19557,35 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Riproduzione audio in corso"
+          }
+        }
+      }
+    },
+    "Postal Code" : {
+      "comment" : "Vault: field of an identity",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Postleitzahl"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Código postal"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Code postal"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "CAP"
           }
         }
       }
@@ -16234,6 +19822,35 @@
         }
       }
     },
+    "Private Key" : {
+      "comment" : "Vault: field of an SSH key",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Privater Schlüssel"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Clave privada"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Clé privée"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Chiave privata"
+          }
+        }
+      }
+    },
     "Private Server" : {
       "comment" : "Settings > Sync: sync mode and section",
       "localizations" : {
@@ -16408,6 +20025,35 @@
         }
       }
     },
+    "Public Key" : {
+      "comment" : "Vault: field of an SSH key",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Öffentlicher Schlüssel"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Clave pública"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Clé publique"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Chiave pubblica"
+          }
+        }
+      }
+    },
     "Public Server (Coming Soon)" : {
       "comment" : "Settings > Sync: sync mode not available yet",
       "localizations" : {
@@ -16462,6 +20108,35 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Viola"
+          }
+        }
+      }
+    },
+    "Put Back" : {
+      "comment" : "Vault: take an item out of the trash",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zurücklegen"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Restaurar"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Remettre"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ripristina"
           }
         }
       }
@@ -16861,6 +20536,35 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Rosso"
+          }
+        }
+      }
+    },
+    "Region" : {
+      "comment" : "Vault: field of an identity, state or region",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Region"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Región"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Région"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Regione"
           }
         }
       }
@@ -17757,6 +21461,35 @@
         }
       }
     },
+    "Reused" : {
+      "comment" : "Vault password check: a password used by several logins",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mehrfach verwendet"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Reutilizada"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Réutilisé"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Riutilizzata"
+          }
+        }
+      }
+    },
     "Rose" : {
       "comment" : "Space theme preset (a pink color)",
       "localizations" : {
@@ -17814,6 +21547,122 @@
         }
       }
     },
+    "Same Host" : {
+      "comment" : "Vault: how a login matches pages, same host and port",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gleicher Host"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mismo host"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Même hôte"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Stesso host"
+          }
+        }
+      }
+    },
+    "Same Page" : {
+      "comment" : "Vault: how a login matches pages, same address",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gleiche Seite"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Misma página"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Même page"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Stessa pagina"
+          }
+        }
+      }
+    },
+    "Same Site" : {
+      "comment" : "Vault: how a login matches pages, same registrable domain",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gleiche Website"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mismo sitio"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Même site"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Stesso sito"
+          }
+        }
+      }
+    },
+    "Save" : {
+      "comment" : "Vault editor",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sichern"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Guardar"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Enregistrer"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Salva"
+          }
+        }
+      }
+    },
     "Save as PDF…" : {
       "comment" : "Recovery kit sheet: saves the kit",
       "localizations" : {
@@ -17844,7 +21693,7 @@
       }
     },
     "Save As…" : {
-      "comment" : "Context menu of a web page: saves it as a web archive or its source",
+      "comment" : "Context menu of a web page: saves it as a web archive or its source\nVault: save a file of an item",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -17897,6 +21746,64 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Salva o stampa il kit per continuare."
+          }
+        }
+      }
+    },
+    "Save the password for %@ in the vault?" : {
+      "comment" : "Vault save bar",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Passwort für %@ im Tresor sichern?"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "¿Guardar la contraseña de %@ en la bóveda?"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Enregistrer le mot de passe de %@ dans le coffre ?"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Salvare la password di %@ nella cassaforte?"
+          }
+        }
+      }
+    },
+    "Save the Private Key…" : {
+      "comment" : "Vault: SSH key, writes the private key to a file",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Privaten Schlüssel sichern …"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Guardar la clave privada…"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Enregistrer la clé privée…"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Salva la chiave privata…"
           }
         }
       }
@@ -18161,6 +22068,35 @@
         }
       }
     },
+    "Search the Vault" : {
+      "comment" : "Vault window: search field",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tresor durchsuchen"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Buscar en la bóveda"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rechercher dans le coffre"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cerca nella cassaforte"
+          }
+        }
+      }
+    },
     "Secret Key" : {
       "comment" : "Recovery kit: the Secret Key, which signs in a new Mac with the password",
       "localizations" : {
@@ -18190,6 +22126,35 @@
         }
       }
     },
+    "Secret or otpauth:// address" : {
+      "comment" : "Vault editor: one-time code field",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Geheimnis oder otpauth://-Adresse"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Secreto o dirección otpauth://"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Secret ou adresse otpauth://"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Segreto o indirizzo otpauth://"
+          }
+        }
+      }
+    },
     "Secure Connection — Show Certificate" : {
       "comment" : "Help tag of the padlock in the address bar",
       "localizations" : {
@@ -18215,6 +22180,93 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Connessione sicura — Mostra certificato"
+          }
+        }
+      }
+    },
+    "Secure Note" : {
+      "comment" : "Vault: category of an item",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sichere Notiz"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nota segura"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Note sécurisée"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nota sicura"
+          }
+        }
+      }
+    },
+    "Security Code" : {
+      "comment" : "Vault: field of a card (CVV)",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Prüfnummer"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Código de seguridad"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cryptogramme"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Codice di sicurezza"
+          }
+        }
+      }
+    },
+    "Select an item" : {
+      "comment" : "Vault window: nothing selected",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wähle ein Objekt aus"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Selecciona un elemento"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sélectionnez un élément"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Seleziona un elemento"
           }
         }
       }
@@ -18481,6 +22533,7 @@
       }
     },
     "Shortcuts" : {
+      "comment" : "Settings tab",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -18504,6 +22557,35 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Scorciatoie"
+          }
+        }
+      }
+    },
+    "Show" : {
+      "comment" : "Vault: button that reveals a secret",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Einblenden"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mostrar"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Afficher"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mostra"
           }
         }
       }
@@ -19458,6 +23540,130 @@
         }
       }
     },
+    "Skip %lld items already in the vault" : {
+      "comment" : "Vault import: duplicates",
+      "localizations" : {
+        "de" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld Objekt überspringen, das schon im Tresor ist"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld Objekte überspringen, die schon im Tresor sind"
+                }
+              }
+            }
+          }
+        },
+        "en" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Skip %lld item already in the vault"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Skip %lld items already in the vault"
+                }
+              }
+            }
+          }
+        },
+        "es" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Omitir %lld elemento que ya está en la bóveda"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Omitir %lld elementos que ya están en la bóveda"
+                }
+              }
+            }
+          }
+        },
+        "fr" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Ignorer %lld élément déjà dans le coffre"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Ignorer %lld éléments déjà dans le coffre"
+                }
+              }
+            }
+          }
+        },
+        "it" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Salta %lld elemento già nella cassaforte"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Salta %lld elementi già nella cassaforte"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "Some items of the vault couldn't be verified yet. Matcha shows their last verified version." : {
+      "comment" : "Vault window: notice",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Einige Objekte des Tresors konnten noch nicht geprüft werden. Matcha zeigt ihre zuletzt geprüfte Version."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aún no se han podido verificar algunos elementos de la bóveda. Matcha muestra su última versión verificada."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Certains éléments du coffre n'ont pas encore pu être vérifiés. Matcha affiche leur dernière version vérifiée."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Alcuni elementi della cassaforte non sono ancora stati verificati. Matcha mostra la loro ultima versione verificata."
+          }
+        }
+      }
+    },
     "Some synced data is unreadable and was left aside." : {
       "comment" : "Settings > Sync: warning: unreadable records",
       "localizations" : {
@@ -19661,6 +23867,35 @@
         }
       }
     },
+    "SSH Key" : {
+      "comment" : "Vault: category of an item",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "SSH-Schlüssel"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Clave SSH"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Clé SSH"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Chiave SSH"
+          }
+        }
+      }
+    },
     "Star" : {
       "comment" : "Icon choice (SF Symbol)",
       "localizations" : {
@@ -19773,6 +24008,35 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Interrompi"
+          }
+        }
+      }
+    },
+    "Strength: about %lld bits" : {
+      "comment" : "Vault generator: entropy of the password",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Stärke: etwa %lld Bit"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Robustez: unos %lld bits"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Robustesse : environ %lld bits"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Robustezza: circa %lld bit"
           }
         }
       }
@@ -19918,6 +24182,35 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Vai al pannello"
+          }
+        }
+      }
+    },
+    "Symbols" : {
+      "comment" : "Vault generator: use symbols",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sonderzeichen"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Símbolos"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Symboles"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Simboli"
           }
         }
       }
@@ -20386,6 +24679,64 @@
         }
       }
     },
+    "Tags" : {
+      "comment" : "Vault window: sidebar section",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tags"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Etiquetas"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tags"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tag"
+          }
+        }
+      }
+    },
+    "Tags, separated by commas" : {
+      "comment" : "Vault editor",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tags, durch Kommas getrennt"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Etiquetas, separadas por comas"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tags, séparés par des virgules"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tag, separati da virgole"
+          }
+        }
+      }
+    },
     "Terminal" : {
       "comment" : "Icon choice (SF Symbol)",
       "localizations" : {
@@ -20416,7 +24767,7 @@
       }
     },
     "Text" : {
-      "comment" : "Folder customization panel: title of the text color row",
+      "comment" : "Vault: type of a custom field",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -20944,6 +25295,35 @@
         }
       }
     },
+    "The file will hold all your passwords and secrets in clear text. Anyone who gets it can read them." : {
+      "comment" : "Vault export: warning",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Die Datei enthält all deine Passwörter und Geheimnisse im Klartext. Wer sie bekommt, kann sie lesen."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "El archivo contendrá todas tus contraseñas y secretos sin cifrar. Cualquiera que lo obtenga podrá leerlos."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Le fichier contiendra tous vos mots de passe et secrets en clair. Quiconque l'obtient peut les lire."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Il file conterrà tutte le tue password e i tuoi segreti in chiaro. Chiunque lo ottenga potrà leggerli."
+          }
+        }
+      }
+    },
     "The keychain refused access. Unlock it, then try again." : {
       "comment" : "Settings > Sync: error: keychain",
       "localizations" : {
@@ -21027,6 +25407,35 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "L'ultima ora"
+          }
+        }
+      }
+    },
+    "The master password is asked again every 14 days, after a restart and for exports." : {
+      "comment" : "Settings > Vault",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Das Master-Passwort wird alle 14 Tage, nach einem Neustart und für Exporte erneut abgefragt."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "La contraseña maestra se vuelve a pedir cada 14 días, tras reiniciar y para las exportaciones."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Le mot de passe maître est redemandé tous les 14 jours, après un redémarrage et pour les exports."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "La password principale viene richiesta di nuovo ogni 14 giorni, dopo un riavvio e per le esportazioni."
           }
         }
       }
@@ -21379,6 +25788,35 @@
         }
       }
     },
+    "The server's vault was older or incomplete (restored, or tampered with). Matcha completed it from this Mac." : {
+      "comment" : "Vault window: notice of a reconciliation or a repair",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Der Tresor des Servers war älter oder unvollständig (wiederhergestellt oder manipuliert). Matcha hat ihn von diesem Mac aus ergänzt."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "La bóveda del servidor era más antigua o estaba incompleta (restaurada o manipulada). Matcha la ha completado desde este Mac."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Le coffre du serveur était plus ancien ou incomplet (restauré, ou altéré). Matcha l'a complété depuis ce Mac."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "La cassaforte del server era più vecchia o incompleta (ripristinata o manomessa). Matcha l'ha completata da questo Mac."
+          }
+        }
+      }
+    },
     "The source of this page couldn't be loaded." : {
       "comment" : "Page source viewer, after an error",
       "localizations" : {
@@ -21495,6 +25933,325 @@
         }
       }
     },
+    "The vault also locks when the Mac sleeps, when its screen locks, and when Matcha quits." : {
+      "comment" : "Settings > Vault",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Der Tresor sperrt sich auch, wenn der Mac in den Ruhezustand geht, der Bildschirm gesperrt oder Matcha beendet wird."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "La bóveda también se bloquea cuando el Mac entra en reposo, se bloquea la pantalla o se cierra Matcha."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Le coffre se verrouille aussi à la mise en veille du Mac, au verrouillage de l'écran et à la fermeture de Matcha."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "La cassaforte si blocca anche quando il Mac va in stop, si blocca lo schermo o si chiude Matcha."
+          }
+        }
+      }
+    },
+    "The vault couldn't do it" : {
+      "comment" : "Vault window: title of an error",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Der Tresor konnte das nicht tun"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "La bóveda no ha podido hacerlo"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Le coffre n'a pas pu le faire"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "La cassaforte non è riuscita a farlo"
+          }
+        }
+      }
+    },
+    "The Vault Is Empty" : {
+      "comment" : "Vault window: no item at all",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Der Tresor ist leer"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "La bóveda está vacía"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Le coffre est vide"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "La cassaforte è vuota"
+          }
+        }
+      }
+    },
+    "The vault is full: it holds 10,000 items at most." : {
+      "comment" : "Vault: error",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Der Tresor ist voll: Er fasst höchstens 10.000 Objekte."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "La bóveda está llena: admite 10.000 elementos como máximo."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Le coffre est plein : il contient 10 000 éléments au plus."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "La cassaforte è piena: contiene al massimo 10.000 elementi."
+          }
+        }
+      }
+    },
+    "The vault is locked" : {
+      "comment" : "Vault window: title of the lock screen",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Der Tresor ist gesperrt"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "La bóveda está bloqueada"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Le coffre est verrouillé"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "La cassaforte è bloccata"
+          }
+        }
+      }
+    },
+    "The vault is locked." : {
+      "comment" : "Vault: error",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Der Tresor ist gesperrt."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "La bóveda está bloqueada."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Le coffre est verrouillé."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "La cassaforte è bloccata."
+          }
+        }
+      }
+    },
+    "The vault is turned off on this Mac. Turn it on in Settings > Vault." : {
+      "comment" : "Vault window: the vault is turned off",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Der Tresor ist auf diesem Mac ausgeschaltet. Schalte ihn unter Einstellungen > Tresor ein."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "La bóveda está desactivada en este Mac. Actívala en Ajustes > Bóveda."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Le coffre est désactivé sur ce Mac. Activez-le dans Réglages > Coffre-fort."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "La cassaforte è disattivata su questo Mac. Attivala in Impostazioni > Cassaforte."
+          }
+        }
+      }
+    },
+    "The vault is waiting for another of your Macs to be verified." : {
+      "comment" : "Vault window: notice",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Der Tresor wartet auf einen deiner anderen Macs, um geprüft zu werden."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "La bóveda espera a otro de tus Mac para verificarse."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Le coffre attend un autre de vos Mac pour être vérifié."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "La cassaforte attende un altro dei tuoi Mac per essere verificata."
+          }
+        }
+      }
+    },
+    "The vault isn't available on this Mac." : {
+      "comment" : "Vault: error",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Der Tresor ist auf diesem Mac nicht verfügbar."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "La bóveda no está disponible en este Mac."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Le coffre n'est pas disponible sur ce Mac."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "La cassaforte non è disponibile su questo Mac."
+          }
+        }
+      }
+    },
+    "The vault of this account doesn't open: its key on the server was replaced." : {
+      "comment" : "Settings > Sync: error, the envelope of the vault root key in the session doesn't open",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Der Tresor dieses Kontos lässt sich nicht öffnen: Sein Schlüssel wurde auf dem Server ersetzt."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "La bóveda de esta cuenta no se abre: su clave se ha sustituido en el servidor."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Le coffre de ce compte ne s'ouvre pas : sa clé a été remplacée sur le serveur."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "La cassaforte di questo account non si apre: la sua chiave è stata sostituita sul server."
+          }
+        }
+      }
+    },
+    "The vault travels with your sync account. Sign in to sync in Settings > Sync to use it." : {
+      "comment" : "Vault window: signed out",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Der Tresor reist mit deinem Synchronisierungskonto. Melde dich unter Einstellungen > Synchronisierung an, um ihn zu nutzen."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "La bóveda viaja con tu cuenta de sincronización. Inicia sesión en Ajustes > Sincronización para usarla."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Le coffre voyage avec votre compte de synchronisation. Connectez-vous dans Réglages > Synchronisation pour l'utiliser."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "La cassaforte viaggia con il tuo account di sincronizzazione. Accedi in Impostazioni > Sincronizzazione per usarla."
+          }
+        }
+      }
+    },
     "The website says: “%@”" : {
       "comment" : "Login sheet: the name the server gives to its protected area; %@ is that name",
       "localizations" : {
@@ -21549,6 +26306,35 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Tema"
+          }
+        }
+      }
+    },
+    "They will be deleted on all your Macs. This can't be undone." : {
+      "comment" : "Vault: confirmation before emptying the trash",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sie werden auf all deinen Macs gelöscht. Das lässt sich nicht widerrufen."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Se eliminarán en todos tus Mac. No se puede deshacer."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ils seront supprimés sur tous vos Mac. C'est définitif."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Verranno eliminati su tutti i tuoi Mac. L'operazione non è reversibile."
           }
         }
       }
@@ -21636,6 +26422,35 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Questa connessione non è privata"
+          }
+        }
+      }
+    },
+    "This export is encrypted. Export it again without a password, then delete it after the import." : {
+      "comment" : "Vault import: an encrypted Bitwarden export",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dieser Export ist verschlüsselt. Exportiere ihn erneut ohne Passwort und lösche ihn nach dem Import."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Esta exportación está cifrada. Vuelve a exportarla sin contraseña y elimínala después de la importación."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cet export est chiffré. Exportez-le de nouveau sans mot de passe, puis supprimez-le après l'import."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Questa esportazione è cifrata. Esportala di nuovo senza password, poi eliminala dopo l'importazione."
           }
         }
       }
@@ -21811,6 +26626,35 @@
         }
       }
     },
+    "This file can't be read." : {
+      "comment" : "Vault import",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Diese Datei kann nicht gelesen werden."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No se puede leer este archivo."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ce fichier ne peut pas être lu."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Questo file non può essere letto."
+          }
+        }
+      }
+    },
     "This file is not an extension. Choose a .crx, .xpi or .zip file, or an unpacked folder." : {
       "localizations" : {
         "de" : {
@@ -21835,6 +26679,35 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Questo file non è un'estensione. Scegli un file .crx, .xpi o .zip, oppure una cartella decompressa."
+          }
+        }
+      }
+    },
+    "This file is too large to import." : {
+      "comment" : "Vault import",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Diese Datei ist zu groß für den Import."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Este archivo es demasiado grande para importarlo."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ce fichier est trop gros pour être importé."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Questo file è troppo grande da importare."
           }
         }
       }
@@ -21897,6 +26770,93 @@
         }
       }
     },
+    "This isn't a private key Matcha can read." : {
+      "comment" : "Vault editor: SSH key",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Das ist kein privater Schlüssel, den Matcha lesen kann."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No es una clave privada que Matcha pueda leer."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ce n'est pas une clé privée que Matcha sait lire."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Non è una chiave privata che Matcha sa leggere."
+          }
+        }
+      }
+    },
+    "This item comes from a newer version of Matcha. Update Matcha to change it." : {
+      "comment" : "Vault: a read-only item",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dieses Objekt stammt aus einer neueren Matcha-Version. Aktualisiere Matcha, um es zu ändern."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Este elemento procede de una versión más reciente de Matcha. Actualiza Matcha para modificarlo."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cet élément vient d'une version plus récente de Matcha. Mettez Matcha à jour pour le modifier."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Questo elemento proviene da una versione più recente di Matcha. Aggiorna Matcha per modificarlo."
+          }
+        }
+      }
+    },
+    "This item is too large for the vault. Shorten its notes or its history." : {
+      "comment" : "Vault: error",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dieses Objekt ist zu groß für den Tresor. Kürze seine Notizen oder seinen Verlauf."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Este elemento es demasiado grande para la bóveda. Acorta sus notas o su historial."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cet élément est trop gros pour le coffre. Raccourcissez ses notes ou son historique."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Questo elemento è troppo grande per la cassaforte. Accorcia le note o la cronologia."
+          }
+        }
+      }
+    },
     "This Mac" : {
       "comment" : "Settings > Sync: devices: the current device",
       "localizations" : {
@@ -21951,6 +26911,35 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Questo Mac e i dati sincronizzati hanno ciascuno i propri Space e pannelli. Unire conserva entrambi; sostituire ne conserva solo uno."
+          }
+        }
+      }
+    },
+    "This Mac has no Touch ID, or no fingerprint." : {
+      "comment" : "Settings > Vault",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dieser Mac hat kein Touch ID oder keinen Fingerabdruck."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Este Mac no tiene Touch ID o ninguna huella."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ce Mac n'a pas Touch ID, ou aucune empreinte."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Questo Mac non ha Touch ID o nessuna impronta."
           }
         }
       }
@@ -22216,6 +27205,35 @@
         }
       }
     },
+    "This one-time code isn't valid. Paste its secret or its otpauth:// address." : {
+      "comment" : "Vault: error",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dieser Einmalcode ist ungültig. Füge sein Geheimnis oder seine otpauth://-Adresse ein."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Este código de un solo uso no es válido. Pega su secreto o su dirección otpauth://."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ce code à usage unique n'est pas valide. Collez son secret ou son adresse otpauth://."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Questo codice monouso non è valido. Incolla il suo segreto o il suo indirizzo otpauth://."
+          }
+        }
+      }
+    },
     "This page" : {
       "comment" : "Permission banner: the page asking, when it has no website name (local file)",
       "localizations" : {
@@ -22448,6 +27466,35 @@
         }
       }
     },
+    "This page isn't secure: what you fill can be read on the network." : {
+      "comment" : "Vault filling: an http page",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Diese Seite ist nicht sicher: Was du ausfüllst, kann im Netzwerk mitgelesen werden."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Esta página no es segura: lo que rellenes se puede leer en la red."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cette page n'est pas sécurisée : ce que vous remplissez peut être lu sur le réseau."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Questa pagina non è sicura: ciò che compili può essere letto sulla rete."
+          }
+        }
+      }
+    },
     "This Page Only" : {
       "comment" : "Notes panel menu: the note is linked to the page shown only",
       "localizations" : {
@@ -22564,6 +27611,35 @@
         }
       }
     },
+    "This RSA key is too short: 2,048 bits at least." : {
+      "comment" : "Vault editor: SSH key",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dieser RSA-Schlüssel ist zu kurz: mindestens 2.048 Bit."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Esta clave RSA es demasiado corta: 2.048 bits como mínimo."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cette clé RSA est trop courte : 2 048 bits au moins."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Questa chiave RSA è troppo corta: almeno 2.048 bit."
+          }
+        }
+      }
+    },
     "This server doesn't accept new accounts." : {
       "comment" : "Settings > Sync: error registration_closed",
       "localizations" : {
@@ -22618,6 +27694,35 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Questa scorciatoia apre una minifinestra da qualsiasi app."
+          }
+        }
+      }
+    },
+    "This sync account was created before the vault. Create a new account to use it." : {
+      "comment" : "Vault window: an account without a vault",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dieses Synchronisierungskonto wurde vor dem Tresor angelegt. Lege ein neues Konto an, um ihn zu nutzen."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Esta cuenta de sincronización se creó antes que la bóveda. Crea una cuenta nueva para usarla."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ce compte de synchronisation a été créé avant le coffre. Créez un nouveau compte pour l'utiliser."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Questo account di sincronizzazione è stato creato prima della cassaforte. Crea un nuovo account per usarla."
           }
         }
       }
@@ -22825,7 +27930,7 @@
       }
     },
     "Title" : {
-      "comment" : "Notes panel: label of the note's title field",
+      "comment" : "Notes panel: label of the note's title field\nVault editor: title of the item\nVault: field of an identity (Mr, Ms…)",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -22969,6 +28074,35 @@
         }
       }
     },
+    "Too many attempts. Try again at %@." : {
+      "comment" : "Vault: too many wrong passwords",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zu viele Versuche. Versuche es um %@ erneut."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Demasiados intentos. Vuelve a intentarlo a las %@."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Trop de tentatives. Réessayez à %@."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Troppi tentativi. Riprova alle %@."
+          }
+        }
+      }
+    },
     "Too many attempts. Try again in a moment." : {
       "comment" : "Settings > Sync: error rate_limited",
       "localizations" : {
@@ -23023,6 +28157,35 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Strumenti"
+          }
+        }
+      }
+    },
+    "Touch ID no longer opens the vault on this Mac. Type your master password." : {
+      "comment" : "Vault: Touch ID invalidated",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Touch ID öffnet den Tresor auf diesem Mac nicht mehr. Gib dein Master-Passwort ein."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Touch ID ya no abre la bóveda en este Mac. Escribe tu contraseña maestra."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Touch ID n'ouvre plus le coffre sur ce Mac. Tapez votre mot de passe maître."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Touch ID non apre più la cassaforte su questo Mac. Digita la password principale."
           }
         }
       }
@@ -23317,6 +28480,35 @@
         }
       }
     },
+    "Trash" : {
+      "comment" : "Vault window: sidebar",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Papierkorb"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Papelera"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Corbeille"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cestino"
+          }
+        }
+      }
+    },
     "Tray" : {
       "comment" : "Icon choice (SF Symbol): an inbox tray",
       "localizations" : {
@@ -23549,6 +28741,35 @@
         }
       }
     },
+    "Type" : {
+      "comment" : "Vault: field of a card (Visa, Mastercard…)",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Typ"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tipo"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Type"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tipo"
+          }
+        }
+      }
+    },
     "Type or paste one emoji" : {
       "comment" : "Help tag of the emoji field (folder customization panel, Space editor)",
       "localizations" : {
@@ -23607,6 +28828,35 @@
         }
       }
     },
+    "Type your master password to open it." : {
+      "comment" : "Vault window: under the title of the lock screen",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gib dein Master-Passwort ein, um ihn zu öffnen."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Escribe tu contraseña maestra para abrirla."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tapez votre mot de passe maître pour l'ouvrir."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Digita la password principale per aprirla."
+          }
+        }
+      }
+    },
     "Unavailable" : {
       "comment" : "An extension from another Mac whose package can't be downloaded",
       "localizations" : {
@@ -23632,6 +28882,64 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Non disponibile"
+          }
+        }
+      }
+    },
+    "Unknown Item" : {
+      "comment" : "Vault: an item of a newer version of Matcha",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Unbekanntes Objekt"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Elemento desconocido"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Élément inconnu"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Elemento sconosciuto"
+          }
+        }
+      }
+    },
+    "Unlock" : {
+      "comment" : "Vault window: button of the lock screen",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Entsperren"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Desbloquear"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Déverrouiller"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sblocca"
           }
         }
       }
@@ -23695,7 +29003,7 @@
       }
     },
     "Untitled" : {
-      "comment" : "Placeholder of a note's empty title",
+      "comment" : "Placeholder of a note's empty title\nVault: an item without title",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -23748,6 +29056,35 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Space senza nome"
+          }
+        }
+      }
+    },
+    "Update" : {
+      "comment" : "Vault save bar: change the saved password",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aktualisieren"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Actualizar"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mettre à jour"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aggiorna"
           }
         }
       }
@@ -23808,6 +29145,35 @@
         }
       }
     },
+    "Update the password saved for %@?" : {
+      "comment" : "Vault save bar",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gesichertes Passwort für %@ aktualisieren?"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "¿Actualizar la contraseña guardada para %@?"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mettre à jour le mot de passe enregistré pour %@ ?"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aggiornare la password salvata per %@?"
+          }
+        }
+      }
+    },
     "Update…" : {
       "comment" : "Settings > Extensions: installs the new version of an extension, received from another Mac, after the permissions screen",
       "localizations" : {
@@ -23862,6 +29228,35 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "URL copiato"
+          }
+        }
+      }
+    },
+    "Use" : {
+      "comment" : "Vault generator: put the password in the field",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Verwenden"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Usar"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Utiliser"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Usa"
           }
         }
       }
@@ -23953,8 +29348,66 @@
         }
       }
     },
+    "Use the vault on this Mac" : {
+      "comment" : "Settings > Vault: turns the vault on or off",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tresor auf diesem Mac verwenden"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Usar la bóveda en este Mac"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Utiliser le coffre sur ce Mac"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Usa la cassaforte su questo Mac"
+          }
+        }
+      }
+    },
+    "Use Touch ID" : {
+      "comment" : "Vault window: button of the lock screen",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Touch ID verwenden"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Usar Touch ID"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Utiliser Touch ID"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Usa Touch ID"
+          }
+        }
+      }
+    },
     "User Name" : {
-      "comment" : "Field of the sheet where a website asks for a user name and password",
+      "comment" : "Field of the sheet where a website asks for a user name and password\nVault: field of a login",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -23978,6 +29431,151 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Nome utente"
+          }
+        }
+      }
+    },
+    "Valid From" : {
+      "comment" : "Vault: field of a card",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gültig ab"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Válida desde"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Valable dès"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Valida dal"
+          }
+        }
+      }
+    },
+    "Vault" : {
+      "comment" : "Title of the vault's window",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tresor"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bóveda"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Coffre-fort"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cassaforte"
+          }
+        }
+      }
+    },
+    "Vault Settings…" : {
+      "comment" : "Vault button: context menu, opens Settings > Vault",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tresor-Einstellungen …"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ajustes de la bóveda…"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Réglages du coffre…"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Impostazioni della cassaforte…"
+          }
+        }
+      }
+    },
+    "Vault: locked" : {
+      "comment" : "Vault button: tooltip while the vault is locked",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tresor: gesperrt"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bóveda: bloqueada"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Coffre : verrouillé"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cassaforte: bloccata"
+          }
+        }
+      }
+    },
+    "Vault: open" : {
+      "comment" : "Vault button: tooltip while the vault is open",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tresor: geöffnet"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bóveda: abierta"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Coffre : ouvert"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cassaforte: aperta"
           }
         }
       }
@@ -24156,6 +29754,35 @@
         }
       }
     },
+    "Waiting for verification" : {
+      "comment" : "Vault window: an item whose cited version hasn't arrived",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wartet auf Prüfung"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pendiente de verificación"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "En attente de vérification"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "In attesa di verifica"
+          }
+        }
+      }
+    },
     "Waiting…" : {
       "comment" : "Settings > Sync: no sync done yet",
       "localizations" : {
@@ -24181,6 +29808,35 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "In attesa…"
+          }
+        }
+      }
+    },
+    "Weak" : {
+      "comment" : "Vault password check: a weak password",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Schwach"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Débil"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Faible"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Debole"
           }
         }
       }
@@ -24297,6 +29953,35 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Autorizzazioni dei siti web"
+          }
+        }
+      }
+    },
+    "Websites" : {
+      "comment" : "Vault: addresses of a login",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Websites"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sitios web"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sites web"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Siti web"
           }
         }
       }
@@ -24469,6 +30154,64 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Quando la barra laterale è nascosta"
+          }
+        }
+      }
+    },
+    "Wrong passphrase." : {
+      "comment" : "Vault editor: SSH key",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Falsche Passphrase."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Frase de contraseña incorrecta."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Phrase de passe incorrecte."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Passphrase errata."
+          }
+        }
+      }
+    },
+    "Wrong password." : {
+      "comment" : "Vault: the master password typed doesn't open it",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Falsches Passwort."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Contraseña incorrecta."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mot de passe incorrect."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Password errata."
           }
         }
       }
@@ -24672,6 +30415,35 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "I tuoi dati non vengono cifrati di nuovo. Gli altri Mac vengono disconnessi e chiedono la nuova password."
+          }
+        }
+      }
+    },
+    "Your fingerprint opens the vault on this Mac. The master password is asked again every 14 days and after a restart." : {
+      "comment" : "Vault: offer of Touch ID",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dein Fingerabdruck öffnet den Tresor auf diesem Mac. Das Master-Passwort wird alle 14 Tage und nach einem Neustart erneut abgefragt."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tu huella abre la bóveda en este Mac. La contraseña maestra se vuelve a pedir cada 14 días y tras reiniciar."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Votre empreinte ouvre le coffre sur ce Mac. Le mot de passe maître est redemandé tous les 14 jours et après un redémarrage."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "La tua impronta apre la cassaforte su questo Mac. La password principale viene richiesta di nuovo ogni 14 giorni e dopo un riavvio."
           }
         }
       }
@@ -24904,6 +30676,35 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "I tuoi Space, cartelle, preferiti, pannelli fissati e di oggi, note, estensioni e impostazioni, su tutti i tuoi Mac. Tutto è cifrato su questo Mac con la tua password principale: il server non può leggerlo."
+          }
+        }
+      }
+    },
+    "Your sync server doesn't keep vaults. Update it to use the vault." : {
+      "comment" : "Vault window: a server without vault",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dein Synchronisierungsserver bewahrt keine Tresore auf. Aktualisiere ihn, um den Tresor zu nutzen."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tu servidor de sincronización no guarda bóvedas. Actualízalo para usar la bóveda."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Votre serveur de synchronisation ne garde pas de coffre. Mettez-le à jour pour utiliser le coffre."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Il tuo server di sincronizzazione non conserva casseforti. Aggiornalo per usare la cassaforte."
           }
         }
       }

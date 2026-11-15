@@ -57,10 +57,18 @@ extension SyncService {
             kdf: creation.kdf,
             authKey: creation.authKey,
             wrappedAccountKey: creation.wrappedAccountKey,
-            recovery: SyncKeyEnvelope(authKey: creation.recoveryAuthKey, wrappedAccountKey: creation.recoveryWrappedAccountKey),
+            wrappedVaultRootKey: creation.wrappedVaultRootKey,
+            recovery: SyncKeyEnvelope(
+                authKey: creation.recoveryAuthKey,
+                wrappedAccountKey: creation.recoveryWrappedAccountKey,
+                wrappedVaultRootKey: creation.recoveryWrappedVaultRootKey,
+            ),
             device: SyncDeviceDescription(id: device.id, name: Self.deviceName),
         ))
         try keep(response, keys: (creation.accountKey, creation.secretKey), endpoint: endpoint, email: email, deviceID: device.id)
+        // Drawn here: nothing to check.
+        try storeVaultEnvelope(creation.wrappedVaultRootKey, kdf: creation.kdf, server: server, accountID: response.accountId)
+        let vaultRootKey = creation.vaultRootKey
         let kit = SyncRecoveryKit(
             server: server,
             email: email,
@@ -68,6 +76,7 @@ extension SyncService {
             recoveryKey: creation.recoveryKey.displayed,
         )
         awaitSaving(kit)
+        vaultRootKeyArrived(vaultRootKey)
         return kit
     }
 
@@ -108,7 +117,15 @@ extension SyncService {
         ))
         let accountKey = try Self.unwrap(response.wrappedAccountKey, with: keys.wrapKey)
         try keep(response, keys: (accountKey, secretKey), endpoint: endpoint, email: email, deviceID: device.id)
+        let vaultRootKey = try keepVaultEnvelope(
+            response.wrappedVaultRootKey,
+            kdf: kdf,
+            wrapKey: keys.wrapKey,
+            server: endpoint.address,
+            accountID: response.accountId,
+        )
         try startSignedIn()
+        vaultRootKeyArrived(vaultRootKey)
     }
 
     /// Signs out: this Mac's tokens are revoked on the server (when it answers), sync stops, the browsing data stays,
@@ -145,6 +162,7 @@ extension SyncService {
         let recovery = SyncAccountKeys.recoveryKeys(recoveryKey)
         let started = try await client.recoverStart(SyncRecoverStartRequest(email: email, recoveryAuthKey: Self.bytes(recovery.authKey)))
         let accountKey = try Self.unwrap(started.recoveryWrappedAccountKey, with: recovery.wrapKey)
+        let vaultRootKey = try started.recoveryWrappedVaultRootKey.map { try Self.unwrapVault($0, with: recovery.wrapKey) }
         let kdf = SyncKDF.random(iterations: endpoint.info.iterations)
         let secretKey = SyncSecretKey.random()
         let keys = try await Self.derive { try SyncAccountKeys.passwordKeys(password: newPassword, secretKey: secretKey, kdf: kdf) }
@@ -155,11 +173,20 @@ extension SyncService {
             kdf: kdf,
             authKey: Self.bytes(keys.authKey),
             wrappedAccountKey: SyncAccountKeys.wrap(accountKey, with: keys.wrapKey),
-            recovery: replacement.map { try Self.envelope(of: accountKey, for: $0) },
+            wrappedVaultRootKey: vaultRootKey.map { try VaultCrypto.wrapRootKey($0, with: keys.wrapKey) },
+            recovery: replacement.map { try Self.envelope(of: (accountKey, vaultRootKey), for: $0) },
             device: SyncDeviceDescription(id: device.id, name: Self.deviceName),
         ))
         try keep(response, keys: (accountKey, secretKey), endpoint: endpoint, email: email, deviceID: device.id)
+        _ = try keepVaultEnvelope(
+            response.wrappedVaultRootKey,
+            kdf: kdf,
+            wrapKey: keys.wrapKey,
+            server: server,
+            accountID: response.accountId,
+        )
         try startSignedIn()
+        vaultRootKeyArrived(vaultRootKey)
         let kit = SyncRecoveryKit(
             server: server,
             email: email,
@@ -177,15 +204,22 @@ extension SyncService {
     func changePassword(current: String, new: String) async throws {
         let (client, accountKey) = try signedInAccount()
         let secretKey = try storedSecretKey()
-        let authKey = try await currentAuthKey(password: current, client: client)
+        let currentKeys = try await currentKeys(password: current, client: client)
+        // Wrapped again with the account key, or nothing changes (`VAULT.md` § 2.2).
+        let vaultRootKey = try storedVaultRootKey(wrapKey: currentKeys.wrapKey)
         let kdf = SyncKDF.random(iterations: configuration.serverInfo?.iterations ?? SyncKDF.minimumIterations)
         let keys = try await Self.derive { try SyncAccountKeys.passwordKeys(password: new, secretKey: secretKey, kdf: kdf) }
+        let wrappedVaultRootKey = try vaultRootKey.map { try VaultCrypto.wrapRootKey($0, with: keys.wrapKey) }
         try await client.changePassword(SyncChangePasswordRequest(
-            authKey: authKey,
+            authKey: Self.bytes(currentKeys.authKey),
             kdf: kdf,
             newAuthKey: Self.bytes(keys.authKey),
             wrappedAccountKey: SyncAccountKeys.wrap(accountKey, with: keys.wrapKey),
+            wrappedVaultRootKey: wrappedVaultRootKey,
         ))
+        if let server = configuration.server, let accountID = configuration.accountID {
+            _ = try keepVaultEnvelope(wrappedVaultRootKey, kdf: kdf, wrapKey: keys.wrapKey, server: server, accountID: accountID)
+        }
     }
 
     /// Replaces the recovery key; returns the new kit to save, with the same Secret Key (`SYNC.md` § 3.3): the way to
@@ -193,11 +227,12 @@ extension SyncService {
     func replaceRecoveryKey(password: String) async throws -> SyncRecoveryKit {
         let (client, accountKey) = try signedInAccount()
         let secretKey = try storedSecretKey()
-        let authKey = try await currentAuthKey(password: password, client: client)
+        let currentKeys = try await currentKeys(password: password, client: client)
+        let vaultRootKey = try storedVaultRootKey(wrapKey: currentKeys.wrapKey)
         let recoveryKey = SyncRecoveryKey.random()
         try await client.changeRecovery(SyncChangeRecoveryRequest(
-            authKey: authKey,
-            recovery: Self.envelope(of: accountKey, for: recoveryKey),
+            authKey: Self.bytes(currentKeys.authKey),
+            recovery: Self.envelope(of: (accountKey, vaultRootKey), for: recoveryKey),
         ))
         guard let server = configuration.server, let email = configuration.email else {
             throw SyncClientError.signedOut
@@ -299,41 +334,6 @@ extension SyncService {
             throw SyncClientError.signedOut
         }
         return (client, SymmetricKey(data: accountKey))
-    }
-
-    /// `authKey` of the current password and of the kept Secret Key, which the sensitive operations require
-    /// (`SYNC.md` § 4.1).
-    private func currentAuthKey(password: String, client: SyncAPIClient) async throws -> Data {
-        guard let email = configuration.email else {
-            throw SyncClientError.signedOut
-        }
-        let secretKey = try storedSecretKey()
-        let kdf = try await client.prelogin(email: email)
-        let keys = try await Self.derive { try SyncAccountKeys.passwordKeys(password: password, secretKey: secretKey, kdf: kdf) }
-        return Self.bytes(keys.authKey)
-    }
-
-    /// PBKDF2 (hundreds of thousands of iterations) off the main thread.
-    @concurrent
-    nonisolated static func derive<Result: Sendable>(_ work: @Sendable () throws -> Result) async throws -> Result {
-        try work()
-    }
-
-    nonisolated static func unwrap(_ wrapped: Data, with key: SymmetricKey) throws -> SymmetricKey {
-        do {
-            return try SyncAccountKeys.unwrap(wrapped, with: key)
-        } catch {
-            throw SyncClientError.accountKeyUnreadable
-        }
-    }
-
-    nonisolated static func envelope(of accountKey: SymmetricKey, for recoveryKey: SyncRecoveryKey) throws -> SyncKeyEnvelope {
-        let keys = SyncAccountKeys.recoveryKeys(recoveryKey)
-        return try SyncKeyEnvelope(authKey: bytes(keys.authKey), wrappedAccountKey: SyncAccountKeys.wrap(accountKey, with: keys.wrapKey))
-    }
-
-    nonisolated static func bytes(_ key: SymmetricKey) -> Data {
-        key.withUnsafeBytes { Data($0) }
     }
 }
 

@@ -19,8 +19,14 @@ nonisolated struct SyncKeychain: Sendable {
         case secretKey
         case accessToken
         case refreshToken
+        /// Copy of the envelope of the vault root key, with the `kdf` of the account: the vault opens offline
+        /// (`VAULT.md` § 7.1). Not a secret: it opens only with the password and the Secret Key.
+        case vaultEnvelope
+        /// The vault root key wrapped by a key of this Mac's Secure Enclave, for Touch ID (`VAULT.md` § 7.2).
+        case vaultTouchID
 
-        /// What an expired session takes away: everything but the Secret Key.
+        /// What an expired session takes away: everything but the Secret Key and the vault's envelopes (the vault of
+        /// this Mac stays, `VAULT.md` § 5.5).
         static let session: [Item] = [.accountKey, .accessToken, .refreshToken]
     }
 

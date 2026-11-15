@@ -55,6 +55,7 @@ enum SyncErrorText {
         case .signedOut: String(localized: "Sign in again to keep syncing.")
         case .accountKeyUnreadable: String(localized: "The account's key couldn't be opened. Check the password or the recovery key.")
         case .keychain: String(localized: "The keychain refused access. Unlock it, then try again.")
+        case .vaultEnvelopeUnreadable: String(localized: "The vault of this account doesn't open: its key on the server was replaced.")
         }
     }
 

@@ -64,6 +64,8 @@ final class BrowserTab: Identifiable {
     let localFiles = PageLocalFiles()
     /// Translation of the page (task 9.2).
     let translation = PageTranslation()
+    /// Login forms of the page, for the vault's filling (`VAULT.md` § 8).
+    let vaultForms = VaultPageForms()
     /// The displayed document came over a certificate the user accepted for its website (“Not Secure”, audit K5); read
     /// from the document's own connection, whichever tab accepted it (`NavigationCoordinator+Authentication`, WB5).
     var usesAcceptedCertificate = false

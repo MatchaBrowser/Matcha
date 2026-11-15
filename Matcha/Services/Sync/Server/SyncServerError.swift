@@ -65,6 +65,9 @@ nonisolated enum SyncClientError: Error, Equatable, Sendable {
     case accountKeyUnreadable
     /// The keychain refused (locked, access denied): an error, not an absence.
     case keychain(OSStatus)
+    /// The envelope of the vault root key doesn't open: replaced on the server, or another password
+    /// (`VAULT.md` § 7.1).
+    case vaultEnvelopeUnreadable
 }
 
 /// Problem object of an error answer.

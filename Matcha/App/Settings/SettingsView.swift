@@ -2,40 +2,46 @@ import SwiftUI
 
 /// Settings window (⌘,). The tab shown follows `SettingsSelection` (“Manage Extensions…” opens Extensions).
 struct SettingsView: View {
+    /// Wide enough for the names of all the tabs in the toolbar, in each language (`SettingsToolbarTests`): the
+    /// longest, German, needs 710 points on macOS 26.
+    static let width: CGFloat = 720
+
     /// The app's (`AppEnvironment`).
     @Bindable var selection: SettingsSelection
     let extensions: ExtensionManager
     let extensionSync: ExtensionSyncAdapter
     let menuShortcuts: MenuShortcutStore
     let shortcutRecorder: ShortcutRecorder
+    let vault: VaultService
 
     var body: some View {
         TabView(selection: $selection.tab) {
             GeneralSettingsView()
-                .tabItem { Label("General", systemImage: "gearshape") }
-                .tag(SettingsSelection.Tab.general)
+                .settingsTab(.general)
             ShortcutsSettingsView(store: menuShortcuts, recorder: shortcutRecorder)
-                .tabItem { Label("Shortcuts", systemImage: "keyboard") }
-                .tag(SettingsSelection.Tab.shortcuts)
+                .settingsTab(.shortcuts)
             AppearanceSettingsView()
-                .tabItem { Label("Appearance", systemImage: "paintbrush") }
-                .tag(SettingsSelection.Tab.appearance)
+                .settingsTab(.appearance)
             ProfilesSettingsView()
-                .tabItem { Label("Profiles", systemImage: "person.2") }
-                .tag(SettingsSelection.Tab.profiles)
+                .settingsTab(.profiles)
             PrivacySettingsView()
-                .tabItem { Label("Privacy", systemImage: "hand.raised") }
-                .tag(SettingsSelection.Tab.privacy)
+                .settingsTab(.privacy)
             ExtensionsSettingsView(manager: extensions, syncAdapter: extensionSync)
-                .tabItem { Label("Extensions", systemImage: "puzzlepiece.extension") }
-                .tag(SettingsSelection.Tab.extensions)
+                .settingsTab(.extensions)
             SyncSettingsView()
-                .tabItem { Label("Sync", systemImage: "arrow.triangle.2.circlepath") }
-                .tag(SettingsSelection.Tab.sync)
+                .settingsTab(.sync)
+            VaultSettingsView(vault: vault)
+                .settingsTab(.vault)
             AdvancedSettingsView()
-                .tabItem { Label("Advanced", systemImage: "gearshape.2") }
-                .tag(SettingsSelection.Tab.advanced)
+                .settingsTab(.advanced)
         }
-        .frame(width: 520)
+        .frame(width: Self.width)
+    }
+}
+
+private extension View {
+    func settingsTab(_ tab: SettingsSelection.Tab) -> some View {
+        tabItem { Label { Text(tab.title) } icon: { Image(systemName: tab.symbol) } }
+            .tag(tab)
     }
 }

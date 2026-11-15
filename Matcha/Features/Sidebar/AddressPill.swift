@@ -30,6 +30,7 @@ struct AddressPill: View {
             if let tab {
                 PageSecurityIndicator(page: tab)
                     .font(.subheadline)
+                VaultFillButton(tab: tab)
             }
         }
         .padding(.trailing, 8)

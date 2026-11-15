@@ -68,6 +68,7 @@ struct PageCard: View {
                 FindBar(page: tab, activate: activate)
                 PermissionBanner(prompts: tab.permissionPrompts)
                 LocalFilesBanner(page: tab)
+                VaultSaveBar(forms: tab.vaultForms)
             }
             page
                 // Area that the peek (Shift-click) dims, below the address bar (task 4.4).
@@ -132,6 +133,12 @@ struct PageCard: View {
             .overlay {
                 if let error = tab.loadFailure.error {
                     PageLoadErrorView(page: tab, error: error, activate: activate)
+                }
+            }
+            // The vault's list under the login field just reached (`VAULT.md` § 8.1).
+            .overlay {
+                if tab.vaultForms.focusedField != nil {
+                    VaultFieldSuggestions(tab: tab)
                 }
             }
         } else {

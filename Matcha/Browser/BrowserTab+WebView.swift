@@ -9,6 +9,8 @@ extension BrowserTab {
         webView.navigationDelegate = delegate
         webView.uiDelegate = delegate
         webView.notifications = delegate
+        webView.vaultForms = vaultForms
+        vaultForms.isPrivate = !configuration.websiteDataStore.isPersistent
         webView.pageZoom = pageZoom
         webView.audio = audio
         return webView

@@ -21,6 +21,13 @@ final class SyncService {
     var pendingRecoveryKit: SyncRecoveryKit?
     /// Error of the last cycle, if it failed.
     var lastError: (any Error)?
+    /// The session brought an envelope of the vault root key that doesn't open (`VAULT.md` § 7.1).
+    var isVaultEnvelopeUnreadable = false
+    /// Takes the vault root key whenever an account flow has it (creation, sign-in, recovery): the vault opens
+    /// without asking for the password again.
+    @ObservationIgnored var onVaultRootKey: (@MainActor (SymmetricKey) -> Void)?
+    /// The vault, started and stopped with the account (`VAULT.md` § 5).
+    @ObservationIgnored weak var vault: (any SyncVaultParticipant)?
     /// This Mac's time minus the server's, in seconds (warning beyond 10 minutes).
     private(set) var clockOffset: TimeInterval?
     /// Image of the account's avatar (JPEG or PNG), decrypted and kept in cache; nil without one.
@@ -186,6 +193,7 @@ final class SyncService {
             Task { await self?.cycleDidFinish(error) }
         }
         self.coordinator = coordinator
+        activateVault(of: (server, accountID), client: client, accountKey: accountKey, deviceID: deviceID)
         refreshOtherMacs()
         coordinator.start(observing: session.container.mainContext, defaults: defaults, watchedKeys: watchedKeys)
         startEventStream(client: client, info: info)
@@ -204,6 +212,7 @@ final class SyncService {
         coordinator?.stop()
         coordinator = nil
         store = nil
+        vault?.syncDidDeactivate(forgetting: false)
         refreshOtherMacs()
         eventStream?.stop()
         eventStream = nil
@@ -245,6 +254,9 @@ final class SyncService {
     private func cycleDidFinish(_ error: (any Error)?) async {
         lastError = error
         refreshOtherMacs()
+        if error == nil, let engine = coordinator?.engine {
+            await vault?.syncCycleDidFinish(state: engine.state)
+        }
         if let error = error as? SyncServerError {
             if error.endsSession {
                 sessionEnded(error)
@@ -285,6 +297,10 @@ final class SyncService {
     /// Stops sync on this Mac; its browsing data stays.
     func signOutLocally(reason: SyncConfiguration.SignedOutReason?, deletesState: Bool) {
         deactivate()
+        // Only the user's sign-out or deletion from this Mac forgets the vault (`VAULT.md` § 5.5).
+        if reason == nil, deletesState {
+            vault?.syncDidDeactivate(forgetting: true)
+        }
         if deletesState, let server = configuration.server, let accountID = configuration.accountID {
             SyncStateFile(url: stateURL(server: server, accountID: accountID)).delete()
             extensions?.synced.forget()

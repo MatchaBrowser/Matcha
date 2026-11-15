@@ -5,6 +5,11 @@ import WebKit
 typealias PlatformWindow = NSWindow
 
 extension WKWebView {
+    /// Gives the keyboard back to the page, after a native list over it (`VaultFieldSuggestions`).
+    func focusPage() {
+        window?.makeFirstResponder(self)
+    }
+
     /// `takeSnapshot`, whose image is an `NSImage` on the Mac (a `UIImage` on iOS): `completion` gets its bitmap, or
     /// nil.
     func takeSnapshotImage(with configuration: WKSnapshotConfiguration, completion: @escaping @MainActor (CGImage?) -> Void) {

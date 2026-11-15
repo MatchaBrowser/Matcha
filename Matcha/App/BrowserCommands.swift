@@ -193,9 +193,6 @@ struct BrowserCommands: Commands {
                 .disabled(frontTab?.hasURL != true)
         }
 
-        // File > Import From (task 7.1).
-        ImportCommands()
-
         // File > Export as PDF…, Print…; View > zoom (task 5.4), after “Reload Page”.
         PageCommands(miniWindows: miniWindows, shortcuts: shortcuts)
 

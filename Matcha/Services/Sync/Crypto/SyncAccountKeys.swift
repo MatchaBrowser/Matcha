@@ -104,15 +104,19 @@ nonisolated enum SyncAccountKeys {
         return SymmetricKey(data: bytes)
     }
 
-    /// Data for creating an account (`SYNC.md` § 3.3): salt, Secret Key, account key and recovery key drawn at random.
+    /// Data for creating an account (`SYNC.md` § 3.3): salt, Secret Key, account key, vault root key and recovery key
+    /// drawn at random.
     struct Creation {
         let kdf: SyncKDF
         let authKey: Data
         let wrappedAccountKey: Data
+        let wrappedVaultRootKey: Data
         let recoveryAuthKey: Data
         let recoveryWrappedAccountKey: Data
+        let recoveryWrappedVaultRootKey: Data
         let secretKey: SyncSecretKey
         let accountKey: SymmetricKey
+        let vaultRootKey: SymmetricKey
         let recoveryKey: SyncRecoveryKey
     }
 
@@ -121,16 +125,21 @@ nonisolated enum SyncAccountKeys {
         let secretKey = SyncSecretKey.random()
         let keys = try passwordKeys(password: password, secretKey: secretKey, kdf: kdf)
         let accountKey = SymmetricKey(size: .bits256)
+        // The only moment the client has both `wrapKey` and the recovery key (`VAULT.md` § 2.2).
+        let vaultRootKey = SymmetricKey(size: .bits256)
         let recoveryKey = SyncRecoveryKey.random()
         let recovery = recoveryKeys(recoveryKey)
         return try Creation(
             kdf: kdf,
             authKey: keys.authKey.withUnsafeBytes { Data($0) },
             wrappedAccountKey: wrap(accountKey, with: keys.wrapKey),
+            wrappedVaultRootKey: VaultCrypto.wrapRootKey(vaultRootKey, with: keys.wrapKey),
             recoveryAuthKey: recovery.authKey.withUnsafeBytes { Data($0) },
             recoveryWrappedAccountKey: wrap(accountKey, with: recovery.wrapKey),
+            recoveryWrappedVaultRootKey: VaultCrypto.wrapRootKey(vaultRootKey, with: recovery.wrapKey),
             secretKey: secretKey,
             accountKey: accountKey,
+            vaultRootKey: vaultRootKey,
             recoveryKey: recoveryKey,
         )
     }

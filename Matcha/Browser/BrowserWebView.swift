@@ -23,6 +23,8 @@ final class BrowserWebView: WKWebView {
     weak var noteQuotes: (any NoteQuoteReceiving)?
     /// Recipient of the messages of the notification script: the tab's navigation delegate (review CO1).
     weak var notifications: (any PageNotificationReceiving)?
+    /// Recipient of the messages of the vault's script: the tab's forms (`VAULT.md` § 8).
+    weak var vaultForms: (any VaultFormReceiving)?
 
     /// Inspectable according to the developer tools setting, followed as long as the view exists.
     override init(frame: CGRect, configuration: WKWebViewConfiguration) {
